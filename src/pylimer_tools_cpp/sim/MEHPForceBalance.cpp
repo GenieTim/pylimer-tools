@@ -5395,6 +5395,42 @@ namespace sim {
     }
 
     /**
+     * @brief Get the indices of active Nodes
+     *
+     * @param tolerance the tolerance: springs under a certain length are
+     * considered inactive
+     * @return std::vector<long int> the atom ids
+     */
+    std::vector<long int> MEHPForceBalance::getIndicesOfActiveNodes(
+      const ForceBalanceNetwork* net,
+      const Eigen::VectorXd& u,
+      const Eigen::VectorXd& springPartitions,
+      double tolerance) const
+    {
+      std::vector<long int> results;
+      results.reserve(net->nrOfNodes);
+
+      // find all active springs
+      Eigen::ArrayXb springIsActive =
+        this->findActiveSprings(net, u, springPartitions, tolerance);
+
+      for (size_t i = 0; i < net->nrOfNodes; i++) {
+        if (net->oldAtomTypes[i] != this->entanglementType) {
+          std::vector<size_t> springIndices =
+            this->getInvolvedFullSpringIndices(*net, i);
+          for (const size_t springIndex : springIndices) {
+            if (springIsActive[springIndex]) {
+              results.push_back(i);
+              break;
+            }
+          }
+        }
+      }
+
+      return results;
+    };
+
+    /**
      * @brief Get the atom ids of the active cross-links (not entanglement
      * beads/links)
      *
@@ -5406,26 +5442,17 @@ namespace sim {
       double tolerance) const
     {
       std::vector<long int> results;
-      results.reserve(this->initialConfig.nrOfNodes);
-
       // find all active springs
-      Eigen::ArrayXb springIsActive =
-        this->findActiveSprings(&this->initialConfig,
-                                this->currentDisplacements,
-                                this->currentSpringPartitionsVec,
-                                tolerance);
+      std::vector<long int> activeNodes =
+        this->getIndicesOfActiveNodes(&this->initialConfig,
+                                      this->currentDisplacements,
+                                      this->currentSpringPartitionsVec,
+                                      tolerance);
 
-      for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
-        if (this->initialConfig.oldAtomTypes[i] != this->entanglementType) {
-          std::vector<size_t> springIndices =
-            this->getInvolvedFullSpringIndices(this->initialConfig, i);
-          for (const size_t springIndex : springIndices) {
-            if (springIsActive[springIndex]) {
-              results.push_back(this->initialConfig.oldAtomIds[i]);
-              break;
-            }
-          }
-        }
+      results.reserve(activeNodes.size());
+
+      for (long int nodeIdx : activeNodes) {
+        results.push_back(this->initialConfig.oldAtomIds[nodeIdx]);
       }
 
       return results;

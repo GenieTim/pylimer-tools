@@ -1508,34 +1508,66 @@ TEST_CASE("MEHP Force Balance fully active chains are fully active",
         CHECK(mol.getType() == pe::NETWORK_STRAND);
       }
 
-      pcm::MEHPForceBalance forceBalancer =
-        pcm::MEHPForceBalance(universe, 2, false);
-      size_t initialNSprings = forceBalancer.getNrOfSprings();
-
-      SECTION("For large enough box")
+      SECTION("Without entanglements")
       {
-        forceBalancer.configAssumeBoxLargeEnough(true);
-        CHECK(forceBalancer.getNrOfActiveSprings() ==
-              forceBalancer.getNrOfSprings());
-        double initialResidual = forceBalancer.getDisplacementResidualNorm();
-        CHECK(std::isfinite(initialResidual));
-        CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-          10000,
-          1e-10,
-          initialResidual,
-          pcm::StructureSimplificationMode::ALL_TIM));
-        CHECK(forceBalancer.getNrOfIterations() > 0);
-        CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-        CHECK(forceBalancer.getNrOfActiveSprings() ==
-              forceBalancer.getNrOfSprings());
-        CHECK(forceBalancer.getNrOfSprings() == initialNSprings);
-        CHECK_THAT(forceBalancer.getActiveWeightFraction(),
-                   Catch::Matchers::WithinRel(1.0));
-        CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
+        pcm::MEHPForceBalance forceBalancer =
+          pcm::MEHPForceBalance(universe, 2, false);
+        size_t initialNSprings = forceBalancer.getNrOfSprings();
+
+        SECTION("For large enough box")
+        {
+          forceBalancer.configAssumeBoxLargeEnough(true);
+          CHECK(forceBalancer.getNrOfActiveSprings() ==
+                forceBalancer.getNrOfSprings());
+          double initialResidual = forceBalancer.getDisplacementResidualNorm();
+          CHECK(std::isfinite(initialResidual));
+          CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+            10000,
+            1e-10,
+            initialResidual,
+            pcm::StructureSimplificationMode::ALL_TIM));
+          CHECK(forceBalancer.getNrOfIterations() > 0);
+          CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+          CHECK(forceBalancer.getNrOfActiveSprings() ==
+                forceBalancer.getNrOfSprings());
+          CHECK(forceBalancer.getNrOfSprings() == initialNSprings);
+          CHECK_THAT(forceBalancer.getActiveWeightFraction(),
+                     Catch::Matchers::WithinRel(1.0));
+          CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
+                     Catch::Matchers::WithinAbs(0.0, 1e-9));
+          CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
+        }
+
+        SECTION("For not large enough box")
+        {
+          forceBalancer.configAssumeBoxLargeEnough(false);
+          CHECK(forceBalancer.getNrOfActiveSprings() ==
+                forceBalancer.getNrOfSprings());
+          double initialResidual = forceBalancer.getDisplacementResidualNorm();
+          CHECK(std::isfinite(initialResidual));
+          CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+            10000,
+            1e-10,
+            initialResidual,
+            pcm::StructureSimplificationMode::ALL_TIM));
+          CHECK(forceBalancer.getNrOfIterations() > 0);
+          CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+          CHECK(forceBalancer.getNrOfActiveSprings() ==
+                forceBalancer.getNrOfSprings());
+          CHECK(forceBalancer.getNrOfSprings() == initialNSprings);
+          CHECK_THAT(forceBalancer.getActiveWeightFraction(),
+                     Catch::Matchers::WithinRel(1.0));
+          CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
+                     Catch::Matchers::WithinAbs(0.0, 1e-9));
+          CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
+        }
       }
 
-      SECTION("For not large enough box")
+      SECTION("With entanglements")
       {
+        pcm::MEHPForceBalance forceBalancer =
+          pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+            universe, 400, 2.0, 0.0, 100, 0.0, "a533d", 2, false);
         forceBalancer.configAssumeBoxLargeEnough(false);
         CHECK(forceBalancer.getNrOfActiveSprings() ==
               forceBalancer.getNrOfSprings());
@@ -1550,9 +1582,10 @@ TEST_CASE("MEHP Force Balance fully active chains are fully active",
         CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
         CHECK(forceBalancer.getNrOfActiveSprings() ==
               forceBalancer.getNrOfSprings());
-        CHECK(forceBalancer.getNrOfSprings() == initialNSprings);
         CHECK_THAT(forceBalancer.getActiveWeightFraction(),
                    Catch::Matchers::WithinRel(1.0));
+        CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
+                   Catch::Matchers::WithinAbs(0.0, 1e-9));
         CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
       }
     }
@@ -1855,6 +1888,8 @@ TEST_CASE("MEHP Force Balance does not collapse",
     // outputNetwork(forceBalanceConventional.getNetwork(),
     //               forceBalanceConventional.getCurrentDisplacements(),
     //               forceBalanceConventional.getSpringPartitions());
+    CHECK_THAT(forceBalanceConventional.getSolubleWeightFraction(),
+               Catch::Matchers::WithinAbs(0.0, 1e-9));
   }
   SECTION("Assuming too small box")
   {
@@ -1881,6 +1916,8 @@ TEST_CASE("MEHP Force Balance does not collapse",
     // outputNetwork(forceBalanceNew.getNetwork(),
     //               forceBalanceNew.getCurrentDisplacements(),
     //               forceBalanceNew.getSpringPartitions());
+    CHECK_THAT(forceBalanceNew.getSolubleWeightFraction(),
+               Catch::Matchers::WithinAbs(0.0, 1e-9));
   }
 };
 
@@ -2782,4 +2819,97 @@ TEST_CASE(
     CHECK(forceBalancerEntanglementSprings.getGammaFactors(-1.).sum() <
           forceBalancerEntanglementLinks.getGammaFactors(-1.).sum());
   }
+}
+
+TEST_CASE(
+  "MEHP Force Balance adding Entanglements vs. Phantom behaves as expected",
+  "[analysis][MEHPForceBalance][long]")
+{
+  std::cout << "Running test \"MEHP Force Balance adding Entanglements vs. "
+               "Phantom behaves as expected\""
+            << std::endl;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  CHECK(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+
+  // a structure with lots of dangling things that can and will be entangled,
+  // yet the entanglements removed
+  std::string inputFile =
+    suspectedPath + "mc_own-si_pdms_crosslinked_melt_464_a_77_r_1.71_wsol_0."
+                    "0114_f_4_v_1.structure.out";
+
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  auto masses = universe.getMasses();
+  std::cout << "Read file " << inputFile << std::endl;
+
+  // sample entanglements
+  pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
+    entanglements =
+      pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
+        universe, 4368, 4., 0., 190, 0, "af1346lhkdsaöf123", 2, true);
+
+  pcm::MEHPForceBalance forceBalancerEntanglements =
+    pcm::MEHPForceBalance::constructWithSlipLinks(
+      universe, entanglements, 2, false);
+
+  pcm::MEHPForceBalance forceBalancerPhantom =
+    pcm::MEHPForceBalance(universe, 2, false);
+
+  forceBalancerEntanglements.configAssumeBoxLargeEnough(true);
+  forceBalancerPhantom.configAssumeBoxLargeEnough(true);
+
+  double initialResidualE =
+    forceBalancerEntanglements.getDisplacementResidualNorm();
+  double initialResidualP = forceBalancerPhantom.getDisplacementResidualNorm();
+
+  CHECK(forceBalancerEntanglements.getNrOfPartialSprings() >
+        forceBalancerPhantom.getNrOfPartialSprings());
+  CHECK(forceBalancerEntanglements.getNrOfActiveSprings() >
+        forceBalancerPhantom.getNrOfActiveSprings());
+  CHECK(forceBalancerEntanglements.getSolubleWeightFraction() <
+        forceBalancerPhantom.getSolubleWeightFraction());
+
+  forceBalancerEntanglements.runForceRelaxation();
+  forceBalancerPhantom.runForceRelaxation();
+
+  CHECK(forceBalancerEntanglements.getNrOfPartialSprings() >
+        forceBalancerPhantom.getNrOfPartialSprings());
+  CHECK(forceBalancerEntanglements.getNrOfActiveSprings() >
+        forceBalancerPhantom.getNrOfActiveSprings());
+  CHECK(forceBalancerEntanglements.getSolubleWeightFraction() <
+        forceBalancerPhantom.getSolubleWeightFraction());
+
+  forceBalancerEntanglements.runForceRelaxation(
+    5000,
+    1e-10,
+    initialResidualE,
+    pcm::StructureSimplificationMode::ALL_TIM,
+    1e-3,
+    false,
+    pcm::LinkSwappingMode::NO_SWAPPING,
+    10,
+    1.0,
+    -1,
+    true);
+  forceBalancerPhantom.runForceRelaxation(
+    5000,
+    1e-10,
+    initialResidualP,
+    pcm::StructureSimplificationMode::ALL_TIM,
+    1e-3,
+    false,
+    pcm::LinkSwappingMode::NO_SWAPPING,
+    10,
+    1.0,
+    -1,
+    true);
+
+  CHECK(forceBalancerEntanglements.getNrOfSprings() >
+        forceBalancerPhantom.getNrOfSprings());
+  CHECK(forceBalancerEntanglements.getNrOfActiveSprings() >
+        forceBalancerPhantom.getNrOfActiveSprings());
+  CHECK(forceBalancerEntanglements.getSolubleWeightFraction() <
+        forceBalancerPhantom.getSolubleWeightFraction());
 }
