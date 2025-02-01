@@ -1084,7 +1084,7 @@ namespace sim {
            Eigen::ArrayXd::Ones(net->nrOfSprings));
 
         // TODO: currently, the weight of the atoms is ignored
-        // normalise by the number of atoms
+        // normalize by the number of atoms
         return (allActiveAtomsPerChains.matrix().sum() +
                 this->getNrOfActiveNodes(tolerance)) /
                (static_cast<double>(this->universe.getNrOfAtoms()));
@@ -1163,25 +1163,38 @@ namespace sim {
           return 0.;
         }
 
-        std::pair<Eigen::ArrayXb, Eigen::ArrayXb> clusteredToActive =
-          this->findClusteredToActive(net, u, springPartitions, tolerance);
-        // find all active springs
-        Eigen::ArrayXb activeSprings = clusteredToActive.first;
-        assert(activeSprings.size() == net->nrOfSprings);
+        std::vector<pylimer_tools::entities::Universe> clusters =
+          this->universe.getClusters();
+        std::vector<long int> atomIdxToClusterIdx(
+          this->universe.getNrOfAtoms());
+        for (size_t i = 0; i < clusters.size(); ++i) {
+          for (const pylimer_tools::entities::Atom& atom :
+               clusters[i].getAtoms()) {
+            atomIdxToClusterIdx[this->universe.getIdxByAtomId(atom.getId())] =
+              i;
+          }
+        }
 
-        Eigen::ArrayXb nodeIsActive = clusteredToActive.second;
-        assert(nodeIsActive.size() == net->nrOfNodes);
+        std::vector<bool> clusterIsActive(clusters.size(), false);
 
-        // as of now, the springsContourLength is equal to the number of bonds
-        // from cross-link to cross-link. therefore, the number of atoms of each
-        // of these springs is one less
-        Eigen::ArrayXd allActiveAtomsPerChains =
-          activeSprings.cast<double>() *
-          (net->springsContourLength.array() -
-           Eigen::ArrayXd::Ones(net->nrOfSprings));
-        double activeNodes = nodeIsActive.count();
+        // find active atoms
+        std::vector<long int> activeNodeIndices =
+          this->getIndicesOfActiveNodes(net, u, springPartitions, tolerance);
 
-        return ((allActiveAtomsPerChains).matrix().sum() + activeNodes);
+        for (const long int& nodeIdx : activeNodeIndices) {
+          long int universeAtomIdx =
+            this->universe.getIdxByAtomId(net->oldAtomIds[nodeIdx]);
+          clusterIsActive[atomIdxToClusterIdx[universeAtomIdx]] = true;
+        }
+
+        double nClusteredAtoms = 0.;
+        for (size_t i = 0; i < clusters.size(); ++i) {
+          if (clusterIsActive[i]) {
+            nClusteredAtoms += clusters[i].getNrOfAtoms();
+          }
+        }
+
+        return nClusteredAtoms;
       }
 
       /**
@@ -1215,7 +1228,20 @@ namespace sim {
       }
 
       /**
-       * @brief Get the Ids Of active Nodes
+       * @brief Get the indices of active Nodes
+       *
+       * @param tolerance the tolerance: springs under a certain length are
+       * considered inactive
+       * @return std::vector<long int> the atom ids
+       */
+      std::vector<long int> getIndicesOfActiveNodes(
+        const ForceBalanceNetwork* net,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
+        double tolerance = 1e-3) const;
+
+      /**
+       * @brief Get the Ids of active Nodes
        *
        * @param tolerance the tolerance: springs under a certain length are
        * considered inactive
@@ -1351,7 +1377,9 @@ namespace sim {
        * from the nr of springs thanks to omitted free chains or primary loops)
        * @return double
        */
-      double getGammaFactor(double b02 = 0.96, int nrOfChains = -1, double oneOverSpringPartitionUpperLimit = 1.) const;
+      double getGammaFactor(double b02 = 0.96,
+                            int nrOfChains = -1,
+                            double oneOverSpringPartitionUpperLimit = 1.) const;
 
       /**
        * @brief Get the per-(partial)-spring gamma factors
@@ -1360,7 +1388,9 @@ namespace sim {
        * computed as phantom = N<b^2>.
        * @return Eigen::VectorXd
        */
-      Eigen::VectorXd getGammaFactors(double b02, double oneOverSpringPartitionUpperLimit = 1.) const;
+      Eigen::VectorXd getGammaFactors(
+        double b02,
+        double oneOverSpringPartitionUpperLimit = 1.) const;
 
       /**
        * @brief Get the number of force balance iterations done so far
