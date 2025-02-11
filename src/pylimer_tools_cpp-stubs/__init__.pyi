@@ -1676,15 +1676,17 @@ class MEHPForceBalance:
                   Otherwise, you can set it to true and therewith get some securities.
         """
 
-    def config_entanglement_atom_type(self, type: int = -1) -> None:
+    def config_entanglement_type(self, type: int = -1) -> None:
         """
                  To have certain cross-links behave as entanglements in the removal process,
-                 you can specify the (cross-link) atom type here.
+                 you can specify the here a type, that you have used in the universe to specify:
+                 - the type of entanglement atoms (expected with functionality f = 3),
+                 - and the entanglement-bonds between the entanglement atoms.
 
                  I.e., say you want to model some entanglements as non-slipping,
-                 or even as additional bonds between two strand beads resulting in f = 3 beads, for example,
-                 you can call this method to have the "StructureSimplificationMode" also removing these atoms,
-                 if they have a functionality of 2 or less.
+                 bonds between two strand beads resulting in f = 3 beads, for example,
+                 you can call this method to have the "StructureSimplificationMode" also remove these atoms,
+                 if they have a functionality of 2 or less while still being connected to its partner bead.
         """
 
     def config_mean_bond_length(self, b: float = 1.0) -> None:
@@ -1696,6 +1698,16 @@ class MEHPForceBalance:
         """
                  Config every how many steps to simplify the structure.
                  Default: 10.
+        """
+
+    def config_spring_breaking_distance(
+            self, distance_over_contour_length: float = -1) -> None:
+        """
+                  Configure the "force" (distance over contour length) at which the bonds break.
+                  Can be used to model the effect of fracture, to reduce the stiffening happening upon deformation.
+                  Springs breaking will happen before the simplification procedure is run.
+                  Negative values will disable spring breaking.
+                  Default: -1..
         """
 
     def config_spring_constant(self, kappa: float = 1.0) -> None:
@@ -1751,7 +1763,7 @@ class MEHPForceBalance:
     def get_current_spring_vectors(self) -> numpy.ndarray:
         ...
 
-    def get_dangling_weight_fraction(self, tolerance: float = 0.05) -> float:
+    def get_dangling_weight_fraction(self, tolerance: float = 0.001) -> float:
         """
                   Compute the weight fraction of non-active springs
 
@@ -1762,11 +1774,6 @@ class MEHPForceBalance:
         """
                    Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for
                    :math:`b` in :math:`\\langle R_{0,\\eta}^2 = N_{\\eta} b^2\\rangle`.
-        """
-
-    def get_default_nr_of_chains(self) -> int:
-        """
-                  Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for normalizing the distances.`.
         """
 
     def get_displacement_residual_norm(
@@ -1781,7 +1788,7 @@ class MEHPForceBalance:
         """
 
     def get_effective_functionality_of_atoms(
-            self, tolerance: float = 0.05) -> dict[int, int]:
+            self, tolerance: float = 0.001) -> dict[int, int]:
         """
                   Returns the number of active springs connected to each atom, atomId used as index
 
@@ -1804,8 +1811,8 @@ class MEHPForceBalance:
                   Evaluate the force on a particular (slip- or cross-) link.
         """
 
-    def get_gamma_factor(self, b02: float = -1.0,
-                         nr_of_chains: int = -1) -> float:
+    def get_gamma_factor(self, b02: float = -1.0, nr_of_chains: int = -1,
+                         one_over_spring_partition_upper_limit: float = 1.0) -> float:
         """
                   Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
 
@@ -1819,68 +1826,44 @@ class MEHPForceBalance:
                   :math:`k_B` Boltzmann's constant.
 
                   :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
-                  :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains.
+                  :param nr_of_chains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs.
         """
 
-    def get_gamma_factor_using_partial_springs(
-            self, one_over_spring_partition_upper_limit: float = 1.0, b02: float = -1.0, nr_of_chains: int = -1) -> float:
-        """
-                  Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
-
-                  :math:`\\Gamma = \\langle\\gamma_{\\eta}\\rangle`, with :math:`\\gamma_{\\eta} = \\frac{\\bar{r_{\\eta}}^2}{R_{0,\\eta}^2}`,
-                  which you can use as :math:`G_{\\mathrm{ANT}} = \\Gamma \\nu k_B T`,
-                  where :math:`\\eta` is the index of a particular strand,
-                  :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\\eta}*b^2$`
-                  :math:`N_{\\eta}` is the number of atoms in this strand :math:`\\eta`,
-                  :math:`b` its mean square bond length,
-                  :math:`T` the temperature and
-                  :math:`k_B` Boltzmann's constant.
-
-                  :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
-                  :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains.
-        """
-
-    def get_gamma_factors(self, b02: float) -> numpy.ndarray:
+    def get_gamma_factors(
+            self, b02: float, one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
         """
                   Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
         """
 
-    def get_ids_of_active_nodes(self, tolerance: float = 0.05, minimum_nr_of_active_connections: int = 2,
-                                maximum_nr_of_active_connections: int = -1, use_partial: bool = False) -> list[int]:
+    def get_ids_of_active_nodes(self, tolerance: float = 0.001) -> list[int]:
         """
                   Get the atom ids of the nodes that are considered active.
+                  Only cross-link ids are returned (not e.g. entanglement links).
 
-                  Arguments:
-                   - :param tolerance: springs under this length are considered inactive. A node is active if it has > 2 active springs.
-                   - :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
-                   - :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
-                       Use a value < 0 to indicate that there is no maximum number of active connections.
+                  :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
         """
 
     def get_neighbour_link_indices(
             self, network: SimplifiedBalanceNetwork, link_idx: int) -> list[int]:
         ...
 
-    def get_nr_of_active_nodes(self, tolerance: float = 0.05, minimumNrOfActiveConnections: int = 2,
-                               maximumNrOfActiveConnections: int = -1, usePartial: bool = False) -> int:
+    def get_nr_of_active_nodes(self, tolerance: float = 0.001) -> int:
         """
-                   Get the number of active nodes remaining after running the simulation.
+                  Get the number of active nodes (incl. entanglement nodes [atoms with type = entanglementType, present in the universe when creating this simulator],
+                  excl. entanglement links [the slip-links created internally when e.g. constructing the simulator with random slip-links]).
 
-                  :param tolerance: springs under this length are considered inactive.
-                  :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
-                  :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
-                       Use a value < 0 to indicate that there is no maximum number of active connections.
-                  :param usePartial: Whether to use the partial spring distances rather than the total (set to true if you want primary loop contributors)
+                  :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
         """
 
-    def get_nr_of_active_partial_springs(self, tolerance: float = 0.05) -> int:
+    def get_nr_of_active_partial_springs(
+            self, tolerance: float = 0.001) -> int:
         """
                    Get the number of active partial springs remaining after running the simulation.
 
                   :param tolerance: springs under this length are considered inactive
         """
 
-    def get_nr_of_active_springs(self, tolerance: float = 0.05) -> int:
+    def get_nr_of_active_springs(self, tolerance: float = 0.001) -> int:
         """
                    Get the number of active springs remaining after running the simulation.
 
@@ -1929,7 +1912,7 @@ class MEHPForceBalance:
                   Returns the pressure at the current state of the simulation.
         """
 
-    def get_soluble_weight_fraction(self, tolerance: float = 0.05) -> float:
+    def get_soluble_weight_fraction(self, tolerance: float = 0.001) -> float:
         """
                   Compute the weight fraction of springs connected to active
                   springs (any depth).
@@ -1939,7 +1922,7 @@ class MEHPForceBalance:
 
     def get_spring_partitions(self) -> numpy.ndarray:
         """
-                  Get the current spring partitions.
+                  Get the current spring partitions (the fraction of the contour length associated with each partial spring).
         """
 
     def get_springpartition_indices_of_sliplink(
@@ -1966,6 +1949,11 @@ class MEHPForceBalance:
             self, one_over_spring_partition_upper_limit: float = 1.0, xlinks_only: bool = False) -> numpy.ndarray:
         """
                   Returns the stress tensor at the current state of the simulation.
+        """
+
+    def get_weighted_partial_spring_lengths(self) -> numpy.ndarray:
+        """
+                  Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
         """
 
     def inspect_displacement_to_mean_position_update(
@@ -1997,7 +1985,7 @@ class MEHPForceBalance:
                   Randomly sample and add slip-links based on certain criteria.
         """
 
-    def run_force_relaxation(self, max_nr_of_steps: int = 250000, x_tolerance: float = 1e-12, initial_residual_norm: float = -1.0, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: float = 0.01, do_inner_iterations: bool = False,
+    def run_force_relaxation(self, max_nr_of_steps: int = 250000, x_tolerance: float = 1e-12, initial_residual_norm: float = -1.0, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: float = 0.001, do_inner_iterations: bool = False,
                              allow_sliplinks_to_pass_each_other: LinkSwappingMode = ..., swapping_frequency: int = 10, one_over_spring_partition_upper_limit: float = 1.0, nr_of_crosslink_swaps_allowed_per_sliplink: int = -1, disable_slipping: bool = False) -> None:
         """
                   Run the simulation.
@@ -2037,6 +2025,15 @@ class MEHPForceBalance:
                                    arg1: numpy.ndarray, arg2: numpy.ndarray, arg3: float, arg4: bool) -> None:
         ...
 
+    def validate_network(self) -> bool:
+        """
+                  Validates the internal structures.
+
+                  Throws an error if something is not ok.
+                  Otherwise, it returns true.
+
+                  Can be used e.g. as :code:`assert fb.validate_network()`.
+        """
     @property
     def network(self) -> SimplifiedBalanceNetwork:
         ...
@@ -2128,14 +2125,14 @@ class MEHPForceRelaxation:
                        - values: a list of OutputConfiguration structs
         """
 
-    def count_active_clustered_atoms(self, tolerance: float = 0.05) -> float:
+    def count_active_clustered_atoms(self, tolerance: float = 0.001) -> float:
         """
                   Counts the active clustered atoms in the system.
 
                   :param tolerance: springs under this length are considered inactive.
         """
 
-    def get_active_chains(self, tolerance: float = 0.05) -> list[Molecule]:
+    def get_active_chains(self, tolerance: float = 0.001) -> list[Molecule]:
         """
                   Get the cross-linker chains that are active.
         """
@@ -2151,16 +2148,11 @@ class MEHPForceRelaxation:
                   Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
         """
 
-    def get_dangling_weight_fraction(self, tolerance: float = 0.05) -> float:
+    def get_dangling_weight_fraction(self, tolerance: float = 0.001) -> float:
         """
                   Compute the weight fraction of non-active springs
 
                   Caution: ignores atom masses.
-        """
-
-    def get_default_nr_of_chains(self) -> int:
-        """
-                  Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for normalizing the distances.`.
         """
 
     def get_default_r0_square(self) -> float:
@@ -2169,7 +2161,7 @@ class MEHPForceRelaxation:
         """
 
     def get_effective_functionality_of_atoms(
-            self, tolerance: float = 0.05) -> dict[int, int]:
+            self, tolerance: float = 0.001) -> dict[int, int]:
         """
                   Returns the number of active springs connected to each atom, atomId used as index
 
@@ -2225,19 +2217,17 @@ class MEHPForceRelaxation:
                   See also :func:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor` for the mean of these.
         """
 
-    def get_ids_of_active_nodes(self, tolerance: float = 0.05, minimum_nr_of_active_connections: int = 2,
+    def get_ids_of_active_nodes(self, tolerance: float = 0.001, minimum_nr_of_active_connections: int = 2,
                                 maximum_nr_of_active_connections: int = -1) -> list[int]:
         """
                   Get the atom ids of the nodes that are considered active.
 
-                  :param tolerance: springs under this length are considered inactive. A node is active if it has > 2 active springs.
-                  :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
-                  :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
-                       Use a value < 0 to indicate that there is no maximum number of active connections.
+                  Arguments:
+                   - :param tolerance: springs under this length are considered inactive. A node is active if it has > 2 active springs.
         """
 
-    def get_nr_of_active_nodes(self, tolerance: float = 0.05, minimum_nr_of_active_connections: int = 2,
-                               maximum_nr_of_active_connections: int = -1) -> int:
+    def get_nr_of_active_nodes(self, tolerance: float = 0.001,
+                               minimumNrOfActiveConnections: int = 2, maximumNrOfActiveConnections: int = -1) -> int:
         """
                    Get the number of active nodes remaining after running the simulation.
 
@@ -2245,9 +2235,10 @@ class MEHPForceRelaxation:
                   :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
                   :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
                        Use a value < 0 to indicate that there is no maximum number of active connections.
+                  :param usePartial: Whether to use the partial spring distances rather than the total (set to true if you want primary loop contributors)
         """
 
-    def get_nr_of_active_springs(self, tolerance: float = 0.05) -> int:
+    def get_nr_of_active_springs(self, tolerance: float = 0.001) -> int:
         """
                    Get the number of active springs remaining after running the simulation.
 
@@ -2286,7 +2277,7 @@ class MEHPForceRelaxation:
                   Returns the residuals at the current state of the simulation.
         """
 
-    def get_soluble_weight_fraction(self, tolerance: float = 0.05) -> float:
+    def get_soluble_weight_fraction(self, tolerance: float = 0.001) -> float:
         """
                   Compute the weight fraction of springs connected to active
                   springs (any depth).
