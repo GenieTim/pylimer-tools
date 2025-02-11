@@ -22,6 +22,7 @@ MEHPForceBalance
       ~MEHPForceBalance.config_entanglement_type
       ~MEHPForceBalance.config_mean_bond_length
       ~MEHPForceBalance.config_simplification_frequency
+      ~MEHPForceBalance.config_spring_breaking_distance
       ~MEHPForceBalance.config_spring_constant
       ~MEHPForceBalance.config_step_output
       ~MEHPForceBalance.construct_with_random_sliplinks
@@ -89,6 +90,7 @@ MEHPForceBalance
    .. automethod:: config_entanglement_type
    .. automethod:: config_mean_bond_length
    .. automethod:: config_simplification_frequency
+   .. automethod:: config_spring_breaking_distance
    .. automethod:: config_spring_constant
    .. automethod:: config_step_output
    .. automethod:: construct_with_random_sliplinks
