@@ -798,6 +798,16 @@ init_pylimer_bound_sim(py::module_& m)
          if they have a functionality of 2 or less while still being connected to its partner bead.
          )pbdoc",
          py::arg("type") = -1)
+    .def("config_spring_breaking_distance",
+         &mehp::MEHPForceBalance::configSpringBreakingDistance,
+         R"pbdoc(
+          Configure the "force" (distance over contour length) at which the bonds break.
+          Can be used to model the effect of fracture, to reduce the stiffening happening upon deformation.
+          Springs breaking will happen before the simplification procedure is run.
+          Negative values will disable spring breaking.
+          Default: -1..
+         )pbdoc",
+         py::arg("distance_over_contour_length") = -1)
     .def("config_simplification_frequency",
          &mehp::MEHPForceBalance::configSimplificationFrequency,
          R"pbdoc(

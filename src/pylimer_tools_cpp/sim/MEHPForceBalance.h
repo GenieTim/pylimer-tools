@@ -44,30 +44,33 @@ namespace sim {
       friend class cereal::access;
 #endif
 
-      // state
+      // member properties
       pylimer_tools::entities::Universe universe;
       pylimer_tools::entities::Box box;
-      bool is2D = false;
-      bool assumeBoxLargeEnough = true;
-      double kappa = 1.0;
+      // state
+      ExitReason exitReason = ExitReason::UNSET;
       bool simulationHasRun = false;
-      int stepOutputFrequency = 0;
-      int simplificationFrequency = 10;
-      int entanglementType = -999;
-      double defaultBondLength = 0.0;
-      std::string stepOutputFile;
-      bool outputEndNodes = false;
-      std::string endNodesFile;
       ForceBalanceNetwork initialConfig;
       Eigen::VectorXd currentDisplacements;
       Eigen::VectorXd currentSpringVectors;
       Eigen::VectorXd currentPartialSpringVectors;
       Eigen::VectorXd
         currentSpringPartitionsVec; /* gives the parametrisation of N */
+      // configuration
+      bool is2D = false;
+      bool assumeBoxLargeEnough = true;
+      double kappa = 1.0;
       int crossLinkerType = 2;
       int sliplinkType = 3;
       int nrOfStepsDone = 0;
-      ExitReason exitReason = ExitReason::UNSET;
+      int stepOutputFrequency = 0;
+      int simplificationFrequency = 10;
+      int entanglementType = -999;
+      double defaultBondLength = 0.0;
+      double springBreakingLength = -1.;
+      std::string stepOutputFile;
+      bool outputEndNodes = false;
+      std::string endNodesFile;
 
     public:
       MEHPForceBalance(const pylimer_tools::entities::Universe& u,
@@ -593,6 +596,19 @@ namespace sim {
                                       double tolerance) const;
 
       /**
+       * @brief Remove springs that exert a stress higher than
+       * `this->springBreakingLength`
+       *
+       * @param net
+       * @param displacements
+       * @param springPartitions
+       * @return size_t the number of springs broken
+       */
+      size_t breakTooLongSprings(ForceBalanceNetwork& net,
+                                 Eigen::VectorXd& displacements,
+                                 Eigen::VectorXd& springPartitions) const;
+
+      /**
        * @brief Remove double listed springs from crosslinkers
        *
        * @param net
@@ -620,6 +636,19 @@ namespace sim {
                         Eigen::VectorXd& displacements,
                         Eigen::VectorXd& springPartitions,
                         const size_t springIdx) const;
+
+      /**
+       * @brief break a spring, given its partial spring index
+       *
+       * @param net
+       * @param displacements
+       * @param springPartitions
+       * @param partialSpringIdx
+       */
+      void breakPartialSpring(ForceBalanceNetwork& net,
+                              Eigen::VectorXd& displacements,
+                              Eigen::VectorXd& springPartitions,
+                              const size_t partialSpringIdx) const;
 
       /**
        * @brief Remove a spring, but also all springs that are connected to it
@@ -922,6 +951,11 @@ namespace sim {
       void configSimplificationFrequency(int newRemovalFrequency = 10)
       {
         this->simplificationFrequency = newRemovalFrequency;
+      }
+
+      void configSpringBreakingDistance(double newSpringBreakingForce = -1.)
+      {
+        this->springBreakingLength = newSpringBreakingForce;
       }
 
       /**

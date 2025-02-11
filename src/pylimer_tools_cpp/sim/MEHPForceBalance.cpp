@@ -242,6 +242,10 @@ namespace sim {
         previousResidual = currentResidual;
         iterationsDone += 1;
         if (iterationsDone % this->simplificationFrequency == 0) {
+          this->breakTooLongSprings(this->initialConfig,
+                                    this->currentDisplacements,
+                                    this->currentSpringPartitionsVec);
+
           do {
 #ifndef NDEBUG
             this->validateNetwork();
@@ -779,6 +783,55 @@ namespace sim {
 #endif
 
       return numRemoved;
+    }
+
+    /**
+     * @brief Remove springs that exert a stress higher than
+     * `this->springBreakingLength`
+     *
+     * @param net
+     * @param displacements
+     * @param springPartitions
+     * @return size_t the number of springs broken
+     */
+    size_t MEHPForceBalance::breakTooLongSprings(
+      ForceBalanceNetwork& net,
+      Eigen::VectorXd& displacements,
+      Eigen::VectorXd& springPartitions) const
+    {
+      if (this->springBreakingLength <= 0.) {
+        return 0;
+      }
+
+      size_t numBroken = 0;
+
+      // iterate the springs, determine their distance, and determine if it
+      // exceeds the breaking force
+      for (long int partialSpringIdx = net.nrOfPartialSprings;
+           partialSpringIdx >= 0;
+           --partialSpringIdx) {
+        if (partialSpringIdx >= net.nrOfPartialSprings) {
+          partialSpringIdx = net.nrOfPartialSprings - 1;
+        }
+        double distance =
+          (this->evaluatePartialSpringDistance(net,
+                                               displacements,
+                                               partialSpringIdx,
+                                               this->is2D,
+                                               this->assumeBoxLargeEnough))
+            .norm();
+        if ((distance / (springPartitions[partialSpringIdx] *
+                         net.springsContourLength
+                           [net.partialToFullSpringIndex[partialSpringIdx]])) >
+            this->springBreakingLength) {
+          // break this spring
+          numBroken += 1;
+          this->breakPartialSpring(
+            net, displacements, springPartitions, partialSpringIdx);
+        }
+      }
+
+      return numBroken;
     }
 
     /**
@@ -1728,9 +1781,28 @@ namespace sim {
     };
 
     /**
+     * @brief break a spring, given its partial spring index
+     *
+     * @param net
+     * @param displacements
+     * @param springPartitions
+     * @param partialSpringIdx
+     */
+    void MEHPForceBalance::breakPartialSpring(
+      ForceBalanceNetwork& net,
+      Eigen::VectorXd& displacements,
+      Eigen::VectorXd& springPartitions,
+      const size_t partialSpringIdx) const
+    {
+      this->removeSpringFollowingEntanglementLinks(
+        net,
+        displacements,
+        springPartitions,
+        net.partialToFullSpringIndex[partialSpringIdx]);
+    };
+
+    /**
      * @brief remove a link from the network
-     *
-     *
      *
      * @param net
      * @param displacements
