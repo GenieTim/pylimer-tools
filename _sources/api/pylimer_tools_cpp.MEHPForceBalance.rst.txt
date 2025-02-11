@@ -66,6 +66,7 @@ MEHPForceBalance
       ~MEHPForceBalance.get_stress_on
       ~MEHPForceBalance.get_stress_tensor
       ~MEHPForceBalance.get_stress_tensor_link_based
+      ~MEHPForceBalance.get_weighted_partial_spring_lengths
       ~MEHPForceBalance.inspect_displacement_to_mean_position_update
       ~MEHPForceBalance.inspect_parametrisation_optimsation_for_link
       ~MEHPForceBalance.inspect_spring_partition_update
@@ -134,6 +135,7 @@ MEHPForceBalance
    .. automethod:: get_stress_on
    .. automethod:: get_stress_tensor
    .. automethod:: get_stress_tensor_link_based
+   .. automethod:: get_weighted_partial_spring_lengths
    .. automethod:: inspect_displacement_to_mean_position_update
    .. automethod:: inspect_parametrisation_optimsation_for_link
    .. automethod:: inspect_spring_partition_update

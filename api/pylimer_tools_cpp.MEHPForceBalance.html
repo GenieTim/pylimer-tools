@@ -478,7 +478,7 @@
 <td><p>Compute the weight fraction of springs connected to active springs (any depth).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_spring_partitions" title="pylimer_tools_cpp.MEHPForceBalance.get_spring_partitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_spring_partitions</span></code></a>(self)</p></td>
-<td><p>Get the current spring partitions.</p></td>
+<td><p>Get the current spring partitions (the fraction of the contour length associated with each partial spring).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_springpartition_indices_of_sliplink" title="pylimer_tools_cpp.MEHPForceBalance.get_springpartition_indices_of_sliplink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_springpartition_indices_of_sliplink</span></code></a>(...)</p></td>
 <td><p></p></td>
@@ -492,37 +492,40 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_stress_tensor_link_based" title="pylimer_tools_cpp.MEHPForceBalance.get_stress_tensor_link_based"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_stress_tensor_link_based</span></code></a>(self[, ...])</p></td>
 <td><p>Returns the stress tensor at the current state of the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.inspect_displacement_to_mean_position_update" title="pylimer_tools_cpp.MEHPForceBalance.inspect_displacement_to_mean_position_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inspect_displacement_to_mean_position_update</span></code></a>(...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_weighted_partial_spring_lengths" title="pylimer_tools_cpp.MEHPForceBalance.get_weighted_partial_spring_lengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_weighted_partial_spring_lengths</span></code></a>(self)</p></td>
+<td><p>Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.inspect_displacement_to_mean_position_update" title="pylimer_tools_cpp.MEHPForceBalance.inspect_displacement_to_mean_position_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inspect_displacement_to_mean_position_update</span></code></a>(...)</p></td>
 <td><p>Helper method to debug and/or understand what happens to certain links when being displaced.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.inspect_parametrisation_optimsation_for_link" title="pylimer_tools_cpp.MEHPForceBalance.inspect_parametrisation_optimsation_for_link"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inspect_parametrisation_optimsation_for_link</span></code></a>(...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.inspect_parametrisation_optimsation_for_link" title="pylimer_tools_cpp.MEHPForceBalance.inspect_parametrisation_optimsation_for_link"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inspect_parametrisation_optimsation_for_link</span></code></a>(...)</p></td>
 <td><p>Helper method to debug and/or understand what happens to certain links when being displaced and their partition updated.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.inspect_spring_partition_update" title="pylimer_tools_cpp.MEHPForceBalance.inspect_spring_partition_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inspect_spring_partition_update</span></code></a>(self, link_idx)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.inspect_spring_partition_update" title="pylimer_tools_cpp.MEHPForceBalance.inspect_spring_partition_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inspect_spring_partition_update</span></code></a>(self, link_idx)</p></td>
 <td><p>Helper method to debug and/or understand what happens to certain links when the spring partition is being updated.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.move_sliplinks_to_their_best_branch" title="pylimer_tools_cpp.MEHPForceBalance.move_sliplinks_to_their_best_branch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">move_sliplinks_to_their_best_branch</span></code></a>(self, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.move_sliplinks_to_their_best_branch" title="pylimer_tools_cpp.MEHPForceBalance.move_sliplinks_to_their_best_branch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">move_sliplinks_to_their_best_branch</span></code></a>(self, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.randomly_add_sliplinks" title="pylimer_tools_cpp.MEHPForceBalance.randomly_add_sliplinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randomly_add_sliplinks</span></code></a>(self, ...[, cutoff, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.randomly_add_sliplinks" title="pylimer_tools_cpp.MEHPForceBalance.randomly_add_sliplinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randomly_add_sliplinks</span></code></a>(self, ...[, cutoff, ...])</p></td>
 <td><p>Randomly sample and add slip-links based on certain criteria.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation" title="pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_force_relaxation</span></code></a>(self, max_nr_of_steps, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation" title="pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_force_relaxation</span></code></a>(self, max_nr_of_steps, ...)</p></td>
 <td><p>Run the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.set_displacements" title="pylimer_tools_cpp.MEHPForceBalance.set_displacements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_displacements</span></code></a>(self, arg0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.set_displacements" title="pylimer_tools_cpp.MEHPForceBalance.set_displacements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_displacements</span></code></a>(self, arg0)</p></td>
 <td><p>Set the current link displacements.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.set_spring_contour_lengths" title="pylimer_tools_cpp.MEHPForceBalance.set_spring_contour_lengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_spring_contour_lengths</span></code></a>(self, arg0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.set_spring_contour_lengths" title="pylimer_tools_cpp.MEHPForceBalance.set_spring_contour_lengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_spring_contour_lengths</span></code></a>(self, arg0)</p></td>
 <td><p>Set/overwrite the contour lengths.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.set_spring_partitions" title="pylimer_tools_cpp.MEHPForceBalance.set_spring_partitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_spring_partitions</span></code></a>(self, arg0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.set_spring_partitions" title="pylimer_tools_cpp.MEHPForceBalance.set_spring_partitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_spring_partitions</span></code></a>(self, arg0)</p></td>
 <td><p>Set the current spring partitions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.swap_sliplinks_incl_xlinks" title="pylimer_tools_cpp.MEHPForceBalance.swap_sliplinks_incl_xlinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">swap_sliplinks_incl_xlinks</span></code></a>(self, arg0, arg1, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.swap_sliplinks_incl_xlinks" title="pylimer_tools_cpp.MEHPForceBalance.swap_sliplinks_incl_xlinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">swap_sliplinks_incl_xlinks</span></code></a>(self, arg0, arg1, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.validate_network" title="pylimer_tools_cpp.MEHPForceBalance.validate_network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_network</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.validate_network" title="pylimer_tools_cpp.MEHPForceBalance.validate_network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_network</span></code></a>(self)</p></td>
 <td><p>Validates the internal structures.</p></td>
 </tr>
 </tbody>
@@ -878,7 +881,7 @@ springs (any depth).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance.get_spring_partitions">
 <span class="sig-name descname"><span class="pre">get_spring_partitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><span class="pre">pylimer_tools_cpp.MEHPForceBalance</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance.get_spring_partitions" title="Link to this definition">¶</a></dt>
-<dd><p>Get the current spring partitions.</p>
+<dd><p>Get the current spring partitions (the fraction of the contour length associated with each partial spring).</p>
 </dd></dl>
 
 <dl class="py method">
@@ -905,6 +908,12 @@ Make sure to multiply by <span class="math notranslate nohighlight">\(\kappa\)</
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance.get_stress_tensor_link_based">
 <span class="sig-name descname"><span class="pre">get_stress_tensor_link_based</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><span class="pre">pylimer_tools_cpp.MEHPForceBalance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">one_over_spring_partition_upper_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlinks_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance.get_stress_tensor_link_based" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the stress tensor at the current state of the simulation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance.get_weighted_partial_spring_lengths">
+<span class="sig-name descname"><span class="pre">get_weighted_partial_spring_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><span class="pre">pylimer_tools_cpp.MEHPForceBalance</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance.get_weighted_partial_spring_lengths" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1107,6 +1116,7 @@ Otherwise, it returns true.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_stress_on"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.get_stress_on()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_stress_tensor"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.get_stress_tensor()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_stress_tensor_link_based"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.get_stress_tensor_link_based()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_weighted_partial_spring_lengths"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.get_weighted_partial_spring_lengths()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.inspect_displacement_to_mean_position_update"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.inspect_displacement_to_mean_position_update()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.inspect_parametrisation_optimsation_for_link"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.inspect_parametrisation_optimsation_for_link()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.inspect_spring_partition_update"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.inspect_spring_partition_update()</span></code></a></li>
