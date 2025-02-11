@@ -1070,8 +1070,13 @@ init_pylimer_bound_sim(py::module_& m)
     .def("get_spring_partitions",
          &mehp::MEHPForceBalance::getSpringPartitions,
          R"pbdoc(
-          Get the current spring partitions.
+          Get the current spring partitions (the fraction of the contour length associated with each partial spring).
      )pbdoc")
+    .def("get_weighted_partial_spring_lengths",
+         &mehp::MEHPForceBalance::getWeightedPartialSpringLengths,
+         R"pbdoc(
+          Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
+          )pbdoc")
     .def("set_spring_partitions",
          &mehp::MEHPForceBalance::setSpringPartitions,
          R"pbdoc(
