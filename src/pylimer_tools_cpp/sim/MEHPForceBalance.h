@@ -1761,14 +1761,21 @@ namespace sim {
         this->currentSpringPartitionsVec = newSpringPartitionsVec;
       }
 
+      /**
+       * @brief Get the Weighted Partial Spring Lengths
+       * 
+       * @return Eigen::VectorXd 
+       */
       Eigen::VectorXd getWeightedPartialSpringLengths()
       {
         Eigen::VectorXd weightedLengths =
           Eigen::VectorXd(this->initialConfig.nrOfPartialSprings);
         for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
           weightedLengths(i) =
-            this->evaluatePartialSpringDistance(
-              this->initialConfig, this->currentDisplacements, i).norm() /
+            this
+              ->evaluatePartialSpringDistance(
+                this->initialConfig, this->currentDisplacements, i)
+              .norm() /
             (this->currentSpringPartitionsVec(i) *
              this->initialConfig.springsContourLength
                [this->initialConfig.partialToFullSpringIndex[i]]);
