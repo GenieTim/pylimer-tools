@@ -1762,23 +1762,34 @@ namespace sim {
       }
 
       /**
+       * @brief Get the Weighted Partial Spring Length for one partial spring
+       *
+       * @return double
+       */
+      double getWeightedPartialSpringLength(
+        const ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
+        size_t partialSpringIdx,
+        double oneOverSpringPartitionUpperLimit = 1.) const;
+
+      /**
        * @brief Get the Weighted Partial Spring Lengths
        *
        * @return Eigen::VectorXd
        */
-      Eigen::VectorXd getWeightedPartialSpringLengths()
+      Eigen::VectorXd getWeightedPartialSpringLengths(
+        double oneOverSpringPartitionUpperLimit = 1.)
       {
         Eigen::VectorXd weightedLengths =
           Eigen::VectorXd(this->initialConfig.nrOfPartialSprings);
         for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
-          weightedLengths(i) =
-            this
-              ->evaluatePartialSpringDistance(
-                this->initialConfig, this->currentDisplacements, i)
-              .norm() /
-            (this->currentSpringPartitionsVec(i) *
-             this->initialConfig.springsContourLength
-               [this->initialConfig.partialToFullSpringIndex[i]]);
+          weightedLengths(i) = this->getWeightedPartialSpringLength(
+            this->initialConfig,
+            this->currentDisplacements,
+            this->currentSpringPartitionsVec,
+            i,
+            oneOverSpringPartitionUpperLimit);
         }
 
         return weightedLengths;

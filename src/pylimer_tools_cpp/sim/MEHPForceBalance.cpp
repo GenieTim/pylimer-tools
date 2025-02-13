@@ -813,17 +813,9 @@ namespace sim {
         if (partialSpringIdx >= net.nrOfPartialSprings) {
           partialSpringIdx = net.nrOfPartialSprings - 1;
         }
-        double distance =
-          (this->evaluatePartialSpringDistance(net,
-                                               displacements,
-                                               partialSpringIdx,
-                                               this->is2D,
-                                               this->assumeBoxLargeEnough))
-            .norm();
-        if ((distance / (springPartitions[partialSpringIdx] *
-                         net.springsContourLength
-                           [net.partialToFullSpringIndex[partialSpringIdx]])) >
-            this->springBreakingLength) {
+        double len = this->getWeightedPartialSpringLength(
+          net, displacements, springPartitions, partialSpringIdx);
+        if (len > this->springBreakingLength) {
           // break this spring
           numBroken += 1;
           this->breakPartialSpring(
@@ -5659,6 +5651,31 @@ namespace sim {
             ".");
       }
       return gammaFactors;
+    }
+
+    /**
+     * @brief Get the Weighted Partial Spring Length
+     *
+     * @return double
+     */
+    double MEHPForceBalance::getWeightedPartialSpringLength(
+      const ForceBalanceNetwork& net,
+      const Eigen::VectorXd& u,
+      const Eigen::VectorXd& springPartitions,
+      size_t partialSpringIdx,
+      double oneOverSpringPartitionUpperLimit) const
+    {
+      double N =
+        net
+          .springsContourLength[net.partialToFullSpringIndex[partialSpringIdx]];
+      double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+        net.partialSpringIsPartial[partialSpringIdx],
+        1.0 / (N * springPartitions(partialSpringIdx)),
+        N,
+        oneOverSpringPartitionUpperLimit);
+      return this->evaluatePartialSpringDistance(net, u, partialSpringIdx)
+               .norm() *
+             oneOverContourLengthFraction;
     }
 
     /**
