@@ -10,10 +10,8 @@ from scipy import optimize
 from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
     compute_effective_crosslinker_functionality,
-    compute_stoichiometric_imbalance,
-    compute_weight_fractions,
-    measure_weight_fraction_of_soluble_material,
-)
+    compute_stoichiometric_imbalance, compute_weight_fractions,
+    measure_weight_fraction_of_soluble_material)
 from pylimer_tools.io.unit_styles import UnitStyle
 from pylimer_tools_cpp import Universe
 
@@ -44,8 +42,7 @@ def predict_shear_modulus(**kwargs):
     ToDo:
       - Support more than one crosslinker type (as is supported by original formula)
     """
-    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(
-        **kwargs)
+    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(**kwargs)
     return g_mmt_phantom + g_mmt_entanglement
 
 
@@ -243,8 +240,7 @@ def compute_weight_fraction_of_backbone(
         w_sol = measure_weight_fraction_of_soluble_material(network)
 
     phi_el = 0
-    w_a = weight_fractions[crosslinker_type] / \
-        functionality_per_type[crosslinker_type]
+    w_a = weight_fractions[crosslinker_type] / functionality_per_type[crosslinker_type]
     w_xl = weight_fractions[crosslinker_type]
     w_x2 = 1 - w_xl
     assert w_a <= 1 and w_a >= 0
@@ -358,8 +354,7 @@ def compute_weight_fraction_of_soluble_material_from_weight_fractions(
       - g: the functionality of the ordinary chains
     """
     alpha, _ = compute_miller_macosko_probabilities(r, p, f)
-    return w_f * (alpha**f) + w_g * \
-        ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
+    return w_f * (alpha**f) + w_g * ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
 
 
 def compute_weight_fractions_and_probabilities(
@@ -433,8 +428,7 @@ def compute_weight_fractions_and_probabilities(
                 "The p computed ({}) is outside the accepted range. ".format(p)
                 + "Falling back to effective cross-linker functionality."
             )
-            p = compute_effective_crosslinker_functionality(
-                network, crosslinker_type)
+            p = compute_effective_crosslinker_functionality(network, crosslinker_type)
     if p > 1 or p < 0:
         raise ValueError(
             "Detected p = {} for f = {}. Need p in (0, 1).".format(
@@ -543,26 +537,18 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int):
 def validate_r_and_p(r: float, p: float, f: int):
     if p < 0:
         raise ValueError(
-            "The cross-linker conversion `p` must be positive, got {}".format(
-                p)
+            "The cross-linker conversion `p` must be positive, got {}".format(p)
         )
     if r < 0:
         raise ValueError(
-            "The stoichiometric imbalance `r` must be positive, got {}".format(
-                r)
+            "The stoichiometric imbalance `r` must be positive, got {}".format(r)
         )
     if f < 2:
         raise ValueError(
             "The cross-linker functionality `f` must be >= 2, got {}".format(f)
         )
     # assume:
-    n_chains = 1000
-    # -> compute:
-    n_xlinks = r * 2 * n_chains / f
-    max_possible_bonds = min(2 * n_chains, f * n_xlinks)
-    if n_xlinks == 0:
-        return
-    p_max = max_possible_bonds / (n_xlinks * f)
+    p_max = predict_maximum_p(r=r, f=f)
     if p > p_max:
         raise ValueError(
             "For a system with r = {} and f = {}, p (in terms of crosslinkers) must be < {}, {} given.".format(
@@ -635,8 +621,7 @@ def compute_modulus_decomposition(
                 "The p computed ({}) is outside the accepted range. ".format(p)
                 + "Falling back to effective cross-linker functionality."
             )
-            p = compute_effective_crosslinker_functionality(
-                network, crosslinker_type)
+            p = compute_effective_crosslinker_functionality(network, crosslinker_type)
     if f is None:
         if functionality_per_type is None:
             functionality_per_type = network.determine_functionality_per_type()
@@ -665,7 +650,7 @@ def compute_modulus_decomposition(
         ) * ureg("MPa")
         # -> MPa, melt entanglement modulus of PDMS
 
-    # boltzmann constant
+    # Boltzmann constant
     kb = 1.380649e-23 * ureg.joule / ureg.kelvin
     # affine
     g_anm = nu * kb * temperature
@@ -681,10 +666,8 @@ def compute_modulus_decomposition(
     gamma_mmt = (2 * r / f) * gamma_mmt_sum if f != 0 else 0.0
     g_mmt_phantom = gamma_mmt * nu * kb * temperature
     # fraction of elastically effective strands.
-    g_mmt_entanglement = g_e_1 * \
-        compute_trapping_factor(p=p, r=r, f=f, alpha=alpha)
-    # entanglement part. TODO : check adjustment with r (and where the 0.22 is
-    # coming from? Fabian' s fit!)
+    g_mmt_entanglement = g_e_1 * compute_trapping_factor(p=p, r=r, f=f, alpha=alpha)
+    # entanglement part. TODO : check adjustment with r
     return g_mmt_phantom, g_mmt_entanglement, g_anm, g_pnm
 
 
@@ -842,6 +825,7 @@ def compute_trapping_factor(
         p = compute_crosslinker_conversion(
             network, crosslinker_type=crosslinker_type, f=f
         )
+
     if r is None:
         _require_network(network, "r")
         r = compute_stoichiometric_imbalance(
@@ -881,8 +865,7 @@ def compute_probability_that_monomer_is_effective(
     f = functionality_of_monomer
     m = expected_degree_of_effect
     alpha = p_f_a_out
-    return scipy.special.binom(
-        f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
+    return scipy.special.binom(f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
 
 
 def predict_gelation_point(r: float, f: int, g: int = 2) -> float:
@@ -906,6 +889,22 @@ def predict_gelation_point(r: float, f: int, g: int = 2) -> float:
     return math.sqrt(1 / (r * (f - 1) * (g - 1)))
 
 
+def predict_maximum_p(r: float, f: int) -> float:
+    """
+    Compute the maximum cross-linker conversion possible given a stoichiometric inbalance.
+
+    """
+    # assume:
+    n_chains = 1000
+    # -> compute:
+    n_xlinks = r * 2 * n_chains / f
+    if n_xlinks == 0:
+        return None
+    max_possible_bonds = min(2 * n_chains, f * n_xlinks)
+    p_max = max_possible_bonds / (n_xlinks * f)
+    return p_max
+
+
 def predict_p_from_w_sol(
     w_sol: float, r: float, w_f: float, w_g: float, f: int, g: int = 2
 ):
@@ -927,8 +926,7 @@ def predict_p_from_w_sol(
         except ValueError:
             p_f_a_out = 1.0  # highest value -> this will not be the optimum
         return (
-            w_f * p_f_a_out**f + w_g *
-            (r * p * p_f_a_out ** (f - 1) + 1 - r * p) ** g
+            w_f * p_f_a_out**f + w_g * (r * p * p_f_a_out ** (f - 1) + 1 - r * p) ** g
         )
 
     res = optimize.minimize_scalar(
@@ -945,6 +943,5 @@ def _require_network(network: Universe = None, instead_of: str = ""):
             raise ValueError("A network is required")
         else:
             raise ValueError(
-                "If `{}` is not specified, a network is required".format(
-                    instead_of)
+                "If `{}` is not specified, a network is required".format(instead_of)
             )
