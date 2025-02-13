@@ -1763,8 +1763,8 @@ namespace sim {
 
       /**
        * @brief Get the Weighted Partial Spring Lengths
-       * 
-       * @return Eigen::VectorXd 
+       *
+       * @return Eigen::VectorXd
        */
       Eigen::VectorXd getWeightedPartialSpringLengths()
       {
