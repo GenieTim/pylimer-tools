@@ -2509,6 +2509,7 @@ namespace sim {
         const int dir,
         const double tolerance = 1e-3) const
       {
+        INVALIDARG_EXP_IFN(dir >= 0 && dir < 3, "Invalid direction");
         Eigen::VectorXd partialSpringVectors =
           this->evaluatePartialSpringVectors(
             *net, u, this->is2D, this->assumeBoxLargeEnough);
