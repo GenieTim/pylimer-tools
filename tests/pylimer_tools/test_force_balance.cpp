@@ -642,6 +642,11 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         // (forceBalancer2.getDefaultR0Square() / (expectedNb2));
         CHECK(forceBalancer2.getGammaFactor(1.) ==
               Catch::Approx(forceBalancer2.getGammaFactors(1.).mean()));
+        CHECK(
+          forceBalancer2.getGammaFactors(b02).mean() ==
+          Catch::Approx((forceBalancer2.getGammaFactorsInDir(b02, 0).mean() +
+                         forceBalancer2.getGammaFactorsInDir(b02, 1).mean() +
+                         forceBalancer2.getGammaFactorsInDir(b02, 2).mean())));
         CHECK(forceBalancer2.getGammaFactor(b02) ==
               Catch::Approx(forceBalancer2.getGammaFactors(b02).mean()));
         CHECK_THAT(
@@ -659,6 +664,10 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         // TODO: find better, more accurate tests here
         CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
         CHECK(forceBalancer2.getNrOfActiveSprings() > 1);
+        CHECK(forceBalancer2.getNrOfActiveSprings() <=
+              (forceBalancer2.getNrOfActiveSpringsInDir(0) +
+               forceBalancer2.getNrOfActiveSpringsInDir(1) +
+               forceBalancer2.getNrOfActiveSpringsInDir(2)));
         CHECK(forceBalancer2.getAverageSpringLength() > 1.0);
         CHECK(forceBalancer2.getEffectiveFunctionalityOfAtoms().size() ==
               forceBalancer2.getNrOfNodes());
@@ -1904,6 +1913,11 @@ TEST_CASE("MEHP Force Balance does not collapse",
           forceBalanceNew.getNrOfSprings());
     // compare to what we expect
     CHECK(forceBalanceNew.getNrOfActiveSprings() == 8);
+
+    CHECK(forceBalanceNew.getNrOfActiveSprings() <=
+          (forceBalanceNew.getNrOfActiveSpringsInDir(0) +
+           forceBalanceNew.getNrOfActiveSpringsInDir(1) +
+           forceBalanceNew.getNrOfActiveSpringsInDir(2)));
     CHECK(forceBalanceNew.getNrOfActiveNodes() == 4);
     CHECK(forceBalanceNew.getAverageSpringLength() == Catch::Approx(5.0));
     // forceBalanceNew.setSpringContourLengths(
@@ -1954,6 +1968,9 @@ TEST_CASE(
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
+    CHECK(forceBalancer.getNrOfActiveSpringsInDir(0) == 0);
+    CHECK(forceBalancer.getNrOfActiveSpringsInDir(1) == 0);
+    CHECK(forceBalancer.getNrOfActiveSpringsInDir(2) == 0);
     CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
 
     double pressBefore = forceBalancer.getPressure();
