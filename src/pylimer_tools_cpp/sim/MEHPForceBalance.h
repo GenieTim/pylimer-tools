@@ -1427,6 +1427,19 @@ namespace sim {
         double oneOverSpringPartitionUpperLimit = 1.) const;
 
       /**
+       * @brief Get the per-(partial)-spring gamma factors
+       *
+       * @param b02 the melt <b^2>: mean bond length; vgl. the required <R_0^2>,
+       * computed as phantom = N<b^2>.
+       * @param dir the direction (0=x, 1=y, 2=z)
+       * @return Eigen::VectorXd
+       */
+      Eigen::VectorXd getGammaFactorsInDir(
+        double b02,
+        int dir,
+        double oneOverSpringPartitionUpperLimit = 1.) const;
+
+      /**
        * @brief Get the number of force balance iterations done so far
        *
        * @return int

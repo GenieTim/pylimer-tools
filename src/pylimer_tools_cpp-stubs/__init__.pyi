@@ -1835,6 +1835,15 @@ class MEHPForceBalance:
                   Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
         """
 
+    def get_gamma_factors_in_dir(self, b02: float, direction: int,
+                                 one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
+        """
+                       Evaluates the gamma factor for each strand in the specified direction (i.e., the squared distance divided by the contour length multiplied by b02)
+
+                       :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
+                       :param direction: the direction in which to compute the gamma factors (0: x, 1: y, 2: z)
+        """
+
     def get_ids_of_active_nodes(self, tolerance: float = 0.001) -> list[int]:
         """
                   Get the atom ids of the nodes that are considered active.
@@ -1951,7 +1960,8 @@ class MEHPForceBalance:
                   Returns the stress tensor at the current state of the simulation.
         """
 
-    def get_weighted_partial_spring_lengths(self) -> numpy.ndarray:
+    def get_weighted_partial_spring_lengths(
+            self, one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
         """
                   Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
         """

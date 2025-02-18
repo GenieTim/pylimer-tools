@@ -1057,6 +1057,17 @@ init_pylimer_bound_sim(py::module_& m)
      )pbdoc",
          py::arg("b02"),
          py::arg("one_over_spring_partition_upper_limit") = 1.)
+    .def("get_gamma_factors_in_dir",
+         &mehp::MEHPForceBalance::getGammaFactorsInDir,
+         R"pbdoc(
+               Evaluates the gamma factor for each strand in the specified direction (i.e., the squared distance divided by the contour length multiplied by b02)
+
+               :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
+               :param direction: the direction in which to compute the gamma factors (0: x, 1: y, 2: z)
+          )pbdoc",
+         py::arg("b02"),
+         py::arg("direction"),
+         py::arg("one_over_spring_partition_upper_limit") = 1.)
     .def("get_nr_of_nodes", &mehp::MEHPForceBalance::getNrOfNodes, R"pbdoc(
            Get the number of nodes (crosslinkers) considered in this simulation.
      )pbdoc")
@@ -1076,7 +1087,8 @@ init_pylimer_bound_sim(py::module_& m)
          &mehp::MEHPForceBalance::getWeightedPartialSpringLengths,
          R"pbdoc(
           Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
-          )pbdoc")
+          )pbdoc",
+         py::arg("one_over_spring_partition_upper_limit") = 1.)
     .def("set_spring_partitions",
          &mehp::MEHPForceBalance::setSpringPartitions,
          R"pbdoc(
