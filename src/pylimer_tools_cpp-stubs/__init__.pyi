@@ -1879,6 +1879,15 @@ class MEHPForceBalance:
                   :param tolerance: springs under this length are considered inactive
         """
 
+    def get_nr_of_active_springs_in_dir(
+            self, direction: int, tolerance: float = 0.001) -> int:
+        """
+                        Get the number of active springs remaining after running the simulation.
+
+                       :param direction: the direction in which to compute the active springs (0: x, 1: y, 2: z)
+                       :param tolerance: springs under this length are considered inactive
+        """
+
     def get_nr_of_atoms(self) -> int:
         ...
 
