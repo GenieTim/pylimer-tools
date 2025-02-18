@@ -1141,6 +1141,16 @@ init_pylimer_bound_sim(py::module_& m)
           :param tolerance: springs under this length are considered inactive
      )pbdoc",
          py::arg("tolerance") = 1e-3)
+    .def("get_nr_of_active_springs_in_dir",
+         &mehp::MEHPForceBalance::getNrOfActiveSpringsInDir,
+         R"pbdoc(
+                Get the number of active springs remaining after running the simulation.
+     
+               :param direction: the direction in which to compute the active springs (0: x, 1: y, 2: z)
+               :param tolerance: springs under this length are considered inactive
+          )pbdoc",
+         py::arg("direction"),
+         py::arg("tolerance") = 1e-3)
     .def("get_nr_of_active_partial_springs",
          &mehp::MEHPForceBalance::getNrOfActivePartialSprings,
          R"pbdoc(
