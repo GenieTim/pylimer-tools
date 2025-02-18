@@ -51,6 +51,7 @@ MEHPForceBalance
       ~MEHPForceBalance.get_nr_of_active_nodes
       ~MEHPForceBalance.get_nr_of_active_partial_springs
       ~MEHPForceBalance.get_nr_of_active_springs
+      ~MEHPForceBalance.get_nr_of_active_springs_in_dir
       ~MEHPForceBalance.get_nr_of_atoms
       ~MEHPForceBalance.get_nr_of_bonds
       ~MEHPForceBalance.get_nr_of_extra_atoms
@@ -121,6 +122,7 @@ MEHPForceBalance
    .. automethod:: get_nr_of_active_nodes
    .. automethod:: get_nr_of_active_partial_springs
    .. automethod:: get_nr_of_active_springs
+   .. automethod:: get_nr_of_active_springs_in_dir
    .. automethod:: get_nr_of_atoms
    .. automethod:: get_nr_of_bonds
    .. automethod:: get_nr_of_extra_atoms
