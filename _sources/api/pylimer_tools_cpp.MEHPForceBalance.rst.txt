@@ -45,6 +45,7 @@ MEHPForceBalance
       ~MEHPForceBalance.get_force_on
       ~MEHPForceBalance.get_gamma_factor
       ~MEHPForceBalance.get_gamma_factors
+      ~MEHPForceBalance.get_gamma_factors_in_dir
       ~MEHPForceBalance.get_ids_of_active_nodes
       ~MEHPForceBalance.get_neighbour_link_indices
       ~MEHPForceBalance.get_nr_of_active_nodes
@@ -114,6 +115,7 @@ MEHPForceBalance
    .. automethod:: get_force_on
    .. automethod:: get_gamma_factor
    .. automethod:: get_gamma_factors
+   .. automethod:: get_gamma_factors_in_dir
    .. automethod:: get_ids_of_active_nodes
    .. automethod:: get_neighbour_link_indices
    .. automethod:: get_nr_of_active_nodes
