@@ -254,7 +254,10 @@ init_pylimer_bound_generators(py::module_& m)
             Fetch the current (or final) state of the universe.
 
             Use this method to actually (MC) place beads between the cross-links and retrieve the generated structure.
-            )pbdoc");
+            )pbdoc")
+    .def("get_force_relaxation",
+         &MCUniverseGenerator::getForceRelaxation,
+         R"pbdoc()pbdoc");
 
   m.def("do_random_walk",
         py::overload_cast<int, double, double, std::string>(&doRandomWalkChain),

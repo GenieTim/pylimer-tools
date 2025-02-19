@@ -1504,6 +1504,9 @@ class MCUniverseGenerator:
                  Set to 0. to disable the formation of secondary loops.
         """
 
+    def get_force_relaxation(self) -> ...:
+        ...
+
     def get_mean_bead_distance(self) -> float:
         """
         Get the currently configured mean bead distance.
