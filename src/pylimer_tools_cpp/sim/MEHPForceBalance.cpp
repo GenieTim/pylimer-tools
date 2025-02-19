@@ -5654,6 +5654,51 @@ namespace sim {
     }
 
     /**
+     * @brief Get the per-(partial)-spring gamma factors
+     *
+     * @param b02 the melt <b^2>: mean bond length; vgl. the required <R_0^2>,
+     * computed as phantom = N<b^2>.
+     * @param dir the direction (0=x, 1=y, 2=z)
+     * @return Eigen::VectorXd
+     */
+    Eigen::VectorXd MEHPForceBalance::getGammaFactorsInDir(
+      double b02,
+      int dir,
+      double oneOverSpringPartitionUpperLimit) const
+    {
+      INVALIDARG_EXP_IFN(dir >= 0 && dir <= 2, "Invalid direction.");
+      Eigen::VectorXd springVectors = this->evaluatePartialSpringVectors(
+        this->initialConfig, this->currentDisplacements);
+      RUNTIME_EXP_IFN(this->currentSpringPartitionsVec.size() * 3 ==
+                        springVectors.size(),
+                      "Unexpected dimensions in springVectors.");
+
+      Eigen::VectorXd gammaFactors(springVectors.size() / 3);
+      const double commonDenominator = 1. / b02;
+      for (size_t i = 0; i < springVectors.size() / 3; ++i) {
+        double N = this->initialConfig.springsContourLength
+                     [this->initialConfig.partialToFullSpringIndex[i]];
+        double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+          this->initialConfig.partialSpringIsPartial[i],
+          1.0 / (N * this->currentSpringPartitionsVec(i)),
+          N,
+          oneOverSpringPartitionUpperLimit);
+        gammaFactors[i] = SQUARE(springVectors[3 * i + dir]) *
+                          commonDenominator * oneOverContourLengthFraction;
+        RUNTIME_EXP_IFN(std::isfinite(gammaFactors[i]),
+                        "Non-finite gamma factor for partial spring " +
+                          std::to_string(i) +
+                          ", computed from N = " + std::to_string(N) +
+                          ", oneOverSpringPartitionUpperLimit = " +
+                          std::to_string(oneOverSpringPartitionUpperLimit) +
+                          " and squared distance = " +
+                          std::to_string(SQUARE(springVectors[3 * i + dir])) +
+                          " in dir " + std::to_string(dir) + ".");
+      }
+      return gammaFactors;
+    }
+
+    /**
      * @brief Get the Weighted Partial Spring Length
      *
      * @return double

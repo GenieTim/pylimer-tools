@@ -1342,6 +1342,19 @@ namespace utils {
       return forceRelaxationNetwork;
     }
 
+    pylimer_tools::sim::mehp::MEHPForceRelaxation getForceRelaxation() const
+    {
+      // first, convert to a useable structure for the force relaxation
+      pylimer_tools::sim::mehp::Network forceRelaxationNetwork =
+        this->convertToForceRelaxationNetwork();
+
+      // actually start force relaxation
+      pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
+        pylimer_tools::sim::mehp::MEHPForceRelaxation(forceRelaxationNetwork);
+
+      return forceRelaxer;
+    }
+
     /**
      * @brief Run force relaxation to improve the statistics of the cross-linked
      * strands
@@ -1383,7 +1396,7 @@ namespace utils {
      *
      * @return size_t
      */
-    size_t getCurrentNrOfAtoms()
+    size_t getCurrentNrOfAtoms() const
     {
       size_t nAtomsTotal =
         std::reduce(this->simplifiedUniverse.beadsInStrand.begin(),
@@ -1398,7 +1411,7 @@ namespace utils {
      *
      * @return size_t
      */
-    size_t getCurrentNrOfBonds()
+    size_t getCurrentNrOfBonds() const
     {
       size_t nBondsTotal = 0;
       for (size_t strandIdx = 0;
@@ -1418,6 +1431,13 @@ namespace utils {
         }
       }
       return nBondsTotal;
+    }
+
+    double getCurrentCrosslinkerConversion() const
+    {
+      return 1. -
+             (static_cast<double>(this->nrOfAvailableCrosslinkSites) /
+              static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
     }
 
     /**

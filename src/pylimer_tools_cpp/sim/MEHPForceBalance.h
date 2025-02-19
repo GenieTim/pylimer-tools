@@ -1364,6 +1364,11 @@ namespace sim {
         return this->countNrOfActiveSprings(tolerance);
       }
 
+      int getNrOfActiveSpringsInDir(int dir, double tolerance = 1e-3) const
+      {
+        return this->countNrOfActiveSpringsInDir(dir, tolerance);
+      }
+
       /**
        * @brief Get the Nr Of Active Springs object
        *
@@ -1424,6 +1429,19 @@ namespace sim {
        */
       Eigen::VectorXd getGammaFactors(
         double b02,
+        double oneOverSpringPartitionUpperLimit = 1.) const;
+
+      /**
+       * @brief Get the per-(partial)-spring gamma factors
+       *
+       * @param b02 the melt <b^2>: mean bond length; vgl. the required <R_0^2>,
+       * computed as phantom = N<b^2>.
+       * @param dir the direction (0=x, 1=y, 2=z)
+       * @return Eigen::VectorXd
+       */
+      Eigen::VectorXd getGammaFactorsInDir(
+        double b02,
+        int dir,
         double oneOverSpringPartitionUpperLimit = 1.) const;
 
       /**
@@ -2414,9 +2432,16 @@ namespace sim {
         return (this->findActiveSprings(net, u, springPartitions, tolerance))
           .count();
       }
+
       int countNrOfActiveSprings(const double tolerance = 1e-3) const
       {
         return (this->findActiveSprings(tolerance) == true).count();
+      }
+
+      int countNrOfActiveSpringsInDir(const int dir,
+                                      const double tolerance = 1e-3) const
+      {
+        return (this->findActiveSpringsInDir(dir, tolerance) == true).count();
       }
 
       int countNrOfActivePartialSprings(const double tolerance = 1e-3) const
@@ -2464,6 +2489,54 @@ namespace sim {
                                        this->currentDisplacements,
                                        this->currentSpringPartitionsVec,
                                        tolerance);
+      }
+
+      /**
+       * @brief Determine for each spring whether the spring contains at least
+       * one partial spring that is considered active (tolerance criterion)
+       *
+       * @param net
+       * @param u
+       * @param springPartitions
+       * @param dir
+       * @param tolerance
+       * @return Eigen::ArrayXb
+       */
+      Eigen::ArrayXb findActiveSpringsInDir(
+        const ForceBalanceNetwork* net,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
+        const int dir,
+        const double tolerance = 1e-3) const
+      {
+        INVALIDARG_EXP_IFN(dir >= 0 && dir < 3, "Invalid direction");
+        Eigen::VectorXd partialSpringVectors =
+          this->evaluatePartialSpringVectors(
+            *net, u, this->is2D, this->assumeBoxLargeEnough);
+        Eigen::ArrayXb result =
+          Eigen::ArrayXb::Constant(net->nrOfSprings, false);
+
+        for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+          result[net->partialToFullSpringIndex[i]] =
+            result[net->partialToFullSpringIndex[i]] ||
+            !this->distanceIsWithinTolerance(
+              Eigen::Vector3d(partialSpringVectors[3 * i + dir], 0, 0),
+              tolerance,
+              net->springsContourLength[net->partialToFullSpringIndex[i]],
+              springPartitions[i]);
+        }
+
+        return result;
+      }
+
+      Eigen::ArrayXb findActiveSpringsInDir(const int dir,
+                                            const double tolerance = 1e-3) const
+      {
+        return this->findActiveSpringsInDir(&this->initialConfig,
+                                            this->currentDisplacements,
+                                            this->currentSpringPartitionsVec,
+                                            dir,
+                                            tolerance);
       }
 
       Eigen::ArrayXb findActiveNodes(const double tolerance = 1e-3) const
