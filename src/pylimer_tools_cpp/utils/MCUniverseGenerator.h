@@ -1342,6 +1342,19 @@ namespace utils {
       return forceRelaxationNetwork;
     }
 
+    pylimer_tools::sim::mehp::MEHPForceRelaxation getForceRelaxation() const
+    {
+      // first, convert to a useable structure for the force relaxation
+      pylimer_tools::sim::mehp::Network forceRelaxationNetwork =
+        this->convertToForceRelaxationNetwork();
+
+      // actually start force relaxation
+      pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
+        pylimer_tools::sim::mehp::MEHPForceRelaxation(forceRelaxationNetwork);
+
+      return forceRelaxer;
+    }
+
     /**
      * @brief Run force relaxation to improve the statistics of the cross-linked
      * strands
