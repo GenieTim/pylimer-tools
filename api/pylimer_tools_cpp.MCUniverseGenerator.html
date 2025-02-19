@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="MEHPForceBalance" href="pylimer_tools_cpp.MEHPForceBalance.html" /><link rel="prev" title="LinkSwappingMode" href="pylimer_tools_cpp.LinkSwappingMode.html" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.2.0 and Furo 2024.08.06 -->
         <title>MCUniverseGenerator - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
@@ -312,7 +312,7 @@
 <h1>MCUniverseGenerator<a class="headerlink" href="#mcuniversegenerator" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">MCUniverseGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ly</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">MCUniverseGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ly</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A <a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pylimer_tools_cpp.Universe</span></code></a> generator using a Monte-Carlo procedure.</p>
 <p class="rubric">Methods Summary</p>
@@ -348,6 +348,18 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability" title="pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_secondary_loop_probability</span></code></a>(self[, ...])</p></td>
 <td><p>Configure an additional weight reduction for the secondary loop formation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_crosslinker_conversion</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_atoms" title="pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_nr_of_atoms</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_bonds" title="pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_nr_of_bonds</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation" title="pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_force_relaxation</span></code></a>(self)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mean_bead_distance</span></code></a>(self)</p></td>
 <td><p>Get the currently configured mean bead distance.</p></td>
@@ -518,6 +530,26 @@ This results in more primary loops for shorter chains than for longer ones.</p>
 This results in more secondary loops for shorter chains than for longer ones.</p>
 <p>Set to 0. to disable the formation of secondary loops.</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion">
+<span class="sig-name descname"><span class="pre">get_current_crosslinker_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_atoms">
+<span class="sig-name descname"><span class="pre">get_current_nr_of_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_atoms" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_bonds">
+<span class="sig-name descname"><span class="pre">get_current_nr_of_bonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_bonds" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation">
+<span class="sig-name descname"><span class="pre">get_force_relaxation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pylimer_tools::sim::mehp::MEHPForceRelaxation</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance">
@@ -740,6 +772,10 @@ Should in principle always be valid when called from Python; if not, there is a 
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.config_nr_of_mc_steps()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.config_primary_loop_probability()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.config_secondary_loop_probability()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_current_crosslinker_conversion()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_atoms"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_current_nr_of_atoms()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_bonds"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_current_nr_of_bonds()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_force_relaxation()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_mean_bead_distance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mean_squared_bead_distance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_mean_squared_bead_distance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_atoms"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_nr_of_atoms()</span></code></a></li>

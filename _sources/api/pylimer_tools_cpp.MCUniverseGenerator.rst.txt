@@ -20,6 +20,10 @@ MCUniverseGenerator
       ~MCUniverseGenerator.config_nr_of_mc_steps
       ~MCUniverseGenerator.config_primary_loop_probability
       ~MCUniverseGenerator.config_secondary_loop_probability
+      ~MCUniverseGenerator.get_current_crosslinker_conversion
+      ~MCUniverseGenerator.get_current_nr_of_atoms
+      ~MCUniverseGenerator.get_current_nr_of_bonds
+      ~MCUniverseGenerator.get_force_relaxation
       ~MCUniverseGenerator.get_mean_bead_distance
       ~MCUniverseGenerator.get_mean_squared_bead_distance
       ~MCUniverseGenerator.get_nr_of_atoms
@@ -48,6 +52,10 @@ MCUniverseGenerator
    .. automethod:: config_nr_of_mc_steps
    .. automethod:: config_primary_loop_probability
    .. automethod:: config_secondary_loop_probability
+   .. automethod:: get_current_crosslinker_conversion
+   .. automethod:: get_current_nr_of_atoms
+   .. automethod:: get_current_nr_of_bonds
+   .. automethod:: get_force_relaxation
    .. automethod:: get_mean_bead_distance
    .. automethod:: get_mean_squared_bead_distance
    .. automethod:: get_nr_of_atoms
