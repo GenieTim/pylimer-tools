@@ -245,6 +245,10 @@ init_pylimer_bound_generators(py::module_& m)
          Run force relaxation with the cross-linkers and their strands,
          to have the cross-links in their statistically most probable position.
          )pbdoc")
+    .def("get_current_nr_of_atoms", &MCUniverseGenerator::getCurrentNrOfAtoms)
+    .def("get_current_nr_of_bonds", &MCUniverseGenerator::getCurrentNrOfBonds)
+    .def("get_current_crosslinker_conversion",
+         &MCUniverseGenerator::getCurrentCrosslinkerConversion)
     .def("validate", &MCUniverseGenerator::validateInternalState, R"pbdoc(
          Check whether the internal state of the generator is valid.
          Throws errors if not. 

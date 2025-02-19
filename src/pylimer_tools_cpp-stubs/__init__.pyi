@@ -1504,6 +1504,15 @@ class MCUniverseGenerator:
                  Set to 0. to disable the formation of secondary loops.
         """
 
+    def get_current_crosslinker_conversion(self) -> float:
+        ...
+
+    def get_current_nr_of_atoms(self) -> int:
+        ...
+
+    def get_current_nr_of_bonds(self) -> int:
+        ...
+
     def get_force_relaxation(self) -> ...:
         ...
 
