@@ -187,22 +187,47 @@ TEST_CASE("MCUniverseGenerator can generate without primary loops",
   generator.addCrosslinkers(100, 4, 2);
   generator.configPrimaryLoopProbability(0.);
   generator.addStrands(200, 10, 1);
-  generator.linkStrandsToConversion(0.9, 1.);
 
-  pe::Universe universe = generator.getUniverse();
-  CHECK(universe.getAtomsOfType(2).size() == 100);
-  CHECK(universe.getMolecules(2).size() == 200);
+  SECTION("Without max distance")
+  {
+    generator.linkStrandsToConversion(0.9, 1.);
 
-  // verify that no primary loops are present
-  // method 1: detection of molecules
-  auto chains = universe.getChainsWithCrosslinker(2);
-  for (const auto& chain : chains) {
-    CHECK(chain.getType() != pe::MoleculeType::PRIMARY_LOOP);
+    pe::Universe universe = generator.getUniverse();
+    CHECK(universe.getAtomsOfType(2).size() == 100);
+    CHECK(universe.getMolecules(2).size() == 200);
+
+    // verify that no primary loops are present
+    // method 1: detection of molecules
+    auto chains = universe.getChainsWithCrosslinker(2);
+    for (const auto& chain : chains) {
+      CHECK(chain.getType() != pe::MoleculeType::PRIMARY_LOOP);
+    }
+
+    // method 2: detection of loops
+    auto loops = universe.countLoopLengths(14);
+    CHECK(loops.size() == 0);
   }
 
-  // method 2: detection of loops
-  auto loops = universe.countLoopLengths(14);
-  CHECK(loops.size() == 0);
+  SECTION("With max distance")
+  {
+    generator.configMaxDistanceMultiplier(3.);
+    generator.linkStrandsToConversion(0.9, 1.);
+
+    pe::Universe universe = generator.getUniverse();
+    CHECK(universe.getAtomsOfType(2).size() == 100);
+    CHECK(universe.getMolecules(2).size() == 200);
+
+    // verify that no primary loops are present
+    // method 1: detection of molecules
+    auto chains = universe.getChainsWithCrosslinker(2);
+    for (const auto& chain : chains) {
+      CHECK(chain.getType() != pe::MoleculeType::PRIMARY_LOOP);
+    }
+
+    // method 2: detection of loops
+    auto loops = universe.countLoopLengths(14);
+    CHECK(loops.size() == 0);
+  }
 }
 
 TEST_CASE("Universe can cross-link up to w_sol",
