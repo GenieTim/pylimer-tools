@@ -358,8 +358,10 @@ namespace entities {
         result.conservativeResize(12);
       }
 
-      // use a set to avoid returning duplicates
-      std::set<bucket_idx_t> buckets;
+      // use a bitset to avoid returning duplicates
+      std::vector<bool> visitedBuckets =
+        pylimer_tools::utils::initializeWithValue<bool>(this->totalNrOfBuckets,
+                                                        false);
       Eigen::Array3li indexTriplet;
       // now, do permutations of all these
       assert(minIndices[0] <= maxIndices[0]);
@@ -376,7 +378,8 @@ namespace entities {
               this->getBucketIndexForTriplet(indexTriplet);
             // found the bucket, insert its contents into the results if
             // desired
-            if (buckets.insert(bucketIndex).second) {
+            if (bucketIndex >= 0 && !visitedBuckets[bucketIndex]) {
+              visitedBuckets[bucketIndex] = true;
               for (int indexInBucket = 0;
                    indexInBucket < this->neighbourBucketSizes[bucketIndex];
                    ++indexInBucket) {
@@ -490,6 +493,12 @@ namespace entities {
     triplet += this->nrOfBuckets * (triplet < 0).cast<long int>();
   }
 
+  /**
+   * @brief Decompose the one index into a triplet of indices
+   *
+   * @param index
+   * @return Eigen::Array3li
+   */
   Eigen::Array3li EigenNeighbourList::tripletFromIndex(bucket_idx_t index) const
   {
     bucket_idx_t bucketIndexZ =
@@ -503,6 +512,12 @@ namespace entities {
     return Eigen::Array3li(bucketIndexX, bucketIndexY, bucketIndexZ);
   }
 
+  /**
+   * @brief Get one index, normalized, given a triplet of indices
+   *
+   * @param ind
+   * @return bucket_idx_t
+   */
   bucket_idx_t EigenNeighbourList::getBucketIndexForTriplet(
     Eigen::Array3li ind) const
   {

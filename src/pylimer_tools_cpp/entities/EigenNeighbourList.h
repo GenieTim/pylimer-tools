@@ -132,17 +132,32 @@ namespace entities {
 
     void normalizeTriplet(Eigen::Array3li& triplet) const;
 
+    /**
+     * @brief Decompose the one index into a triplet of indices
+     *
+     * @param index
+     * @return Eigen::Array3li
+     */
     Eigen::Array3li tripletFromIndex(bucket_idx_t index) const;
 
+    /**
+     * @brief Get one index, normalized, given a triplet of indices
+     *
+     * @param ind
+     * @return bucket_idx_t
+     */
     bucket_idx_t getBucketIndexForTriplet(Eigen::Array3li ind) const;
 
     Eigen::Array3li getBucketTripletForCoordinates(
       const Eigen::Vector3d& coordinates) const;
 
   private:
+    // the width of the buckets in each dimension (double)
     Eigen::Array3d bucketWidths;
+    // the number of buckets in each dimension (integer)
     Eigen::Array3li nrOfBuckets;
 
+    // the total number of buckets (integer)
     size_t totalNrOfBuckets;
 
     double cutoff;
