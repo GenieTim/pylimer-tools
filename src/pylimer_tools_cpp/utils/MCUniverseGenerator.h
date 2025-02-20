@@ -3,6 +3,7 @@
 
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
+#include "../entities/EigenNeighbourList.h"
 #include "../entities/Universe.h"
 #include "../sim/MEHPForceRelaxation.h"
 #include "../sim/MEHPUtilityStructures.h"
@@ -127,6 +128,12 @@ namespace utils {
       INVALIDARG_EXP_IFN(newSecondaryLoopProbability >= 0,
                          "Invalid secondary loop formation probability");
       this->secondaryLoopProbability = newSecondaryLoopProbability;
+    }
+
+    void configMaxDistanceMultiplier(double newMaxDistanceMultiplier = -1.)
+    {
+      this->maxDistanceMult = newMaxDistanceMultiplier;
+      this->resetNeighbourList();
     }
 
     /**
@@ -289,6 +296,7 @@ namespace utils {
         this->remainingCrossLinkerFunctionality.push_back(
           crosslinkerFunctionality);
       }
+      this->updateNeighbourListCoordinates();
 #ifndef NDEBUG
       this->validateInternalState();
 #endif
@@ -466,6 +474,7 @@ namespace utils {
         }
       }
 
+      this->updateNeighbourListCoordinates();
       this->validateInternalState();
     }
 
@@ -540,6 +549,7 @@ namespace utils {
           crosslinkerFunctionality - 1);
       }
 
+      this->updateNeighbourListCoordinates();
       this->validateInternalState();
     }
 
@@ -709,8 +719,9 @@ namespace utils {
           static_cast<double>(
             this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
             timesNForR02,
-          -1. // beadsPerChains[strandIdx] * this->beadDistance
-        );
+          static_cast<double>(
+            this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
+            this->maxDistanceMult);
 
         this->simplifiedUniverse.strandTo[strandIdx] = partnerCrosslinker;
         this->remainingCrossLinkerFunctionality[partnerCrosslinker] -= 1;
@@ -825,8 +836,9 @@ namespace utils {
               static_cast<double>(
                 this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
                 timesNForR02,
-              -1. // beadsPerChains[strandIdx] * this->beadDistance
-            );
+              static_cast<double>(
+                this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
+                this->maxDistanceMult);
 
             this->simplifiedUniverse.strandTo[strandIdx] = partnerCrosslinker;
             this->remainingCrossLinkerFunctionality[partnerCrosslinker] -= 1;
@@ -1214,6 +1226,7 @@ namespace utils {
           this->simplifiedUniverse.xlinkZ[i] *= scalingFactor;
         }
       }
+      this->updateNeighbourListCoordinates();
     }
 
     /**
@@ -1389,6 +1402,7 @@ namespace utils {
         this->simplifiedUniverse.xlinkZ[i] =
           forceRelaxationNetwork.coordinates(3 * i + 2);
       }
+      this->updateNeighbourListCoordinates();
     }
 
     /**
@@ -1509,20 +1523,25 @@ namespace utils {
     }
 
   private:
+    /// settings
     double beadDistance;
     double meanSquaredBeadDistance;
     double primaryLoopProbability = 1.0;
     double secondaryLoopProbability = 1.0;
+    double maxDistanceMult = -1.0;
     size_t nMcSteps = 2000;
+    /// random distributions
     std::mt19937 rng;
     std::uniform_real_distribution<double> distX;
     std::uniform_real_distribution<double> distY;
     std::uniform_real_distribution<double> distZ;
 
+    /// state
     CrosslinkerUniverse simplifiedUniverse;
     long int originalNrOfAvailableCrosslinkSites = 0;
     long int nrOfAvailableCrosslinkSites = 0;
     std::vector<int> remainingCrossLinkerFunctionality;
+    pylimer_tools::entities::EigenNeighbourList xlinkNeighbourList;
     pylimer_tools::entities::Box box;
 
     /**
@@ -1856,46 +1875,48 @@ namespace utils {
                                const double desiredR02,
                                const double maxDistance)
     {
-      assert(this->simplifiedUniverse.xlinkTypes.size() ==
-             this->remainingCrossLinkerFunctionality.size());
+      RUNTIME_EXP_IFN(this->simplifiedUniverse.xlinkTypes.size() ==
+                        this->remainingCrossLinkerFunctionality.size(),
+                      "Invalid internal state, number of and remaining "
+                      "cross-link functionalities mismatch");
+
+      double sumOfWeights = 0.0;
+      const double normalisationFactorInExponential = -3. / (2. * desiredR02);
 
       std::vector<size_t> suitableMatches;
       std::vector<double> matchWeights;
-      double sumOfWeights = 0.0;
-      const double normalisationFactorInExponential = -3. / (2. * desiredR02);
-      size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
-      // TODO: use a neighbour list instead, maybe?
-      for (int i = 0; i < nCrosslinks; ++i) {
-        if (this->remainingCrossLinkerFunctionality[i] < 1) {
-          continue;
+      if (maxDistance < 0.) {
+        matchWeights.reserve(this->nrOfAvailableCrosslinkSites);
+        suitableMatches.reserve(this->nrOfAvailableCrosslinkSites);
+        size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+        for (int i = 0; i < nCrosslinks; ++i) {
+          double thisWeight = this->evaluatePartnerProbability(
+            from, i, normalisationFactorInExponential, maxDistance);
+          if (thisWeight < 0.0) {
+            continue;
+          }
+          suitableMatches.push_back(i);
+          matchWeights.push_back(thisWeight);
+          sumOfWeights += thisWeight;
         }
-        size_t partner = i;
-        Eigen::Vector3d dist = this->getVectorBetween(from, i);
-        if (dist.norm() < maxDistance || maxDistance < 0.) {
-          suitableMatches.push_back(partner);
-          double thisWeight =
-            static_cast<double>(this->remainingCrossLinkerFunctionality[i]) *
-            std::exp(dist.squaredNorm() * normalisationFactorInExponential);
-          if (partner == from) {
-            thisWeight *= this->primaryLoopProbability;
+      } else {
+        // else: use a neighbour list instead, to improve performance
+        // we could possibly improve this further by pre-allocating the result
+        // array
+        Eigen::ArrayXi acceptableIndices =
+          this->xlinkNeighbourList.getIndicesCloseToCoordinates(
+            Eigen::Vector3d(this->simplifiedUniverse.xlinkX[from],
+                            this->simplifiedUniverse.xlinkY[from],
+                            this->simplifiedUniverse.xlinkZ[from]),
+            maxDistance);
+        for (int i = 0; i < acceptableIndices.size(); ++i) {
+          int crosslinkIdx = acceptableIndices(i);
+          double thisWeight = this->evaluatePartnerProbability(
+            from, crosslinkIdx, normalisationFactorInExponential, maxDistance);
+          if (thisWeight <= 0.0) {
+            continue;
           }
-          if (this->secondaryLoopProbability != 1.) {
-            // check whether this cross-link would lead to a secondary loop
-            // => apply weight for every other already existing back-link
-            for (size_t partnersSubStrand :
-                 this->simplifiedUniverse.strandsOfXlink[partner]) {
-              assert(this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
-                       partner ||
-                     this->simplifiedUniverse.strandTo[partnersSubStrand] ==
-                       partner);
-              if (this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
-                    from ||
-                  this->simplifiedUniverse.strandTo[partnersSubStrand] ==
-                    from) {
-                thisWeight *= this->secondaryLoopProbability;
-              }
-            }
-          }
+          suitableMatches.push_back(crosslinkIdx);
           matchWeights.push_back(thisWeight);
           sumOfWeights += thisWeight;
         }
@@ -1908,6 +1929,68 @@ namespace utils {
       std::discrete_distribution<long int> weightDist(matchWeights.begin(),
                                                       matchWeights.end());
       return suitableMatches[weightDist(this->rng)];
+    }
+
+    double evaluatePartnerProbability(
+      size_t from,
+      size_t to,
+      const double normalisationFactorInExponential,
+      const double maxDistance)
+    {
+      if (this->remainingCrossLinkerFunctionality[to] < 1) {
+        return -1.;
+      }
+      Eigen::Vector3d dist = this->getVectorBetween(from, to);
+      double thisWeight = -1.;
+      if (dist.norm() < maxDistance || maxDistance < 0.) {
+        thisWeight =
+          static_cast<double>(this->remainingCrossLinkerFunctionality[to]) *
+          std::exp(dist.squaredNorm() * normalisationFactorInExponential);
+        if (to == from) {
+          thisWeight *= this->primaryLoopProbability;
+        }
+        if (this->secondaryLoopProbability != 1.) {
+          // check whether this cross-link would lead to a secondary loop
+          // => apply weight for every other already existing back-link
+          for (size_t partnersSubStrand :
+               this->simplifiedUniverse.strandsOfXlink[to]) {
+            assert(this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
+                     to ||
+                   this->simplifiedUniverse.strandTo[partnersSubStrand] == to);
+            if (this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
+                  from ||
+                this->simplifiedUniverse.strandTo[partnersSubStrand] == from) {
+              thisWeight *= this->secondaryLoopProbability;
+            }
+          }
+        }
+      }
+      return thisWeight;
+    }
+
+    /**
+     * @brief Re-initialize the neighbour list of the cross-links
+     *
+     */
+    void resetNeighbourList()
+    {
+      if (this->maxDistanceMult > 0.) {
+        Eigen::VectorXd newCoordinates = this->getCrosslinkCoordinates();
+        this->xlinkNeighbourList.initialize(
+          newCoordinates, this->box, this->maxDistanceMult);
+      }
+    }
+
+    /**
+     * @brief Update the coordinates stored in the neighbour list
+     *
+     */
+    void updateNeighbourListCoordinates()
+    {
+      Eigen::VectorXd newCoordinates = this->getCrosslinkCoordinates();
+      if (this->maxDistanceMult > 0.) {
+        this->xlinkNeighbourList.resetCoordinates(newCoordinates);
+      }
     }
 
     ///// Utility functions
@@ -1953,6 +2036,23 @@ namespace utils {
       diff << x2 - x1, y2 - y1, z2 - z1;
       this->box.handlePBC(diff);
       return diff.norm();
+    }
+
+    /**
+     * @brief Copy the cross-linker coordinates into an Eigen::VectorXd
+     *
+     * @return Eigen::VectorXd
+     */
+    Eigen::VectorXd getCrosslinkCoordinates()
+    {
+      size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+      Eigen::VectorXd coordinates = Eigen::VectorXd(3 * nCrosslinks);
+      for (size_t i = 0; i < nCrosslinks; ++i) {
+        coordinates(3 * i) = this->simplifiedUniverse.xlinkX[i];
+        coordinates(3 * i + 1) = this->simplifiedUniverse.xlinkY[i];
+        coordinates(3 * i + 2) = this->simplifiedUniverse.xlinkZ[i];
+      }
+      return coordinates;
     }
   };
 } // namespace utils
