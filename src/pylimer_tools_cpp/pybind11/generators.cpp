@@ -97,6 +97,10 @@ init_pylimer_bound_generators(py::module_& m)
 
          For example, you may expect a maximum end-to-end distance of a chain to be :math:`N b`,
          in which case you would set this value to :math:`b`.
+
+         Note that the neighbour list is initialized when this function is called.
+         It does respect all :math:`N` that are set at that point.
+         Therefore, try to call this method after adding strands, before doing cross-linking.
          )pbdoc",
          py::arg("multiplier") = -1.0)
     .def("add_crosslinkers_at",

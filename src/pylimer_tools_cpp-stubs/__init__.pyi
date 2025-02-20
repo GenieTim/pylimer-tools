@@ -1483,6 +1483,10 @@ class MCUniverseGenerator:
 
                  For example, you may expect a maximum end-to-end distance of a chain to be :math:`N b`,
                  in which case you would set this value to :math:`b`.
+
+                 Note that the neighbour list is initialized when this function is called.
+                 It does respect all :math:`N` that are set at that point.
+                 Therefore, try to call this method after adding strands, before doing cross-linking.
         """
 
     def config_nr_of_mc_steps(self, n_steps: int = 2000) -> None:
