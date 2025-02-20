@@ -1945,7 +1945,8 @@ namespace utils {
       if (dist.norm() < maxDistance || maxDistance < 0.) {
         thisWeight =
           static_cast<double>(this->remainingCrossLinkerFunctionality[to]) *
-          std::exp(dist.squaredNorm() * normalisationFactorInExponential);
+          static_cast<double>(std::exp<float>(static_cast<float>(
+            dist.squaredNorm() * normalisationFactorInExponential)));
         if (to == from) {
           thisWeight *= this->primaryLoopProbability;
         }
