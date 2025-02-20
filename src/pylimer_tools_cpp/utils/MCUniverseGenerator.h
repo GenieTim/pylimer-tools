@@ -1977,6 +1977,12 @@ namespace utils {
     {
       if (this->maxDistanceMult > 0.) {
         Eigen::VectorXd newCoordinates = this->getCrosslinkCoordinates();
+        double idealCutoff =
+          (static_cast<double>(*std::max_element(
+             std::begin(this->simplifiedUniverse.beadsInStrand),
+             std::end(this->simplifiedUniverse.beadsInStrand))) +
+           1.) *
+          this->maxDistanceMult;
         this->xlinkNeighbourList.initialize(
           newCoordinates, this->box, this->maxDistanceMult);
       }
