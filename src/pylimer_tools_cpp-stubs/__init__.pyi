@@ -1477,6 +1477,14 @@ class MCUniverseGenerator:
                     :param strand_atom_type: Type of atoms for the strands (default: 1).
         """
 
+    def config_max_distance_multiplier(self, multiplier: float = -1.0) -> None:
+        """
+                 For larger systems, you may want to set this value to something > 0 in order to improve sampling performance.
+
+                 For example, you may expect a maximum end-to-end distance of a chain to be :math:`N b`,
+                 in which case you would set this value to :math:`b`.
+        """
+
     def config_nr_of_mc_steps(self, n_steps: int = 2000) -> None:
         """
         Set the number of Monte-Carlo steps during bond length equilibration.

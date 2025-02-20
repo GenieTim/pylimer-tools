@@ -90,6 +90,15 @@ init_pylimer_bound_generators(py::module_& m)
          Set to 0. to disable the formation of secondary loops.
          )pbdoc",
          py::arg("probability") = 1.0)
+    .def("config_max_distance_multiplier",
+         &MCUniverseGenerator::configMaxDistanceMultiplier,
+         R"pbdoc(
+         For larger systems, you may want to set this value to something > 0 in order to improve sampling performance.
+
+         For example, you may expect a maximum end-to-end distance of a chain to be :math:`N b`,
+         in which case you would set this value to :math:`b`.
+         )pbdoc",
+         py::arg("multiplier") = -1.0)
     .def("add_crosslinkers_at",
          &MCUniverseGenerator::addCrosslinkersAt,
          R"pbdoc(
