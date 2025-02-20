@@ -516,6 +516,9 @@ To link them to cross-linkers, use some of the <code class="code docutils litera
 <dd><p>For larger systems, you may want to set this value to something &gt; 0 in order to improve sampling performance.</p>
 <p>For example, you may expect a maximum end-to-end distance of a chain to be <span class="math notranslate nohighlight">\(N b\)</span>,
 in which case you would set this value to <span class="math notranslate nohighlight">\(b\)</span>.</p>
+<p>Note that the neighbour list is initialized when this function is called.
+It does respect all <span class="math notranslate nohighlight">\(N\)</span> that are set at that point.
+Therefore, try to call this method after adding strands, before doing cross-linking.</p>
 </dd></dl>
 
 <dl class="py method">
