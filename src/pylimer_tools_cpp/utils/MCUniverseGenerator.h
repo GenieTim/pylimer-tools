@@ -1984,7 +1984,7 @@ namespace utils {
            1.) *
           this->maxDistanceMult;
         this->xlinkNeighbourList.initialize(
-          newCoordinates, this->box, this->maxDistanceMult);
+          newCoordinates, this->box, idealCutoff);
       }
     }
 
