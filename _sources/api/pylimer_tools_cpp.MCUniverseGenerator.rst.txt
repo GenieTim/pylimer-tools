@@ -17,6 +17,7 @@ MCUniverseGenerator
       ~MCUniverseGenerator.add_randomly_functionalized_strands
       ~MCUniverseGenerator.add_solvent_chains
       ~MCUniverseGenerator.add_strands
+      ~MCUniverseGenerator.config_max_distance_multiplier
       ~MCUniverseGenerator.config_nr_of_mc_steps
       ~MCUniverseGenerator.config_primary_loop_probability
       ~MCUniverseGenerator.config_secondary_loop_probability
@@ -49,6 +50,7 @@ MCUniverseGenerator
    .. automethod:: add_randomly_functionalized_strands
    .. automethod:: add_solvent_chains
    .. automethod:: add_strands
+   .. automethod:: config_max_distance_multiplier
    .. automethod:: config_nr_of_mc_steps
    .. automethod:: config_primary_loop_probability
    .. automethod:: config_secondary_loop_probability
