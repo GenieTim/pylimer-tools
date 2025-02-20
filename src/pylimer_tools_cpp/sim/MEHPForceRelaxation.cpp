@@ -29,6 +29,8 @@ namespace sim {
       double ftol)
     {
       this->simulationHasRun = true;
+      RUNTIME_EXP_IFN(this->forceEvaluator != nullptr,
+                      "Force evaluator is not set");
       this->forceEvaluator->setNetwork(this->forceRelaxationNetwork);
       this->forceEvaluator->setIs2D(this->is2D);
       this->forceEvaluator->prepareForEvaluations();

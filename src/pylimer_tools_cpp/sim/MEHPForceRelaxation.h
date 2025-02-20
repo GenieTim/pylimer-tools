@@ -66,15 +66,15 @@ namespace sim {
       MEHPForceRelaxation(const pylimer_tools::entities::Universe& u,
                           int crossLinkerType = 2,
                           bool is2D = false,
-                          MEHPForceEvaluator* forceEvaluator = nullptr,
+                          MEHPForceEvaluator* newForceEvaluator = nullptr,
                           double kappa = 1.0,
                           bool remove2functionalCrosslinkers = false,
                           bool removeDanglingChains = false)
         : universe(u)
       {
-        if (forceEvaluator == nullptr) {
+        if (newForceEvaluator == nullptr) {
           this->springForceEvaluator = SimpleSpringMEHPForceEvaluator(kappa);
-          forceEvaluator = &this->springForceEvaluator;
+          newForceEvaluator = &this->springForceEvaluator;
         }
         this->crossLinkerType = crossLinkerType;
         // interpret network already to be able to give early results
@@ -93,23 +93,23 @@ namespace sim {
         this->forceRelaxationNetwork = net;
         this->is2D = is2D;
         this->initializeDefaults();
-        this->setForceEvaluator(forceEvaluator);
+        this->setForceEvaluator(newForceEvaluator);
       };
 
       MEHPForceRelaxation(const Network& net,
                           bool is2D = false,
-                          MEHPForceEvaluator* forceEvaluator = nullptr,
+                          MEHPForceEvaluator* newForceEvaluator = nullptr,
                           double kappa = 1.0)
       {
         this->forceRelaxationNetwork = net;
 
-        if (forceEvaluator == nullptr) {
+        if (newForceEvaluator == nullptr) {
           this->springForceEvaluator = SimpleSpringMEHPForceEvaluator(kappa);
-          forceEvaluator = &this->springForceEvaluator;
+          newForceEvaluator = &this->springForceEvaluator;
         }
 
         this->initializeDefaults();
-        this->setForceEvaluator(forceEvaluator);
+        this->setForceEvaluator(newForceEvaluator);
       }
 
 #ifdef CEREALIZABLE
