@@ -659,9 +659,61 @@ Optional, can be passed to improve performance</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_monomer_is_effective">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_probability_that_monomer_is_effective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">functionality_of_monomer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_degree_of_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_f_a_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_monomer_is_effective" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the probability that an Af, monomer will be an effective cross-link of degree m</p>
+<dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_dangling">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_probability_that_bifunctional_monomer_is_dangling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_f_b_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_dangling" title="Link to this definition">¶</a></dt>
+<dd><p>Consider a copolymerization of A_f with B_2.
+This function computes the probability that a random B_2 unit will be dangling.</p>
+<dl class="simple">
+<dt>Source:</dt><dd><ul class="simple">
+<li><p>Eq. 6.1 in <a class="reference external" href="https://doi.org/10.1002/pen.760190409">https://doi.org/10.1002/pen.760190409</a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>beta</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_B^{out})\)</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_effective">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_probability_that_bifunctional_monomer_is_effective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_f_b_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_effective" title="Link to this definition">¶</a></dt>
+<dd><p>Consider a copolymerization of A_f with B_2.
+This function computes the probability that a random B_2 unit will be effective.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>beta</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_B^{out})\)</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_dangling">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_probability_that_crosslink_is_dangling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">functionality_of_monomer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_f_a_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_dangling" title="Link to this definition">¶</a></dt>
+<dd><p>Consider a copolymerization of A_f with B_2.
+This function computes the probability that a random A_f unit will be dangling (pendant).
+This is equal to the probability that only one of the arms is attached to the gel.</p>
+<dl class="simple">
+<dt>Source:</dt><dd><ul class="simple">
+<li><p>Eq. 6.2 in <a class="reference external" href="https://doi.org/10.1002/pen.760190409">https://doi.org/10.1002/pen.760190409</a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>functionality_of_monomer</strong> (<em>-</em>) – f</p></li>
+<li><p><strong>alpha</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_A^{out})\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_effective">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_probability_that_crosslink_is_effective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">functionality_of_monomer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_degree_of_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_f_a_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_effective" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the probability that an Af, monomer will be an effective cross-link of exactly degree m</p>
 <p><span class="math notranslate nohighlight">\(P(X_m^f) = inom{f}{m} [P(F_A^{out})]^{f-m}[1-P(F_A^{out})]^m\)</span></p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
@@ -674,6 +726,28 @@ Optional, can be passed to improve performance</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>functionality_of_monomer</strong> (<em>-</em>) – f</p></li>
 <li><p><strong>expected_decree_of_effect</strong> (<em>-</em>) – m</p></li>
+<li><p><strong>alpha</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_A^{out})\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_with_degree_is_dangling">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_probability_that_crosslink_with_degree_is_dangling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">functionality_of_monomer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree_of_ineffectiveness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_f_a_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_with_degree_is_dangling" title="Link to this definition">¶</a></dt>
+<dd><p>Consider a copolymerization of A_f with B_2.
+This function computes the probability that a random A_f unit will have i pendant arms.</p>
+<dl class="simple">
+<dt>Source:</dt><dd><ul class="simple">
+<li><p>Eq. 6.3 in <a class="reference external" href="https://doi.org/10.1002/pen.760190409">https://doi.org/10.1002/pen.760190409</a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>functionality_of_monomer</strong> (<em>-</em>) – f</p></li>
+<li><p><strong>degree_of_ineffectiveness</strong> (<em>-</em>) – i</p></li>
 <li><p><strong>alpha</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_A^{out})\)</span></p></li>
 </ul>
 </dd>
@@ -704,20 +778,13 @@ Provide all parameters if you don’t have the network.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_weight_fraction_of_backbone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionality_per_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the weight fraction of the backbone strands in an infinite network</p>
-<dl class="simple">
-<dt>Source:</dt><dd><ul class="simple">
-<li><p><a class="reference external" href="https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737">https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737</a> (see supporting information for formulae)</p></li>
-<li><p><a class="reference external" href="https://pubs.acs.org/doi/10.1021/ma00046a021">https://pubs.acs.org/doi/10.1021/ma00046a021</a> (see appendix)</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Compute the weight fraction of the backbone (elastically effective) strands in an infinite network</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>network</strong> (<em>-</em>) – the polymer network to do the computation for</p></li>
 <li><p><strong>crosslinker_type</strong> (<em>-</em>) – the type of the junctions/cross-linkers to select them in the network</p></li>
-<li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.</p></li>
+<li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: atom type, and value: functionality atoms with this type.</p></li>
 <li><p><strong>weight_fractions</strong> (<em>-</em>) – a dictionary with the weight fraction of each type of atom</p></li>
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
 <li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the crosslinkers</p></li>
@@ -728,7 +795,7 @@ Provide all parameters if you don’t have the network.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\Phi_{el}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\Phi_{el} = w_e\)</span></p></li>
 </ul>
 </p>
 </dd>
@@ -738,7 +805,13 @@ Provide all parameters if you don’t have the network.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_weight_fraction_of_dangling_chains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionality_per_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the weight fraction of dangling strands in infinite network</p>
+<dd><p>Compute the weight fraction of dangling (pendant) strands in infinite network</p>
+<dl class="simple">
+<dt>Source:</dt><dd><ul class="simple">
+<li><p>Eq. 6.4 in <a class="reference external" href="https://doi.org/10.1002/pen.760190409">https://doi.org/10.1002/pen.760190409</a></p></li>
+</ul>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -755,7 +828,7 @@ Provide all parameters if you don’t have the network.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
-<li><p>weightFraction $Phi_d = 1 - Phi_{el} - w_{sol}$</p></li>
+<li><p>weightFraction <span class="math notranslate nohighlight">\($\Phi_d = w_p$\)</span></p></li>
 </ul>
 </p>
 </dd>
@@ -1442,7 +1515,11 @@ that have a weight less than a certain fraction of the total weight.</p>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus"><code class="docutils literal notranslate"><span class="pre">compute_junction_modulus()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities"><code class="docutils literal notranslate"><span class="pre">compute_miller_macosko_probabilities()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition"><code class="docutils literal notranslate"><span class="pre">compute_modulus_decomposition()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_monomer_is_effective"><code class="docutils literal notranslate"><span class="pre">compute_probability_that_monomer_is_effective()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_dangling"><code class="docutils literal notranslate"><span class="pre">compute_probability_that_bifunctional_monomer_is_dangling()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_effective"><code class="docutils literal notranslate"><span class="pre">compute_probability_that_bifunctional_monomer_is_effective()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_dangling"><code class="docutils literal notranslate"><span class="pre">compute_probability_that_crosslink_is_dangling()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_effective"><code class="docutils literal notranslate"><span class="pre">compute_probability_that_crosslink_is_effective()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_with_degree_is_dangling"><code class="docutils literal notranslate"><span class="pre">compute_probability_that_crosslink_with_degree_is_dangling()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor"><code class="docutils literal notranslate"><span class="pre">compute_trapping_factor()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone"><code class="docutils literal notranslate"><span class="pre">compute_weight_fraction_of_backbone()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains"><code class="docutils literal notranslate"><span class="pre">compute_weight_fraction_of_dangling_chains()</span></code></a></li>
