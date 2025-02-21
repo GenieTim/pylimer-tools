@@ -10,8 +10,10 @@ from scipy import optimize
 from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
     compute_effective_crosslinker_functionality,
-    compute_stoichiometric_imbalance, compute_weight_fractions,
-    measure_weight_fraction_of_soluble_material)
+    compute_stoichiometric_imbalance,
+    compute_weight_fractions,
+    measure_weight_fraction_of_soluble_material,
+)
 from pylimer_tools.io.unit_styles import UnitStyle
 from pylimer_tools_cpp import Universe
 
@@ -165,7 +167,10 @@ def compute_weight_fraction_of_dangling_chains(
     p: float = None,
 ) -> float:
     """
-    Compute the weight fraction of dangling strands in infinite network
+    Compute the weight fraction of dangling (pendant) strands in infinite network
+
+    Source:
+      - Eq. 6.4 in https://doi.org/10.1002/pen.760190409
 
     Arguments:
       - network: the network to compute the weight fraction for
@@ -176,21 +181,43 @@ def compute_weight_fraction_of_dangling_chains(
       - p: the extent of reaction in terms of the crosslinkers
 
     Returns:
-      - weightFraction $\\Phi_d = 1 - \\Phi_{el} - w_{sol}$: weightDangling/weightTotal
+      - weightFraction :math:`$\\Phi_d = w_p$`: weightDangling/weightTotal
     """
+    if network is not None and network.get_nr_of_atoms() == 0:
+        return 0
 
-    # possible alternative?!:
-    # 2*beta*(1-beta)
+    if functionality_per_type is None or crosslinker_type not in functionality_per_type:
+        functionality_per_type = network.determine_functionality_per_type()
 
-    return (
-        1.0
-        - compute_weight_fraction_of_backbone(
-            network, crosslinker_type, functionality_per_type, weight_fractions, r, p
-        )
-        - compute_weight_fraction_of_soluble_material(
-            network, crosslinker_type, functionality_per_type, weight_fractions, r, p
-        )
+    weight_fractions, alpha, beta = compute_weight_fractions_and_probabilities(
+        network, crosslinker_type, functionality_per_type, weight_fractions, r, p
     )
+
+    w_dangling = 0.0
+    for atom_type, weight_fraction in weight_fractions.items():
+        if atom_type == crosslinker_type:
+            probabilities = compute_probability_that_crosslink_is_dangling(
+                functionality_per_type[crosslinker_type], alpha
+            )
+            for i in range(functionality_per_type[crosslinker_type] - 1):
+                probabilities += (
+                    compute_probability_that_crosslink_with_degree_is_dangling(
+                        functionality_of_monomer=functionality_per_type[
+                            crosslinker_type
+                        ],
+                        degree_of_ineffectiveness=i,
+                        p_f_a_out=alpha,
+                    )
+                    * (i / functionality_per_type[crosslinker_type])
+                )
+            w_dangling += probabilities * weight_fraction
+        else:
+            w_dangling += (
+                weight_fraction
+                * compute_probability_that_bifunctional_monomer_is_dangling(beta)
+            )
+
+    return w_dangling
 
 
 def compute_weight_fraction_of_backbone(
@@ -202,22 +229,18 @@ def compute_weight_fraction_of_backbone(
     p: float = None,
 ) -> float:
     """
-    Compute the weight fraction of the backbone strands in an infinite network
-
-    Source:
-      - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737 (see supporting information for formulae)
-      - https://pubs.acs.org/doi/10.1021/ma00046a021 (see appendix)
+    Compute the weight fraction of the backbone (elastically effective) strands in an infinite network
 
     Arguments:
       - network: the polymer network to do the computation for
       - crosslinker_type: the type of the junctions/cross-linkers to select them in the network
-      - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
+      - functionality_per_type: a dictionary with key: atom type, and value: functionality atoms with this type.
       - weight_fractions: a dictionary with the weight fraction of each type of atom
       - r: the stoichiometric imbalance
       - p: the extent of reaction in terms of the crosslinkers
 
     Returns:
-      - :math:`\\Phi_{el}`: weight fraction of network backbone
+      - :math:`\\Phi_{el} = w_e`: weight fraction of network backbone
     """
     if network is not None and network.get_nr_of_atoms() == 0:
         return 0
@@ -228,49 +251,25 @@ def compute_weight_fraction_of_backbone(
     weight_fractions, alpha, beta = compute_weight_fractions_and_probabilities(
         network, crosslinker_type, functionality_per_type, weight_fractions, r, p
     )
-    w_sol = compute_weight_fraction_of_soluble_material(
-        network, crosslinker_type, functionality_per_type, weight_fractions, r, p
-    )
-    if w_sol < 0 or w_sol > 1:
-        warnings.warn(
-            "The weight fraction w_sol predicted by MMT ({}) is outside accepted range. ".format(
-                w_sol
-            )
-            + "Falling back to measurement."
-        )
-        w_sol = measure_weight_fraction_of_soluble_material(network)
 
-    phi_el = 0
-    w_a = weight_fractions[crosslinker_type] / \
-        functionality_per_type[crosslinker_type]
-    w_xl = weight_fractions[crosslinker_type]
-    w_x2 = 1 - w_xl
-    assert w_a <= 1 and w_a >= 0
-    assert w_xl <= 1 and w_xl >= 0
-    assert w_x2 <= 1 and w_x2 >= 0
-    assert w_sol <= 1 and w_sol >= 0
-    if w_sol == 1:
-        return 0
-    if functionality_per_type[crosslinker_type] == 3:
-        phi_el = (
-            (w_x2 * (1 - beta) ** 2)
-            + (w_xl * ((1 - alpha) ** 3 + 3 * alpha * (1 - w_a) * ((1 - alpha) ** 2)))
-        ) / (1 - w_sol)
-    else:
-        assert functionality_per_type[crosslinker_type] == 4
-        phi_el = (
-            (w_x2 * (1 - beta) ** 2)
-            + (
-                w_xl
-                * (
-                    ((1 - alpha) ** 4)
-                    + 4 * alpha * (1 - w_a) * ((1 - alpha) ** 3)
-                    + 6 * (alpha**2) * (1 - 2 * w_a) * (1 - alpha) ** 2
-                )
+    w_elastic = 0.0
+    for atom_type, weight_fraction in weight_fractions.items():
+        if atom_type == crosslinker_type:
+            probabilities = 0.0
+            for i in range(2, functionality_per_type[crosslinker_type] + 1):
+                probabilities += compute_probability_that_crosslink_is_effective(
+                    functionality_of_monomer=functionality_per_type[crosslinker_type],
+                    expected_degree_of_effect=i,
+                    p_f_a_out=alpha,
+                ) * (i / functionality_per_type[crosslinker_type])
+            w_elastic += probabilities * weight_fraction
+        else:
+            w_elastic += (
+                weight_fraction
+                * compute_probability_that_bifunctional_monomer_is_effective(beta)
             )
-        ) / (1 - w_sol)
 
-    return phi_el
+    return w_elastic
 
 
 def compute_weight_fraction_of_soluble_material(
@@ -329,7 +328,7 @@ def compute_weight_fraction_of_soluble_material(
     for key in weight_fractions:
         coefficient = alpha if key == crosslinker_type else beta
         if key not in weight_fractions or math.isclose(
-            weight_fractions[key], 0, abs_tol=1e-10
+            weight_fractions[key], 0.0, abs_tol=1e-10
         ):
             continue
         w_sol += weight_fractions[key] * (
@@ -667,9 +666,9 @@ def compute_modulus_decomposition(
     alpha, beta = compute_miller_macosko_probabilities(r, p, f)
     gamma_mmt_sum = 0.0
     for m in range(3, f + 1):
-        gamma_mmt_sum += ((m - 2) / 2) * compute_probability_that_monomer_is_effective(
-            f, m, alpha
-        )
+        gamma_mmt_sum += (
+            (m - 2) / 2
+        ) * compute_probability_that_crosslink_is_effective(f, m, alpha)
     gamma_mmt = (2 * r / f) * gamma_mmt_sum if f != 0 else 0.0
     g_mmt_phantom = gamma_mmt * nu * kb * temperature
     # fraction of elastically effective strands.
@@ -792,9 +791,9 @@ def compute_junction_modulus(
         alpha, _ = compute_miller_macosko_probabilities(r, p, f)
     gamma_mmt_sum = 0.0
     for m in range(3, f + 1):
-        gamma_mmt_sum += ((m - 2) / 2) * compute_probability_that_monomer_is_effective(
-            f, m, alpha
-        )
+        gamma_mmt_sum += (
+            (m - 2) / 2
+        ) * compute_probability_that_crosslink_is_effective(f, m, alpha)
 
     kb = 1.380649e-23 * ureg.joule / ureg.kelvin
     return kb * temperature * xlink_concentration_0 * gamma_mmt_sum
@@ -854,11 +853,11 @@ def compute_trapping_factor(
     return pel**2
 
 
-def compute_probability_that_monomer_is_effective(
+def compute_probability_that_crosslink_is_effective(
     functionality_of_monomer: int, expected_degree_of_effect: int, p_f_a_out: float
 ):
     """
-    Compute the probability that an Af, monomer will be an effective cross-link of degree m
+    Compute the probability that an Af, monomer will be an effective cross-link of exactly degree m
 
     :math:`P(X_m^f) = \binom{f}{m} [P(F_A^{out})]^{f-m}[1-P(F_A^{out})]^m`
 
@@ -870,11 +869,88 @@ def compute_probability_that_monomer_is_effective(
         - expected_decree_of_effect: m
         - alpha: :math:`P(F_A^{out})`
     """
+    assert 0 <= p_f_a_out <= 1, "p_f_a_out must be between 0 and 1"
     f = functionality_of_monomer
     m = expected_degree_of_effect
     alpha = p_f_a_out
     return scipy.special.binom(
         f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
+
+
+def compute_probability_that_bifunctional_monomer_is_effective(
+        p_f_b_out: float):
+    """
+    Consider a copolymerization of A_f with B_2.
+    This function computes the probability that a random B_2 unit will be effective.
+
+    Arguments:
+        - beta: :math:`P(F_B^{out})`
+    """
+    assert 0 <= p_f_b_out <= 1, "p_f_b_out must be between 0 and 1"
+    return (1 - p_f_b_out) ** 2
+
+
+def compute_probability_that_crosslink_with_degree_is_dangling(
+    functionality_of_monomer: int, degree_of_ineffectiveness: int, p_f_a_out: float
+):
+    """
+    Consider a copolymerization of A_f with B_2.
+    This function computes the probability that a random A_f unit will have i pendant arms.
+
+    Source:
+        - Eq. 6.3 in https://doi.org/10.1002/pen.760190409
+
+    Arguments:
+        - functionality_of_monomer: f
+        - degree_of_ineffectiveness: i
+        - alpha: :math:`P(F_A^{out})`
+    """
+    assert 0 <= p_f_a_out <= 1, "p_f_a_out must be between 0 and 1"
+    f = functionality_of_monomer
+    i = degree_of_ineffectiveness
+    assert i <= f - 2, "degree_of_ineffectiveness must be less or equal to f-2"
+    alpha = p_f_a_out
+    # NOTE: verify that the last exponent is f - m, rather than f - 1 as in
+    # the paper
+    return scipy.special.binom(f, i) * (alpha ** (i)) * \
+        ((1.0 - alpha) ** (f - i))
+
+
+def compute_probability_that_crosslink_is_dangling(
+    functionality_of_monomer: int, p_f_a_out: float
+):
+    """
+    Consider a copolymerization of A_f with B_2.
+    This function computes the probability that a random A_f unit will be dangling (pendant).
+    This is equal to the probability that only one of the arms is attached to the gel.
+
+    Source:
+        - Eq. 6.2 in https://doi.org/10.1002/pen.760190409
+
+    Arguments:
+        - functionality_of_monomer: f
+        - alpha: :math:`P(F_A^{out})`
+    """
+    assert 0 <= p_f_a_out <= 1, "p_f_a_out must be between 0 and 1"
+    f = functionality_of_monomer
+    alpha = p_f_a_out
+    return scipy.special.binom(f, 1) * (alpha ** (f - 1)) * (1.0 - alpha)
+
+
+def compute_probability_that_bifunctional_monomer_is_dangling(
+        p_f_b_out: float):
+    """
+    Consider a copolymerization of A_f with B_2.
+    This function computes the probability that a random B_2 unit will be dangling.
+
+    Source:
+        - Eq. 6.1 in https://doi.org/10.1002/pen.760190409
+
+    Arguments:
+        - beta: :math:`P(F_B^{out})`
+    """
+    assert 0 <= p_f_b_out <= 1, "p_f_b_out must be between 0 and 1"
+    return scipy.special.binom(2, 1) * (p_f_b_out) * ((1.0 - p_f_b_out))
 
 
 def predict_gelation_point(r: float, f: int, g: int = 2) -> float:

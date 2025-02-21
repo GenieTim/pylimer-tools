@@ -776,7 +776,7 @@ namespace sim {
           activeSprings.cast<double>() *
           (this->net.springsContourLength.array() -
            Eigen::ArrayXd::Ones(this->net.nrOfSprings));
-        // finally, normalise by the number of atoms.
+        // finally, normalize by the number of atoms.
         // NOTE: currently, the weight of the atoms is ignored
         return 1. - ((allActiveAtomsPerChains).matrix().sum() +
                      this->getNrOfActiveNodes()) /
