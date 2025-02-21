@@ -1078,7 +1078,7 @@ namespace sim {
           "got " +
             std::to_string(activeWeightFraction + solubleWeightFraction) + ".");
 
-        // finally, normalise by the number of atoms.
+        // finally, normalize by the number of atoms.
         // TODO: currently, the weight of the atoms is ignored
         return 1. - activeWeightFraction - solubleWeightFraction;
       }
@@ -1255,7 +1255,7 @@ namespace sim {
         }
         double nActiveClusteredAtoms =
           this->countActiveClusteredAtoms(net, u, springPartitions, tolerance);
-        // finally, normalise by the number of atoms.
+        // finally, normalize by the number of atoms.
         // NOTE: currently, the weight of the atoms is ignored
         return 1. - (nActiveClusteredAtoms /
                      (static_cast<double>(this->universe.getNrOfAtoms())));
