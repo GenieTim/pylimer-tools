@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="ComputedIntValues" href="pylimer_tools_cpp.ComputedIntValues.html" /><link rel="prev" title="Box" href="pylimer_tools_cpp.Box.html" />
 
-    <!-- Generated with Sphinx 8.2.0 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.2.1 and Furo 2024.08.06 -->
         <title>ComputedDoubleValues - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
@@ -329,6 +329,7 @@
 <p>STRESS_NXY</p>
 <p>STRESS_NXZ</p>
 <p>STRESS_NYZ</p>
+<p>GAMMA</p>
 <p>MEAN_B</p>
 <p>MAX_B</p>
 <p>MSD</p>
@@ -336,61 +337,64 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.MAX_B" title="pylimer_tools_cpp.ComputedDoubleValues.MAX_B"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MAX_B</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.GAMMA" title="pylimer_tools_cpp.ComputedDoubleValues.GAMMA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GAMMA</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.MEAN_B" title="pylimer_tools_cpp.ComputedDoubleValues.MEAN_B"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEAN_B</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.MAX_B" title="pylimer_tools_cpp.ComputedDoubleValues.MAX_B"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MAX_B</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.MSD" title="pylimer_tools_cpp.ComputedDoubleValues.MSD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MSD</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.MEAN_B" title="pylimer_tools_cpp.ComputedDoubleValues.MEAN_B"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEAN_B</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.PRESSURE" title="pylimer_tools_cpp.ComputedDoubleValues.PRESSURE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRESSURE</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.MSD" title="pylimer_tools_cpp.ComputedDoubleValues.MSD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MSD</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_NXY" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_NXY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_NXY</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.PRESSURE" title="pylimer_tools_cpp.ComputedDoubleValues.PRESSURE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRESSURE</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_NXZ" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_NXZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_NXZ</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_NXY" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_NXY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_NXY</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_NYZ" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_NYZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_NYZ</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_NXZ" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_NXZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_NXZ</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_XX" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_XX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_XX</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_NYZ" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_NYZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_NYZ</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_XY" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_XY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_XY</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_XX" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_XX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_XX</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_XZ" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_XZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_XZ</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_XY" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_XY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_XY</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_YY" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_YY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_YY</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_XZ" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_XZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_XZ</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_YZ" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_YZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_YZ</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_YY" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_YY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_YY</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_ZZ" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_ZZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_ZZ</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_YZ" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_YZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_YZ</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.TEMPERATURE" title="pylimer_tools_cpp.ComputedDoubleValues.TEMPERATURE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEMPERATURE</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.STRESS_ZZ" title="pylimer_tools_cpp.ComputedDoubleValues.STRESS_ZZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRESS_ZZ</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.TIME" title="pylimer_tools_cpp.ComputedDoubleValues.TIME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TIME</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.TEMPERATURE" title="pylimer_tools_cpp.ComputedDoubleValues.TEMPERATURE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEMPERATURE</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.TIMESTEP" title="pylimer_tools_cpp.ComputedDoubleValues.TIMESTEP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TIMESTEP</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.TIME" title="pylimer_tools_cpp.ComputedDoubleValues.TIME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TIME</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.VOLUME" title="pylimer_tools_cpp.ComputedDoubleValues.VOLUME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VOLUME</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.TIMESTEP" title="pylimer_tools_cpp.ComputedDoubleValues.TIMESTEP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TIMESTEP</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.name" title="pylimer_tools_cpp.ComputedDoubleValues.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.VOLUME" title="pylimer_tools_cpp.ComputedDoubleValues.VOLUME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VOLUME</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.value" title="pylimer_tools_cpp.ComputedDoubleValues.value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.name" title="pylimer_tools_cpp.ComputedDoubleValues.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.value" title="pylimer_tools_cpp.ComputedDoubleValues.value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -398,18 +402,23 @@
 </div>
 <p class="rubric">Attributes Documentation</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.ComputedDoubleValues.GAMMA">
+<span class="sig-name descname"><span class="pre">GAMMA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ComputedDoubleValues.GAMMA:</span> <span class="pre">14&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ComputedDoubleValues.GAMMA" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ComputedDoubleValues.MAX_B">
-<span class="sig-name descname"><span class="pre">MAX_B</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ComputedDoubleValues.MAX_B:</span> <span class="pre">15&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ComputedDoubleValues.MAX_B" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">MAX_B</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ComputedDoubleValues.MAX_B:</span> <span class="pre">16&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ComputedDoubleValues.MAX_B" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ComputedDoubleValues.MEAN_B">
-<span class="sig-name descname"><span class="pre">MEAN_B</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ComputedDoubleValues.MEAN_B:</span> <span class="pre">14&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ComputedDoubleValues.MEAN_B" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">MEAN_B</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ComputedDoubleValues.MEAN_B:</span> <span class="pre">15&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ComputedDoubleValues.MEAN_B" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ComputedDoubleValues.MSD">
-<span class="sig-name descname"><span class="pre">MSD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ComputedDoubleValues.MSD:</span> <span class="pre">16&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ComputedDoubleValues.MSD" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">MSD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ComputedDoubleValues.MSD:</span> <span class="pre">17&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ComputedDoubleValues.MSD" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -552,6 +561,7 @@
             <ul>
 <li><a class="reference internal" href="#">ComputedDoubleValues</a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues"><code class="docutils literal notranslate"><span class="pre">ComputedDoubleValues</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.GAMMA"><code class="docutils literal notranslate"><span class="pre">ComputedDoubleValues.GAMMA</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.MAX_B"><code class="docutils literal notranslate"><span class="pre">ComputedDoubleValues.MAX_B</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.MEAN_B"><code class="docutils literal notranslate"><span class="pre">ComputedDoubleValues.MEAN_B</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues.MSD"><code class="docutils literal notranslate"><span class="pre">ComputedDoubleValues.MSD</span></code></a></li>

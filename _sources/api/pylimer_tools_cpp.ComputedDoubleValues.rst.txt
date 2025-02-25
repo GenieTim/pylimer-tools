@@ -10,6 +10,7 @@ ComputedDoubleValues
 
    .. autosummary::
 
+      ~ComputedDoubleValues.GAMMA
       ~ComputedDoubleValues.MAX_B
       ~ComputedDoubleValues.MEAN_B
       ~ComputedDoubleValues.MSD
@@ -32,6 +33,7 @@ ComputedDoubleValues
 
    .. rubric:: Attributes Documentation
 
+   .. autoattribute:: GAMMA
    .. autoattribute:: MAX_B
    .. autoattribute:: MEAN_B
    .. autoattribute:: MSD

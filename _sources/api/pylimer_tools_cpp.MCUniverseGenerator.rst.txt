@@ -24,6 +24,7 @@ MCUniverseGenerator
       ~MCUniverseGenerator.get_current_crosslinker_conversion
       ~MCUniverseGenerator.get_current_nr_of_atoms
       ~MCUniverseGenerator.get_current_nr_of_bonds
+      ~MCUniverseGenerator.get_force_balance
       ~MCUniverseGenerator.get_force_relaxation
       ~MCUniverseGenerator.get_mean_bead_distance
       ~MCUniverseGenerator.get_mean_squared_bead_distance
@@ -57,6 +58,7 @@ MCUniverseGenerator
    .. automethod:: get_current_crosslinker_conversion
    .. automethod:: get_current_nr_of_atoms
    .. automethod:: get_current_nr_of_bonds
+   .. automethod:: get_force_balance
    .. automethod:: get_force_relaxation
    .. automethod:: get_mean_bead_distance
    .. automethod:: get_mean_squared_bead_distance
