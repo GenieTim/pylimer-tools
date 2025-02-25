@@ -274,6 +274,9 @@ init_pylimer_bound_generators(py::module_& m)
             )pbdoc")
     .def("get_force_relaxation",
          &MCUniverseGenerator::getForceRelaxation,
+         R"pbdoc()pbdoc")
+    .def("get_force_balance",
+         &MCUniverseGenerator::getForceBalance,
          R"pbdoc()pbdoc");
 
   m.def("do_random_walk",

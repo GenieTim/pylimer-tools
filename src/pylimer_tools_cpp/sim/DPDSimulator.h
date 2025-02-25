@@ -448,6 +448,8 @@ namespace sim {
 
       double getVolume() override { return this->box.getVolume(); }
 
+      double getGamma() override { return -1.; }
+
       Eigen::VectorXd getBondLengths() override
       {
         Eigen::VectorXd bondDistances =

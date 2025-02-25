@@ -97,6 +97,7 @@ init_pylimer_bound_sim(py::module_& m)
     .value("STRESS_NXY", ComputedDoubleValues::STRESS_NXY)
     .value("STRESS_NXZ", ComputedDoubleValues::STRESS_NXZ)
     .value("STRESS_NYZ", ComputedDoubleValues::STRESS_NYZ)
+    .value("GAMMA", ComputedDoubleValues::GAMMA)
     .value("MEAN_B", ComputedDoubleValues::MEAN_B)
     .value("MAX_B", ComputedDoubleValues::MAX_B)
     .value("MSD", ComputedDoubleValues::MSD);
