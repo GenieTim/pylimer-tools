@@ -464,8 +464,9 @@ namespace sim {
 #ifndef NDEBUG
       for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
         Eigen::Vector3d dist = this->evaluatePartialSpringDistance(net, u, i);
+        Eigen::Vector3d comparison = relevantPartialDistances.segment(3 * i, 3);
         assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
-          dist, relevantPartialDistances.segment(3 * i, 3), 1e-9));
+          dist, comparison, 1e-9));
       }
 #endif
 
@@ -626,12 +627,14 @@ namespace sim {
           this->removeSpringFollowingEntanglementLinks(
             net, displacements, springPartitions, springIdx);
           springIdx = std::min<long int>(springIdx, net.nrOfSprings - 1);
+          numRemoved += 1;
         }
       }
 
 #ifndef NDEBUG
       this->validateNetwork();
 #endif
+      return numRemoved;
     }
 
     /**
@@ -954,7 +957,7 @@ namespace sim {
       }
       pylimer_tools::entities::NeighbourList neighbourList =
         pylimer_tools::entities::NeighbourList(
-          atomsForNeighbourList, this->universe.getBox(), cutoff);
+          atomsForNeighbourList, this->box, cutoff);
 
       std::random_device rd{};
       std::mt19937 rng = std::mt19937(seed > 0 ? seed : rd());
@@ -985,7 +988,7 @@ namespace sim {
       std::vector<double> slipLinkStrandBeta;
       slipLinkStrandBeta.reserve(nrOfSliplinksToSample);
 
-      pylimer_tools::entities::Box box = this->universe.getBox();
+      pylimer_tools::entities::Box box = this->box;
 
       size_t nrOfSlipLinksPlaced = 0;
       size_t nrOfAttempts = 0;
@@ -1139,7 +1142,7 @@ namespace sim {
       loopMinCoords.reserve(loops.size());
       std::vector<std::array<double, 3>> loopMaxCoords;
       loopMaxCoords.reserve(loops.size());
-      pylimer_tools::entities::Box box = this->universe.getBox();
+      pylimer_tools::entities::Box box = this->box;
       for (std::vector<long int> loop : loops) {
         // max & min coordinates
         // TODO: implement, such that the max & min work also with infinite
@@ -3852,23 +3855,20 @@ namespace sim {
       // ugly brute-force method to check all possible combinations (ideally,
       // more or less at least)
       Eigen::Array3i multiplicity1 =
-        ((this->universe.getBox()
-            .getOffset(viaCoords - sourceCoords)
-            .array()
-            .abs() +
+        ((this->box.getOffset(viaCoords - sourceCoords).array().abs() +
           this->getPartialSpringBoxOffset(net, partialSpringIdx1)
             .array()
             .abs()) /
-         this->universe.getBox().getL())
+         this->box.getL())
           .rint()
           .cast<int>()
           .abs();
       Eigen::Array3i multiplicity2 =
-        ((this->universe.getBox().getOffset(targetCoords - viaCoords).array() +
+        ((this->box.getOffset(targetCoords - viaCoords).array() +
           this->getPartialSpringBoxOffset(net, partialSpringIdx2)
             .array()
             .abs()) /
-         this->universe.getBox().getL())
+         this->box.getL())
           .rint()
           .cast<int>()
           .abs();
@@ -4719,6 +4719,7 @@ namespace sim {
         (displacedCoords(net.springPartCoordinateIndexB) -
          displacedCoords(net.springPartCoordinateIndexA)) +
         net.springPartBoxOffset;
+
       if (assumeLarge) {
         this->box.handlePBC(partialDistances);
       }
@@ -4747,7 +4748,7 @@ namespace sim {
     {
       // convert nodes & springs back to a universe
       pylimer_tools::entities::Universe xlinkUniverse =
-        pylimer_tools::entities::Universe(this->universe.getBox());
+        pylimer_tools::entities::Universe(this->box);
       std::vector<long int> ids;
       std::vector<int> types = pylimer_tools::utils::initializeWithValue(
         this->initialConfig.nrOfNodes, crossLinkerType);
@@ -5815,7 +5816,7 @@ namespace sim {
       size_t nrOfXlinks = currentLinkIdx;
 
       // crossLinkerUniverse.simplify();
-      pylimer_tools::entities::Box box = this->universe.getBox();
+      pylimer_tools::entities::Box box = this->box;
       net.L[0] = box.getLx();
       net.L[1] = box.getLy();
       net.L[2] = box.getLz();
@@ -5866,7 +5867,7 @@ namespace sim {
           net.oldAtomIds[linkIdx] = atom.getId();
           net.oldAtomTypes[linkIdx] = atom.getType();
           Eigen::Vector3d coords = atom.getCoordinates();
-          this->universe.getBox().handlePBC(coords);
+          this->box.handlePBC(coords);
           net.coordinates.segment(3 * linkIdx, 3) = coords;
         }
       }
@@ -5963,8 +5964,7 @@ namespace sim {
             net.coordinates.segment(3 * nodeIdxFrom, 3);
           net.springPartBoxOffset.segment(3 * spring_idx, 3) =
             expectedDistance - actualDistance;
-          assert(this->universe.getBox().isValidOffset(expectedDistance -
-                                                       actualDistance));
+          assert(this->box.isValidOffset(expectedDistance - actualDistance));
 
           spring_idx += 1;
         }
@@ -6035,7 +6035,7 @@ namespace sim {
                       "Invalid size of link is sliplink");
       RUNTIME_EXP_IFN(net.nrOfCrosslinkSwapsEndured.size() ==
                         net.nrOfLinks - net.nrOfNodes,
-                      "Invalid size of link is sliplink");
+                      "Invalid size of nr of cross-link swaps endured");
       RUNTIME_EXP_IFN(
         net.linkIsSliplink.count() == (net.nrOfLinks - net.nrOfNodes),
         "Nr of nodes plus nr of slp-links should give the total nr of links");

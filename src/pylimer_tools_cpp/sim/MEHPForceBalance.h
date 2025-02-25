@@ -96,6 +96,19 @@ namespace sim {
         this->completeInitialization();
       };
 
+      MEHPForceBalance(const ForceBalanceNetwork& net,
+                       const Eigen::VectorXd& springPartitions,
+                       bool is2D = false)
+      {
+        this->is2D = is2D;
+        this->initialConfig = net;
+        this->currentSpringPartitionsVec = springPartitions;
+        this->currentDisplacements =
+          Eigen::VectorXd::Zero(net.coordinates.size());
+        this->box = pylimer_tools::entities::Box(net.L[0], net.L[1], net.L[2]);
+        this->completeInitialization();
+      }
+
 #ifdef CEREALIZABLE
       static MEHPForceBalance constructFromString(std::string s)
       {
@@ -1297,8 +1310,8 @@ namespace sim {
 
       std::vector<double> getOverallSpringLengths() const
       {
-        Eigen::VectorXd partialSpringDistances =
-          this->getCurrentPartialSpringDistances();
+        std::vector<double> partialSpringDistances =
+          this->getCurrentPartialSpringLengths();
         assert(partialSpringDistances.size() ==
                this->initialConfig.nrOfPartialSprings);
         std::vector<double> results =
@@ -1316,12 +1329,8 @@ namespace sim {
         Eigen::VectorXd partialSpringVectors =
           this->evaluatePartialSpringVectors(this->initialConfig,
                                              this->currentDisplacements);
-        Eigen::VectorXd results =
-          Eigen::VectorXd::Zero(this->initialConfig.nrOfPartialSprings);
-        for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
-          results[i] = partialSpringVectors.segment(3 * i, 3).norm();
-        }
-        return results;
+
+        return partialSpringVectors;
       }
 
       std::vector<double> getCurrentPartialSpringLengths() const
@@ -1419,6 +1428,7 @@ namespace sim {
       double getGammaFactor(double b02 = 0.96,
                             int nrOfChains = -1,
                             double oneOverSpringPartitionUpperLimit = 1.) const;
+      double getGamma() override { return this->getGammaFactor(-1., -1., 1.); }
 
       /**
        * @brief Get the per-(partial)-spring gamma factors
@@ -1574,7 +1584,7 @@ namespace sim {
           net.springPartBoxOffset.segment(3 * springIdx, 3);
 
         if (boxLargeEnough) {
-          this->universe.getBox().handlePBC<Eigen::Vector3d>(dist);
+          this->box.handlePBC<Eigen::Vector3d>(dist);
         }
 
         if (is2d) {
@@ -2635,7 +2645,7 @@ namespace sim {
 
         Eigen::Vector3d coords = atom1.getCoordinates();
         Eigen::Vector3d dist = atom2.getCoordinates() - coords;
-        this->universe.getBox().handlePBC(dist);
+        this->box.handlePBC(dist);
         coords += 0.5 * dist;
 
         net.coordinates.segment(3 * linkIdx, 3) = coords;
@@ -2660,7 +2670,7 @@ namespace sim {
         }
 
         Eigen::Vector3d coords = atom.getCoordinates();
-        this->universe.getBox().handlePBC(coords);
+        this->box.handlePBC(coords);
         net.coordinates.segment(3 * linkIdx, 3) = coords;
         net.linkIsSliplink[linkIdx] = atomType != this->crossLinkerType;
         if (!net.linkIsSliplink[linkIdx]) {
@@ -2685,7 +2695,7 @@ namespace sim {
                                      double contourLength = 1.,
                                      double contourLengthFraction = 1.) const
       {
-        return dist.squaredNorm() <=
+        return dist.norm() <=
                (tolerance *
                 std::max(contourLengthFraction * contourLength, 1.));
       }
@@ -2747,11 +2757,11 @@ namespace sim {
         Eigen::Vector3d additionalDistance1 =
           linedUpAtoms[atom1Idx].getCoordinates() -
           net.coordinates.segment(3 * from, 3);
-        this->universe.getBox().handlePBC(additionalDistance1);
+        this->box.handlePBC(additionalDistance1);
         Eigen::Vector3d additionalDistance2 =
           net.coordinates.segment(3 * to, 3) -
           linedUpAtoms[atom2Idx].getCoordinates();
-        this->universe.getBox().handlePBC(additionalDistance2);
+        this->box.handlePBC(additionalDistance2);
         expectedDistance += additionalDistance1 + additionalDistance2;
         if (this->is2D) {
           expectedDistance[2] = 0.0;
@@ -2763,8 +2773,7 @@ namespace sim {
           net, Eigen::VectorXd::Zero(net.coordinates.size()), partialSpringIdx);
         net.springPartBoxOffset.segment(3 * partialSpringIdx, 3) =
           expectedDistance - actualDistance;
-        assert(this->universe.getBox().isValidOffset(expectedDistance -
-                                                     actualDistance));
+        assert(this->box.isValidOffset(expectedDistance - actualDistance));
 #ifndef NDEBUG
         Eigen::Vector3d newActualDistance = this->evaluatePartialSpringDistance(
           net, Eigen::VectorXd::Zero(net.coordinates.size()), partialSpringIdx);

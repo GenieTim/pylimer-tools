@@ -187,6 +187,10 @@ namespace sim {
          actualCoordinates(net->springCoordinateIndexA)) +
         net->springBoxOffset;
 
+      if (net->assumeBoxLargeEnough) {
+        box.handlePBC(springDistances);
+      }
+
       if (is2D) {
         // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
         //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
@@ -195,10 +199,6 @@ namespace sim {
         }
       }
       assert(springDistances.size() == net->nrOfSprings * 3);
-
-      if (net->assumeBoxLargeEnough) {
-        box.handlePBC(springDistances);
-      }
 
       return springDistances;
     }
@@ -408,7 +408,7 @@ namespace sim {
       Eigen::VectorXi nrOfActiveSpringsConnected =
         Eigen::VectorXi::Zero(this->forceRelaxationNetwork.nrOfNodes);
       Eigen::ArrayXb springIsActive =
-        this->findActiveSprings(this->currentSpringDistances, tolerance);
+        this->findActiveSprings(&this->forceRelaxationNetwork, tolerance);
       for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfSprings; i++) {
         if (springIsActive[i] == true) { /* active spring */
           int a = this->forceRelaxationNetwork.springIndexA[i];

@@ -4,6 +4,7 @@
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include "../../src/pylimer_tools_cpp/io/DataFileWriter.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceRelaxation.h"
 #include "../../src/pylimer_tools_cpp/utils/MCUniverseGenerator.h"
 #include <catch2/catch_approx.hpp>
@@ -262,6 +263,139 @@ TEST_CASE("Universe can cross-link up to w_sol",
   CHECK_THAT(
     0.1,
     Catch::Matchers::WithinAbs(forceRelaxer.getSolubleWeightFraction(), 0.05));
+
+  pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer2 =
+    generator.getForceRelaxation();
+
+  pylimer_tools::sim::mehp::MEHPForceBalance forceBalance =
+    generator.getForceBalance();
+  forceBalance.configAssumeBoxLargeEnough(true);
+  // compare structures before running optimization procedures
+  CHECK(forceBalance.getNrOfSprings() == forceRelaxer.getNrOfSprings());
+  Eigen::VectorXd fbVecs = forceBalance.getCurrentPartialSpringDistances();
+  Eigen::VectorXd frVecs = forceRelaxer2.getCurrentSpringDistances();
+  REQUIRE(fbVecs.size() == 3 * forceBalance.getNrOfSprings());
+  REQUIRE(frVecs.size() == 3 * forceBalance.getNrOfSprings());
+  for (size_t springIdx = 0; springIdx < fbVecs.size(); springIdx += 1) {
+    for (size_t dir = 0; dir < 3; dir++) {
+      CHECK_THAT(frVecs[3 * springIdx + dir],
+                 Catch::Matchers::WithinRel(fbVecs[3 * springIdx + dir]));
+    }
+    REQUIRE_THAT(frVecs.segment(3 * springIdx, 3).squaredNorm(),
+                 Catch::Matchers::WithinRel(
+                   fbVecs.segment(3 * springIdx, 3).squaredNorm()));
+  }
+  CHECK(frVecs.isApprox(fbVecs));
+  CHECK_THAT(
+    forceBalance.getNrOfActiveSprings(1e-2),
+    Catch::Matchers::WithinAbs(forceRelaxer2.getNrOfActiveSprings(1e-2), 1));
+  CHECK_THAT(
+    forceBalance.getGammaFactor(1.),
+    Catch::Matchers::WithinRel(forceRelaxer2.getGammaFactor(1.), 0.01));
+
+  // run force relaxation
+  while (forceRelaxer2.suggestsRerun()) {
+    forceRelaxer2.runForceRelaxation();
+  }
+
+  CHECK_THAT(
+    forceRelaxer2.countActiveClusteredAtoms(),
+    Catch::Matchers::WithinAbs(forceRelaxer.countActiveClusteredAtoms(), 1));
+
+  // also run force balance
+  forceBalance.runForceRelaxation();
+
+  CHECK(forceBalance.validateNetwork());
+  CHECK(forceBalance.getNrOfSprings() == forceRelaxer.getNrOfSprings());
+  CHECK_THAT(forceBalance.getGammaFactor(1.),
+             Catch::Matchers::WithinRel(forceRelaxer.getGammaFactor(1.), 0.01));
+  CHECK_THAT(
+    forceBalance.getNrOfActiveSprings(1e-2),
+    Catch::Matchers::WithinAbs(forceRelaxer.getNrOfActiveSprings(1e-2), 1));
+}
+
+TEST_CASE("Generator can return force balance and relaxation",
+          "[generator][MCUniverseGenerator]")
+{
+  std::cout
+    << "Running test \"Generator can return force balance and relaxation\""
+    << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);
+  generator.setSeed(8804);
+  generator.setBeadDistance(0.964);
+  generator.addCrosslinkers(100, 4, 2);
+
+  generator.addStrands(200, 19, 1);
+  generator.linkStrandsToConversion(0.925, 1.);
+
+  pe::Universe universe = generator.getUniverse();
+  REQUIRE(universe.getVolume() == 10.0 * 10.0 * 10.0);
+  REQUIRE(universe.getAtomsOfType(2).size() == 100);
+  REQUIRE(universe.getAtomsOfType(1).size() == 200 * 19);
+
+  pylimer_tools::sim::mehp::ForceBalanceNetwork fbNet =
+    generator.convertToForceBalanceNetwork();
+  pylimer_tools::sim::mehp::Network frNet =
+    generator.convertToForceRelaxationNetwork();
+
+  REQUIRE(fbNet.nrOfSprings == frNet.nrOfSprings);
+  REQUIRE(fbNet.coordinates.isApprox(frNet.coordinates));
+  REQUIRE(fbNet.springIndexA.isApprox(frNet.springIndexA));
+  REQUIRE(fbNet.springIndexB.isApprox(frNet.springIndexB));
+  REQUIRE(fbNet.springPartIndexA.isApprox(frNet.springIndexA));
+  REQUIRE(fbNet.springPartIndexB.isApprox(frNet.springIndexB));
+  REQUIRE(
+    fbNet.springPartCoordinateIndexA.isApprox(frNet.springCoordinateIndexA));
+  REQUIRE(
+    fbNet.springPartCoordinateIndexB.isApprox(frNet.springCoordinateIndexB));
+  REQUIRE(fbNet.springPartBoxOffset.isApprox(frNet.springBoxOffset));
+  REQUIRE(fbNet.vol == frNet.vol);
+  for (size_t dir = 0; dir < 3; dir++) {
+    REQUIRE(fbNet.L[0] == frNet.L[0]);
+  }
+
+  pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer2 =
+    generator.getForceRelaxation();
+  forceRelaxer2.configAssumeBoxLargeEnough(true);
+
+  pylimer_tools::sim::mehp::MEHPForceBalance forceBalance =
+    generator.getForceBalance();
+  forceBalance.configAssumeBoxLargeEnough(true);
+  // compare structures before running optimization procedures
+  CHECK(forceBalance.getNrOfSprings() == forceRelaxer2.getNrOfSprings());
+  Eigen::VectorXd fbVecs = forceBalance.getCurrentPartialSpringDistances();
+  Eigen::VectorXd fbVecs2 = forceBalance.getCurrentSpringDistances();
+  REQUIRE(fbVecs.isApprox(fbVecs2));
+  Eigen::VectorXd frVecs = forceRelaxer2.getCurrentSpringDistances();
+  Eigen::VectorXd frVecs2 = forceRelaxer2.getSpringDistances();
+  REQUIRE(frVecs.isApprox(frVecs2));
+  REQUIRE(fbVecs.size() == 3 * forceBalance.getNrOfSprings());
+  REQUIRE(frVecs.size() == 3 * forceBalance.getNrOfSprings());
+  CHECK(frVecs.isApprox(fbVecs));
+  CHECK_THAT(
+    forceBalance.getNrOfActiveSprings(1e-2),
+    Catch::Matchers::WithinAbs(forceRelaxer2.getNrOfActiveSprings(1e-2), 1));
+  CHECK_THAT(
+    forceBalance.getGammaFactor(1.),
+    Catch::Matchers::WithinRel(forceRelaxer2.getGammaFactor(1.), 0.01));
+
+  // run force relaxation
+  while (forceRelaxer2.suggestsRerun()) {
+    forceRelaxer2.runForceRelaxation();
+  }
+
+  // also run force balance
+  forceBalance.runForceRelaxation();
+
+  CHECK(forceBalance.validateNetwork());
+  CHECK(forceBalance.getNrOfSprings() == forceRelaxer2.getNrOfSprings());
+  CHECK_THAT(
+    forceBalance.getGammaFactor(1.),
+    Catch::Matchers::WithinRel(forceRelaxer2.getGammaFactor(1.), 0.01));
+  CHECK_THAT(
+    forceBalance.getNrOfActiveSprings(1e-2),
+    Catch::Matchers::WithinAbs(forceRelaxer2.getNrOfActiveSprings(1e-2), 1));
 }
 
 TEST_CASE("MCUniverseGenerator can remove w_sol",

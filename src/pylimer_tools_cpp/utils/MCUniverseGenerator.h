@@ -5,6 +5,7 @@
 #include "../entities/Box.h"
 #include "../entities/EigenNeighbourList.h"
 #include "../entities/Universe.h"
+#include "../sim/MEHPForceBalance.h"
 #include "../sim/MEHPForceRelaxation.h"
 #include "../sim/MEHPUtilityStructures.h"
 #include "../utils/BoolUtils.h"
@@ -1316,8 +1317,10 @@ namespace utils {
           forceRelaxationNetwork.springIndexB(newSpringIdx) = to;
           forceRelaxationNetwork.springIndicesOfLinks[from].push_back(
             newSpringIdx);
-          forceRelaxationNetwork.springIndicesOfLinks[to].push_back(
-            newSpringIdx);
+          if (to != from) {
+            forceRelaxationNetwork.springIndicesOfLinks[to].push_back(
+              newSpringIdx);
+          }
           newSpringIdx += 1;
         } else {
           assert(to < 0);
@@ -1329,8 +1332,6 @@ namespace utils {
       forceRelaxationNetwork.springIndexB.conservativeResize(nActualSprings);
       forceRelaxationNetwork.springsContourLength.conservativeResize(
         nActualSprings);
-      forceRelaxationNetwork.springBoxOffset =
-        Eigen::VectorXd::Zero(3 * nActualSprings);
       forceRelaxationNetwork.nrOfSprings = nActualSprings;
 
       forceRelaxationNetwork.springCoordinateIndexA =
@@ -1345,6 +1346,11 @@ namespace utils {
             forceRelaxationNetwork.springIndexB(i) * 3 + dir;
         }
       }
+      forceRelaxationNetwork.springBoxOffset =
+        this->box.getOffset(forceRelaxationNetwork.coordinates(
+                              forceRelaxationNetwork.springCoordinateIndexB) -
+                            forceRelaxationNetwork.coordinates(
+                              forceRelaxationNetwork.springCoordinateIndexA));
 
       forceRelaxationNetwork.meanSpringContourLength =
         forceRelaxationNetwork.springsContourLength.size() > 0
@@ -1366,6 +1372,182 @@ namespace utils {
         pylimer_tools::sim::mehp::MEHPForceRelaxation(forceRelaxationNetwork);
 
       return forceRelaxer;
+    }
+
+    /**
+     * @brief Convert the current simplified universe to a useable structure for
+     * the force balance
+     *
+     * @return pylimer_tools::sim::mehp::ForceBalanceNetwork
+     */
+    pylimer_tools::sim::mehp::ForceBalanceNetwork convertToForceBalanceNetwork()
+      const
+    {
+      pylimer_tools::sim::mehp::ForceBalanceNetwork forceBalanceNetwork;
+      forceBalanceNetwork.L[0] = this->box.getLx();
+      forceBalanceNetwork.L[1] = this->box.getLy();
+      forceBalanceNetwork.L[2] = this->box.getLz();
+      for (size_t dir = 0; dir < 3; ++dir) {
+        forceBalanceNetwork.boxHalfs[dir] = forceBalanceNetwork.L[dir] * 0.5;
+      }
+      forceBalanceNetwork.vol = this->box.getVolume();
+
+      const size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+      size_t nDanglingEnds = 0;
+      std::vector<size_t> danglingEndPartners = {};
+      for (size_t i = 0; i < this->simplifiedUniverse.strandFrom.size(); ++i) {
+        if (this->simplifiedUniverse.strandFrom[i] >= 0 &&
+            this->simplifiedUniverse.strandTo[i] < 0) {
+          nDanglingEnds += 1;
+          danglingEndPartners.push_back(this->simplifiedUniverse.strandFrom[i]);
+        }
+      }
+      forceBalanceNetwork.nrOfNodes = nCrosslinks + nDanglingEnds;
+      forceBalanceNetwork.nrOfLinks = forceBalanceNetwork.nrOfNodes;
+      forceBalanceNetwork.oldAtomIds =
+        Eigen::ArrayXi::Zero(forceBalanceNetwork.nrOfNodes);
+      forceBalanceNetwork.coordinates =
+        Eigen::VectorXd(forceBalanceNetwork.nrOfNodes * 3);
+      forceBalanceNetwork.linkIsSliplink =
+        Eigen::ArrayXb::Zero(forceBalanceNetwork.nrOfLinks);
+      forceBalanceNetwork.nrOfCrosslinkSwapsEndured = Eigen::ArrayXi::Zero(0);
+      forceBalanceNetwork.springIndicesOfLinks.reserve(nCrosslinks);
+      forceBalanceNetwork.oldAtomTypes =
+        Eigen::ArrayXi::Zero(forceBalanceNetwork.nrOfNodes);
+      // cross-links first, in order to keep consistent numbering
+      for (size_t crosslinkIdx = 0; crosslinkIdx < nCrosslinks;
+           ++crosslinkIdx) {
+        forceBalanceNetwork.coordinates(3 * crosslinkIdx + 0) =
+          this->simplifiedUniverse.xlinkX[crosslinkIdx];
+        forceBalanceNetwork.coordinates(3 * crosslinkIdx + 1) =
+          this->simplifiedUniverse.xlinkY[crosslinkIdx];
+        forceBalanceNetwork.coordinates(3 * crosslinkIdx + 2) =
+          this->simplifiedUniverse.xlinkZ[crosslinkIdx];
+        forceBalanceNetwork.oldAtomIds(crosslinkIdx) = crosslinkIdx;
+        forceBalanceNetwork.oldAtomTypes(crosslinkIdx) =
+          this->simplifiedUniverse.xlinkTypes[crosslinkIdx];
+      }
+      for (size_t danglingEndIdx = 0; danglingEndIdx < nDanglingEnds;
+           ++danglingEndIdx) {
+        size_t nodeIdx = nCrosslinks + danglingEndIdx;
+        // collapse dangling ends already to connected cross-link
+        forceBalanceNetwork.coordinates(3 * nodeIdx + 0) =
+          this->simplifiedUniverse.xlinkX[danglingEndPartners[danglingEndIdx]];
+        forceBalanceNetwork.coordinates(3 * nodeIdx + 1) =
+          this->simplifiedUniverse.xlinkY[danglingEndPartners[danglingEndIdx]];
+        forceBalanceNetwork.coordinates(3 * nodeIdx + 2) =
+          this->simplifiedUniverse.xlinkZ[danglingEndPartners[danglingEndIdx]];
+      }
+      for (size_t i = 0; i < forceBalanceNetwork.nrOfNodes; ++i) {
+        std::vector<size_t> empty = {};
+        forceBalanceNetwork.springIndicesOfLinks.push_back(empty);
+      }
+
+      size_t nSpringEstimate = this->simplifiedUniverse.strandFrom.size();
+      forceBalanceNetwork.springIndexA = Eigen::ArrayXi::Zero(nSpringEstimate);
+      forceBalanceNetwork.springIndexB = Eigen::ArrayXi::Zero(nSpringEstimate);
+      forceBalanceNetwork.springsContourLength =
+        Eigen::VectorXd::Zero(nSpringEstimate);
+      size_t newSpringIdx = 0;
+      size_t handledDanglingIdx = 0;
+      // we omit all free strands
+      for (size_t springIdx = 0;
+           springIdx < this->simplifiedUniverse.strandFrom.size();
+           ++springIdx) {
+        long int from = this->simplifiedUniverse.strandFrom[springIdx];
+        long int to = this->simplifiedUniverse.strandTo[springIdx];
+        if (from >= 0) {
+          if (to < 0) {
+            // dangling strand
+            to = nCrosslinks + handledDanglingIdx;
+            handledDanglingIdx += 1;
+            forceBalanceNetwork.springsContourLength(newSpringIdx) =
+              this->simplifiedUniverse.beadsInStrand[springIdx];
+          } else {
+            forceBalanceNetwork.springsContourLength(newSpringIdx) =
+              this->simplifiedUniverse.beadsInStrand[springIdx] + 1;
+          }
+          forceBalanceNetwork.springIndexA(newSpringIdx) = from;
+          forceBalanceNetwork.springIndexB(newSpringIdx) = to;
+          forceBalanceNetwork.springIndicesOfLinks[from].push_back(
+            newSpringIdx);
+          if (from != to) {
+            forceBalanceNetwork.springIndicesOfLinks[to].push_back(
+              newSpringIdx);
+          }
+          newSpringIdx += 1;
+        } else {
+          assert(to < 0);
+        }
+      }
+      assert(handledDanglingIdx == nDanglingEnds);
+      const size_t nActualSprings = newSpringIdx;
+      forceBalanceNetwork.springIndexA.conservativeResize(nActualSprings);
+      forceBalanceNetwork.springIndexB.conservativeResize(nActualSprings);
+      forceBalanceNetwork.springsContourLength.conservativeResize(
+        nActualSprings);
+      forceBalanceNetwork.nrOfSprings = nActualSprings;
+      forceBalanceNetwork.springsType = Eigen::ArrayXi::Ones(nActualSprings);
+      forceBalanceNetwork.springIsActive = Eigen::ArrayXb::Ones(nActualSprings);
+      forceBalanceNetwork.partialSpringIsPartial =
+        Eigen::ArrayXb::Zero(nActualSprings);
+      forceBalanceNetwork.nrOfPartialSprings = nActualSprings;
+      forceBalanceNetwork.nrOfSpringsWithPartition = 0;
+
+      forceBalanceNetwork.springCoordinateIndexA =
+        Eigen::ArrayXi::Zero(3 * nActualSprings);
+      forceBalanceNetwork.springCoordinateIndexB =
+        Eigen::ArrayXi::Zero(3 * nActualSprings);
+      forceBalanceNetwork.partialToFullSpringIndex =
+        Eigen::ArrayXi::LinSpaced(nActualSprings, 0, nActualSprings - 1);
+      for (size_t i = 0; i < nActualSprings; ++i) {
+        for (size_t dir = 0; dir < 3; ++dir) {
+          forceBalanceNetwork.springCoordinateIndexA(3 * i + dir) =
+            forceBalanceNetwork.springIndexA(i) * 3 + dir;
+          forceBalanceNetwork.springCoordinateIndexB(3 * i + dir) =
+            forceBalanceNetwork.springIndexB(i) * 3 + dir;
+        }
+        std::vector<size_t> linkIndices =
+          // forceBalanceNetwork.springIndexA(i) ==
+          //     forceBalanceNetwork.springIndexB(i)
+          //   ? { { forceBalanceNetwork.springIndexA(i) } }
+          //   :
+          { static_cast<size_t>(forceBalanceNetwork.springIndexA(i)),
+            static_cast<size_t>(forceBalanceNetwork.springIndexB(i)) };
+        forceBalanceNetwork.linkIndicesOfSprings.push_back(linkIndices);
+        forceBalanceNetwork.localToGlobalSpringIndex.push_back({ { i } });
+      }
+      forceBalanceNetwork.springPartBoxOffset =
+        this->box.getOffset(forceBalanceNetwork.coordinates(
+                              forceBalanceNetwork.springCoordinateIndexB) -
+                            forceBalanceNetwork.coordinates(
+                              forceBalanceNetwork.springCoordinateIndexA));
+
+      forceBalanceNetwork.springPartCoordinateIndexA =
+        forceBalanceNetwork.springCoordinateIndexA;
+      forceBalanceNetwork.springPartCoordinateIndexB =
+        forceBalanceNetwork.springCoordinateIndexB;
+      forceBalanceNetwork.springPartIndexA = forceBalanceNetwork.springIndexA;
+      forceBalanceNetwork.springPartIndexB = forceBalanceNetwork.springIndexB;
+
+      forceBalanceNetwork.meanSpringContourLength =
+        forceBalanceNetwork.springsContourLength.size() > 0
+          ? forceBalanceNetwork.springsContourLength.mean()
+          : 1.;
+
+      return forceBalanceNetwork;
+    }
+
+    pylimer_tools::sim::mehp::MEHPForceBalance getForceBalance() const
+    {
+      pylimer_tools::sim::mehp::ForceBalanceNetwork net =
+        this->convertToForceBalanceNetwork();
+
+      Eigen::VectorXd springPartitions = Eigen::VectorXd::Ones(net.nrOfSprings);
+      pylimer_tools::sim::mehp::MEHPForceBalance balance =
+        pylimer_tools::sim::mehp::MEHPForceBalance(net, springPartitions);
+      balance.validateNetwork();
+      return balance;
     }
 
     /**

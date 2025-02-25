@@ -48,7 +48,7 @@ namespace sim {
       "numExtraAtoms", "numBonds", "numExtraBonds", "numBondsToForm",
     };
 
-#define NUM_COMPUTABLE_DOUBLE_VALUES 17
+#define NUM_COMPUTABLE_DOUBLE_VALUES 18
 
   enum ComputedDoubleValues
   {
@@ -66,9 +66,10 @@ namespace sim {
     STRESS_NXY = 11,
     STRESS_NYZ = 12,
     STRESS_NXZ = 13,
-    MEAN_B = 14,
-    MAX_B = 15,
-    MSD = 16
+    GAMMA = 14,
+    MEAN_B = 15,
+    MAX_B = 16,
+    MSD = 17
   };
 
   const std::array<std::string, NUM_COMPUTABLE_DOUBLE_VALUES>
@@ -86,6 +87,7 @@ namespace sim {
                                   "Stress[0,0]-Stress[1,1]",
                                   "Stress[1,1]-Stress[2,2]",
                                   "Stress[0,0]-Stress[2,2]",
+                                  "Gamma",
                                   "<b>",
                                   "max(b)",
                                   "MSD" };
@@ -285,6 +287,7 @@ namespace sim {
         stressTensor(0, 0) - stressTensor(1, 1),
         stressTensor(1, 1) - stressTensor(2, 2),
         stressTensor(0, 0) - stressTensor(2, 2),
+        this->requiresDEvaluation(GAMMA, currentStep) ? this->getGamma() : 0.,
         this->requiresDEvaluation(MEAN_B, currentStep) ? bondLengths.mean()
                                                        : 0.0,
         this->requiresDEvaluation(MAX_B, currentStep) ? bondLengths.maxCoeff()
@@ -690,6 +693,7 @@ namespace sim {
     virtual long int getNumBondsToForm() = 0;
     virtual size_t getNumParticles() = 0;
     virtual double getVolume() = 0;
+    virtual double getGamma() = 0;
   };
 }
 }
