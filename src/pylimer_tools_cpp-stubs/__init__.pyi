@@ -514,16 +514,20 @@ class ComputedDoubleValues:
 
       STRESS_NYZ
 
+      GAMMA
+
       MEAN_B
 
       MAX_B
 
       MSD
     """
-    MAX_B: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.MAX_B: 15>
-    # value = <ComputedDoubleValues.MEAN_B: 14>
+    GAMMA: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.GAMMA: 14>
+    # value = <ComputedDoubleValues.MAX_B: 16>
+    MAX_B: typing.ClassVar[ComputedDoubleValues]
+    # value = <ComputedDoubleValues.MEAN_B: 15>
     MEAN_B: typing.ClassVar[ComputedDoubleValues]
-    # value = <ComputedDoubleValues.MSD: 16>
+    # value = <ComputedDoubleValues.MSD: 17>
     MSD: typing.ClassVar[ComputedDoubleValues]
     # value = <ComputedDoubleValues.PRESSURE: 3>
     PRESSURE: typing.ClassVar[ComputedDoubleValues]
@@ -553,7 +557,7 @@ class ComputedDoubleValues:
     TIMESTEP: typing.ClassVar[ComputedDoubleValues]
     # value = <ComputedDoubleValues.VOLUME: 2>
     VOLUME: typing.ClassVar[ComputedDoubleValues]
-    __members__: typing.ClassVar[dict[str, ComputedDoubleValues]]  # value = {'TIMESTEP': <ComputedDoubleValues.TIMESTEP: 0>, 'TIME': <ComputedDoubleValues.TIME: 1>, 'VOLUME': <ComputedDoubleValues.VOLUME: 2>, 'PRESSURE': <ComputedDoubleValues.PRESSURE: 3>, 'TEMPERATURE': <ComputedDoubleValues.TEMPERATURE: 4>, 'STRESS_XX': <ComputedDoubleValues.STRESS_XX: 5>, 'STRESS_YY': <ComputedDoubleValues.STRESS_YY: 6>, 'STRESS_ZZ': <ComputedDoubleValues.STRESS_ZZ: 7>, 'STRESS_XY': <ComputedDoubleValues.STRESS_XY: 8>, 'STRESS_XZ': <ComputedDoubleValues.STRESS_XZ: 10>, 'STRESS_YZ': <ComputedDoubleValues.STRESS_YZ: 9>, 'STRESS_NXY': <ComputedDoubleValues.STRESS_NXY: 11>, 'STRESS_NXZ': <ComputedDoubleValues.STRESS_NXZ: 13>, 'STRESS_NYZ': <ComputedDoubleValues.STRESS_NYZ: 12>, 'MEAN_B': <ComputedDoubleValues.MEAN_B: 14>, 'MAX_B': <ComputedDoubleValues.MAX_B: 15>, 'MSD': <ComputedDoubleValues.MSD: 16>}
+    __members__: typing.ClassVar[dict[str, ComputedDoubleValues]]  # value = {'TIMESTEP': <ComputedDoubleValues.TIMESTEP: 0>, 'TIME': <ComputedDoubleValues.TIME: 1>, 'VOLUME': <ComputedDoubleValues.VOLUME: 2>, 'PRESSURE': <ComputedDoubleValues.PRESSURE: 3>, 'TEMPERATURE': <ComputedDoubleValues.TEMPERATURE: 4>, 'STRESS_XX': <ComputedDoubleValues.STRESS_XX: 5>, 'STRESS_YY': <ComputedDoubleValues.STRESS_YY: 6>, 'STRESS_ZZ': <ComputedDoubleValues.STRESS_ZZ: 7>, 'STRESS_XY': <ComputedDoubleValues.STRESS_XY: 8>, 'STRESS_XZ': <ComputedDoubleValues.STRESS_XZ: 10>, 'STRESS_YZ': <ComputedDoubleValues.STRESS_YZ: 9>, 'STRESS_NXY': <ComputedDoubleValues.STRESS_NXY: 11>, 'STRESS_NXZ': <ComputedDoubleValues.STRESS_NXZ: 13>, 'STRESS_NYZ': <ComputedDoubleValues.STRESS_NYZ: 12>, 'GAMMA': <ComputedDoubleValues.GAMMA: 14>, 'MEAN_B': <ComputedDoubleValues.MEAN_B: 15>, 'MAX_B': <ComputedDoubleValues.MAX_B: 16>, 'MSD': <ComputedDoubleValues.MSD: 17>}
 
     @staticmethod
     def _pybind11_conduit_v1_(*args, **kwargs):
@@ -1523,6 +1527,9 @@ class MCUniverseGenerator:
         ...
 
     def get_current_nr_of_bonds(self) -> int:
+        ...
+
+    def get_force_balance(self) -> ...:
         ...
 
     def get_force_relaxation(self) -> ...:
