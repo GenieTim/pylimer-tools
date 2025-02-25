@@ -5644,8 +5644,8 @@ namespace sim {
         RUNTIME_EXP_IFN(
           std::isfinite(gammaFactors[i]),
           "Non-finite gamma factor for partial spring " + std::to_string(i) +
-            ", computed from N = " + std::to_string(N) +
-            ", oneOverSpringPartitionUpperLimit = " +
+            ", computed from N = " + std::to_string(N) + ", b02 = " +
+            std::to_string(b02) + ", oneOverSpringPartitionUpperLimit = " +
             std::to_string(oneOverSpringPartitionUpperLimit) +
             " and squared distance = " +
             std::to_string(springVectors.segment(3 * i, 3).squaredNorm()) +

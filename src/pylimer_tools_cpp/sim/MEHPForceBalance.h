@@ -1428,7 +1428,7 @@ namespace sim {
       double getGammaFactor(double b02 = 0.96,
                             int nrOfChains = -1,
                             double oneOverSpringPartitionUpperLimit = 1.) const;
-      double getGamma() override { return this->getGammaFactor(-1., -1., 1.); }
+      double getGamma() override { return this->getGammaFactor(1., -1., 1.); }
 
       /**
        * @brief Get the per-(partial)-spring gamma factors
