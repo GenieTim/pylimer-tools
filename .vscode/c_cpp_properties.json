@@ -2,42 +2,63 @@
     "configurations": [
         {
             "name": "Mac",
+            "defines": [],
+            "compilerPath": "/usr/local/opt/llvm/bin/clang-19",
+            "intelliSenseMode": "macos-clang-x86",
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "compilerPathInCppPropertiesJson": "/opt/homebrew/opt/llvm/bin/clang++",
+            "configurationProviderInCppPropertiesJson": "ms-vscode.cmake-tools",
+            "mergeConfigurations": false,
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            },
             "includePath": [
-                "${workspaceFolder}/src/**",
                 "${workspaceFolder}/vendor/nlopt/nloptLib-install/include",
                 "${workspaceFolder}/vendor/igraph/igraphLib-install/include",
                 "${workspaceFolder}/tests/build/_deps/catch2-build/generated-includes",
                 "${workspaceFolder}/tests/build/_deps/spectra-src/include",
                 "${workspaceFolder}/vendor/pybind11/include",
-                "${workspaceFolder}/tests/build/_deps/catch2-src/src",
-                "/opt/homebrew/Cellar/eigen/3.4.0_1/include/eigen3"
-            ],
-            "defines": [],
-            "compilerPath": "/opt/homebrew/opt/llvm/bin/clang++",
-            "intelliSenseMode": "${default}",
-            "cStandard": "c17",
-            "cppStandard": "c++20",
-            "configurationProvider": "ms-vscode.cmake-tools"
+                "/usr/local/include"
+            ]
         },
         {
             "name": "Linux",
-            "includePath": [
-                "${workspaceFolder}/src/**",
-                "${workspaceFolder}/tests/build/_deps/catch2-src/src/**",
-                "${workspaceFolder}/vendor/nlopt/nloptLib-install/include",
-                "${workspaceFolder}/vendor/igraph/igraphLib-install/include",
-                "/usr/local/include",
-                "/usr/local/var/vcpkg/installed/x64-osx/include/python3.9/",
-                "${workspaceFolder}/tests/build/_deps/catch2-build/generated-includes",
-                "${workspaceFolder}/tests/build/_deps/spectra-src/include",
-                "${workspaceFolder}/vendor/pybind11/include"
-            ],
             "defines": [],
-            "compilerPath": "/usr/bin/gcc",
-            "intelliSenseMode": "${default}",
+            "compilerPath": "/usr/bin/g++",
+            "intelliSenseMode": "macos-gcc-x64",
             "cStandard": "c17",
             "cppStandard": "c++20",
-            "configurationProvider": "ms-vscode.cmake-tools"
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "includePath": [
+                "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/src/**",
+                "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/tests/build/_deps/catch2-src/src/**",
+                "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/vendor/nlopt/nloptLib-install/include",
+                "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/vendor/igraph/igraphLib-install/include",
+                "/usr/local/include",
+                "/usr/local/var/vcpkg/installed/x64-osx/include/python3.9/",
+                "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/tests/build/_deps/catch2-build/generated-includes",
+                "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/tests/build/_deps/spectra-src/include",
+                "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/vendor/pybind11/include"
+            ],
+            "compilerPathInCppPropertiesJson": "/usr/local/opt/llvm/bin/clang-19",
+            "configurationProviderInCppPropertiesJson": "ms-vscode.cmake-tools",
+            "mergeConfigurations": false,
+            "browse": {
+                "path": [
+                    "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/src/**",
+                    "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/tests/build/_deps/catch2-src/src/**",
+                    "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/vendor/nlopt/nloptLib-install/include",
+                    "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/vendor/igraph/igraphLib-install/include",
+                    "/usr/local/include",
+                    "/usr/local/var/vcpkg/installed/x64-osx/include/python3.9/",
+                    "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/tests/build/_deps/catch2-build/generated-includes",
+                    "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/tests/build/_deps/spectra-src/include",
+                    "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/vendor/pybind11/include",
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ],
     "version": 4
