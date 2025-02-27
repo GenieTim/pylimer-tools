@@ -10,10 +10,8 @@ from scipy import optimize
 from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
     compute_effective_crosslinker_functionality,
-    compute_stoichiometric_imbalance,
-    compute_weight_fractions,
-    measure_weight_fraction_of_soluble_material,
-)
+    compute_stoichiometric_imbalance, compute_weight_fractions,
+    measure_weight_fraction_of_soluble_material)
 from pylimer_tools.io.unit_styles import UnitStyle
 from pylimer_tools_cpp import Universe
 
@@ -44,8 +42,7 @@ def predict_shear_modulus(**kwargs):
     ToDo:
       - Support more than one crosslinker type (as is supported by original formula)
     """
-    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(
-        **kwargs)
+    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(**kwargs)
     return g_mmt_phantom + g_mmt_entanglement
 
 
@@ -355,8 +352,7 @@ def compute_weight_fraction_of_soluble_material_from_weight_fractions(
       - g: the functionality of the ordinary chains
     """
     alpha, _ = compute_miller_macosko_probabilities(r, p, f)
-    return w_f * (alpha**f) + w_g * \
-        ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
+    return w_f * (alpha**f) + w_g * ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
 
 
 def compute_weight_fractions_and_probabilities(
@@ -430,8 +426,7 @@ def compute_weight_fractions_and_probabilities(
                 "The p computed ({}) is outside the accepted range. ".format(p)
                 + "Falling back to effective cross-linker functionality."
             )
-            p = compute_effective_crosslinker_functionality(
-                network, crosslinker_type)
+            p = compute_effective_crosslinker_functionality(network, crosslinker_type)
     if p > 1 or p < 0:
         raise ValueError(
             "Detected p = {} for f = {}. Need p in (0, 1).".format(
@@ -454,23 +449,27 @@ def compute_weight_fractions_and_probabilities(
     return weight_fractions, alpha, beta
 
 
-def compute_miller_macosko_probabilities(r: float, p: float, f: int):
+def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float = 1.0):
     """
     Compute Macosko and Miller's probabilities :math:`P(F_A)` and :math:`P(F_B)`
     i.e., the probability that a randomly chosen A (cross-link) or B (strand-end),
     respectively, is the start of a finite chain.
 
     Sources:
-      - https://pubs.acs.org/doi/10.1021/ma60050a004
       - https://doi.org/10.1021/ma60050a003
+      - https://doi.org/10.1021/ma60050a004
+      - https://doi.org/10.1021/ma00046a021 (with monofunctional chains, f = 4)
+      - https://doi.org/10.1021/cm0343507 (with monofunctional chains, f = 3)
 
     Note:
-        Currently, only systems with B_2 and A_f are supported.
+        Currently, only systems with B_2, B_1 and A_f are supported.
 
     Arguments:
       - r: the stoichiometric imbalance
       - p: the extent of reaction in terms of the crosslinkers
       - f: the functionality of the the crosslinker
+      - b2: the fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.
+            Can be computed e.g. as :math:`b_2 = \frac{2 \cdot [B_2]}{[B_1] + 2 \cdot [B_2]}`
 
     Returns:
       - alpha: :math:`P(F_A)`
@@ -478,37 +477,37 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int):
     """
     if r == 0 or p == 0 or f == 0:
         return 1.0, 1.0
+    if b2 > 1 or b2 <= 0:
+        raise ValueError("b2 must be in (0, 1), got b2 = {}".format(b2))
 
     # first, check a few things required by the formulae
     # since we want alpha, beta \in [0,1], given they are supposed to be
     # probabilities
     validate_r_and_p(r, p, f)
 
+    if not (1/(f-1) < b2 * (p**2) * r < 1):
+        warnings.warn(
+            "The resulting P(F_A) is probably unreliable, "
+            + "as the detected root does not fulfill the required conditions."
+        )
+
+    # End validation.
     # actually do the calculations
     if f == 3:
-        alpha = (1 - r * p * p) / (r * p * p)
-        if not (1 / (p**2) < 2 * r and (1 / (p**2) > r)):
-            warnings.warn(
-                "The resulting P(F_A) is probably unreliable, "
-                + "as the detected root does not fulfill the required conditions."
-            )
+        alpha = (1 - r * p * p * b2) / (r * p * p * b2)
     elif f == 4:
-        alpha = ((1.0 / (r * p * p)) - 3.0 / 4.0) ** (1.0 / 2.0) - (1.0 / 2.0)
-        if not (1 / (p**2) < 3 * r and (1 / (p**2) > r)):
-            warnings.warn(
-                "The resulting P(F_A) is probably unreliable, "
-                + "as the detected root does not fulfill the required conditions."
-            )
+        alpha = ((1.0 / (r * p * p * b2)) - 3.0 / 4.0) ** (1.0 / 2.0) - (1.0 / 2.0)
     else:
+        assert f > 4, "A functionality of {} is not supported.".format(f)
 
         def fun_to_root_for_alpha(alpha):
-            return r * p**2 * alpha ** (f - 1) - alpha - r * (p**2) + 1
+            return r * b2 * p**2 * alpha ** (f - 1) - alpha - r * b2 * (p**2) + 1
 
         def fun_to_root_for_alpha_prime(alpha):
-            return -1 + alpha ** (f - 2) * (-1 + f) * (p**2) * r
+            return -1 + alpha ** (f - 2) * (-1 + f) * (p**2) * r * b2
 
         def fun_to_root_for_alpha_prime2(alpha):
-            return alpha ** (f - 3) * (-2 + f) * (-1 + f) * (p**2) * r
+            return alpha ** (f - 3) * (-2 + f) * (-1 + f) * (p**2) * r * b2
 
         alpha_sol = optimize.root_scalar(
             fun_to_root_for_alpha,
@@ -534,19 +533,17 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int):
             )
             + "as it will be clipped to [0,1] from {}".format(beta)
         )
-    return np.clip(alpha, 0, 1), np.clip(beta, 0, 1)  # TODO: reconsider
+    return np.clip(alpha, 0, 1), np.clip(beta, 0, 1)  # TODO: reconsider clipping.
 
 
 def validate_r_and_p(r: float, p: float, f: int):
     if p < 0:
         raise ValueError(
-            "The cross-linker conversion `p` must be positive, got {}".format(
-                p)
+            "The cross-linker conversion `p` must be positive, got {}".format(p)
         )
     if r < 0:
         raise ValueError(
-            "The stoichiometric imbalance `r` must be positive, got {}".format(
-                r)
+            "The stoichiometric imbalance `r` must be positive, got {}".format(r)
         )
     if f < 2:
         raise ValueError(
@@ -574,6 +571,7 @@ def compute_modulus_decomposition(
     temperature: pint.Quantity = None,
     functionality_per_type: dict = None,
     g_e_1: float = None,
+    b2: float = 1.
 ):
     """
     Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
@@ -626,8 +624,7 @@ def compute_modulus_decomposition(
                 "The p computed ({}) is outside the accepted range. ".format(p)
                 + "Falling back to effective cross-linker functionality."
             )
-            p = compute_effective_crosslinker_functionality(
-                network, crosslinker_type)
+            p = compute_effective_crosslinker_functionality(network, crosslinker_type)
     if f is None:
         if functionality_per_type is None:
             functionality_per_type = network.determine_functionality_per_type()
@@ -663,17 +660,16 @@ def compute_modulus_decomposition(
     # phantom
     g_pnm = (1 - 2 / f) * nu * kb * temperature if f != 0 else 0.0
     # MMT:
-    alpha, beta = compute_miller_macosko_probabilities(r, p, f)
+    alpha, beta = compute_miller_macosko_probabilities(r, p, f, b2)
     gamma_mmt_sum = 0.0
     for m in range(3, f + 1):
         gamma_mmt_sum += (
             (m - 2) / 2
         ) * compute_probability_that_crosslink_is_effective(f, m, alpha)
-    gamma_mmt = (2 * r / f) * gamma_mmt_sum if f != 0 else 0.0
+    gamma_mmt = (2 * r * b2 / f) * gamma_mmt_sum if f != 0 else 0.0
     g_mmt_phantom = gamma_mmt * nu * kb * temperature
     # fraction of elastically effective strands.
-    g_mmt_entanglement = g_e_1 * \
-        compute_trapping_factor(p=p, r=r, f=f, alpha=alpha)
+    g_mmt_entanglement = g_e_1 * compute_trapping_factor(p=p, r=r, f=f, alpha=alpha)
     # entanglement part. TODO : check adjustment with r
     return g_mmt_phantom, g_mmt_entanglement, g_anm, g_pnm
 
@@ -873,12 +869,10 @@ def compute_probability_that_crosslink_is_effective(
     f = functionality_of_monomer
     m = expected_degree_of_effect
     alpha = p_f_a_out
-    return scipy.special.binom(
-        f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
+    return scipy.special.binom(f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
 
 
-def compute_probability_that_bifunctional_monomer_is_effective(
-        p_f_b_out: float):
+def compute_probability_that_bifunctional_monomer_is_effective(p_f_b_out: float):
     """
     Consider a copolymerization of A_f with B_2.
     This function computes the probability that a random B_2 unit will be effective.
@@ -912,8 +906,7 @@ def compute_probability_that_crosslink_with_degree_is_dangling(
     alpha = p_f_a_out
     # NOTE: verify that the last exponent is f - m, rather than f - 1 as in
     # the paper
-    return scipy.special.binom(f, i) * (alpha ** (i)) * \
-        ((1.0 - alpha) ** (f - i))
+    return scipy.special.binom(f, i) * (alpha ** (i)) * ((1.0 - alpha) ** (f - i))
 
 
 def compute_probability_that_crosslink_is_dangling(
@@ -937,8 +930,7 @@ def compute_probability_that_crosslink_is_dangling(
     return scipy.special.binom(f, 1) * (alpha ** (f - 1)) * (1.0 - alpha)
 
 
-def compute_probability_that_bifunctional_monomer_is_dangling(
-        p_f_b_out: float):
+def compute_probability_that_bifunctional_monomer_is_dangling(p_f_b_out: float):
     """
     Consider a copolymerization of A_f with B_2.
     This function computes the probability that a random B_2 unit will be dangling.
@@ -1011,8 +1003,7 @@ def predict_p_from_w_sol(
         except ValueError:
             p_f_a_out = 1.0  # highest value -> this will not be the optimum
         return (
-            w_f * p_f_a_out**f + w_g *
-            (r * p * p_f_a_out ** (f - 1) + 1 - r * p) ** g
+            w_f * p_f_a_out**f + w_g * (r * p * p_f_a_out ** (f - 1) + 1 - r * p) ** g
         )
 
     res = optimize.minimize_scalar(
@@ -1029,6 +1020,5 @@ def _require_network(network: Universe = None, instead_of: str = ""):
             raise ValueError("A network is required")
         else:
             raise ValueError(
-                "If `{}` is not specified, a network is required".format(
-                    instead_of)
+                "If `{}` is not specified, a network is required".format(instead_of)
             )
