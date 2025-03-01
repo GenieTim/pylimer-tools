@@ -274,10 +274,20 @@ init_pylimer_bound_generators(py::module_& m)
             )pbdoc")
     .def("get_force_relaxation",
          &MCUniverseGenerator::getForceRelaxation,
-         R"pbdoc()pbdoc")
+         R"pbdoc(
+         Get an instance of the force relaxation procedure.
+         This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
+         )pbdoc")
     .def("get_force_balance",
          &MCUniverseGenerator::getForceBalance,
-         R"pbdoc()pbdoc");
+         R"pbdoc(
+         Get an instance of the force balance procedure.
+         This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
+         
+         Note: 
+               due to the universe missing, some methods will not work;
+               you won't be able to query the fraction of active and dangling and soluble structures, for example.
+         )pbdoc");
 
   m.def("do_random_walk",
         py::overload_cast<int, double, double, std::string>(&doRandomWalkChain),

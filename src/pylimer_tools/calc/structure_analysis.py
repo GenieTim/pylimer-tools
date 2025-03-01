@@ -163,6 +163,69 @@ def compute_extent_of_reaction(
     return actually_formed_bonds / (max_formable_bonds)
 
 
+def compute_fraction_of_bifunctional_reactive_sites(
+    network: Universe, crosslinker_type: int = 2, functionality_per_type: dict = None
+) -> dict:
+    """
+    Compute the mole fraction of reactive sites in B2
+    among all reactive sites in a mixture of A1 and B2.
+    """
+    if functionality_per_type is None:
+        functionality_per_type = network.determine_functionality_per_type()
+
+    monofunctional_types = [
+        t for t, f in functionality_per_type.items() if f == 1]
+    if len(monofunctional_types) == 0:
+        """
+        Assume the whole monofunctional chain has the same atom type
+        """
+        chains_with_crosslinks = network.get_chains_with_crosslinker(
+            crosslinker_type=crosslinker_type
+        )
+        all_atom_types = set(network.get_atom_types())
+        atom_type_has_only_monofunctional = {
+            atype: True for atype in all_atom_types}
+        for chain in chains_with_crosslinks:
+            n_xlinks = len(chain.get_atoms_by_type(crosslinker_type))
+            atom_types_in_chain = set(chain.get_atom_types())
+            if n_xlinks > 1:
+                for atype in atom_types_in_chain:
+                    atom_type_has_only_monofunctional[atype] = False
+
+        # the atom_type_has_only_monofunctional is now a dictionary that indicates
+        # the atom types belonging to a monofunctional chain
+        monofunctional_types = [
+            t for t, i in atom_type_has_only_monofunctional.items() if i
+        ]
+
+    if len(monofunctional_types) == 0:
+        return 1.0
+
+    # then, count the number of chains where one end is of the monofunctional
+    # type
+    chains_with_crosslinks = network.get_chains_with_crosslinker(
+        crosslinker_type=crosslinker_type
+    )
+
+    n_monofunctional_chains = sum(
+        1
+        for chain in chains_with_crosslinks
+        if any(
+            a.get_type() in monofunctional_types
+            for a in chain.get_strand_ends(
+                crosslinker_type=crosslinker_type, close_loop=True
+            )
+        )
+        and chain.get_nr_of_atoms() > 1
+    )
+    n_bifunctional_chains = (
+        len(network.get_molecules(crosslinker_type)) - n_monofunctional_chains
+    )
+    return (2 * n_bifunctional_chains) / (
+        n_monofunctional_chains + 2 * n_bifunctional_chains
+    )
+
+
 def compute_mean_end_to_end_distances(
     networks: Iterable[Universe], crosslinker_type: int = 2
 ) -> dict:

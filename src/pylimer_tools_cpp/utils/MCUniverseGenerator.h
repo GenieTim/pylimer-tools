@@ -2091,6 +2091,8 @@ namespace utils {
                             this->simplifiedUniverse.xlinkY[from],
                             this->simplifiedUniverse.xlinkZ[from]),
             maxDistance);
+        suitableMatches.reserve(acceptableIndices.size());
+        matchWeights.reserve(acceptableIndices.size());
         for (int i = 0; i < acceptableIndices.size(); ++i) {
           int crosslinkIdx = acceptableIndices(i);
           double thisWeight = this->evaluatePartnerProbability(
