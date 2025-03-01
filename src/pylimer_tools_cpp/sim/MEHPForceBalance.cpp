@@ -593,6 +593,9 @@ namespace sim {
       size_t linkIdx,
       bool allowOnEntanglement) const
     {
+      INVALIDARG_EXP_IFN(linkIdx < net.nrOfLinks,
+                         "Cannot remove duplicate spring indices of index "
+                         "higher than nr. of links.");
       // remove duplicate mentions of the same spring index
       std::sort(net.springIndicesOfLinks[linkIdx].begin(),
                 net.springIndicesOfLinks[linkIdx].end());
@@ -603,11 +606,23 @@ namespace sim {
         std::cout << "Removed duplicate spring indices from link " << linkIdx
                   << std::endl;
 #endif
-        RUNTIME_EXP_IFN(
-          linkIdx > net.nrOfNodes ||
-            (net.oldAtomTypes[linkIdx] != this->entanglementType) ||
-            allowOnEntanglement,
-          "Require entanglement beads to not form primary loops.");
+        if (!allowOnEntanglement) {
+          if (linkIdx < net.nrOfNodes) {
+            RUNTIME_EXP_IFN(
+              net.oldAtomTypes[linkIdx] != this->entanglementType,
+              "Require entanglement beads to not form primary loops. Link " +
+                std::to_string(linkIdx) + " is slip-link " +
+                std::to_string(net.linkIsSliplink[linkIdx]) +
+                " with old atom type" +
+                std::to_string(net.oldAtomTypes[linkIdx]) + ".");
+          } else {
+            RUNTIME_EXP_IFN(
+              !net.linkIsSliplink[linkIdx],
+              "Require entanglement beads to not form primary loops. Link " +
+                std::to_string(linkIdx) + " is slip-link " +
+                std::to_string(net.linkIsSliplink[linkIdx]) + ".");
+          }
+        }
         net.springIndicesOfLinks[linkIdx].erase(
           last, net.springIndicesOfLinks[linkIdx].end());
       }
@@ -2348,7 +2363,7 @@ namespace sim {
           }
         }
         this->removeDuplicateListedSpringsFromLink(
-          net, linkOfRemovedSpring, linkOfRemovedSpring == linkToReduce);
+          net, linkOfRemovedSpring, linkOfRemovedSpring != linkToReduce);
       }
 
       for (int i = net.springIndicesOfLinks[linkToReduce].size() - 1; i >= 0;

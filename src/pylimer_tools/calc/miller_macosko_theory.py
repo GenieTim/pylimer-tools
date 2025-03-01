@@ -1,6 +1,6 @@
 import math
 import warnings
-from typing import Union
+from typing import Callable, List, Union
 
 import numpy as np
 import pint
@@ -10,6 +10,7 @@ from scipy import optimize
 from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
     compute_effective_crosslinker_functionality,
+    compute_fraction_of_bifunctional_reactive_sites,
     compute_stoichiometric_imbalance, compute_weight_fractions,
     measure_weight_fraction_of_soluble_material)
 from pylimer_tools.io.unit_styles import UnitStyle
@@ -63,13 +64,16 @@ def predict_number_density_of_junction_points(
     Returns:
       - mu: The predicted number density of junction points
     """
-    if functionality_per_type is None or crosslinker_type not in functionality_per_type:
-        functionality_per_type = network.determine_functionality_per_type()
-
-    weight_fractions, alpha, _ = compute_weight_fractions_and_probabilities(
-        network, crosslinker_type, functionality_per_type
+    param = _compute_validate_parameters(
+        {**locals()},
+        ["functionality_per_type", "weight_fractions", "p_f_a_out"],
     )
 
+    functionality_per_type, weight_fractions, alpha = (
+        param["functionality_per_type"],
+        param["weight_fractions"],
+        param["p_f_a_out"],
+    )
     if functionality_per_type[crosslinker_type] == 3:
         return weight_fractions[crosslinker_type] * (1 - alpha) ** 3
     elif functionality_per_type[crosslinker_type] == 4:
@@ -107,15 +111,13 @@ def predict_number_density_of_network_strands(
     Returns:
       - nu: The predicted number density of network strands
     """
-    if (functionality_per_type is None) or (
-        crosslinker_type not in functionality_per_type
-    ):
-        functionality_per_type = network.determine_functionality_per_type()
+    param = _compute_validate_parameters(
+        {**locals()},
+        ["functionality_per_type", "weight_fractions", "r", "p", "crosslinker_type"],
+    )
 
-    if crosslinker_type not in functionality_per_type:
-        raise ValueError("Could not determine cross-linker functionality")
+    weight_fractions, r, p = param["weight_fractions"], param["r"], param["p"]
 
-    weight_fractions = network.compute_weight_fractions()
     if crosslinker_type not in weight_fractions:
         weight_fractions[crosslinker_type] = 0.0
     alpha, _ = compute_miller_macosko_probabilities(
@@ -162,6 +164,7 @@ def compute_weight_fraction_of_dangling_chains(
     weight_fractions: dict = None,
     r: float = None,
     p: float = None,
+    b2: float = None,
 ) -> float:
     """
     Compute the weight fraction of dangling (pendant) strands in infinite network
@@ -183,11 +186,16 @@ def compute_weight_fraction_of_dangling_chains(
     if network is not None and network.get_nr_of_atoms() == 0:
         return 0
 
-    if functionality_per_type is None or crosslinker_type not in functionality_per_type:
-        functionality_per_type = network.determine_functionality_per_type()
+    param = _compute_validate_parameters(
+        {**locals()},
+        ["functionality_per_type", "weight_fractions", "p_f_a_out", "p_f_b_out"],
+    )
 
-    weight_fractions, alpha, beta = compute_weight_fractions_and_probabilities(
-        network, crosslinker_type, functionality_per_type, weight_fractions, r, p
+    functionality_per_type, weight_fractions, alpha, beta = (
+        param["functionality_per_type"],
+        param["weight_fractions"],
+        param["p_f_a_out"],
+        param["p_f_b_out"],
     )
 
     w_dangling = 0.0
@@ -224,6 +232,7 @@ def compute_weight_fraction_of_backbone(
     weight_fractions: dict = None,
     r: float = None,
     p: float = None,
+    b2: float = None,
 ) -> float:
     """
     Compute the weight fraction of the backbone (elastically effective) strands in an infinite network
@@ -242,11 +251,16 @@ def compute_weight_fraction_of_backbone(
     if network is not None and network.get_nr_of_atoms() == 0:
         return 0
 
-    if functionality_per_type is None or crosslinker_type not in functionality_per_type:
-        functionality_per_type = network.determine_functionality_per_type()
+    param = _compute_validate_parameters(
+        {**locals()},
+        ["functionality_per_type", "weight_fractions", "p_f_a_out", "p_f_b_out"],
+    )
 
-    weight_fractions, alpha, beta = compute_weight_fractions_and_probabilities(
-        network, crosslinker_type, functionality_per_type, weight_fractions, r, p
+    functionality_per_type, weight_fractions, alpha, beta = (
+        param["functionality_per_type"],
+        param["weight_fractions"],
+        param["p_f_a_out"],
+        param["p_f_b_out"],
     )
 
     w_elastic = 0.0
@@ -276,6 +290,7 @@ def compute_weight_fraction_of_soluble_material(
     weight_fractions: dict = None,
     r: float = None,
     p: float = None,
+    b2: float = None,
 ) -> float:
     """
     Compute the weight fraction of soluble material by MMT.
@@ -301,25 +316,17 @@ def compute_weight_fraction_of_soluble_material(
     if network is not None and network.get_nr_of_bonds() == 0:
         return 1.0
 
-    weight_fractions, alpha, beta = compute_weight_fractions_and_probabilities(
-        network, crosslinker_type, functionality_per_type, weight_fractions, r, p
+    param = _compute_validate_parameters(
+        {**locals()},
+        ["functionality_per_type", "weight_fractions", "p_f_a_out", "p_f_b_out"],
     )
 
-    if functionality_per_type is not None and not np.all(
-        [
-            key in functionality_per_type
-            for key in weight_fractions.keys()
-            if weight_fractions[key] > 0.0
-        ]
-    ):
-        warnings.warn(
-            "functionality_per_type does not contain functionality for all types. Will be re-computed."
-        )
-        functionality_per_type = None
-
-    if functionality_per_type is None:
-        _require_network(network, "functionality_per_type")
-        functionality_per_type = network.determine_functionality_per_type()
+    functionality_per_type, weight_fractions, alpha, beta = (
+        param["functionality_per_type"],
+        param["weight_fractions"],
+        param["p_f_a_out"],
+        param["p_f_b_out"],
+    )
 
     w_sol = 0
     for key in weight_fractions:
@@ -355,100 +362,6 @@ def compute_weight_fraction_of_soluble_material_from_weight_fractions(
     return w_f * (alpha**f) + w_g * ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
 
 
-def compute_weight_fractions_and_probabilities(
-    network: Universe,
-    crosslinker_type: int,
-    functionality_per_type: dict = None,
-    weight_fractions: dict = None,
-    r: float = None,
-    p: float = None,
-):
-    """
-    Shortcut function filling all missing parameters,
-    computing the weight fractions per type in the network,
-    and the MMT probabilities :math:`P(F_a^{out})` and  :math:`P(F_b^{out})`
-
-    Arguments:
-      - network: the polymer network to do the computation for
-      - crosslinker_type: the type of the junctions/cross-linkers to select them in the network
-      - weight_fractions (dict): a dictionary with key: type, and value: weight fraction of type.
-          Pass if you want to omit the network.
-      - functionality_per_type (dict): a dictionary with key: type, and value: functionality of this atom type.
-          See: :func:`~pylimer_tools_cpp.Universe.determine_functionality_per_type`.
-      - r: the stoichiometric imbalance
-      - p: the extent of reaction in terms of the crosslinkers
-    """
-    if functionality_per_type is None or crosslinker_type not in functionality_per_type:
-        assert network is not None
-        functionality_per_type = network.determine_functionality_per_type()
-        if crosslinker_type not in functionality_per_type:
-            raise ValueError(
-                "The crosslinker type {} is not present in the network. Got types {}".format(
-                    crosslinker_type,
-                    ", ".join([str(t) for t in functionality_per_type.keys()]),
-                )
-            )
-
-    if functionality_per_type[crosslinker_type] not in range(3, 7):
-        raise NotImplementedError(
-            "Currently, a crosslinker functionality of {} is not supported.".format(
-                functionality_per_type[crosslinker_type]
-            )
-        )
-
-    if weight_fractions is None:
-        weight_fractions = compute_weight_fractions(network)
-        assert math.isclose(
-            sum(w for w in weight_fractions.values()), 1.0, abs_tol=1e-9
-        )
-        if crosslinker_type not in weight_fractions:
-            weight_fractions[crosslinker_type] = 0.0
-
-    for key in functionality_per_type:
-        if (
-            key != crosslinker_type
-            and functionality_per_type[key] != 2
-            and weight_fractions[key] > 0
-        ):
-            raise NotImplementedError(
-                "Currently, only strand functionality of 2 is supported. {} given for type {}".format(
-                    functionality_per_type[key], key
-                )
-            )
-
-    if p is None:
-        assert network is not None
-        p = compute_crosslinker_conversion(
-            network, crosslinker_type, functionality_per_type[crosslinker_type]
-        )
-        if p < 0 or p > 1:
-            warnings.warn(
-                "The p computed ({}) is outside the accepted range. ".format(p)
-                + "Falling back to effective cross-linker functionality."
-            )
-            p = compute_effective_crosslinker_functionality(network, crosslinker_type)
-    if p > 1 or p < 0:
-        raise ValueError(
-            "Detected p = {} for f = {}. Need p in (0, 1).".format(
-                p, functionality_per_type[crosslinker_type]
-            )
-        )
-    if r is None:
-        assert network is not None
-        r = compute_stoichiometric_imbalance(
-            network, crosslinker_type, functionality_per_type=functionality_per_type
-        )
-    assert r >= 0
-
-    alpha, beta = compute_miller_macosko_probabilities(
-        r, p, functionality_per_type[crosslinker_type]
-    )
-    assert alpha <= 1 and alpha >= 0
-    assert beta <= 1 and beta >= 0
-
-    return weight_fractions, alpha, beta
-
-
 def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float = 1.0):
     """
     Compute Macosko and Miller's probabilities :math:`P(F_A)` and :math:`P(F_B)`
@@ -469,7 +382,7 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float =
       - p: the extent of reaction in terms of the crosslinkers
       - f: the functionality of the the crosslinker
       - b2: the fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.
-            Can be computed e.g. as :math:`b_2 = \frac{2 \cdot [B_2]}{[B_1] + 2 \cdot [B_2]}`
+            Can be computed e.g. as :math:`b_2 = \frac{2 \\cdot [B_2]}{[B_1] + 2 \\cdot [B_2]}`
 
     Returns:
       - alpha: :math:`P(F_A)`
@@ -483,9 +396,9 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float =
     # first, check a few things required by the formulae
     # since we want alpha, beta \in [0,1], given they are supposed to be
     # probabilities
-    validate_r_and_p(r, p, f)
+    _validate_r_and_p(r, p, f)
 
-    if not (1/(f-1) < b2 * (p**2) * r < 1):
+    if not (1 / (f - 1) < b2 * (p**2) * r < 1):
         warnings.warn(
             "The resulting P(F_A) is probably unreliable, "
             + "as the detected root does not fulfill the required conditions."
@@ -533,30 +446,8 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float =
             )
             + "as it will be clipped to [0,1] from {}".format(beta)
         )
-    return np.clip(alpha, 0, 1), np.clip(beta, 0, 1)  # TODO: reconsider clipping.
-
-
-def validate_r_and_p(r: float, p: float, f: int):
-    if p < 0:
-        raise ValueError(
-            "The cross-linker conversion `p` must be positive, got {}".format(p)
-        )
-    if r < 0:
-        raise ValueError(
-            "The stoichiometric imbalance `r` must be positive, got {}".format(r)
-        )
-    if f < 2:
-        raise ValueError(
-            "The cross-linker functionality `f` must be >= 2, got {}".format(f)
-        )
-    # assume:
-    p_max = predict_maximum_p(r=r, f=f)
-    if p > p_max:
-        raise ValueError(
-            "For a system with r = {} and f = {}, p (in terms of crosslinkers) must be < {}, {} given.".format(
-                r, f, p_max, p
-            )
-        )
+    # TODO: reconsider clipping.
+    return np.clip(alpha, 0, 1), np.clip(beta, 0, 1)
 
 
 def compute_modulus_decomposition(
@@ -571,7 +462,7 @@ def compute_modulus_decomposition(
     temperature: pint.Quantity = None,
     functionality_per_type: dict = None,
     g_e_1: float = None,
-    b2: float = 1.
+    b2: float = 1.0,
 ):
     """
     Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
@@ -603,45 +494,19 @@ def compute_modulus_decomposition(
                 "Unit style or unit registry must be specified to compute modulus."
             )
         ureg = unit_style.get_underlying_unit_registry()
-    if (crosslinker_type is None or network is None) and (
-        r is None or f is None or p is None or nu is None
-    ):
-        raise ValueError(
-            "Either the network and crosslinker_type or the required variables must be specified"
-        )
-    if r is None:
-        r = compute_stoichiometric_imbalance(
-            network,
-            crosslinker_type=crosslinker_type,
-            functionality_per_type=functionality_per_type,
-        )
-    if p is None:
-        p = compute_crosslinker_conversion(
-            network, crosslinker_type, functionality_per_type=functionality_per_type
-        )
-        if p < 0 or p > 1:
-            warnings.warn(
-                "The p computed ({}) is outside the accepted range. ".format(p)
-                + "Falling back to effective cross-linker functionality."
-            )
-            p = compute_effective_crosslinker_functionality(network, crosslinker_type)
-    if f is None:
-        if functionality_per_type is None:
-            functionality_per_type = network.determine_functionality_per_type()
-        if crosslinker_type not in functionality_per_type:
-            raise ValueError(
-                "The cross-linker functionality could not be determined. "
-                + "Please pass it explicitly (`f`, or in `functionality_per_type`)."
-            )
-        f = functionality_per_type[crosslinker_type]
-    if nu is None:
-        if unit_style is None:
-            raise ValueError(
-                "Unit style must be specified to compute nu, since the units of volume are unknown otherwise."
-            )
-        nu = len(network.get_molecules(crosslinker_type)) / (
-            network.get_volume() * unit_style.get_base_unit_of("volume")
-        )
+
+    param = _compute_validate_parameters(
+        {**locals()},
+        ["f", "nu", "p_f_a_out", "p"],
+    )
+
+    f, nu, alpha, p = (
+        param["f"],
+        param["nu"],
+        param["p_f_a_out"],
+        param["p"],
+    )
+
     if temperature is None:
         temperature = (273.15 + 25) * ureg.kelvin  # Temperature in Kelvin
     if g_e_1 is None:
@@ -660,7 +525,6 @@ def compute_modulus_decomposition(
     # phantom
     g_pnm = (1 - 2 / f) * nu * kb * temperature if f != 0 else 0.0
     # MMT:
-    alpha, beta = compute_miller_macosko_probabilities(r, p, f, b2)
     gamma_mmt_sum = 0.0
     for m in range(3, f + 1):
         gamma_mmt_sum += (
@@ -669,7 +533,7 @@ def compute_modulus_decomposition(
     gamma_mmt = (2 * r * b2 / f) * gamma_mmt_sum if f != 0 else 0.0
     g_mmt_phantom = gamma_mmt * nu * kb * temperature
     # fraction of elastically effective strands.
-    g_mmt_entanglement = g_e_1 * compute_trapping_factor(p=p, r=r, f=f, alpha=alpha)
+    g_mmt_entanglement = g_e_1 * compute_trapping_factor(p=p, alpha=alpha)
     # entanglement part. TODO : check adjustment with r
     return g_mmt_phantom, g_mmt_entanglement, g_anm, g_pnm
 
@@ -757,7 +621,7 @@ def compute_entanglement_modulus(
         temperature = (273.15 + 25) * ureg.kelvin
     if alpha is None:
         alpha, _ = compute_miller_macosko_probabilities(r, p, f)
-    return compute_trapping_factor(p=p, r=r, f=f, alpha=alpha) * g_e_1
+    return compute_trapping_factor(p=p, alpha=alpha) * g_e_1
 
 
 def compute_junction_modulus(
@@ -795,52 +659,17 @@ def compute_junction_modulus(
     return kb * temperature * xlink_concentration_0 * gamma_mmt_sum
 
 
-def compute_trapping_factor(
-    network: Universe = None,
-    p: float = None,
-    r: float = None,
-    f: Union[int, None] = None,
-    alpha: Union[float, None] = None,
-    beta: Union[float, None] = None,
-    crosslinker_type: int = 2,
-) -> float:
+def compute_trapping_factor(alpha: float, p: float) -> float:
     """
     Compute the Langley trapping factor :math:`T_e`.
-    Not all parameters are required; they will be computed from the network if needed.
-    Provide all parameters if you don't have the network.
 
     Literature: https://doi.org/10.1021/ma60004a015
 
     Arguments:
-        - network: the network to compute the trapping factor for.
-        - p: the extent of reaction in terms of the crosslinkers.
-        - r: the stoichiometric imbalance of reactants.
-        - f: functionality of the crosslinkers. Only needed if alpha is None.
         - alpha: :math:`P(F_a^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`
-        - beta: :math:`P(F_b^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`
+        - p: the extent of reaction in terms of the crosslinkers.
     """
-    if f is None:
-        _require_network(network, "f")
-        f = network.determine_functionality_per_type()[crosslinker_type]
-
-    if p is None:
-        _require_network(network, "p")
-        p = compute_crosslinker_conversion(
-            network, crosslinker_type=crosslinker_type, f=f
-        )
-
-    if r is None:
-        _require_network(network, "r")
-        r = compute_stoichiometric_imbalance(
-            network,
-            crosslinker_type=crosslinker_type,
-            functionality_per_type={crosslinker_type: f},
-        )
-
-    if alpha is None or beta is None:
-        alpha, beta = compute_miller_macosko_probabilities(r, p, f)
-
-    if p == 0 or r == 0:
+    if p == 0:
         return 0.0
 
     # for long B2s reacting with small A_fs
@@ -1022,3 +851,207 @@ def _require_network(network: Universe = None, instead_of: str = ""):
             raise ValueError(
                 "If `{}` is not specified, a network is required".format(instead_of)
             )
+
+
+def _validate_r_and_p(r: float, p: float, f: int):
+    if p < 0:
+        raise ValueError(
+            "The cross-linker conversion `p` must be positive, got {}".format(p)
+        )
+    if r < 0:
+        raise ValueError(
+            "The stoichiometric imbalance `r` must be positive, got {}".format(r)
+        )
+    if f < 2:
+        raise ValueError(
+            "The cross-linker functionality `f` must be >= 2, got {}".format(f)
+        )
+    # assume:
+    p_max = predict_maximum_p(r=r, f=f)
+    if p > p_max:
+        raise ValueError(
+            "For a system with r = {} and f = {}, p (in terms of crosslinkers) must be < {}, {} given.".format(
+                r, f, p_max, p
+            )
+        )
+
+
+class _ParamValidatorAssembler:
+    """
+    A class to compute and validate one parameter.
+
+    """
+
+    def __init__(
+        self,
+        param_name: str,
+        param_func: Callable,
+        param_validator: Callable,
+        dependencies: List[str],
+    ):
+        self.param_name = param_name
+        self.param_func = param_func
+        self.param_validator = param_validator
+        self.dependencies = dependencies
+
+
+_validators_assembler = [
+    _ParamValidatorAssembler(
+        "functionality_per_type",
+        lambda p: p["network"].determine_functionality_per_type(),
+        lambda x: isinstance(x, dict),
+        ["network"],
+    ),
+    _ParamValidatorAssembler(
+        "weight_fractions",
+        lambda p: p["network"].compute_weight_fractions(),
+        lambda x: isinstance(x, dict),
+        ["network"],
+    ),
+    _ParamValidatorAssembler(
+        "f",
+        lambda p: p["functionality_per_type"].get(p["crosslinker_type"], 0),
+        lambda f: f >= 2 and np.isfinite(f),
+        ["functionality_per_type", "crosslinker_type"],
+    ),
+    _ParamValidatorAssembler(
+        "r",
+        lambda p: compute_stoichiometric_imbalance(
+            network=p["network"],
+            crosslinker_type=p["crosslinker_type"],
+            functionality_per_type=p["functionality_per_type"],
+        ),
+        lambda r: r > 0 and np.isfinite(r),
+        ["network", "crosslinker_type"],
+    ),
+    _ParamValidatorAssembler(
+        "p",
+        lambda p: compute_crosslinker_conversion(
+            network=p["network"],
+            crosslinker_type=p["crosslinker_type"],
+            functionality_per_type=p["functionality_per_type"],
+        ),
+        lambda p: 0 <= p <= 1,
+        ["network", "crosslinker_type"],
+    ),
+    _ParamValidatorAssembler(
+        "nu",
+        lambda p: (
+            len(p["network"].get_molecules(p["crosslinker_type"]))
+            / (p["network"].get_volume() * p["unit_style"].get_base_unit_of("volume"))
+        ),
+        lambda nu: nu.magnitude > 0 and np.isfinite(nu.magnitude),
+        ["network", "crosslinker_type", "unit_style"],
+    ),
+    _ParamValidatorAssembler(
+        "b2",
+        lambda p: compute_fraction_of_bifunctional_reactive_sites(
+            network=p["network"],
+            crosslinker_type=p["crosslinker_type"],
+            functionality_per_type=p["functionality_per_type"],
+        ),
+        lambda b2: 0 <= b2 <= 1,
+        ["network", "crosslinker_type"],
+    ),
+    _ParamValidatorAssembler(
+        "p_f_a_out",
+        lambda p: compute_miller_macosko_probabilities(
+            r=p["r"], p=p["p"], f=p["f"], b2=p["b2"]
+        )[0],
+        lambda alpha: 0 <= alpha <= 1,
+        ["r", "p", "f", "b2"],
+    ),
+    _ParamValidatorAssembler(
+        "p_f_b_out",
+        lambda p: compute_miller_macosko_probabilities(
+            r=p["r"], p=p["p"], f=p["f"], b2=p["b2"]
+        )[1],
+        lambda beta: 0 <= beta <= 1,
+        ["r", "p", "f", "b2"],
+    ),
+    _ParamValidatorAssembler(
+        "network",
+        lambda p: p["network"],
+        lambda x: isinstance(x, Universe),
+        ["network"],
+    ),
+]
+_validator_per_name = {v.param_name: v for v in _validators_assembler}
+
+
+def _compute_validate_parameters(
+    given_parameters: dict, required_parameters: List[str]
+) -> dict:
+    """
+    Slightly overengineered function
+    to compute missing parameters e.g. from the network,
+    and validate parameters.
+    """
+
+    def _param_is_ready(param: str) -> bool:
+        return param in given_parameters and not given_parameters[param] is None
+
+    def _is_complete(dependencies: List[str]) -> bool:
+        return all(_param_is_ready(param) for param in dependencies)
+
+    def _can_be_computed(param: _ParamValidatorAssembler) -> bool:
+        return all(_param_is_ready(dep) for dep in param.dependencies)
+
+    def _validate(param_name: str):
+        if not _validator_per_name[param_name].param_validator(given_parameters[p]):
+            raise ValueError(
+                "Invalid value for parameter '{}' (got {}).".format(
+                    param_name, given_parameters[param_name]
+                )
+            )
+
+    # first, validate existing parameters
+    present = [d for d in required_parameters if _param_is_ready(d)]
+    for p in present:
+        _validate(p)
+
+    # first, determine all parameters to compute
+    to_compute = set([d for d in required_parameters if not _param_is_ready(d)])
+    # add dependencies
+    found_last_iteration = True
+    while found_last_iteration:
+        found_last_iteration = False
+        for p in list(to_compute):
+            dependencies = _validator_per_name[p].dependencies
+            for dep in dependencies:
+                if dep not in to_compute and not _param_is_ready(dep):
+                    to_compute.add(dep)
+                    found_last_iteration = True
+
+    found_last_iteration = False
+    while not _is_complete(required_parameters):
+        # Instead of building a dependency graph,
+        # we simply iterate over all validators and try to compute
+        # the required parameters, as often as required.
+        found_last_iteration = False
+
+        for p in list(to_compute):
+            if _can_be_computed(_validator_per_name[p]):
+                try:
+                    given_parameters[p] = _validator_per_name[p].param_func(
+                        given_parameters
+                    )
+                except Exception as e:
+                    raise ValueError(
+                        "Error while computing parameter '{}': {}".format(p, str(e))
+                    )
+                to_compute.remove(p)
+                _validate(p)
+                found_last_iteration = True
+
+        if not found_last_iteration:
+            raise ValueError(
+                "Missing required parameters: {}".format(", ".join(to_compute))
+                + ".{}".format(
+                    " Some of them may be computed as dependencies of others."
+                    if len(to_compute) > 1
+                    else ""
+                )
+            )
+
+    return given_parameters
