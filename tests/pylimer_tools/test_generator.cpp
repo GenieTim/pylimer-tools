@@ -276,7 +276,8 @@ TEST_CASE("Universe can cross-link up to w_sol",
   Eigen::VectorXd frVecs = forceRelaxer2.getCurrentSpringDistances();
   REQUIRE(fbVecs.size() == 3 * forceBalance.getNrOfSprings());
   REQUIRE(frVecs.size() == 3 * forceBalance.getNrOfSprings());
-  for (size_t springIdx = 0; springIdx < fbVecs.size(); springIdx += 1) {
+  for (size_t springIdx = 0; springIdx < forceBalance.getNrOfSprings();
+       springIdx += 1) {
     for (size_t dir = 0; dir < 3; dir++) {
       CHECK_THAT(frVecs[3 * springIdx + dir],
                  Catch::Matchers::WithinRel(fbVecs[3 * springIdx + dir]));
