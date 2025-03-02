@@ -2363,7 +2363,7 @@ namespace sim {
           }
         }
         this->removeDuplicateListedSpringsFromLink(
-          net, linkOfRemovedSpring, linkOfRemovedSpring != linkToReduce);
+          net, linkOfRemovedSpring, true);
       }
 
       for (int i = net.springIndicesOfLinks[linkToReduce].size() - 1; i >= 0;

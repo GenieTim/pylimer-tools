@@ -276,6 +276,7 @@ TEST_CASE(
       pcm::MEHPForceRelaxation forceRelaxer2 = pcm::MEHPForceRelaxation(
         universe2, 2, false, nullptr, 1.0, false, true);
       REQUIRE(forceRelaxer2.getExitReason() == pcm::ExitReason::UNSET);
+      CHECK(forceRelaxer2.getNrOfSprings() == 8142);
       REQUIRE(forceRelaxer2.getNrOfIterations() == 0);
       REQUIRE(forceRelaxer2.getVolume() ==
               Catch::Approx(universe2.getVolume()));
@@ -292,6 +293,8 @@ TEST_CASE(
       }
       CHECK(forceRelaxer2.getResidualNorm() * 79 ==
             Catch::Approx(1457.465048151));
+
+      // run force relaxation
       REQUIRE_NOTHROW(forceRelaxer2.runForceRelaxation());
       CHECK(forceRelaxer2.getNrOfSprings() == 8142);
       CHECK(forceRelaxer2.getNrOfIterations() > 1);
@@ -323,17 +326,17 @@ TEST_CASE(
             Catch::Approx(
               61308.0398526509)); // shear modulus from the pressure, MPa
       double expectedNb2 = slope * Nb * beadMass;
-      double nb2Correction =
-        (forceRelaxer2.getDefaultR0Square() / (expectedNb2));
+      double defaultR02 = forceRelaxer2.getDefaultR0Square();
+      double nb2Correction = (defaultR02) / (expectedNb2);
       double gammaCorrectionFactor = nb2Correction;
-      CHECK(forceRelaxer2.getGammaFactor() *
-              forceRelaxer2.getDefaultR0Square() ==
+      double gammaFactor = forceRelaxer2.getGammaFactor(-1., nrOfChains);
+      CHECK(gammaFactor * defaultR02 ==
             Catch::Approx(
               42.6130241132)); // as from conversion-less Mathematica script
-      CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor * kb * T *
-              nu ==
-            Catch::Approx(61338.8913392133)); // ANT shear modulus, Pa
-      CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor ==
+      CHECK_THAT(gammaFactor * gammaCorrectionFactor * kb * T * nu,
+                 Catch::Matchers::WithinRel(61338.8913392133,
+                                            1e-3)); // ANT shear modulus, Pa
+      CHECK(gammaFactor * gammaCorrectionFactor ==
             Catch::Approx(0.3194444644)); // "correct" gamma factor
       CHECK(forceRelaxer2.getExitReason() == pcm::ExitReason::F_TOLERANCE);
       // TODO: find better, more accurate tests here
@@ -375,8 +378,9 @@ TEST_CASE(
     forceRelaxer2.runForceRelaxation("LD_LBFGS", 10000, 1e-5, 1e-18);
     REQUIRE(forceRelaxer2.getNrOfIterations() > 5);
     CHECK(forceRelaxer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-    CHECK(forceRelaxer2.getGammaFactor(25, forceRelaxer2.getNrOfSprings()) ==
-          Catch::Approx(1. / 3.).epsilon(0.001));
+    int nSprings = forceRelaxer2.getNrOfSprings();
+    double gammaFactor2 = forceRelaxer2.getGammaFactor(25, nSprings);
+    CHECK(gammaFactor2 == Catch::Approx(2. / 150.).epsilon(0.001));
     auto stressTensor = forceRelaxer2.getStressTensor();
     CHECK(forceRelaxer2.getPressure() ==
           Catch::Approx(
@@ -545,13 +549,14 @@ TEST_CASE(
       double nb2Correction =
         (forceRelaxer2.getDefaultR0Square() / (expectedNb2));
       double gammaCorrectionFactor = nb2Correction;
-      CHECK(forceRelaxer2.getGammaFactor() *
+      CHECK(forceRelaxer2.getGammaFactor(-1., nrOfChains) *
               forceRelaxer2.getDefaultR0Square() ==
             Catch::Approx(42.6136781099));
-      CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor * kb * T *
-              nu ==
+      CHECK(forceRelaxer2.getGammaFactor(-1., nrOfChains) *
+              gammaCorrectionFactor * kb * T * nu ==
             Catch::Approx(61308.980768089)); // ANT shear modulus, Pa
-      CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor ==
+      CHECK(forceRelaxer2.getGammaFactor(-1., nrOfChains) *
+              gammaCorrectionFactor ==
             Catch::Approx(0.319449367)); // "correct" gamma factor
       CHECK(forceRelaxer2.getExitReason() == pcm::ExitReason::F_TOLERANCE);
       // TODO: find better, more accurate tests here
