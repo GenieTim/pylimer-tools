@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="pylimer_tools.io package" href="pylimer_tools.io.html" /><link rel="prev" title="pylimer_tools package" href="pylimer_tools.html" />
 
-    <!-- Generated with Sphinx 8.2.1 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
         <title>pylimer_tools.calc package - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
@@ -891,7 +891,7 @@ See: <a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pyl
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.predict_gelation_point">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">predict_gelation_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.predict_gelation_point" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">predict_gelation_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.predict_gelation_point" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the gelation point <span class="math notranslate nohighlight">\(p_{gel}\)</span> as theoretically predicted
 (gelation point = critical extent of reaction for gelation)</p>
 <dl class="simple">
@@ -905,7 +905,7 @@ See: <a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pyl
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</p></li>
 <li><p><strong>f</strong> (<em>-</em>) – functionality of the crosslinkers</p></li>
-<li><p><strong>g</strong> (<em>-</em>) – functionality of the precursor polymer</p></li>
+<li><p><strong>b2</strong> (<em>-</em>) – the mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -922,8 +922,14 @@ See: <a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pyl
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.predict_maximum_p">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">predict_maximum_p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.predict_maximum_p" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">predict_maximum_p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.predict_maximum_p" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the maximum cross-linker conversion possible given a stoichiometric inbalance.</p>
+<p>Arguments:
+- r (double): the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
+- f (int): functionality of the crosslinkers
+- b2 (double, optional): the mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</p>
+<p>Returns:
+- p_max: the maximum cross-linker conversion possible</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1164,7 +1170,15 @@ If None: will use max functionality per type.</p></li>
 <dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.compute_fraction_of_bifunctional_reactive_sites">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">compute_fraction_of_bifunctional_reactive_sites</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionality_per_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.compute_fraction_of_bifunctional_reactive_sites" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the mole fraction of reactive sites in B2
-among all reactive sites in a mixture of A1 and B2.</p>
+among all reactive sites in a mixture of B1 and B2.
+Uses the network to detect what might be monofunctional chains,
+and then counts them and the bifunctional ones.</p>
+<p>Arguments:
+- network: the polymer network to do the computation for
+- crosslinker_type: the atom type of crosslinker beads
+- functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.</p>
+<p>Returns:
+- b2, the mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2.</p>
 </dd></dl>
 
 <dl class="py function">
