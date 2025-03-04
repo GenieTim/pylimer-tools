@@ -168,7 +168,17 @@ def compute_fraction_of_bifunctional_reactive_sites(
 ) -> dict:
     """
     Compute the mole fraction of reactive sites in B2
-    among all reactive sites in a mixture of A1 and B2.
+    among all reactive sites in a mixture of B1 and B2.
+    Uses the network to detect what might be monofunctional chains,
+    and then counts them and the bifunctional ones.
+
+    Arguments:
+    - network: the polymer network to do the computation for
+    - crosslinker_type: the atom type of crosslinker beads
+    - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
+
+    Returns:
+    - b2, the mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2.
     """
     if functionality_per_type is None:
         functionality_per_type = network.determine_functionality_per_type()

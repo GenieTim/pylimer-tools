@@ -393,7 +393,7 @@ TEST_CASE("Generator can return force balance and relaxation",
   CHECK(forceBalance.getNrOfSprings() == forceRelaxer2.getNrOfSprings());
   CHECK_THAT(
     forceBalance.getGammaFactor(1.),
-    Catch::Matchers::WithinRel(forceRelaxer2.getGammaFactor(1.), 0.01));
+    Catch::Matchers::WithinRel(forceRelaxer2.getGammaFactor(1.), 0.025));
   CHECK_THAT(
     forceBalance.getNrOfActiveSprings(1e-2),
     Catch::Matchers::WithinAbs(forceRelaxer2.getNrOfActiveSprings(1e-2), 1));

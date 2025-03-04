@@ -8,7 +8,6 @@ from pylimer_tools.calc.miller_macosko_theory import (
     compute_miller_macosko_probabilities,
     compute_modulus_decomposition,
     compute_weight_fraction_of_soluble_material,
-    compute_weight_fractions_and_probabilities,
     predict_gelation_point,
     predict_number_density_of_junction_points,
     compute_weight_fraction_of_backbone,
@@ -220,6 +219,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             "r": 1.0,
             "p": 0.95,
             "weight_fractions": {1: 0.85, 2: 0.15},
+            "b2": 1,
         }
 
         ps = [1.0, 0.9, 0.95, 0.98]
@@ -288,35 +288,11 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             ),
         )
         self.assertRaises(
-            NotImplementedError,
-            lambda: compute_weight_fraction_of_soluble_material(
-                self.testUniverse, 2, functionality_per_type={1: 1, 2: 3}
-            ),
-        )
-        self.assertRaises(
             ValueError,
             lambda: compute_weight_fraction_of_soluble_material(
                 self.testUniverse, 7),
         )
         self.saturatedTestUniverse.set_masses({1: 1, 2: 1})
-
-        res_tuple = compute_weight_fractions_and_probabilities(
-            self.saturatedTestUniverse, 2
-        )
-        expected_tuple = ({1: 0.85, 2: 0.15},
-                          0.111111111111111, 0.111111111111111)
-        self.assertEqual(len(res_tuple), len(expected_tuple))
-        for i in range(len(res_tuple)):
-            if isinstance(res_tuple[i], int) or isinstance(
-                    res_tuple[i], float):
-                self.assertAlmostEqual(res_tuple[i], expected_tuple[i])
-            elif isinstance(res_tuple[i], dict):
-                for key in res_tuple[i].keys():
-                    self.assertAlmostEqual(
-                        res_tuple[i][key], expected_tuple[i][key])
-            else:
-                raise ValueError(
-                    "Expected integer, float or dict for comparison")
 
         self.assertAlmostEqual(
             0.010699588477366243,
