@@ -88,7 +88,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
 
     def test_gelation_point_prediction(self):
         self.assertAlmostEqual(1, predict_gelation_point(1, 2))
-        self.assertAlmostEqual(1, predict_gelation_point(1, 2, 2))
+        self.assertAlmostEqual(1, predict_gelation_point(1, 2, 1))
 
     def test_shear_modulus_prediction(self):
         self.assertRaises(
