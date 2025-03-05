@@ -390,7 +390,7 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
     Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
     CHECK_NOTHROW(
-      forceBalancer.displaceToMeanPosition(net, displacements, partitions, 0));
+      forceBalancer.displaceToMeanPosition(net, displacements, partitions, 0, 1.));
     CHECK(displacements[0] == Catch::Approx(7.687).epsilon(1e-5));
     CHECK(displacements[1] == Catch::Approx(2.03926).epsilon(1e-5));
     CHECK(displacements[2] == Catch::Approx(5.88634).epsilon(1e-5));
@@ -1171,9 +1171,9 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     // outputNetwork(net, displacements, forceBalancer.getSpringPartitions());
     for (int i = 0; i < 5; ++i) {
       forceBalancer.displaceToMeanPosition(
-        net, displacements, springPartitions, 4);
+        net, displacements, springPartitions, 4, 1.);
       forceBalancer.updateSpringPartition(
-        net, displacements, springPartitions, 4);
+        net, displacements, springPartitions, 4, 1.);
     }
     CHECK(springPartitions[springPartitions.size() - 1] == Catch::Approx(0.5));
     CHECK(displacements[3 * 4] == Catch::Approx(-4.2));
@@ -1232,7 +1232,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       // outputNetwork(net, displacements, springPartitions);
 
       forceBalancer2.displaceToMeanPosition(
-        net, displacements, springPartitions, 4);
+        net, displacements, springPartitions, 4, 1.);
       CHECK(net.coordinates[4 * 3] + displacements[4 * 3] ==
             Catch::Approx(2.5));
       CHECK(net.coordinates[4 * 3 + 1] + displacements[4 * 3 + 1] ==

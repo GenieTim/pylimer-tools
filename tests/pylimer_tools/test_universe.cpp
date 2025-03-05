@@ -573,7 +573,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(reducedUniverse.getPropertyValues<int>("id").size() == 3);
       REQUIRE(reducedUniverse.getAtomTypes().size() == 3);
       for (const auto& myPair : loops) {
-        for (const std::vector<pe::Atom> loop : myPair.second) {
+        for (const std::vector<pe::Atom>& loop : myPair.second) {
           REQUIRE(loop.size() == myPair.first);
         }
       }
