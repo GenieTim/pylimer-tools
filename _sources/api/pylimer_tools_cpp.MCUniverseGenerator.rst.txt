@@ -17,10 +17,10 @@ MCUniverseGenerator
       ~MCUniverseGenerator.add_randomly_functionalized_strands
       ~MCUniverseGenerator.add_solvent_chains
       ~MCUniverseGenerator.add_strands
-      ~MCUniverseGenerator.config_max_distance_multiplier
       ~MCUniverseGenerator.config_nr_of_mc_steps
       ~MCUniverseGenerator.config_primary_loop_probability
       ~MCUniverseGenerator.config_secondary_loop_probability
+      ~MCUniverseGenerator.disable_max_distance
       ~MCUniverseGenerator.get_current_crosslinker_conversion
       ~MCUniverseGenerator.get_current_nr_of_atoms
       ~MCUniverseGenerator.get_current_nr_of_bonds
@@ -40,6 +40,8 @@ MCUniverseGenerator
       ~MCUniverseGenerator.set_bead_distance
       ~MCUniverseGenerator.set_mean_squared_bead_distance
       ~MCUniverseGenerator.set_seed
+      ~MCUniverseGenerator.use_linear_max_distance
+      ~MCUniverseGenerator.use_zscore_max_distance
       ~MCUniverseGenerator.validate
 
    .. rubric:: Methods Documentation
@@ -51,10 +53,10 @@ MCUniverseGenerator
    .. automethod:: add_randomly_functionalized_strands
    .. automethod:: add_solvent_chains
    .. automethod:: add_strands
-   .. automethod:: config_max_distance_multiplier
    .. automethod:: config_nr_of_mc_steps
    .. automethod:: config_primary_loop_probability
    .. automethod:: config_secondary_loop_probability
+   .. automethod:: disable_max_distance
    .. automethod:: get_current_crosslinker_conversion
    .. automethod:: get_current_nr_of_atoms
    .. automethod:: get_current_nr_of_bonds
@@ -74,4 +76,6 @@ MCUniverseGenerator
    .. automethod:: set_bead_distance
    .. automethod:: set_mean_squared_bead_distance
    .. automethod:: set_seed
+   .. automethod:: use_linear_max_distance
+   .. automethod:: use_zscore_max_distance
    .. automethod:: validate

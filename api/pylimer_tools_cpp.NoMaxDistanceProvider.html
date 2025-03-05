@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="do_random_walk_chain_from_to_mc" href="pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html" /><link rel="prev" title="do_random_walk" href="pylimer_tools_cpp.do_random_walk.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="NonGaussianSpringForceEvaluator" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html" /><link rel="prev" title="NeighbourList" href="pylimer_tools_cpp.NeighbourList.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>do_random_walk_chain_from_to - PylimerTools documentation</title>
+        <title>NoMaxDistanceProvider - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -221,7 +221,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.compute_stoichiometric_imbalance.html">compute_stoichiometric_imbalance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.do_linear_walk_chain_from_to.html">do_linear_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.do_random_walk.html">do_random_walk</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">do_random_walk_chain_from_to</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.do_random_walk_chain_from_to.html">do_random_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">do_random_walk_chain_from_to_mc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.predict_gelation_point.html">predict_gelation_point</a></li>
@@ -252,7 +252,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MoleculeIterator.html">MoleculeIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MoleculeType.html">MoleculeType</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NeighbourList.html">NeighbourList</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">NoMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.OutputConfiguration.html">OutputConfiguration</a></li>
@@ -292,7 +292,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/api/pylimer_tools_cpp.do_random_walk_chain_from_to.rst.txt" title="View this page">
+  <a class="muted-link" href="../_sources/api/pylimer_tools_cpp.NoMaxDistanceProvider.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -312,12 +312,29 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="do-random-walk-chain-from-to">
-<h1>do_random_walk_chain_from_to<a class="headerlink" href="#do-random-walk-chain-from-to" title="Link to this heading">¶</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.do_random_walk_chain_from_to">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">do_random_walk_chain_from_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_coordinates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_coordinates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bead_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_squared_bead_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.do_random_walk_chain_from_to" title="Link to this definition">¶</a></dt>
-<dd><p>Do a random walk from one point to another.</p>
+          <section id="nomaxdistanceprovider">
+<h1>NoMaxDistanceProvider<a class="headerlink" href="#nomaxdistanceprovider" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NoMaxDistanceProvider">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">NoMaxDistanceProvider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NoMaxDistanceProvider" title="pylimer_tools_cpp.NoMaxDistanceProvider"><span class="pre">pylimer_tools_cpp.NoMaxDistanceProvider</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.NoMaxDistanceProvider" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pylimer_tools_cpp.MaxDistanceProvider.html#pylimer_tools_cpp.MaxDistanceProvider" title="pylimer_tools_cpp.MaxDistanceProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">MaxDistanceProvider</span></code></a></p>
+<p>For MC generation, to disable the neighbour list useage.</p>
+<p class="rubric">Methods Summary</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NoMaxDistanceProvider.get_max_distance" title="pylimer_tools_cpp.NoMaxDistanceProvider.get_max_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_max_distance</span></code></a>(self, N)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NoMaxDistanceProvider.get_max_distance">
+<span class="sig-name descname"><span class="pre">get_max_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NoMaxDistanceProvider" title="pylimer_tools_cpp.NoMaxDistanceProvider"><span class="pre">pylimer_tools_cpp.NoMaxDistanceProvider</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NoMaxDistanceProvider.get_max_distance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </section>
@@ -327,23 +344,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">
+          <a class="next-page" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">do_random_walk_chain_from_to_mc</div>
+                <div class="title">NonGaussianSpringForceEvaluator</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="pylimer_tools_cpp.do_random_walk.html">
+          <a class="prev-page" href="pylimer_tools_cpp.NeighbourList.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">do_random_walk</div>
+                <div class="title">NeighbourList</div>
                 
               </div>
             </a>
@@ -376,8 +393,11 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">do_random_walk_chain_from_to</a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.do_random_walk_chain_from_to"><code class="docutils literal notranslate"><span class="pre">do_random_walk_chain_from_to()</span></code></a></li>
+<li><a class="reference internal" href="#">NoMaxDistanceProvider</a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NoMaxDistanceProvider"><code class="docutils literal notranslate"><span class="pre">NoMaxDistanceProvider</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NoMaxDistanceProvider.get_max_distance"><code class="docutils literal notranslate"><span class="pre">NoMaxDistanceProvider.get_max_distance()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

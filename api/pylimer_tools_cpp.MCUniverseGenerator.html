@@ -241,15 +241,18 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LazyUniverseSequenceIterator.html">LazyUniverseSequenceIterator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LinearMaxDistanceProvider.html">LinearMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LinkSwappingMode.html">LinkSwappingMode</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">MCUniverseGenerator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceBalance.html">MEHPForceBalance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceEvaluator.html">MEHPForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceRelaxation.html">MEHPForceRelaxation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MaxDistanceProvider.html">MaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Molecule.html">Molecule</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MoleculeIterator.html">MoleculeIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MoleculeType.html">MoleculeType</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NeighbourList.html">NeighbourList</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.OutputConfiguration.html">OutputConfiguration</a></li>
@@ -259,6 +262,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DANGLING_CHAIN.html">DANGLING_CHAIN</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.FREE_CHAIN.html">FREE_CHAIN</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NETWORK_STRAND.html">NETWORK_STRAND</a></li>
@@ -340,17 +344,17 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_strands" title="pylimer_tools_cpp.MCUniverseGenerator.add_strands"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_strands</span></code></a>(self, nr_of_strands, strand_lengths)</p></td>
 <td><p>Add strands.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_max_distance_multiplier" title="pylimer_tools_cpp.MCUniverseGenerator.config_max_distance_multiplier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_max_distance_multiplier</span></code></a>(self[, ...])</p></td>
-<td><p>For larger systems, you may want to set this value to something &gt; 0 in order to improve sampling performance.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps" title="pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_nr_of_mc_steps</span></code></a>(self[, n_steps])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps" title="pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_nr_of_mc_steps</span></code></a>(self[, n_steps])</p></td>
 <td><p>Set the number of Monte-Carlo steps during bond length equilibration.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability" title="pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_primary_loop_probability</span></code></a>(self[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability" title="pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_primary_loop_probability</span></code></a>(self[, ...])</p></td>
 <td><p>Configure an additional weight reduction for the primary loop formation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability" title="pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_secondary_loop_probability</span></code></a>(self[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability" title="pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_secondary_loop_probability</span></code></a>(self[, ...])</p></td>
 <td><p>Configure an additional weight reduction for the secondary loop formation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance" title="pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disable_max_distance</span></code></a>(self)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_crosslinker_conversion</span></code></a>(self)</p></td>
 <td><p></p></td>
@@ -408,6 +412,12 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed" title="pylimer_tools_cpp.MCUniverseGenerator.set_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_seed</span></code></a>(self, seed)</p></td>
 <td><p>Set the seed for the random generator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance" title="pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_linear_max_distance</span></code></a>(self, provider)</p></td>
+<td><p>Converts the <span class="math notranslate nohighlight">\(N\)</span> to a maximum distance within which to sample.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance" title="pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_zscore_max_distance</span></code></a>(self, std_multiplier)</p></td>
+<td><p>Converts the <span class="math notranslate nohighlight">\(N\)</span> to a maximum distance within which to sample.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.validate" title="pylimer_tools_cpp.MCUniverseGenerator.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(self)</p></td>
 <td><p>Check whether the internal state of the generator is valid.</p></td>
@@ -514,17 +524,6 @@ To link them to cross-linkers, use some of the <code class="code docutils litera
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.config_max_distance_multiplier">
-<span class="sig-name descname"><span class="pre">config_max_distance_multiplier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.config_max_distance_multiplier" title="Link to this definition">¶</a></dt>
-<dd><p>For larger systems, you may want to set this value to something &gt; 0 in order to improve sampling performance.</p>
-<p>For example, you may expect a maximum end-to-end distance of a chain to be <span class="math notranslate nohighlight">\(N b\)</span>,
-in which case you would set this value to <span class="math notranslate nohighlight">\(b\)</span>.</p>
-<p>Note that the neighbour list is initialized when this function is called.
-It does respect all <span class="math notranslate nohighlight">\(N\)</span> that are set at that point.
-Therefore, try to call this method after adding strands, before doing cross-linking.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps">
 <span class="sig-name descname"><span class="pre">config_nr_of_mc_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2000</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps" title="Link to this definition">¶</a></dt>
 <dd><p>Set the number of Monte-Carlo steps during bond length equilibration.</p>
@@ -547,6 +546,11 @@ This results in more primary loops for shorter chains than for longer ones.</p>
 This results in more secondary loops for shorter chains than for longer ones.</p>
 <p>Set to 0. to disable the formation of secondary loops.</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance">
+<span class="sig-name descname"><span class="pre">disable_max_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion">
@@ -726,6 +730,31 @@ Also used for the target cross-linker partner sampling.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance">
+<span class="sig-name descname"><span class="pre">use_linear_max_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance" title="Link to this definition">¶</a></dt>
+<dd><p>Converts the <span class="math notranslate nohighlight">\(N\)</span> to a maximum distance within which to sample.
+The distance will be calculated as <span class="math notranslate nohighlight">\(N \times \text{max_distance_multiplier}\)</span>.
+Useful only for performance improvements in large systems.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance">
+<span class="sig-name descname"><span class="pre">use_zscore_max_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_multiplier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_sqrt_multiplier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance" title="Link to this definition">¶</a></dt>
+<dd><p>Converts the <span class="math notranslate nohighlight">\(N\)</span> to a maximum distance within which to sample.
+The distance will be calculated as <span class="math notranslate nohighlight">\(\text{std_multiplier} \times \sqrt{N \times \text{in_sqrt_multiplier}}\)</span>.
+Useful only for performance improvements in large systems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>std_multiplier</strong> (<em>-</em>) – The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
+E.g., 3.29 for 99.9% of all conformations.</p></li>
+<li><p><strong>in_sqrt_multiplier</strong> (<em>-</em>) – The multiplier with the <span class="math notranslate nohighlight">\(N\)</span> in the square root. Probably <span class="math notranslate nohighlight">\(&lt;b^2&gt;\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.validate">
 <span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.validate" title="Link to this definition">¶</a></dt>
 <dd><p>Check whether the internal state of the generator is valid.
@@ -800,10 +829,10 @@ Should in principle always be valid when called from Python; if not, there is a 
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.add_randomly_functionalized_strands()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.add_solvent_chains()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_strands"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.add_strands()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_max_distance_multiplier"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.config_max_distance_multiplier()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.config_nr_of_mc_steps()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.config_primary_loop_probability()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.config_secondary_loop_probability()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.disable_max_distance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_current_crosslinker_conversion()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_atoms"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_current_nr_of_atoms()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_bonds"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_current_nr_of_bonds()</span></code></a></li>
@@ -823,6 +852,8 @@ Should in principle always be valid when called from Python; if not, there is a 
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.set_bead_distance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.set_mean_squared_bead_distance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.set_seed()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.use_linear_max_distance()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.use_zscore_max_distance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.validate"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.validate()</span></code></a></li>
 </ul>
 </li>

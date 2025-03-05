@@ -1,0 +1,17 @@
+MaxDistanceProvider
+===================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MaxDistanceProvider
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~MaxDistanceProvider.get_max_distance
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_max_distance

@@ -1,0 +1,17 @@
+ZScoreMaxDistanceProvider
+=========================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: ZScoreMaxDistanceProvider
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ZScoreMaxDistanceProvider.get_max_distance
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_max_distance
