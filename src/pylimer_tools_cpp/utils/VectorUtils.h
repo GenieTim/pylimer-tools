@@ -7,6 +7,7 @@
 #include "utilityMacros.h"
 #include <Eigen/Dense>
 #include <cassert>
+#include <float.h>
 #include <iterator>
 #include <map>
 #include <unordered_map>
@@ -97,6 +98,24 @@ namespace utils {
       results.push_back(vecs.segment(segmentSize * i, segmentSize).norm());
     }
     return results;
+  }
+
+  static inline double segmentwise_norm_max(const Eigen::VectorXd& vecs,
+                                            const size_t segmentSize = 3)
+  {
+    INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a useable size");
+    INVALIDARG_EXP_IFN(vecs.size() % segmentSize == 0,
+                       "The size of the supplied vector, " +
+                         std::to_string(vecs.size()) +
+                         " is not a multiple of the segment size, " +
+                         std::to_string(segmentSize) + ".");
+    double result = -DBL_MAX;
+
+    for (size_t i = 0; i < vecs.size() / segmentSize; i++) {
+      result =
+        std::max(vecs.segment(segmentSize * i, segmentSize).norm(), result);
+    }
+    return result;
   }
 
 /**

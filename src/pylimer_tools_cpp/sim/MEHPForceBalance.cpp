@@ -169,19 +169,19 @@ namespace sim {
         //                                        oneOverSpringPartitions);
 
         // place slip-link
-        for (size_t link_idx = this->initialConfig.nrOfNodes;
-             link_idx < this->initialConfig.nrOfLinks;
-             ++link_idx) {
-          assert(this->initialConfig.linkIsSliplink[link_idx]);
-          // std::cout << "Handling " << link_idx << " of " << net.nrOfNodes
-          //           << " / " << net.nrOfLinks << std::endl;
+        if (!disableSlipping) {
+          for (size_t link_idx = this->initialConfig.nrOfNodes;
+               link_idx < this->initialConfig.nrOfLinks;
+               ++link_idx) {
+            assert(this->initialConfig.linkIsSliplink[link_idx]);
+            // std::cout << "Handling " << link_idx << " of " << net.nrOfNodes
+            //           << " / " << net.nrOfLinks << std::endl;
 
-          // std::cout << "Still handling " << link_idx << " of " <<
-          // net.nrOfNodes
-          //           << " / " << net.nrOfLinks << std::endl;
-          int innerIterationsDone = 0;
-          do {
-            if (!disableSlipping) {
+            // std::cout << "Still handling " << link_idx << " of " <<
+            // net.nrOfNodes
+            //           << " / " << net.nrOfLinks << std::endl;
+            int innerIterationsDone = 0;
+            do {
               double r2 =
                 this->updateSpringPartition(this->initialConfig,
                                             this->currentDisplacements,
@@ -190,16 +190,17 @@ namespace sim {
                                             link_idx,
                                             oneOverSpringPartitionUpperLimit,
                                             allowSlipLinksToPassEachOther);
-            }
-            double displacementDone =
-              this->displaceToMeanPosition(this->initialConfig,
-                                           this->currentDisplacements,
-                                           this->currentSpringPartitionsVec,
-                                           link_idx,
-                                           oneOverSpringPartitionUpperLimit);
-            maxDistanceMoved = std::max(maxDistanceMoved, displacementDone);
-            innerIterationsDone += 1;
-          } while (doInnerIterations && innerIterationsDone < 50);
+
+              double displacementDone =
+                this->displaceToMeanPosition(this->initialConfig,
+                                             this->currentDisplacements,
+                                             this->currentSpringPartitionsVec,
+                                             link_idx,
+                                             oneOverSpringPartitionUpperLimit);
+              maxDistanceMoved = std::max(maxDistanceMoved, displacementDone);
+              innerIterationsDone += 1;
+            } while (doInnerIterations && innerIterationsDone < 50);
+          }
         }
 
         oneOverSpringPartitions = this->assembleOneOverSpringPartition(
@@ -212,20 +213,26 @@ namespace sim {
                                                oneOverSpringPartitions);
 
         // place crosslinkers
-        for (size_t link_idx = 0; link_idx < this->initialConfig.nrOfNodes;
-             ++link_idx) {
-          assert(!this->initialConfig.linkIsSliplink[link_idx]);
-          double distanceMoved =
-            this->displaceToMeanPosition(this->initialConfig,
-                                         this->currentDisplacements,
-                                         this->currentSpringPartitionsVec,
-                                         link_idx,
-                                         oneOverSpringPartitionUpperLimit);
-          if (distanceMoved > maxDistanceMoved) {
-            maxDistanceMoved = distanceMoved;
-            indexOfMaxDistanceMoved = link_idx;
-          }
-        }
+        // for (size_t link_idx = 0; link_idx < this->initialConfig.nrOfNodes;
+        //      ++link_idx) {
+        //   assert(!this->initialConfig.linkIsSliplink[link_idx]);
+        //   double distanceMoved =
+        //     this->displaceToMeanPosition(this->initialConfig,
+        //                                  this->currentDisplacements,
+        //                                  this->currentSpringPartitionsVec,
+        //                                  link_idx,
+        //                                  oneOverSpringPartitionUpperLimit);
+        //   if (distanceMoved > maxDistanceMoved) {
+        //     maxDistanceMoved = distanceMoved;
+        //     indexOfMaxDistanceMoved = link_idx;
+        //   }
+        // }
+        maxDistanceMoved = std::max(
+          maxDistanceMoved,
+          this->displaceToMeanPosition(this->initialConfig,
+                                       this->currentDisplacements,
+                                       this->currentSpringPartitionsVec,
+                                       oneOverSpringPartitionUpperLimit));
 
         currentResidual = this->getDisplacementResidualNormFor(
           this->initialConfig,
@@ -382,7 +389,6 @@ namespace sim {
       Eigen::VectorXd oneOverSpringPartitions =
         this->assembleOneOverSpringPartition(
           net, springPartitions, oneOverSpringPartitionUpperLimit);
-      double elasticFreeEnergy = 0.;
 
       Eigen::VectorXd forces = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
       Eigen::VectorXd distances = this->evaluatePartialSpringVectors(
@@ -394,22 +400,25 @@ namespace sim {
         (this->kappa * oneOverSpringPartitions.array() * distances.array())
           .matrix();
 
-      // #ifndef NDEBUG
-      //       Eigen::VectorXd forces2 = Eigen::VectorXd::Zero(3 *
-      //       net.nrOfLinks); Eigen::VectorXi debugNrSpringsVisited =
-      //         Eigen::VectorXi::Zero(net.nrOfPartialSprings);
-      //       for (size_t i = 0; i < net.nrOfLinks; ++i) {
-      //         forces2.segment(3 * i, 3) =
-      //           this->evaluateForceOnLink(i,
-      //                                     net,
-      //                                     u,
-      //                                     springPartitions,
-      //                                     debugNrSpringsVisited,
-      //                                     oneOverSpringPartitionUpperLimit);
-      //       }
-      //       assert((debugNrSpringsVisited.array() == 2).all());
-      //       assert(forces.isApprox(forces2));
-      // #endif
+#ifndef NDEBUG
+      // Eigen::VectorXd forces2 = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
+      // Eigen::VectorXi debugNrSpringsVisited =
+      //   Eigen::VectorXi::Zero(net.nrOfPartialSprings);
+      // for (size_t i = 0; i < net.nrOfLinks; ++i) {
+      //   forces2.segment(3 * i, 3) =
+      //     this->evaluateForceOnLink(i,
+      //                               net,
+      //                               u,
+      //                               springPartitions,
+      //                               debugNrSpringsVisited,
+      //                               oneOverSpringPartitionUpperLimit);
+      // }
+      // assert((debugNrSpringsVisited.array() == 2).all());
+      // double squareN1 = forces.squaredNorm();
+      // double squareN2 = forces2.squaredNorm();
+      // assert(APPROX_EQUAL(squareN1, squareN2, 1e-9));
+      // assert(forces.isApprox(forces2));
+#endif
 
       return forces.squaredNorm();
     }
@@ -4347,6 +4356,69 @@ namespace sim {
 
       assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
         distanceAfter, distanceBefore));
+    }
+
+    /**
+     * @brief Displace all links to the mean of all connected neighbours
+     *
+     * @param net the force balance network
+     * @param u the current displacements, wherein the resulting coordinates
+     * shall be stored
+     * @param linkIdx the idx of the link to displace
+     * @return double, the distance (squared norm) displaced
+     */
+    double MEHPForceBalance::displaceToMeanPosition(
+      const ForceBalanceNetwork& net,
+      Eigen::VectorXd& u,
+      const Eigen::VectorXd& springPartitions,
+      const double oneOverSpringPartitionUpperLimit) const
+    {
+      Eigen::ArrayXd oneOverSpringPartitions =
+        this
+          ->assembleOneOverSpringPartition(
+            net, springPartitions, oneOverSpringPartitionUpperLimit)
+          .array();
+
+      Eigen::ArrayXd objectiveDisplacement =
+        Eigen::ArrayXd::Zero(3 * net.nrOfLinks);
+      Eigen::ArrayXd distances =
+        this
+          ->evaluatePartialSpringVectors(
+            net, u, this->is2D, this->assumeBoxLargeEnough)
+          .array();
+      objectiveDisplacement(net.springPartCoordinateIndexA) +=
+        (oneOverSpringPartitions * distances);
+      objectiveDisplacement(net.springPartCoordinateIndexB) -=
+        (oneOverSpringPartitions * distances);
+
+      Eigen::ArrayXd springPartsContributions =
+        Eigen::ArrayXd::Zero(net.nrOfLinks * 3);
+      springPartsContributions(net.springPartCoordinateIndexA) +=
+        oneOverSpringPartitions;
+      springPartsContributions(net.springPartCoordinateIndexB) +=
+        oneOverSpringPartitions;
+      springPartsContributions = springPartsContributions.unaryExpr(
+        [](double v) { return v > 0. ? v : 1.0; });
+      Eigen::ArrayXd remainingDisplacement =
+        (objectiveDisplacement / springPartsContributions);
+      // NOTE: this stays mostly static, could be stored on the network
+      Eigen::ArrayXd nSpringsPerLink = Eigen::ArrayXd::Zero(net.nrOfLinks * 3);
+      nSpringsPerLink(net.springPartCoordinateIndexA) += 1.;
+      nSpringsPerLink(net.springPartCoordinateIndexB) += 1.;
+      // make sure there are no infinite back-and-forth
+      remainingDisplacement(net.springPartCoordinateIndexA) +=
+        (remainingDisplacement(net.springPartCoordinateIndexB) /
+         (nSpringsPerLink(net.springPartCoordinateIndexA) * 2.));
+      remainingDisplacement(net.springPartCoordinateIndexB) +=
+        (remainingDisplacement(net.springPartCoordinateIndexA) /
+         (nSpringsPerLink(net.springPartCoordinateIndexB) * 2.));
+
+      // actually displace
+      u += remainingDisplacement.matrix();
+
+      double max_denom =
+        pylimer_tools::utils::segmentwise_norm_max(remainingDisplacement);
+      return max_denom;
     }
 
     /**

@@ -2137,6 +2137,20 @@ namespace sim {
                                    const size_t spring2) const;
 
       /**
+       * @brief Displace all links to the mean of all connected neighbours
+       *
+       * @param net the force balance network
+       * @param u the current displacements, wherein the resulting coordinates
+       * shall be stored
+       * @return double, the distance (squared norm) displaced
+       */
+      double displaceToMeanPosition(
+        const ForceBalanceNetwork& net,
+        Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
+        const double oneOverSpringPartitionUpperLimit = 1.0) const;
+
+      /**
        * @brief Displace one link to the mean of all connected neighbours
        *
        * @param net the force balance network
