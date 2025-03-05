@@ -58,12 +58,61 @@ namespace utils {
     std::vector<double> meanSquaredBeadDistanceInStrand;
   };
 
+  class MaxDistanceProvider
+  {
+  public:
+    virtual ~MaxDistanceProvider() {}
+    virtual double getMaxDistance(const double N) = 0;
+  };
+
+  class LinearMaxDistanceProvider : public MaxDistanceProvider
+  {
+  private:
+    double multiplier;
+
+  public:
+    LinearMaxDistanceProvider(const double mult)
+      : multiplier(mult)
+    {
+    }
+
+    double getMaxDistance(const double N) override
+    {
+      return N * this->multiplier;
+    }
+  };
+
+  class ZScoreMaxDistanceProvider : public MaxDistanceProvider
+  {
+  private:
+    double innerMultiplier;
+    double stdMultiplier;
+
+  public:
+    ZScoreMaxDistanceProvider(const double stdMult, const double innerMult = 1.)
+      : innerMultiplier(innerMult)
+      , stdMultiplier(stdMult)
+    {
+    }
+    double getMaxDistance(const double N) override
+    {
+      return this->stdMultiplier * std::sqrt(N * this->innerMultiplier);
+    }
+  };
+
+  class NoMaxDistanceProvider : public MaxDistanceProvider
+  {
+  public:
+    double getMaxDistance(const double N) override { return -1.; }
+  };
+
   class MCUniverseGenerator
   {
   public:
     MCUniverseGenerator(const double Lx, const double Ly, const double Lz)
     {
       std::random_device rd{};
+      this->maxDistanceProvider.reset(new NoMaxDistanceProvider());
       this->rng = std::mt19937(rd());
       this->distX = std::uniform_real_distribution<double>(0.0, Lx);
       this->distY = std::uniform_real_distribution<double>(0.0, Ly);
@@ -131,9 +180,30 @@ namespace utils {
       this->secondaryLoopProbability = newSecondaryLoopProbability;
     }
 
-    void configMaxDistanceMultiplier(double newMaxDistanceMultiplier = -1.)
+    void disableMaxDistance()
     {
-      this->maxDistanceMult = newMaxDistanceMultiplier;
+      this->configMaxDistanceProvider(
+        std::make_unique<NoMaxDistanceProvider>());
+    }
+
+    void useLinearMaxDistance(double newMultiplier)
+    {
+      this->configMaxDistanceProvider(
+        std::make_unique<LinearMaxDistanceProvider>(newMultiplier));
+    }
+
+    void useZScoreMaxDistance(double newStdMultiplier,
+                              double innerMultiplier = 1.)
+    {
+      this->configMaxDistanceProvider(
+        std::make_unique<ZScoreMaxDistanceProvider>(newStdMultiplier,
+                                                    innerMultiplier));
+    }
+
+    void configMaxDistanceProvider(
+      std::unique_ptr<MaxDistanceProvider> newMaxDistanceProvider)
+    {
+      this->maxDistanceProvider = std::move(newMaxDistanceProvider);
       this->resetNeighbourList();
     }
 
@@ -720,9 +790,8 @@ namespace utils {
           static_cast<double>(
             this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
             timesNForR02,
-          static_cast<double>(
-            this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
-            this->maxDistanceMult);
+          this->maxDistanceProvider->getMaxDistance(static_cast<double>(
+            this->simplifiedUniverse.beadsInStrand[strandIdx] + 1)));
 
         this->simplifiedUniverse.strandTo[strandIdx] = partnerCrosslinker;
         this->remainingCrossLinkerFunctionality[partnerCrosslinker] -= 1;
@@ -837,9 +906,8 @@ namespace utils {
               static_cast<double>(
                 this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
                 timesNForR02,
-              static_cast<double>(
-                this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
-                this->maxDistanceMult);
+              this->maxDistanceProvider->getMaxDistance(
+                this->simplifiedUniverse.beadsInStrand[strandIdx] + 1));
 
             this->simplifiedUniverse.strandTo[strandIdx] = partnerCrosslinker;
             this->remainingCrossLinkerFunctionality[partnerCrosslinker] -= 1;
@@ -1710,7 +1778,7 @@ namespace utils {
     double meanSquaredBeadDistance;
     double primaryLoopProbability = 1.0;
     double secondaryLoopProbability = 1.0;
-    double maxDistanceMult = -1.0;
+    std::unique_ptr<MaxDistanceProvider> maxDistanceProvider;
     size_t nMcSteps = 2000;
     /// random distributions
     std::mt19937 rng;
@@ -2152,20 +2220,25 @@ namespace utils {
       return thisWeight;
     }
 
+    double getIdealCutoff()
+    {
+
+      return this->maxDistanceProvider->getMaxDistance(
+        static_cast<double>(
+          *std::max_element(std::begin(this->simplifiedUniverse.beadsInStrand),
+                            std::end(this->simplifiedUniverse.beadsInStrand))) +
+        1.);
+    }
+
     /**
      * @brief Re-initialize the neighbour list of the cross-links
      *
      */
     void resetNeighbourList()
     {
-      if (this->maxDistanceMult > 0.) {
+      double idealCutoff = this->getIdealCutoff();
+      if (idealCutoff > 0.) {
         Eigen::VectorXd newCoordinates = this->getCrosslinkCoordinates();
-        double idealCutoff =
-          (static_cast<double>(*std::max_element(
-             std::begin(this->simplifiedUniverse.beadsInStrand),
-             std::end(this->simplifiedUniverse.beadsInStrand))) +
-           1.) *
-          this->maxDistanceMult;
         this->xlinkNeighbourList.initialize(
           newCoordinates, this->box, idealCutoff);
       }
@@ -2178,7 +2251,7 @@ namespace utils {
     void updateNeighbourListCoordinates()
     {
       Eigen::VectorXd newCoordinates = this->getCrosslinkCoordinates();
-      if (this->maxDistanceMult > 0.) {
+      if (this->getIdealCutoff() > 0.) {
         this->xlinkNeighbourList.resetCoordinates(newCoordinates);
       }
     }
