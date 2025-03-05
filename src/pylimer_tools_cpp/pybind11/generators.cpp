@@ -18,6 +18,72 @@ using namespace pylimer_tools::utils;
 void
 init_pylimer_bound_generators(py::module_& m)
 {
+  class PyMaxDistanceProvider : public MaxDistanceProvider
+  {
+  public:
+    /* Inherit the constructors */
+    using MaxDistanceProvider::MaxDistanceProvider;
+
+    /* Trampoline (need one for each virtual function) */
+    double getMaxDistance(const double N) override
+    {
+      PYBIND11_OVERRIDE_PURE(
+        double,              /* Return type */
+        MaxDistanceProvider, /* Parent class */
+        getMaxDistance, /* Name of function in C++ (must match Python name) */
+        N               /* Argument(s) */
+      );
+    }
+  };
+
+  py::class_<MaxDistanceProvider, PyMaxDistanceProvider>(
+    m, "MaxDistanceProvider", R"pbdoc(
+     
+     )pbdoc")
+    .def(py::init<>())
+    .def("get_max_distance",
+         &MaxDistanceProvider::getMaxDistance,
+         "N",
+         py::arg("N"));
+
+  py::class_<LinearMaxDistanceProvider, MaxDistanceProvider>(
+    m, "LinearMaxDistanceProvider", R"pbdoc(
+    For MC generation, converts the :math:`N` to a maximum distance within which to sample.
+    The distance will be calculated as :math:`N \times \text{max_distance_multiplier}`.
+    Useful only for performance improvements in large systems.
+    )pbdoc")
+    .def(py::init<const double>(), py::arg("max_distance_multiplier"))
+    .def("get_max_distance",
+         &LinearMaxDistanceProvider::getMaxDistance,
+         "",
+         py::arg("N"));
+  py::class_<ZScoreMaxDistanceProvider, MaxDistanceProvider>(
+    m, "ZScoreMaxDistanceProvider", R"pbdoc(
+     For MC generation, converts the :math:`N` to a maximum distance within which to sample.
+     The distance will be calculated as :math:`\text{std_multiplier} \times \sqrt{N \times \text{in_sqrt_multiplier}}`.
+         Useful only for performance improvements in large systems.
+
+     Arguments:
+     - std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
+          E.g., 3.29 for 99.9% of all conformations.
+     - in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
+    )pbdoc")
+    .def(py::init<const double, const double>(),
+         py::arg("std_multiplier"),
+         py::arg("in_sqrt_multiplier"))
+    .def("get_max_distance",
+         &ZScoreMaxDistanceProvider::getMaxDistance,
+         "",
+         py::arg("N"));
+  py::class_<NoMaxDistanceProvider, MaxDistanceProvider>(
+    m, "NoMaxDistanceProvider", R"pbdoc(
+    For MC generation, to disable the neighbour list useage.
+    )pbdoc")
+    .def(py::init<>())
+    .def("get_max_distance",
+         &NoMaxDistanceProvider::getMaxDistance,
+         "",
+         py::arg("N"));
 
   py::class_<MCUniverseGenerator>(m, "MCUniverseGenerator", R"pbdoc(
        A :obj:`pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
@@ -90,19 +156,45 @@ init_pylimer_bound_generators(py::module_& m)
          Set to 0. to disable the formation of secondary loops.
          )pbdoc",
          py::arg("probability") = 1.0)
-    .def("config_max_distance_multiplier",
-         &MCUniverseGenerator::configMaxDistanceMultiplier,
+    .def("disable_max_distance", &MCUniverseGenerator::disableMaxDistance)
+    .def("use_linear_max_distance",
+         &MCUniverseGenerator::useLinearMaxDistance,
          R"pbdoc(
-         For larger systems, you may want to set this value to something > 0 in order to improve sampling performance.
+          Converts the :math:`N` to a maximum distance within which to sample.
+          The distance will be calculated as :math:`N \times \text{max_distance_multiplier}`.
+          Useful only for performance improvements in large systems.
+          )pbdoc",
+         py::arg("provider"))
+    .def("use_zscore_max_distance",
+         &MCUniverseGenerator::useZScoreMaxDistance,
+         R"pbdoc(
+         Converts the :math:`N` to a maximum distance within which to sample.
+         The distance will be calculated as :math:`\text{std_multiplier} \times \sqrt{N \times \text{in_sqrt_multiplier}}`.
+         Useful only for performance improvements in large systems.
 
-         For example, you may expect a maximum end-to-end distance of a chain to be :math:`N b`,
-         in which case you would set this value to :math:`b`.
-
-         Note that the neighbour list is initialized when this function is called.
-         It does respect all :math:`N` that are set at that point.
-         Therefore, try to call this method after adding strands, before doing cross-linking.
+         Arguments:
+          - std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
+               E.g., 3.29 for 99.9% of all conformations.
+          - in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
          )pbdoc",
-         py::arg("multiplier") = -1.0)
+         py::arg("std_multiplier"),
+         py::arg("in_sqrt_multiplier") = 1.)
+    //     .def("config_max_distance_provider",
+    //          &MCUniverseGenerator::configMaxDistanceProvider,
+    //          R"pbdoc(
+    //          For larger systems, you may want to set this value to something
+    //          other than the NoMaxDistanceProvider in order to improve
+    //          sampling performance.
+
+    //          For example, you may expect a maximum end-to-end distance of a
+    //          chain to be :math:`N b`, in which case you would set this value
+    //          to LinearMaxDistanceProvider(:math:`b`).
+
+    //          Note that the neighbour list is initialized when this function
+    //          is called. It does respect all :math:`N` that are set at that
+    //          point. Therefore, try to call this method after adding strands,
+    //          before doing cross-linking. Before that, it's not relevant for
+    //          performance anyway. )pbdoc", py::arg("provider"))
     .def("add_crosslinkers_at",
          &MCUniverseGenerator::addCrosslinkersAt,
          R"pbdoc(

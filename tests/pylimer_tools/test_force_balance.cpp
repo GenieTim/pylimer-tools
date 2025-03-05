@@ -389,8 +389,8 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
     // check unentangled primary loops
     Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
-    CHECK_NOTHROW(
-      forceBalancer.displaceToMeanPosition(net, displacements, partitions, 0, 1.));
+    CHECK_NOTHROW(forceBalancer.displaceToMeanPosition(
+      net, displacements, partitions, 0, 1.));
     CHECK(displacements[0] == Catch::Approx(7.687).epsilon(1e-5));
     CHECK(displacements[1] == Catch::Approx(2.03926).epsilon(1e-5));
     CHECK(displacements[2] == Catch::Approx(5.88634).epsilon(1e-5));

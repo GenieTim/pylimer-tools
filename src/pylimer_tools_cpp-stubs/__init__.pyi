@@ -30,16 +30,19 @@ __all__ = [
     'ExitReason',
     'FREE_CHAIN',
     'LazyUniverseSequenceIterator',
+    'LinearMaxDistanceProvider',
     'LinkSwappingMode',
     'MCUniverseGenerator',
     'MEHPForceBalance',
     'MEHPForceEvaluator',
     'MEHPForceRelaxation',
+    'MaxDistanceProvider',
     'Molecule',
     'MoleculeIterator',
     'MoleculeType',
     'NETWORK_STRAND',
     'NeighbourList',
+    'NoMaxDistanceProvider',
     'NonGaussianSpringForceEvaluator',
     'NormalModeAnalyzer',
     'OutputConfiguration',
@@ -51,6 +54,7 @@ __all__ = [
     'UNDEFINED',
     'Universe',
     'UniverseSequence',
+    'ZScoreMaxDistanceProvider',
     'compute_stoichiometric_imbalance',
     'do_linear_walk_chain_from_to',
     'do_random_walk',
@@ -1309,6 +1313,25 @@ class LazyUniverseSequenceIterator:
         ...
 
 
+class LinearMaxDistanceProvider(MaxDistanceProvider):
+    """
+
+        For MC generation, converts the :math:`N` to a maximum distance within which to sample.
+        The distance will be calculated as :math:`N \\times \\text{max_distance_multiplier}`.
+        Useful only for performance improvements in large systems.
+
+    """
+    @staticmethod
+    def _pybind11_conduit_v1_(*args, **kwargs):
+        ...
+
+    def __init__(self, max_distance_multiplier: float) -> None:
+        ...
+
+    def get_max_distance(self, N: float) -> float:
+        ...
+
+
 class LinkSwappingMode:
     """
     Members:
@@ -1481,18 +1504,6 @@ class MCUniverseGenerator:
                     :param strand_atom_type: Type of atoms for the strands (default: 1).
         """
 
-    def config_max_distance_multiplier(self, multiplier: float = -1.0) -> None:
-        """
-                 For larger systems, you may want to set this value to something > 0 in order to improve sampling performance.
-
-                 For example, you may expect a maximum end-to-end distance of a chain to be :math:`N b`,
-                 in which case you would set this value to :math:`b`.
-
-                 Note that the neighbour list is initialized when this function is called.
-                 It does respect all :math:`N` that are set at that point.
-                 Therefore, try to call this method after adding strands, before doing cross-linking.
-        """
-
     def config_nr_of_mc_steps(self, n_steps: int = 2000) -> None:
         """
         Set the number of Monte-Carlo steps during bond length equilibration.
@@ -1519,6 +1530,9 @@ class MCUniverseGenerator:
 
                  Set to 0. to disable the formation of secondary loops.
         """
+
+    def disable_max_distance(self) -> None:
+        ...
 
     def get_current_crosslinker_conversion(self) -> float:
         ...
@@ -1645,6 +1659,26 @@ class MCUniverseGenerator:
     def set_seed(self, seed: int) -> None:
         """
         Set the seed for the random generator.
+        """
+
+    def use_linear_max_distance(self, provider: float) -> None:
+        """
+                  Converts the :math:`N` to a maximum distance within which to sample.
+                  The distance will be calculated as :math:`N \\times \\text{max_distance_multiplier}`.
+                  Useful only for performance improvements in large systems.
+        """
+
+    def use_zscore_max_distance(
+            self, std_multiplier: float, in_sqrt_multiplier: float = 1.0) -> None:
+        """
+                 Converts the :math:`N` to a maximum distance within which to sample.
+                 The distance will be calculated as :math:`\\text{std_multiplier} \\times \\sqrt{N \\times \\text{in_sqrt_multiplier}}`.
+                 Useful only for performance improvements in large systems.
+
+                 Arguments:
+                  - std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
+                       E.g., 3.29 for 99.9% of all conformations.
+                  - in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
         """
 
     def validate(self) -> None:
@@ -2399,6 +2433,25 @@ class MEHPForceRelaxation:
         """
 
 
+class MaxDistanceProvider:
+    """
+
+
+
+    """
+    @staticmethod
+    def _pybind11_conduit_v1_(*args, **kwargs):
+        ...
+
+    def __init__(self) -> None:
+        ...
+
+    def get_max_distance(self, N: float) -> float:
+        """
+        N
+        """
+
+
 class Molecule:
     """
 
@@ -2784,6 +2837,23 @@ class NeighbourList:
                   It will not show up when querying for neighbours,
                   but its neighbours cannot be queried either.
         """
+
+
+class NoMaxDistanceProvider(MaxDistanceProvider):
+    """
+
+        For MC generation, to disable the neighbour list useage.
+
+    """
+    @staticmethod
+    def _pybind11_conduit_v1_(*args, **kwargs):
+        ...
+
+    def __init__(self) -> None:
+        ...
+
+    def get_max_distance(self, N: float) -> float:
+        ...
 
 
 class NonGaussianSpringForceEvaluator(MEHPForceEvaluator):
@@ -3904,6 +3974,31 @@ class UniverseSequence:
         """
                   Set the format of the data files to be read. See :obj:`~pylimer_tools_cpp.AtomStyle`.
         """
+
+
+class ZScoreMaxDistanceProvider(MaxDistanceProvider):
+    """
+
+         For MC generation, converts the :math:`N` to a maximum distance within which to sample.
+         The distance will be calculated as :math:`\\text{std_multiplier} \\times \\sqrt{N \\times \\text{in_sqrt_multiplier}}`.
+             Useful only for performance improvements in large systems.
+
+         Arguments:
+         - std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
+              E.g., 3.29 for 99.9% of all conformations.
+         - in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
+
+    """
+    @staticmethod
+    def _pybind11_conduit_v1_(*args, **kwargs):
+        ...
+
+    def __init__(self, std_multiplier: float,
+                 in_sqrt_multiplier: float) -> None:
+        ...
+
+    def get_max_distance(self, N: float) -> float:
+        ...
 
 
 def compute_stoichiometric_imbalance(
