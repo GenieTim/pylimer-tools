@@ -233,6 +233,10 @@ namespace sim {
                                        this->currentDisplacements,
                                        this->currentSpringPartitionsVec,
                                        oneOverSpringPartitionUpperLimit));
+        RUNTIME_EXP_IFN(
+          std::isfinite(maxDistanceMoved),
+          "Something went wrong: the last distance moved is not finite but " +
+            std::to_string(maxDistanceMoved) + ".");
 
         currentResidual = this->getDisplacementResidualNormFor(
           this->initialConfig,
@@ -4401,6 +4405,9 @@ namespace sim {
         [](double v) { return v > 0. ? v : 1.0; });
       Eigen::ArrayXd remainingDisplacement =
         (objectiveDisplacement / springPartsContributions);
+      RUNTIME_EXP_IFN(
+        pylimer_tools::utils::all_components_finite(remainingDisplacement),
+        "Some displacements are not finite");
       // NOTE: this stays mostly static, could be stored on the network
       Eigen::ArrayXd nSpringsPerLink = Eigen::ArrayXd::Zero(net.nrOfLinks * 3);
       nSpringsPerLink(net.springPartCoordinateIndexA) += 1.;
@@ -4417,6 +4424,9 @@ namespace sim {
       backForthDisplacement(net.springPartCoordinateIndexB) +=
         (remainingDisplacement(net.springPartCoordinateIndexA) /
          (nSpringsPerLink(net.springPartCoordinateIndexB) * 2.));
+      RUNTIME_EXP_IFN(
+        pylimer_tools::utils::all_components_finite(backForthDisplacement),
+        "Some displacements are not finite");
 
       // actually displace
       u += (remainingDisplacement + backForthDisplacement).matrix();

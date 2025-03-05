@@ -236,6 +236,17 @@ namespace utils {
   }
 
   template<typename IN>
+  static inline bool all_components_finite(const IN& vec)
+  {
+    for (size_t i = 0; i < vec.size(); ++i) {
+      if (!std::isfinite(vec[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  template<typename IN>
   static inline bool vector_has_duplicates(const std::vector<IN>& vec)
   {
     std::vector<IN> vecSorted;
