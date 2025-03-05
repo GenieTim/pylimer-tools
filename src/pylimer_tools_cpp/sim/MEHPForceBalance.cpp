@@ -4405,19 +4405,24 @@ namespace sim {
       Eigen::ArrayXd nSpringsPerLink = Eigen::ArrayXd::Zero(net.nrOfLinks * 3);
       nSpringsPerLink(net.springPartCoordinateIndexA) += 1.;
       nSpringsPerLink(net.springPartCoordinateIndexB) += 1.;
+      nSpringsPerLink =
+        nSpringsPerLink.unaryExpr([](double v) { return v > 0. ? v : 1.0; });
       // make sure there are no infinite back-and-forth
-      remainingDisplacement(net.springPartCoordinateIndexA) +=
+      // and actually displace
+      Eigen::ArrayXd backForthDisplacement =
+        Eigen::ArrayXd::Zero(net.nrOfLinks * 3);
+      backForthDisplacement(net.springPartCoordinateIndexA) +=
         (remainingDisplacement(net.springPartCoordinateIndexB) /
          (nSpringsPerLink(net.springPartCoordinateIndexA) * 2.));
-      remainingDisplacement(net.springPartCoordinateIndexB) +=
+      backForthDisplacement(net.springPartCoordinateIndexB) +=
         (remainingDisplacement(net.springPartCoordinateIndexA) /
          (nSpringsPerLink(net.springPartCoordinateIndexB) * 2.));
 
       // actually displace
-      u += remainingDisplacement.matrix();
+      u += (remainingDisplacement + backForthDisplacement).matrix();
 
-      double max_denom =
-        pylimer_tools::utils::segmentwise_norm_max(remainingDisplacement);
+      double max_denom = pylimer_tools::utils::segmentwise_norm_max(
+        remainingDisplacement + backForthDisplacement);
       return max_denom;
     }
 
