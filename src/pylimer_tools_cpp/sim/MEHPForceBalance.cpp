@@ -163,10 +163,10 @@ namespace sim {
         }
         maxDistanceMoved = 0.0;
 
-        intermediateResidual =
-          this->getDisplacementResidualNormFor(this->initialConfig,
-                                               this->currentDisplacements,
-                                               oneOverSpringPartitions);
+        // intermediateResidual =
+        //   this->getDisplacementResidualNormFor(this->initialConfig,
+        //                                        this->currentDisplacements,
+        //                                        oneOverSpringPartitions);
 
         // place slip-link
         for (size_t link_idx = this->initialConfig.nrOfNodes;
@@ -380,53 +380,37 @@ namespace sim {
       const double oneOverSpringPartitionUpperLimit) const
     {
       Eigen::VectorXd oneOverSpringPartitions =
-        this->assembleOneOverSpringPartition(this->initialConfig,
-                                             this->currentSpringPartitionsVec,
-                                             oneOverSpringPartitionUpperLimit);
+        this->assembleOneOverSpringPartition(
+          net, springPartitions, oneOverSpringPartitionUpperLimit);
       double elasticFreeEnergy = 0.;
 
       Eigen::VectorXd forces = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
-      // for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
-      //   if (net.springPartIndexA[i] == net.springPartIndexB[i]) {
-      //     // primary loops cancel out anyway
-      //     continue;
-      //   }
-      //   Eigen::Vector3d dist =
-      //     this->evaluatePartialSpringDistance(net, u, i, this->is2D);
-      //   const double contourLengthFraction = springPartitions[i];
-      //   const double N =
-      //     net.springsContourLength[net.partialToFullSpringIndex[i]];
-      //   double oneOverContourLengthFraction =
-      //   CLAMP_ONE_OVER_SPRINGPARTITION(
-      //     net.partialSpringIsPartial[i],
-      //     ((contourLengthFraction > 0.) ? 1.0 / (N * contourLengthFraction)
-      //                                   : 0.),
-      //     N,
-      //     oneOverSpringPartitionUpperLimit);
-      //   assert(APPROX_EQUAL(
-      //     oneOverContourLengthFraction, oneOverSpringPartitions[3 * i],
-      //     1e-9));
-      //   elasticFreeEnergy +=
-      //     dist.squaredNorm() * 0.5 * oneOverContourLengthFraction;
-      //   forces.segment(3 * net.springPartIndexA[i], 3) +=
-      //     dist * oneOverContourLengthFraction;
-      //   forces.segment(3 * net.springPartIndexB[i], 3) -=
-      //     dist * oneOverContourLengthFraction;
-      // }
-      Eigen::VectorXi debugNrSpringsVisited =
-        Eigen::VectorXi::Zero(net.nrOfPartialSprings);
-      for (size_t i = 0; i < net.nrOfLinks; ++i) {
-        forces.segment(3 * i, 3) =
-          this->evaluateForceOnLink(i,
-                                    net,
-                                    u,
-                                    springPartitions,
-                                    debugNrSpringsVisited,
-                                    oneOverSpringPartitionUpperLimit);
-      }
-      assert((debugNrSpringsVisited.array() == 2).all());
+      Eigen::VectorXd distances = this->evaluatePartialSpringVectors(
+        net, u, this->is2D, this->assumeBoxLargeEnough);
+      forces(net.springPartCoordinateIndexA) +=
+        (this->kappa * oneOverSpringPartitions.array() * distances.array())
+          .matrix();
+      forces(net.springPartCoordinateIndexB) -=
+        (this->kappa * oneOverSpringPartitions.array() * distances.array())
+          .matrix();
 
-      // return elasticFreeEnergy;
+      // #ifndef NDEBUG
+      //       Eigen::VectorXd forces2 = Eigen::VectorXd::Zero(3 *
+      //       net.nrOfLinks); Eigen::VectorXi debugNrSpringsVisited =
+      //         Eigen::VectorXi::Zero(net.nrOfPartialSprings);
+      //       for (size_t i = 0; i < net.nrOfLinks; ++i) {
+      //         forces2.segment(3 * i, 3) =
+      //           this->evaluateForceOnLink(i,
+      //                                     net,
+      //                                     u,
+      //                                     springPartitions,
+      //                                     debugNrSpringsVisited,
+      //                                     oneOverSpringPartitionUpperLimit);
+      //       }
+      //       assert((debugNrSpringsVisited.array() == 2).all());
+      //       assert(forces.isApprox(forces2));
+      // #endif
+
       return forces.squaredNorm();
     }
 
@@ -4381,8 +4365,10 @@ namespace sim {
       const size_t linkIdx,
       const double oneOverSpringPartitionUpperLimit) const
     {
+#ifndef NDEBUG
       Eigen::Vector3d forceBefore = this->getForceOn(
         net, u, springPartitions, linkIdx, oneOverSpringPartitionUpperLimit);
+#endif
       // Eigen::Vector3d currentDisplacement = u.segment(3 * linkIdx, 3);
       Eigen::Vector3d objectiveDisplacement =
         Eigen::Vector3d::Zero(); // = remainingDisplacement.array();
@@ -4464,6 +4450,7 @@ namespace sim {
                                          : objectiveDisplacementContributors);
       u.segment(3 * linkIdx, 3) += objectiveDisplacement * denominator;
 
+#ifndef NDEBUG
       if (!this->assumeBoxLargeEnough) {
         Eigen::Vector3d forceAfter = this->getForceOn(
           net, u, springPartitions, linkIdx, oneOverSpringPartitionUpperLimit);
@@ -4476,6 +4463,7 @@ namespace sim {
           assert(forceBefore.squaredNorm() >= forceAfter.squaredNorm());
         }
       }
+#endif
 
       double dist = (objectiveDisplacement * denominator).squaredNorm();
       // if (dist > 0.1) {
@@ -4740,7 +4728,7 @@ namespace sim {
       }
 
       // reset for 2D systems
-      if (this->is2D) {
+      if (is2D) {
         // partialDistances(Eigen::seq(2, net.nrOfPartialSprings, 3)) =
         //   Eigen::VectorXd::Zero(net.nrOfPartialSprings);
         for (size_t i = 2; i < 3 * net.nrOfPartialSprings; i += 3) {
