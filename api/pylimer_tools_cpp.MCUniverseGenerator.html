@@ -413,7 +413,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed" title="pylimer_tools_cpp.MCUniverseGenerator.set_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_seed</span></code></a>(self, seed)</p></td>
 <td><p>Set the seed for the random generator.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance" title="pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_linear_max_distance</span></code></a>(self, provider)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance" title="pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_linear_max_distance</span></code></a>(self, multiplier)</p></td>
 <td><p>Converts the <span class="math notranslate nohighlight">\(N\)</span> to a maximum distance within which to sample.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance" title="pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_zscore_max_distance</span></code></a>(self, std_multiplier)</p></td>
@@ -731,10 +731,12 @@ Also used for the target cross-linker partner sampling.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance">
-<span class="sig-name descname"><span class="pre">use_linear_max_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">use_linear_max_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance" title="Link to this definition">¶</a></dt>
 <dd><p>Converts the <span class="math notranslate nohighlight">\(N\)</span> to a maximum distance within which to sample.
-The distance will be calculated as <span class="math notranslate nohighlight">\(N \times \text{max_distance_multiplier}\)</span>.
-Useful only for performance improvements in large systems.</p>
+The distance will be calculated as <span class="math notranslate nohighlight">\(N \times \text{multiplier}\)</span>.
+For example, commonly, a maximum distance is <span class="math notranslate nohighlight">\(N \times &lt;b&gt;\)</span>,
+in which case the multiplier is <span class="math notranslate nohighlight">\(&lt;b&gt;\)</span>.</p>
+<p>Useful only for performance improvements in large systems.</p>
 </dd></dl>
 
 <dl class="py method">
