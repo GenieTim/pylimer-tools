@@ -49,7 +49,9 @@ namespace entities {
 
     this->totalNrOfBuckets = this->nrOfBuckets.prod();
 
+    this->neighbourBuckets.clear();
     this->neighbourBuckets.reserve(this->totalNrOfBuckets);
+    this->neighbourBucketNeighboursDefaultCutoff.clear();
     this->neighbourBucketNeighboursDefaultCutoff.reserve(
       this->totalNrOfBuckets);
     // std::cout << "Preparing " << this->totalNrOfBuckets << " bins"

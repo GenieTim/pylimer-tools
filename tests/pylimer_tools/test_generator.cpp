@@ -50,6 +50,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
   generator.addSolventChains(100, 16, 3);
   generator.addStrands((4 / 2) * 100, 16);
   generator.configNrOfMCSteps(10);
+  generator.useLinearMaxDistance(1.);
   generator.linkStrandsToConversion(0.8);
 
   pe::Universe universe = generator.getUniverse();
@@ -87,6 +88,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
     generator2.addSolventChains(100, 16, 3);
     generator2.addStrands((4 / 2) * 100, 16);
     generator2.configNrOfMCSteps(10);
+    generator.useLinearMaxDistance(1.);
     generator2.linkStrandsToConversion(0.8);
 
     pe::Universe universe2 = generator2.getUniverse();
@@ -211,7 +213,7 @@ TEST_CASE("MCUniverseGenerator can generate without primary loops",
 
   SECTION("With max distance")
   {
-    generator.configMaxDistanceMultiplier(3.);
+    generator.useLinearMaxDistance(3.);
     generator.linkStrandsToConversion(0.9, 1.);
 
     pe::Universe universe = generator.getUniverse();
@@ -461,6 +463,7 @@ TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
   generator.configNrOfMCSteps(0);
 
   generator.addStrands(800, 10, 1);
+  generator.useZScoreMaxDistance(3.29, 1.);
   generator.linkStrandsToConversion(0.925, 1.);
 
   pe::Universe universe = generator.getUniverse();
@@ -588,6 +591,7 @@ TEST_CASE(
   generator.addStrands(212, 107, 3);
   generator.addMonofunctionalStrands(586, 57, 4);
 
+  generator.useZScoreMaxDistance(3.29, 1.107008);
   generator.linkStrandsToSolubleFraction(0.31);
 
   pe::Universe universe = generator.getUniverse();

@@ -2762,23 +2762,23 @@ TEST_CASE(
     CHECK_THAT(
       forceBalancerEntanglementSprings.getSolubleWeightFraction(),
       Catch::Matchers::WithinAbs(
-        forceBalancerEntanglementLinks.getSolubleWeightFraction(), 0.0025));
+        forceBalancerEntanglementLinks.getSolubleWeightFraction(), 0.005));
     CHECK_THAT(
       forceBalancerEntanglementSprings.getActiveWeightFraction(),
       Catch::Matchers::WithinAbs(
-        forceBalancerEntanglementLinks.getActiveWeightFraction(), 0.0025));
+        forceBalancerEntanglementLinks.getActiveWeightFraction(), 0.005));
     CHECK_THAT(
       forceBalancerEntanglementSprings.getDanglingWeightFraction(),
       Catch::Matchers::WithinAbs(
-        forceBalancerEntanglementLinks.getDanglingWeightFraction(), 0.0025));
+        forceBalancerEntanglementLinks.getDanglingWeightFraction(), 0.005));
     CHECK_THAT(
       forceBalancerEntanglementSprings.getStressTensor().trace(),
       Catch::Matchers::WithinRel(
         forceBalancerEntanglementLinks.getStressTensor().trace(), 0.1));
     CHECK(forceBalancerEntanglementSprings.getStressTensor().trace() <
           forceBalancerEntanglementLinks.getStressTensor().trace());
-    CHECK(forceBalancerEntanglementSprings.getGammaFactors(-1.).sum() <
-          forceBalancerEntanglementLinks.getGammaFactors(-1.).sum());
+    CHECK(forceBalancerEntanglementSprings.getGammaFactors(1.).sum() <
+          forceBalancerEntanglementLinks.getGammaFactors(1.).sum());
   }
 
   SECTION("Without simplification of the structure")

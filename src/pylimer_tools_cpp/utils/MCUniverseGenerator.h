@@ -2220,9 +2220,11 @@ namespace utils {
       return thisWeight;
     }
 
-    double getIdealCutoff()
+    double getIdealCutoff() const
     {
-
+      if (this->simplifiedUniverse.beadsInStrand.size() == 0) {
+        return -1.;
+      }
       return this->maxDistanceProvider->getMaxDistance(
         static_cast<double>(
           *std::max_element(std::begin(this->simplifiedUniverse.beadsInStrand),
