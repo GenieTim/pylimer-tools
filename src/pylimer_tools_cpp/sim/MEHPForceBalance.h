@@ -2147,8 +2147,7 @@ namespace sim {
       double displaceToMeanPosition(
         const ForceBalanceNetwork& net,
         Eigen::VectorXd& u,
-        const Eigen::VectorXd& springPartitions,
-        const double oneOverSpringPartitionUpperLimit = 1.0) const;
+        const Eigen::ArrayXd& oneOverSpringPartitions) const;
 
       /**
        * @brief Displace one link to the mean of all connected neighbours
@@ -2271,7 +2270,7 @@ namespace sim {
         return this->initialConfig.nrOfNodes;
       }
 
-      void debugAtomVicinity(const size_t atomId)
+      void debugAtomVicinity(const size_t atomId) const
       {
         long int atomIdx = -1;
         for (size_t i = 0; i < this->initialConfig.oldAtomIds.size(); ++i) {

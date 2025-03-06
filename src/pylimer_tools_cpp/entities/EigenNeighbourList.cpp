@@ -311,6 +311,10 @@ namespace entities {
     const double upperCutoff,
     bool expectDefault) const
   {
+    if (this->totalNrOfBuckets < 2) {
+      result.setOnes();
+      return result.size();
+    }
 
 #ifndef NDEBUG
     INVALIDARG_EXP_IFN(upperCutoff > 0.0,

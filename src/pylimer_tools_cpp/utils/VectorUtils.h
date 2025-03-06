@@ -109,13 +109,24 @@ namespace utils {
                          std::to_string(vecs.size()) +
                          " is not a multiple of the segment size, " +
                          std::to_string(segmentSize) + ".");
-    double result = -DBL_MAX;
+    double result = 0.; //-DBL_MAX;
 
     for (size_t i = 0; i < vecs.size() / segmentSize; i++) {
       result =
         std::max(vecs.segment(segmentSize * i, segmentSize).norm(), result);
     }
     return result;
+  }
+
+  template<typename IN>
+  static inline bool all_components_finite(const IN& vec)
+  {
+    for (size_t i = 0; i < vec.size(); ++i) {
+      if (!std::isfinite(vec[i])) {
+        return false;
+      }
+    }
+    return true;
   }
 
 /**
@@ -233,17 +244,6 @@ namespace utils {
     }
 
     return out; // both done
-  }
-
-  template<typename IN>
-  static inline bool all_components_finite(const IN& vec)
-  {
-    for (size_t i = 0; i < vec.size(); ++i) {
-      if (!std::isfinite(vec[i])) {
-        return false;
-      }
-    }
-    return true;
   }
 
   template<typename IN>

@@ -128,9 +128,7 @@ namespace entities {
     }
     Eigen::Vector3d getCoordinates() const
     {
-      Eigen::Vector3d coords = Eigen::Vector3d::Zero();
-      this->getCoordinates<Eigen::Vector3d>(coords);
-      return coords;
+      return Eigen::Vector3d(this->x, this->y, this->z);
     }
     template<typename VectorType>
     void getUnwrappedCoordinates(VectorType& vec, const Box& box) const
