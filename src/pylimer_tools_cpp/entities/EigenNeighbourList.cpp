@@ -312,7 +312,8 @@ namespace entities {
     bool expectDefault) const
   {
     if (this->totalNrOfBuckets < 2) {
-      result.setOnes();
+      size_t nResults = this->neighbourBucketSizes.sum();
+      result = Eigen::ArrayXi::LinSpaced(nResults, 0, nResults - 1);
       return result.size();
     }
 

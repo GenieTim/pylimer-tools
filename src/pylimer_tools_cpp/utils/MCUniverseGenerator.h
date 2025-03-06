@@ -2175,6 +2175,12 @@ namespace utils {
       }
 
       if (suitableMatches.size() == 0) {
+        if (maxDistance > 0.) {
+          std::cerr << "No suitable partner found within max distance. "
+                       "Increasing for this link."
+                    << std::endl;
+          return this->findAppropriateLink(from, desiredR02, -1.);
+        }
         throw std::runtime_error("No suitable partner found.");
       }
 
