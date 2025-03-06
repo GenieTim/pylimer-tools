@@ -85,9 +85,9 @@ namespace entities {
       // throw std::invalid_argument("Expected upper cutoff > 0, got " +
       //                             std::to_string(upperCutoff) + ".");
     }
-
-    size_t indexBasis =
-      this->getBucketIndexForTriplet(this->getBucketIndicesForAtom(atom));
+    std::tuple<long int, long int, long int> bucketIndicesForAtom =
+      this->getBucketIndicesForAtom(atom);
+    size_t indexBasis = this->getBucketIndexForTriplet(bucketIndicesForAtom);
     bool foundSelf = !expectSelf;
     for (size_t atomIndex : this->neighbourBuckets[indexBasis]) {
       if (this->atoms[atomIndex].getId() == atom.getId()) {
@@ -111,7 +111,7 @@ namespace entities {
       if (bucketIndex == indexBasis) {
         foundBasis = true;
       }
-      std::vector<size_t> atomIndices = this->neighbourBuckets[bucketIndex];
+      std::vector<size_t> atomIndices = this->neighbourBuckets.at(bucketIndex);
       for (size_t atomIndex : atomIndices) {
         double distance =
           !unwrapped
@@ -197,15 +197,16 @@ namespace entities {
            bucketIndexZ * this->nrOfBucketsX * this->nrOfBucketsY;
   }
 
-  std::tuple<size_t, size_t, size_t> NeighbourList::getBucketIndicesForAtom(
+  std::tuple<long int, long int, long int>
+  NeighbourList::getBucketIndicesForAtom(
     const pylimer_tools::entities::Atom& atom) const
   {
     return std::make_tuple(
-      static_cast<size_t>(
+      static_cast<long int>(
         std::floor(atom.getUnwrappedX(this->box) / this->bucketWidthX)),
-      static_cast<size_t>(
+      static_cast<long int>(
         std::floor(atom.getUnwrappedY(this->box) / this->bucketWidthY)),
-      static_cast<size_t>(
+      static_cast<long int>(
         std::floor(atom.getUnwrappedZ(this->box) / this->bucketWidthZ)));
   }
 

@@ -2929,4 +2929,46 @@ TEST_CASE(
         forceBalancerPhantom.getNrOfActiveSprings());
   CHECK(forceBalancerEntanglements.getSolubleWeightFraction() <
         forceBalancerPhantom.getSolubleWeightFraction());
-}
+};
+
+TEST_CASE("Temporary force balance test case",
+          "[analysis][MEHPForceBalance][long]")
+{
+  std::cout << "Running test \"Temporary force balance test case\""
+            << std::endl;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  CHECK(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/tmp/";
+
+  // a structure with lots of dangling things that can and will be entangled,
+  // yet the entanglements removed
+  std::string inputFile =
+    suspectedPath + "mc_own-si_pdms_crosslinked_melt_2590_a_221_2410_monoa_271_"
+                    "r_1.44_wsol_0.278_f_4_v_1.structure.out";
+
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  auto masses = universe.getMasses();
+  std::cout << "Read file " << inputFile << std::endl;
+
+  // sample entanglements
+  pcm::MEHPForceBalance forceBalancerEntanglements =
+    pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+      universe, 26832, 3.25, 0., 26000, 0, "", 2, false);
+
+  forceBalancerEntanglements.configAssumeBoxLargeEnough(false);
+
+  CHECK_NOTHROW(forceBalancerEntanglements.runForceRelaxation(
+    50000,
+    1e-8,
+    -1.,
+    pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+    1e-3,
+    false,
+    pcm::LinkSwappingMode::NO_SWAPPING,
+    1000,
+    1.,
+    -1,
+    true));
+};

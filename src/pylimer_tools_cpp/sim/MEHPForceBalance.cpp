@@ -111,6 +111,7 @@ namespace sim {
 
       // actual loop
       bool wasInterrupted = false;
+      bool iterateForDisplacements = !disableSlipping;
       do {
         if (allowSlipLinksToPassEachOther != LinkSwappingMode::NO_SWAPPING) {
           if (swappingFrequency > 0 &&
@@ -213,30 +214,33 @@ namespace sim {
                                                oneOverSpringPartitions);
 
         // place crosslinkers
-        // for (size_t link_idx = 0; link_idx < this->initialConfig.nrOfNodes;
-        //      ++link_idx) {
-        //   assert(!this->initialConfig.linkIsSliplink[link_idx]);
-        //   double distanceMoved =
-        //     this->displaceToMeanPosition(this->initialConfig,
-        //                                  this->currentDisplacements,
-        //                                  this->currentSpringPartitionsVec,
-        //                                  link_idx,
-        //                                  oneOverSpringPartitionUpperLimit);
-        //   if (distanceMoved > maxDistanceMoved) {
-        //     maxDistanceMoved = distanceMoved;
-        //     indexOfMaxDistanceMoved = link_idx;
-        //   }
-        // }
-        maxDistanceMoved = std::max(
-          maxDistanceMoved,
-          this->displaceToMeanPosition(this->initialConfig,
-                                       this->currentDisplacements,
-                                       this->currentSpringPartitionsVec,
-                                       oneOverSpringPartitionUpperLimit));
-        RUNTIME_EXP_IFN(
-          std::isfinite(maxDistanceMoved),
-          "Something went wrong: the last distance moved is not finite but " +
-            std::to_string(maxDistanceMoved) + ".");
+        if (iterateForDisplacements) {
+          for (size_t link_idx = 0; link_idx < this->initialConfig.nrOfNodes;
+               ++link_idx) {
+            assert(!this->initialConfig.linkIsSliplink[link_idx]);
+            double distanceMoved =
+              this->displaceToMeanPosition(this->initialConfig,
+                                           this->currentDisplacements,
+                                           this->currentSpringPartitionsVec,
+                                           link_idx,
+                                           oneOverSpringPartitionUpperLimit);
+            if (distanceMoved > maxDistanceMoved) {
+              maxDistanceMoved = distanceMoved;
+              indexOfMaxDistanceMoved = link_idx;
+            }
+          }
+        } else {
+          maxDistanceMoved = std::max(
+            maxDistanceMoved,
+            this->displaceToMeanPosition(this->initialConfig,
+                                         this->currentDisplacements,
+                                         oneOverSpringPartitions.array()));
+          RUNTIME_EXP_IFN(
+            std::isfinite(maxDistanceMoved),
+            "Something went wrong: the last distance moved is not finite but " +
+              std::to_string(maxDistanceMoved) + " in iteration " +
+              std::to_string(iterationsDone + 1) + ".");
+        }
 
         currentResidual = this->getDisplacementResidualNormFor(
           this->initialConfig,
@@ -250,6 +254,16 @@ namespace sim {
         //     ") than in the previous iteration. This makes no "
         //     "sense and hints at a mistake.");
         // }
+
+        if (!iterateForDisplacements && currentResidual > previousResidual) {
+          // TODO: this cannot be a real solution…
+          std::cerr << "Residual is bigger than previous (" << currentResidual
+                    << " vs. " << previousResidual << ") in iteration "
+                    << iterationsDone + 1 << ". Switching displacement method."
+                    << std::endl;
+          iterateForDisplacements = true;
+        }
+
         previousResidual = currentResidual;
         iterationsDone += 1;
         if (iterationsDone % this->simplificationFrequency == 0) {
@@ -307,6 +321,7 @@ namespace sim {
                                           this->currentSpringPartitionsVec,
                                           inactiveRemovalCutoff);
             }
+
             // cleanup some things
             if (simplificationMode !=
                 StructureSimplificationMode::NO_SIMPLIFICATION) {
@@ -4374,15 +4389,9 @@ namespace sim {
     double MEHPForceBalance::displaceToMeanPosition(
       const ForceBalanceNetwork& net,
       Eigen::VectorXd& u,
-      const Eigen::VectorXd& springPartitions,
-      const double oneOverSpringPartitionUpperLimit) const
+      const Eigen::ArrayXd& oneOverSpringPartitions) const
     {
-      Eigen::ArrayXd oneOverSpringPartitions =
-        this
-          ->assembleOneOverSpringPartition(
-            net, springPartitions, oneOverSpringPartitionUpperLimit)
-          .array();
-
+      assert(oneOverSpringPartitions.size() == net.nrOfPartialSprings * 3);
       Eigen::ArrayXd objectiveDisplacement =
         Eigen::ArrayXd::Zero(3 * net.nrOfLinks);
       Eigen::ArrayXd distances =
@@ -4429,11 +4438,15 @@ namespace sim {
         "Some displacements are not finite");
 
       // actually displace
-      u += (remainingDisplacement + backForthDisplacement).matrix();
+      Eigen::VectorXd finalDisplacement =
+        (remainingDisplacement + backForthDisplacement).matrix();
+      // this->box.handlePBC(finalDisplacement);
+      u += finalDisplacement;
 
-      double max_denom = pylimer_tools::utils::segmentwise_norm_max(
-        remainingDisplacement + backForthDisplacement);
-      return max_denom;
+      double max_disp =
+        pylimer_tools::utils::segmentwise_norm_max(finalDisplacement, 3);
+
+      return max_disp;
     }
 
     /**

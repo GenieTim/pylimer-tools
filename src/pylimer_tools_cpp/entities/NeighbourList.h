@@ -48,7 +48,7 @@ namespace entities {
     size_t getBucketIndexForTriplet(
       std::tuple<long int, long int, long int> ind) const;
 
-    std::tuple<size_t, size_t, size_t> getBucketIndicesForAtom(
+    std::tuple<long int, long int, long int> getBucketIndicesForAtom(
       const pylimer_tools::entities::Atom& atom) const;
 
     std::vector<size_t> getCombinedBucketIndicesForAtom(

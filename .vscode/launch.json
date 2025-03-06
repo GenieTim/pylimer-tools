@@ -25,7 +25,7 @@
       "name": "Debug C++ Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["[MCUniverseGenerator]"],
+      "args": ["Temporary force balance test case"],
       "env": {
         "MallocNanoZone": "0",
         "ASAN_OPTIONS": "detect_leaks=0",
@@ -67,6 +67,21 @@
       "processId": "${command:pickProcess}",
       "program": "/Users/timbernhard/.vscode/extensions/ms-vscode.cpptools-1.22.11-darwin-arm64/bin/cpptools",
       "MIMode": "lldb"
+    },
+    {
+      // debug python file with arguments
+      "name": "Python: Current File with Arg",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "args": [
+        "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/tests/pylimer_tools/fixtures/tmp/mc_own-si_pdms_crosslinked_melt_2590_a_221_2410_monoa_271_r_1.44_wsol_0.278_f_4_v_1.structure.out"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONUNBUFFERED": "1"
+      }
     }
   ]
 }
