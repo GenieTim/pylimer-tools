@@ -4394,33 +4394,45 @@ namespace sim {
       assert(oneOverSpringPartitions.size() == net.nrOfPartialSprings * 3);
       Eigen::ArrayXd objectiveDisplacement =
         Eigen::ArrayXd::Zero(3 * net.nrOfLinks);
-      Eigen::ArrayXd distances =
+      Eigen::ArrayXd partialSpringDistances =
         this
           ->evaluatePartialSpringVectors(
             net, u, this->is2D, this->assumeBoxLargeEnough)
           .array();
       objectiveDisplacement(net.springPartCoordinateIndexA) +=
-        (oneOverSpringPartitions * distances);
+        (oneOverSpringPartitions * partialSpringDistances);
       objectiveDisplacement(net.springPartCoordinateIndexB) -=
-        (oneOverSpringPartitions * distances);
+        (oneOverSpringPartitions * partialSpringDistances);
 
-      Eigen::ArrayXd springPartsContributions =
+      Eigen::ArrayXd springPartWeightingFactor =
         Eigen::ArrayXd::Zero(net.nrOfLinks * 3);
-      springPartsContributions(net.springPartCoordinateIndexA) +=
-        oneOverSpringPartitions;
-      springPartsContributions(net.springPartCoordinateIndexB) +=
-        oneOverSpringPartitions;
-      springPartsContributions = springPartsContributions.unaryExpr(
+      Eigen::ArrayXd loopPartialSpringEliminator =
+        (net.springPartCoordinateIndexA != net.springPartCoordinateIndexB)
+          .cast<double>();
+
+      springPartWeightingFactor(net.springPartCoordinateIndexA) +=
+        oneOverSpringPartitions * loopPartialSpringEliminator;
+      springPartWeightingFactor(net.springPartCoordinateIndexB) +=
+        oneOverSpringPartitions * loopPartialSpringEliminator;
+      springPartWeightingFactor = springPartWeightingFactor.unaryExpr(
         [](double v) { return v > 0. ? v : 1.0; });
       Eigen::ArrayXd remainingDisplacement =
-        (objectiveDisplacement / springPartsContributions);
+        (objectiveDisplacement / springPartWeightingFactor);
       RUNTIME_EXP_IFN(
         pylimer_tools::utils::all_components_finite(remainingDisplacement),
         "Some displacements are not finite");
+      // at this point, we have the ideal displacement if we were to do it
+      // just one link at a time.
+      // by doing all at once, as here, though, e.g. a pair of links would
+      // oscillate back and forth to compensate for that:
+
       // NOTE: this stays mostly static, could be stored on the network
       Eigen::ArrayXd nSpringsPerLink = Eigen::ArrayXd::Zero(net.nrOfLinks * 3);
-      nSpringsPerLink(net.springPartCoordinateIndexA) += 1.;
-      nSpringsPerLink(net.springPartCoordinateIndexB) += 1.;
+      // add a one for every partial spring that's not a primary loop
+      nSpringsPerLink(net.springPartCoordinateIndexA) +=
+        loopPartialSpringEliminator;
+      nSpringsPerLink(net.springPartCoordinateIndexB) +=
+        loopPartialSpringEliminator;
       nSpringsPerLink =
         nSpringsPerLink.unaryExpr([](double v) { return v > 0. ? v : 1.0; });
       // make sure there are no infinite back-and-forth
@@ -4428,9 +4440,11 @@ namespace sim {
       Eigen::ArrayXd backForthDisplacement =
         Eigen::ArrayXd::Zero(net.nrOfLinks * 3);
       backForthDisplacement(net.springPartCoordinateIndexA) +=
+        loopPartialSpringEliminator *
         (remainingDisplacement(net.springPartCoordinateIndexB) /
          (nSpringsPerLink(net.springPartCoordinateIndexA) * 2.));
       backForthDisplacement(net.springPartCoordinateIndexB) +=
+        loopPartialSpringEliminator *
         (remainingDisplacement(net.springPartCoordinateIndexA) /
          (nSpringsPerLink(net.springPartCoordinateIndexB) * 2.));
       RUNTIME_EXP_IFN(
