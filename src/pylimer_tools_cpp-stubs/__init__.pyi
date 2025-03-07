@@ -1661,10 +1661,13 @@ class MCUniverseGenerator:
         Set the seed for the random generator.
         """
 
-    def use_linear_max_distance(self, provider: float) -> None:
+    def use_linear_max_distance(self, multiplier: float) -> None:
         """
                   Converts the :math:`N` to a maximum distance within which to sample.
-                  The distance will be calculated as :math:`N \\times \\text{max_distance_multiplier}`.
+                  The distance will be calculated as :math:`N \\times \\text{multiplier}`.
+                  For example, commonly, a maximum distance is :math:`N \\times <b>`,
+                  in which case the multiplier is :math:`<b>`.
+
                   Useful only for performance improvements in large systems.
         """
 
