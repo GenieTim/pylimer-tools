@@ -45,12 +45,15 @@ def predict_shear_modulus(**kwargs):
     ToDo:
       - Support more than one crosslinker type (as is supported by original formula)
     """
-    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(**kwargs)
+    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(
+        **kwargs)
     return g_mmt_phantom + g_mmt_entanglement
 
 
 def predict_number_density_of_junction_points(
-    network: Universe, crosslinker_type: int, functionality_per_type: dict = None
+    network: Union[Universe, None] = None,
+    crosslinker_type: int = 2,
+    functionality_per_type: Union[dict, None] = None,
 ) -> float:
     """
     Compute the number density of network strands using MMT
@@ -91,11 +94,11 @@ def predict_number_density_of_junction_points(
 
 
 def predict_number_density_of_network_strands(
-    network: Universe,
+    network: Union[Universe, None] = None,
     crosslinker_type: int = 2,
-    functionality_per_type: dict = None,
-    r: float = None,
-    p: float = None,
+    functionality_per_type: Union[dict, None] = None,
+    r: Union[float, None] = None,
+    p: Union[float, None] = None,
 ) -> float:
     """
     Compute the number density of network strands using MMT
@@ -166,13 +169,13 @@ def predict_number_density_of_network_strands(
 
 
 def compute_weight_fraction_of_dangling_chains(
-    network: Universe,
-    crosslinker_type: int,
-    functionality_per_type: dict = None,
-    weight_fractions: dict = None,
-    r: float = None,
-    p: float = None,
-    b2: float = None,
+    network: Union[Universe, None] = None,
+    crosslinker_type: int = 2,
+    functionality_per_type: Union[dict, None] = None,
+    weight_fractions: Union[dict, None] = None,
+    r: Union[float, None] = None,
+    p: Union[float, None] = None,
+    b2: Union[float, None] = None,
 ) -> float:
     """
     Compute the weight fraction of dangling (pendant) strands in infinite network
@@ -234,13 +237,13 @@ def compute_weight_fraction_of_dangling_chains(
 
 
 def compute_weight_fraction_of_backbone(
-    network: Universe,
-    crosslinker_type: int,
-    functionality_per_type: dict = None,
-    weight_fractions: dict = None,
-    r: float = None,
-    p: float = None,
-    b2: float = None,
+    network: Union[Universe, None] = None,
+    crosslinker_type: int = 2,
+    functionality_per_type: Union[dict, None] = None,
+    weight_fractions: Union[dict, None] = None,
+    r: Union[float, None] = None,
+    p: Union[float, None] = None,
+    b2: Union[float, None] = None,
 ) -> float:
     """
     Compute the weight fraction of the backbone (elastically effective) strands in an infinite network
@@ -292,13 +295,13 @@ def compute_weight_fraction_of_backbone(
 
 
 def compute_weight_fraction_of_soluble_material(
-    network: Universe,
+    network: Union[Universe, None] = None,
     crosslinker_type: int = 2,
-    functionality_per_type: dict = None,
-    weight_fractions: dict = None,
-    r: float = None,
-    p: float = None,
-    b2: float = None,
+    functionality_per_type: Union[dict, None] = None,
+    weight_fractions: Union[dict, None] = None,
+    r: Union[float, None] = None,
+    p: Union[float, None] = None,
+    b2: Union[float, None] = None,
 ) -> float:
     """
     Compute the weight fraction of soluble material by MMT.
@@ -367,10 +370,12 @@ def compute_weight_fraction_of_soluble_material_from_weight_fractions(
       - g: the functionality of the ordinary chains
     """
     alpha, _ = compute_miller_macosko_probabilities(r, p, f)
-    return w_f * (alpha**f) + w_g * ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
+    return w_f * (alpha**f) + w_g * \
+        ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
 
 
-def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float = 1.0):
+def compute_miller_macosko_probabilities(
+        r: float, p: float, f: int, b2: float = 1.0):
     """
     Compute Macosko and Miller's probabilities :math:`P(F_A)` and :math:`P(F_B)`
     i.e., the probability that a randomly chosen A (cross-link) or B (strand-end),
@@ -417,7 +422,8 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float =
     if f == 3:
         alpha = (1 - r * p * p * b2) / (r * p * p * b2)
     elif f == 4:
-        alpha = ((1.0 / (r * p * p * b2)) - 3.0 / 4.0) ** (1.0 / 2.0) - (1.0 / 2.0)
+        alpha = ((1.0 / (r * p * p * b2)) - 3.0 /
+                 4.0) ** (1.0 / 2.0) - (1.0 / 2.0)
     else:
         if not (f > 4):
             raise NotImplementedError(
@@ -425,7 +431,8 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float =
             )
 
         def fun_to_root_for_alpha(alpha):
-            return r * b2 * p**2 * alpha ** (f - 1) - alpha - r * b2 * (p**2) + 1
+            return r * b2 * p**2 * \
+                alpha ** (f - 1) - alpha - r * b2 * (p**2) + 1
 
         def fun_to_root_for_alpha_prime(alpha):
             return -1 + alpha ** (f - 2) * (-1 + f) * (p**2) * r * b2
@@ -462,17 +469,17 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float =
 
 
 def compute_modulus_decomposition(
-    network: Universe,
+    network: Union[Universe, None] = None,
     ureg: pint.UnitRegistry = None,
     unit_style: Union[None, UnitStyle] = None,
     crosslinker_type: int = None,
-    r: float = None,
-    p: float = None,
+    r: Union[float, None] = None,
+    p: Union[float, None] = None,
     f: int = None,
-    nu: float = None,
+    nu: Union[float, None] = None,
     temperature: pint.Quantity = None,
-    functionality_per_type: dict = None,
-    g_e_1: float = None,
+    functionality_per_type: Union[dict, None] = None,
+    g_e_1: Union[float, None] = None,
     b2: float = 1.0,
 ):
     """
@@ -683,9 +690,6 @@ def compute_trapping_factor(beta: float) -> float:
         - beta: :math:`P(F_b^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`
         - p: the extent of reaction in terms of the crosslinkers.
     """
-    if p == 0:
-        return 0.0
-
     # for long B2s reacting with small A_fs
     return (1 - beta) ** 4
     # pel = ((1 / (p)) * (1 - alpha)) ** 2
@@ -712,10 +716,12 @@ def compute_probability_that_crosslink_is_effective(
     f = functionality_of_monomer
     m = expected_degree_of_effect
     alpha = p_f_a_out
-    return scipy.special.binom(f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
+    return scipy.special.binom(
+        f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
 
 
-def compute_probability_that_bifunctional_monomer_is_effective(p_f_b_out: float):
+def compute_probability_that_bifunctional_monomer_is_effective(
+        p_f_b_out: float):
     """
     Consider a copolymerization of A_f with B_2.
     This function computes the probability that a random B_2 unit will be effective.
@@ -749,7 +755,8 @@ def compute_probability_that_crosslink_with_degree_is_dangling(
     alpha = p_f_a_out
     # NOTE: verify that the last exponent is f - m, rather than f - 1 as in
     # the paper
-    return scipy.special.binom(f, i) * (alpha ** (i)) * ((1.0 - alpha) ** (f - i))
+    return scipy.special.binom(f, i) * (alpha ** (i)) * \
+        ((1.0 - alpha) ** (f - i))
 
 
 def compute_probability_that_crosslink_is_dangling(
@@ -773,7 +780,8 @@ def compute_probability_that_crosslink_is_dangling(
     return scipy.special.binom(f, 1) * (alpha ** (f - 1)) * (1.0 - alpha)
 
 
-def compute_probability_that_bifunctional_monomer_is_dangling(p_f_b_out: float):
+def compute_probability_that_bifunctional_monomer_is_dangling(
+        p_f_b_out: float):
     """
     Consider a copolymerization of A_f with B_2.
     This function computes the probability that a random B_2 unit will be dangling.
@@ -853,7 +861,8 @@ def predict_p_from_w_sol(
         except ValueError:
             p_f_a_out = 1.0  # highest value -> this will not be the optimum
         return (
-            w_f * p_f_a_out**f + w_g * (r * p * p_f_a_out ** (f - 1) + 1 - r * p) ** g
+            w_f * p_f_a_out**f + w_g *
+            (r * p * p_f_a_out ** (f - 1) + 1 - r * p) ** g
         )
 
     res = optimize.minimize_scalar(
@@ -867,11 +876,13 @@ def predict_p_from_w_sol(
 def _validate_r_and_p(r: float, p: float, f: int):
     if p < 0:
         raise ValueError(
-            "The cross-linker conversion `p` must be positive, got {}".format(p)
+            "The cross-linker conversion `p` must be positive, got {}".format(
+                p)
         )
     if r < 0:
         raise ValueError(
-            "The stoichiometric imbalance `r` must be positive, got {}".format(r)
+            "The stoichiometric imbalance `r` must be positive, got {}".format(
+                r)
         )
     if f < 2:
         raise ValueError(
@@ -921,7 +932,9 @@ _validators_assembler = [
     ),
     _ParamValidatorAssembler(
         "crosslinker_type",
-        lambda p: max(p["functionality_per_type"], key=p["functionality_per_type"].get),
+        lambda p: max(
+            p["functionality_per_type"],
+            key=p["functionality_per_type"].get),
         lambda x: isinstance(x, int) and x >= 0,
         ["functionality_per_type"],
     ),
@@ -1015,7 +1028,8 @@ def _compute_validate_parameters(
         return all(_param_is_ready(dep) for dep in param.dependencies)
 
     def _validate(param_name: str):
-        if not _validator_per_name[param_name].param_validator(given_parameters[p]):
+        if not _validator_per_name[param_name].param_validator(
+                given_parameters[p]):
             raise ValueError(
                 "Invalid value for parameter '{}' (got {}).".format(
                     param_name, given_parameters[param_name]
@@ -1028,7 +1042,8 @@ def _compute_validate_parameters(
         _validate(p)
 
     # first, determine all parameters to compute
-    to_compute = set([d for d in required_parameters if not _param_is_ready(d)])
+    to_compute = set(
+        [d for d in required_parameters if not _param_is_ready(d)])
     # add dependencies
     found_last_iteration = True
     while found_last_iteration:
