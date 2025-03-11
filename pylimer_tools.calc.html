@@ -911,7 +911,8 @@ See: <a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pyl
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</p></li>
 <li><p><strong>f</strong> (<em>-</em>) – functionality of the crosslinkers</p></li>
-<li><p><strong>b2</strong> (<em>-</em>) – the mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</p></li>
+<li><p><strong>b2</strong> (<em>-</em>) – the mole fraction of reactive sites in B2 among all reactive sites
+in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -930,12 +931,25 @@ See: <a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pyl
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.predict_maximum_p">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">predict_maximum_p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.predict_maximum_p" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the maximum cross-linker conversion possible given a stoichiometric inbalance.</p>
-<p>Arguments:
-- r (double): the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
-- f (int): functionality of the crosslinkers
-- b2 (double, optional): the mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</p>
-<p>Returns:
-- p_max: the maximum cross-linker conversion possible</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</p></li>
+<li><p><strong>f</strong> (<em>-</em>) – functionality of the crosslinkers</p></li>
+<li><p><strong>b2</strong> (<em>-</em>) – the mole fraction of reactive sites in B2 among all reactive sites
+in a mixture of B1 and B2</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the maximum cross-linker conversion possible</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>p_max</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1004,13 +1018,18 @@ See: <a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pyl
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">predict_p_from_w_sol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w_sol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the extent of reaction based on the weight fraction of soluble material.</p>
-<p>Arguments:
-- w_sol: the weight fraction of soluble material
-- r: the stoichiometric imbalance
-- w_f: the weight fraction of crosslinkers with functionality f,
-- w_g: the weight fraction of precursor chains with functionality g,
-- f: the functionality of the crosslinkers
-- g: the functionality of the precursor chains</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w_sol</strong> (<em>-</em>) – the weight fraction of soluble material</p></li>
+<li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
+<li><p><strong>w_f</strong> (<em>-</em>) – the weight fraction of crosslinkers with functionality f,</p></li>
+<li><p><strong>w_g</strong> (<em>-</em>) – the weight fraction of precursor chains with functionality g,</p></li>
+<li><p><strong>f</strong> (<em>-</em>) – the functionality of the crosslinkers</p></li>
+<li><p><strong>g</strong> (<em>-</em>) – the functionality of the precursor chains</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
