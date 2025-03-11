@@ -334,6 +334,16 @@ namespace sim {
                 oneOverSpringPartitionUpperLimit);
             }
           } while (nRemoved > 0);
+          // after removal, the residual changed, might even have increased
+          // beyond initial
+          // -> reset previous and current to prevent change to iterative
+          // displacement
+          currentResidual = this->getDisplacementResidualNormFor(
+            this->initialConfig,
+            this->currentDisplacements,
+            this->currentSpringPartitionsVec,
+            oneOverSpringPartitionUpperLimit);
+          previousResidual = currentResidual;
         }
         this->handleOutput(iterationsDone);
 

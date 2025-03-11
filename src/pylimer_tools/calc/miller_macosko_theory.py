@@ -47,7 +47,9 @@ def predict_shear_modulus(**kwargs):
 
 
 def predict_number_density_of_junction_points(
-    network: Universe, crosslinker_type: int, functionality_per_type: dict = None
+    network: Union[Universe, None] = None,
+    crosslinker_type: int = 2,
+    functionality_per_type: Union[dict, None] = None,
 ) -> float:
     """
     Compute the number density of network strands using MMT
@@ -88,11 +90,11 @@ def predict_number_density_of_junction_points(
 
 
 def predict_number_density_of_network_strands(
-    network: Universe,
+    network: Union[Universe, None] = None,
     crosslinker_type: int = 2,
-    functionality_per_type: dict = None,
-    r: float = None,
-    p: float = None,
+    functionality_per_type: Union[dict, None] = None,
+    r: Union[float, None] = None,
+    p: Union[float, None] = None,
 ) -> float:
     """
     Compute the number density of network strands using MMT
@@ -163,13 +165,13 @@ def predict_number_density_of_network_strands(
 
 
 def compute_weight_fraction_of_dangling_chains(
-    network: Universe,
-    crosslinker_type: int,
-    functionality_per_type: dict = None,
-    weight_fractions: dict = None,
-    r: float = None,
-    p: float = None,
-    b2: float = None,
+    network: Union[Universe, None] = None,
+    crosslinker_type: int = 2,
+    functionality_per_type: Union[dict, None] = None,
+    weight_fractions: Union[dict, None] = None,
+    r: Union[float, None] = None,
+    p: Union[float, None] = None,
+    b2: Union[float, None] = None,
 ) -> float:
     """
     Compute the weight fraction of dangling (pendant) strands in infinite network
@@ -231,13 +233,13 @@ def compute_weight_fraction_of_dangling_chains(
 
 
 def compute_weight_fraction_of_backbone(
-    network: Universe,
-    crosslinker_type: int,
-    functionality_per_type: dict = None,
-    weight_fractions: dict = None,
-    r: float = None,
-    p: float = None,
-    b2: float = None,
+    network: Union[Universe, None] = None,
+    crosslinker_type: int = 2,
+    functionality_per_type: Union[dict, None] = None,
+    weight_fractions: Union[dict, None] = None,
+    r: Union[float, None] = None,
+    p: Union[float, None] = None,
+    b2: Union[float, None] = None,
 ) -> float:
     """
     Compute the weight fraction of the backbone (elastically effective) strands in an infinite network
@@ -289,13 +291,13 @@ def compute_weight_fraction_of_backbone(
 
 
 def compute_weight_fraction_of_soluble_material(
-    network: Universe,
-    crosslinker_type: int,
-    functionality_per_type: dict = None,
-    weight_fractions: dict = None,
-    r: float = None,
-    p: float = None,
-    b2: float = None,
+    network: Union[Universe, None] = None,
+    crosslinker_type: int = 2,
+    functionality_per_type: Union[dict, None] = None,
+    weight_fractions: Union[dict, None] = None,
+    r: Union[float, None] = None,
+    p: Union[float, None] = None,
+    b2: Union[float, None] = None,
 ) -> float:
     """
     Compute the weight fraction of soluble material by MMT.
@@ -459,17 +461,17 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float =
 
 
 def compute_modulus_decomposition(
-    network: Universe,
+    network: Union[Universe, None] = None,
     ureg: pint.UnitRegistry = None,
     unit_style: Union[None, UnitStyle] = None,
     crosslinker_type: int = None,
-    r: float = None,
-    p: float = None,
+    r: Union[float, None] = None,
+    p: Union[float, None] = None,
     f: int = None,
-    nu: float = None,
+    nu: Union[float, None] = None,
     temperature: pint.Quantity = None,
-    functionality_per_type: dict = None,
-    g_e_1: float = None,
+    functionality_per_type: Union[dict, None] = None,
+    g_e_1: Union[float, None] = None,
     b2: float = 1.0,
 ):
     """
@@ -505,13 +507,14 @@ def compute_modulus_decomposition(
 
     param = _compute_validate_parameters(
         {**locals()},
-        ["f", "nu", "p_f_a_out", "p", "r"],
+        ["f", "nu", "p_f_a_out", "p_f_b_out", "p", "r"],
     )
 
-    f, nu, alpha, p, r = (
+    f, nu, alpha, beta, p, r = (
         param["f"],
         param["nu"],
         param["p_f_a_out"],
+        param["p_f_b_out"],
         param["p"],
         param["r"],
     )
@@ -542,7 +545,7 @@ def compute_modulus_decomposition(
     gamma_mmt = (2 * r * b2 / f) * gamma_mmt_sum if f != 0 else 0.0
     g_mmt_phantom = gamma_mmt * nu * kb * temperature
     # fraction of elastically effective strands.
-    g_mmt_entanglement = g_e_1 * compute_trapping_factor(p=p, alpha=alpha)
+    g_mmt_entanglement = g_e_1 * compute_trapping_factor(beta=beta)
     # entanglement part. TODO : check adjustment with r
     return g_mmt_phantom, g_mmt_entanglement, g_anm, g_pnm
 
@@ -602,35 +605,36 @@ def compute_extracted_modulus(
 
 
 def compute_entanglement_modulus(
-    p: float,
-    r: float,
-    f: int,
     g_e_1: pint.Quantity,
-    alpha: Union[float, None] = None,
-    temperature: pint.Quantity = None,
-    ureg: pint.UnitRegistry = None,
+    temperature: pint.Quantity,
+    network: Union[Universe, None] = None,
+    crosslinker_type: int = 2,
+    p: Union[float, None] = None,
+    r: Union[float, None] = None,
+    f: Union[int, None] = None,
+    b2: Union[float, None] = None,
+    beta: Union[float, None] = None,
 ):
     """
     Compute MMT's entanglement contribution to the equilibrium shear modulus, given by
     :math:`k_B T \\epsilon_e T_e`.
 
     Arguments:
-        - p: the cross-linker conversion
-        - r: the stoichiometric imbalance
-        - f: the functionality of the crosslinkers
-        - g_e_1: the melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
-        - alpha: :math:`P(F_a^{out})`, optional
-        - temperature: the temperatures; defaults to room temperature (25 °C)
+      - g_e_1: the melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
+      - temperature: the temperatures; defaults to room temperature (25 °C)
+      - network: the polymer network to do the computation for
+      - crosslinker_type: the type of the junctions/cross-linkers to select them in the network
+      - p: the cross-linker conversion
+      - r: the stoichiometric imbalance
+      - f: the functionality of the crosslinkers
+      - beta: :math:`P(F_b^{out})`, optional
     """
-    if temperature is None:
-        if ureg is None:
-            raise ValueError(
-                "Unit registry must be initialized, or temperature specified."
-            )
-        temperature = (273.15 + 25) * ureg.kelvin
-    if alpha is None:
-        alpha, _ = compute_miller_macosko_probabilities(r, p, f)
-    return compute_trapping_factor(p=p, alpha=alpha) * g_e_1
+    param = _compute_validate_parameters(
+        {**locals()},
+        ["p_f_b_out"],
+    )
+
+    return compute_trapping_factor(beta=param["p_f_b_out"]) * g_e_1
 
 
 def compute_junction_modulus(
@@ -668,23 +672,20 @@ def compute_junction_modulus(
     return kb * temperature * xlink_concentration_0 * gamma_mmt_sum
 
 
-def compute_trapping_factor(alpha: float, p: float) -> float:
+def compute_trapping_factor(beta: float) -> float:
     """
     Compute the Langley trapping factor :math:`T_e`.
 
     Literature: https://doi.org/10.1021/ma60004a015
 
     Arguments:
-        - alpha: :math:`P(F_a^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`
+        - beta: :math:`P(F_b^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`
         - p: the extent of reaction in terms of the crosslinkers.
     """
-    if p == 0:
-        return 0.0
-
     # for long B2s reacting with small A_fs
-    # return (1 - beta)**4
-    pel = ((1 / (p)) * (1 - alpha)) ** 2
-    return pel**2
+    return (1 - beta) ** 4
+    # pel = ((1 / (p)) * (1 - alpha)) ** 2
+    # return pel**2
 
 
 def compute_probability_that_crosslink_is_effective(
