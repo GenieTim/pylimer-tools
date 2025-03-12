@@ -9,11 +9,8 @@ from scipy import optimize
 
 from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
-    compute_effective_crosslinker_functionality,
     compute_fraction_of_bifunctional_reactive_sites,
     compute_stoichiometric_imbalance,
-    compute_weight_fractions,
-    measure_weight_fraction_of_soluble_material,
 )
 from pylimer_tools.io.unit_styles import UnitStyle
 from pylimer_tools_cpp import Universe
@@ -807,7 +804,8 @@ def predict_gelation_point(r: float, f: int, b2: int = 1) -> float:
     Arguments:
       - r (double): the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
       - f (int): functionality of the crosslinkers
-      - b2 (double, optional): the mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2
+      - b2 (double, optional): the mole fraction of reactive sites in B2 among all reactive sites
+        in a mixture of B1 and B2
 
     Returns:
       - p_gel: critical extent of reaction for gelation
@@ -822,12 +820,13 @@ def predict_maximum_p(r: float, f: int, b2: float = 1) -> float:
     Compute the maximum cross-linker conversion possible given a stoichiometric inbalance.
 
     Arguments:
-    - r (double): the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
-    - f (int): functionality of the crosslinkers
-    - b2 (double, optional): the mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2
+      - r (double): the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
+      - f (int): functionality of the crosslinkers
+      - b2 (double, optional): the mole fraction of reactive sites in B2 among all reactive sites
+        in a mixture of B1 and B2
 
     Returns:
-    - p_max: the maximum cross-linker conversion possible
+      - p_max: the maximum cross-linker conversion possible
     """
     # assume:
     n_chains = 1000
@@ -847,12 +846,12 @@ def predict_p_from_w_sol(
     Compute the extent of reaction based on the weight fraction of soluble material.
 
     Arguments:
-    - w_sol: the weight fraction of soluble material
-    - r: the stoichiometric imbalance
-    - w_f: the weight fraction of crosslinkers with functionality f,
-    - w_g: the weight fraction of precursor chains with functionality g,
-    - f: the functionality of the crosslinkers
-    - g: the functionality of the precursor chains
+      - w_sol: the weight fraction of soluble material
+      - r: the stoichiometric imbalance
+      - w_f: the weight fraction of crosslinkers with functionality f,
+      - w_g: the weight fraction of precursor chains with functionality g,
+      - f: the functionality of the crosslinkers
+      - g: the functionality of the precursor chains
     """
 
     def compute_wsol(p):
