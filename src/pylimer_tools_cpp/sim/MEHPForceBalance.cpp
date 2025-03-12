@@ -338,12 +338,7 @@ namespace sim {
           // beyond initial
           // -> reset previous and current to prevent change to iterative
           // displacement
-          currentResidual = this->getDisplacementResidualNormFor(
-            this->initialConfig,
-            this->currentDisplacements,
-            this->currentSpringPartitionsVec,
-            oneOverSpringPartitionUpperLimit);
-          previousResidual = currentResidual;
+          previousResidual = initialResidual;
         }
         this->handleOutput(iterationsDone);
 
