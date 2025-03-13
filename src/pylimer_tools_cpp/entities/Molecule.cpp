@@ -67,6 +67,8 @@ namespace entities {
     this->key =
       pylimer_tools::utils::join(ids.begin(), ids.end(), std::string("-"));
     igraph_vector_destroy(&allIds);
+    // detect whether the graph has more than the standard attributes
+    this->atomsHaveCustomAttributes = this->checkIfAtomsHaveCustomAttributes();
   };
 
   // rule of three:
@@ -88,6 +90,7 @@ namespace entities {
   {
     std::swap(this->parent, src.parent);
     std::swap(this->typeOfThisMolecule, src.typeOfThisMolecule);
+    std::swap(this->atomsHaveCustomAttributes, src.atomsHaveCustomAttributes);
     std::swap(this->size, src.size);
     std::swap(this->key, src.key);
     std::swap(this->massPerType, src.massPerType);
