@@ -109,6 +109,7 @@ namespace entities {
     // using copy assignement operators ourselfes
     this->box = src.box;
     this->atomIdToVertexIdx = src.atomIdToVertexIdx;
+    this->atomsHaveCustomAttributes = src.atomsHaveCustomAttributes;
     this->massPerType = src.massPerType;
     igraph_copy(&this->graph, &src.graph);
   };
@@ -136,6 +137,7 @@ namespace entities {
     //
     std::swap(this->box, src.box);
     std::swap(this->graph, src.graph);
+    std::swap(this->atomsHaveCustomAttributes, src.atomsHaveCustomAttributes);
     std::swap(this->atomIdToVertexIdx, src.atomIdToVertexIdx);
     std::swap(this->massPerType, src.massPerType);
 
@@ -167,6 +169,8 @@ namespace entities {
     for (int i = 0; i < ids.size(); ++i) {
       this->atomIdToVertexIdx[ids[i]] = i;
     }
+    // detect whether the graph has more than the standard attributes
+    this->atomsHaveCustomAttributes = this->checkIfAtomsHaveCustomAttributes();
   }
 
   void Universe::addAtoms(const std::vector<long int>& newIds,
@@ -258,6 +262,7 @@ namespace entities {
       pylimer_tools::utils::StdVectorToIgraphVectorT(newNz, &valueVec);
       igraph_cattribute_VAN_setv(&this->graph, "nz", &valueVec);
       if (!additionalData.empty()) {
+        this->atomsHaveCustomAttributes = true;
         for (const auto& [key, value] : additionalData) {
           pylimer_tools::utils::StdVectorToIgraphVectorT(value, &valueVec);
           igraph_cattribute_VAN_setv(&this->graph, key.c_str(), &valueVec);
@@ -280,6 +285,7 @@ namespace entities {
         igraph_cattribute_VAN_set(
           &this->graph, "nz", this->NAtoms + i, newNz[i]);
         if (!additionalData.empty()) {
+          this->atomsHaveCustomAttributes = true;
           for (const auto& [key, value] : additionalData) {
             igraph_cattribute_VAN_set(
               &this->graph, key.c_str(), this->NAtoms + i, value[i]);
@@ -312,6 +318,7 @@ namespace entities {
       &this->graph, "type", vertexIdx, replacement.getType());
     for (const auto& [key, value] : replacement.getExtraData()) {
       igraph_cattribute_VAN_set(&this->graph, key.c_str(), vertexIdx, value);
+      this->atomsHaveCustomAttributes = true;
     }
   }
 
@@ -338,6 +345,7 @@ namespace entities {
 
     std::normal_distribution<double> dist(mean, variance);
 
+    this->atomsHaveCustomAttributes = true;
     for (igraph_integer_t i = 0; i < this->NAtoms; ++i) {
       igraph_cattribute_VAN_set(&this->graph, "vx", i, dist(e2));
       igraph_cattribute_VAN_set(&this->graph, "vy", i, dist(e2));
@@ -817,7 +825,7 @@ namespace entities {
 
     // split the copy into the separate components
     igraph_graph_list_t components;
-    igraph_graph_list_init(&components, this->getNrOfAtoms());
+    igraph_graph_list_init(&components, 1);
     if (igraph_decompose(
           &graphWithoutCrosslinkers, &components, IGRAPH_WEAK, -1, 0)) {
       throw std::runtime_error("Failed to decompose graph.");
@@ -954,7 +962,7 @@ namespace entities {
 
     // split the copy into the separate components
     igraph_graph_list_t components;
-    igraph_graph_list_init(&components, 3);
+    igraph_graph_list_init(&components, 1);
     if (igraph_decompose(
           &graphWithoutJunctions, &components, IGRAPH_STRONG, -1, 0)) {
       throw std::runtime_error("Failed to decompose graph.");
@@ -1087,8 +1095,7 @@ namespace entities {
       }
 
       // finally, create the molecule/chain
-      molecules.push_back(
-        Molecule(this->box, chain, molType, this->massPerType));
+      molecules.emplace_back(this->box, chain, molType, this->massPerType);
     }
     // what was neglected so far: springs between junctions!
     for (long int junctionIdx : indicesToRemove) {
@@ -1147,8 +1154,7 @@ namespace entities {
             &chain,
             0,
             vertexAndEdgeProperties.second);
-          molecules.push_back(
-            Molecule(this->box, &chain, molType, this->massPerType));
+          molecules.emplace_back(this->box, &chain, molType, this->massPerType);
           igraph_destroy(&chain);
         }
       }
@@ -1178,8 +1184,7 @@ namespace entities {
           igraph_add_edge(&chain, 0, 0);
           pylimer_tools::utils::copyEdgeProperties(
             &this->graph, edgeId, &chain, 0, vertexAndEdgeProperties.second);
-          molecules.push_back(
-            Molecule(this->box, &chain, molType, this->massPerType));
+          molecules.emplace_back(this->box, &chain, molType, this->massPerType);
           igraph_destroy(&chain);
         }
       }
@@ -2426,7 +2431,7 @@ namespace entities {
       size_t numExtraBonds = static_cast<size_t>(std::round(
         static_cast<double>(chain.getNrOfBonds()) * interpolationFactor));
       for (size_t i = 1; i < numExtraBonds; ++i) {
-        results.push_back(std::make_pair(previousId, currentMaxIdx));
+        results.emplace_back(previousId, currentMaxIdx);
         previousId = currentMaxIdx;
         currentMaxIdx += 1;
       }
@@ -2434,7 +2439,7 @@ namespace entities {
         vertexIdToNewIdx[end1] = currentMaxIdx;
         currentMaxIdx += 1;
       }
-      results.push_back(std::make_pair(vertexIdToNewIdx[end1], previousId));
+      results.emplace_back(vertexIdToNewIdx[end1], previousId);
     }
 
     return results;

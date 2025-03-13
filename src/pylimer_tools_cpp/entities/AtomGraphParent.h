@@ -200,6 +200,8 @@ namespace entities {
      * @return Atom
      */
     Atom getAtomByVertexIdx(const long int vertexIdx) const;
+    Atom getSimpleAtomByVertexIdx(const long int vertexIdx) const;
+    Atom getComplexAtomByVertexIdx(const long int vertexIdx) const;
 
     /**
      * @brief Get the (wrapped) position vector for a vertex (ignoring image
@@ -523,6 +525,7 @@ namespace entities {
 
   protected:
     igraph_t graph;
+    bool atomsHaveCustomAttributes = false;
     igraph_vs_t getVerticesWithDegreeSelector(int degree) const;
     std::vector<long int> getVerticesWithDegree(int degree) const;
     std::vector<long int> getVerticesWithDegree(
@@ -532,6 +535,7 @@ namespace entities {
       std::function<bool(int)> selector) const;
     std::vector<long int> getVerticesWithDegree(const igraph_t* someGraph,
                                                 std::vector<int> degrees) const;
+    bool checkIfAtomsHaveCustomAttributes() const;
   };
 
 } // namespace entities

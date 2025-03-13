@@ -229,6 +229,39 @@ namespace entities {
    */
   Atom AtomGraphParent::getAtomByVertexIdx(const long int vertexIdx) const
   {
+    if (this->atomsHaveCustomAttributes) {
+      return this->getComplexAtomByVertexIdx(vertexIdx);
+    }
+    return this->getSimpleAtomByVertexIdx(vertexIdx);
+  };
+
+  Atom AtomGraphParent::getSimpleAtomByVertexIdx(const long int vertexIdx) const
+  {
+    if (vertexIdx > this->getNrOfVertices()) {
+      throw std::invalid_argument("Atom with this vertex id (" +
+                                  std::to_string(vertexIdx) +
+                                  ") does not exist");
+    }
+
+    return Atom(
+      static_cast<long int>(
+        std::lround(igraph_cattribute_VAN(&this->graph, "id", vertexIdx))),
+      static_cast<int>(
+        std::rint(igraph_cattribute_VAN(&this->graph, "type", vertexIdx))),
+      igraph_cattribute_VAN(&this->graph, "x", vertexIdx),
+      igraph_cattribute_VAN(&this->graph, "y", vertexIdx),
+      igraph_cattribute_VAN(&this->graph, "z", vertexIdx),
+      static_cast<int>(
+        std::rint(igraph_cattribute_VAN(&this->graph, "nx", vertexIdx))),
+      static_cast<int>(
+        std::rint(igraph_cattribute_VAN(&this->graph, "ny", vertexIdx))),
+      static_cast<int>(
+        std::rint(igraph_cattribute_VAN(&this->graph, "nz", vertexIdx))));
+  };
+
+  Atom AtomGraphParent::getComplexAtomByVertexIdx(
+    const long int vertexIdx) const
+  {
     if (vertexIdx > this->getNrOfVertices()) {
       throw std::invalid_argument("Atom with this vertex id (" +
                                   std::to_string(vertexIdx) +
@@ -236,12 +269,13 @@ namespace entities {
     }
 
     igraph_strvector_t vnames;
-    igraph_strvector_init(&vnames, 1);
+    igraph_strvector_init(&vnames, 12);
     igraph_cattribute_list(
       &this->graph, nullptr, nullptr, &vnames, nullptr, nullptr, nullptr);
 
     // fetch all atom properties
     std::unordered_map<std::string, double> atomProperties;
+    atomProperties.reserve(igraph_strvector_size(&vnames));
     for (size_t i = 0; i < igraph_strvector_size(&vnames); ++i) {
       atomProperties[igraph_strvector_get(&vnames, i)] = igraph_cattribute_VAN(
         &this->graph, igraph_strvector_get(&vnames, i), vertexIdx);
@@ -250,7 +284,7 @@ namespace entities {
     igraph_strvector_destroy(&vnames);
 
     return Atom(atomProperties);
-  }
+  };
 
   Eigen::Vector3d AtomGraphParent::getPositionVectorForVertex(
     const int vertexId) const
@@ -788,6 +822,17 @@ namespace entities {
 
     return result;
   }
+
+  bool AtomGraphParent::checkIfAtomsHaveCustomAttributes() const
+  {
+    igraph_strvector_t vnames;
+    igraph_strvector_init(&vnames, 8);
+    igraph_cattribute_list(
+      &this->graph, nullptr, nullptr, &vnames, nullptr, nullptr, nullptr);
+
+    // default is 8 attributes: id, type, x, y, z, nx, ny, nz
+    return igraph_strvector_size(&vnames) > 8;
+  };
 
   void AtomGraphParent::writeGraphToFile(const std::string& filename) const
   {
