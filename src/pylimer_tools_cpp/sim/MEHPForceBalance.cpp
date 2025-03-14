@@ -1485,8 +1485,11 @@ namespace sim {
 #endif
       INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                          "Can only remove springs, not partial springs.");
+#ifndef NDEBUG
       Eigen::VectorXd allTotalSpringDistancesBefore =
         this->evaluateSpringLengths(net, displacements, this->is2D);
+#endif
+
       std::vector<size_t> affectedLinks = net.linkIndicesOfSprings[springIdx];
       std::vector<size_t> uniqueAffectedLinks =
         net.linkIndicesOfSprings[springIdx];
@@ -1614,14 +1617,10 @@ namespace sim {
       }
 
       // then, update the partial springs
-      for (size_t partialSpringIdx = 0;
-           partialSpringIdx < net.nrOfPartialSprings;
-           ++partialSpringIdx) {
-        assert(net.partialToFullSpringIndex[partialSpringIdx] != springIdx);
-        if (net.partialToFullSpringIndex[partialSpringIdx] > springIdx) {
-          net.partialToFullSpringIndex[partialSpringIdx] -= 1;
-        }
-      }
+      // decrease by one if larger then springIdx
+      assert((net.partialToFullSpringIndex != springIdx).all());
+      net.partialToFullSpringIndex -=
+        (net.partialToFullSpringIndex > springIdx).cast<int>();
 
       assert(net.localToGlobalSpringIndex.size() == net.nrOfSprings);
       for (size_t loopingSpringIdx = 0; loopingSpringIdx < net.nrOfSprings;
@@ -1642,6 +1641,8 @@ namespace sim {
       // remove the affected slip-links that are now only on one spring
       //
       std::vector<size_t> linksToRemove;
+      linksToRemove.reserve(affectedLinks.size() -
+                            2); // keep the first and last links
       for (size_t i = 1; i < affectedLinks.size() - 1; ++i) {
         linksToRemove.push_back(affectedLinks[i]);
       }
@@ -1743,7 +1744,7 @@ namespace sim {
 #ifdef DEBUG_REMOVAL
       std::cout << "Removed spring " << springIdx << std::endl;
 #endif
-
+#ifndef NDEBUG
       Eigen::VectorXd allTotalSpringDistancesAfter =
         this->evaluateSpringLengths(net, displacements, this->is2D);
       assert(allTotalSpringDistancesAfter.size() == net.nrOfSprings);
@@ -1765,6 +1766,7 @@ namespace sim {
             "springs.");
         }
       }
+#endif
     }
 
     /**
@@ -1879,6 +1881,7 @@ namespace sim {
       // renumber the remaining links
       for (size_t i = 0; i < net.linkIndicesOfSprings.size(); ++i) {
         for (size_t j = 0; j < net.linkIndicesOfSprings[i].size(); ++j) {
+#ifndef NDEBUG
           RUNTIME_EXP_IFN(
             net.linkIndicesOfSprings[i][j] != linkIdx,
             "Expected not to find link to remove " + std::to_string(linkIdx) +
@@ -1887,6 +1890,7 @@ namespace sim {
                                          net.linkIndicesOfSprings[i].end(),
                                          std::string(", ")) +
               ".");
+#endif
           if (net.linkIndicesOfSprings[i][j] > linkIdx) {
             net.linkIndicesOfSprings[i][j] -= 1;
           }
@@ -1895,22 +1899,26 @@ namespace sim {
       //
       assert(net.springPartIndexA.size() == net.springPartIndexB.size());
       for (size_t i = 0; i < net.springPartIndexA.size(); ++i) {
+#ifndef NDEBUG
         RUNTIME_EXP_IFN(
           net.springPartIndexA[i] != linkIdx,
           "Exected link " + std::to_string(linkIdx) +
             " to not be linked anywhere anymore, found in partial spring " +
             std::to_string(i) + ".");
+#endif
         if (net.springPartIndexA[i] > linkIdx) {
           net.springPartIndexA[i] -= 1;
           net.springPartCoordinateIndexA[3 * i] -= 3;
           net.springPartCoordinateIndexA[3 * i + 1] -= 3;
           net.springPartCoordinateIndexA[3 * i + 2] -= 3;
         }
+#ifndef NDEBUG
         RUNTIME_EXP_IFN(
           net.springPartIndexB[i] != linkIdx,
           "Exected link " + std::to_string(linkIdx) +
             " to not be linked anywhere anymore, found in partial spring " +
             std::to_string(i) + ".");
+#endif
         if (net.springPartIndexB[i] > linkIdx) {
           net.springPartIndexB[i] -= 1;
           net.springPartCoordinateIndexB[3 * i] -= 3;
@@ -1918,24 +1926,17 @@ namespace sim {
           net.springPartCoordinateIndexB[3 * i + 2] -= 3;
         }
       }
-      //
+      // some validation of current state
       assert(net.springIndexA.size() == net.springIndexB.size());
-      for (size_t i = 0; i < net.springIndexA.size(); ++i) {
-        assert(net.springIndexA[i] != linkIdx);
-        if (net.springIndexA[i] > linkIdx) {
-          net.springIndexA[i] -= 1;
-          net.springCoordinateIndexA[3 * i] -= 3;
-          net.springCoordinateIndexA[3 * i + 1] -= 3;
-          net.springCoordinateIndexA[3 * i + 2] -= 3;
-        }
-        assert(net.springIndexB[i] != linkIdx);
-        if (net.springIndexB[i] > linkIdx) {
-          net.springIndexB[i] -= 1;
-          net.springCoordinateIndexB[3 * i] -= 3;
-          net.springCoordinateIndexB[3 * i + 1] -= 3;
-          net.springCoordinateIndexB[3 * i + 2] -= 3;
-        }
-      }
+      assert((net.springIndexA != linkIdx).all());
+      assert((net.springIndexB != linkIdx).all());
+      // renumber springs
+      net.springIndexA -= (net.springIndexA > linkIdx).cast<int>();
+      net.springCoordinateIndexA -=
+        3 * (net.springCoordinateIndexA > 3 * linkIdx).cast<int>();
+      net.springIndexB -= (net.springIndexB > linkIdx).cast<int>();
+      net.springCoordinateIndexB -=
+        3 * (net.springCoordinateIndexB > 3 * linkIdx).cast<int>();
     }
 
     /**
