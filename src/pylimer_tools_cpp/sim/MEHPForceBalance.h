@@ -122,11 +122,7 @@ namespace sim {
        * @brief Instantiate this simulator with randomly chosen slip-links.
        *
        * @param universe
-       * @param nrOfSliplinksToSample
-       * @param cutoff
-       * @param minimumNrOfSliplinks
-       * @param sameStrandCutoff
-       * @param seed
+       * @param entanglements
        * @param crossLinkerType
        * @param is2D
        * @return MEHPForceBalance
@@ -422,7 +418,8 @@ namespace sim {
         const double sameStrandCutoff = 3,
         const std::string seed = "",
         int crossLinkerType = 2,
-        bool is2D = false)
+        bool is2D = false,
+        bool filterEntanglements = true)
       {
         // sample the "entanglements"
         pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
@@ -435,7 +432,8 @@ namespace sim {
                                       sameStrandCutoff,
                                       seed,
                                       crossLinkerType,
-                                      true);
+                                      true,
+                                      filterEntanglements);
 
         RUNTIME_EXP_IFN(
           entanglements.pairsOfAtoms.size() >= minimumNrOfSliplinks,

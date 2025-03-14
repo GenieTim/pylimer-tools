@@ -40,7 +40,8 @@ namespace topo {
       const double sameStrandCutoff,
       const std::string& seed,
       int crossLinkerType,
-      bool ignoreCrosslinks)
+      bool ignoreCrosslinks,
+      bool filterDanglingAndSoluble)
     {
       INVALIDARG_EXP_IFN(minimumNrOfSliplinks < universe.getNrOfAtoms() / 2,
                          "Minimum number of slip-links must be less than the "
@@ -70,18 +71,31 @@ namespace topo {
       std::vector<std::pair<size_t, size_t>> pairsOfAtoms;
       pairsOfAtoms.reserve(nrOfSliplinksToSample);
       std::vector<long int> pairOfAtom =
-        pylimer_tools::utils::initializeWithValue<long int>(
-          universe.getNrOfAtoms(), -1);
+        std::vector<long int>(universe.getNrOfAtoms(), -1);
 
       // assemble some minor performance benefits
       std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
         universe.getChainsWithCrosslinker(crossLinkerType);
+      std::vector<bool> ignoreMolecule =
+        std::vector<bool>(crossLinkerChains.size(), filterDanglingAndSoluble);
+      if (filterDanglingAndSoluble) {
+        std::transform(
+          crossLinkerChains.begin(),
+          crossLinkerChains.end(),
+          ignoreMolecule.begin(),
+          [](const pylimer_tools::entities::Molecule& m) {
+            return m.getType() ==
+                     pylimer_tools::entities::MoleculeType::DANGLING_CHAIN ||
+                   m.getType() ==
+                     pylimer_tools::entities::MoleculeType::FREE_CHAIN;
+          });
+      }
 
-      std::unordered_map<size_t, size_t> atomToStrand;
-      atomToStrand.reserve(universe.getNrOfAtoms());
+      std::vector<long int> atomToStrand =
+        std::vector<long int>(universe.getNrOfAtoms(), -1);
       // use long int here to make unproblematic subtractions
-      std::unordered_map<size_t, long int> atomIdxInStrand;
-      atomIdxInStrand.reserve(universe.getNrOfAtoms());
+      std::vector<long int> atomIdxInStrand =
+        std::vector<long int>(universe.getNrOfAtoms(), -1);
       // start by setting distribution to sample from
       std::vector<pylimer_tools::entities::Atom> atomsForNeighbourList;
       atomsForNeighbourList.reserve(universe.getNrOfAtoms());
@@ -93,9 +107,10 @@ namespace topo {
           if (((atom.getType() != crossLinkerType) && (atomIdx != 0) &&
                (atomIdx != (atoms.size() - 1))) ||
               !ignoreCrosslinks) {
+            igraph_integer_t vertexIdx = universe.getIdxByAtomId(atom.getId());
             atomsForNeighbourList.push_back(atom);
-            atomToStrand.emplace(atom.getId(), i);
-            atomIdxInStrand.emplace(atom.getId(), atomIdx);
+            atomToStrand[vertexIdx] = i;
+            atomIdxInStrand[vertexIdx] = atomIdx;
           }
         }
       }
@@ -116,8 +131,8 @@ namespace topo {
       size_t numLinksFoundInIteration = 1;
 
       // start iteration to sample "entanglements"
-      while (pairsOfAtoms.size() < minimumNrOfSliplinks &&
-             numLinksFoundInIteration > 0) {
+      size_t numEntanglementsSampled = 0;
+      do {
         numLinksFoundInIteration = 0;
         std::shuffle(
           atomsForNeighbourList.begin(), atomsForNeighbourList.end(), rng);
@@ -166,40 +181,47 @@ namespace topo {
               ". This time sampled with atom " + std::to_string(a1.getId()) +
               ".");
           RUNTIME_EXP_IFN(
-            (atomToStrand[a2.getId()] != atomToStrand[a1.getId()]) ||
+            (atomToStrand[atomVertexIdx2] != atomToStrand[atomVertexIdx1]) ||
               ((std::abs(static_cast<double>(atomIdxInStrand[a2.getId()] -
                                              atomIdxInStrand[a1.getId()])) >=
                 sameStrandCutoff)),
             "Expected neighbours to have been deleted if too far apart.");
-          pairOfAtom[atomVertexIdx2] = pairsOfAtoms.size();
-          pairOfAtom[atomVertexIdx1] = pairsOfAtoms.size();
-          pairsOfAtoms.push_back(std::make_pair(a1.getId(), a2.getId()));
+
+          if (!filterDanglingAndSoluble ||
+              (!ignoreMolecule[atomToStrand[atomVertexIdx2]] &&
+               !ignoreMolecule[atomToStrand[atomVertexIdx1]])) {
+            pairOfAtom[atomVertexIdx2] = pairsOfAtoms.size();
+            pairOfAtom[atomVertexIdx1] = pairsOfAtoms.size();
+            pairsOfAtoms.push_back(std::make_pair(a1.getId(), a2.getId()));
+          }
+          numEntanglementsSampled += 1;
           numLinksFoundInIteration += 1;
           neighbourList.removeAtom(a2,
                                    "After marking atom as second pair part.");
           // std::cout << "Merging atoms " << a1.getId() << " ("
           //           << atomIdxInStrand[a1.getId()] << "th in "
-          //           << atomToStrand[a1.getId()] << ") and " << a2.getId()
+          //           << atomToStrand[atomVertexIdx1] << ") and " << a2.getId()
           //           << " (" << atomIdxInStrand[a2.getId()] << "th in "
-          //           << atomToStrand[a2.getId()] << ") "
+          //           << atomToStrand[atomVertexIdx2] << ") "
           //           << " with distance " << a1.distanceTo(a2,
           //           universe.getBox())
           //           << std::endl;
-          // if (atomToStrand[a2.getId()] == atomToStrand[a1.getId()]) {
+          // if (atomToStrand[atomVertexIdx2] == atomToStrand[atomVertexIdx1]) {
           //   std::cout << "Same strand detected: distance is "
           //             << std::abs(
           //                  static_cast<double>(atomIdxInStrand[a2.getId()] -
           //                                      atomIdxInStrand[a1.getId()]))
           //             << std::endl;
           // }
-          if (pairsOfAtoms.size() >= nrOfSliplinksToSample) {
+          if (numEntanglementsSampled >= nrOfSliplinksToSample) {
             break;
           }
         }
-        if (pairsOfAtoms.size() >= nrOfSliplinksToSample) {
+        if (numEntanglementsSampled >= nrOfSliplinksToSample) {
           break;
         }
-      }
+      } while (numEntanglementsSampled < minimumNrOfSliplinks &&
+               numLinksFoundInIteration > 0);
 
       AtomPairEntanglements result;
       result.pairsOfAtoms = pairsOfAtoms;

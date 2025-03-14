@@ -52,7 +52,8 @@ namespace topo {
       const double sameStrandCutoff = 3,
       const std::string& seed = "",
       int crossLinkerType = 2,
-      bool ignoreCrosslinks = true);
+      bool ignoreCrosslinks = true,
+      bool filterDanglingAndSoluble = false);
 
   }
 

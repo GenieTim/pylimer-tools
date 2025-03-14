@@ -4434,9 +4434,11 @@ namespace sim {
         [](double v) { return v > 0. ? v : 1.0; });
       Eigen::ArrayXd remainingDisplacement =
         (objectiveDisplacement / springPartWeightingFactor);
+#ifndef NDEBUG
       RUNTIME_EXP_IFN(
         pylimer_tools::utils::all_components_finite(remainingDisplacement),
         "Some displacements are not finite");
+#endif
       // at this point, we have the ideal displacement if we were to do it
       // just one link at a time.
       // by doing all at once, as here, though, e.g. a pair of links would
@@ -4449,8 +4451,8 @@ namespace sim {
         loopPartialSpringEliminator;
       nSpringsPerLink(net.springPartCoordinateIndexB) +=
         loopPartialSpringEliminator;
-      // nSpringsPerLink =
-      //   nSpringsPerLink.unaryExpr([](double v) { return v > 0. ? v : 1.0; });
+      nSpringsPerLink =
+        nSpringsPerLink.unaryExpr([](double v) { return v > 0. ? v : 1.0; });
       // make sure there are no infinite back-and-forth
       // and actually displace
       Eigen::ArrayXd backForthDisplacement =
@@ -4472,6 +4474,9 @@ namespace sim {
       // actually displace
       Eigen::VectorXd finalDisplacement =
         (remainingDisplacement + backForthDisplacement).matrix();
+      RUNTIME_EXP_IFN(
+        pylimer_tools::utils::all_components_finite(finalDisplacement),
+        "Some displacements are not finite");
       // this->box.handlePBC(finalDisplacement);
       u += finalDisplacement;
 
