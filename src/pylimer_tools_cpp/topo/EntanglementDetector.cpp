@@ -193,6 +193,9 @@ namespace topo {
             pairOfAtom[atomVertexIdx2] = pairsOfAtoms.size();
             pairOfAtom[atomVertexIdx1] = pairsOfAtoms.size();
             pairsOfAtoms.push_back(std::make_pair(a1.getId(), a2.getId()));
+          } else {
+            pairOfAtom[atomVertexIdx2] = -2;
+            pairOfAtom[atomVertexIdx1] = -2;
           }
           numEntanglementsSampled += 1;
           numLinksFoundInIteration += 1;
@@ -222,6 +225,13 @@ namespace topo {
         }
       } while (numEntanglementsSampled < minimumNrOfSliplinks &&
                numLinksFoundInIteration > 0);
+
+      // reset internal thing
+      for (size_t i = 0; i < pairOfAtom.size(); ++i) {
+        if (pairOfAtom[i] == -2) {
+          pairOfAtom[i] = -1;
+        }
+      }
 
       AtomPairEntanglements result;
       result.pairsOfAtoms = pairsOfAtoms;
