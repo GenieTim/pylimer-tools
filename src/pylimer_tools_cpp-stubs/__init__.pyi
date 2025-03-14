@@ -1703,8 +1703,8 @@ class MEHPForceBalance:
         ...
 
     @staticmethod
-    def construct_with_random_sliplinks(universe: Universe, nr_of_sliplinks_to_sample: int, upper_sampling_cutoff: float = 1.2, lower_sampling_cutoff: float = 0.0,
-                                        minimum_nr_of_sliplinks: int = 0, same_strand_cutoff: float = 3, seed: str = '', crosslinker_type: int = 2, is_2d: bool = False) -> MEHPForceBalance:
+    def construct_with_random_sliplinks(universe: Universe, nr_of_sliplinks_to_sample: int, upper_sampling_cutoff: float = 1.2, lower_sampling_cutoff: float = 0.0, minimum_nr_of_sliplinks: int = 0,
+                                        same_strand_cutoff: float = 3, seed: str = '', crosslinker_type: int = 2, is_2d: bool = False, skip_dangling_soluble_entanglements: bool = True) -> MEHPForceBalance:
         """
                   Instantiate this simulator with randomly chosen slip-links.
         """
@@ -4065,8 +4065,8 @@ def predict_gelation_point(arg0: float, arg1: int, arg2: int) -> float:
     """
 
 
-def randomly_sample_entanglements(universe: Universe, nr_of_samples: int, upper_cutoff: float, lower_cutoff: float = 0, minimum_nr_of_samples: int = 0,
-                                  same_strand_cutoff: float = 3.0, seed: str = '', crosslinker_type: int = 2, ignore_crosslinks: bool = True) -> AtomPairEntanglements:
+def randomly_sample_entanglements(universe: Universe, nr_of_samples: int, upper_cutoff: float, lower_cutoff: float = 0, minimum_nr_of_samples: int = 0, same_strand_cutoff: float = 3.0,
+                                  seed: str = '', crosslinker_type: int = 2, ignore_crosslinks: bool = True, filter_dangling_and_soluble: bool = False) -> AtomPairEntanglements:
     """
         Randomly find pairs of atoms that are close together and could be
         entanglements
@@ -4083,6 +4083,8 @@ def randomly_sample_entanglements(universe: Universe, nr_of_samples: int, upper_
         :param ignore_crosslinks: Whether to ignore crosslinks when finding entanglements.
           Careful: if you don't ignore them, the same-strand policy might not work correctly,
           since each cross-link should actually be associated with more than one strand.
+        :param filter_dangling_and_soluble: Whether to filter out dangling chains and soluble crosslinks when finding entanglements.
+          This means, entanglements involving an obviously (1st order) dangling or soluble chain are
     """
 
 
