@@ -105,7 +105,6 @@ namespace sim {
       double previousResidual = initialResidual;
       double intermediateResidual = 0.0;
       size_t iterationsDone = 0;
-      size_t nRemoved = 0;
 
       this->prepareAllOutputs();
 
@@ -202,12 +201,12 @@ namespace sim {
               innerIterationsDone += 1;
             } while (doInnerIterations && innerIterationsDone < 50);
           }
+          oneOverSpringPartitions = this->assembleOneOverSpringPartition(
+            this->initialConfig,
+            this->currentSpringPartitionsVec,
+            oneOverSpringPartitionUpperLimit);
         }
 
-        oneOverSpringPartitions = this->assembleOneOverSpringPartition(
-          this->initialConfig,
-          this->currentSpringPartitionsVec,
-          oneOverSpringPartitionUpperLimit);
         intermediateResidual =
           this->getDisplacementResidualNormFor(this->initialConfig,
                                                this->currentDisplacements,
@@ -270,12 +269,14 @@ namespace sim {
           this->breakTooLongSprings(this->initialConfig,
                                     this->currentDisplacements,
                                     this->currentSpringPartitionsVec);
+          size_t nRemoved = 0;
+          size_t nRemovedThisLoop = 0;
 
           do {
 #ifndef NDEBUG
             this->validateNetwork();
 #endif
-            nRemoved = 0;
+            nRemovedThisLoop = 0;
             if (simplificationMode ==
                   StructureSimplificationMode::INACTIVE_ONLY ||
                 simplificationMode == StructureSimplificationMode::ALL_TIM) {
@@ -283,7 +284,7 @@ namespace sim {
               std::cout << "Checking and possibly removing inactive cross-links"
                         << std::endl;
 #endif
-              nRemoved +=
+              nRemovedThisLoop +=
                 this->removeInactiveCrosslinks(this->initialConfig,
                                                this->currentDisplacements,
                                                this->currentSpringPartitionsVec,
@@ -300,7 +301,7 @@ namespace sim {
                 << "Checking and possibly removing cross-links with f = 2"
                 << std::endl;
 #endif
-              nRemoved += this->removeTwofunctionalCrosslinks(
+              nRemovedThisLoop += this->removeTwofunctionalCrosslinks(
                 this->initialConfig,
                 this->currentDisplacements,
                 this->currentSpringPartitionsVec);
@@ -315,7 +316,7 @@ namespace sim {
                            "springs, Andrei's way"
                         << std::endl;
 #endif
-              nRemoved +=
+              nRemovedThisLoop +=
                 this->doRemovalAndreisWay(this->initialConfig,
                                           this->currentDisplacements,
                                           this->currentSpringPartitionsVec,
@@ -333,12 +334,21 @@ namespace sim {
                 this->currentSpringPartitionsVec,
                 oneOverSpringPartitionUpperLimit);
             }
-          } while (nRemoved > 0);
+
+            nRemoved += nRemovedThisLoop;
+          } while (nRemovedThisLoop > 0);
           // after removal, the residual changed, might even have increased
           // beyond initial
           // -> reset previous and current to prevent change to iterative
           // displacement
-          previousResidual = initialResidual;
+          if (nRemoved > 0) {
+            previousResidual = initialResidual;
+
+            oneOverSpringPartitions = this->assembleOneOverSpringPartition(
+              this->initialConfig,
+              this->currentSpringPartitionsVec,
+              oneOverSpringPartitionUpperLimit);
+          }
         }
         this->handleOutput(iterationsDone);
 
@@ -4438,8 +4448,8 @@ namespace sim {
         loopPartialSpringEliminator;
       nSpringsPerLink(net.springPartCoordinateIndexB) +=
         loopPartialSpringEliminator;
-      nSpringsPerLink =
-        nSpringsPerLink.unaryExpr([](double v) { return v > 0. ? v : 1.0; });
+      // nSpringsPerLink =
+      //   nSpringsPerLink.unaryExpr([](double v) { return v > 0. ? v : 1.0; });
       // make sure there are no infinite back-and-forth
       // and actually displace
       Eigen::ArrayXd backForthDisplacement =
@@ -4452,9 +4462,11 @@ namespace sim {
         loopPartialSpringEliminator *
         (remainingDisplacement(net.springPartCoordinateIndexA) /
          (nSpringsPerLink(net.springPartCoordinateIndexB) * 2.));
+#ifndef NDEBUG
       RUNTIME_EXP_IFN(
         pylimer_tools::utils::all_components_finite(backForthDisplacement),
         "Some displacements are not finite");
+#endif
 
       // actually displace
       Eigen::VectorXd finalDisplacement =
