@@ -150,11 +150,12 @@ namespace topo {
           // NOTE: this skews the whole thing a bit
           std::erase_if(
             neighbours, [&](const pylimer_tools::entities::Atom& a) -> bool {
-              return ((
-                (atomToStrand.at(a.getId()) == atomToStrand.at(a1.getId())) &&
-                (std::abs(static_cast<double>(atomIdxInStrand.at(a.getId()) -
-                                              atomIdxInStrand.at(a1.getId()))) <
-                 sameStrandCutoff)));
+              return (
+                ((atomToStrand[universe.getIdxByAtomId(a.getId())] ==
+                  atomToStrand[atomVertexIdx1]) &&
+                 (std::abs(static_cast<double>(
+                    atomIdxInStrand[universe.getIdxByAtomId(a.getId())] -
+                    atomIdxInStrand[atomVertexIdx1])) < sameStrandCutoff)));
             });
           if (neighbours.size() == 0) {
             // std::cerr << "Not enough close neighbours found." << std::endl;

@@ -2957,6 +2957,7 @@ TEST_CASE("Temporary force balance test case",
     pcm::MEHPForceBalance::constructWithRandomSlipLinks(
       universe, 26832, 3.25, 0., 26000, 0, "", 2, false);
 
+  std::cout << "Sampled entanglements " << std::endl;
   forceBalancerEntanglements.configAssumeBoxLargeEnough(false);
 
   CHECK_NOTHROW(forceBalancerEntanglements.runForceRelaxation(
