@@ -2,6 +2,9 @@
 #define UTILITY_MACROS_H
 
 #include <iostream>
+#ifdef __cpp_lib_stacktrace
+#include <stacktrace>
+#endif
 
 // to string, without macro expansion
 #define STRINGINFY(s) #s
@@ -17,12 +20,22 @@
       std::string(message) + std::string("\nFailed condition: " #condition));  \
   }
 
+#ifdef __cpp_lib_stacktrace
+#define RUNTIME_EXP_IFN(condition, message)                                    \
+  if (!(condition)) {                                                          \
+    std::cerr << "Runtime error: " << message << std::endl;                    \
+    std::cerr << std::stacktrace::current() << std::endl;                      \
+    throw std::runtime_error(std::string(message) +                            \
+                             std::string("\nFailed condition: " #condition));  \
+  }
+#else
 #define RUNTIME_EXP_IFN(condition, message)                                    \
   if (!(condition)) {                                                          \
     std::cerr << "Runtime error: " << message << std::endl;                    \
     throw std::runtime_error(std::string(message) +                            \
                              std::string("\nFailed condition: " #condition));  \
   }
+#endif
 
 #define REQUIRE_IGRAPH_SUCCESS(igraph_call)                                    \
   if (igraph_call) {                                                           \

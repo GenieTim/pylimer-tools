@@ -681,7 +681,8 @@ init_pylimer_bound_sim(py::module_& m)
                 py::arg("same_strand_cutoff") = 3,
                 py::arg("seed") = "",
                 py::arg("crosslinker_type") = 2,
-                py::arg("is_2d") = false)
+                py::arg("is_2d") = false,
+                py::arg("skip_dangling_soluble_entanglements") = true)
     .def_property_readonly("network", &mehp::MEHPForceBalance::getNetwork)
     .def(
       "validate_network",
