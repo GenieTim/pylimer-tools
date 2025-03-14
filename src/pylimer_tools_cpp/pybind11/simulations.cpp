@@ -179,6 +179,9 @@ init_pylimer_bound_sim(py::module_& m)
   py::class_<mehp::ForceBalanceNetwork>(m, "SimplifiedBalanceNetwork", R"pbdoc(
      A more efficient structure of the network for use in MEHP force balance.
      Consists usually only of the cross- and slip-links.
+     
+     Assumed terminology: a spring is approximately a strand/chain,
+     whereas a partial spring is the spring between a cross-link and an entanglement-link (slip-link).
  )pbdoc")
     .def_readonly("box_lengths", &mehp::ForceBalanceNetwork::L)
     .def_readonly("volume", &mehp::ForceBalanceNetwork::vol)

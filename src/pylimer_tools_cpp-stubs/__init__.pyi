@@ -3046,6 +3046,9 @@ class SimplifiedBalanceNetwork:
          A more efficient structure of the network for use in MEHP force balance.
          Consists usually only of the cross- and slip-links.
 
+         Assumed terminology: a spring is approximately a strand/chain,
+         whereas a partial spring is the spring between a cross-link and an entanglement-link (slip-link).
+
     """
     @staticmethod
     def _pybind11_conduit_v1_(*args, **kwargs):
