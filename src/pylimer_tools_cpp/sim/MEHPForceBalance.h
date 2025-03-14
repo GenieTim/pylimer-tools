@@ -436,7 +436,8 @@ namespace sim {
                                       filterEntanglements);
 
         RUNTIME_EXP_IFN(
-          entanglements.pairsOfAtoms.size() >= minimumNrOfSliplinks || filterEntanglements,
+          entanglements.pairsOfAtoms.size() >= minimumNrOfSliplinks ||
+            filterEntanglements,
           "Minimum number of slip-links could not be sampled: got " +
             std::to_string(entanglements.pairsOfAtoms.size()) + " instead of " +
             std::to_string(minimumNrOfSliplinks) + ".");
