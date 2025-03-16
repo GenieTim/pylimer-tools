@@ -29,7 +29,6 @@ if (NOT DEFINED nlopt_LOADED)
 				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${nlopt_PREFIX_PATH}/nloptLib-install -DINSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DCMAKE_INSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DNLOPT_GUILE=OFF -DNLOPT_OCTAVE=OFF -DNLOPT_MATLAB=OFF -DNLOPT_SWIG=OFF -DNLOPT_PYTHON=OFF -DBUILD_SHARED_LIBS=OFF
 				BUILD_COMMAND ${CMAKE_COMMAND} --build ${nlopt_PREFIX_PATH}/src/nloptLib-build --config Release
 				BUILD_BYPRODUCTS ${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt${LIBRARY_SUFFIX}
-				UPDATE_DISCONNECTED ON
 		)
 		# FetchContent_MakeAvailable(nloptLib)
 		add_library(nlopt STATIC IMPORTED)

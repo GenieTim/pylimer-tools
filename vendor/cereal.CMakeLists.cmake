@@ -23,7 +23,6 @@ if (NOT DEFINED cereal_LOADED)
 		PREFIX ${cereal_PREFIX_PATH}
 		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${cereal_PREFIX_PATH}/cerealLib-install -DINSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/cereal/cerealLib-install/lib -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/cereal/cerealLib-install/lib -Dcereal_GUILE=OFF -Dcereal_OCTAVE=OFF -Dcereal_MATLAB=OFF -Dcereal_SWIG=OFF -Dcereal_PYTHON=OFF -DBUILD_SHARED_LIBS=OFF
 		INSTALL_DIR ${CMAKE_CURRENT_LIST_DIR}/cereal${vendor_suffix}/cerealLib-install
-		UPDATE_DISCONNECTED ON
 	)
 	
 	# add_library(cereal STATIC IMPORTED)
