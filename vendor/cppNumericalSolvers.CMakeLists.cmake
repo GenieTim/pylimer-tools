@@ -15,7 +15,6 @@ if (NOT DEFINED cpp_optim_LOADED)
 				cpp_optim
 				GIT_REPOSITORY https://github.com/PatWie/CppNumericalSolvers
 				GIT_TAG 9e21e01736237a1e10e57bffca1b00fe6655d9f6 # origin/v2 # 
-				UPDATE_DISCONNECTED ON
 		)
 
 		FetchContent_MakeAvailable(cpp_optim)
