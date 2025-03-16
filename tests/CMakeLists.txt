@@ -179,23 +179,24 @@ catch_discover_tests(header_tests)
 # code coverage setup in the end
 if (CODE_COVERAGE)
 	set(ENABLE_COVERAGE ON)
+	set(CODE_COVERAGE_VERBOSE ON)
 	include(CodeCoverage)
 	append_coverage_compiler_flags()
 	setup_target_for_coverage_lcov(
 		NAME pylimer_tests-gcov
 		EXECUTABLE pylimer_tests
 		DEPENDENCIES pylimer_tests
-		LCOV_ARGS --ignore-errors inconsistent,source
+		LCOV_ARGS --ignore-errors inconsistent,source,format
 		EXECUTABLE_ARGS --skip-benchmarks --durations yes "~[long]"
-		EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
+		EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/../vendor/*" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
 	)
 	setup_target_for_coverage_lcov(
 		NAME header_tests-gcov
 		EXECUTABLE header_tests
 		DEPENDENCIES header_tests
-		LCOV_ARGS --ignore-errors inconsistent,source
+		LCOV_ARGS --ignore-errors inconsistent,source,format
 		EXECUTABLE_ARGS --skip-benchmarks --durations yes "~[long]"
-		EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
+		EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/../vendor/*" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
 	)
 	# BASE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/.."
 endif()

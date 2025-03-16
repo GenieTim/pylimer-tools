@@ -18,9 +18,9 @@
 #include <unordered_set>
 #include <vector>
 
-#ifndef NDEBUG
-#define DEBUG_REMOVAL
-#endif
+// #ifndef NDEBUG
+// #define DEBUG_REMOVAL
+// #endif
 
 namespace pylimer_tools {
 namespace sim {

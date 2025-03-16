@@ -61,7 +61,7 @@ jobs:
         run: genbadge coverage -i coverage.xml -o ".github/coverage.svg"
 
       - name: Upload to CodeCov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           fail_ci_if_error: false # optional (default = false)
@@ -70,7 +70,7 @@ jobs:
 
       # Commit Coverage Badge if applicable
       - name: Verify Changed files
-        uses: tj-actions/verify-changed-files@v17
+        uses: tj-actions/verify-changed-files@v20
         id: changed_files
         with:
           files: .github/coverage.svg
