@@ -73,6 +73,10 @@ namespace topo {
       std::vector<long int> pairOfAtom =
         std::vector<long int>(universe.getNrOfAtoms(), -1);
 
+      if (nrOfSliplinksToSample == 0) {
+        return AtomPairEntanglements(pairsOfAtoms, pairOfAtom);
+      }
+
       // assemble some minor performance benefits
       std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
         universe.getChainsWithCrosslinker(crossLinkerType);
