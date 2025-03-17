@@ -187,8 +187,8 @@ namespace topo {
               ".");
           RUNTIME_EXP_IFN(
             (atomToStrand[atomVertexIdx2] != atomToStrand[atomVertexIdx1]) ||
-              ((std::abs(static_cast<double>(atomIdxInStrand[a2.getId()] -
-                                             atomIdxInStrand[a1.getId()])) >=
+              ((std::abs(static_cast<double>(atomIdxInStrand[atomVertexIdx2] -
+                                             atomIdxInStrand[atomVertexIdx1])) >=
                 sameStrandCutoff)),
             "Expected neighbours to have been deleted if too far apart.");
 
