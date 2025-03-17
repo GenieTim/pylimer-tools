@@ -420,41 +420,52 @@ namespace sim {
       const Eigen::VectorXd& springPartitions,
       const double oneOverSpringPartitionUpperLimit) const
     {
-      Eigen::VectorXd oneOverSpringPartitions =
-        this->assembleOneOverSpringPartition(
-          net, springPartitions, oneOverSpringPartitionUpperLimit);
+      Eigen::ArrayXd oneOverSpringPartitions =
+        this
+          ->assembleOneOverSpringPartition(
+            net, springPartitions, oneOverSpringPartitionUpperLimit)
+          .array();
 
-      Eigen::VectorXd forces = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
-      Eigen::VectorXd distances = this->evaluatePartialSpringVectors(
-        net, u, this->is2D, this->assumeBoxLargeEnough);
+      Eigen::ArrayXd loopPartialSpringEliminator =
+        (net.springPartCoordinateIndexA != net.springPartCoordinateIndexB)
+          .cast<double>();
+      Eigen::ArrayXd forces = Eigen::ArrayXd::Zero(3 * net.nrOfLinks);
+      Eigen::ArrayXd distances =
+        this
+          ->evaluatePartialSpringVectors(
+            net, u, this->is2D, this->assumeBoxLargeEnough)
+          .array();
       forces(net.springPartCoordinateIndexA) +=
-        (this->kappa * oneOverSpringPartitions.array() * distances.array())
-          .matrix();
+        (this->kappa * oneOverSpringPartitions * distances *
+         loopPartialSpringEliminator);
       forces(net.springPartCoordinateIndexB) -=
-        (this->kappa * oneOverSpringPartitions.array() * distances.array())
-          .matrix();
+        (this->kappa * oneOverSpringPartitions * distances *
+         loopPartialSpringEliminator);
 
 #ifndef NDEBUG
-      // Eigen::VectorXd forces2 = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
-      // Eigen::VectorXi debugNrSpringsVisited =
-      //   Eigen::VectorXi::Zero(net.nrOfPartialSprings);
-      // for (size_t i = 0; i < net.nrOfLinks; ++i) {
-      //   forces2.segment(3 * i, 3) =
-      //     this->evaluateForceOnLink(i,
-      //                               net,
-      //                               u,
-      //                               springPartitions,
-      //                               debugNrSpringsVisited,
-      //                               oneOverSpringPartitionUpperLimit);
-      // }
-      // assert((debugNrSpringsVisited.array() == 2).all());
-      // double squareN1 = forces.squaredNorm();
-      // double squareN2 = forces2.squaredNorm();
-      // assert(APPROX_EQUAL(squareN1, squareN2, 1e-9));
-      // assert(forces.isApprox(forces2));
+      Eigen::ArrayXd forces2 = Eigen::ArrayXd::Zero(3 * net.nrOfLinks);
+      Eigen::VectorXi debugNrSpringsVisited =
+        Eigen::VectorXi::Zero(net.nrOfPartialSprings);
+      for (size_t i = 0; i < net.nrOfLinks; ++i) {
+        forces2.segment(3 * i, 3) =
+          this
+            ->evaluateForceOnLink(i,
+                                  net,
+                                  u,
+                                  springPartitions,
+                                  debugNrSpringsVisited,
+                                  oneOverSpringPartitionUpperLimit)
+            .array();
+      }
+      assert((debugNrSpringsVisited.array() == 2).all());
+      double squareN1 = forces.matrix().squaredNorm();
+      double squareN2 = forces2.matrix().squaredNorm();
+      assert(APPROX_EQUAL(squareN1, squareN2, 1e-9));
+      assert(
+        pylimer_tools::utils::vector_approx_equal(forces, forces2, 1e-9, true));
 #endif
 
-      return forces.squaredNorm();
+      return forces.matrix().squaredNorm();
     }
 
     /**
