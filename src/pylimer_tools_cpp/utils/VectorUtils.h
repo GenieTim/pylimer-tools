@@ -260,11 +260,16 @@ namespace utils {
   template<typename IN>
   static inline bool vector_approx_equal(const IN& v1,
                                          const IN& v2,
-                                         const double absEps = 1e-12)
+                                         const double absEps = 1e-12,
+                                         bool echo = false)
   {
     assert(v1.size() == v2.size());
     for (size_t i = 0; i < v1.size(); ++i) {
       if (!APPROX_EQUAL(v1[i], v2[i], absEps)) {
+        if (echo) {
+          std::cout << "Detected unequality: v1[" << i << "] = " << v1[i]
+                    << ", v2[" << i << "] = " << v2[i] << std::endl;
+        }
         return false;
       }
     }
@@ -274,11 +279,16 @@ namespace utils {
   template<typename IN>
   static inline bool vector_approx_rel_equal(const IN& v1,
                                              const IN& v2,
-                                             const double eps = 1e-12)
+                                             const double eps = 1e-12,
+                                             bool echo = false)
   {
     assert(v1.size() == v2.size());
     for (size_t i = 0; i < v1.size(); ++i) {
       if (!APPROX_REL_EQUAL(v1[i], v2[i], eps)) {
+        if (echo) {
+          std::cout << "Detected unequality: v1[" << i << "] = " << v1[i]
+                    << ", v2[" << i << "] = " << v2[i] << std::endl;
+        }
         return false;
       }
     }

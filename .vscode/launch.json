@@ -25,7 +25,7 @@
       "name": "Debug C++ Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["Conversion of structure is equal for both methods"],
+      "args": ["[MEHPForceBalance]"],
       "env": {
         "MallocNanoZone": "0",
         "ASAN_OPTIONS": "detect_leaks=0",
