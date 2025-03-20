@@ -651,3 +651,47 @@ TEST_CASE(
     0.,
     Catch::Matchers::WithinAbs(forceRelaxer2.getSolubleWeightFraction(), 0.05));
 }
+
+TEST_CASE("Universe generator with randomly functionalized chains use "
+          "appropriate bond lengths",
+          "[generator][MCUniverseGenerator]")
+{
+  std::cout << "Running test \"Universe generator with randomly functionalized "
+               "chains use appropriate bond lengths\""
+            << std::endl;
+
+  pu::MCUniverseGenerator generator =
+    pu::MCUniverseGenerator(35.375493, 35.375493, 35.375493);
+  generator.setSeed(8804);
+  double meanSquaredB = 1.107008;
+  generator.setMeanSquaredBeadDistance(meanSquaredB);
+  generator.configNrOfMCSteps(0);
+
+  std::vector<int> chainLengths = pu::initializeWithValue(50, 50);
+
+  SECTION("Randomly functionalized chains")
+  {
+    generator.addRandomlyFunctionalizedStrands(
+      chainLengths.size(), chainLengths, 0.7, 8, 2, 1, true);
+    REQUIRE_NOTHROW(generator.validateInternalState());
+
+    pe::Universe universe = generator.getUniverse();
+    std::vector<double> bondLengths = universe.computeBondLengths();
+    double maxBondLength =
+      *std::max_element(bondLengths.begin(), bondLengths.end());
+    CHECK(maxBondLength < 5. * meanSquaredB);
+  }
+
+  SECTION("End-functionalized chains")
+  {
+    generator.addCrosslinkStrands(
+      chainLengths.size(), chainLengths, 8, 2, 1, true);
+    REQUIRE_NOTHROW(generator.validateInternalState());
+
+    pe::Universe universe = generator.getUniverse();
+    std::vector<double> bondLengths = universe.computeBondLengths();
+    double maxBondLength =
+      *std::max_element(bondLengths.begin(), bondLengths.end());
+    CHECK(maxBondLength < 5. * meanSquaredB);
+  }
+}

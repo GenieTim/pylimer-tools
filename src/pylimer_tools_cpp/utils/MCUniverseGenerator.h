@@ -414,7 +414,7 @@ namespace utils {
                                           int strandAtomType = 2,
                                           bool whiteNoise = true)
     {
-      INVALIDARG_EXP_IFN(nrOfStrands > 0, "");
+      INVALIDARG_EXP_IFN(nrOfStrands > 0, "Cannot add 0 or less strands");
       INVALIDARG_EXP_IFN(
         functionalizationProbability >= 0. &&
           functionalizationProbability <= 1.,
@@ -422,6 +422,8 @@ namespace utils {
       INVALIDARG_EXP_IFN(crosslinkerFunctionality >= 1,
                          "Cross-linker functionality must be at least 1. Use "
                          "normal chains instead for lower functionalities.");
+      INVALIDARG_EXP_IFN(nrOfStrands == beadsPerStrand.size(),
+                         "Inconsistent sizes");
 #ifndef NDEBUG
       this->validateInternalState();
 #endif
@@ -450,13 +452,17 @@ namespace utils {
                               lastSampledBead < 0 ? EMPTY_BACKGROUND
                                                   : UNCONNECTED);
               nEffectiveStrands += 1;
-              this->linkStrandToCrosslink(
-                currentSpringIdx, nCrosslinksBefore + nCrosslinks, true);
             }
 
+            // order matters here for the displacements afterwards
             if (lastSampledBead >= 0) {
               this->linkStrandToCrosslink(
                 currentSpringIdx, nCrosslinksBefore + nCrosslinks - 1, true);
+            }
+
+            if (i > 0) {
+              this->linkStrandToCrosslink(
+                currentSpringIdx, nCrosslinksBefore + nCrosslinks, true);
             }
 
             nCrosslinks += 1;
@@ -499,6 +505,7 @@ namespace utils {
         long int to = this->simplifiedUniverse.strandTo[newStrandIdx];
         assert(from < static_cast<long int>(nCrosslinksBefore + nCrosslinks));
         assert(to < static_cast<long int>(nCrosslinksBefore + nCrosslinks));
+        // do the linking that was omitted earlier
         if (from >= 0) {
           this->simplifiedUniverse.strandsOfXlink[from].push_back(newStrandIdx);
         }
@@ -564,43 +571,24 @@ namespace utils {
       INVALIDARG_EXP_IFN(crosslinkerFunctionality >= 2,
                          "Cross-linker functionality must be at least 2. Use "
                          "solvent chains instead for lower functionalities.");
+      INVALIDARG_EXP_IFN(nrOfCrosslinkStrands == beadsPerStrand.size(),
+                         "Inconsistent sizes");
 #ifndef NDEBUG
       this->validateInternalState();
 #endif
-
-      Eigen::VectorXd firstLinkCoordinates =
-        this->generateRandomPositions(nrOfCrosslinkStrands);
-      assert(firstLinkCoordinates.size() == 3 * nrOfCrosslinkStrands);
-      firstLinkCoordinates.conservativeResize(2 * 3 * nrOfCrosslinkStrands);
-
-      for (size_t i = 0; i < nrOfCrosslinkStrands; ++i) {
-        std::normal_distribution<double> otherEndCoordinateDist =
-          std::normal_distribution<double>(
-            0.,
-            std::sqrt(static_cast<double>(beadsPerStrand[i] + 1) *
-                      this->meanSquaredBeadDistance / 3.));
-
-        for (size_t dir = 0; dir < 3; ++dir) {
-          firstLinkCoordinates(2 * 3 * i + dir) =
-            firstLinkCoordinates(3 * i + dir) +
-            otherEndCoordinateDist(this->rng);
-        }
-      }
-
       size_t nCrosslinksBefore = this->remainingCrossLinkerFunctionality.size();
-
-      this->addXlinkAtoms(
-        2 * nrOfCrosslinkStrands, crosslinkerAtomType, firstLinkCoordinates);
-
       size_t nStrandsBefore = this->simplifiedUniverse.strandFrom.size();
 
+      // start with adding the ends
+      this->addCrosslinkers(2 * nrOfCrosslinkStrands,
+                            crosslinkerFunctionality,
+                            crosslinkerAtomType,
+                            whiteNoise);
+
+      // then, add the middle strands
       this->addStrands(nrOfCrosslinkStrands, beadsPerStrand, strandAtomType);
 
-      this->originalNrOfAvailableCrosslinkSites +=
-        crosslinkerFunctionality * nrOfCrosslinkStrands * 2;
-      this->nrOfAvailableCrosslinkSites +=
-        (crosslinkerFunctionality - 1) * nrOfCrosslinkStrands * 2;
-
+      // finally, do the linking and adjustment of the positions
       for (size_t i = 0; i < nrOfCrosslinkStrands; ++i) {
         size_t strandIdx = nStrandsBefore + i;
         size_t from = nCrosslinksBefore + i;
@@ -1252,7 +1240,8 @@ namespace utils {
       Eigen::ArrayXb activeNodes = activeComponents.second;
 
       RUNTIME_EXP_IFN(activeNodes.count() > 0,
-                      "No active nodes found during force relaxation.");
+                      "No active nodes found during force relaxation. "
+                      "Removing soluble fraction does not make sense.");
 
       // now that we know which springs and nodes are soluble,
       // we can remove them
@@ -1937,7 +1926,7 @@ namespace utils {
         "Require one end to be free to be connected to");
       if (!ignoreInexistent) {
         INVALIDARG_EXP_IFN(crosslinkIdx <
-                             this->simplifiedUniverse.strandFrom.size(),
+                             this->remainingCrossLinkerFunctionality.size(),
                            "The chosen crosslink " +
                              std::to_string(crosslinkIdx) + " does not exist.");
         INVALIDARG_EXP_IFN(
@@ -1957,6 +1946,7 @@ namespace utils {
           this->simplifiedUniverse.strandFrom[strandIdx] >= 0,
           "Strands are required to have the first end be connected first.");
         this->simplifiedUniverse.strandTo[strandIdx] = crosslinkIdx;
+        Eigen::VectorXd newCoordinates = this->getCrosslinkCoordinates();
       }
     };
 
@@ -2256,8 +2246,8 @@ namespace utils {
      */
     void updateNeighbourListCoordinates()
     {
-      Eigen::VectorXd newCoordinates = this->getCrosslinkCoordinates();
       if (this->getIdealCutoff() > 0.) {
+        Eigen::VectorXd newCoordinates = this->getCrosslinkCoordinates();
         this->xlinkNeighbourList.resetCoordinates(newCoordinates);
       }
     }
