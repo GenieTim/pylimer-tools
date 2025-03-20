@@ -1,5 +1,4 @@
-#ifndef UTILITY_MACROS_H
-#define UTILITY_MACROS_H
+#pragma once
 
 #include <iostream>
 #ifdef __cpp_lib_stacktrace
@@ -106,5 +105,3 @@
   {                                                                            \
     return static_cast<TUnder>(a) == b;                                        \
   }
-
-#endif

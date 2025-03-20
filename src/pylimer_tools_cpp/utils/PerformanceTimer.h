@@ -1,5 +1,4 @@
-#ifndef PERFORMANCE_TIMER_H
-#define PERFORMANCE_TIMER_H
+#pragma once
 
 #include "./utilityMacros.h"
 #include <array>
@@ -256,5 +255,3 @@ namespace utils {
   };
 }
 }
-
-#endif // PERFORMANCE_TIMER_H

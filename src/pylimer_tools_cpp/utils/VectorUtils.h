@@ -1,5 +1,4 @@
-#ifndef VECTOR_UTILS_H
-#define VECTOR_UTILS_H
+#pragma once
 
 #include <algorithm>
 // #include <iostream>
@@ -380,5 +379,3 @@ namespace utils {
   }
 } // namespace utils
 } // namespace pylimer_tools
-
-#endif

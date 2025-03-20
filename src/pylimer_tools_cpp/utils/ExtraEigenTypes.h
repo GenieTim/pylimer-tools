@@ -1,5 +1,4 @@
-#ifndef EXTRA_EIGEN_TYPES_H
-#define EXTRA_EIGEN_TYPES_H
+#pragma once
 
 #include <Eigen/Dense>
 
@@ -36,6 +35,4 @@ median(const Eigen::DenseBase<Derived>& d)
 #pragma omp declare reduction(+ : Eigen::Matrix3d : omp_out =                  \
                                 omp_out + omp_in)                              \
   initializer(omp_priv = Eigen::Matrix3d::Zero())
-#endif
-
 #endif

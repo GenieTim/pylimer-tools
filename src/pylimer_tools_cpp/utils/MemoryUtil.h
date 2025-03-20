@@ -1,5 +1,4 @@
-#ifndef MEMORY_UTIL_H
-#define MEMORY_UTIL_H
+#pragma once
 
 /*
  * Author:  David Robert Nadeau
@@ -128,5 +127,3 @@ getCurrentRSS()
   return (size_t)0L; /* Unsupported. */
 #endif
 }
-
-#endif

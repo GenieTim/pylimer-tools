@@ -1,5 +1,4 @@
-#ifndef BOX_H
-#define BOX_H
+#pragma once
 
 #include "../utils/utilityMacros.h"
 #include <Eigen/Dense>
@@ -438,5 +437,3 @@ namespace entities {
   };
 } // namespace entities
 } // namespace pylimer_tools
-
-#endif

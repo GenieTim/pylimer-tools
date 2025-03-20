@@ -1,5 +1,4 @@
-#ifndef STRING_UTIL_H
-#define STRING_UTIL_H
+#pragma once
 
 #include <Eigen/Dense>
 #include <algorithm>
@@ -304,5 +303,3 @@ namespace utils {
 } // namespace utils
 
 } // namespace pylimer_tools
-
-#endif

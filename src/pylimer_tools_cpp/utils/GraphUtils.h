@@ -1,5 +1,4 @@
-#ifndef GRAPH_UTILS_H
-#define GRAPH_UTILS_H
+#pragma once
 
 #include <algorithm>
 // #include <iostream>
@@ -88,5 +87,3 @@ namespace utils {
   }
 } // namespace utils
 } // namespace pylimer_tools
-
-#endif

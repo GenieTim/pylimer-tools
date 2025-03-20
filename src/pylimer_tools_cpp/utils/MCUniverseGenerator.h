@@ -1,5 +1,4 @@
-#ifndef MC_UNIVERSE_GENERATOR_H
-#define MC_UNIVERSE_GENERATOR_H
+#pragma once
 
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
@@ -2328,5 +2327,3 @@ namespace utils {
   };
 } // namespace utils
 } // namespace pylimer_tools
-
-#endif

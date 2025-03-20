@@ -1,6 +1,4 @@
-#ifndef BOOL_UTILS_H
-#define BOOL_UTILS_H
-
+#pragma once
 #include <cstdarg>
 #include <iostream>
 
@@ -27,5 +25,3 @@ all_equal(int count, ...)
 
   return result;
 }
-
-#endif
