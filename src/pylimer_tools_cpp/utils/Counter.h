@@ -1,5 +1,4 @@
-#ifndef COUNTER_H
-#define COUNTER_H
+#pragma once
 
 #include <unordered_map>
 #include <vector>
@@ -67,5 +66,3 @@ namespace utils {
   };
 }
 }
-
-#endif

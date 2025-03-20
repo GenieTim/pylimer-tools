@@ -1,5 +1,4 @@
-#ifndef ATOM_H
-#define ATOM_H
+#pragma once
 
 #include "Box.h"
 #include <Eigen/Dense>
@@ -166,4 +165,3 @@ namespace entities {
   };
 } // namespace entities
 } // namespace pylimer_tools
-#endif

@@ -1,5 +1,4 @@
-#ifndef NEIGHBOURLIST_H
-#define NEIGHBOURLIST_H
+#pragma once
 
 extern "C"
 {
@@ -76,5 +75,3 @@ namespace entities {
   };
 };
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef RANDOM_WALKER_H
-#define RANDOM_WALKER_H
+#pragma once
 
 #include "../entities/Box.h"
 #include "../sim/MCSimulator.h"
@@ -260,5 +259,3 @@ namespace utils {
   }
 }
 }
-
-#endif

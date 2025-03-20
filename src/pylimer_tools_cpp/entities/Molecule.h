@@ -1,5 +1,4 @@
-#ifndef MOLECULE_H
-#define MOLECULE_H
+#pragma once
 
 extern "C"
 {
@@ -138,5 +137,3 @@ namespace entities {
   };
 } // namespace entities
 } // namespace pylimer_tools
-
-#endif

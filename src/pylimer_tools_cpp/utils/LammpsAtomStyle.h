@@ -1,5 +1,4 @@
-#ifndef LAMMPS_ATOM_STYLE_H
-#define LAMMPS_ATOM_STYLE_H
+#pragma once
 
 #include <algorithm>
 #include <string>
@@ -64,5 +63,3 @@ namespace utils {
   }
 }
 }
-
-#endif

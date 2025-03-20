@@ -1,6 +1,5 @@
+#pragma once
 #ifdef CEREALIZABLE
-#ifndef CEREAL_UTILS_H
-#define CEREAL_UTILS_H
 
 #include <fstream>
 #include <iomanip>
@@ -514,5 +513,4 @@ namespace utils {
 }
 }
 
-#endif
 #endif

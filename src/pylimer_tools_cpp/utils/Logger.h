@@ -1,6 +1,4 @@
-#ifndef LOGGER_H
-#define LOGGER_H
-
+#pragma once
 #include <iostream>
 #include <string>
 #include <vector>
@@ -24,4 +22,3 @@ namespace utils {
   };
 } // namespace utils
 } // namespace pylimer_tools
-#endif
