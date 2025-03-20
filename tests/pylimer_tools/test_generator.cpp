@@ -695,3 +695,42 @@ TEST_CASE("Universe generator with randomly functionalized chains use "
     CHECK(maxBondLength < 5. * meanSquaredB);
   }
 }
+
+TEST_CASE("Universe generator uses correct w_sol even for strange structures",
+          "[generator][MCUniverseGenerator][long]")
+{
+  std::cout
+    << "Running test \"Universe generator uses correct w_sol even for strange "
+       "structures\""
+    << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(
+    76.21419834207877, 76.21419834207877, 76.21419834207877);
+  generator.setSeed(8804);
+  generator.setMeanSquaredBeadDistance(1.107008);
+  generator.configNrOfMCSteps(0);
+
+  std::vector<int> randomFchainLengths = pu::initializeWithValue(2020, 210);
+  generator.addRandomlyFunctionalizedStrands(randomFchainLengths.size(),
+                                             randomFchainLengths,
+                                             0.024285714285714285,
+                                             1,
+                                             2,
+                                             1,
+                                             true);
+
+  std::vector<int> chainLengths = pu::initializeWithValue(2121, 107);
+  generator.addStrands(chainLengths.size(), chainLengths, 1);
+
+  generator.useZScoreMaxDistance(3., 1.107008);
+  generator.linkStrandsToSolubleFraction(0.31);
+
+  pe::Universe universe = generator.getUniverse();
+  pylimer_tools::sim::mehp::MEHPForceBalance forceBalance =
+    pylimer_tools::sim::mehp::MEHPForceBalance(universe);
+
+  forceBalance.runForceRelaxation();
+
+  CHECK_THAT(forceBalance.getSolubleWeightFraction(),
+             Catch::Matchers::WithinAbs(0.31, 0.05));
+}
