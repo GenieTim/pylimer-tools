@@ -39,7 +39,8 @@
                 "/usr/local/var/vcpkg/installed/x64-osx/include/python3.9/",
                 "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/tests/build/_deps/catch2-build/generated-includes",
                 "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/tests/build/_deps/spectra-src/include",
-                "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/vendor/pybind11/include"
+                "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/vendor/pybind11/include",
+                "/usr/local/Cellar/eigen/3.4.0_1/include/eigen3"
             ],
             "compilerPathInCppPropertiesJson": "/usr/local/opt/llvm/bin/clang-19",
             "configurationProviderInCppPropertiesJson": "ms-vscode.cmake-tools",

@@ -441,10 +441,10 @@ namespace utils {
           if (randomDist(this->rng) < functionalizationProbability) {
             // yes, we want to replace this bead `i` with a cross-link
             size_t currentSpringIdx = nStrandsBefore + nEffectiveStrands;
-            long int remainingLength =
+            long int lengthToPrevious =
               i - (lastSampledBead >= 0 ? (lastSampledBead + 1) : 0);
             if (i > 0) {
-              this->addStrand(remainingLength,
+              this->addStrand(lengthToPrevious,
                               strandAtomType,
                               UNCONNECTED,
                               lastSampledBead < 0 ? EMPTY_BACKGROUND
@@ -487,9 +487,11 @@ namespace utils {
       }
 
       // then, add the cross-link atoms
+      // distances need to be taken into account, are handled later
       this->addCrosslinkers(
         nCrosslinks, crosslinkerFunctionality, crosslinkerAtomType, whiteNoise);
 
+      // actually link the cross-links to the cross-link strand
       for (size_t newStrandIdx = nStrandsBefore;
            newStrandIdx < nStrandsBefore + nEffectiveStrands;
            ++newStrandIdx) {
@@ -507,22 +509,15 @@ namespace utils {
         if (from >= 0 && to >= 0) {
           // finally, make sure that the coordinates of two subsequent
           // cross-links match the required length of the respective strand
-          double stddev = std::sqrt(
-            static_cast<double>(
-              this->simplifiedUniverse.beadsInStrand[newStrandIdx] + 1) *
-            this->meanSquaredBeadDistance / 3.);
-          std::normal_distribution<double> otherEndCoordinateDist =
-            std::normal_distribution<double>(0., stddev);
+          Eigen::VectorXd delta = this->sampleCoordinatesWithinNBeadDistance(
+            this->simplifiedUniverse.beadsInStrand[newStrandIdx]);
 
-          const double deltaX = otherEndCoordinateDist(this->rng);
           this->simplifiedUniverse.xlinkX[to] =
-            this->simplifiedUniverse.xlinkX[from] + deltaX;
-          const double deltaY = otherEndCoordinateDist(this->rng);
+            this->simplifiedUniverse.xlinkX[from] + delta[0];
           this->simplifiedUniverse.xlinkY[to] =
-            this->simplifiedUniverse.xlinkY[from] + deltaY;
-          const double deltaZ = otherEndCoordinateDist(this->rng);
+            this->simplifiedUniverse.xlinkY[from] + delta[1];
           this->simplifiedUniverse.xlinkZ[to] =
-            this->simplifiedUniverse.xlinkZ[from] + deltaZ;
+            this->simplifiedUniverse.xlinkZ[from] + delta[2];
 
 // validate the distances
 #ifndef NDEBUG
@@ -607,16 +602,22 @@ namespace utils {
         (crosslinkerFunctionality - 1) * nrOfCrosslinkStrands * 2;
 
       for (size_t i = 0; i < nrOfCrosslinkStrands; ++i) {
+        size_t strandIdx = nStrandsBefore + i;
+        size_t from = nCrosslinksBefore + i;
+        size_t to = nCrosslinksBefore + i + nrOfCrosslinkStrands;
         // actually link these strands
-        this->simplifiedUniverse.strandFrom[nStrandsBefore + i] =
-          nCrosslinksBefore + i;
-        this->simplifiedUniverse.strandTo[nStrandsBefore + i] =
-          nCrosslinksBefore + i + nrOfCrosslinkStrands;
-        // remember remaining cross-link functionality
-        this->remainingCrossLinkerFunctionality.push_back(
-          crosslinkerFunctionality - 1);
-        this->remainingCrossLinkerFunctionality.push_back(
-          crosslinkerFunctionality - 1);
+        this->linkStrandToCrosslink(strandIdx, from, false);
+        this->linkStrandToCrosslink(strandIdx, to, false);
+        // make sure the positions make sense
+        Eigen::VectorXd delta =
+          this->sampleCoordinatesWithinNBeadDistance(beadsPerStrand[i]);
+
+        this->simplifiedUniverse.xlinkX[to] =
+          this->simplifiedUniverse.xlinkX[from] + delta[0];
+        this->simplifiedUniverse.xlinkY[to] =
+          this->simplifiedUniverse.xlinkY[from] + delta[1];
+        this->simplifiedUniverse.xlinkZ[to] =
+          this->simplifiedUniverse.xlinkZ[from] + delta[2];
       }
 
       this->updateNeighbourListCoordinates();
@@ -2113,8 +2114,6 @@ namespace utils {
     /**
      * @brief find an Atom in a collection with an objective distance
      *
-     * TODO: check probabilities to not only select the very best.
-     *
      * @param from the Atom to start the distance from
      * @param desiredR02 the distance to target if possible
      * @param maxDistance the maximum distance to accept random matches from
@@ -2306,6 +2305,19 @@ namespace utils {
       diff << x2 - x1, y2 - y1, z2 - z1;
       this->box.handlePBC(diff);
       return diff.norm();
+    }
+
+    Eigen::Vector3d sampleCoordinatesWithinNBeadDistance(int nBeads)
+    {
+      double stddev = std::sqrt(static_cast<double>(nBeads + 1) *
+                                this->meanSquaredBeadDistance / 3.);
+      std::normal_distribution<double> otherEndCoordinateDist =
+        std::normal_distribution<double>(0., stddev);
+      // sample the coordinates delta, return
+      Eigen::Vector3d otherEndCoordinates;
+      otherEndCoordinates << otherEndCoordinateDist(this->rng),
+        otherEndCoordinateDist(this->rng), otherEndCoordinateDist(this->rng);
+      return otherEndCoordinates;
     }
 
     /**
