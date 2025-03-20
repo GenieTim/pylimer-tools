@@ -25,7 +25,7 @@
       "name": "Debug C++ Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["Universe generator with randomly functionalized chains use appropriate bond lengths"],
+      "args": ["Universe generator uses correct w_sol even for strange structures"],
       "env": {
         "MallocNanoZone": "0",
         "ASAN_OPTIONS": "detect_leaks=0",

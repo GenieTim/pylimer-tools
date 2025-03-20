@@ -648,10 +648,14 @@ namespace sim {
         // convert springs
         size_t spring_idx = 0;
         for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
+          if (crossLinkerChains[i].getNrOfBonds() == 0) {
+            continue;
+          }
           std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
             crossLinkerChains[i].getAtomsOfType(crossLinkerType);
           std::vector<pylimer_tools::entities::Atom> endsOfChain =
             crossLinkerChains[i].getChainEnds(crossLinkerType, true);
+          assert(endsOfChain.size() == 2);
           long int nodeIdxFrom = atomIdToNode.at(endsOfChain[0].getId());
           long int nodeIdxTo = atomIdToNode.at(endsOfChain[1].getId());
           bool addChain = false;
