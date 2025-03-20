@@ -34,7 +34,7 @@ namespace entities {
       , ny(nyNow)
       , nz(nzNow) {};
 
-    Atom(std::unordered_map<std::string, double>& properties)
+    explicit Atom(std::unordered_map<std::string, double>& properties)
       : Atom(static_cast<long int>(std::lround(properties["id"])),
              static_cast<int>(std::rint(properties["type"])),
              properties["x"],

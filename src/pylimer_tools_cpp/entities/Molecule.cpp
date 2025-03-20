@@ -507,15 +507,20 @@ namespace entities {
                                                     const int crossLinkerType,
                                                     bool requireOrder) const
   {
+    size_t vertexIdFrom = this->atomIdToVertexIdx.at(atomIdFrom);
+    size_t vertexIdTo = this->atomIdToVertexIdx.at(atomIdTo);
     std::vector<long int> alignedVertices =
       this->getVerticesLinedUp(crossLinkerType, true);
+
+    if (vertexIdFrom == vertexIdTo && alignedVertices.size() == 1) {
+      return Eigen::Vector3d::Zero();
+    }
+
     Eigen::VectorXd alignedCoordinates =
       Eigen::VectorXd::Zero(3 * alignedVertices.size());
     this->getAssumedVertexCoordinates(
       alignedCoordinates, this->parent, alignedVertices);
     Eigen::Vector3d result = Eigen::Vector3d::Zero();
-    size_t vertexIdFrom = this->atomIdToVertexIdx.at(atomIdFrom);
-    size_t vertexIdTo = this->atomIdToVertexIdx.at(atomIdTo);
     bool recording = false;
     for (size_t i = 0; i < alignedVertices.size(); ++i) {
       if (recording) {
@@ -535,8 +540,13 @@ namespace entities {
         recording = true;
       }
     }
-    throw std::runtime_error(
-      "Did not find both vertices to compute overall bond sum for");
+    SHOULD_NOT_REACH_HERE(
+      "Did not find both vertices (" + std::to_string(vertexIdFrom) + " and " +
+      std::to_string(vertexIdTo) +
+      ") to compute overall bond sum for in molecule " +
+      pylimer_tools::utils::join(
+        alignedVertices.begin(), alignedVertices.end(), std::string(", ")) +
+      "." + (requireOrder ? " Order of atoms is required." : ""));
   };
 
   size_t Molecule::getNrOfBondsFromTo(size_t atomIdFrom,
@@ -565,9 +575,12 @@ namespace entities {
         recording = true;
       }
     }
-    throw std::runtime_error(
-      "Did not find both vertices (" + std::to_string(atomIdTo) + " & " +
-      std::to_string(atomIdFrom) + ") to count atoms between");
+    SHOULD_NOT_REACH_HERE(
+      "Did not find both vertices (" + std::to_string(vertexIdFrom) + " and " +
+      std::to_string(vertexIdTo) + ") to count bonds between in molecule " +
+      pylimer_tools::utils::join(
+        alignedVertices.begin(), alignedVertices.end(), std::string(", ")) +
+      "." + (requireOrder ? " Order of atoms is required." : ""));
   }
 
   /**
@@ -614,12 +627,12 @@ namespace entities {
           break;
         }
         // we assume a functionality of 2 for ordinary strands
-        if (subConnections.size() != 2) {
-          throw std::runtime_error(
-            "Failed to align all atoms on one strand, as a functionality of " +
+        RUNTIME_EXP_IFN(
+          subConnections.size() == 2,
+          "Failed to align all atoms on one strand, as a functionality of " +
             std::to_string(subConnections.size()) +
             " was found and 1 or 2 expected.");
-        }
+
         int subConnectionDirection = (subConnections[0] == lastCenter) ? 1 : 0;
         if (subConnections[subConnectionDirection] == vertexIdToStartWith) {
           loopFound = true;
@@ -637,12 +650,10 @@ namespace entities {
       }
     }
 
-    if (results.size() != this->getNrOfAtoms()) {
-      throw std::runtime_error(
-        "Failed to align all atoms on one strand: Lined up " +
-        std::to_string(results.size()) + " instead of " +
-        std::to_string(this->getNrOfAtoms()) + " atoms.");
-    }
+    RUNTIME_EXP_IFN(results.size() == this->getNrOfAtoms(),
+                    "Failed to align all atoms on one strand: Lined up " +
+                      std::to_string(results.size()) + " instead of " +
+                      std::to_string(this->getNrOfAtoms()) + " atoms.");
 
     if (closeLoop && loopFound) {
       results.push_back(results[0]);

@@ -35,10 +35,15 @@
                              std::string("\nFailed condition: " #condition));  \
   }
 #endif
+#define RUNTIME_EXP(message)                                                   \
+  std::cerr << "Runtime error: " << message << std::endl;                      \
+  throw std::runtime_error(std::string(message));
+
+#define SHOULD_NOT_REACH_HERE(message) RUNTIME_EXP(message)
 
 #define REQUIRE_IGRAPH_SUCCESS(igraph_call)                                    \
   if (igraph_call) {                                                           \
-    throw std::runtime_error("Failure when calling igraph: " #igraph_call);    \
+    RUNTIME_EXP("Failure when calling igraph: " #igraph_call);                 \
   }
 
 // mathematical closeness
