@@ -999,7 +999,10 @@ namespace utils {
         throw std::invalid_argument(
           "A cross-linker conversion of " +
           std::to_string(targetCrossLinkerConversion) +
-          " is not reachable with this nr of strands.");
+          " is not reachable with this nr of strands. Maximum possible p is " +
+          std::to_string(currentCrosslinkerConversion +
+                         potentialNewBonds * conversionPerBond) +
+          ".");
       }
 
       const long int targetNrOfAvailableCrosslinkSites = std::round(
