@@ -645,6 +645,8 @@ Optional, can be passed to improve performance</p></li>
 <li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.
 Optional, can be passed to improve performance</p></li>
 <li><p><strong>g_e_1</strong> (<em>-</em>) – the melt entanglement modulus</p></li>
+<li><p><strong>b2</strong> (<em>-</em>) – the mole fraction of reactive sites in B2 among all reactive sites
+in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -792,6 +794,8 @@ This function computes the probability that a random A_f unit will have i pendan
 <li><p><strong>weight_fractions</strong> (<em>-</em>) – a dictionary with the weight fraction of each type of atom</p></li>
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
 <li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the crosslinkers</p></li>
+<li><p><strong>b2</strong> (<em>-</em>) – the mole fraction of reactive sites in B2 among all reactive sites
+in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -825,6 +829,8 @@ This function computes the probability that a random A_f unit will have i pendan
 <li><p><strong>weight_fractions</strong> (<em>-</em>) – a dictionary with the weight fraction of each type of atom</p></li>
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
 <li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the crosslinkers</p></li>
+<li><p><strong>b2</strong> (<em>-</em>) – the mole fraction of reactive sites in B2 among all reactive sites
+in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -859,6 +865,10 @@ This function computes the probability that a random A_f unit will have i pendan
 Pass if you want to omit the network.</p></li>
 <li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.
 See: <a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.determine_functionality_per_type" title="pylimer_tools_cpp.Universe.determine_functionality_per_type"><code class="xref py py-func docutils literal notranslate"><span class="pre">determine_functionality_per_type()</span></code></a>.</p></li>
+<li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the crosslinkers</p></li>
+<li><p><strong>b2</strong> (<em>-</em>) – the mole fraction of reactive sites in B2 among all reactive sites
+in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1016,7 +1026,7 @@ in a mixture of B1 and B2</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">predict_p_from_w_sol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w_sol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">predict_p_from_w_sol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w_sol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionality_per_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the extent of reaction based on the weight fraction of soluble material.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
