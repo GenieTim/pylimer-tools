@@ -20,13 +20,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with: 
+        with:
           submodules: "recursive"
 
       - name: Set up Python
-        uses:  actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          cache: 'pip'
+          cache: "pip"
           python-version: ${{ matrix.python-version }}
 
       - uses: actions/cache@v3
@@ -56,7 +56,7 @@ jobs:
         run: python -m build --wheel
 
       - name: Store the build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
           path: dist
@@ -75,13 +75,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with: 
+        with:
           submodules: "recursive"
 
       - name: Set up Python
-        uses:  actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          cache: 'pip'
+          cache: "pip"
           python-version: ${{ matrix.python-version }}
 
       - uses: actions/cache@v3
@@ -109,11 +109,57 @@ jobs:
         run: ./bin/build-wheel.sh
 
       - name: Store the build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
           path: dist
           retention-days: 3
+
+  # inspired by https://github.com/igraph/python-igraph/blob/a039f5d6e5fc705458ffa966e3ec5fcbb4985f03/.github/workflows/build.yml
+  build_wheel_wasm:
+    name: Build wheels for WebAssembly
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          cache: "pip"
+          python-version: "3.12"
+
+      - name: Install OS dependencies
+        run: sudo apt install ninja-build cmake flex bison
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: "3.1.58"
+          actions-cache-folder: "emsdk-cache"
+
+      - name: Build wheel
+        run: |
+          pip install pyodide-build==0.26.2
+          python3 bin/fix_pyodide_build.py
+          pyodide build
+
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+        if: ${{ failure() }}
+        with:
+          limit-access-to-actor: true
+          wait-timeout-minutes: 5
+
+      - name: Store the build
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-wasm
+          path: ./dist/*.whl
 
   build-linux:
     runs-on: ubuntu-latest
@@ -121,13 +167,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with: 
+        with:
           submodules: "recursive"
 
       - name: Set up Python
-        uses:  actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          cache: 'pip'
+          cache: "pip"
           python-version: "3.10"
 
       - uses: actions/cache@v3
@@ -151,12 +197,12 @@ jobs:
       - name: Build manylinux Python wheels
         uses: RalfG/python-wheels-manylinux-build@v0.5.0
         with:
-          python-versions: "cp38-cp38 cp39-cp39 cp310-cp310"
+          python-versions: "cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311 cp312-cp312"
           build-requirements: "cython numpy scikit-build pybind11 cmake ninja wheel"
-          system-packages: "bison flex libomp libopenblas-dev"
+          system-packages: "cmake bison flex libomp libopenblas-dev"
 
       - name: Store the build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
           path: dist
@@ -168,13 +214,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with: 
+        with:
           submodules: "recursive"
 
       - name: Set up Python
-        uses:  actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          cache: 'pip'
+          cache: "pip"
           python-version: "3.10"
 
       - name: Install Dependencies
@@ -184,7 +230,7 @@ jobs:
         run: ./bin/build-sdist.sh
 
       - name: Store the build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
           path: dist
