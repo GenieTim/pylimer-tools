@@ -24,7 +24,7 @@ def compute_stoichiometric_imbalance(
 ) -> float:
     """
     Compute the stoichiometric imbalance
-    ( nr. of bonds formable of cross-linker / (nr. of precursor chains * 2) )
+    ( nr. of bonds formable of cross-linker / (nr. of bonds formable of precursor chains) )
 
     r > 1 means an excess of crosslinkers, whereas r = 0 implies that there are not crosslinkers in the network.
 

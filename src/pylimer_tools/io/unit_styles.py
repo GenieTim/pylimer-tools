@@ -102,7 +102,8 @@ class UnitStyleFactory(object):
         """
         return list(self.get_everares_et_al_data()["name"].unique())
 
-    def get_unit_style(self, unit_type: str, dimension: int = 3, **kwargs) -> UnitStyle:
+    def get_unit_style(self, unit_type: str,
+                       dimension: int = 3, **kwargs) -> UnitStyle:
         """
         Get a UnitStyle instance corresponding to the unit system requested.
 
@@ -153,7 +154,8 @@ class UnitStyleFactory(object):
                 )
             # follow derivation for more accurate results
             # sigma_conversion = polymer_data.sigma
-            sigma_conversion = 0.1 * polymer_data.l_K / (0.965 * polymer_data.Cb)
+            sigma_conversion = 0.1 * polymer_data.l_K / \
+                (0.965 * polymer_data.Cb)
             ureg.define("sigma = {} * nanometer".format(sigma_conversion))
             ureg.define("eps = {}e-21 joule".format(polymer_data.kB_Tref))
             # time is most difficult in lj — let's keep tau
@@ -202,7 +204,8 @@ class UnitStyleFactory(object):
             return UnitStyle(
                 {
                     "mass": (
-                        ureg("g/mol") if accept_mol else ureg("g") / avogadro_constant
+                        ureg("g/mol") if accept_mol else ureg("g") /
+                        avogadro_constant
                     ),
                     "distance": ureg.angstrom,
                     "time": ureg.femtosecond,
@@ -238,7 +241,8 @@ class UnitStyleFactory(object):
             return UnitStyle(
                 {
                     "mass": (
-                        ureg("g/mol") if accept_mol else ureg("g") / avogadro_constant
+                        ureg("g/mol") if accept_mol else ureg("g") /
+                        avogadro_constant
                     ),
                     "distance": ureg.angstrom,
                     "time": ureg.picosecond,
