@@ -842,18 +842,16 @@ def predict_maximum_p(r: float, f: int, b2: float = 1) -> float:
       - r (double): the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
       - f (int): functionality of the crosslinkers
       - b2 (double, optional): the mole fraction of reactive sites in B2 among all reactive sites
-        in a mixture of B1 and B2
+        in a mixture of B1 and B2. Since `r` already includes the number of active sites, this argument
+        is not necessary.
 
     Returns:
       - p_max: the maximum cross-linker conversion possible
     """
-    # assume:
-    n_chains = 1000
-    # -> compute:
-    n_xlinks = r * 2 * b2 * n_chains / f
+    n_xlinks = r * 2 / f
     if n_xlinks == 0:
         return None
-    max_possible_bonds = min(2 * n_chains, f * n_xlinks)
+    max_possible_bonds = min(2, f * n_xlinks)
     p_max = max_possible_bonds / (n_xlinks * f)
     return p_max
 
@@ -878,6 +876,7 @@ def predict_p_from_w_sol(
       - f: the functionality of the crosslinkers
       - g: the functionality of the precursor chains
     """
+
     def compute_wsol(p):
         return compute_weight_fraction_of_soluble_material(
             network=network,
