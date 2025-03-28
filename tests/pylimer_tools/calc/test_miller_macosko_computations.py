@@ -245,7 +245,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         for r in np.linspace(0.5, 1.0, 10):
             for f in range(3, 12):
                 self.assertAlmostEqual(predict_maximum_p(r=r, f=f, b2=1), 1.0)
-        for r in np.linspace(1, 1.5, 10):
+        for r in np.linspace(1.01, 1.5, 10):
             for f in range(3, 12):
                 self.assertLess(predict_maximum_p(r=r, f=f, b2=1), 1.0)
 
