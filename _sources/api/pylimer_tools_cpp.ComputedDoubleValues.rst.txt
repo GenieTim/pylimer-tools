@@ -15,6 +15,7 @@ ComputedDoubleValues
       ~ComputedDoubleValues.MEAN_B
       ~ComputedDoubleValues.MSD
       ~ComputedDoubleValues.PRESSURE
+      ~ComputedDoubleValues.RESIDUAL
       ~ComputedDoubleValues.STRESS_NXY
       ~ComputedDoubleValues.STRESS_NXZ
       ~ComputedDoubleValues.STRESS_NYZ
@@ -38,6 +39,7 @@ ComputedDoubleValues
    .. autoattribute:: MEAN_B
    .. autoattribute:: MSD
    .. autoattribute:: PRESSURE
+   .. autoattribute:: RESIDUAL
    .. autoattribute:: STRESS_NXY
    .. autoattribute:: STRESS_NXZ
    .. autoattribute:: STRESS_NYZ
