@@ -25,7 +25,7 @@
       "name": "Debug C++ Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["Universe generator uses correct w_sol even for strange structures"],
+      "args": ["MCUniverseGenerator can remove w_sol"],
       "env": {
         "MallocNanoZone": "0",
         "ASAN_OPTIONS": "detect_leaks=0",
