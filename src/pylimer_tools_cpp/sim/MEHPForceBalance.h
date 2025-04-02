@@ -2179,6 +2179,12 @@ namespace sim {
       double getDisplacementResidualNorm(
         const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
+      double getResidual() override
+      {
+        // this is for the output
+        return this->getDisplacementResidualNorm();
+      }
+
       double getDisplacementResidualNormFor(
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,

@@ -524,7 +524,7 @@ TEST_CASE("MUniverseGenerator can generate with cross-link chains",
 
   std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
   CHECK(chains.size() == 10);
-  for (auto chain : chains) {
+  for (pe::Molecule& chain : chains) {
     CHECK(chain.getNrOfAtoms() == 12);
   }
 }
@@ -553,7 +553,7 @@ TEST_CASE(
 
     std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
     CHECK(chains.size() == 10);
-    for (auto chain : chains) {
+    for (pe::Molecule& chain : chains) {
       CHECK(chain.getNrOfAtoms() == 10);
     }
   }
@@ -577,11 +577,12 @@ TEST_CASE(
     std::vector<int> chainLengths = pu::initializeWithValue(1000, 100);
     generator.addRandomlyFunctionalizedStrands(
       1000, chainLengths, 3.2, 1, 2, 1, true);
+    CHECK_THAT(generator.getCurrentNrOfAvailableCrosslinkSites(),
+               Catch::Matchers::WithinRel(1000 * 100 * 3.2, 0.01));
 
     pe::Universe universe = generator.getUniverse();
     double nCrosslinks = static_cast<double>(universe.getAtomsOfType(2).size());
-    CHECK_THAT(nCrosslinks,
-               Catch::Matchers::WithinRel(1000 * 100, 0.001));
+    CHECK_THAT(nCrosslinks, Catch::Matchers::WithinRel(1000 * 100, 0.001));
     CHECK(universe.getNrOfAtoms() == 1000 * 100);
     std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
     CHECK(chains.size() > 5000);
@@ -597,37 +598,191 @@ TEST_CASE("Randomly functionalized chains collapse",
             << std::endl;
 
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
+  generator.setSeed(457564875e2);
+  generator.setBeadDistance(0.75);
+  generator.configNrOfMCSteps(0);
+
+  std::vector<int> chainLengths = pu::initializeWithValue(20, 100);
+  generator.addRandomlyFunctionalizedStrands(
+    20, chainLengths, 7.2, 1, 2, 1, true);
+
+  CHECK_THAT(generator.getCurrentNrOfAvailableCrosslinkSites(),
+             Catch::Matchers::WithinRel(20 * 100 * 7.2, 0.01));
+  CHECK_THAT(generator.getCurrentCrosslinkerConversion(),
+             Catch::Matchers::WithinAbs(0.0, 1e-10));
+
+  pe::Universe universe = generator.getUniverse();
+  double nCrosslinks = static_cast<double>(universe.getAtomsOfType(2).size());
+  CHECK_THAT(nCrosslinks, Catch::Matchers::WithinRel(20 * 100, 0.01));
+  CHECK(universe.getNrOfAtoms() == 20 * 100);
+
+  std::vector<pe::Molecule> chains = universe.getMolecules(6);
+  CHECK(chains.size() == 20);
+  for (pe::Molecule& chain : chains) {
+    CHECK(chain.getNrOfAtoms() == 100);
+    CHECK_THAT(chain.getAtomsOfType(2).size(),
+               Catch::Matchers::WithinAbs(100., 2));
+  }
+
+  // first with "incorrect" spring type
+  pylimer_tools::sim::mehp::MEHPForceBalance forceBalanceEasy =
+    pylimer_tools::sim::mehp::MEHPForceBalance(universe, 6);
+  CHECK(forceBalanceEasy.getNrOfSprings() == 0);
+
+  forceBalanceEasy.runForceRelaxation();
+
+  CHECK_THAT(forceBalanceEasy.getSolubleWeightFraction(),
+             Catch::Matchers::WithinAbs(1.0, 0.001));
+
+  // then, with many short springs
+  pylimer_tools::sim::mehp::MEHPForceBalance forceBalance =
+    pylimer_tools::sim::mehp::MEHPForceBalance(universe);
+
+  pylimer_tools::sim::OutputConfiguration outputConfig;
+  outputConfig.intValues = { pylimer_tools::sim::ComputedIntValues::STEP };
+  outputConfig.doubleValues = {
+    pylimer_tools::sim::ComputedDoubleValues::RESIDUAL,
+    pylimer_tools::sim::ComputedDoubleValues::GAMMA
+  };
+  std::vector<pylimer_tools::sim::OutputConfiguration> outputConfigs = { outputConfig };
+  forceBalance.configStepOutput(outputConfigs);
+
+  SECTION("With big box")
+  {
+    forceBalance.configAssumeBoxLargeEnough(true);
+    forceBalance.runForceRelaxation();
+
+    CHECK_THAT(forceBalance.getSolubleWeightFraction(),
+               Catch::Matchers::WithinAbs(1.0, 0.001));
+    CHECK(forceBalance.getNrOfNodes() <= 20 * 100);
+  }
+
+  SECTION("With small box")
+  {
+    forceBalance.configAssumeBoxLargeEnough(false);
+    forceBalance.runForceRelaxation();
+
+    CHECK_THAT(forceBalance.getSolubleWeightFraction(),
+               Catch::Matchers::WithinAbs(1.0, 0.001));
+    CHECK(forceBalance.getNrOfNodes() <= 20 * 100);
+  }
+}
+
+TEST_CASE(
+  "Single randomly functionalized chain can be prevented from building loops",
+  "[generator][MCUniverseGenerator][long]")
+{
+
+  std::cout << "Running test \"Single randomly functionalized chain can be "
+               "prevented from building loops\""
+            << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
   generator.setSeed(8804);
   generator.setBeadDistance(0.75);
   generator.configNrOfMCSteps(0);
 
-  std::vector<int> chainLengths = pu::initializeWithValue(100, 200);
-  generator.addRandomlyFunctionalizedStrands(
-    100, chainLengths, 7.2, 1, 2, 1, true);
+  SECTION("No primary loops")
+  {
+    generator.addRandomlyFunctionalizedStrands(1, { 100 }, 0.8, 4, 2, 1, true);
+    double nCrosslinkSites =
+      static_cast<double>(generator.getCurrentNrOfAvailableCrosslinkSites());
+    CHECK_THAT(nCrosslinkSites,
+               Catch::Matchers::WithinRel(100 * 0.8 * 4, 0.05));
+    CHECK_THAT(generator.getCurrentCrosslinkerConversion(),
+               Catch::Matchers::WithinAbs(0.0, 1e-10));
 
-  pe::Universe universe = generator.getUniverse();
-  double nCrosslinks = static_cast<double>(universe.getAtomsOfType(2).size());
-  CHECK_THAT(nCrosslinks, Catch::Matchers::WithinRel(100 * 200, 0.01));
-  CHECK(universe.getNrOfAtoms() == 100 * 200);
+    generator.addStrands(5, { 10, 10, 10, 10, 10 }, 1);
+    generator.configPrimaryLoopProbability(0.0);
+    CHECK_THAT(generator.getCurrentCrosslinkerConversion(),
+               Catch::Matchers::WithinAbs(0.0, 1e-10));
+    SECTION("To conversion")
+    {
+      generator.linkStrandsToConversion(9. / nCrosslinkSites);
+      // we get all five dangling strands, not more
+      CHECK(generator.getCurrentNrOfAvailableCrosslinkSites() ==
+            nCrosslinkSites - 5);
+      CHECK_THAT(generator.getCurrentCrosslinkerConversion(),
+                 Catch::Matchers::WithinRel(5. / nCrosslinkSites, 0.05));
 
-  pylimer_tools::sim::mehp::MEHPForceBalance forceBalance =
-    pylimer_tools::sim::mehp::MEHPForceBalance(universe);
+      std::vector<pe::Molecule> chains =
+        generator.getUniverse().getChainsWithCrosslinker(6);
+      CHECK(chains.size() == 11);
+      for (pe::Molecule& chain : chains) {
+        CHECK(chain.getType() != pe::MoleculeType::PRIMARY_LOOP);
+      }
+    }
 
-  forceBalance.runForceRelaxation();
+    SECTION("To soluble fraction")
+    {
+      generator.linkStrandsToSolubleFraction(0.);
+      // we get all five dangling strands, not more
+      CHECK(generator.getCurrentNrOfAvailableCrosslinkSites() ==
+            nCrosslinkSites - 5);
+      CHECK_THAT(generator.getCurrentCrosslinkerConversion(),
+                 Catch::Matchers::WithinRel(5. / nCrosslinkSites, 0.05));
 
-  CHECK_THAT(forceBalance.getSolubleWeightFraction(),
-             Catch::Matchers::WithinAbs(0.0, 0.001));
-  CHECK(forceBalance.getNrOfNodes() <= 100 * 200);
+      std::vector<pe::Molecule> chains =
+        generator.getUniverse().getChainsWithCrosslinker(6);
+      CHECK(chains.size() == 11);
+      for (pe::Molecule& chain : chains) {
+        CHECK(chain.getType() != pe::MoleculeType::PRIMARY_LOOP);
+      }
+    }
+  }
 
-  // this time with "incorrect" spring type
-  forceBalance =
-    pylimer_tools::sim::mehp::MEHPForceBalance(universe, 6);
+  SECTION("No primary nor secondary loops")
+  {
+    generator.addRandomlyFunctionalizedStrands(
+      2, { 100, 100 }, 0.8, 4, 2, 1, true);
+    double nCrosslinkSites =
+      static_cast<double>(generator.getCurrentNrOfAvailableCrosslinkSites());
+    CHECK_THAT(nCrosslinkSites,
+               Catch::Matchers::WithinRel(100 * 0.8 * 4 * 2, 0.05));
+    CHECK_THAT(generator.getCurrentCrosslinkerConversion(),
+               Catch::Matchers::WithinAbs(0.0, 1e-10));
 
-  forceBalance.runForceRelaxation();
+    // generator.addStrands(2, { 10, 10 }, 1);
+    generator.addStrands(5, { 10, 10, 10, 10, 10 }, 1);
+    generator.configPrimaryLoopProbability(0.0);
+    generator.configSecondaryLoopProbability(0.0);
+    CHECK_THAT(generator.getCurrentCrosslinkerConversion(),
+               Catch::Matchers::WithinAbs(0.0, 1e-10));
 
-  CHECK_THAT(forceBalance.getSolubleWeightFraction(),
-             Catch::Matchers::WithinAbs(0.0, 0.001));
-  CHECK(forceBalance.getNrOfSprings() == 100);
+    SECTION("To soluble fraction")
+    {
+      generator.linkStrandsToSolubleFraction(0.);
+      // we get all five dangling strands and one connecting strand,
+      // afterwards, things would be primary/secondary loops
+      CHECK(generator.getCurrentNrOfAvailableCrosslinkSites() ==
+            nCrosslinkSites - 6);
+      CHECK_THAT(generator.getCurrentCrosslinkerConversion(),
+                 Catch::Matchers::WithinRel(6. / (nCrosslinkSites), 0.05));
+
+      std::vector<pe::Molecule> chains =
+        generator.getUniverse().getChainsWithCrosslinker(6);
+      for (pe::Molecule& chain : chains) {
+        CHECK(chain.getType() != pe::MoleculeType::PRIMARY_LOOP);
+      }
+    }
+
+    SECTION("To conversion")
+    {
+      generator.linkStrandsToConversion(9.1 / nCrosslinkSites);
+      // we get all five dangling strands and one connecting strand,
+      // afterwards, things would be primary/secondary loops
+      CHECK(generator.getCurrentNrOfAvailableCrosslinkSites() ==
+            nCrosslinkSites - 6);
+      CHECK_THAT(generator.getCurrentCrosslinkerConversion(),
+                 Catch::Matchers::WithinRel(6. / (nCrosslinkSites), 0.05));
+
+      std::vector<pe::Molecule> chains =
+        generator.getUniverse().getChainsWithCrosslinker(6);
+      for (pe::Molecule& chain : chains) {
+        CHECK(chain.getType() != pe::MoleculeType::PRIMARY_LOOP);
+      }
+    }
+  }
 }
 
 TEST_CASE(

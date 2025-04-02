@@ -373,6 +373,7 @@ namespace sim {
        * @return double
        */
       double getResidualNorm() const;
+      double getResidual() override { return this->getResidualNorm(); }
 
       /**
        * @brief Get the residuals (gradient) at the current step

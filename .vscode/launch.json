@@ -25,7 +25,10 @@
       "name": "Debug C++ Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["MCUniverseGenerator can remove w_sol"],
+      "args": [
+        "Randomly functionalized chains collapse"
+        // "Randomly functionalized chains collapse"
+      ],
       "env": {
         "MallocNanoZone": "0",
         "ASAN_OPTIONS": "detect_leaks=0",

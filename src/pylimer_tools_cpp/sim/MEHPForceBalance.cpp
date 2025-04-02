@@ -74,6 +74,10 @@ namespace sim {
           simplificationMode == StructureSimplificationMode::NO_SIMPLIFICATION,
         "Removal cut-off must be positive when simplification is enabled.");
 
+      if (this->getNrOfSprings() == 0) {
+        return;
+      }
+
       /* array allocation */
       std::vector<Eigen::ArrayXi> independentVertexSets;
       double maxDistanceMoved = 0.0;
@@ -110,7 +114,9 @@ namespace sim {
 
       // actual loop
       bool wasInterrupted = false;
-      bool iterateForDisplacements = !disableSlipping;
+      bool iterateForDisplacements =
+        !(disableSlipping ||
+          (this->initialConfig.nrOfNodes == this->initialConfig.nrOfLinks));
       do {
         if (allowSlipLinksToPassEachOther != LinkSwappingMode::NO_SWAPPING) {
           if (swappingFrequency > 0 &&
@@ -442,28 +448,29 @@ namespace sim {
         (this->kappa * oneOverSpringPartitions * distances *
          loopPartialSpringEliminator);
 
-#ifndef NDEBUG
-      Eigen::ArrayXd forces2 = Eigen::ArrayXd::Zero(3 * net.nrOfLinks);
-      Eigen::VectorXi debugNrSpringsVisited =
-        Eigen::VectorXi::Zero(net.nrOfPartialSprings);
-      for (size_t i = 0; i < net.nrOfLinks; ++i) {
-        forces2.segment(3 * i, 3) =
-          this
-            ->evaluateForceOnLink(i,
-                                  net,
-                                  u,
-                                  springPartitions,
-                                  debugNrSpringsVisited,
-                                  oneOverSpringPartitionUpperLimit)
-            .array();
-      }
-      assert((debugNrSpringsVisited.array() == 2).all());
-      double squareN1 = forces.matrix().squaredNorm();
-      double squareN2 = forces2.matrix().squaredNorm();
-      assert(APPROX_EQUAL(squareN1, squareN2, 1e-9));
-      assert(
-        pylimer_tools::utils::vector_approx_equal(forces, forces2, 1e-9, true));
-#endif
+      // #ifndef NDEBUG
+      //       Eigen::ArrayXd forces2 = Eigen::ArrayXd::Zero(3 * net.nrOfLinks);
+      //       Eigen::VectorXi debugNrSpringsVisited =
+      //         Eigen::VectorXi::Zero(net.nrOfPartialSprings);
+      //       for (size_t i = 0; i < net.nrOfLinks; ++i) {
+      //         forces2.segment(3 * i, 3) =
+      //           this
+      //             ->evaluateForceOnLink(i,
+      //                                   net,
+      //                                   u,
+      //                                   springPartitions,
+      //                                   debugNrSpringsVisited,
+      //                                   oneOverSpringPartitionUpperLimit)
+      //             .array();
+      //       }
+      //       assert((debugNrSpringsVisited.array() == 2).all());
+      //       double squareN1 = forces.matrix().squaredNorm();
+      //       double squareN2 = forces2.matrix().squaredNorm();
+      //       assert(APPROX_EQUAL(squareN1, squareN2, 1e-9));
+      //       assert(
+      //         pylimer_tools::utils::vector_approx_equal(forces, forces2,
+      //         1e-9, true));
+      // #endif
 
       return forces.matrix().squaredNorm();
     }

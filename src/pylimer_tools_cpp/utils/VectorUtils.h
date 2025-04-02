@@ -192,6 +192,44 @@ namespace utils {
   {
     return v[v.size() - 1];
   }
+
+  /**
+   * @brief Finds the index of the first occurrence of a value in a vector,
+   * starting from a specified position.
+   *
+   * If the value is found at the start position, the function searches
+   * backwards to find the first index. Otherwise, it searches forward from the
+   * start position.
+   *
+   * @tparam T The type of elements in the vector.
+   * @param v The vector to search in.
+   * @param value The value to search for.
+   * @param start The starting index for the search (default is 0).
+   * @return size_t The index of the first occurrence of the value, or the size
+   * of the vector if not found.
+   */
+  template<typename T>
+  static inline size_t first_occuring_index(const std::vector<T>& v,
+                                            const T value,
+                                            size_t start = 0)
+  {
+    if (v[start] == value) {
+      for (long int i = start; i >= 0; i--) {
+        if (v[i] != value) {
+          return static_cast<size_t>(i + 1);
+        }
+      }
+      return 0;
+    } else {
+      for (size_t i = start; i < v.size(); i++) {
+        if (v[i] == value) {
+          return i;
+        }
+      }
+    }
+    return v.size();
+  }
+
   /**
    * @brief Find whether a map contains a value
    *
