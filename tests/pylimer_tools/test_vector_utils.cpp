@@ -179,6 +179,19 @@ TEST_CASE("Vector Rows can be removed", "[Eigen]")
   }
 }
 
+TEST_CASE("First occurence is found", "[VectorUtils]")
+{
+  std::cout << "Running test \"First occurence is found\"" << std::endl;
+  std::vector<int> testVec = { 1, 2, 3, 4, 4, 5, 5, 5, 6, 7, 8, 9, 10 };
+  CHECK(pu::first_occuring_index(testVec, 5) == 5);
+  CHECK(pu::first_occuring_index(testVec, 5, 6) == 5);
+  CHECK(pu::first_occuring_index(testVec, 5, 7) == 5);
+  CHECK(pu::first_occuring_index(testVec, 5, 2) == 5);
+  CHECK(pu::first_occuring_index(testVec, 1, 0) == 0);
+  CHECK(pu::first_occuring_index(testVec, 5, 8) == testVec.size());
+  CHECK(pu::first_occuring_index(testVec, 11) == testVec.size());
+}
+
 TEST_CASE("Elements can be found and conditionally added", "[VectorUtils]")
 {
   std::cout << "Running test \"Elements can be found and conditionally added\""

@@ -444,7 +444,7 @@ namespace utils {
 
       int nRepeat = 1;
       if (functionalizationProbability > 1.) {
-        nRepeat = static_cast<int>(std::round(functionalizationProbability));
+        nRepeat = static_cast<int>(std::ceil(functionalizationProbability));
         functionalizationProbability /= static_cast<double>(nRepeat);
       }
 
@@ -518,26 +518,26 @@ namespace utils {
 
       // then, add the cross-link atoms
       // distances need to be taken into account, are handled later
-      this->addCrosslinkers(
-        nCrosslinks, crosslinkerFunctionality, crosslinkerAtomType, whiteNoise);
       RUNTIME_EXP_IFN(nCrosslinks == strandIdOfCrosslink.size(),
                       "Did not register the expected number of cross-links.");
       RUNTIME_EXP_IFN(nCrosslinks == newCrosslinkFunctionality.size(),
                       "Did not register the expected number of cross-links.");
-      for (size_t newXlinxOffset = 0; newXlinxOffset < nCrosslinks;
-           ++newXlinxOffset) {
+      this->addCrosslinkers(
+        nCrosslinks, crosslinkerFunctionality, crosslinkerAtomType, whiteNoise);
+      for (size_t newXlinOffset = 0; newXlinOffset < nCrosslinks;
+           ++newXlinOffset) {
         this->simplifiedUniverse
-          .xlinkChainId[nCrosslinksBefore + newXlinxOffset] =
-          strandIdOfCrosslink[newXlinxOffset];
+          .xlinkChainId[nCrosslinksBefore + newXlinOffset] =
+          strandIdOfCrosslink[newXlinOffset];
         int functionalityDifferenceToDesired =
-          newCrosslinkFunctionality[newXlinxOffset] -
+          newCrosslinkFunctionality[newXlinOffset] -
           this->remainingCrossLinkerFunctionality[nCrosslinksBefore +
-                                                  newXlinxOffset];
+                                                  newXlinOffset];
         this->originalNrOfAvailableCrosslinkSites +=
           functionalityDifferenceToDesired;
         this->nrOfAvailableCrosslinkSites += functionalityDifferenceToDesired;
         this->remainingCrossLinkerFunctionality[nCrosslinksBefore +
-                                                newXlinxOffset] +=
+                                                newXlinOffset] +=
           functionalityDifferenceToDesired;
       }
 
@@ -552,8 +552,6 @@ namespace utils {
         // do the linking that was omitted earlier
         if (from >= 0) {
           this->simplifiedUniverse.strandsOfXlink[from].push_back(newStrandIdx);
-          this->simplifiedUniverse.xlinkChainId[from] =
-            nCrosslinksBefore + newStrandIdx;
         }
         if (to >= 0) {
           this->simplifiedUniverse.strandsOfXlink[to].push_back(newStrandIdx);
@@ -820,13 +818,16 @@ namespace utils {
           cInfinity;
         // we don't have free cross-link choice
         // find one that follows the desired end-to-end distribution
-        size_t partnerCrosslinker = this->findAppropriateLink(
+        long int partnerCrosslinker = this->findAppropriateLink(
           this->simplifiedUniverse.strandFrom[strandIdx],
           static_cast<double>(
             this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
             timesNForR02,
           this->maxDistanceProvider->getMaxDistance(static_cast<double>(
             this->simplifiedUniverse.beadsInStrand[strandIdx] + 1)));
+
+        RUNTIME_EXP_IFN(partnerCrosslinker >= 0,
+                        "No suitable cross-link partner found.");
 
         this->simplifiedUniverse.strandTo[strandIdx] = partnerCrosslinker;
         this->remainingCrossLinkerFunctionality[partnerCrosslinker] -= 1;
@@ -936,13 +937,21 @@ namespace utils {
                 " for strand " + std::to_string(strandIdx) + ".");
             // we don't have free cross-link choice
             // find one that follows the desired end-to-end distribution
-            size_t partnerCrosslinker = this->findAppropriateLink(
+            long int partnerCrosslinker = this->findAppropriateLink(
               this->simplifiedUniverse.strandFrom[strandIdx],
               static_cast<double>(
                 this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
                 timesNForR02,
               this->maxDistanceProvider->getMaxDistance(
                 this->simplifiedUniverse.beadsInStrand[strandIdx] + 1));
+
+            // it should be thought through again what to do in this case, where
+            // there is no matching cross-link.
+            // RUNTIME_EXP_IFN(partnerCrosslinker >= 0, "No suitable cross-link
+            // partner found.");
+            if (partnerCrosslinker < 0) {
+              continue;
+            }
 
             this->simplifiedUniverse.strandTo[strandIdx] = partnerCrosslinker;
             this->remainingCrossLinkerFunctionality[partnerCrosslinker] -= 1;
@@ -1751,6 +1760,11 @@ namespace utils {
               static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
     }
 
+    size_t getCurrentNrOfAvailableCrosslinkSites() const
+    {
+      return this->nrOfAvailableCrosslinkSites;
+    }
+
     /**
      * @brief Check if the internal state of the universe is consistent
      *
@@ -1792,6 +1806,12 @@ namespace utils {
             this->simplifiedUniverse.strandFrom[subStrandIdx] == xlinkIdx ||
               this->simplifiedUniverse.strandTo[subStrandIdx] == xlinkIdx,
             "Inconsistent links int list of cross-links <> strands.");
+        }
+        if (xlinkIdx > 0) {
+          RUNTIME_EXP_IFN(
+            this->simplifiedUniverse.xlinkChainId[xlinkIdx] >=
+              this->simplifiedUniverse.xlinkChainId[xlinkIdx - 1],
+            "Expected the chain ID to increase with cross-link index.");
         }
       }
       for (size_t strandIdx = 0;
@@ -2170,11 +2190,12 @@ namespace utils {
      * @param from the Atom to start the distance from
      * @param desiredR02 the distance to target if possible
      * @param maxDistance the maximum distance to accept random matches from
-     * @return int the index in possiblePartners that matches best
+     * @return long int the index in possiblePartners that matches best,
+     * negative if none found
      */
-    size_t findAppropriateLink(size_t from,
-                               const double desiredR02,
-                               const double maxDistance)
+    long int findAppropriateLink(size_t from,
+                                 const double desiredR02,
+                                 const double maxDistance)
     {
       RUNTIME_EXP_IFN(this->simplifiedUniverse.xlinkTypes.size() ==
                         this->remainingCrossLinkerFunctionality.size(),
@@ -2193,7 +2214,7 @@ namespace utils {
         for (int i = 0; i < nCrosslinks; ++i) {
           double thisWeight = this->evaluatePartnerProbability(
             from, i, normalisationFactorInExponential, maxDistance);
-          if (thisWeight < 0.0) {
+          if (thisWeight <= 0.0) {
             continue;
           }
           suitableMatches.push_back(i);
@@ -2232,7 +2253,7 @@ namespace utils {
                     << std::endl;
           return this->findAppropriateLink(from, desiredR02, -1.);
         }
-        throw std::runtime_error("No suitable partner found.");
+        return -1;
       }
 
       std::discrete_distribution<long int> weightDist(matchWeights.begin(),
@@ -2256,32 +2277,53 @@ namespace utils {
         thisWeight =
           static_cast<double>(this->remainingCrossLinkerFunctionality[to]) *
           std::exp(dist.squaredNorm() * normalisationFactorInExponential);
-        if (to == from || (respectXlinkChains &&
-                           this->simplifiedUniverse.xlinkChainId[from] ==
-                             this->simplifiedUniverse.xlinkChainId[to])) {
+        int strand1 = this->simplifiedUniverse.xlinkChainId[from];
+        int strand2 = this->simplifiedUniverse.xlinkChainId[to];
+        if (to == from || (respectXlinkChains && strand1 == strand2)) {
           thisWeight *= this->primaryLoopProbability;
         }
         if (this->secondaryLoopProbability != 1.) {
           // check whether this cross-link would lead to a secondary loop
           // => apply weight for every other already existing back-link
-          for (size_t partnersSubStrand :
-               this->simplifiedUniverse.strandsOfXlink[to]) {
-            assert(this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
-                     to ||
-                   this->simplifiedUniverse.strandTo[partnersSubStrand] == to);
-            long int otherStrandEnd =
-              this->simplifiedUniverse.strandFrom[partnersSubStrand] == to
-                ? this->simplifiedUniverse.strandTo[partnersSubStrand]
-                : this->simplifiedUniverse.strandFrom[partnersSubStrand];
-            bool isSecondaryLoop = otherStrandEnd == from;
-            if (respectXlinkChains && !isSecondaryLoop && otherStrandEnd >= 0) {
-              // more complex logic to consider cross-link chains
-              isSecondaryLoop =
-                ((this->simplifiedUniverse.xlinkChainId[from] ==
-                  this->simplifiedUniverse.xlinkChainId[otherStrandEnd]));
+
+          // secondary loops in this case are any loops between two strands
+          // we store the chain ids sequentially -> use to reduce the
+          // iterations
+          size_t xlinkIdxOnStrand1 =
+            respectXlinkChains
+              ? pylimer_tools::utils::first_occuring_index(
+                  this->simplifiedUniverse.xlinkChainId, strand1, from)
+              : from;
+          assert(xlinkIdxOnStrand1 < this->simplifiedUniverse.xlinkChainId.size());
+          while (this->simplifiedUniverse.xlinkChainId[xlinkIdxOnStrand1] ==
+                   strand1 &&
+                 xlinkIdxOnStrand1 <
+                   this->simplifiedUniverse.xlinkChainId.size()) {
+            for (size_t partnersSubStrand :
+                 this->simplifiedUniverse.strandsOfXlink[xlinkIdxOnStrand1]) {
+              assert(this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
+                       xlinkIdxOnStrand1 ||
+                     this->simplifiedUniverse.strandTo[partnersSubStrand] ==
+                       xlinkIdxOnStrand1);
+              long int otherStrandEnd =
+                this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
+                    xlinkIdxOnStrand1
+                  ? this->simplifiedUniverse.strandTo[partnersSubStrand]
+                  : this->simplifiedUniverse.strandFrom[partnersSubStrand];
+              bool wouldBeSecondaryLoop = false;
+              if (otherStrandEnd >= 0) {
+                // more complex logic to consider cross-link chains
+                wouldBeSecondaryLoop =
+                  ((strand2 ==
+                    this->simplifiedUniverse.xlinkChainId[otherStrandEnd]));
+              }
+              if (wouldBeSecondaryLoop) {
+                thisWeight *= this->secondaryLoopProbability;
+              }
             }
-            if (isSecondaryLoop) {
-              thisWeight *= this->secondaryLoopProbability;
+            xlinkIdxOnStrand1 += 1;
+            if (!respectXlinkChains) {
+              break;
             }
           }
         }

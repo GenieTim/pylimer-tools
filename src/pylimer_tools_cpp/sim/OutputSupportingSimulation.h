@@ -48,7 +48,7 @@ namespace sim {
       "numExtraAtoms", "numBonds", "numExtraBonds", "numBondsToForm",
     };
 
-#define NUM_COMPUTABLE_DOUBLE_VALUES 18
+#define NUM_COMPUTABLE_DOUBLE_VALUES 19
 
   enum ComputedDoubleValues
   {
@@ -67,9 +67,10 @@ namespace sim {
     STRESS_NYZ = 12,
     STRESS_NXZ = 13,
     GAMMA = 14,
-    MEAN_B = 15,
-    MAX_B = 16,
-    MSD = 17
+    RESIDUAL = 15,
+    MEAN_B = 16,
+    MAX_B = 17,
+    MSD = 18
   };
 
   const std::array<std::string, NUM_COMPUTABLE_DOUBLE_VALUES>
@@ -88,6 +89,7 @@ namespace sim {
                                   "Stress[1,1]-Stress[2,2]",
                                   "Stress[0,0]-Stress[2,2]",
                                   "Gamma",
+                                  "Residual",
                                   "<b>",
                                   "max(b)",
                                   "MSD" };
@@ -288,6 +290,7 @@ namespace sim {
         stressTensor(1, 1) - stressTensor(2, 2),
         stressTensor(0, 0) - stressTensor(2, 2),
         this->requiresDEvaluation(GAMMA, currentStep) ? this->getGamma() : 0.,
+        this->requiresDEvaluation(RESIDUAL, currentStep) ? this->getResidual() : 0.,
         this->requiresDEvaluation(MEAN_B, currentStep) ? bondLengths.mean()
                                                        : 0.0,
         this->requiresDEvaluation(MAX_B, currentStep) ? bondLengths.maxCoeff()
@@ -678,22 +681,23 @@ namespace sim {
     }
 #endif
 
-    virtual double getTimestep() = 0;
     virtual double getCurrentTime(double currentStep) = 0;
+    virtual double getGamma() = 0;
+    virtual double getResidual() = 0;
+    virtual double getTemperature() = 0;
+    virtual double getTimestep() = 0;
+    virtual double getVolume() = 0;
     virtual Eigen::Matrix3d getStressTensor() = 0;
-    virtual int getNumShifts() = 0;
-    virtual int getNumRelocations() = 0;
     virtual Eigen::VectorXd getBondLengths() = 0;
     virtual Eigen::VectorXd getCoordinates() = 0;
-    virtual double getTemperature() = 0;
-    virtual size_t getNumAtoms() = 0;
-    virtual size_t getNumExtraAtoms() = 0;
-    virtual size_t getNumBonds() = 0;
-    virtual size_t getNumExtraBonds() = 0;
+    virtual int getNumRelocations() = 0;
+    virtual int getNumShifts() = 0;
     virtual long int getNumBondsToForm() = 0;
+    virtual size_t getNumAtoms() = 0;
+    virtual size_t getNumBonds() = 0;
+    virtual size_t getNumExtraAtoms() = 0;
+    virtual size_t getNumExtraBonds() = 0;
     virtual size_t getNumParticles() = 0;
-    virtual double getVolume() = 0;
-    virtual double getGamma() = 0;
   };
 }
 }
