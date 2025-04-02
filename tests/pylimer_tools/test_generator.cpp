@@ -117,6 +117,8 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
     // not enough strands to reach conversion:
     generator.addStrands(2, 10, 1);
     REQUIRE_THROWS(generator.linkStrandsToConversion(2.0));
+    REQUIRE_THROWS(generator.addRandomlyFunctionalizedStrands(
+      2, { 10, 10 }, 7, 3, 2, 2, true));
   }
 
   // SECTION("Universe can be written and read again") {
@@ -569,6 +571,63 @@ TEST_CASE(
     std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
     CHECK(chains.size() > 5000);
   }
+
+  SECTION("With functionalization probability > 1")
+  {
+    std::vector<int> chainLengths = pu::initializeWithValue(1000, 100);
+    generator.addRandomlyFunctionalizedStrands(
+      1000, chainLengths, 3.2, 1, 2, 1, true);
+
+    pe::Universe universe = generator.getUniverse();
+    double nCrosslinks = static_cast<double>(universe.getAtomsOfType(2).size());
+    CHECK_THAT(nCrosslinks,
+               Catch::Matchers::WithinRel(1000 * 100, 0.001));
+    CHECK(universe.getNrOfAtoms() == 1000 * 100);
+    std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
+    CHECK(chains.size() > 5000);
+    chains = universe.getChainsWithCrosslinker(6);
+    CHECK(chains.size() == 1000);
+  }
+}
+
+TEST_CASE("Randomly functionalized chains collapse",
+          "[generator][MCUniverseGenerator][long]")
+{
+  std::cout << "Running test \"Randomly functionalized chains collapse\""
+            << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
+  generator.setSeed(8804);
+  generator.setBeadDistance(0.75);
+  generator.configNrOfMCSteps(0);
+
+  std::vector<int> chainLengths = pu::initializeWithValue(100, 200);
+  generator.addRandomlyFunctionalizedStrands(
+    100, chainLengths, 7.2, 1, 2, 1, true);
+
+  pe::Universe universe = generator.getUniverse();
+  double nCrosslinks = static_cast<double>(universe.getAtomsOfType(2).size());
+  CHECK_THAT(nCrosslinks, Catch::Matchers::WithinRel(100 * 200, 0.01));
+  CHECK(universe.getNrOfAtoms() == 100 * 200);
+
+  pylimer_tools::sim::mehp::MEHPForceBalance forceBalance =
+    pylimer_tools::sim::mehp::MEHPForceBalance(universe);
+
+  forceBalance.runForceRelaxation();
+
+  CHECK_THAT(forceBalance.getSolubleWeightFraction(),
+             Catch::Matchers::WithinAbs(0.0, 0.001));
+  CHECK(forceBalance.getNrOfNodes() <= 100 * 200);
+
+  // this time with "incorrect" spring type
+  forceBalance =
+    pylimer_tools::sim::mehp::MEHPForceBalance(universe, 6);
+
+  forceBalance.runForceRelaxation();
+
+  CHECK_THAT(forceBalance.getSolubleWeightFraction(),
+             Catch::Matchers::WithinAbs(0.0, 0.001));
+  CHECK(forceBalance.getNrOfSprings() == 100);
 }
 
 TEST_CASE(
