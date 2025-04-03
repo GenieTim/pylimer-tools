@@ -373,7 +373,12 @@ namespace sim {
        * @return double
        */
       double getResidualNorm() const;
-      double getResidual() override { return this->getResidualNorm(); }
+      double getResidual() override
+      {
+        // std::cout << "ResidualNorm: " << this->getResidualNorm() <<
+        // std::endl;
+        return this->getResidualNorm();
+      }
 
       /**
        * @brief Get the residuals (gradient) at the current step
@@ -523,6 +528,9 @@ namespace sim {
 
       double getTemperature() override
       {
+        std::cerr << "Warning: Temperature is not a reasonable metric for this "
+                     "type of computation."
+                  << std::endl;
         return -1; // TODO: implement?
       }
 

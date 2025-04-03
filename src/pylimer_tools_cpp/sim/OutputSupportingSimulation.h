@@ -206,14 +206,21 @@ namespace sim {
     inline bool requiresDEvaluation(const ComputedDoubleValues val,
                                     const long int currentStep) const
     {
-      return (this->doubleValueRequiredEvery[val] != 0) &&
-             ((currentStep % this->doubleValueRequiredEvery[val]) == 0);
+      bool requiresEval =
+        (this->doubleValueRequiredEvery[val] > 0) &&
+        ((currentStep % this->doubleValueRequiredEvery[val]) == 0);
+      // if (requiresEval) {
+      //   std::cout << "Requiring evaluating " <<
+      //   ComputedDoubleValuesNames[val]
+      //             << " at step " << currentStep << std::endl;
+      // }
+      return requiresEval;
     }
 
     inline bool requiresIEvaluation(const ComputedIntValues val,
                                     const long int currentStep) const
     {
-      return (this->intValueRequiredEvery[val] != 0) &&
+      return (this->intValueRequiredEvery[val] > 0) &&
              ((currentStep % this->intValueRequiredEvery[val]) == 0);
     }
 
@@ -271,31 +278,40 @@ namespace sim {
 
       // assemble all computed values into an easy-to-access array
       std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES> doublevalues = {
-        this->getTimestep(),
-        this->requiresDEvaluation(TIME, currentStep)
-          ? this->getCurrentTime(currentStep)
-          : 0.,
-        this->requiresDEvaluation(VOLUME, currentStep) ? this->getVolume() : 0.,
-        pressure, // + kineticPressureTerm,
-        this->requiresDEvaluation(TEMPERATURE, currentStep)
-          ? this->getTemperature()
-          : 0.,
-        stressTensor(0, 0),
-        stressTensor(1, 1),
-        stressTensor(2, 2),
-        stressTensor(0, 1),
-        stressTensor(1, 2),
-        stressTensor(0, 2),
-        stressTensor(0, 0) - stressTensor(1, 1),
-        stressTensor(1, 1) - stressTensor(2, 2),
-        stressTensor(0, 0) - stressTensor(2, 2),
-        this->requiresDEvaluation(GAMMA, currentStep) ? this->getGamma() : 0.,
-        this->requiresDEvaluation(RESIDUAL, currentStep) ? this->getResidual() : 0.,
-        this->requiresDEvaluation(MEAN_B, currentStep) ? bondLengths.mean()
-                                                       : 0.0,
-        this->requiresDEvaluation(MAX_B, currentStep) ? bondLengths.maxCoeff()
-                                                      : 0.0,
-        0.
+        { this->getTimestep(),
+          this->requiresDEvaluation(ComputedDoubleValues::TIME, currentStep)
+            ? this->getCurrentTime(currentStep)
+            : 0.,
+          this->requiresDEvaluation(ComputedDoubleValues::VOLUME, currentStep)
+            ? this->getVolume()
+            : 0.,
+          pressure, // + kineticPressureTerm,
+          this->requiresDEvaluation(ComputedDoubleValues::TEMPERATURE,
+                                    currentStep)
+            ? this->getTemperature()
+            : 0.,
+          stressTensor(0, 0),
+          stressTensor(1, 1),
+          stressTensor(2, 2),
+          stressTensor(0, 1),
+          stressTensor(1, 2),
+          stressTensor(0, 2),
+          stressTensor(0, 0) - stressTensor(1, 1),
+          stressTensor(1, 1) - stressTensor(2, 2),
+          stressTensor(0, 0) - stressTensor(2, 2),
+          this->requiresDEvaluation(ComputedDoubleValues::GAMMA, currentStep)
+            ? this->getGamma()
+            : 0.,
+          this->requiresDEvaluation(ComputedDoubleValues::RESIDUAL, currentStep)
+            ? this->getResidual()
+            : 0.,
+          this->requiresDEvaluation(ComputedDoubleValues::MEAN_B, currentStep)
+            ? bondLengths.mean()
+            : 0.0,
+          this->requiresDEvaluation(ComputedDoubleValues::MAX_B, currentStep)
+            ? bondLengths.maxCoeff()
+            : 0.0,
+          0. }
       };
       int streamIdx = 0;
       for (streamIdx = 0; streamIdx < this->outputConfigs.size(); ++streamIdx) {
@@ -454,6 +470,7 @@ namespace sim {
       int streamIdx = 0)
     {
       assert(streamIdx <= this->outputStreams.size());
+      assert(doublevalues.size() == NUM_COMPUTABLE_DOUBLE_VALUES);
       for (ComputedIntValues val : oc.intValues) {
         RUNTIME_EXP_IFN(std::isfinite(static_cast<double>(intvalues[val])),
                         "Expect output quantities to be finite, found " +
@@ -493,7 +510,8 @@ namespace sim {
             }
             break;
           default:
-            outputBuffer += std::to_string(doublevalues[val]) + "\t";
+            outputBuffer += "(" + std::to_string(val) + ")" +
+                            std::to_string(doublevalues[val]) + "\t";
         }
       }
       if (!outputBuffer.empty()) {
@@ -537,15 +555,15 @@ namespace sim {
         STRESS_XZ, STRESS_NXY, STRESS_NYZ, STRESS_NXZ, PRESSURE
       };
       for (ComputedDoubleValues v : stressTensorRequiringValues) {
-        if (requireStressTensorEvery == 0) {
-          requireStressTensorEvery = this->doubleValueRequiredEvery[v];
+        if (this->requireStressTensorEvery == 0) {
+          this->requireStressTensorEvery = this->doubleValueRequiredEvery[v];
         } else {
-          requireStressTensorEvery = std::gcd(
-            requireStressTensorEvery, this->doubleValueRequiredEvery[v]);
+          this->requireStressTensorEvery = std::gcd(
+            this->requireStressTensorEvery, this->doubleValueRequiredEvery[v]);
         }
       }
       // similarly for the bond length
-      requireBondLenEvery =
+      this->requireBondLenEvery =
         std::gcd(this->doubleValueRequiredEvery[ComputedDoubleValues::MAX_B],
                  this->doubleValueRequiredEvery[ComputedDoubleValues::MEAN_B]);
     }
@@ -682,11 +700,11 @@ namespace sim {
 #endif
 
     virtual double getCurrentTime(double currentStep) = 0;
-    virtual double getGamma() = 0;
-    virtual double getResidual() = 0;
     virtual double getTemperature() = 0;
+    virtual double getGamma() = 0;
     virtual double getTimestep() = 0;
     virtual double getVolume() = 0;
+    virtual double getResidual() = 0;
     virtual Eigen::Matrix3d getStressTensor() = 0;
     virtual Eigen::VectorXd getBondLengths() = 0;
     virtual Eigen::VectorXd getCoordinates() = 0;
