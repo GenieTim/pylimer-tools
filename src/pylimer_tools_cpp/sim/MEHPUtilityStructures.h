@@ -46,6 +46,17 @@ namespace sim {
       OTHER
     };
 
+    enum SLESolver {
+      DEFAULT,
+      SIMPLICIAL_LLT,
+      SIMPLICIAL_DLT,
+      SPARSE_LU,
+      SPARSE_QR,
+      CONJUGATE_GRADIENT,
+      LEAST_SQUARES_CONJUGATE_GRADIENT,
+      BICGSTAB
+    };
+
     // typedef Eigen::Array<Eigen::ArrayXi, Eigen::Dynamic, 1> ArrayXArrayXi;
     typedef std::vector<std::vector<size_t>> ArrayXArrayXi;
     typedef std::vector<std::set<size_t>> ArrayXArrayXiUnique;

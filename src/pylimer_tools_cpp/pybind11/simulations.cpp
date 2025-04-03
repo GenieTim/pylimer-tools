@@ -4,6 +4,7 @@
 #include "../entities/Universe.h"
 #include "../sim/DPDSimulator.h"
 #include "../sim/MEHPForceBalance.h"
+#include "../sim/MEHPForceBalance2.h"
 #include "../sim/MEHPForceEvaluator.h"
 #include "../sim/MEHPForceRelaxation.h"
 
@@ -644,6 +645,17 @@ init_pylimer_bound_sim(py::module_& m)
     .value("ALL_MC_TRY", mehp::LinkSwappingMode::ALL_MC_TRY)
     .value("ALL_MC_TRY_CYCLE", mehp::LinkSwappingMode::ALL_MC_TRY_CYCLE);
 
+  py::enum_<mehp::SLESolver>(m, "SLESolver")
+    .value("DEFAULT", mehp::SLESolver::DEFAULT)
+    .value("SIMPLICIAL_LLT", mehp::SLESolver::SIMPLICIAL_LLT)
+    .value("SIMPLICIAL_DLT", mehp::SLESolver::SIMPLICIAL_DLT)
+    .value("SPARSE_LU", mehp::SLESolver::SPARSE_LU)
+    .value("SPARSE_QR", mehp::SLESolver::SPARSE_QR)
+    .value("CONJUGATE_GRADIENT", mehp::SLESolver::CONJUGATE_GRADIENT)
+    .value("LEAST_SQUARES_CONJUGATE_GRADIENT",
+           mehp::SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT)
+    .value("BICGSTAB", mehp::SLESolver::BICGSTAB);
+
   ////////////////////////////////////////////////////////////////
   // MARK: Force Balance
   py::class_<mehp::MEHPForceBalance>(m, "MEHPForceBalance", R"pbdoc(
@@ -1223,6 +1235,557 @@ init_pylimer_bound_sim(py::module_& m)
       [](py::tuple t) {
         std::string in = t[0].cast<std::string>();
         return mehp::MEHPForceBalance::constructFromString(in);
+      }))
+#endif
+    ;
+
+  ////////////////////////////////////////////////////////////////
+  // MARK: Force Balance 2
+  py::class_<mehp::MEHPForceBalance2>(m, "MEHPForceBalance2", R"pbdoc(
+     A small simulation tool for quickly minimizing the force between the cross-linker beads.
+      )pbdoc")
+    .def(py::init<pe::Universe, int, bool, bool, bool>(),
+         R"pbdoc(
+           Instantiate the simulator for a certain universe.
+ 
+           :param universe: the universe to simulate with
+           :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
+           :param is2D: Whether to ignore the z direction.
+           :param kappa: the spring constant
+           :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
+           :param remove_dangling_chains: whether to keep or remove obviously dangling chains when setting up the network
+           )pbdoc",
+         py::arg("universe"),
+         py::arg("crosslinker_type") = 2,
+         py::arg("is_2d") = false,
+         py::arg("remove_2functional_crosslinkers") = false,
+         py::arg("remove_dangling_chains") = false)
+    .def("__copy__",
+         [](const mehp::MEHPForceBalance2& self) {
+           return mehp::MEHPForceBalance2(self);
+         })
+    .def_static("construct_with_random_sliplinks",
+                &mehp::MEHPForceBalance2::constructWithRandomSlipLinks,
+                R"pbdoc(
+           Instantiate this simulator with randomly chosen slip-links.
+          )pbdoc",
+                py::arg("universe"),
+                py::arg("nr_of_sliplinks_to_sample"),
+                py::arg("upper_sampling_cutoff") = 1.2,
+                py::arg("lower_sampling_cutoff") = 0.0,
+                py::arg("minimum_nr_of_sliplinks") = 0,
+                py::arg("same_strand_cutoff") = 3,
+                py::arg("seed") = "",
+                py::arg("crosslinker_type") = 2,
+                py::arg("is_2d") = false,
+                py::arg("skip_dangling_soluble_entanglements") = true)
+    .def_property_readonly("network", &mehp::MEHPForceBalance2::getNetwork)
+    .def(
+      "validate_network",
+      [](const mehp::MEHPForceBalance2& fb) { return fb.validateNetwork(); },
+      R"pbdoc(
+           Validates the internal structures.
+ 
+           Throws an error if something is not ok.
+           Otherwise, it returns true.
+ 
+           Can be used e.g. as :code:`assert fb.validate_network()`.
+      )pbdoc")
+    .def(
+      "run_force_relaxation",
+      [](mehp::MEHPForceBalance2& sim,
+         const mehp::StructureSimplificationMode simplificationMode,
+         const double inactiveRemovalCutoff,
+         const double oneOverSpringPartitionUpperLimit,
+         const mehp::SLESolver solverChoice) {
+        return sim.runForceRelaxation(
+          simplificationMode,
+          inactiveRemovalCutoff,
+          oneOverSpringPartitionUpperLimit,
+          solverChoice,
+          []() { return PyErr_CheckSignals() != 0; },
+          []() { throw py::error_already_set(); });
+      },
+      R"pbdoc(
+           Run the simulation.
+               
+           :param simplification_mode: How to simplify the structure during the minimization.
+           :param inactive_removal_cutoff: The tolerance in distance units of the partial spring length to count as active, relevant if simplification mode is specified to be something other than NO_SIMPLIFICATION.
+           :param one_over_spring_partition_upper_limit: Super-secret parameter. Use 1, gradually increase (and then -1) if you want to publish.
+           :param sle_solver: The solver to use for the system of linear equations (SLE).
+           )pbdoc",
+      py::arg("simplification_mode") =
+        mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
+      py::arg("inactive_removal_cutoff") = 1e-3,
+      py::arg("one_over_spring_partition_upper_limit") = 1.0,
+      py::arg("sle_solver") = mehp::SLESolver::DEFAULT)
+    .def("deform_to",
+         &mehp::MEHPForceBalance2::deformTo,
+         R"pbdoc(
+           Perform a deformation of the system box to a different box.
+           All coordinates etc. will be scaled as needed.
+          )pbdoc",
+         py::arg("new_box"))
+    .def("config_step_output",
+         &mehp::MEHPForceBalance2::configStepOutput,
+         R"pbdoc(
+           Set which values to log.
+           
+           Arguments:
+                - values: a list of OutputConfiguration structs
+      )pbdoc")
+    .def("config_assume_box_large_enough",
+         &mehp::MEHPForceBalance2::configAssumeBoxLargeEnough,
+         R"pbdoc(
+           Configure whether to run PBC on the bonds or not.
+ 
+           If your bonds could get larger than half the box length, this must be kept false (default).
+           Otherwise, you can set it to true and therewith get some securities.
+          )pbdoc",
+         py::arg("box_large_enough") = false)
+    .def("config_mean_bond_length",
+         &mehp::MEHPForceBalance2::configMeanBondLength,
+         R"pbdoc(
+      Configure the :math:`b` used e.g. for the topological Gamma-factor.
+      )pbdoc",
+         py::arg("b") = 1.0)
+    .def("config_spring_constant",
+         &mehp::MEHPForceBalance2::configSpringConstant,
+         R"pbdoc()pbdoc",
+         py::arg("kappa") = 1.0)
+    .def("config_entanglement_type",
+         &mehp::MEHPForceBalance2::configEntanglementType,
+         R"pbdoc(
+          To have certain cross-links behave as entanglements in the removal process,
+          you can specify the here a type, that you have used in the universe to specify:
+          - the type of entanglement atoms (expected with functionality f = 3),
+          - and the entanglement-bonds between the entanglement atoms.
+ 
+          I.e., say you want to model some entanglements as non-slipping,
+          bonds between two strand beads resulting in f = 3 beads, for example,
+          you can call this method to have the "StructureSimplificationMode" also remove these atoms,
+          if they have a functionality of 2 or less while still being connected to its partner bead.
+          )pbdoc",
+         py::arg("type") = -1)
+    .def("config_spring_breaking_distance",
+         &mehp::MEHPForceBalance2::configSpringBreakingDistance,
+         R"pbdoc(
+           Configure the "force" (distance over contour length) at which the bonds break.
+           Can be used to model the effect of fracture, to reduce the stiffening happening upon deformation.
+           Springs breaking will happen before the simplification procedure is run.
+           Negative values will disable spring breaking.
+           Default: -1..
+          )pbdoc",
+         py::arg("distance_over_contour_length") = -1)
+    .def("config_simplification_frequency",
+         &mehp::MEHPForceBalance2::configSimplificationFrequency,
+         R"pbdoc(
+          Config every how many steps to simplify the structure.
+          Default: 10.
+          )pbdoc",
+         py::arg("frequency") = 10)
+    .def("swap_sliplinks_incl_xlinks",
+         &mehp::MEHPForceBalance2::swapSlipLinksInclXlinks)
+    .def("move_sliplinks_to_their_best_branch",
+         &mehp::MEHPForceBalance2::moveSlipLinksToTheirBestBranch)
+    .def(
+      "get_force_on",
+      [](mehp::MEHPForceBalance2& sim,
+         const size_t linkIdx,
+         const double oneOver) { return sim.getForceOn(linkIdx, oneOver); },
+      R"pbdoc(
+           Evaluate the force on a particular (slip- or cross-) link.
+       )pbdoc",
+      py::arg("link_idx"),
+      py::arg("one_over_spring_partition_upper_limit") = 1.0)
+    .def("get_force_magnitude_vector",
+         &mehp::MEHPForceBalance2::getForceMagnitudeVector,
+         R"pbdoc(
+           Evaluate the norm of the force on each (slip- or cross-) link.
+      )pbdoc")
+    .def(
+      "get_stress_on",
+      [](mehp::MEHPForceBalance2& sim,
+         const size_t linkIdx,
+         const double oneOver) { return sim.getStressOn(linkIdx, oneOver); },
+      R"pbdoc(
+           Evaluate the stress on a particular (slip- or cross-) link.
+       )pbdoc",
+      py::arg("link_idx"),
+      py::arg("one_over_spring_partition_upper_limit") = 1.0)
+    .def("inspect_displacement_to_mean_position_update",
+         &mehp::MEHPForceBalance2::inspectDisplacementToMeanPositionUpdate,
+         R"pbdoc(
+           Helper method to debug and/or understand what happens to certain links when being displaced.
+          )pbdoc",
+         py::arg("link_idx"),
+         py::arg("one_over_spring_partition_upper_limit") = 1.0)
+    .def("inspect_spring_partition_update",
+         &mehp::MEHPForceBalance2::inspectSpringPartitionUpdate,
+         R"pbdoc(
+           Helper method to debug and/or understand what happens to certain links 
+           when the spring partition is being updated.
+          )pbdoc",
+         py::arg("link_idx"))
+    .def("inspect_parametrisation_optimsation_for_link",
+         &mehp::MEHPForceBalance2::inspectParametrisationOptimsationForLink,
+         R"pbdoc(
+           Helper method to debug and/or understand what happens to certain links 
+           when being displaced and their partition updated.
+          )pbdoc",
+         py::arg("link_idx"),
+         py::arg("displacements"),
+         py::arg("spring_partitions"),
+         py::arg("max_nr_of_steps") = 100,
+         py::arg("alpha_tol") = 1e-9,
+         py::arg("min_nr_of_steps") = 1,
+         py::arg("one_over_spring_partition_upper_limit") = 1.0)
+    .def("get_springpartition_indices_of_sliplink",
+         &mehp::MEHPForceBalance2::getSpringpartitionIndicesOfSliplink,
+         R"pbdoc()pbdoc",
+         py::arg("network"),
+         py::arg("link_idx"))
+    .def("get_neighbour_link_indices",
+         &mehp::MEHPForceBalance2::getNeighbourLinkIndices,
+         R"pbdoc()pbdoc",
+         py::arg("network"),
+         py::arg("link_idx"))
+    .def(
+      "evaluate_partial_spring_distance",
+      [](const mehp::MEHPForceBalance2& sim,
+         const mehp::ForceBalanceNetwork& net,
+         const Eigen::VectorXd& u,
+         const size_t springIdx) {
+        return sim.evaluatePartialSpringDistance(net, u, springIdx);
+      },
+      R"pbdoc()pbdoc",
+      py::arg("network"),
+      py::arg("displacements"),
+      py::arg("spring_idx"))
+    .def(
+      "evaluate_partial_spring_distance_from",
+      [](const mehp::MEHPForceBalance2& sim,
+         const mehp::ForceBalanceNetwork& net,
+         const Eigen::VectorXd& u,
+         const size_t springIdx,
+         const size_t linkIdx) {
+        return sim.evaluatePartialSpringDistanceFrom(
+          net, u, springIdx, linkIdx);
+      },
+      R"pbdoc()pbdoc",
+      py::arg("network"),
+      py::arg("displacements"),
+      py::arg("spring_idx"),
+      py::arg("link_idx"))
+    .def(
+      "evaluate_partial_spring_distance_to",
+      [](const mehp::MEHPForceBalance2& sim,
+         const mehp::ForceBalanceNetwork& net,
+         const Eigen::VectorXd& u,
+         const size_t springIdx,
+         const size_t linkIdx) {
+        return sim.evaluatePartialSpringDistanceTo(net, u, springIdx, linkIdx);
+      },
+      R"pbdoc()pbdoc",
+      py::arg("network"),
+      py::arg("displacements"),
+      py::arg("spring_idx"),
+      py::arg("link_idx"))
+    // .def("getForceEvaluator", &mehp::MEHPForceBalance2::getForceEvaluator,
+    // R"pbdoc(
+    //      Query the currently used force evaluator.
+    // )pbdoc")
+    //     .def("setForceEvaluator",
+    //          &mehp::MEHPForceBalance2::setForceEvaluator,
+    //          R"pbdoc(
+    //           Reset the currently used force evaluator.
+    //      )pbdoc")
+    //     .def("getForce",
+    //          &mehp::MEHPForceBalance2::getForce,
+    //          R"pbdoc(
+    //           Returns the force at the current state of the simulation.
+    //      )pbdoc")
+    //     .def("getResidualNorm",
+    //          &mehp::MEHPForceBalance2::getResidualNorm,
+    //          R"pbdoc(
+    //           Returns the residual norm at the current state of the
+    //           simulation.
+    //      )pbdoc")
+    .def("get_nr_of_atoms", &mehp::MEHPForceBalance2::getNumAtoms)
+    .def("get_nr_of_extra_atoms", &mehp::MEHPForceBalance2::getNumExtraAtoms)
+    .def("get_nr_of_bonds", &mehp::MEHPForceBalance2::getNumBonds)
+    .def("get_nr_of_extra_bonds", &mehp::MEHPForceBalance2::getNumExtraBonds)
+    .def("get_nr_of_intra_chain_sliplinks",
+         &mehp::MEHPForceBalance2::getNumIntraChainSlipLinks)
+    .def("get_pressure",
+         &mehp::MEHPForceBalance2::getPressure,
+         R"pbdoc(
+           Returns the pressure at the current state of the simulation.
+      )pbdoc")
+    .def("get_soluble_weight_fraction",
+         &mehp::MEHPForceBalance2::getSolubleWeightFraction,
+         R"pbdoc(
+           Compute the weight fraction of springs connected to active
+           springs (any depth). 
+           
+           Caution: ignores atom masses.
+      )pbdoc",
+         py::arg("tolerance") = 1e-3)
+    .def("get_dangling_weight_fraction",
+         &mehp::MEHPForceBalance2::getDanglingWeightFraction,
+         R"pbdoc(
+           Compute the weight fraction of non-active springs
+ 
+           Caution: ignores atom masses.
+      )pbdoc",
+         py::arg("tolerance") = 1e-3)
+    .def("add_sliplinks",
+         py::overload_cast<const std::vector<size_t>&,
+                           const std::vector<size_t>&,
+                           const std::vector<double>&,
+                           const std::vector<double>&,
+                           const std::vector<double>&,
+                           const std::vector<double>&,
+                           const std::vector<double>&,
+                           const bool>(&mehp::MEHPForceBalance2::addSlipLinks),
+         R"pbdoc(
+           Add new slip-links
+      )pbdoc",
+         py::arg("strand_idx_1"),
+         py::arg("strand_idx_2"),
+         py::arg("x"),
+         py::arg("y"),
+         py::arg("z"),
+         py::arg("alpha_1"),
+         py::arg("alpha_2"),
+         py::arg("clamp_alpha") = false)
+    .def("randomly_add_sliplinks",
+         &mehp::MEHPForceBalance2::randomlyAddSliplinks,
+         R"pbdoc(
+           Randomly sample and add slip-links based on certain criteria.
+          )pbdoc",
+         py::arg("nr_of_sliplinks_to_sample"),
+         py::arg("cutoff") = 2.0,
+         py::arg("minimum_nr_of_sliplinks") = 0,
+         py::arg("same_strand_cutoff") = 2,
+         py::arg("exclude_crosslinks") = false,
+         py::arg("seed") = -1)
+    .def("add_sliplinks_based_on_cycles",
+         &mehp::MEHPForceBalance2::addSliplinksBasedOnCycles,
+         R"pbdoc(
+           Detect and add slip-links based on detected entanglements.
+ 
+           WARNING:
+                Does not work yet.
+          )pbdoc",
+         py::arg("maxLoopLength") = -1)
+    .def(
+      "get_stress_tensor",
+      [](mehp::MEHPForceBalance2& fb, const double oneOver = 1.) {
+        return fb.getStressTensor(oneOver);
+      },
+      R"pbdoc(
+           Returns the stress tensor at the current state of the simulation.
+ 
+           The units are in :math:`[\text{units of }\kappa]/[\text{distance units}]`,
+           where the units of :math:`\kappa` should be :math:`[\text{force}]/[\text{distance units}]^2`.
+           Make sure to multiply by :math:`\kappa` or configure it appropriately.
+      )pbdoc",
+      py::arg("one_over_spring_partition_upper_limit") = 1.)
+    .def("get_stress_tensor_link_based",
+         &mehp::MEHPForceBalance2::getStressTensorLinkBased,
+         R"pbdoc(
+           Returns the stress tensor at the current state of the simulation.
+      )pbdoc",
+         py::arg("one_over_spring_partition_upper_limit") = 1.,
+         py::arg("xlinks_only") = false)
+    .def("get_gamma_factor",
+         &mehp::MEHPForceBalance2::getGammaFactor,
+         R"pbdoc(
+           Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
+ 
+           :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
+           which you can use as :math:`G_{\mathrm{ANT}} = \Gamma \nu k_B T`,
+           where :math:`\eta` is the index of a particular strand, 
+           :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\eta}*b^2$`
+           :math:`N_{\eta}` is the number of atoms in this strand :math:`\eta`, 
+           :math:`b` its mean square bond length,
+           :math:`T` the temperature and 
+           :math:`k_B` Boltzmann's constant.
+           
+           :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
+           :param nr_of_chains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs. 
+      )pbdoc",
+         py::arg("b02") = -1.0,
+         py::arg("nr_of_chains") = -1,
+         py::arg("one_over_spring_partition_upper_limit") = 1.)
+    .def("get_gamma_factors",
+         &mehp::MEHPForceBalance2::getGammaFactors,
+         R"pbdoc(
+           Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
+      )pbdoc",
+         py::arg("b02"),
+         py::arg("one_over_spring_partition_upper_limit") = 1.)
+    .def("get_gamma_factors_in_dir",
+         &mehp::MEHPForceBalance2::getGammaFactorsInDir,
+         R"pbdoc(
+                Evaluates the gamma factor for each strand in the specified direction (i.e., the squared distance divided by the contour length multiplied by b02)
+ 
+                :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
+                :param direction: the direction in which to compute the gamma factors (0: x, 1: y, 2: z)
+           )pbdoc",
+         py::arg("b02"),
+         py::arg("direction"),
+         py::arg("one_over_spring_partition_upper_limit") = 1.)
+    .def("get_nr_of_nodes", &mehp::MEHPForceBalance2::getNrOfNodes, R"pbdoc(
+            Get the number of nodes (crosslinkers) considered in this simulation.
+      )pbdoc")
+    .def("get_nr_of_springs",
+         &mehp::MEHPForceBalance2::getNrOfSprings,
+         R"pbdoc(
+           Get the number of springs considered in this simulation.
+ 
+           :param tolerance: springs under this length are considered inactive
+      )pbdoc")
+    .def("get_spring_partitions",
+         &mehp::MEHPForceBalance2::getSpringPartitions,
+         R"pbdoc(
+           Get the current spring partitions (the fraction of the contour length associated with each partial spring).
+      )pbdoc")
+    .def("get_weighted_partial_spring_lengths",
+         &mehp::MEHPForceBalance2::getWeightedPartialSpringLengths,
+         R"pbdoc(
+           Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
+           )pbdoc",
+         py::arg("one_over_spring_partition_upper_limit") = 1.)
+    .def("set_spring_partitions",
+         &mehp::MEHPForceBalance2::setSpringPartitions,
+         R"pbdoc(
+           Set the current spring partitions.
+      )pbdoc")
+    .def("get_displacements",
+         &mehp::MEHPForceBalance2::getCurrentDisplacements,
+         R"pbdoc(
+           Get the current link displacements.
+      )pbdoc")
+    .def("set_displacements",
+         &mehp::MEHPForceBalance2::setCurrentDisplacements,
+         R"pbdoc(
+           Set the current link displacements.
+      )pbdoc")
+    .def("set_spring_contour_lengths",
+         &mehp::MEHPForceBalance2::setSpringContourLengths,
+         R"pbdoc(
+           Set/overwrite the contour lengths.
+      )pbdoc")
+    .def("get_displacement_residual_norm",
+         &mehp::MEHPForceBalance2::getDisplacementResidualNorm,
+         R"pbdoc(
+           Get the current link displacement residual norm.
+      )pbdoc",
+         py::arg("one_over_spring_partition_upper_limit") = 1.)
+    .def("get_ids_of_active_nodes",
+         &mehp::MEHPForceBalance2::getIdsOfActiveNodes,
+         R"pbdoc(
+           Get the atom ids of the nodes that are considered active.
+           Only cross-link ids are returned (not e.g. entanglement links).
+ 
+           :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
+      )pbdoc",
+         py::arg("tolerance") = 1e-3)
+    .def("get_nr_of_active_nodes",
+         &mehp::MEHPForceBalance2::getNrOfActiveNodes,
+         R"pbdoc(
+           Get the number of active nodes (incl. entanglement nodes [atoms with type = entanglementType, present in the universe when creating this simulator], 
+           excl. entanglement links [the slip-links created internally when e.g. constructing the simulator with random slip-links]).
+ 
+           :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
+      )pbdoc",
+         py::arg("tolerance") = 1e-3)
+    .def("get_nr_of_active_springs",
+         &mehp::MEHPForceBalance2::getNrOfActiveSprings,
+         R"pbdoc(
+            Get the number of active springs remaining after running the simulation.
+ 
+           :param tolerance: springs under this length are considered inactive
+      )pbdoc",
+         py::arg("tolerance") = 1e-3)
+    .def("get_nr_of_active_springs_in_dir",
+         &mehp::MEHPForceBalance2::getNrOfActiveSpringsInDir,
+         R"pbdoc(
+                 Get the number of active springs remaining after running the simulation.
+      
+                :param direction: the direction in which to compute the active springs (0: x, 1: y, 2: z)
+                :param tolerance: springs under this length are considered inactive
+           )pbdoc",
+         py::arg("direction"),
+         py::arg("tolerance") = 1e-3)
+    .def("get_nr_of_active_partial_springs",
+         &mehp::MEHPForceBalance2::getNrOfActivePartialSprings,
+         R"pbdoc(
+            Get the number of active partial springs remaining after running the simulation.
+ 
+           :param tolerance: springs under this length are considered inactive
+      )pbdoc",
+         py::arg("tolerance") = 1e-3)
+    .def("get_current_partial_spring_vectors",
+         &mehp::MEHPForceBalance2::getCurrentPartialSpringDistances,
+         R"pbdoc(
+           Get the partial spring vectors.
+      )pbdoc")
+    .def("get_current_partial_spring_lengths",
+         &mehp::MEHPForceBalance2::getCurrentPartialSpringLengths,
+         R"pbdoc(
+           Get the partial spring distances.
+      )pbdoc")
+    .def("get_current_spring_vectors",
+         &mehp::MEHPForceBalance2::getCurrentSpringDistances)
+    .def("get_overall_spring_lengths",
+         &mehp::MEHPForceBalance2::getOverallSpringLengths,
+         R"pbdoc(
+           Get the sum of the lengths of the partial springs of each spring.
+      )pbdoc")
+    .def("get_effective_functionality_of_atoms",
+         &mehp::MEHPForceBalance2::getEffectiveFunctionalityOfAtoms,
+         R"pbdoc(
+           Returns the number of active springs connected to each atom, atomId used as index
+ 
+           :param tolerance: springs under this length are considered inactive
+      )pbdoc",
+         py::arg("tolerance") = 1e-3)
+    .def("get_average_spring_length",
+         &mehp::MEHPForceBalance2::getAverageSpringLength,
+         R"pbdoc(
+            Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()`,
+            this value is normalized by the number of springs rather than the number of chains.
+      )pbdoc")
+    .def("get_default_mean_bond_length",
+         &mehp::MEHPForceBalance2::getDefaultMeanBondLength,
+         R"pbdoc(
+            Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()` for 
+            :math:`b` in :math:`\langle R_{0,\eta}^2 = N_{\eta} b^2\rangle`.
+      )pbdoc")
+    .def("get_nr_of_iterations",
+         &mehp::MEHPForceBalance2::getNrOfIterations,
+         R"pbdoc(
+           Returns the number of iterations used for force relaxation so far.
+      )pbdoc")
+    .def("get_exit_reason", &mehp::MEHPForceBalance2::getExitReason, R"pbdoc(
+            Returns the reason for termination of the simulation
+      )pbdoc")
+    .def("get_crosslinker_universe",
+         &mehp::MEHPForceBalance2::getCrosslinkerVerse,
+         R"pbdoc(
+           Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
+      )pbdoc")
+#ifdef CEREALIZABLE
+    .def(py::pickle(
+      [](const mehp::MEHPForceBalance2& u) {
+        return py::make_tuple(pylimer_tools::utils::serializeToString(u));
+      },
+      [](py::tuple t) {
+        std::string in = t[0].cast<std::string>();
+        return mehp::MEHPForceBalance2::constructFromString(in);
       }))
 #endif
     ;

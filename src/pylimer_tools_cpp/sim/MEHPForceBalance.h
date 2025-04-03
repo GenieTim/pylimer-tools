@@ -1,5 +1,4 @@
-#ifndef MEHP_FORCE_BALANCE_H
-#define MEHP_FORCE_BALANCE_H
+#pragma once
 
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
@@ -34,7 +33,7 @@ namespace pylimer_tools {
 namespace sim {
   namespace mehp {
 
-    class MEHPForceBalance
+    class MEHPForceBalance final
       : public pylimer_tools::sim::OutputSupportingSimulation
     {
     private:
@@ -2267,6 +2266,9 @@ namespace sim {
 
       double getTemperature() override
       {
+        std::cerr << "Warning: Temperature is not a reasonable metric for this "
+                     "type of computation."
+                  << std::endl;
         return -1; // TODO: implement?
       }
 
@@ -3336,4 +3338,3 @@ namespace sim {
   } // namespace mehp
 } // namespace calc
 } // namespace pylimer_tools
-#endif

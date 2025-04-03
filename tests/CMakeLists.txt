@@ -65,6 +65,8 @@ add_library(test_sources
 		pylimer_tools/test_dpd_simulator.cpp
 		pylimer_tools/test_eigen_neighbourlist_benchmark.cpp 
 		pylimer_tools/test_force_balance.cpp
+		pylimer_tools/test_force_balance2.cpp
+		pylimer_tools/test_force_balance_benchmark.cpp
 		pylimer_tools/test_force_relaxation.cpp
 		pylimer_tools/test_generator.cpp 
 		pylimer_tools/test_molecule.cpp 
@@ -75,7 +77,6 @@ add_library(test_sources
 		pylimer_tools/test_universe.cpp 
 		pylimer_tools/test_universesequence.cpp 
 )
-# pylimer_tools/test_force_balance2.cpp
 
 IF (WIN32)
 		message(AUTHOR_WARNING "On Windows, OpenMP will not be used")
