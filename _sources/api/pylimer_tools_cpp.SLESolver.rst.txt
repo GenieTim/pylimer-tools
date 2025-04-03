@@ -1,0 +1,35 @@
+SLESolver
+=========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: SLESolver
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~SLESolver.BICGSTAB
+      ~SLESolver.CONJUGATE_GRADIENT
+      ~SLESolver.DEFAULT
+      ~SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT
+      ~SLESolver.SIMPLICIAL_DLT
+      ~SLESolver.SIMPLICIAL_LLT
+      ~SLESolver.SPARSE_LU
+      ~SLESolver.SPARSE_QR
+      ~SLESolver.name
+      ~SLESolver.value
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: BICGSTAB
+   .. autoattribute:: CONJUGATE_GRADIENT
+   .. autoattribute:: DEFAULT
+   .. autoattribute:: LEAST_SQUARES_CONJUGATE_GRADIENT
+   .. autoattribute:: SIMPLICIAL_DLT
+   .. autoattribute:: SIMPLICIAL_LLT
+   .. autoattribute:: SPARSE_LU
+   .. autoattribute:: SPARSE_QR
+   .. autoattribute:: name
+   .. autoattribute:: value

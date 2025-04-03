@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="NonGaussianSpringForceEvaluator" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html" /><link rel="prev" title="NeighbourList" href="pylimer_tools_cpp.NeighbourList.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="SimpleSpringMEHPForceEvaluator" href="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html" /><link rel="prev" title="OutputConfiguration" href="pylimer_tools_cpp.OutputConfiguration.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>NoMaxDistanceProvider - PylimerTools documentation</title>
+        <title>SLESolver - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -253,11 +253,11 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MoleculeIterator.html">MoleculeIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MoleculeType.html">MoleculeType</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NeighbourList.html">NeighbourList</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">NoMaxDistanceProvider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.OutputConfiguration.html">OutputConfiguration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SLESolver.html">SLESolver</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">SLESolver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">SimpleSpringMEHPForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
@@ -294,7 +294,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/api/pylimer_tools_cpp.NoMaxDistanceProvider.rst.txt" title="View this page">
+  <a class="muted-link" href="../_sources/api/pylimer_tools_cpp.SLESolver.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -314,27 +314,107 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="nomaxdistanceprovider">
-<h1>NoMaxDistanceProvider<a class="headerlink" href="#nomaxdistanceprovider" title="Link to this heading">¶</a></h1>
+          <section id="slesolver">
+<h1>SLESolver<a class="headerlink" href="#slesolver" title="Link to this heading">¶</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.NoMaxDistanceProvider">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">NoMaxDistanceProvider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NoMaxDistanceProvider" title="pylimer_tools_cpp.NoMaxDistanceProvider"><span class="pre">pylimer_tools_cpp.NoMaxDistanceProvider</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.NoMaxDistanceProvider" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="pylimer_tools_cpp.MaxDistanceProvider.html#pylimer_tools_cpp.MaxDistanceProvider" title="pylimer_tools_cpp.MaxDistanceProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">MaxDistanceProvider</span></code></a></p>
-<p>For MC generation, to disable the neighbour list useage.</p>
-<p class="rubric">Methods Summary</p>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">SLESolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.SLESolver" title="pylimer_tools_cpp.SLESolver"><span class="pre">pylimer_tools_cpp.SLESolver</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.SLESolver" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Members:</p>
+<p>DEFAULT</p>
+<p>SIMPLICIAL_LLT</p>
+<p>SIMPLICIAL_DLT</p>
+<p>SPARSE_LU</p>
+<p>SPARSE_QR</p>
+<p>CONJUGATE_GRADIENT</p>
+<p>LEAST_SQUARES_CONJUGATE_GRADIENT</p>
+<p>BICGSTAB</p>
+<p class="rubric">Attributes Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NoMaxDistanceProvider.get_max_distance" title="pylimer_tools_cpp.NoMaxDistanceProvider.get_max_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_max_distance</span></code></a>(self, N)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.BICGSTAB" title="pylimer_tools_cpp.SLESolver.BICGSTAB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BICGSTAB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT" title="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CONJUGATE_GRADIENT</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.DEFAULT" title="pylimer_tools_cpp.SLESolver.DEFAULT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT" title="pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_DLT" title="pylimer_tools_cpp.SLESolver.SIMPLICIAL_DLT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SIMPLICIAL_DLT</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT" title="pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SIMPLICIAL_LLT</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SPARSE_LU" title="pylimer_tools_cpp.SLESolver.SPARSE_LU"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPARSE_LU</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SPARSE_QR" title="pylimer_tools_cpp.SLESolver.SPARSE_QR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPARSE_QR</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.name" title="pylimer_tools_cpp.SLESolver.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.value" title="pylimer_tools_cpp.SLESolver.value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p class="rubric">Methods Documentation</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.NoMaxDistanceProvider.get_max_distance">
-<span class="sig-name descname"><span class="pre">get_max_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NoMaxDistanceProvider" title="pylimer_tools_cpp.NoMaxDistanceProvider"><span class="pre">pylimer_tools_cpp.NoMaxDistanceProvider</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NoMaxDistanceProvider.get_max_distance" title="Link to this definition">¶</a></dt>
+<p class="rubric">Attributes Documentation</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.BICGSTAB">
+<span class="sig-name descname"><span class="pre">BICGSTAB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.BICGSTAB:</span> <span class="pre">7&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT">
+<span class="sig-name descname"><span class="pre">CONJUGATE_GRADIENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.CONJUGATE_GRADIENT:</span> <span class="pre">5&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.DEFAULT">
+<span class="sig-name descname"><span class="pre">DEFAULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.DEFAULT:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.DEFAULT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT">
+<span class="sig-name descname"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT:</span> <span class="pre">6&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.SIMPLICIAL_DLT">
+<span class="sig-name descname"><span class="pre">SIMPLICIAL_DLT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.SIMPLICIAL_DLT:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_DLT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT">
+<span class="sig-name descname"><span class="pre">SIMPLICIAL_LLT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.SIMPLICIAL_LLT:</span> <span class="pre">1&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.SPARSE_LU">
+<span class="sig-name descname"><span class="pre">SPARSE_LU</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.SPARSE_LU:</span> <span class="pre">3&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SPARSE_LU" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.SPARSE_QR">
+<span class="sig-name descname"><span class="pre">SPARSE_QR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.SPARSE_QR:</span> <span class="pre">4&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SPARSE_QR" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.value">
+<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.value" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -346,23 +426,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">
+          <a class="next-page" href="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">NonGaussianSpringForceEvaluator</div>
+                <div class="title">SimpleSpringMEHPForceEvaluator</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="pylimer_tools_cpp.NeighbourList.html">
+          <a class="prev-page" href="pylimer_tools_cpp.OutputConfiguration.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">NeighbourList</div>
+                <div class="title">OutputConfiguration</div>
                 
               </div>
             </a>
@@ -395,9 +475,18 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">NoMaxDistanceProvider</a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.NoMaxDistanceProvider"><code class="docutils literal notranslate"><span class="pre">NoMaxDistanceProvider</span></code></a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.NoMaxDistanceProvider.get_max_distance"><code class="docutils literal notranslate"><span class="pre">NoMaxDistanceProvider.get_max_distance()</span></code></a></li>
+<li><a class="reference internal" href="#">SLESolver</a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver"><code class="docutils literal notranslate"><span class="pre">SLESolver</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.BICGSTAB"><code class="docutils literal notranslate"><span class="pre">SLESolver.BICGSTAB</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT"><code class="docutils literal notranslate"><span class="pre">SLESolver.CONJUGATE_GRADIENT</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.DEFAULT"><code class="docutils literal notranslate"><span class="pre">SLESolver.DEFAULT</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT"><code class="docutils literal notranslate"><span class="pre">SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_DLT"><code class="docutils literal notranslate"><span class="pre">SLESolver.SIMPLICIAL_DLT</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT"><code class="docutils literal notranslate"><span class="pre">SLESolver.SIMPLICIAL_LLT</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SPARSE_LU"><code class="docutils literal notranslate"><span class="pre">SLESolver.SPARSE_LU</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SPARSE_QR"><code class="docutils literal notranslate"><span class="pre">SLESolver.SPARSE_QR</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.name"><code class="docutils literal notranslate"><span class="pre">SLESolver.name</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.value"><code class="docutils literal notranslate"><span class="pre">SLESolver.value</span></code></a></li>
 </ul>
 </li>
 </ul>
