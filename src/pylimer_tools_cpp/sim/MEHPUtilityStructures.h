@@ -46,7 +46,8 @@ namespace sim {
       OTHER
     };
 
-    enum SLESolver {
+    enum SLESolver
+    {
       DEFAULT,
       SIMPLICIAL_LLT,
       SIMPLICIAL_DLT,
