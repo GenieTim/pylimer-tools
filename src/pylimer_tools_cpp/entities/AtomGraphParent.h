@@ -3,7 +3,7 @@
 
 extern "C"
 {
-#include <igraph/igraph.h>
+#include <igraph.h>
 }
 #include "../utils/CerealUtils.h"
 #include "../utils/GraphUtils.h"

@@ -12,7 +12,7 @@
 
 extern "C"
 {
-#include <igraph/igraph.h>
+#include <igraph.h>
 }
 #include <algorithm>
 #include <cassert>

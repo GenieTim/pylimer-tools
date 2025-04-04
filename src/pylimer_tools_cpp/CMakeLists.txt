@@ -65,11 +65,11 @@ else()
 endif()
 
 # register dependencies
-add_dependencies(pylimer_tools igraph::igraph)
+add_dependencies(pylimer_tools igraph)
 include_directories(${igraph_INCLUDE_DIRS})
 add_dependencies(pylimer_tools nlopt)
 include_directories(${nlopt_INCLUDE_DIRS})
-add_dependencies(pylimer_tools cerealLib)
+add_dependencies(pylimer_tools cereal)
 include_directories(${cereal_INCLUDE_DIRS})
 add_dependencies(pylimer_tools Spectra)
 include_directories(${Spectra_INCLUDE_DIRS})
@@ -78,8 +78,8 @@ target_link_libraries(pylimer_tools PUBLIC
 	${igraph_LIBRARIES} 
 	${nlopt_LIBRARIES}
 )
-target_link_libraries(pylimer_tools PRIVATE ${STD_FS_LIB})
 
+target_link_libraries(pylimer_tools PRIVATE ${STD_FS_LIB})
 # add_dependencies(pylimer_tools Eigen3::Eigen)
 
 target_link_libraries(pylimer_tools PUBLIC Eigen3::Eigen)

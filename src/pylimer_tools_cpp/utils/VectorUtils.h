@@ -13,7 +13,7 @@
 #include <vector>
 extern "C"
 {
-#include <igraph/igraph.h>
+#include <igraph.h>
 }
 
 namespace pylimer_tools {

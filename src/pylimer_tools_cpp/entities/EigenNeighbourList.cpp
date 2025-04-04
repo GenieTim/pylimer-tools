@@ -1,7 +1,7 @@
 
 extern "C"
 {
-#include <igraph/igraph.h>
+#include <igraph.h>
 }
 #include "../utils/StringUtils.h"
 #include "../utils/VectorUtils.h"

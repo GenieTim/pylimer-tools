@@ -141,23 +141,23 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
   referenceForceBalancer.runForceRelaxation();
   auto end_ref = std::chrono::high_resolution_clock::now();
   auto duration_ref =
-    std::chrono::duration_cast<std::chrono::microseconds>(end_ref - start_ref);
+    std::chrono::duration_cast<std::chrono::microseconds>(end_ref -
+    start_ref);
   std::cout << "Reference Time (FB1) to beat: "
             << std::duration_to_string(duration_ref) << " " << std::endl;
   CHECK(referenceForceBalancer.getNrOfActiveNodes(1e-1) == 0);
 
-  // BENCHMARK_ADVANCED("MEHP LD_MMA " +
-  //                    largeInputFile)(Catch::Benchmark::Chronometer meter)
-  // {
-  //   pcm::MEHPForceRelaxation forceRelaxer =
-  //     pcm::MEHPForceRelaxation(universe, 2);
-
-  //   meter.measure([&forceRelaxer, &referenceForceBalancer] {
-  //     forceRelaxer.runForceRelaxation("LD_MMA");
-  //     CHECK(forceRelaxer.getGamma() == referenceForceBalancer.getGamma());
-  //     return forceRelaxer.getNrOfIterations();
-  //   });
-  // };
+  pcm::MEHPForceRelaxation forceRelaxer = pcm::MEHPForceRelaxation(universe, 2);
+  auto start_fr = std::chrono::high_resolution_clock::now();
+  forceRelaxer.runForceRelaxation("LD_MMA");
+  auto end_fr = std::chrono::high_resolution_clock::now();
+  CHECK_THAT(
+    forceRelaxer.getGamma(),
+    Catch::Matchers::WithinAbs(referenceForceBalancer.getGamma(), 1e-5));
+  auto duration_fr =
+    std::chrono::duration_cast<std::chrono::microseconds>(end_fr - start_fr);
+  std::cout << "Force Relaxation, LD_MMA: "
+            << std::duration_to_string(duration_fr) << " " << std::endl;
 
   for (pcm::SLESolver solverChoice :
        { // pcm::SIMPLICIAL_LLT,

@@ -1,6 +1,6 @@
 extern "C"
 {
-#include <igraph/igraph.h>
+#include <igraph.h>
 }
 #include "../utils/VectorUtils.h"
 #include "Atom.h"

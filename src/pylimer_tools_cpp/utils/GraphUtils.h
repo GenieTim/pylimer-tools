@@ -10,7 +10,7 @@
 #include <vector>
 extern "C"
 {
-#include <igraph/igraph.h>
+#include <igraph.h>
 }
 #include "./VectorUtils.h"
 

@@ -2,7 +2,7 @@
 
 extern "C"
 {
-#include <igraph/igraph.h>
+#include <igraph.h>
 }
 #include "../utils/ExtraEigenTypes.h"
 #include "Box.h"

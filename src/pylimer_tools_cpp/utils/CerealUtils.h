@@ -23,7 +23,7 @@
 #include <cereal/types/vector.hpp>
 extern "C"
 {
-#include <igraph/igraph.h>
+#include <igraph.h>
 }
 
 namespace cereal {

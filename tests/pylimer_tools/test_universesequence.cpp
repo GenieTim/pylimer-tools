@@ -12,7 +12,7 @@
 #include <string>
 extern "C"
 {
-#include <igraph/igraph.h>
+#include <igraph.h>
 }
 
 namespace pe = pylimer_tools::entities;

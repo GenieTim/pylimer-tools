@@ -1,6 +1,6 @@
 extern "C"
 {
-#include <igraph/igraph.h>
+#include <igraph.h>
 }
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtils.h"

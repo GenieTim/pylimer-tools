@@ -9,7 +9,7 @@
 #include <set>
 extern "C"
 {
-#include <igraph/igraph.h>
+#include <igraph.h>
 }
 #ifdef OPENMP_FOUND
 #include <omp.h>

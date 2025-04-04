@@ -13,7 +13,7 @@
 #include <string>
 extern "C"
 {
-#include <igraph/igraph.h>
+#include <igraph.h>
 }
 
 namespace pu = pylimer_tools::utils;

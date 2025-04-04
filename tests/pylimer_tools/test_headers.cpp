@@ -10,7 +10,7 @@
 #include <string>
 extern "C"
 {
-#include <igraph/igraph.h>
+#include <igraph.h>
 }
 
 #define CATCH_CONFIG_MAIN
