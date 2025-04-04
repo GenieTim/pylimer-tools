@@ -5,6 +5,7 @@
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include "../../src/pylimer_tools_cpp/io/DataFileWriter.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance2.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceRelaxation.h"
 #include "../../src/pylimer_tools_cpp/utils/MCUniverseGenerator.h"
 #include <catch2/catch_approx.hpp>
@@ -650,6 +651,7 @@ TEST_CASE("Randomly functionalized chains collapse",
   SECTION("With big box")
   {
     forceBalance.configAssumeBoxLargeEnough(true);
+    CHECK(forceBalance.getResidual() > 0.);
     forceBalance.runForceRelaxation();
 
     CHECK_THAT(forceBalance.getSolubleWeightFraction(),
@@ -660,6 +662,7 @@ TEST_CASE("Randomly functionalized chains collapse",
   SECTION("With small box")
   {
     forceBalance.configAssumeBoxLargeEnough(false);
+    CHECK(forceBalance.getResidual() > 0.);
     forceBalance.runForceRelaxation();
 
     CHECK_THAT(forceBalance.getSolubleWeightFraction(),
