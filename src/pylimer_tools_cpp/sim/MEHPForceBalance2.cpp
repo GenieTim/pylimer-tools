@@ -125,6 +125,8 @@ namespace sim {
                  this->initialConfig.nrOfLinks);
           assert(this->initialConfig.springPartIndexB[springIdx] <
                  this->initialConfig.nrOfLinks);
+          // triplets will be summed up -> we can use the same indices multiple
+          // times
           for (size_t dir = 0; dir < 3; ++dir) {
             triplets.push_back(Eigen::Triplet<double>(
               this->initialConfig.springPartIndexA[springIdx] * 3 + dir,

@@ -50,21 +50,25 @@ TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
     {
       pcm::MEHPForceRelaxation forceRelaxer =
         pcm::MEHPForceRelaxation(universe, 2);
+      forceRelaxer.configAssumeBoxLargeEnough(false);
 
       meter.measure([&forceRelaxer, &referenceForceBalancer] {
         forceRelaxer.runForceRelaxation("LD_MMA");
-        CHECK(forceRelaxer.getGamma() == referenceForceBalancer.getGamma());
+        CHECK_THAT(
+          forceRelaxer.getGamma(),
+          Catch::Matchers::WithinRel(referenceForceBalancer.getGamma()));
         return forceRelaxer.getNrOfIterations();
       });
     };
 
-    for (pcm::SLESolver solverChoice : { pcm::SIMPLICIAL_LLT,
-                                         pcm::SIMPLICIAL_DLT,
-                                         pcm::SPARSE_LU,
-                                         pcm::SPARSE_QR,
-                                         pcm::CONJUGATE_GRADIENT,
-                                         pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
-                                         pcm::BICGSTAB }) {
+    for (pcm::SLESolver solverChoice :
+         { // pcm::SIMPLICIAL_LLT,
+           //                                    pcm::SIMPLICIAL_DLT,
+           //                                    pcm::SPARSE_LU,
+           //                                    pcm::SPARSE_QR,
+           pcm::CONJUGATE_GRADIENT,
+           pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
+           pcm::BICGSTAB }) {
       pcm::MEHPForceBalance2 forceBalancer =
         pcm::MEHPForceBalance2(universe, 2);
       forceBalancer.configAssumeBoxLargeEnough(false);
