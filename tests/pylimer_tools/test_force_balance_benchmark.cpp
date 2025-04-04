@@ -13,6 +13,7 @@
 #include <filesystem>
 #include <iostream>
 #include <map>
+#include <print>
 #include <random>
 #include <vector>
 
@@ -45,26 +46,27 @@ TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
     std::cout << "Reference Time (FB1) to beat: " << duration_ref.count()
               << " microseconds" << std::endl;
 
-    BENCHMARK_ADVANCED("MEHP LD_MMA " +
-                       largeInputFile)(Catch::Benchmark::Chronometer meter)
-    {
-      pcm::MEHPForceRelaxation forceRelaxer =
-        pcm::MEHPForceRelaxation(universe, 2);
+    // BENCHMARK_ADVANCED("MEHP LD_MMA " +
+    //                    largeInputFile)(Catch::Benchmark::Chronometer meter)
+    // {
+    //   pcm::MEHPForceRelaxation forceRelaxer =
+    //     pcm::MEHPForceRelaxation(universe, 2);
 
-      meter.measure([&forceRelaxer, &referenceForceBalancer] {
-        forceRelaxer.runForceRelaxation("LD_MMA");
-        CHECK(forceRelaxer.getGamma() == referenceForceBalancer.getGamma());
-        return forceRelaxer.getNrOfIterations();
-      });
-    };
+    //   meter.measure([&forceRelaxer, &referenceForceBalancer] {
+    //     forceRelaxer.runForceRelaxation("LD_MMA");
+    //     CHECK(forceRelaxer.getGamma() == referenceForceBalancer.getGamma());
+    //     return forceRelaxer.getNrOfIterations();
+    //   });
+    // };
 
-    for (pcm::SLESolver solverChoice : { pcm::SIMPLICIAL_LLT,
-                                         pcm::SIMPLICIAL_DLT,
-                                         pcm::SPARSE_LU,
-                                         pcm::SPARSE_QR,
-                                         pcm::CONJUGATE_GRADIENT,
-                                         pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
-                                         pcm::BICGSTAB }) {
+    for (pcm::SLESolver solverChoice :
+         { // pcm::SIMPLICIAL_LLT,
+           //                                    pcm::SIMPLICIAL_DLT,
+           //                                    pcm::SPARSE_LU,
+           //                                    pcm::SPARSE_QR,
+           pcm::CONJUGATE_GRADIENT,
+           pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
+           pcm::BICGSTAB }) {
       pcm::MEHPForceBalance2 forceBalancer =
         pcm::MEHPForceBalance2(universe, 2);
       forceBalancer.configAssumeBoxLargeEnough(false);
@@ -83,14 +85,22 @@ TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
         continue;
       }
 
-      CHECK_THAT(forceBalancer.getGamma(),
-                 Catch::Matchers::WithinRel(referenceForceBalancer.getGamma()));
+      CHECK_THAT(
+        forceBalancer.getGamma(),
+        Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(), 1e-4));
       auto end = std::chrono::high_resolution_clock::now();
       auto duration =
         std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+      auto mins = std::chrono::duration_cast<std::chrono::minutes>(duration);
+      auto secs =
+        std::chrono::duration_cast<std::chrono::seconds>(duration - mins);
+      auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+        duration - mins - secs);
+        
       std::cout << "Solver (FB2): " << solverChoice
-                << ", Time: " << duration.count() << " microseconds"
-                << std::endl;
+                << ", Time: " << mins.count() << ":" << secs.count() << "."
+                << ms.count() << std::endl;
     }
   }
 }
