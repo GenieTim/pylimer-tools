@@ -24,9 +24,9 @@ namespace utils {
    * @param chainLen the number of atoms to add in between from and to
    */
   static Eigen::VectorXd doRandomWalkChain(int chainLen,
-                                    double beadDistance,
-                                    double meanSquaredBeadDistance,
-                                    std::mt19937 rng)
+                                           double beadDistance,
+                                           double meanSquaredBeadDistance,
+                                           std::mt19937 rng)
   {
     std::uniform_real_distribution<double> angleDistribution =
       std::uniform_real_distribution<double>(0, 2 * M_PI);
@@ -68,9 +68,9 @@ namespace utils {
   }
 
   static Eigen::VectorXd doRandomWalkChain(int chainLen,
-                                    double beadDistance = 1.0,
-                                    double meanSquaredBeadDistance = 1.0,
-                                    std::string seed = "")
+                                           double beadDistance = 1.0,
+                                           double meanSquaredBeadDistance = 1.0,
+                                           std::string seed = "")
   {
     std::mt19937 rng;
     if (seed == "") {

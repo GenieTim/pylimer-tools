@@ -15,7 +15,6 @@
 #include <filesystem>
 #include <iostream>
 #include <map>
-#include <print>
 #include <random>
 #include <vector>
 
@@ -145,6 +144,7 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
     std::chrono::duration_cast<std::chrono::microseconds>(end_ref - start_ref);
   std::cout << "Reference Time (FB1) to beat: "
             << std::duration_to_string(duration_ref) << " " << std::endl;
+  CHECK(referenceForceBalancer.getNrOfActiveNodes(1e-1) == 0);
 
   // BENCHMARK_ADVANCED("MEHP LD_MMA " +
   //                    largeInputFile)(Catch::Benchmark::Chronometer meter)
@@ -183,13 +183,14 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
                 << std::endl;
       continue;
     }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
     CHECK_THAT(
       forceBalancer.getGamma(),
       Catch::Matchers::WithinAbs(referenceForceBalancer.getGamma(), 1e-5));
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration =
-      std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    CHECK(forceBalancer.getNrOfActiveNodes() == 0);
 
     std::cout << "Solver (FB2): " << solverChoice
               << ", Time: " << std::duration_to_string(duration) << std::endl;
