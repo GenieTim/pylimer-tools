@@ -7,7 +7,7 @@
 namespace pylimer_tools {
 namespace sim {
 
-  void equilibrateChainWithMC(Eigen::VectorXd& coordinates,
+  static void equilibrateChainWithMC(Eigen::VectorXd& coordinates,
                               double meanSquaredBeadDistance,
                               std::mt19937 rng,
                               bool fixFirst = false,
