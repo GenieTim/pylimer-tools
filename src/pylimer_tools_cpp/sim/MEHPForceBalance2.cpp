@@ -199,8 +199,18 @@ namespace sim {
         switch (solverChoice) {
           // iterative solvers
           case SLESolver::DEFAULT:
-          case SLESolver::CONJUGATE_GRADIENT: {
-            Eigen::ConjugateGradient<Eigen::SparseMatrix<double>, Eigen::Lower>
+          case SLESolver::CONJUGATE_GRADIENT:
+          case SLESolver::CONJUGATE_GRADIENT_DIAGONALIZED: {
+            Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
+                                     Eigen::Lower,
+                                     Eigen::DiagonalPreconditioner<double>>
+              solver;
+            SOLVE_ITERATIVE(solver);
+          }
+          case SLESolver::CONJUGATE_GRADIENT_IDENTITY: {
+            Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
+                                     Eigen::Lower,
+                                     Eigen::IdentityPreconditioner>
               solver;
             SOLVE_ITERATIVE(solver);
           }
