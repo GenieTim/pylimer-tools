@@ -119,8 +119,20 @@ namespace sim {
               this->initialConfig.springPartIndexB[springIdx]) {
             continue;
           }
+          const double contourLengthFraction =
+            this->currentSpringPartitionsVec[springIdx];
+          const double N =
+            this->initialConfig.springsContourLength
+              [this->initialConfig.partialToFullSpringIndex[springIdx]];
+          double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+            this->initialConfig.partialSpringIsPartial[springIdx],
+            1.0 / (N * contourLengthFraction),
+            N,
+            oneOverSpringPartitionUpperLimit);
           double multiplier =
-            this->kappa * oneOverSpringPartitions(springIdx * 3);
+            this->kappa *
+            oneOverContourLengthFraction; // oneOverSpringPartitions(springIdx
+                                          // * 3);
           assert(this->initialConfig.springPartIndexA[springIdx] <
                  this->initialConfig.nrOfLinks);
           assert(this->initialConfig.springPartIndexB[springIdx] <
@@ -146,11 +158,11 @@ namespace sim {
               1. * multiplier));
           }
           constants.segment(3 * this->initialConfig.springPartIndexA[springIdx],
-                            3) +=
+                            3) -=
             this->initialConfig.springPartBoxOffset.segment(3 * springIdx, 3) *
             multiplier;
           constants.segment(3 * this->initialConfig.springPartIndexB[springIdx],
-                            3) -=
+                            3) +=
             this->initialConfig.springPartBoxOffset.segment(3 * springIdx, 3) *
             multiplier;
         }
@@ -409,29 +421,30 @@ namespace sim {
         (this->kappa * oneOverSpringPartitions * distances *
          loopPartialSpringEliminator);
 
-      // #ifndef NDEBUG
-      //       Eigen::ArrayXd forces2 = Eigen::ArrayXd::Zero(3 * net.nrOfLinks);
-      //       Eigen::VectorXi debugNrSpringsVisited =
-      //         Eigen::VectorXi::Zero(net.nrOfPartialSprings);
-      //       for (size_t i = 0; i < net.nrOfLinks; ++i) {
-      //         forces2.segment(3 * i, 3) =
-      //           this
-      //             ->evaluateForceOnLink(i,
-      //                                   net,
-      //                                   u,
-      //                                   springPartitions,
-      //                                   debugNrSpringsVisited,
-      //                                   oneOverSpringPartitionUpperLimit)
-      //             .array();
-      //       }
-      //       assert((debugNrSpringsVisited.array() == 2).all());
-      //       double squareN1 = forces.matrix().squaredNorm();
-      //       double squareN2 = forces2.matrix().squaredNorm();
-      //       assert(APPROX_EQUAL(squareN1, squareN2, 1e-9));
-      //       assert(
-      //         pylimer_tools::utils::vector_approx_equal(forces, forces2,
-      //         1e-9, true));
-      // #endif
+// #ifndef NDEBUG
+//       Eigen::VectorXi debugNrSpringsVisited =
+//         Eigen::VectorXi::Zero(net.nrOfPartialSprings);
+//       for (size_t i = 0; i < net.nrOfLinks; ++i) {
+//         Eigen::Array3d forces2 =
+//           this
+//             ->evaluateForceOnLink(i,
+//                                   net,
+//                                   u,
+//                                   springPartitions,
+//                                   debugNrSpringsVisited,
+//                                   oneOverSpringPartitionUpperLimit)
+//             .array();
+//         double squareN1 = forces.segment(3 * i, 3).matrix().squaredNorm();
+//         double squareN2 = forces2.matrix().squaredNorm();
+//         if (i == 129) {
+//           this->debugAtomVicinity(net.oldAtomIds[i]);
+//         }
+//         assert(APPROX_EQUAL(squareN1, squareN2, 1e-9));
+//         // assert(pylimer_tools::utils::vector_approx_equal(
+//         //   forces.segment(3 * i, 3), forces2, 1e-9, true));
+//       }
+//       assert((debugNrSpringsVisited.array() == 2).all());
+// #endif
 
       return forces.matrix().squaredNorm();
     }
