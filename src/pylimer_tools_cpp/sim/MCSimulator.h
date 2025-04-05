@@ -7,12 +7,12 @@
 namespace pylimer_tools {
 namespace sim {
 
-  void equilibrateChainWithMC(Eigen::VectorXd& coordinates,
-                              double meanSquaredBeadDistance,
-                              std::mt19937 rng,
-                              bool fixFirst = false,
-                              bool fixLast = false,
-                              size_t nSteps = 1000)
+  static void equilibrateChainWithMC(Eigen::VectorXd& coordinates,
+                                     double meanSquaredBeadDistance,
+                                     std::mt19937 rng,
+                                     bool fixFirst = false,
+                                     bool fixLast = false,
+                                     size_t nSteps = 1000)
   {
     INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
                        "Coordinates must have a multiple of 3 elements");

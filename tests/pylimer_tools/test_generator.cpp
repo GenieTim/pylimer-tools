@@ -645,7 +645,9 @@ TEST_CASE("Randomly functionalized chains collapse",
     pylimer_tools::sim::ComputedDoubleValues::RESIDUAL,
     pylimer_tools::sim::ComputedDoubleValues::GAMMA
   };
-  std::vector<pylimer_tools::sim::OutputConfiguration> outputConfigs = { outputConfig };
+  std::vector<pylimer_tools::sim::OutputConfiguration> outputConfigs = {
+    outputConfig
+  };
   forceBalance.configStepOutput(outputConfigs);
 
   SECTION("With big box")
