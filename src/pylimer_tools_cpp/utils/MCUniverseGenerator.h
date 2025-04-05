@@ -2294,7 +2294,8 @@ namespace utils {
               ? pylimer_tools::utils::first_occuring_index(
                   this->simplifiedUniverse.xlinkChainId, strand1, from)
               : from;
-          assert(xlinkIdxOnStrand1 < this->simplifiedUniverse.xlinkChainId.size());
+          assert(xlinkIdxOnStrand1 <
+                 this->simplifiedUniverse.xlinkChainId.size());
           while (this->simplifiedUniverse.xlinkChainId[xlinkIdxOnStrand1] ==
                    strand1 &&
                  xlinkIdxOnStrand1 <

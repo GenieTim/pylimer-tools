@@ -46,13 +46,16 @@ namespace sim {
       OTHER
     };
 
-    enum SLESolver {
+    enum SLESolver
+    {
       DEFAULT,
       SIMPLICIAL_LLT,
       SIMPLICIAL_DLT,
       SPARSE_LU,
       SPARSE_QR,
       CONJUGATE_GRADIENT,
+      CONJUGATE_GRADIENT_DIAGONALIZED,
+      CONJUGATE_GRADIENT_IDENTITY,
       LEAST_SQUARES_CONJUGATE_GRADIENT,
       BICGSTAB
     };

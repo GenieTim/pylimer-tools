@@ -201,8 +201,18 @@ namespace sim {
         switch (solverChoice) {
           // iterative solvers
           case SLESolver::DEFAULT:
-          case SLESolver::CONJUGATE_GRADIENT: {
-            Eigen::ConjugateGradient<Eigen::SparseMatrix<double>, Eigen::Lower>
+          case SLESolver::CONJUGATE_GRADIENT:
+          case SLESolver::CONJUGATE_GRADIENT_DIAGONALIZED: {
+            Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
+                                     Eigen::Lower,
+                                     Eigen::DiagonalPreconditioner<double>>
+              solver;
+            SOLVE_ITERATIVE(solver);
+          }
+          case SLESolver::CONJUGATE_GRADIENT_IDENTITY: {
+            Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
+                                     Eigen::Lower,
+                                     Eigen::IdentityPreconditioner>
               solver;
             SOLVE_ITERATIVE(solver);
           }
@@ -421,30 +431,30 @@ namespace sim {
         (this->kappa * oneOverSpringPartitions * distances *
          loopPartialSpringEliminator);
 
-// #ifndef NDEBUG
-//       Eigen::VectorXi debugNrSpringsVisited =
-//         Eigen::VectorXi::Zero(net.nrOfPartialSprings);
-//       for (size_t i = 0; i < net.nrOfLinks; ++i) {
-//         Eigen::Array3d forces2 =
-//           this
-//             ->evaluateForceOnLink(i,
-//                                   net,
-//                                   u,
-//                                   springPartitions,
-//                                   debugNrSpringsVisited,
-//                                   oneOverSpringPartitionUpperLimit)
-//             .array();
-//         double squareN1 = forces.segment(3 * i, 3).matrix().squaredNorm();
-//         double squareN2 = forces2.matrix().squaredNorm();
-//         if (i == 129) {
-//           this->debugAtomVicinity(net.oldAtomIds[i]);
-//         }
-//         assert(APPROX_EQUAL(squareN1, squareN2, 1e-9));
-//         // assert(pylimer_tools::utils::vector_approx_equal(
-//         //   forces.segment(3 * i, 3), forces2, 1e-9, true));
-//       }
-//       assert((debugNrSpringsVisited.array() == 2).all());
-// #endif
+      // #ifndef NDEBUG
+      //       Eigen::VectorXi debugNrSpringsVisited =
+      //         Eigen::VectorXi::Zero(net.nrOfPartialSprings);
+      //       for (size_t i = 0; i < net.nrOfLinks; ++i) {
+      //         Eigen::Array3d forces2 =
+      //           this
+      //             ->evaluateForceOnLink(i,
+      //                                   net,
+      //                                   u,
+      //                                   springPartitions,
+      //                                   debugNrSpringsVisited,
+      //                                   oneOverSpringPartitionUpperLimit)
+      //             .array();
+      //         double squareN1 = forces.segment(3 * i,
+      //         3).matrix().squaredNorm(); double squareN2 =
+      //         forces2.matrix().squaredNorm(); if (i == 129) {
+      //           this->debugAtomVicinity(net.oldAtomIds[i]);
+      //         }
+      //         assert(APPROX_EQUAL(squareN1, squareN2, 1e-9));
+      //         // assert(pylimer_tools::utils::vector_approx_equal(
+      //         //   forces.segment(3 * i, 3), forces2, 1e-9, true));
+      //       }
+      //       assert((debugNrSpringsVisited.array() == 2).all());
+      // #endif
 
       return forces.matrix().squaredNorm();
     }

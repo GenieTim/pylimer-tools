@@ -1,17 +1,18 @@
 #pragma once
 
+// #include <ranges>
+// #include <string_view>
 #include <Eigen/Dense>
 #include <algorithm>
 #include <chrono>
 #include <cstring>
+#include <iomanip>
 #include <iostream>
 #include <regex>
 #include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
-// #include <ranges>
-// #include <string_view>
 
 namespace std {
 static std::string
@@ -35,20 +36,26 @@ to_string(std::pair<T, T> pair)
          ")";
 }
 
-static std::string
-to_string(std::chrono::duration duration)
+template<typename Duration>
+std::string
+duration_to_string(Duration duration)
 {
-  auto hrs = std::chrono::duration_cast<std::chrono::hours>(duration);
-  auto mins = std::chrono::duration_cast<std::chrono::minutes>(duration - hrs);
-  auto secs =
-    std::chrono::duration_cast<std::chrono::seconds>(duration - hrs - mins);
-  auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-    duration - hrs - mins - secs);
+  auto hours = std::chrono::duration_cast<std::chrono::hours>(duration);
+  duration -= hours;
+  auto minutes = std::chrono::duration_cast<std::chrono::minutes>(duration);
+  duration -= minutes;
+  auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
+  duration -= seconds;
+  auto milliseconds =
+    std::chrono::duration_cast<std::chrono::milliseconds>(duration);
 
-  std::stringstream ss;
-  ss << hrs.count() << ":" << mins.count() << ":" << secs.count() << "."
-     << ms.count();
-  return ss.str();
+  std::ostringstream oss;
+  oss << hours.count() << ":" << std::setw(2) << std::setfill('0')
+      << minutes.count() << ":" << std::setw(2) << std::setfill('0')
+      << seconds.count() << "." << std::setw(3) << std::setfill('0')
+      << milliseconds.count();
+
+  return oss.str();
 }
 } // namespace std
 
