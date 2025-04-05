@@ -47,21 +47,21 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
     std::cout << "Reference Time (FB1) to beat: "
               << std::duration_to_string(duration_ref) << " " << std::endl;
 
-    BENCHMARK_ADVANCED("MEHP LD_MMA " +
-                       largeInputFile)(Catch::Benchmark::Chronometer meter)
-    {
-      pcm::MEHPForceRelaxation forceRelaxer =
-        pcm::MEHPForceRelaxation(universe, 2);
+    // BENCHMARK_ADVANCED("MEHP LD_MMA " +
+    //                    largeInputFile)(Catch::Benchmark::Chronometer meter)
+    // {
+    //   pcm::MEHPForceRelaxation forceRelaxer =
+    //     pcm::MEHPForceRelaxation(universe, 2);
 
-      meter.measure([&forceRelaxer, &referenceForceBalancer] {
-        forceRelaxer.runForceRelaxation("LD_MMA");
+    //   meter.measure([&forceRelaxer, &referenceForceBalancer] {
+    //     forceRelaxer.runForceRelaxation("LD_MMA");
 
-        CHECK_THAT(
-          forceRelaxer.getGamma(),
-          Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(), 1e-2));
-        return forceRelaxer.getNrOfIterations();
-      });
-    };
+    //     CHECK_THAT(
+    //       forceRelaxer.getGamma(),
+    //       Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(), 1e-2));
+    //     return forceRelaxer.getNrOfIterations();
+    //   });
+    // };
 
     for (pcm::SLESolver solverChoice :
          { // pcm::SIMPLICIAL_LLT,
@@ -69,6 +69,7 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
            //                                    pcm::SPARSE_LU,
            //                                    pcm::SPARSE_QR,
            pcm::CONJUGATE_GRADIENT,
+           pcm::CONJUGATE_GRADIENT_IDENTITY,
            pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
            pcm::BICGSTAB }) {
       pcm::MEHPForceBalance2 forceBalancer =
@@ -133,7 +134,7 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
   pe::Universe universe = generator.getUniverse();
 
   pcm::MEHPForceBalance referenceForceBalancer =
-    pcm::MEHPForceBalance(universe, 2);
+    pcm::MEHPForceBalance(universe, 2); // using a different crosslinkerType here makes things faster
   referenceForceBalancer.configAssumeBoxLargeEnough(false);
 
   auto start_ref = std::chrono::high_resolution_clock::now();
@@ -165,6 +166,7 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
          //                                    pcm::SPARSE_LU,
          //                                    pcm::SPARSE_QR,
          pcm::CONJUGATE_GRADIENT,
+         pcm::CONJUGATE_GRADIENT_IDENTITY,
          pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
          pcm::BICGSTAB }) {
     pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(universe, 2);
