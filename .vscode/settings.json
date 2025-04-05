@@ -203,5 +203,6 @@
     "W690"
   ],
   "C_Cpp.clang_format_fallbackStyle": "Mozilla",
-  "clang-format.fallbackStyle": "Mozilla"
+  "clang-format.fallbackStyle": "Mozilla",
+  "C_Cpp.default.compilerPath": "/opt/homebrew/opt/llvm/bin/clang-20"
 }

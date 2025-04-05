@@ -3,7 +3,7 @@
         {
             "name": "Mac",
             "defines": [],
-            "compilerPath": "/usr/local/opt/llvm/bin/clang-19",
+            "compilerPath": "/opt/homebrew/opt/llvm/bin/clang-20",
             "intelliSenseMode": "${default}",
             "cStandard": "c17",
             "cppStandard": "c++20",
