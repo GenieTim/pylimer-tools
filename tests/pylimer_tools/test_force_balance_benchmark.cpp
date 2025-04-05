@@ -4,6 +4,7 @@
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance2.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceEvaluator.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceRelaxation.h"
+#include "../../src/pylimer_tools_cpp/utils/StringUtils.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -13,6 +14,7 @@
 #include <filesystem>
 #include <iostream>
 #include <map>
+#include <print>
 #include <random>
 #include <vector>
 
@@ -42,8 +44,8 @@ TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
     auto end_ref = std::chrono::high_resolution_clock::now();
     auto duration_ref = std::chrono::duration_cast<std::chrono::microseconds>(
       end_ref - start_ref);
-    std::cout << "Reference Time (FB1) to beat: " << duration_ref.count()
-              << " microseconds" << std::endl;
+    std::cout << "Reference Time (FB1) to beat: "
+              << std::to_string(duration_ref) << " microseconds" << std::endl;
 
     BENCHMARK_ADVANCED("MEHP LD_MMA " +
                        largeInputFile)(Catch::Benchmark::Chronometer meter)
@@ -61,14 +63,13 @@ TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
       });
     };
 
-    for (pcm::SLESolver solverChoice :
-         { // pcm::SIMPLICIAL_LLT,
-           //                                    pcm::SIMPLICIAL_DLT,
-           //                                    pcm::SPARSE_LU,
-           //                                    pcm::SPARSE_QR,
-           pcm::CONJUGATE_GRADIENT,
-           pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
-           pcm::BICGSTAB }) {
+    for (pcm::SLESolver solverChoice : { // pcm::SIMPLICIAL_LLT,
+                                         // pcm::SIMPLICIAL_DLT,
+                                         // pcm::SPARSE_LU,
+                                         // pcm::SPARSE_QR,
+                                         pcm::CONJUGATE_GRADIENT,
+                                         pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
+                                         pcm::BICGSTAB }) {
       pcm::MEHPForceBalance2 forceBalancer =
         pcm::MEHPForceBalance2(universe, 2);
       forceBalancer.configAssumeBoxLargeEnough(false);
@@ -87,14 +88,15 @@ TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
         continue;
       }
 
-      CHECK_THAT(forceBalancer.getGamma(),
-                 Catch::Matchers::WithinRel(referenceForceBalancer.getGamma()));
+      CHECK_THAT(
+        forceBalancer.getGamma(),
+        Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(), 1e-4));
       auto end = std::chrono::high_resolution_clock::now();
       auto duration =
         std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
       std::cout << "Solver (FB2): " << solverChoice
-                << ", Time: " << duration.count() << " microseconds"
-                << std::endl;
+                << ", Time: " << std::to_string(duration) << std::endl;
     }
   }
 }

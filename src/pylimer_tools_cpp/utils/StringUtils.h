@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 #include <algorithm>
+#include <chrono>
 #include <cstring>
 #include <iostream>
 #include <regex>
@@ -32,6 +33,22 @@ to_string(std::pair<T, T> pair)
 {
   return "(" + std::to_string(pair.first) + ", " + std::to_string(pair.second) +
          ")";
+}
+
+static std::string
+to_string(std::chrono::duration duration)
+{
+  auto hrs = std::chrono::duration_cast<std::chrono::hours>(duration);
+  auto mins = std::chrono::duration_cast<std::chrono::minutes>(duration - hrs);
+  auto secs =
+    std::chrono::duration_cast<std::chrono::seconds>(duration - hrs - mins);
+  auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+    duration - hrs - mins - secs);
+
+  std::stringstream ss;
+  ss << hrs.count() << ":" << mins.count() << ":" << secs.count() << "."
+     << ms.count();
+  return ss.str();
 }
 } // namespace std
 
