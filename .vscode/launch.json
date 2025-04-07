@@ -26,7 +26,7 @@
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
-        "MEHP Force Balance2 runs"
+        "Force Balance Benchmarks"
         // "Randomly functionalized chains collapse"
       ],
       "env": {

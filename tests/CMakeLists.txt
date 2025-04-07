@@ -58,7 +58,9 @@ FetchContent_MakeAvailable(Catch2)
 # endif()
 
 # add sources & targets
-add_subdirectory(../src/pylimer_tools_cpp pylimer_tools.out)
+if (NOT TARGET pylimer_tools)
+	add_subdirectory(../src/pylimer_tools_cpp pylimer_tools.out)
+endif ()
 
 add_library(test_sources 
 	OBJECT 
