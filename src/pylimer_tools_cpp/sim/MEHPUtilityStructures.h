@@ -158,31 +158,26 @@ namespace sim::mehp {
     double boxHalfs[3];   /* half box sizes */
     size_t nrOfLinks = 0; /* number of links, = nrOfNodes + nrOfSlipLinks */
     size_t nrOfNodes = 0; /* number of crosslinkers */
+    size_t nrOfStrands = 0;
     size_t nrOfSprings = 0;
-    size_t nrOfPartialSprings = 0;
     // coordinates & connectivity
     Eigen::VectorXd coordinates;
     Eigen::VectorXd springsContourLength; /* the N for each spring */
     Eigen::ArrayXi springsType; // gives each spring a type. Needed for
     // entanglements modelled as springs
-    ArrayXArrayXi springIndicesOfLinks;    // maps link -> springs
-    ArrayXArrayXi linkIndicesOfSprings;    // maps spring -> links
-    Eigen::ArrayXb partialSpringIsPartial; // indicates whether a spring
-    // involves a slip-link
-    // local to global: from the 2D structures to the 1D Eigen vector
-    // equivalent to "partial spring indices of spring"
-    ArrayXArrayXi localToGlobalSpringIndex;
+    ArrayXArrayXi strandIndicesOfLinks;    // maps link -> springs
+    ArrayXArrayXi linkIndicesOfStrands;    // maps spring -> links
+    ArrayXArrayXi springIndicesOfStrand;
     // map the "local", partial, spring indices to the full-length springs
-
-    Eigen::ArrayXb linkIsEntanglement;
+    Eigen::ArrayXb linkIsEntanglement; // whether a link is a "cross-link" or an "entanglement-link"
 
     // partial springs
-    Eigen::ArrayXi springPartCoordinateIndexA;
-    Eigen::ArrayXi springPartCoordinateIndexB;
-    Eigen::ArrayXi springPartIndexA;
-    Eigen::ArrayXi springPartIndexB;
-    Eigen::VectorXd springPartBoxOffset;
-    Eigen::ArrayXi partialToFullSpringIndex;
+    Eigen::ArrayXi springCoordinateIndexA;
+    Eigen::ArrayXi springCoordinateIndexB;
+    Eigen::ArrayXi springIndexA;
+    Eigen::ArrayXi springIndexB;
+    Eigen::VectorXd springBoxOffset; // the "PBC" for each spring
+    Eigen::ArrayXi strandIdxOfSpring; // the mapping from spring to strand
 
     Eigen::ArrayXi oldAtomIds;
     Eigen::ArrayXi oldAtomTypes;

@@ -1353,20 +1353,6 @@ init_pylimer_bound_sim(py::module_& m)
          &mehp::MEHPForceBalance2::configSpringConstant,
          R"pbdoc()pbdoc",
          py::arg("kappa") = 1.0)
-    .def("config_entanglement_type",
-         &mehp::MEHPForceBalance2::configEntanglementType,
-         R"pbdoc(
-          To have certain cross-links behave as entanglements in the removal process,
-          you can specify the here a type, that you have used in the universe to specify:
-          - the type of entanglement atoms (expected with functionality f = 3),
-          - and the entanglement-bonds between the entanglement atoms.
- 
-          I.e., say you want to model some entanglements as non-slipping,
-          bonds between two strand beads resulting in f = 3 beads, for example,
-          you can call this method to have the "StructureSimplificationMode" also remove these atoms,
-          if they have a functionality of 2 or less while still being connected to its partner bead.
-          )pbdoc",
-         py::arg("type") = -1)
     .def("config_spring_breaking_distance",
          &mehp::MEHPForceBalance2::configSpringBreakingDistance,
          R"pbdoc(
@@ -1384,10 +1370,6 @@ init_pylimer_bound_sim(py::module_& m)
           Default: 10.
           )pbdoc",
          py::arg("frequency") = 10)
-    .def("swap_sliplinks_incl_xlinks",
-         &mehp::MEHPForceBalance2::swapSlipLinksInclXlinks)
-    .def("move_sliplinks_to_their_best_branch",
-         &mehp::MEHPForceBalance2::moveSlipLinksToTheirBestBranch)
     .def(
       "get_force_on",
       [](mehp::MEHPForceBalance2& sim,
@@ -1420,31 +1402,6 @@ init_pylimer_bound_sim(py::module_& m)
           )pbdoc",
          py::arg("link_idx"),
          py::arg("one_over_spring_partition_upper_limit") = 1.0)
-    .def("inspect_spring_partition_update",
-         &mehp::MEHPForceBalance2::inspectSpringPartitionUpdate,
-         R"pbdoc(
-           Helper method to debug and/or understand what happens to certain links 
-           when the spring partition is being updated.
-          )pbdoc",
-         py::arg("link_idx"))
-    .def("inspect_parametrisation_optimsation_for_link",
-         &mehp::MEHPForceBalance2::inspectParametrisationOptimsationForLink,
-         R"pbdoc(
-           Helper method to debug and/or understand what happens to certain links 
-           when being displaced and their partition updated.
-          )pbdoc",
-         py::arg("link_idx"),
-         py::arg("displacements"),
-         py::arg("spring_partitions"),
-         py::arg("max_nr_of_steps") = 100,
-         py::arg("alpha_tol") = 1e-9,
-         py::arg("min_nr_of_steps") = 1,
-         py::arg("one_over_spring_partition_upper_limit") = 1.0)
-    .def("get_springpartition_indices_of_sliplink",
-         &mehp::MEHPForceBalance2::getSpringpartitionIndicesOfSliplink,
-         R"pbdoc()pbdoc",
-         py::arg("network"),
-         py::arg("link_idx"))
     .def("get_neighbour_link_indices",
          &mehp::MEHPForceBalance2::getNeighbourLinkIndices,
          R"pbdoc()pbdoc",
@@ -1453,7 +1410,7 @@ init_pylimer_bound_sim(py::module_& m)
     .def(
       "evaluate_partial_spring_distance",
       [](const mehp::MEHPForceBalance2& sim,
-         const mehp::ForceBalanceNetwork& net,
+         const mehp::ForceBalance2Network& net,
          const Eigen::VectorXd& u,
          const size_t springIdx) {
         return sim.evaluatePartialSpringDistance(net, u, springIdx);
@@ -1465,7 +1422,7 @@ init_pylimer_bound_sim(py::module_& m)
     .def(
       "evaluate_partial_spring_distance_from",
       [](const mehp::MEHPForceBalance2& sim,
-         const mehp::ForceBalanceNetwork& net,
+         const mehp::ForceBalance2Network& net,
          const Eigen::VectorXd& u,
          const size_t springIdx,
          const size_t linkIdx) {
@@ -1480,7 +1437,7 @@ init_pylimer_bound_sim(py::module_& m)
     .def(
       "evaluate_partial_spring_distance_to",
       [](const mehp::MEHPForceBalance2& sim,
-         const mehp::ForceBalanceNetwork& net,
+         const mehp::ForceBalance2Network& net,
          const Eigen::VectorXd& u,
          const size_t springIdx,
          const size_t linkIdx) {
@@ -1539,46 +1496,6 @@ init_pylimer_bound_sim(py::module_& m)
            Caution: ignores atom masses.
       )pbdoc",
          py::arg("tolerance") = 1e-3)
-    .def("add_sliplinks",
-         py::overload_cast<const std::vector<size_t>&,
-                           const std::vector<size_t>&,
-                           const std::vector<double>&,
-                           const std::vector<double>&,
-                           const std::vector<double>&,
-                           const std::vector<double>&,
-                           const std::vector<double>&,
-                           const bool>(&mehp::MEHPForceBalance2::addSlipLinks),
-         R"pbdoc(
-           Add new slip-links
-      )pbdoc",
-         py::arg("strand_idx_1"),
-         py::arg("strand_idx_2"),
-         py::arg("x"),
-         py::arg("y"),
-         py::arg("z"),
-         py::arg("alpha_1"),
-         py::arg("alpha_2"),
-         py::arg("clamp_alpha") = false)
-    .def("randomly_add_sliplinks",
-         &mehp::MEHPForceBalance2::randomlyAddSliplinks,
-         R"pbdoc(
-           Randomly sample and add slip-links based on certain criteria.
-          )pbdoc",
-         py::arg("nr_of_sliplinks_to_sample"),
-         py::arg("cutoff") = 2.0,
-         py::arg("minimum_nr_of_sliplinks") = 0,
-         py::arg("same_strand_cutoff") = 2,
-         py::arg("exclude_crosslinks") = false,
-         py::arg("seed") = -1)
-    .def("add_sliplinks_based_on_cycles",
-         &mehp::MEHPForceBalance2::addSliplinksBasedOnCycles,
-         R"pbdoc(
-           Detect and add slip-links based on detected entanglements.
- 
-           WARNING:
-                Does not work yet.
-          )pbdoc",
-         py::arg("maxLoopLength") = -1)
     .def(
       "get_stress_tensor",
       [](mehp::MEHPForceBalance2& fb, const double oneOver = 1.) {
@@ -1647,22 +1564,12 @@ init_pylimer_bound_sim(py::module_& m)
  
            :param tolerance: springs under this length are considered inactive
       )pbdoc")
-    .def("get_spring_partitions",
-         &mehp::MEHPForceBalance2::getSpringPartitions,
-         R"pbdoc(
-           Get the current spring partitions (the fraction of the contour length associated with each partial spring).
-      )pbdoc")
     .def("get_weighted_partial_spring_lengths",
          &mehp::MEHPForceBalance2::getWeightedPartialSpringLengths,
          R"pbdoc(
            Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
            )pbdoc",
          py::arg("one_over_spring_partition_upper_limit") = 1.)
-    .def("set_spring_partitions",
-         &mehp::MEHPForceBalance2::setSpringPartitions,
-         R"pbdoc(
-           Set the current spring partitions.
-      )pbdoc")
     .def("get_displacements",
          &mehp::MEHPForceBalance2::getCurrentDisplacements,
          R"pbdoc(
@@ -1738,8 +1645,6 @@ init_pylimer_bound_sim(py::module_& m)
          R"pbdoc(
            Get the partial spring distances.
       )pbdoc")
-    .def("get_current_spring_vectors",
-         &mehp::MEHPForceBalance2::getCurrentSpringDistances)
     .def("get_overall_spring_lengths",
          &mehp::MEHPForceBalance2::getOverallSpringLengths,
          R"pbdoc(
