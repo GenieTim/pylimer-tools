@@ -4,10 +4,7 @@
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance2.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceEvaluator.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceRelaxation.h"
-<<<<<<< HEAD
-=======
 #include "../../src/pylimer_tools_cpp/utils/MCUniverseGenerator.h"
->>>>>>> 5475b245807d0527e70aafdf7647730fba8b6ad3
 #include "../../src/pylimer_tools_cpp/utils/StringUtils.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
@@ -50,19 +47,20 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
     std::cout << "Reference Time (FB1) to beat: "
               << std::duration_to_string(duration_ref) << " " << std::endl;
 
-    BENCHMARK_ADVANCED("MEHP LD_MMA " +
-                       largeInputFile)(Catch::Benchmark::Chronometer meter)
-    {
-      pcm::MEHPForceRelaxation forceRelaxer =
-        pcm::MEHPForceRelaxation(universe, 2);
-      forceRelaxer.configAssumeBoxLargeEnough(false);
+    // BENCHMARK_ADVANCED("MEHP LD_MMA " +
+    //                    largeInputFile)(Catch::Benchmark::Chronometer meter)
+    // {
+    //   pcm::MEHPForceRelaxation forceRelaxer =
+    //     pcm::MEHPForceRelaxation(universe, 2);
+    //   forceRelaxer.configAssumeBoxLargeEnough(false);
 
     //   meter.measure([&forceRelaxer, &referenceForceBalancer] {
     //     forceRelaxer.runForceRelaxation("LD_MMA");
 
     //     CHECK_THAT(
     //       forceRelaxer.getGamma(),
-    //       Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(), 1e-2));
+    //       Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(),
+    //       1e-2));
     //     return forceRelaxer.getNrOfIterations();
     //   });
     // };
@@ -137,8 +135,9 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
 
   pe::Universe universe = generator.getUniverse();
 
-  pcm::MEHPForceBalance referenceForceBalancer =
-    pcm::MEHPForceBalance(universe, 2); // using a different crosslinkerType here makes things faster
+  pcm::MEHPForceBalance referenceForceBalancer = pcm::MEHPForceBalance(
+    universe,
+    2); // using a different crosslinkerType here makes things faster
   referenceForceBalancer.configAssumeBoxLargeEnough(false);
 
   auto start_ref = std::chrono::high_resolution_clock::now();

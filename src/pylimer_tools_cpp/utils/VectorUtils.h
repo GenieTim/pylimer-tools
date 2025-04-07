@@ -11,6 +11,7 @@
 #include <map>
 #include <unordered_map>
 #include <vector>
+
 extern "C"
 {
 #include <igraph/igraph.h>
@@ -85,7 +86,7 @@ namespace utils {
     const Eigen::VectorXd& vecs,
     const size_t segmentSize = 3)
   {
-    INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a useable size");
+    INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
     INVALIDARG_EXP_IFN(vecs.size() % segmentSize == 0,
                        "The size of the supplied vector, " +
                          std::to_string(vecs.size()) +
@@ -102,7 +103,7 @@ namespace utils {
   static inline double segmentwise_norm_max(const Eigen::VectorXd& vecs,
                                             const size_t segmentSize = 3)
   {
-    INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a useable size");
+    INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
     INVALIDARG_EXP_IFN(vecs.size() % segmentSize == 0,
                        "The size of the supplied vector, " +
                          std::to_string(vecs.size()) +
@@ -113,6 +114,25 @@ namespace utils {
     for (size_t i = 0; i < vecs.size() / segmentSize; i++) {
       result =
         std::max(vecs.segment(segmentSize * i, segmentSize).norm(), result);
+    }
+    return result;
+  }
+
+  static inline double segmentwise_norm_mean(const Eigen::VectorXd& vecs,
+                                             const size_t segmentSize = 3)
+  {
+    INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
+    INVALIDARG_EXP_IFN(vecs.size() % segmentSize == 0,
+                       "The size of the supplied vector, " +
+                         std::to_string(vecs.size()) +
+                         " is not a multiple of the segment size, " +
+                         std::to_string(segmentSize) + ".");
+    double result = 0.; //-DBL_MAX;
+    double denominator = 1. / static_cast<double>(vecs.size() / segmentSize);
+
+    for (size_t i = 0; i < vecs.size() / segmentSize; i++) {
+      result +=
+        (vecs.segment(segmentSize * i, segmentSize).norm() * denominator);
     }
     return result;
   }
@@ -128,12 +148,12 @@ namespace utils {
     return true;
   }
 
-/**
- * @brief Remove a row from an Eigen vector
- *
- * @param vec
- * @param rowToRemove
- */
+  /**
+   * @brief Remove a row from an Eigen vector
+   *
+   * @param vec
+   * @param rowToRemove
+   */
 #define MAKE_REMOVE_ROW(EIGEN_TYPE)                                            \
   static inline void removeRow(                                                \
     EIGEN_TYPE& vec, unsigned int rowToRemove, bool noResize = false)          \
@@ -156,12 +176,12 @@ namespace utils {
   MAKE_REMOVE_ROW(Eigen::ArrayXd);
   MAKE_REMOVE_ROW(Eigen::ArrayXb);
 
-/**
- * @brief Remove sequential rows from an Eigen vector
- *
- * @param vec
- * @param rowToRemove
- */
+  /**
+   * @brief Remove sequential rows from an Eigen vector
+   *
+   * @param vec
+   * @param rowToRemove
+   */
 #define MAKE_REMOVE_ROWS(EIGEN_TYPE)                                           \
   static inline void removeRows(EIGEN_TYPE& vec,                               \
                                 unsigned int rowToStartRemove,                 \

@@ -27,6 +27,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/vendor/myConfigureFile.cmake)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+include_directories(SYSTEM) # for CLion
 include(${CMAKE_CURRENT_LIST_DIR}/vendor/CMakeLists.txt)
 
 # prepare python bindings
@@ -36,6 +37,8 @@ message("Using toolchain file ${CMAKE_TOOLCHAIN_FILE}")
 
 # add sources & targets
 add_subdirectory(src/pylimer_tools_cpp)
+# and tests
+add_subdirectory(tests)
 
 pybind11_add_module(pylimer_tools_cpp MODULE 
   src/pylimer_tools_cpp/pybind11/readers.cpp
