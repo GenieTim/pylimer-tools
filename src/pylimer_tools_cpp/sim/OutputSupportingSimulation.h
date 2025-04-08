@@ -569,6 +569,8 @@ namespace sim {
     }
 
   public:
+    virtual ~OutputSupportingSimulation() = default;
+
     OutputSupportingSimulation()
     {
       this->doubleValueRequiredEvery.fill(0);

@@ -1265,7 +1265,7 @@ init_pylimer_bound_sim(py::module_& m)
            return mehp::MEHPForceBalance2(self);
          })
     .def_static("construct_with_random_sliplinks",
-                &mehp::MEHPForceBalance2::constructWithRandomSlipLinks,
+                &mehp::MEHPForceBalance2::constructWithRandomEntanglements,
                 R"pbdoc(
            Instantiate this simulator with randomly chosen slip-links.
           )pbdoc",
@@ -1610,7 +1610,7 @@ init_pylimer_bound_sim(py::module_& m)
       )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_nr_of_active_springs",
-         &mehp::MEHPForceBalance2::getNrOfActiveSprings,
+         &mehp::MEHPForceBalance2::getNrOfActiveStrands,
          R"pbdoc(
             Get the number of active springs remaining after running the simulation.
  
@@ -1618,7 +1618,7 @@ init_pylimer_bound_sim(py::module_& m)
       )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_nr_of_active_springs_in_dir",
-         &mehp::MEHPForceBalance2::getNrOfActiveSpringsInDir,
+         &mehp::MEHPForceBalance2::getNrOfActiveStrandsInDir,
          R"pbdoc(
                  Get the number of active springs remaining after running the simulation.
       
