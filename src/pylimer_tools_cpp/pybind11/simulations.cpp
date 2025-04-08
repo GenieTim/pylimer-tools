@@ -1413,7 +1413,7 @@ init_pylimer_bound_sim(py::module_& m)
          const mehp::ForceBalance2Network& net,
          const Eigen::VectorXd& u,
          const size_t springIdx) {
-        return sim.evaluatePartialSpringDistance(net, u, springIdx);
+        return sim.evaluateSpringVector(net, u, springIdx);
       },
       R"pbdoc()pbdoc",
       py::arg("network"),
@@ -1426,8 +1426,7 @@ init_pylimer_bound_sim(py::module_& m)
          const Eigen::VectorXd& u,
          const size_t springIdx,
          const size_t linkIdx) {
-        return sim.evaluatePartialSpringDistanceFrom(
-          net, u, springIdx, linkIdx);
+        return sim.evaluateSpringVectorFrom(net, u, springIdx, linkIdx);
       },
       R"pbdoc()pbdoc",
       py::arg("network"),
@@ -1441,7 +1440,7 @@ init_pylimer_bound_sim(py::module_& m)
          const Eigen::VectorXd& u,
          const size_t springIdx,
          const size_t linkIdx) {
-        return sim.evaluatePartialSpringDistanceTo(net, u, springIdx, linkIdx);
+        return sim.evaluateSpringVectorTo(net, u, springIdx, linkIdx);
       },
       R"pbdoc()pbdoc",
       py::arg("network"),
@@ -1558,14 +1557,14 @@ init_pylimer_bound_sim(py::module_& m)
             Get the number of nodes (crosslinkers) considered in this simulation.
       )pbdoc")
     .def("get_nr_of_springs",
-         &mehp::MEHPForceBalance2::getNrOfSprings,
+         &mehp::MEHPForceBalance2::getNrOfStrands,
          R"pbdoc(
            Get the number of springs considered in this simulation.
  
            :param tolerance: springs under this length are considered inactive
       )pbdoc")
     .def("get_weighted_partial_spring_lengths",
-         &mehp::MEHPForceBalance2::getWeightedPartialSpringLengths,
+         &mehp::MEHPForceBalance2::getWeightedSpringLengths,
          R"pbdoc(
            Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
            )pbdoc",
@@ -1628,7 +1627,7 @@ init_pylimer_bound_sim(py::module_& m)
          py::arg("direction"),
          py::arg("tolerance") = 1e-3)
     .def("get_nr_of_active_partial_springs",
-         &mehp::MEHPForceBalance2::getNrOfActivePartialSprings,
+         &mehp::MEHPForceBalance2::getNrOfActiveSprings,
          R"pbdoc(
             Get the number of active partial springs remaining after running the simulation.
  
@@ -1636,12 +1635,12 @@ init_pylimer_bound_sim(py::module_& m)
       )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_current_partial_spring_vectors",
-         &mehp::MEHPForceBalance2::getCurrentPartialSpringDistances,
+         &mehp::MEHPForceBalance2::getCurrentSpringDistances,
          R"pbdoc(
            Get the partial spring vectors.
       )pbdoc")
     .def("get_current_partial_spring_lengths",
-         &mehp::MEHPForceBalance2::getCurrentPartialSpringLengths,
+         &mehp::MEHPForceBalance2::getCurrentSpringLengths,
          R"pbdoc(
            Get the partial spring distances.
       )pbdoc")
