@@ -27,126 +27,275 @@
 // #endif
 
 namespace pylimer_tools::sim::mehp {
-MEHPForceBalance2
-MEHPForceBalance2::constructWithEntanglements(
-  const pylimer_tools::entities::Universe& universe,
+MEHPForceBalance2::MEHPForceBalance2(
+  const pylimer_tools::entities::Universe& u,
   const pylimer_tools::topo::entanglement_detection::AtomPairEntanglements&
     entanglements,
   const int crossLinkerType,
-  const bool is2D)
+  const bool is2D,
+  const bool entanglementsAsSprings)
 {
-  const pylimer_tools::entities::Universe emptyUniverse =
-    pylimer_tools::entities::Universe(universe.getBox());
-  MEHPForceBalance2 fb =
-    MEHPForceBalance2(emptyUniverse, crossLinkerType, is2D, false, false);
-  fb.configAssumeBoxLargeEnough(false);
-  fb.universe = universe;
+  this->universe = u;
+  this->is2D = is2D;
+  this->crossLinkerType = crossLinkerType;
+  this->box = u.getBox();
 
+  // start to initialize the network
+  this->initialConfig.L[0] = this->box.getL()[0];
+  this->initialConfig.L[1] = this->box.getL()[1];
+  this->initialConfig.L[2] = this->box.getL()[2];
+
+  this->initialConfig.boxHalfs[0] = 0.5 * this->initialConfig.L[0];
+  this->initialConfig.boxHalfs[1] = 0.5 * this->initialConfig.L[1];
+  this->initialConfig.boxHalfs[2] = 0.5 * this->initialConfig.L[2];
+
+  // move the entanglements to better accessible variables
   const std::vector<std::pair<size_t, size_t>> pairsOfAtoms =
     entanglements.pairsOfAtoms;
   const std::vector<long int> pairOfAtom = entanglements.pairOfAtom;
 
-  // add ends of chains
-  size_t currentVertexId = 0;
-  size_t numUsableChains = 0;
+  // use directly the graph for performance
+  std::unique_ptr<igraph_t> graph = u.getCopyOfGraph();
+
+  // what we do:
+  // 1. find starting points for depth-first search: degree > 2
+  // 2. do depth-first search from these points. Whenever we encounter a
+  // vertex with f > 2, add it to the network.
+  // Whenever we encounter a vertex that's an entanglement,
+  // add it to the network,
+  // Whenever we encounter a vertex that's been encountered,
+  // make sure to adjust the offset of the bond.
+  std::vector<int> vertexDegrees = u.getVertexDegrees();
+  assert(vertexDegrees.size() == u.getNrOfAtoms());
+  std::vector<igraph_integer_t> startingVertices;
+  startingVertices.reserve(vertexDegrees.size());
+  // we will want to start from all vertices, in a sense
+  // but first, start from those with degree > 2
+  for (size_t vIdx = 0; vIdx < vertexDegrees.size(); ++vIdx) {
+    if (vertexDegrees[vIdx] > 2) {
+      startingVertices.push_back(vIdx);
+    }
+  }
+  // then, from the others
+  for (size_t vIdx = 0; vIdx < vertexDegrees.size(); ++vIdx) {
+    if (vertexDegrees[vIdx] <= 2) {
+      startingVertices.push_back(vIdx);
+    }
+  }
+  assert(startingVertices.size() == u.getNrOfAtoms());
+
+  std::vector<long int> oldVertexIdToNewLinkId =
+    pylimer_tools::utils::initializeWithValue<long int>(u.getNrOfAtoms(), -1);
+  std::vector<bool> vertex_visited =
+    pylimer_tools::utils::initializeWithValue(u.getNrOfAtoms(), false);
+  std::vector<bool> edge_followed =
+    pylimer_tools::utils::initializeWithValue(u.getNrOfAtoms(), false);
+
+  igraph_adjlist_t adjacencyList;
+  igraph_adjlist_init(graph.get(),
+                      &adjacencyList,
+                      IGRAPH_OUT,
+                      IGRAPH_LOOPS_TWICE,
+                      IGRAPH_MULTIPLE);
+  igraph_inclist_t incidenceList;
+  igraph_inclist_init(
+    graph.get(), &incidenceList, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
+
+  std::vector<size_t> springFrom;
+  std::vector<size_t> springTo;
+  ArrayXArrayXi springIndicesOfStrand;
+  ArrayXArrayXi linkIndicesOfStrand;
+
+  long int newLinkId = 0;
+  long int newStrandId = 0;
+  for (igraph_integer_t vIdx : startingVertices) {
+    if (vertex_visited[vIdx]) {
+      continue;
+    }
+    vertex_visited[vIdx] = true;
+    // perform depth-first search from vIdx
+    std::stack<igraph_integer_t> vertexStack;
+    vertexStack.push(vIdx);
+    std::stack<size_t> newLinkIdStack;
+    std::stack<size_t> newStrandIdStack;
+    while (!vertexStack.empty()) {
+      igraph_integer_t currentVertex = vertexStack.top();
+
+      igraph_vector_int_t* neighbors =
+        igraph_adjlist_get(&adjacencyList, currentVertex);
+      igraph_vector_int_t* incident_edges =
+        igraph_inclist_get(&incidenceList, currentVertex);
+      assert(igraph_vector_int_size(neighbors) ==
+             igraph_vector_int_size(incident_edges));
+      assert(igraph_vector_int_size(neighbors) == vertexDegrees[currentVertex]);
+
+      // check whether we should remember this vertex
+      // only if we don't remember it yet, ...
+      if ((oldVertexIdToNewLinkId[currentVertex] == -1)) {
+        bool addNewLink = false;
+        bool addSpring = false;
+        bool addNewStrand = false;
+        // three cases on when to add
+        if (pairOfAtom[currentVertex] >= 0) {
+          // 1. entanglement
+          std::pair<size_t, size_t> entanglement =
+            pairsOfAtoms[pairOfAtom[currentVertex]];
+          addNewLink = entanglementsAsSprings ||
+                       (oldVertexIdToNewLinkId[entanglement.first] < 0 &&
+                        oldVertexIdToNewLinkId[entanglement.second] < 0);
+          if (!addNewLink) {
+            assert(XOR(oldVertexIdToNewLinkId[entanglement.first] >= 0,
+                       oldVertexIdToNewLinkId[entanglement.second] >= 0));
+            // make this vertex identical to the other vertex in the
+            // entanglement link
+            oldVertexIdToNewLinkId[currentVertex] =
+              std::max(oldVertexIdToNewLinkId[entanglement.first],
+                       oldVertexIdToNewLinkId[entanglement.second]);
+          }
+          addSpring = true;
+        } else if (vertexStack.empty()) {
+          // 2. first (end / central)
+          addNewLink = true;
+          addNewStrand = true;
+        } else if ((vertexDegrees[currentVertex] > 2 ||
+                    vertexDegrees[currentVertex] == 1)) {
+          // 3. cross-link/end
+          addNewLink = true;
+          addSpring = true;
+          // close the previous strand, start a new strand
+          addNewStrand = true;
+        }
+
+        if (addSpring) {
+          // link this new link to the previous link
+          springIndicesOfStrand[newStrandIdStack.top()].push_back(
+            springFrom.size());
+          springFrom.push_back(newLinkIdStack.top());
+          springTo.push_back(newLinkId);
+        }
+        if (addNewStrand) {
+          newStrandIdStack.push(newStrandId);
+          newStrandId += 1;
+        }
+        if (addNewLink) {
+          // add to network
+          oldVertexIdToNewLinkId[currentVertex] = newLinkId;
+
+          newLinkIdStack.push(newLinkId);
+          newLinkId += 1;
+        }
+      }
+
+      bool goDeeper = false;
+      for (igraph_integer_t i = 0; i < igraph_vector_int_size(neighbors); ++i) {
+        igraph_integer_t neighbor = igraph_vector_int_get(neighbors, i);
+        igraph_integer_t edge = igraph_vector_int_get(incident_edges, i);
+        // check if neighbor has been visited
+        if (vertex_visited[neighbor] && edge_followed[edge]) {
+          // this is the base case whenever we re-iterate this loop.
+          // there are ways to avoid these additional iterations,
+          // but they involve resizing the vectors,
+          // which is generally for how many neighbours we have
+          // not worth it, presumably.
+          continue;
+        } else if (vertex_visited[neighbor] == false) {
+          // this is the case whenever we encounter a new vertex
+          assert(edge_followed[edge] == false);
+          // continue in this direction
+          goDeeper = true;
+          vertex_visited[neighbor] = true;
+          edge_followed[edge] = true;
+          vertexStack.push(neighbor);
+          // let's directly jump to this neighbor, search its neighbours
+          break;
+        } else {
+          // this is the case for loops
+          assert(vertex_visited[neighbor] == true);
+          assert(edge_followed[edge] == false);
+          assert(oldVertexIdToNewLinkId[neighbor] >= 0);
+          // remember this bond (spring)
+          springIndicesOfStrand[newStrandIdStack.top()].push_back(
+            springFrom.size());
+          springFrom.push_back(oldVertexIdToNewLinkId[newLinkIdStack.top()]);
+          springTo.push_back(oldVertexIdToNewLinkId[neighbor]);
+          edge_followed[edge] = true;
+        }
+      }
+
+      if (!goDeeper) {
+        vertexStack.pop();
+        if (oldVertexIdToNewLinkId[currentVertex] == newLinkIdStack.top()) {
+          newLinkIdStack.pop();
+        }
+      }
+    }
+  }
+
+  igraph_inclist_destroy(&incidenceList);
+  igraph_adjlist_destroy(&adjacencyList);
+
+  if (entanglementsAsSprings) {
+    for (const auto& [fst, snd] : pairsOfAtoms) {
+      springFrom.push_back(oldVertexIdToNewLinkId[fst]);
+      springTo.push_back(oldVertexIdToNewLinkId[snd]);
+    }
+  }
+
+  assert(springFrom.size() == springTo.size());
+  this->initialConfig.nrOfSprings = springFrom.size();
+  this->initialConfig.nrOfStrands = springIndicesOfStrand.size();
+  this->initialConfig.springIndicesOfStrand = springIndicesOfStrand;
+  this->initialConfig.linkIndicesOfStrands = linkIndicesOfStrand;
+
+  this->initialConfig.nrOfLinks = newLinkId;
+  this->initialConfig.linkIsEntanglement =
+    Eigen::ArrayXb::Constant(newLinkId, false);
+
+  this->initialConfig.springIndexA =
+    Eigen::ArrayXi(this->initialConfig.nrOfSprings);
+  this->initialConfig.springIndexB =
+    Eigen::ArrayXi(this->initialConfig.nrOfSprings);
+  this->initialConfig.springCoordinateIndexA =
+    Eigen::ArrayXi(this->initialConfig.nrOfSprings * 3);
+  this->initialConfig.springCoordinateIndexB =
+    Eigen::ArrayXi(this->initialConfig.nrOfSprings * 3);
+
+  Eigen::VectorXd baseCoordinates = u.getAssumedVertexCoordinates(this->box);
+
+  for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
+    this->initialConfig.springIndexA(i) = springFrom[i];
+    this->initialConfig.springIndexB(i) = springTo[i];
+    for (size_t dir = 0; dir < 3; ++dir) {
+      this->initialConfig.springCoordinateIndexA(3 * i + dir) =
+        baseCoordinates(springFrom[i] * 3 + dir);
+      this->initialConfig.springCoordinateIndexB(3 * i + dir) =
+        baseCoordinates(springTo[i] * 3 + dir);
+    }
+    this->initialConfig.springBoxOffset.segment(3 * i, 3) =
+      this->box.getOffset(baseCoordinates.segment(3 * springTo[i], 3) -
+                          baseCoordinates.segment(3 * springFrom[i], 3));
+  }
+
+  this->initialConfig.strandIdxOfSpring =
+    Eigen::ArrayXi(this->initialConfig.nrOfSprings);
+  for (size_t strandIdx = 0; strandIdx < springIndicesOfStrand.size();
+       ++strandIdx) {
+    std::vector<size_t>& springIndices = springIndicesOfStrand[strandIdx];
+    for (size_t springIdx : springIndices) {
+      this->initialConfig.strandIdxOfSpring(springIdx) = strandIdx;
+    }
+  }
 
   // TODO: implement
 
-  // resize
-  // links
-  fb.initialConfig.nrOfNodes = currentVertexId;
-  fb.initialConfig.nrOfLinks = currentVertexId + pairsOfAtoms.size();
-  fb.initialConfig.oldAtomIds.resize(fb.initialConfig.nrOfNodes);
-  fb.initialConfig.oldAtomTypes.resize(fb.initialConfig.nrOfNodes);
-  fb.currentDisplacements.resize(3 * fb.initialConfig.nrOfLinks);
-  fb.currentDisplacements.setZero();
-  fb.initialConfig.coordinates.conservativeResize(3 *
-                                                  fb.initialConfig.nrOfLinks);
-  fb.initialConfig.linkIsEntanglement.conservativeResize(
-    fb.initialConfig.nrOfLinks);
-  fb.initialConfig.strandIndicesOfLinks =
-    pylimer_tools::utils::initializeWithValue(fb.initialConfig.nrOfLinks,
-                                              std::vector<size_t>());
-
-  // springs
-  fb.initialConfig.nrOfStrands = numUsableChains;
-  fb.initialConfig.springsContourLength.conservativeResize(numUsableChains);
-  fb.initialConfig.springsType.conservativeResize(numUsableChains);
-  fb.initialConfig.linkIndicesOfStrands =
-    pylimer_tools::utils::initializeWithValue(numUsableChains,
-                                              std::vector<size_t>());
-  fb.initialConfig.springIndicesOfStrand =
-    pylimer_tools::utils::initializeWithValue(numUsableChains,
-                                              std::vector<size_t>());
-
-  // partial springs
-  // we don't know the actual number (yet), but we can over-estimate
-  // pretty well, such that we only need to reduce afterwards
-  size_t numPartialSpringsEstimate = numUsableChains + 2 * pairsOfAtoms.size();
-  fb.initialConfig.nrOfSprings = numPartialSpringsEstimate;
-  fb.initialConfig.springBoxOffset.conservativeResize(
-    3 * numPartialSpringsEstimate);
-  fb.initialConfig.springCoordinateIndexA.conservativeResize(
-    3 * numPartialSpringsEstimate);
-  fb.initialConfig.springCoordinateIndexB.conservativeResize(
-    3 * numPartialSpringsEstimate);
-  fb.initialConfig.springIndexA.conservativeResize(numPartialSpringsEstimate);
-  fb.initialConfig.springIndexB.conservativeResize(numPartialSpringsEstimate);
-  fb.initialConfig.strandIdxOfSpring.conservativeResize(
-    numPartialSpringsEstimate);
-
-  size_t springIdx = 0;
-  size_t partialSpringIdx = 0;
-
-  // TODO: implement
-
-  fb.completeInitialization();
-
-  return fb;
-}
-
-MEHPForceBalance2
-MEHPForceBalance2::constructWithRandomEntanglements(
-  const pylimer_tools::entities::Universe& universe,
-  const size_t nrOfEntanglementsToSample,
-  const double upperCutoff,
-  const double lowerCutoff,
-  const size_t minimumNrOfEntanglements,
-  const double sameStrandCutoff,
-  const std::string seed,
-  int crossLinkerType,
-  bool is2D,
-  bool filterEntanglements)
-{
-  // sample the "entanglements"
-  pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
-    entanglements =
-      pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
-        universe,
-        nrOfEntanglementsToSample,
-        upperCutoff,
-        lowerCutoff,
-        minimumNrOfEntanglements,
-        sameStrandCutoff,
-        seed,
-        crossLinkerType,
-        true,
-        filterEntanglements);
-
-  RUNTIME_EXP_IFN(
-    entanglements.pairsOfAtoms.size() >= minimumNrOfEntanglements ||
-      filterEntanglements,
-    "Minimum number of slip-links could not be sampled: got " +
-      std::to_string(entanglements.pairsOfAtoms.size()) + " instead of " +
-      std::to_string(minimumNrOfEntanglements) + ".");
-
-  return MEHPForceBalance2::constructWithEntanglements(
-    universe, entanglements, crossLinkerType, is2D);
+  this->completeInitialization();
 }
 
 void
 MEHPForceBalance2::completeInitialization()
 {
+  this->currentDisplacements =
+    Eigen::VectorXd::Zero(3 * this->initialConfig.nrOfLinks);
   this->defaultBondLength = universe.computeMeanBondLength();
   RUNTIME_EXP_IFN(this->validateNetwork(), "Invalid internal state");
 }
@@ -3069,226 +3218,6 @@ MEHPForceBalance2::getWeightedSpringLength(const ForceBalance2Network& net,
   return this->evaluateSpringVector(net, u, partialSpringIdx).norm() *
          oneOverContourLengthFraction;
 }
-
-/**
- * @brief Convert the universe to a network
- *
- * @param net the target network
- * @param crossLinkerType the atom type of the crossLinker
- * @return true
- * @return false
- */
-bool
-MEHPForceBalance2::ConvertNetwork(ForceBalance2Network& net,
-                                  const int crossLinkerType,
-                                  bool remove2functionalCrosslinkers,
-                                  bool removeDanglingChains)
-{
-  if (remove2functionalCrosslinkers) {
-    for (pylimer_tools::entities::Atom xlinker :
-         this->universe.getAtomsOfType(crossLinkerType)) {
-      // change type of cross-linkers with a degree <= 2 to "normal",
-      // non-cross-link beads
-      size_t vertexId = this->universe.getIdxByAtomId(xlinker.getId());
-      if (this->universe.computeFunctionalityForVertex(vertexId) <= 2) {
-        this->universe.setPropertyValue(vertexId, "type", crossLinkerType - 1);
-      }
-    }
-  }
-
-  std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
-    this->universe.getChainsWithCrosslinker(crossLinkerType);
-
-  // need to include all but dangling and free chains in order to
-  // model entanglement
-  size_t nrOfSprings = 0;
-  std::vector<bool> useChain = pylimer_tools::utils::initializeWithValue<bool>(
-    crossLinkerChains.size(), false);
-  std::vector<long int> vertexIdToLinkIdx =
-    pylimer_tools::utils::initializeWithValue<long int>(
-      this->universe.getNrOfAtoms(), -1);
-  size_t currentLinkIdx = 0;
-  for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
-    RUNTIME_EXP_IFN(crossLinkerChains[i].getType() !=
-                      pylimer_tools::entities::MoleculeType::UNDEFINED,
-                    "Cross-linker chain's chain type could not be "
-                    "detected. Cannot work like that.");
-    if (crossLinkerChains[i].getType() ==
-        pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
-      assert(crossLinkerChains[i].getChainEnds(crossLinkerType, true).size() ==
-             2);
-      useChain[i] = true;
-      nrOfSprings += 1;
-    } else if (crossLinkerChains[i].getType() ==
-               pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
-      // when omitting f=2 cross-links, it's possible that we end up with
-      // "free" primary loops – let's not use those
-      if (crossLinkerChains[i].getAtomsOfType(crossLinkerType).size() > 0) {
-        useChain[i] = true;
-        nrOfSprings += 1;
-      }
-    } else if (!removeDanglingChains &&
-               crossLinkerChains[i].getType() ==
-                 pylimer_tools::entities::MoleculeType::DANGLING_CHAIN) {
-      std::vector<pylimer_tools::entities::Atom> endAtoms =
-        crossLinkerChains[i].getAtomsOfDegree(1);
-      RUNTIME_EXP_IFN(endAtoms.size() == 2,
-                      "Expected a dangling chain to have two ends, got " +
-                        std::to_string(endAtoms.size()) + ".");
-      // cannot assert this without entanglement types being set
-      // assert(XOR((endAtoms[0].getType() == crossLinkerType),
-      //            endAtoms[1].getType() == crossLinkerType));
-
-      useChain[i] = true;
-      nrOfSprings += 1;
-    }
-
-    if (useChain[i]) {
-      std::vector<pylimer_tools::entities::Atom> endAtoms =
-        crossLinkerChains[i].getChainEnds(crossLinkerType);
-      for (const pylimer_tools::entities::Atom& endAtom : endAtoms) {
-        size_t atomVertexIdx = this->universe.getIdxByAtomId(endAtom.getId());
-        if (vertexIdToLinkIdx[atomVertexIdx] == -1) {
-          vertexIdToLinkIdx[atomVertexIdx] = currentLinkIdx;
-          currentLinkIdx += 1;
-        }
-      }
-    }
-  }
-
-  size_t nrOfXlinks = currentLinkIdx;
-
-  // crossLinkerUniverse.simplify();
-  pylimer_tools::entities::Box box = this->box;
-  net.L[0] = box.getLx();
-  net.L[1] = box.getLy();
-  net.L[2] = box.getLz();
-  net.boxHalfs[0] = 0.5 * net.L[0];
-  net.boxHalfs[1] = 0.5 * net.L[1];
-  net.boxHalfs[2] = 0.5 * net.L[2];
-  net.nrOfNodes = nrOfXlinks;
-  net.nrOfLinks = nrOfXlinks;
-  net.nrOfStrands = nrOfSprings;
-  net.nrOfSprings = nrOfSprings;
-  net.coordinates = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
-  net.oldAtomIds = Eigen::ArrayXi::Zero(net.nrOfLinks);
-  net.oldAtomTypes = Eigen::ArrayXi::Zero(net.nrOfLinks);
-  net.linkIsEntanglement = Eigen::ArrayXb::Constant(net.nrOfLinks, false);
-  net.strandIndicesOfLinks.reserve(net.nrOfLinks);
-  for (size_t i = 0; i < net.nrOfLinks; ++i) {
-    net.strandIndicesOfLinks.push_back(std::vector<size_t>());
-  }
-  net.linkIndicesOfStrands.reserve(net.nrOfStrands);
-  for (size_t i = 0; i < net.nrOfStrands; ++i) {
-    net.linkIndicesOfStrands.push_back(std::vector<size_t>());
-  }
-  net.strandIdxOfSpring = Eigen::ArrayXi(net.nrOfSprings);
-  net.springBoxOffset = Eigen::VectorXd::Zero(3 * net.nrOfStrands);
-  net.springsContourLength = Eigen::VectorXd::Zero(net.nrOfStrands);
-  net.springsType = Eigen::ArrayXi::Zero(net.nrOfStrands);
-
-  // convert (cross-linker-)beads
-  std::map<int, int> atomIdToNode;
-  for (size_t i = 0; i < vertexIdToLinkIdx.size(); ++i) {
-    if (vertexIdToLinkIdx[i] != -1) {
-      size_t linkIdx = vertexIdToLinkIdx[i];
-      pylimer_tools::entities::Atom atom = this->universe.getAtomByVertexIdx(i);
-      atomIdToNode[atom.getId()] = linkIdx;
-      net.oldAtomIds[linkIdx] = atom.getId();
-      net.oldAtomTypes[linkIdx] = atom.getType();
-      Eigen::Vector3d coords = atom.getCoordinates();
-      this->box.handlePBC(coords);
-      net.coordinates.segment(3 * linkIdx, 3) = coords;
-    }
-  }
-
-  // convert springs
-  size_t spring_idx = 0;
-  Eigen::Vector3d expectedDistance = Eigen::Vector3d::Zero();
-  // net.connectivityToSpringIndex.reserve(nrOfSprings);
-  for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
-    if (!useChain[i]) {
-      continue;
-    }
-    std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
-      crossLinkerChains[i].getAtomsOfType(crossLinkerType);
-    std::vector<pylimer_tools::entities::Atom> chainEnds =
-      crossLinkerChains[i].getChainEnds(crossLinkerType, true);
-    RUNTIME_EXP_IFN(chainEnds.size() == 2,
-                    "Expected two chain ends when converting structure. Got " +
-                      std::to_string(chainEnds.size()) + ".");
-    long int atomIdFrom = chainEnds[0].getId();
-    long int atomIdTo = chainEnds[1].getId();
-    bool addChain = false;
-    if (crossLinkerChains[i].getType() ==
-        pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
-      addChain = true;
-
-      // spring contour length = nr of bonds between two cross-linkers
-      net.springsContourLength[spring_idx] =
-        crossLinkerChains[i].getNrOfAtoms() - 1;
-    } else if (crossLinkerChains[i].getType() ==
-               pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
-      addChain = true;
-
-      net.springsContourLength[spring_idx] =
-        crossLinkerChains[i].getNrOfAtoms();
-      if (xlinkersOfChain.size() == 2) {
-        net.springsContourLength[spring_idx] =
-          crossLinkerChains[i].getNrOfAtoms() - 1;
-      }
-    } else if (crossLinkerChains[i].getType() ==
-                 pylimer_tools::entities::MoleculeType::DANGLING_CHAIN &&
-               !removeDanglingChains) {
-      net.springsContourLength[spring_idx] =
-        crossLinkerChains[i].getNrOfAtoms() - 1;
-      addChain = true;
-    }
-    auto bondTypes = crossLinkerChains[i].getBonds()["bond_type"];
-    net.springsType[spring_idx] = MEAN(bondTypes);
-    assert(addChain);
-
-    if (addChain) {
-      long int nodeIdxFrom = atomIdToNode.at(atomIdFrom);
-      long int nodeIdxTo = atomIdToNode.at(atomIdTo);
-      // if (nodeIdxFrom > nodeIdxTo) {
-      //   std::swap(nodeIdxFrom, nodeIdxTo);
-      //   std::swap(atomIdFrom, atomIdTo);
-      // }
-
-      std::vector<pylimer_tools::entities::Atom> allChainAtoms =
-        crossLinkerChains[i].getAtoms();
-
-      pylimer_tools::utils::addIfNotContained(
-        net.strandIndicesOfLinks[nodeIdxFrom], spring_idx);
-      if (nodeIdxFrom != nodeIdxTo) {
-        pylimer_tools::utils::addIfNotContained(
-          net.strandIndicesOfLinks[nodeIdxTo], spring_idx);
-      }
-
-      net.linkIndicesOfStrands[spring_idx].push_back(nodeIdxFrom);
-      net.linkIndicesOfStrands[spring_idx].push_back(nodeIdxTo);
-
-      std::vector<size_t> zeroMap;
-      zeroMap.push_back(spring_idx);
-      net.springIndicesOfStrand.push_back(zeroMap);
-      net.strandIdxOfSpring[spring_idx] = (spring_idx);
-
-      expectedDistance = crossLinkerChains[i].getOverallBondSumFromTo(
-        atomIdFrom, atomIdTo, crossLinkerType, true);
-      Eigen::Vector3d actualDistance =
-        net.coordinates.segment(3 * nodeIdxTo, 3) -
-        net.coordinates.segment(3 * nodeIdxFrom, 3);
-      net.springBoxOffset.segment(3 * spring_idx, 3) =
-        expectedDistance - actualDistance;
-      assert(this->box.isValidOffset(expectedDistance - actualDistance));
-
-      spring_idx += 1;
-    }
-  }
-
-  return spring_idx == net.nrOfStrands;
-};
 
 bool
 MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
