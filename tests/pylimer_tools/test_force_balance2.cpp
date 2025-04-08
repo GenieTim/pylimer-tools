@@ -570,7 +570,7 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
         CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0061105865));
         CHECK_NOTHROW(forceBalancer2.runForceRelaxation());
         CHECK_NOTHROW(forceBalancer2.validateNetwork());
-        CHECK(forceBalancer2.getNrOfSprings() == 9859);
+        CHECK(forceBalancer2.getNrOfStrands() == 9859);
         CHECK(forceBalancer2.getNrOfIterations() > 1);
         CHECK(forceBalancer2.getResidual() < 1e-5);
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
@@ -700,7 +700,7 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
     forceBalancer2.runForceRelaxation();
     CHECK(forceBalancer2.getNrOfIterations() > 5);
     CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-    CHECK(forceBalancer2.getGammaFactor(1., forceBalancer2.getNrOfSprings()) ==
+    CHECK(forceBalancer2.getGammaFactor(1., forceBalancer2.getNrOfStrands()) ==
           Catch::Approx(1. / 3.).epsilon(0.001));
     auto stressTensor = forceBalancer2.getStressTensor();
     CHECK(forceBalancer2.getPressure() ==
@@ -717,7 +717,7 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
 
     pe::Universe universe3 = forceBalancer2.getCrosslinkerVerse();
     CHECK(universe3.getNrOfAtoms() == forceBalancer2.getNrOfNodes());
-    CHECK(universe3.getNrOfBonds() == forceBalancer2.getNrOfSprings());
+    CHECK(universe3.getNrOfBonds() == forceBalancer2.getNrOfStrands());
     CHECK(universe3.getAtomsOfType(2).size() == universe3.getNrOfAtoms());
 
     // try out different algorithms
@@ -1106,7 +1106,7 @@ TEST_CASE("MEHP Force Balance2 handles slip-links",
       pcm::MEHPForceBalance2(universe, 2, false);
     CHECK(forceBalancer2.getNrOfNodes() == forceBalancer2.getNrOfLinks());
     CHECK(forceBalancer2.getNrOfNodes() == 4);
-    CHECK(forceBalancer2.getNrOfSprings() == 5);
+    CHECK(forceBalancer2.getNrOfStrands() == 5);
     double N = 23.;
     forceBalancer2.setSpringContourLengths(
       Eigen::VectorXd::Constant(forceBalancer2.getNetwork().nrOfSprings, N));
@@ -1275,9 +1275,8 @@ TEST_CASE("MEHP Force Balance2 Free chains collapse",
   // these beads overlap first, the gaussian spring one
   pcm::MEHPForceBalance2 forceBalancer =
     pcm::MEHPForceBalance2(universe, 2, false);
-  CHECK(forceBalancer.getNrOfSprings() ==
-        forceBalancer.getNrOfPartialSprings());
-  CHECK(forceBalancer.getNrOfSprings() == nrOfBeads / nrOfBeadsPerChain);
+  CHECK(forceBalancer.getNrOfStrands() == forceBalancer.getNrOfSprings());
+  CHECK(forceBalancer.getNrOfStrands() == nrOfBeads / nrOfBeadsPerChain);
 
   SECTION("Large enough box")
   {
@@ -1371,9 +1370,8 @@ TEST_CASE("MEHP Force Balance2 Entanglement Beads Are Removed",
   // start with the MEHPForceBalance2
   pcm::MEHPForceBalance2 forceBalancer =
     pcm::MEHPForceBalance2(universe, 2, false);
-  CHECK(forceBalancer.getNrOfSprings() ==
-        forceBalancer.getNrOfPartialSprings());
-  CHECK(forceBalancer.getNrOfSprings() == nrOfBeads / nrOfBeadsPerChain + 3);
+  CHECK(forceBalancer.getNrOfStrands() == forceBalancer.getNrOfSprings());
+  CHECK(forceBalancer.getNrOfStrands() == nrOfBeads / nrOfBeadsPerChain + 3);
   forceBalancer.configEntanglementType(3);
   forceBalancer.configSimplificationFrequency(5);
   double initialResidual = forceBalancer.getDisplacementResidualNorm();
@@ -1385,7 +1383,7 @@ TEST_CASE("MEHP Force Balance2 Entanglement Beads Are Removed",
       pcm::StructureSimplificationMode::ALL_TIM));
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getNrOfActiveStrands() == 0);
-    CHECK(forceBalancer.getNrOfSprings() == 0);
+    CHECK(forceBalancer.getNrOfStrands() == 0);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
   }
 
@@ -1396,7 +1394,7 @@ TEST_CASE("MEHP Force Balance2 Entanglement Beads Are Removed",
       pcm::StructureSimplificationMode::ALL_TIM));
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getNrOfActiveStrands() == 0);
-    CHECK(forceBalancer.getNrOfSprings() == 0);
+    CHECK(forceBalancer.getNrOfStrands() == 0);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
   }
 }
@@ -1434,13 +1432,13 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
       {
         pcm::MEHPForceBalance2 forceBalancer =
           pcm::MEHPForceBalance2(universe, 2, false);
-        size_t initialNSprings = forceBalancer.getNrOfSprings();
+        size_t initialNSprings = forceBalancer.getNrOfStrands();
 
         SECTION("For large enough box")
         {
           forceBalancer.configAssumeBoxLargeEnough(true);
           CHECK(forceBalancer.getNrOfActiveStrands() ==
-                forceBalancer.getNrOfSprings());
+                forceBalancer.getNrOfStrands());
           double initialResidual = forceBalancer.getDisplacementResidualNorm();
           CHECK(std::isfinite(initialResidual));
           CHECK_NOTHROW(forceBalancer.runForceRelaxation(
@@ -1448,8 +1446,8 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
           CHECK(forceBalancer.getNrOfIterations() > 0);
           CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
           CHECK(forceBalancer.getNrOfActiveStrands() ==
-                forceBalancer.getNrOfSprings());
-          CHECK(forceBalancer.getNrOfSprings() == initialNSprings);
+                forceBalancer.getNrOfStrands());
+          CHECK(forceBalancer.getNrOfStrands() == initialNSprings);
           CHECK_THAT(forceBalancer.getActiveWeightFraction(),
                      Catch::Matchers::WithinRel(1.0));
           CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
@@ -1461,7 +1459,7 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
         {
           forceBalancer.configAssumeBoxLargeEnough(false);
           CHECK(forceBalancer.getNrOfActiveStrands() ==
-                forceBalancer.getNrOfSprings());
+                forceBalancer.getNrOfStrands());
           double initialResidual = forceBalancer.getDisplacementResidualNorm();
           CHECK(std::isfinite(initialResidual));
           REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
@@ -1469,8 +1467,8 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
           CHECK(forceBalancer.getNrOfIterations() > 0);
           CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
           CHECK(forceBalancer.getNrOfActiveStrands() ==
-                forceBalancer.getNrOfSprings());
-          CHECK(forceBalancer.getNrOfSprings() == initialNSprings);
+                forceBalancer.getNrOfStrands());
+          CHECK(forceBalancer.getNrOfStrands() == initialNSprings);
           CHECK_THAT(forceBalancer.getActiveWeightFraction(),
                      Catch::Matchers::WithinRel(1.0));
           CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
@@ -1486,7 +1484,7 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
             universe, 400, 2.0, 0.0, 100, 0.0, "a533d", 2, false);
         forceBalancer.configAssumeBoxLargeEnough(false);
         CHECK(forceBalancer.getNrOfActiveStrands() ==
-              forceBalancer.getNrOfSprings());
+              forceBalancer.getNrOfStrands());
         double initialResidual = forceBalancer.getDisplacementResidualNorm();
         CHECK(std::isfinite(initialResidual));
         REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
@@ -1494,7 +1492,7 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
         CHECK(forceBalancer.getNrOfIterations() > 0);
         CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
         CHECK(forceBalancer.getNrOfActiveStrands() ==
-              forceBalancer.getNrOfSprings());
+              forceBalancer.getNrOfStrands());
         CHECK_THAT(forceBalancer.getActiveWeightFraction(),
                    Catch::Matchers::WithinRel(1.0));
         CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
@@ -1551,8 +1549,8 @@ TEST_CASE("MEHP Force Balance2 Gives Identical Results for Different PBC "
           Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
     CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
                Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
-    CHECK(forceBalanceConventional.getNrOfPartialSprings() ==
-          forceBalanceNew.getNrOfPartialSprings());
+    CHECK(forceBalanceConventional.getNrOfSprings() ==
+          forceBalanceNew.getNrOfSprings());
     CHECK(forceBalanceConventional.getCurrentDisplacements().isApprox(
       forceBalanceNew.getCurrentDisplacements()));
 
@@ -1565,12 +1563,12 @@ TEST_CASE("MEHP Force Balance2 Gives Identical Results for Different PBC "
       forceBalanceNew.getStressTensor()));
     CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
           Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
-    CHECK(forceBalanceConventional.getNrOfPartialSprings() ==
-          forceBalanceNew.getNrOfPartialSprings());
+    CHECK(forceBalanceConventional.getNrOfSprings() ==
+          forceBalanceNew.getNrOfSprings());
     CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
                Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
-    CHECK(forceBalanceConventional.getNrOfPartialSprings() ==
-          forceBalanceNew.getNrOfPartialSprings());
+    CHECK(forceBalanceConventional.getNrOfSprings() ==
+          forceBalanceNew.getNrOfSprings());
     CHECK(forceBalanceConventional.getCurrentDisplacements().isApprox(
       forceBalanceNew.getCurrentDisplacements()));
 
@@ -1579,8 +1577,8 @@ TEST_CASE("MEHP Force Balance2 Gives Identical Results for Different PBC "
     forceBalanceNew.runForceRelaxation(
       pcm::StructureSimplificationMode::ALL_TIM, 0.01, 1.);
 
-    CHECK(forceBalanceConventional.getNrOfPartialSprings() ==
-          forceBalanceNew.getNrOfPartialSprings());
+    CHECK(forceBalanceConventional.getNrOfSprings() ==
+          forceBalanceNew.getNrOfSprings());
     CHECK(forceBalanceConventional.getStressTensor().isApprox(
       forceBalanceNew.getStressTensor()));
     CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
@@ -1718,7 +1716,7 @@ TEST_CASE("MEHP Force Balance2 does not collapse",
     CHECK(forceBalanceConventional.getExitReason() ==
           pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalanceConventional.getNrOfActiveStrands() ==
-          forceBalanceConventional.getNrOfSprings());
+          forceBalanceConventional.getNrOfStrands());
     // compare to what we expect
     CHECK(forceBalanceConventional.getNrOfActiveStrands() == 8);
     CHECK(forceBalanceConventional.getNrOfActiveNodes() == 4);
@@ -1742,7 +1740,7 @@ TEST_CASE("MEHP Force Balance2 does not collapse",
     CHECK(forceBalanceNew.getNrOfIterations() > 0);
     CHECK(forceBalanceNew.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalanceNew.getNrOfActiveStrands() ==
-          forceBalanceNew.getNrOfSprings());
+          forceBalanceNew.getNrOfStrands());
     // compare to what we expect
     CHECK(forceBalanceNew.getNrOfActiveStrands() == 8);
 
@@ -2034,9 +2032,9 @@ TEST_CASE("MEHPForceBalance2 Random sampling example",
         universe, 1000, 6.0, 0.0, 900, 3.0, "53467829");
     forceBalancerSmallNewSampling.configAssumeBoxLargeEnough(false);
 
-    CHECK_THAT(forceBalancerSmallNewSampling.getNrOfPartialSprings(),
+    CHECK_THAT(forceBalancerSmallNewSampling.getNrOfSprings(),
                Catch::Matchers::WithinRel(
-                 forceBalancerSmallOldSampling1.getNrOfPartialSprings(), 0.1));
+                 forceBalancerSmallOldSampling1.getNrOfSprings(), 0.1));
     CHECK_THAT(forceBalancerSmallNewSampling.getPressure(),
                Catch::Matchers::WithinRel(
                  forceBalancerSmallOldSampling1.getPressure(), 0.5));
@@ -2047,11 +2045,11 @@ TEST_CASE("MEHPForceBalance2 Random sampling example",
 
     // check that the spring vectors are equal
     Eigen::VectorXd springVectorsSmallOldSampling =
-      forceBalancerSmallOldSampling1.evaluateSpringVectors(
+      forceBalancerSmallOldSampling1.evaluateStrandVectors(
         forceBalancerSmallOldSampling1.getNetwork(),
         forceBalancerSmallOldSampling1.getCurrentDisplacements());
     Eigen::VectorXd springVectorsSmallNewSampling =
-      forceBalancerSmallNewSampling.evaluateSpringVectors(
+      forceBalancerSmallNewSampling.evaluateStrandVectors(
         forceBalancerSmallNewSampling.getNetwork(),
         forceBalancerSmallNewSampling.getCurrentDisplacements());
     REQUIRE(forceBalancerSmallOldSampling1.getNetwork().nrOfSprings ==
@@ -2278,8 +2276,8 @@ TEST_CASE("MEHPForceBalance2 Yet another sampling example",
       strandIdx1, strandIdx2, x, y, z, alpha1, alpha2, false);
     CHECK(forceBalancerOldSamplingLarge.getNrOfLinks() ==
           forceBalancerNewSampling.getNrOfLinks());
-    CHECK(forceBalancerOldSamplingLarge.getNrOfPartialSprings() ==
-          forceBalancerNewSampling.getNrOfPartialSprings());
+    CHECK(forceBalancerOldSamplingLarge.getNrOfSprings() ==
+          forceBalancerNewSampling.getNrOfSprings());
 
     // std::cout << "\n\n\nnetwork 4:" << std::endl;
     // outputNetwork(forceBalancer4.getNetwork(),
@@ -2440,14 +2438,14 @@ TEST_CASE(
     pcm::MEHPForceBalance2(universe, 2, false, false, false);
   forceBalancerOldSamplingSmall.configAssumeBoxLargeEnough(false);
   Eigen::VectorXd springVectorsWithoutSlipLinks =
-    forceBalancerOldSamplingSmall.evaluateSpringVectors(
+    forceBalancerOldSamplingSmall.evaluateStrandVectors(
       forceBalancerOldSamplingSmall.getNetwork(),
       forceBalancerOldSamplingSmall.getCurrentDisplacements());
   forceBalancerOldSamplingSmall.randomlyAddSliplinks(
     1000, 6.0, 900, 3.0, false, 53467829);
 
   Eigen::VectorXd springVectorsWithSlipLinks =
-    forceBalancerOldSamplingSmall.evaluateSpringVectors(
+    forceBalancerOldSamplingSmall.evaluateStrandVectors(
       forceBalancerOldSamplingSmall.getNetwork(),
       forceBalancerOldSamplingSmall.getCurrentDisplacements());
 
@@ -2464,13 +2462,13 @@ TEST_CASE(
       universe, 0, 6.0, 0.0, 0, 3.0, "53467829");
   forceBalancer2Without.configAssumeBoxLargeEnough(false);
 
-  CHECK(forceBalancer2.getNrOfPartialSprings() >
-        forceBalancer2Without.getNrOfPartialSprings());
+  CHECK(forceBalancer2.getNrOfSprings() >
+        forceBalancer2Without.getNrOfSprings());
 
   CHECK(forceBalancer2
-          .evaluateSpringVectors(forceBalancer2.getNetwork(),
+          .evaluateStrandVectors(forceBalancer2.getNetwork(),
                                  forceBalancer2.getCurrentDisplacements())
-          .isApprox(forceBalancer2Without.evaluateSpringVectors(
+          .isApprox(forceBalancer2Without.evaluateStrandVectors(
             forceBalancer2Without.getNetwork(),
             forceBalancer2Without.getCurrentDisplacements())));
 }
@@ -2537,9 +2535,9 @@ TEST_CASE(
   forceBalancerEntanglementSprings.configAssumeBoxLargeEnough(true);
   forceBalancerEntanglementLinks.configAssumeBoxLargeEnough(true);
 
-  REQUIRE(forceBalancerEntanglementSprings.getNrOfSprings() >
-          forceBalancerEntanglementLinks.getNrOfSprings());
-  REQUIRE(forceBalancerEntanglementLinks.getNrOfSprings() == 464);
+  REQUIRE(forceBalancerEntanglementSprings.getNrOfStrands() >
+          forceBalancerEntanglementLinks.getNrOfStrands());
+  REQUIRE(forceBalancerEntanglementLinks.getNrOfStrands() == 464);
   REQUIRE(forceBalancerEntanglementSprings.getNrOfActiveStrands() >
           forceBalancerEntanglementLinks.getNrOfActiveStrands());
 
@@ -2558,8 +2556,8 @@ TEST_CASE(
     forceBalancerEntanglementLinks.runForceRelaxation(
       pcm::StructureSimplificationMode::ALL_TIM);
 
-    CHECK(forceBalancerEntanglementSprings.getNrOfSprings() >
-          forceBalancerEntanglementLinks.getNrOfSprings());
+    CHECK(forceBalancerEntanglementSprings.getNrOfStrands() >
+          forceBalancerEntanglementLinks.getNrOfStrands());
     std::vector<long int> activeNodes1 =
       forceBalancerEntanglementSprings.getIdsOfActiveNodes();
     std::sort(activeNodes1.begin(), activeNodes1.end());
@@ -2598,8 +2596,8 @@ TEST_CASE(
     forceBalancerEntanglementLinks.runForceRelaxation(
       pcm::StructureSimplificationMode::NO_SIMPLIFICATION);
 
-    CHECK(forceBalancerEntanglementSprings.getNrOfSprings() >
-          forceBalancerEntanglementLinks.getNrOfSprings());
+    CHECK(forceBalancerEntanglementSprings.getNrOfStrands() >
+          forceBalancerEntanglementLinks.getNrOfStrands());
     std::vector<long int> activeNodes1 =
       forceBalancerEntanglementSprings.getIdsOfActiveNodes();
     std::sort(activeNodes1.begin(), activeNodes1.end());
@@ -2670,8 +2668,8 @@ TEST_CASE(
     forceBalancerEntanglements.getDisplacementResidualNorm();
   double initialResidualP = forceBalancerPhantom.getDisplacementResidualNorm();
 
-  CHECK(forceBalancerEntanglements.getNrOfPartialSprings() >
-        forceBalancerPhantom.getNrOfPartialSprings());
+  CHECK(forceBalancerEntanglements.getNrOfSprings() >
+        forceBalancerPhantom.getNrOfSprings());
   CHECK(forceBalancerEntanglements.getNrOfActiveStrands() >
         forceBalancerPhantom.getNrOfActiveStrands());
   CHECK(forceBalancerEntanglements.getSolubleWeightFraction() <
@@ -2680,8 +2678,8 @@ TEST_CASE(
   forceBalancerEntanglements.runForceRelaxation();
   forceBalancerPhantom.runForceRelaxation();
 
-  CHECK(forceBalancerEntanglements.getNrOfPartialSprings() >
-        forceBalancerPhantom.getNrOfPartialSprings());
+  CHECK(forceBalancerEntanglements.getNrOfSprings() >
+        forceBalancerPhantom.getNrOfSprings());
   CHECK(forceBalancerEntanglements.getNrOfActiveStrands() >
         forceBalancerPhantom.getNrOfActiveStrands());
   CHECK(forceBalancerEntanglements.getSolubleWeightFraction() <
@@ -2692,8 +2690,8 @@ TEST_CASE(
   forceBalancerPhantom.runForceRelaxation(
     pcm::StructureSimplificationMode::ALL_TIM);
 
-  CHECK(forceBalancerEntanglements.getNrOfSprings() >
-        forceBalancerPhantom.getNrOfSprings());
+  CHECK(forceBalancerEntanglements.getNrOfStrands() >
+        forceBalancerPhantom.getNrOfStrands());
   CHECK(forceBalancerEntanglements.getNrOfActiveStrands() >
         forceBalancerPhantom.getNrOfActiveStrands());
   CHECK(forceBalancerEntanglements.getSolubleWeightFraction() <
