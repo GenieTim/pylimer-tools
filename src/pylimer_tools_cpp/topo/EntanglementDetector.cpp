@@ -29,6 +29,7 @@ namespace topo {
      * @param ignoreCrosslinks whether to ignore cross-link atoms when sampling.
      * Careful: if you don't ignore them, the same-strand policy might not work
      * correctly.
+     * @param filterDanglingAndSoluble
      * @return AtomPairEntanglements
      */
     AtomPairEntanglements randomlyFindEntanglements(

@@ -220,13 +220,14 @@ namespace entities {
     /**
      * @brief Compute the offset required to compensate for PBC
      *
-     * @param coords
+     * @param distanceVec
      * @return Eigen::VectorXd
      */
-    Eigen::VectorXd getOffset(const Eigen::VectorXd& coords) const
+    Eigen::VectorXd getOffset(const Eigen::VectorXd& distanceVec) const
     {
-      return -(this->L.replicate(coords.size() / 3, 1) *
-               (coords.array() * this->oneOverL.replicate(coords.size() / 3, 1))
+      return -(this->L.replicate(distanceVec.size() / 3, 1) *
+               (distanceVec.array() *
+                this->oneOverL.replicate(distanceVec.size() / 3, 1))
                  .rint())
                 .matrix();
     }

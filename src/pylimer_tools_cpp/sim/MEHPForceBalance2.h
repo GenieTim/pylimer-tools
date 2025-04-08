@@ -53,46 +53,6 @@ private:
   double springBreakingLength = -1.;
 
 public:
-  explicit MEHPForceBalance2(const pylimer_tools::entities::Universe& u,
-                             const int crossLinkerType = 2,
-                             const bool is2D = false,
-                             const bool remove2functionalCrosslinkers = false,
-                             const bool removeDanglingChains = false)
-    : universe(u)
-  {
-    this->crossLinkerType = crossLinkerType;
-    this->box = u.getBox();
-    // interpret network already to be able to give early results
-    ForceBalance2Network net;
-    RUNTIME_EXP_IFN(ConvertNetwork(net,
-                                   crossLinkerType,
-                                   remove2functionalCrosslinkers,
-                                   removeDanglingChains),
-                    "Failed to convert network.");
-    this->initialConfig = net;
-    this->is2D = is2D;
-    this->currentDisplacements = Eigen::VectorXd::Zero(net.coordinates.size());
-    this->completeInitialization();
-  };
-
-  MEHPForceBalance2(const ForceBalance2Network& net, const bool is2D = false)
-  {
-    this->is2D = is2D;
-    this->initialConfig = net;
-    this->currentDisplacements = Eigen::VectorXd::Zero(net.coordinates.size());
-    this->box = pylimer_tools::entities::Box(net.L[0], net.L[1], net.L[2]);
-    this->completeInitialization();
-  }
-
-#ifdef CEREALIZABLE
-  static MEHPForceBalance2 constructFromString(std::string s)
-  {
-    MEHPForceBalance2 res = MEHPForceBalance2();
-    pylimer_tools::utils::deserializeFromString(res, s);
-    return res;
-  }
-#endif
-
   /**
    * @brief Instantiate this simulator with chosen entanglements.
    *
@@ -100,15 +60,36 @@ public:
    * @param entanglements
    * @param crossLinkerType
    * @param is2D
+   * @param entanglementsAsSprings whether to model the entanglements as merged
+   * beads or beads with 1 spring in between
    * @return MEHPForceBalance2
    */
-  static MEHPForceBalance2 constructWithEntanglements(
+  MEHPForceBalance2(
     const pylimer_tools::entities::Universe& universe,
     const pylimer_tools::topo::entanglement_detection::AtomPairEntanglements&
       entanglements,
     const int crossLinkerType = 2,
-    const bool is2D = false);
-  ;
+    const bool is2D = false,
+    const bool entanglementsAsSprings = false);
+
+  explicit MEHPForceBalance2(const pylimer_tools::entities::Universe& u,
+                             const int crossLinkerType = 2,
+                             const bool is2D = false)
+    : MEHPForceBalance2(
+        u,
+        pylimer_tools::topo::entanglement_detection::AtomPairEntanglements({},
+                                                                           {}),
+        crossLinkerType,
+        is2D,
+        false) {};
+
+  MEHPForceBalance2(const ForceBalance2Network& net, const bool is2D = false)
+  {
+    this->is2D = is2D;
+    this->initialConfig = net;
+    this->box = pylimer_tools::entities::Box(net.L[0], net.L[1], net.L[2]);
+    this->completeInitialization();
+  }
 
   /**
    * @brief Instantiate this simulator with randomly chosen slip-links.
@@ -125,25 +106,46 @@ public:
    * @param crossLinkerType
    * @param is2D
    * @param filterEntanglements
+   * @param entanglementsAsSprings whether to model the entanglements as merged
+   * beads or beads with 1 spring in between
    * @return MEHPForceBalance2
    */
-  static MEHPForceBalance2 constructWithRandomEntanglements(
-    const pylimer_tools::entities::Universe& universe,
-    const size_t nrOfEntanglementsToSample,
-    const double upperCutoff,
-    const double lowerCutoff = 0.,
-    const size_t minimumNrOfEntanglements = 0,
-    const double sameStrandCutoff = 3,
-    const std::string seed = "",
-    int crossLinkerType = 2,
-    bool is2D = false,
-    bool filterEntanglements = true);
+  MEHPForceBalance2(const pylimer_tools::entities::Universe& universe,
+                    const size_t nrOfEntanglementsToSample,
+                    const double upperCutoff,
+                    const double lowerCutoff = 0.,
+                    const size_t minimumNrOfEntanglements = 0,
+                    const double sameStrandCutoff = 3,
+                    const std::string seed = "",
+                    const int crossLinkerType = 2,
+                    const bool is2D = false,
+                    const bool filterEntanglements = true,
+                    const bool entanglementsAsSprings = false)
+    : MEHPForceBalance2(
+        universe,
+        pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
+          universe,
+          nrOfEntanglementsToSample,
+          upperCutoff,
+          lowerCutoff,
+          minimumNrOfEntanglements,
+          sameStrandCutoff,
+          seed,
+          crossLinkerType,
+          true,
+          filterEntanglements),
+        crossLinkerType,
+        is2D,
+        entanglementsAsSprings) {};
 
-  /**
-   * @brief Finish initializing some member properties
-   *
-   */
-  void completeInitialization();
+#ifdef CEREALIZABLE
+  static MEHPForceBalance2 constructFromString(std::string s)
+  {
+    MEHPForceBalance2 res = MEHPForceBalance2();
+    pylimer_tools::utils::deserializeFromString(res, s);
+    return res;
+  }
+#endif
 
   /**
    * @brief Actually do run the simulation
@@ -179,6 +181,7 @@ public:
                           const SLESolver solver,
                           const std::function<bool()>& shouldInterrupt,
                           const std::function<void()>& cleanupInterrupt);
+
   /**
    * @brief Remove crosslinkers which do not have any springs with a certain
    * minimum length
@@ -1211,19 +1214,10 @@ public:
 
 protected:
   /**
-   * @brief Convert the universe to a network
+   * @brief Finish initializing some member properties
    *
-   * @param net the target network
-   * @param crossLinkerType the atom type of the crossLinker
-   * @param remove2functionalCrosslinkers
-   * @param removeDanglingChains
-   * @return true
-   * @return false
    */
-  bool ConvertNetwork(ForceBalance2Network& net,
-                      const int crossLinkerType,
-                      bool remove2functionalCrosslinkers = false,
-                      bool removeDanglingChains = false);
+  void completeInitialization();
 
   /**
    * @brief Evaluate the pressure of the network at specific displacements

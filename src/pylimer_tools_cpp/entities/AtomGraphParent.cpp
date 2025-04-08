@@ -2,6 +2,7 @@ extern "C"
 {
 #include <igraph/igraph.h>
 }
+
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtils.h"
 #include "Atom.h"
@@ -15,6 +16,7 @@ extern "C"
 namespace pylimer_tools {
 namespace entities {
   AtomGraphParent::AtomGraphParent() {}
+
   // rule of three:
   // 1. destructor (to destroy the graph)
   AtomGraphParent::~AtomGraphParent()
@@ -23,6 +25,7 @@ namespace entities {
     // graph
     igraph_destroy(&this->graph);
   }
+
   // 2. copy constructor
   // AtomGraphParent(const AtomGraphParent &src) {
   //   igraph_copy(&this->graph, &src.graph);

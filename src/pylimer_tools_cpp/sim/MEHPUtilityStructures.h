@@ -165,8 +165,8 @@ namespace sim::mehp {
     Eigen::VectorXd springsContourLength; /* the N for each spring */
     Eigen::ArrayXi springsType; // gives each spring a type. Needed for
     // entanglements modelled as springs
-    ArrayXArrayXi strandIndicesOfLinks; // maps link -> springs
-    ArrayXArrayXi linkIndicesOfStrands; // maps spring -> links
+    ArrayXArrayXi strandIndicesOfLinks; // maps link -> strands
+    ArrayXArrayXi linkIndicesOfStrands; // maps strands -> links
     ArrayXArrayXi springIndicesOfStrand;
     // map the "local", partial, spring indices to the full-length springs
     Eigen::ArrayXb linkIsEntanglement; // whether a link is a "cross-link" or an
