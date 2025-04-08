@@ -48,7 +48,6 @@ private:
   int crossLinkerType = 2;
   int entanglementType = 3;
   int nrOfStepsDone = 0;
-  int simplificationFrequency = 10;
   double defaultBondLength = 0.0;
   double springBreakingLength = -1.;
 
@@ -68,9 +67,9 @@ public:
     const pylimer_tools::entities::Universe& universe,
     const pylimer_tools::topo::entanglement_detection::AtomPairEntanglements&
       entanglements,
-    const int crossLinkerType = 2,
-    const bool is2D = false,
-    const bool entanglementsAsSprings = false);
+    int crossLinkerType = 2,
+    bool is2D = false,
+    bool entanglementsAsSprings = false);
 
   explicit MEHPForceBalance2(const pylimer_tools::entities::Universe& u,
                              const int crossLinkerType = 2,
@@ -386,11 +385,6 @@ public:
   }
 
   void configSpringConstant(const double kappa = 1.0) { this->kappa = kappa; }
-
-  void configSimplificationFrequency(const int newRemovalFrequency = 10)
-  {
-    this->simplificationFrequency = newRemovalFrequency;
-  }
 
   void configSpringBreakingDistance(const double newSpringBreakingForce = -1.)
   {
@@ -1039,23 +1033,6 @@ public:
     this->displaceToMeanPosition(this->initialConfig, displacements, linkIdx);
     return displacements;
   };
-
-  /**
-   * @brief Adjust the two spring's box offsets to work best with the
-   * specified slip-link
-   *
-   * @param net the network to adjust
-   * @param u the current displacements
-   * @param entanglementLinkIdx the slip-link around which to adjust the two
-   * springs
-   * @param spring1 one of the two partial spring idx
-   * @param spring2 the partial spring idx of the other spring
-   */
-  void reAlignEntanglementToImages(ForceBalance2Network& net,
-                                   const Eigen::VectorXd& u,
-                                   const size_t entanglementLinkIdx,
-                                   const size_t spring1,
-                                   const size_t spring2) const;
 
   /**
    * @brief Displace all links to the mean of all connected neighbours
