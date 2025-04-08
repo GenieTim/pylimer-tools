@@ -370,9 +370,9 @@ public:
   void setSpringContourLengths(const Eigen::VectorXd& springsContourLengths)
   {
     INVALIDARG_EXP_IFN(springsContourLengths.size() ==
-                         this->initialConfig.springsContourLength.size(),
+                         this->initialConfig.springContourLength.size(),
                        "Contour length must have the correct dimensions.");
-    this->initialConfig.springsContourLength = springsContourLengths;
+    this->initialConfig.springContourLength = springsContourLengths;
   }
 
   void configAssumeBoxLargeEnough(const bool assumption)
@@ -947,12 +947,12 @@ public:
                        "The requested link does not exist");
     std::unordered_set<size_t> partialSpringIndices;
 
-    std::vector<size_t> springIndices = net.strandIndicesOfLinks[linkIdx];
+    std::vector<size_t> springIndices = net.strandIndicesOfLink[linkIdx];
 
     for (size_t spring_index = 0; spring_index < springIndices.size();
          ++spring_index) {
       std::vector<size_t> springsPartners =
-        net.linkIndicesOfStrands[springIndices[spring_index]];
+        net.linkIndicesOfStrand[springIndices[spring_index]];
       for (size_t partner_idx = 0; partner_idx < springsPartners.size() - 1;
            ++partner_idx) {
         if (springsPartners[partner_idx] == linkIdx ||
@@ -1175,7 +1175,7 @@ public:
     std::cout << "Atom " << atomIdx << " (" << atomId << ")"
               << " connectivity:" << std::endl;
     for (long int parentSpringIdx :
-         this->initialConfig.strandIndicesOfLinks[atomIdx]) {
+         this->initialConfig.strandIndicesOfLink[atomIdx]) {
       std::vector<size_t> allSpringIndices =
         this->initialConfig.springIndicesOfStrand[parentSpringIdx];
       std::string prefix = "";
@@ -1187,7 +1187,7 @@ public:
         std::cout << prefix << "\t";
 
         for (long int linkIdx :
-             this->initialConfig.linkIndicesOfStrands[springIdx]) {
+             this->initialConfig.linkIndicesOfStrand[springIdx]) {
           std::cout << linkIdx << " ";
           if (linkIdx < this->initialConfig.nrOfNodes) {
             std::cout << "(" << this->initialConfig.oldAtomIds[linkIdx] << ") ";
@@ -1367,7 +1367,7 @@ protected:
         !this->distanceIsWithinTolerance(
           partialSpringVectors.segment(3 * i, 3),
           tolerance,
-          net->springsContourLength[net->strandIdxOfSpring[i]]);
+          net->springContourLength[net->strandIdxOfSpring[i]]);
     }
 
     return result;
@@ -1406,7 +1406,7 @@ protected:
         !this->distanceIsWithinTolerance(
           Eigen::Vector3d(partialSpringVectors[3 * i + dir], 0, 0),
           tolerance,
-          net->springsContourLength[net->strandIdxOfSpring[i]]);
+          net->springContourLength[net->strandIdxOfSpring[i]]);
     }
 
     return result;
@@ -1435,9 +1435,9 @@ protected:
       Eigen::ArrayXb::Constant(this->initialConfig.nrOfNodes, false);
     for (size_t i = 0; i < activeSprings.size(); ++i) {
       if (activeSprings[i]) {
-        activeNodes[this->initialConfig.linkIndicesOfStrands[i][0]] = true;
+        activeNodes[this->initialConfig.linkIndicesOfStrand[i][0]] = true;
         activeNodes[pylimer_tools::utils::last(
-          this->initialConfig.linkIndicesOfStrands[i])] = true;
+          this->initialConfig.linkIndicesOfStrand[i])] = true;
       }
     }
     return activeNodes;
@@ -1464,7 +1464,7 @@ protected:
       result[i] = !this->distanceIsWithinTolerance(
         springVectors.segment(3 * i, 3),
         tolerance,
-        net->springsContourLength[net->strandIdxOfSpring[i]]);
+        net->springContourLength[net->strandIdxOfSpring[i]]);
     }
 
     return result;
