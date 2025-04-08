@@ -163,7 +163,7 @@ namespace sim::mehp {
     // coordinates & connectivity
     Eigen::VectorXd coordinates;
     Eigen::VectorXd springContourLength; /* the N for each spring */
-    Eigen::ArrayXi springsType; // gives each spring a type. Needed for
+    Eigen::ArrayXi springsType;          // gives each spring a type. Needed for
     // entanglements modelled as springs
     ArrayXArrayXi strandIndicesOfLink; // maps link -> strands
     ArrayXArrayXi linkIndicesOfStrand; // maps strands -> links
