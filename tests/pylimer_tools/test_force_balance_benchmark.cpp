@@ -50,7 +50,7 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
     auto duration_ref = std::chrono::duration_cast<std::chrono::microseconds>(
       end_ref - start_ref);
     std::cout << "Reference Time (FB1) to beat: "
-      << std::duration_to_string(duration_ref) << " " << std::endl;
+              << std::duration_to_string(duration_ref) << " " << std::endl;
 
     // BENCHMARK_ADVANCED("MEHP LD_MMA " +
     //                    largeInputFile)(Catch::Benchmark::Chronometer meter)
@@ -71,8 +71,7 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
     // };
 
     for (pcm::SLESolver solverChoice :
-         {
-           // pcm::SIMPLICIAL_LLT,
+         { // pcm::SIMPLICIAL_LLT,
            //                                    pcm::SIMPLICIAL_DLT,
            //                                    pcm::SPARSE_LU,
            //                                    pcm::SPARSE_QR,
@@ -93,7 +92,7 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
           solverChoice);
       } catch (const std::exception& e) {
         std::cerr << "Exception for solver " << solverChoice << ": " << e.what()
-          << std::endl;
+                  << std::endl;
         continue;
       }
 
@@ -105,7 +104,7 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
         std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
       std::cout << "Solver (FB2): " << solverChoice
-        << ", Time: " << std::duration_to_string(duration) << std::endl;
+                << ", Time: " << std::duration_to_string(duration) << std::endl;
     }
   }
 }
@@ -124,13 +123,7 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
 
   std::vector<int> chainLengths = pu::initializeWithValue(50, 100);
   generator.addRandomlyFunctionalizedStrands(
-    50,
-    chainLengths,
-    7.2,
-    1,
-    2,
-    1,
-    true);
+    50, chainLengths, 7.2, 1, 2, 1, true);
 
   CHECK_THAT(generator.getCurrentNrOfAvailableCrosslinkSites(),
              Catch::Matchers::WithinRel(50 * 100 * 7.2, 0.01));
@@ -158,7 +151,7 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
   auto duration_ref =
     std::chrono::duration_cast<std::chrono::microseconds>(end_ref - start_ref);
   std::cout << "Reference Time (FB1) to beat: "
-    << std::duration_to_string(duration_ref) << " " << std::endl;
+            << std::duration_to_string(duration_ref) << " " << std::endl;
   CHECK(referenceForceBalancer.getNrOfActiveNodes(1e-1) == 0);
 
   // BENCHMARK_ADVANCED("MEHP LD_MMA " +
@@ -175,8 +168,7 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
   // };
 
   for (pcm::SLESolver solverChoice :
-       {
-         // pcm::SIMPLICIAL_LLT,
+       { // pcm::SIMPLICIAL_LLT,
          //                                    pcm::SIMPLICIAL_DLT,
          //                                    pcm::SPARSE_LU,
          //                                    pcm::SPARSE_QR,
@@ -196,7 +188,7 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
         solverChoice);
     } catch (const std::exception& e) {
       std::cerr << "Exception for solver " << solverChoice << ": " << e.what()
-        << std::endl;
+                << std::endl;
       continue;
     }
     auto end = std::chrono::high_resolution_clock::now();
@@ -209,6 +201,6 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
     CHECK(forceBalancer.getNrOfActiveNodes() == 0);
 
     std::cout << "Solver (FB2): " << solverChoice
-      << ", Time: " << std::duration_to_string(duration) << std::endl;
+              << ", Time: " << std::duration_to_string(duration) << std::endl;
   }
 }

@@ -49,17 +49,18 @@ public:
     const Eigen::VectorXd& springDistances,
     bool requiresGradient) const
   {
-    PYBIND11_OVERRIDE_PURE(returntype,
-                           /* Return type */
-                           MEHPForceEvaluator,
-                           /* Parent class */
-                           evaluateForceSetGradient,
-                           /* Name of function in C++
-                                                                            (must
-                              match Python name) */
-                           n,
-                           springDistances,
-                           requiresGradient /* Argument(s) */
+    PYBIND11_OVERRIDE_PURE(
+      returntype,
+      /* Return type */
+      MEHPForceEvaluator,
+      /* Parent class */
+      evaluateForceSetGradient,
+      /* Name of function in C++
+                                                       (must
+         match Python name) */
+      n,
+      springDistances,
+      requiresGradient /* Argument(s) */
     );
   }
 

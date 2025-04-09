@@ -135,8 +135,8 @@ namespace entities {
      */
     template<typename vertex_idx_type>
     unsigned long long hashVertexIndicesOrderRelevant(int r,
-      int count,
-      ...) const
+                                                      int count,
+                                                      ...) const
     {
       unsigned long long hash = 0;
       int numVerticesTotal = this->getNrOfVertices() + 1;
@@ -304,10 +304,7 @@ namespace entities {
       igraph_vector_t allValues;
       igraph_vector_init(&allValues, this->getNrOfVertices());
       if (igraph_cattribute_VANV(
-        &this->graph,
-        propertyName,
-        igraph_vss_all(),
-        &allValues)) {
+            &this->graph, propertyName, igraph_vss_all(), &allValues)) {
         throw std::runtime_error("Failed to query properties of graph.");
       }
       pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
@@ -321,10 +318,7 @@ namespace entities {
                           IN value)
     {
       if (igraph_cattribute_VAN_set(
-        &this->graph,
-        propertyName,
-        vertexId,
-        value)) {
+            &this->graph, propertyName, vertexId, value)) {
         throw std::runtime_error("Failed to set property value");
       }
     }
@@ -421,7 +415,7 @@ namespace entities {
      * @return std::pair<std::vector<std::string>, std::vector<std::string>>
      * first the vertex property names, then the same for the edges
      */
-    std::pair<std::vector<std::string>, std::vector<std::string> >
+    std::pair<std::vector<std::string>, std::vector<std::string>>
     getVertexAndEdgePropertyNames() const;
 
     /**
@@ -473,14 +467,14 @@ namespace entities {
      *
      * @return std::map<std::string, std::vector<long int>>
      */
-    std::map<std::string, std::vector<long int> > getEdges() const;
+    std::map<std::string, std::vector<long int>> getEdges() const;
 
     /**
      * @brief Get all bonds (edges) associated with this graph
      *
      * @return std::map<std::string, std::vector<long int>>
      */
-    std::map<std::string, std::vector<long int> > getBonds() const;
+    std::map<std::string, std::vector<long int>> getBonds() const;
 
     Eigen::VectorXd getAssumedVertexCoordinates(const Box& box) const
     {
