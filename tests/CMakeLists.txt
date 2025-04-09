@@ -48,6 +48,7 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(Catch2)
+add_compile_definitions(PYLIMER_TEST_FIXTURES_DIR="${CMAKE_CURRENT_LIST_DIR}/pylimer_tools/fixtures")
 
 # and other needed packages
 # setupIgraph()
