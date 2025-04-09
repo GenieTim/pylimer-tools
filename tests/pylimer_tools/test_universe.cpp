@@ -11,6 +11,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+
 extern "C"
 {
 #include <igraph/igraph.h>
@@ -46,8 +47,7 @@ TEST_CASE("Universe can be created", "[entity][Universe]")
 
   pe::Universe universe(1.0, 1.0, 1.0);
 
-  SECTION("atoms can be added")
-  {
+  SECTION("atoms can be added") {
     universe.addAtoms({ { 0, 1 } },
                       { { 1, 1 } },
                       { { 0.0, 1.0 } },
@@ -70,8 +70,7 @@ TEST_CASE("Universe can be created", "[entity][Universe]")
     CHECK(universe.getNrOfBonds() == 0);
     REQUIRE_THROWS(universe.getIdxByAtomId(1000));
 
-    SECTION("Atom coordinates can be rescaled")
-    {
+    SECTION("Atom coordinates can be rescaled") {
       CHECK(universe.getVolume() == 1.0);
       CHECK(universe.getAtom(0).getX() == 0.0);
       CHECK(universe.getAtom(1).getX() == 1.0);
@@ -91,8 +90,7 @@ TEST_CASE("Universe can be created", "[entity][Universe]")
       CHECK(universe.getAtom(1).getZ() == 2.0);
     }
 
-    SECTION("Atoms can be removed")
-    {
+    SECTION("Atoms can be removed") {
       universe.addBonds({ { 0, 1, 3, 4 } }, { { 1, 3, 4, 0 } });
       pe::Universe universeCopy = pe::Universe(universe);
       CHECK_NOTHROW(universeCopy.getAtom(3));
@@ -106,8 +104,7 @@ TEST_CASE("Universe can be created", "[entity][Universe]")
       CHECK(universeCopy.getNrOfBonds() == 1);
     }
 
-    SECTION("molecules are found")
-    {
+    SECTION("molecules are found") {
       CHECK(universe.getNrOfAtoms() == 4);
       CHECK(universe.getMolecules(2).size() == 4);
       // works twice: make sure there is no removal of anything happening
@@ -122,16 +119,14 @@ TEST_CASE("Universe can be created", "[entity][Universe]")
       CHECK(universe.getMolecules(2).size() == 2);
     }
 
-    SECTION("Special constructors work")
-    {
+    SECTION("Special constructors work") {
       pe::Universe universe2 = universe;
       CHECK(universe2.getNrOfAtoms() == 4);
       CHECK(universe2.getMolecules(2).size() == 4);
     }
   }
 
-  SECTION("Disallowed mutations are detected")
-  {
+  SECTION("Disallowed mutations are detected") {
     std::vector<int> threeZeros = { { 0, 0, 0 } };
     std::vector<long int> oneTwoThree = { { 1, 2, 3 } };
     std::vector<long int> threeLongZeros = { { 0, 0, 0 } };
@@ -144,32 +139,32 @@ TEST_CASE("Universe can be created", "[entity][Universe]")
       3, oneTwoThree, threeLongZeros, threeZeros, true, true));
     // all fine
     REQUIRE_NOTHROW(universe.addAtoms(oneTwoThree,
-                                      threeZeros,
-                                      threeDoubleZeros,
-                                      threeDoubleZeros,
-                                      threeDoubleZeros,
-                                      threeZeros,
-                                      threeZeros,
-                                      threeZeros));
+      threeZeros,
+      threeDoubleZeros,
+      threeDoubleZeros,
+      threeDoubleZeros,
+      threeZeros,
+      threeZeros,
+      threeZeros));
     // id already exists
     REQUIRE_THROWS(universe.addAtoms(threeLongZeros,
-                                     threeZeros,
-                                     threeDoubleZeros,
-                                     threeDoubleZeros,
-                                     threeDoubleZeros,
-                                     threeZeros,
-                                     threeZeros,
-                                     threeZeros));
+      threeZeros,
+      threeDoubleZeros,
+      threeDoubleZeros,
+      threeDoubleZeros,
+      threeZeros,
+      threeZeros,
+      threeZeros));
     std::vector<long int> fourLongZeros = { { 0, 0, 0, 0 } };
     // different lengths
     REQUIRE_THROWS(universe.addAtoms(fourLongZeros,
-                                     threeZeros,
-                                     threeDoubleZeros,
-                                     threeDoubleZeros,
-                                     threeDoubleZeros,
-                                     threeZeros,
-                                     threeZeros,
-                                     threeZeros));
+      threeZeros,
+      threeDoubleZeros,
+      threeDoubleZeros,
+      threeDoubleZeros,
+      threeZeros,
+      threeZeros,
+      threeZeros));
     // different lengths
     REQUIRE_THROWS(
       universe.addAngles(oneTwoThree, fourLongZeros, oneTwoThree, threeZeros));
@@ -187,8 +182,7 @@ TEST_CASE("Universe can be resized", "[entity][Universe]")
   pe::Universe universe = pe::Universe(1.0, 1.0, 1.0);
   REQUIRE(universe.getVolume() == 1.0);
 
-  SECTION("resizing smaller changes volume")
-  {
+  SECTION("resizing smaller changes volume") {
     REQUIRE_THROWS(pe::Box(0.0, 1.0, 2.0));
     universe.setBox(pe::Box(0.25, 1.0, 2.0));
     REQUIRE(universe.getVolume() == 0.5);
@@ -206,8 +200,7 @@ TEST_CASE("Universe can be resized", "[entity][Universe]")
     REQUIRE(universe.findLoops(2).size() == 0);
   }
 
-  SECTION("resizing bigger changes volume")
-  {
+  SECTION("resizing bigger changes volume") {
     universe.setBoxLengths(1.0, 1.0, 1.0);
     REQUIRE(universe.getVolume() == 1.0);
     universe.setBox(pe::Box(2.0, 1.0, 2.0));
@@ -223,8 +216,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
 
   pe::Universe universe = pe::Universe(1.0, 1.0, 1.0);
 
-  SECTION("Loop Entanglements are detected")
-  {
+  SECTION("Loop Entanglements are detected") {
     /**
      * The system looks like this (in terms of bonds, not 3D placement):
      *
@@ -237,15 +229,22 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
      * 8-7
      */
     universe.setBox(pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0));
-    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },   // id
-                      { { 1, 1, 1, 2, 1, 2, 2, 1 } },   // type
-                      { { -5, 5, 5, -5, 7, 1, 1, 7 } }, // x
-                      { { -5, -5, 5, 5, 0, 0, 0, 0 } }, // y
-                      { { 1, 1, 1, 1, -5, -5, 5, 5 } }, // z
-                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },   // nx
-                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },   // ny
-                      { { 1, 1, 1, 1, 1, 1, 1, 1 } }    // nz
-    );
+    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },
+                      // id
+                      { { 1, 1, 1, 2, 1, 2, 2, 1 } },
+                      // type
+                      { { -5, 5, 5, -5, 7, 1, 1, 7 } },
+                      // x
+                      { { -5, -5, 5, 5, 0, 0, 0, 0 } },
+                      // y
+                      { { 1, 1, 1, 1, -5, -5, 5, 5 } },
+                      // z
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },
+                      // nx
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },
+                      // ny
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } } // nz
+      );
     universe.addBonds(8,
                       { { 1, 2, 3, 4, 5, 6, 7, 8 } },
                       { { 2, 3, 4, 1, 6, 7, 8, 5 } },
@@ -255,27 +254,26 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE(universe.getNrOfBonds() == 8);
     const std::vector<long int> empty;
     CHECK(universe.findLoopEntanglements(empty, empty, empty, empty).size() ==
-          0);
+      0);
     CHECK(
       universe
-        .findLoopEntanglements({ { 1, 2, 7 } }, { { 0, 3, 6 } }, empty, empty)
-        .size() == 0);
+      .findLoopEntanglements({ { 1, 2, 7 } }, { { 0, 3, 6 } }, empty, empty)
+      .size() == 0);
     CHECK(
       universe
-        .findLoopEntanglements({ { 0, 1, 2 } }, { { 5, 7, 6 } }, empty, empty)
-        .size() == 2);
+      .findLoopEntanglements({ { 0, 1, 2 } }, { { 5, 7, 6 } }, empty, empty)
+      .size() == 2);
     CHECK(universe
-            .findLoopEntanglements(
-              { { 0, 1, 2, 3 } }, { { 4, 5, 6, 7 } }, empty, empty)
-            .size() > 0);
+      .findLoopEntanglements(
+        { { 0, 1, 2, 3 } }, { { 4, 5, 6, 7 } }, empty, empty)
+      .size() > 0);
     CHECK(universe
-            .findLoopEntanglements(
-              { { 4, 5, 6, 7 } }, { { 0, 1, 2, 3 } }, empty, empty)
-            .size() > 0);
+      .findLoopEntanglements(
+        { { 4, 5, 6, 7 } }, { { 0, 1, 2, 3 } }, empty, empty)
+      .size() > 0);
   }
 
-  SECTION("Molecules with crossLinkers are found")
-  {
+  SECTION("Molecules with crossLinkers are found") {
     universe.setBox(pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0));
     /**
     # The system looks like this (in terms of bonds, not 3D placement):
@@ -286,22 +284,37 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     #
     # *4
     */
-    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },       // id
-                      { { 1, 1, 1, 2, 1, 2, 2, 1 } },       // type
-                      { { 1.25, 2, 3, 1.01, 2, 4, 1, 1 } }, // x
-                      { { 1, 1, 1, 4.01, 2, 1, 2, 3 } },    // y
-                      { { 1, 1, 1, 1.01, 1, 1, 1, 1 } },    // z
-                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },       // nx
-                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },       // ny
-                      { { 1, 1, 1, 1, 1, 1, 1, 1 } }        // nz
-    );
+    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },
+                      // id
+                      { { 1, 1, 1, 2, 1, 2, 2, 1 } },
+                      // type
+                      { { 1.25, 2, 3, 1.01, 2, 4, 1, 1 } },
+                      // x
+                      { { 1, 1, 1, 4.01, 2, 1, 2, 3 } },
+                      // y
+                      { { 1, 1, 1, 1.01, 1, 1, 1, 1 } },
+                      // z
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },
+                      // nx
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },
+                      // ny
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } } // nz
+      );
     universe.addBonds(7,
                       { { 1, 2, 3, 6, 5, 7, 7 } },
                       { { 2, 3, 6, 5, 7, 1, 8 } },
                       { { 1, 1, 1, 1, 1, 1, 11 } });
 
-    SECTION("Atoms can be replaced")
-    {
+    SECTION("Graph copy can be accessed") {
+      igraph_t graph = universe.getCopyOfGraph();
+      CHECK(igraph_vcount(&graph) == universe.getNrOfAtoms());
+      CHECK(igraph_ecount(&graph) == universe.getNrOfBonds());
+      igraph_integer_t degree;
+      igraph_degree_1(&graph, &degree, 0, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
+      CHECK(degree == 2);
+    }
+
+    SECTION("Atoms can be replaced") {
       REQUIRE_THROWS(universe.replaceAtom(2, universe.getAtom(3)));
       pe::Atom replacementAtom = pe::Atom(2, 2, 1.23, 1.23, 1.23, 0, 0, 0);
       universe.replaceAtom(2, replacementAtom);
@@ -309,26 +322,23 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(replacedAtom == replacementAtom);
     }
 
-    SECTION("Atom types are counted")
-    {
+    SECTION("Atom types are counted") {
       std::map<int, int> atomCounts = universe.countAtomTypes();
       REQUIRE(atomCounts.size() == 2);
       REQUIRE(atomCounts[1] == 5);
       REQUIRE(atomCounts[2] == 3);
     }
 
-    SECTION("Shortest paths are found")
-    {
+    SECTION("Shortest paths are found") {
       std::vector<pe::Atom> path = universe.getShortestPath(0, 2);
       REQUIRE(path.size() == 3);
     }
 
-    SECTION("Masses are persisted in session")
-    {
+    SECTION("Masses are persisted in session") {
       std::map<int, double> weightFractions = universe.computeWeightFractions();
       CHECK(!weightFractions.empty());
       CHECK(weightFractions[2] ==
-            (3. / 8.)); // without masses, the default is 1.0 per type
+        (3. / 8.)); // without masses, the default is 1.0 per type
       std::map<int, double> masses = universe.getMasses();
       REQUIRE(masses.size() == 0);
       masses[1] = 1.0;
@@ -345,11 +355,10 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       otherMasses[2] = 0.0;
       CHECK(otherMasses[2] == 0.0);
       CHECK(universe.computeTotalMassWithMasses(otherMasses) ==
-            Catch::Approx(5 * 1.0));
+        Catch::Approx(5 * 1.0));
     }
 
-    SECTION("Bonds can be removed")
-    {
+    SECTION("Bonds can be removed") {
       int bondsBefore = universe.getNrOfBonds();
       REQUIRE(bondsBefore == 7);
       universe.writeGraphToFile("test-graph.gml");
@@ -358,8 +367,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       CHECK(universe.getNrOfBonds() == bondsBefore - 3);
     }
 
-    SECTION("Get bonds returns")
-    {
+    SECTION("Get bonds returns") {
       auto edges = universe.getEdges();
       CHECK(edges["edge_from"][0] == 1 - 1);
       CHECK(edges["edge_to"][0] == 2 - 1);
@@ -371,13 +379,13 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       CHECK(bonds["bond_from"].size() == edges["edge_from"].size());
       CHECK(bonds["bond_from"].size() == 7);
       CHECK(bonds["bond_from"][3] ==
-            universe.getAtomIdByIdx(edges["edge_from"][3]));
+        universe.getAtomIdByIdx(edges["edge_from"][3]));
       CHECK(bonds["bond_to"][3] ==
-            universe.getAtomIdByIdx(edges["edge_to"][3]));
+        universe.getAtomIdByIdx(edges["edge_to"][3]));
       CHECK(universe.getIdxByAtomId(bonds["bond_from"][2]) ==
-            edges["edge_from"][2]);
+        edges["edge_from"][2]);
       CHECK(universe.getIdxByAtomId(bonds["bond_to"][2]) ==
-            edges["edge_to"][2]);
+        edges["edge_to"][2]);
       CHECK(bonds["bond_type"][5] == 1);
       CHECK(bonds["bond_type"][6] == 11);
       // get atoms with type returns
@@ -386,8 +394,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       CHECK(universe.getAtomsOfType(0).size() == 0);
     }
 
-    SECTION("internal lengths are computed correctly")
-    {
+    SECTION("internal lengths are computed correctly") {
       REQUIRE(universe.computeMeanBondLength() == Catch::Approx(1.1452634834));
       auto chains = universe.getChainsWithCrosslinker(2);
       REQUIRE(chains.size() == 3);
@@ -406,8 +413,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(universe.computeDys({ { 7, 6 } }, { { 6, 7 } }) == dys);
     }
 
-    SECTION("get angles returns")
-    {
+    SECTION("get angles returns") {
       REQUIRE(universe.getAngles()["angle_from"].size() == 0);
       auto detectedAngles = universe.detectAngles();
       REQUIRE(detectedAngles["angle_from"].size() == 8);
@@ -431,8 +437,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       CHECK(Catch::Approx(angles[0]) == 1.815770741);
     }
 
-    SECTION("get dihedral angles returns")
-    {
+    SECTION("get dihedral angles returns") {
       REQUIRE(universe.getDihedralAngles()["dihedral_angle_from"].size() == 0);
       auto detectedAngles = universe.detectDihedralAngles();
       REQUIRE(detectedAngles["dihedral_angle_from"].size() == 8);
@@ -450,8 +455,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(universe.getDihedralAngles()["dihedral_angle_from"].size() == 8);
     }
 
-    SECTION("get atoms returns")
-    {
+    SECTION("get atoms returns") {
       // get atoms with type returns atoms with properties
       std::vector<pe::Molecule> molecules = universe.getMolecules(2);
       REQUIRE(molecules[0].getAtomsOfType(1).size() == 3);
@@ -465,8 +469,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE_THROWS(universe.getAtomByVertexIdx(999));
     }
 
-    SECTION("get atoms with crossLinkers returns")
-    {
+    SECTION("get atoms with crossLinkers returns") {
       // get atoms with crossLinkers returns
       auto chains = universe.getChainsWithCrosslinker(2);
       REQUIRE(chains.size() == 3);
@@ -486,9 +489,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(chains[0].getAtomsOfDegree(0).size() == 0);
     }
 
-    SECTION("Loops are found")
-    {
-      std::map<int, std::vector<std::vector<pe::Atom>>> loops =
+    SECTION("Loops are found") {
+      std::map<int, std::vector<std::vector<pe::Atom> > > loops =
         universe.findLoopsOfAtoms(2, -1, true);
       REQUIRE(pylimer_tools::utils::map_has_key(loops, 2));
       REQUIRE(loops.size() == 1);
@@ -511,9 +513,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(bondsOf2.size() == 1);
       REQUIRE(bondsOf2[0] == 3);
       REQUIRE(universe
-                .getEdgeIdsFromTo(universe.getIdxByAtomId(1),
-                                  universe.getIdxByAtomId(2))
-                .size() == 1);
+        .getEdgeIdsFromTo(universe.getIdxByAtomId(1),
+          universe.getIdxByAtomId(2))
+        .size() == 1);
       std::vector<pe::Atom> minimalLoop1 =
         universe.findMinimalOrderLoopFrom(1, 2, -1, false);
       REQUIRE(minimalLoop1.size() == 6);
@@ -524,22 +526,20 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
         minimalLoopIds.push_back(a.getId());
       }
       REQUIRE(*std::max_element(minimalLoopIds.begin(), minimalLoopIds.end()) ==
-              7);
+        7);
       REQUIRE(*std::min_element(minimalLoopIds.begin(), minimalLoopIds.end()) ==
-              1);
+        1);
       REQUIRE_THAT(minimalLoopIds, Catch::Matchers::VectorContains(2));
     }
 
-    SECTION("Clusters are found")
-    {
+    SECTION("Clusters are found") {
       std::vector<pe::Universe> clusters = universe.getClusters();
       REQUIRE(clusters.size() == 2);
       REQUIRE(clusters[1].getAtoms()[0].getId() == 4);
       REQUIRE_THROWS(clusters[0].getMolecules(-1)[0].getAtomsLinedUp());
     }
 
-    SECTION("Loops are found in reduced universe")
-    {
+    SECTION("Loops are found in reduced universe") {
       /**
        * @brief increase system size, reduce to x-linkers, test
        *
@@ -563,11 +563,16 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                         { { 0, 1 } },
                         { { 0, 1 } });
       universe.addBonds(
-        2, { { 4, 9 } }, { { 9, 4 } }, { { 1, 1 } }, false, false);
+        2,
+        { { 4, 9 } },
+        { { 9, 4 } },
+        { { 1, 1 } },
+        false,
+        false);
       REQUIRE(universe.getNrOfBonds() == 2 + 7);
       pe::Universe reducedUniverse = universe.getNetworkOfCrosslinker(2);
       REQUIRE(reducedUniverse.getNrOfAtoms() == 3);
-      std::map<int, std::vector<std::vector<pe::Atom>>> loops =
+      std::map<int, std::vector<std::vector<pe::Atom> > > loops =
         reducedUniverse.findLoopsOfAtoms(2, -1);
       REQUIRE(loops.size() == 2);
       REQUIRE(reducedUniverse.getPropertyValues<int>("id").size() == 3);
@@ -583,7 +588,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE_THAT(loops[2][0],
                    Catch::Matchers::UnorderedEquals(std::vector<pe::Atom>{
                      reducedUniverse.getAtom(6), reducedUniverse.getAtom(7) }));
-      std::map<std::string, std::vector<long int>> bonds =
+      std::map<std::string, std::vector<long int> > bonds =
         reducedUniverse.getBonds();
       REQUIRE_THAT(
         bonds["bond_from"],
@@ -595,9 +600,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
 
       // second-order loop (in reduced universe)
       REQUIRE(reducedUniverse
-                .getEdgeIdsFromTo(reducedUniverse.getIdxByAtomId(6),
-                                  reducedUniverse.getIdxByAtomId(7))
-                .size() == 2);
+        .getEdgeIdsFromTo(reducedUniverse.getIdxByAtomId(6),
+          reducedUniverse.getIdxByAtomId(7))
+        .size() == 2);
       std::vector<pe::Atom> minimalLoop2 =
         reducedUniverse.findMinimalOrderLoopFrom(6, 7, -1, false);
       REQUIRE(minimalLoop2.size() == 2);
@@ -611,9 +616,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
 
       // second-order loop
       REQUIRE(universe
-                .getEdgeIdsFromTo(universe.getIdxByAtomId(4),
-                                  universe.getIdxByAtomId(9))
-                .size() == 2);
+        .getEdgeIdsFromTo(universe.getIdxByAtomId(4),
+          universe.getIdxByAtomId(9))
+        .size() == 2);
       std::vector<pe::Atom> minimalLoop1 =
         universe.findMinimalOrderLoopFrom(4, 9, -1, false);
       REQUIRE(minimalLoop1.size() == 2);
@@ -624,21 +629,19 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(minimalLoop5.size() == 2);
     }
 
-    SECTION("Infinite Strands are found")
-    {
+    SECTION("Infinite Strands are found") {
       universe.setBoxLengths(4.0, 4.0, 2.0);
       REQUIRE(universe.hasInfiniteStrand(2, -1) == false);
       universe.addBonds(2, { { 8, 4 } }, { { 4, 1 } });
-      std::map<int, std::vector<std::vector<pe::Atom>>> loops =
+      std::map<int, std::vector<std::vector<pe::Atom> > > loops =
         universe.findLoopsOfAtoms(2, -1);
       CHECK(loops.size() == 2);
       CHECK(universe.hasInfiniteStrand(2, -1) == true);
       CHECK(universe.getMeanStrandLength(2) ==
-            Catch::Approx(((double)(3 + 1 + 1)) / 3.0));
+        Catch::Approx(((double)(3 + 1 + 1)) / 3.0));
     }
 
-    SECTION("Reduction to Cross-linker-verse works")
-    {
+    SECTION("Reduction to Cross-linker-verse works") {
       pe::Universe reducedUniverse = universe.getNetworkOfCrosslinker(2);
       REQUIRE(reducedUniverse.getNrOfAtoms() == 3);
       REQUIRE(reducedUniverse.getAtomsOfType(2).size() == 3);
@@ -658,8 +661,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(atom.getY() == 4.01);
       REQUIRE(atom.getZ() == 1.01);
 
-      SECTION("Copy constructors/assignment work")
-      {
+      SECTION("Copy constructors/assignment work") {
         pe::Universe newUniverse = pe::Universe(universe);
         newUniverse = reducedUniverse;
         REQUIRE(newUniverse.getNrOfBonds() == 2);
@@ -668,8 +670,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       }
     }
 
-    SECTION("Computations work")
-    {
+    SECTION("Computations work") {
       universe.setBoxLengths(10.0, 10.0, 10.0);
 
       // To understand where the following computations are coming from
@@ -688,35 +689,41 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       CHECK(endToEndDistances[2] == chains[2].computeEndToEndDistance());
       CHECK(endToEndDistances[2] == 1.0);
       CHECK(universe.computeMeanEndToEndDistance(2) ==
-            Catch::Approx((2.0 * sqrt(3.0 * 3.0 + 1.0 * 1.0) + 1.0) / 3.0));
+        Catch::Approx((2.0 * sqrt(3.0 * 3.0 + 1.0 * 1.0) + 1.0) / 3.0));
       CHECK(universe.computeMeanSquareEndToEndDistance(2) ==
-            Catch::Approx((2.0 * (3.0 * 3.0 + 1.0 * 1.0) + 1.0) / 3.0));
+        Catch::Approx((2.0 * (3.0 * 3.0 + 1.0 * 1.0) + 1.0) / 3.0));
     }
   }
 
-  SECTION("Molecule Types are determined correctly")
-  {
+  SECTION("Molecule Types are determined correctly") {
     /**
     # The system looks like this (in terms of bonds, not 3D placement):
     # 1-2-3
     #
     # *7-*6-5
     */
-    universe.addAtoms({ { 1, 2, 3, 5, 6, 7 } }, // id
-                      { { 1, 1, 1, 1, 2, 2 } }, // type
-                      { { 3, 2, 2, 2, 2, 2 } }, // x
-                      { { 1, 1, 1, 1, 1, 1 } }, // y
-                      { { 1, 1, 1, 1, 1, 1 } }, // z
-                      { { 1, 1, 1, 1, 1, 1 } }, // nx
-                      { { 1, 1, 1, 1, 1, 1 } }, // ny
-                      { { 1, 1, 1, 1, 1, 1 } }  // nz
-    );
+    universe.addAtoms({ { 1, 2, 3, 5, 6, 7 } },
+                      // id
+                      { { 1, 1, 1, 1, 2, 2 } },
+                      // type
+                      { { 3, 2, 2, 2, 2, 2 } },
+                      // x
+                      { { 1, 1, 1, 1, 1, 1 } },
+                      // y
+                      { { 1, 1, 1, 1, 1, 1 } },
+                      // z
+                      { { 1, 1, 1, 1, 1, 1 } },
+                      // nx
+                      { { 1, 1, 1, 1, 1, 1 } },
+                      // ny
+                      { { 1, 1, 1, 1, 1, 1 } } // nz
+      );
     universe.addBonds(4, { { 1, 2, 5, 6 } }, { { 2, 3, 6, 7 } });
     CHECK(universe.getNrOfBonds() == 4);
     CHECK(universe.getMolecules(2).size() == 2);
     CHECK(universe.getChainsWithCrosslinker(2).size() == 3);
     CHECK(universe.computeFunctionalityForVertex(universe.getIdxByAtomId(1)) ==
-          1);
+      1);
     CHECK(universe.computeFunctionalityForAtom(1) == 1);
     CHECK(universe.getAtomsConnectedTo(universe.getIdxByAtomId(1)).size() == 1);
     auto chains = universe.getChainsWithCrosslinker(2);
@@ -732,14 +739,13 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     CHECK(chains[2].getKey() == "6-7");
     universe.setBoxLengths(3.0, 3.0, 3.0);
     CHECK(universe.determineEffectiveFunctionalityPerType()[2] ==
-          (1. + 2.) / 2.);
+      (1. + 2.) / 2.);
     CHECK(chains[0].computeEndToEndDistance() == 1.0);
     CHECK(chains[1].computeEndToEndDistance() == 0.0);
     CHECK(universe.computeMeanEndToEndDistance(2) == 1.0);
     CHECK(universe.computeMeanSquareEndToEndDistance(2) == 1.0);
 
-    SECTION("Primary loops too")
-    {
+    SECTION("Primary loops too") {
       // instead of rewriting above tests,
       // let's just add new atoms & bonds.
       // the resulting new structure will look like this (in terms of bonds, not
@@ -749,15 +755,22 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       // 9-8
       // | |
       // ↳-*7-*6-5
-      universe.addAtoms({ { 8, 9 } }, // id
-                        { { 1, 1 } }, // type
-                        { { 0, 1 } }, // x
-                        { { 2, 3 } }, // y
-                        { { 0, 0 } }, // z
-                        { { 1, 1 } }, // nx
-                        { { 1, 1 } }, // ny
-                        { { 1, 1 } }  // nz
-      );
+      universe.addAtoms({ { 8, 9 } },
+                        // id
+                        { { 1, 1 } },
+                        // type
+                        { { 0, 1 } },
+                        // x
+                        { { 2, 3 } },
+                        // y
+                        { { 0, 0 } },
+                        // z
+                        { { 1, 1 } },
+                        // nx
+                        { { 1, 1 } },
+                        // ny
+                        { { 1, 1 } } // nz
+        );
       universe.addBonds(3, { { 7, 8, 9 } }, { { 8, 9, 7 } });
       CHECK(universe.getNrOfBonds() == 7);
       auto newChains = universe.getChainsWithCrosslinker(2);
@@ -767,10 +780,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     }
   }
 
-  SECTION("PolyDispersity Calculation")
-  {
-    SECTION("Literature system")
-    {
+  SECTION("PolyDispersity Calculation") {
+    SECTION("Literature system") {
       // as taken from https://www.pslc.ws/macrog/average.htm
       std::vector<int> nrOfMolecules = {
         { 1, 3, 5, 8, 10, 13, 20, 13, 10, 8, 5, 3, 1 }
@@ -812,14 +823,13 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       // then, do the calculation
       CHECK(universe.computeTotalMass() == Catch::Approx(50000000));
       CHECK(universe.computeNumberAverageMolecularWeight(-1) ==
-            Catch::Approx(500000));
+        Catch::Approx(500000));
       CHECK(universe.computeWeightAverageMolecularWeight(-1) ==
-            Catch::Approx(531600));
+        Catch::Approx(531600));
       CHECK(universe.computePolydispersityIndex(-1) == Catch::Approx(1.0632));
     }
 
-    SECTION("System to zero out")
-    {
+    SECTION("System to zero out") {
       // other system
       std::vector<double> oneZeroDouble = getVectorWithOne<double>(0.0);
       std::vector<int> oneZeroInt = getVectorWithOne(0);
@@ -851,8 +861,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
         CHECK(universe2.computePolydispersityIndex(-1) == Catch::Approx(1.0));
       }
       // add cross-linkers
-      SECTION("With cross-linkers")
-      {
+      SECTION("With cross-linkers") {
         std::vector<int> type2 = getVectorWithOne(2);
         for (size_t i = 0; i < 10; ++i) {
           currentId += 1;
@@ -870,19 +879,25 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     }
   }
 
-  SECTION("Local Density Computation")
-  {
+  SECTION("Local Density Computation") {
     const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
     universe.setBox(box);
-    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },             // id
-                      { { 2, 1, 1, 1, 2, 1, 1, 1 } },             // type
-                      { { 1., 2., 3., 4., 9., -10., -9., -8. } }, // x
-                      { { 1., 2., 3., 4., 9., -10., -9., -8. } }, // y
-                      { { 1., 2., 3., 4., 9., -10., -9., -8. } }, // z
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },             // nx
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },             // ny
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } }              // nz
-    );
+    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },
+                      // id
+                      { { 2, 1, 1, 1, 2, 1, 1, 1 } },
+                      // type
+                      { { 1., 2., 3., 4., 9., -10., -9., -8. } },
+                      // x
+                      { { 1., 2., 3., 4., 9., -10., -9., -8. } },
+                      // y
+                      { { 1., 2., 3., 4., 9., -10., -9., -8. } },
+                      // z
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },
+                      // nx
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },
+                      // ny
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } } // nz
+      );
 
     std::vector<double> distances = { 0., 1., 2., 3. };
     std::vector<size_t> result = universe.countAtomsInSkinDistance(distances);
@@ -935,22 +950,19 @@ TEST_CASE("Universe can be decomposed", "[Universe][entity]")
 
   CHECK(universe.getChainsWithCrosslinker(2).size() == 10);
 
-  SECTION("Also with secondary loop")
-  {
+  SECTION("Also with secondary loop") {
     // add a secondary loop to check that it is returned as well
     universe.addBonds({ 0 }, { static_cast<long>(nrOfBeadsPerChain) });
     CHECK(universe.getChainsWithCrosslinker(2).size() == 11);
   }
 
-  SECTION("Also with primary loop")
-  {
+  SECTION("Also with primary loop") {
     // add a primary loop to check that it is returned as well
     universe.addBonds({ 0 }, { 0 });
     CHECK(universe.getChainsWithCrosslinker(2).size() == 11);
   }
 
-  SECTION("Also with more loops")
-  {
+  SECTION("Also with more loops") {
     // add a primary loop to check that it is returned as well
     universe.addBonds({ 0, 0 }, { static_cast<long>(nrOfBeadsPerChain), 0 });
     CHECK(universe.getChainsWithCrosslinker(2).size() == 12);
@@ -961,8 +973,7 @@ TEST_CASE("Coordinates work")
 {
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
 
-  SECTION("with molecules and lined up")
-  {
+  SECTION("with molecules and lined up") {
     /**
      * @brief A grid of two rows, each one bead between the two crosslinkers
      *
@@ -981,9 +992,12 @@ TEST_CASE("Coordinates work")
           -0.1,
           5.,
           0.,
-          5. } }, // x with slight (0.1) deviation, so we don't start perfect
-      { { 0.1, 0., -0.1, 0., 5., 5., 5., 5., 2.5, 2.5, 7.5, 7.5 } }, // y
-      { { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. } },        // z
+          5. } },
+      // x with slight (0.1) deviation, so we don't start perfect
+      { { 0.1, 0., -0.1, 0., 5., 5., 5., 5., 2.5, 2.5, 7.5, 7.5 } },
+      // y
+      { { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. } },
+      // z
       { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
       { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
       { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } });
@@ -1023,7 +1037,9 @@ TEST_CASE("Coordinates work")
     Eigen::VectorXd vertexCoordinates =
       molecules[0].getUnwrappedVertexCoordinates(alignedVertices, box);
     molecules[0].getAssumedVertexCoordinates(
-      alignedCoordinates, box, alignedVertices);
+      alignedCoordinates,
+      box,
+      alignedVertices);
     CHECK(vertexCoordinates[0] == 0.);
     CHECK(vertexCoordinates[1] == 0.1);
     CHECK(alignedCoordinates[0] == 0.);
@@ -1039,19 +1055,25 @@ TEST_CASE("Coordinates work")
     }
   }
 
-  SECTION("Coordinates are fetched appropriately")
-  {
+  SECTION("Coordinates are fetched appropriately") {
     const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
     universe.setBox(box);
-    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
-                      { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
-                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x
-                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // y
-                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // z
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // nx
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // ny
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } }      // nz
-    );
+    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },
+                      // id
+                      { { 2, 1, 1, 1, 2, 1, 1, 1 } },
+                      // type
+                      { { 1, 2, 3, 4, 9, -10, -9, -8 } },
+                      // x
+                      { { 1, 2, 3, 4, 9, -10, -9, -8 } },
+                      // y
+                      { { 1, 2, 3, 4, 9, -10, -9, -8 } },
+                      // z
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },
+                      // nx
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },
+                      // ny
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } } // nz
+      );
     std::vector<long int> indices = { { 1, 2, 3 } };
     Eigen::VectorXd coordinates =
       universe.getUnwrappedVertexCoordinates(indices, box);
@@ -1075,15 +1097,14 @@ TEST_CASE("Large universe can be used", "[Universe][entity]")
 
   pe::Universe universe = universeSeq.atIndex(0);
 
-  SECTION("Edges can be interpolated")
-  {
-    std::map<std::string, std::vector<long int>> edges = universe.getEdges();
-    std::vector<std::pair<size_t, size_t>> interpolatedEdges1 =
+  SECTION("Edges can be interpolated") {
+    std::map<std::string, std::vector<long int> > edges = universe.getEdges();
+    std::vector<std::pair<size_t, size_t> > interpolatedEdges1 =
       universe.interpolateEdges(2, 1);
     CHECK(interpolatedEdges1.size() == edges["edge_from"].size());
-    std::vector<std::pair<size_t, size_t>> interpolatedEdges2 =
+    std::vector<std::pair<size_t, size_t> > interpolatedEdges2 =
       universe.interpolateEdges(2, 2.);
     CHECK(interpolatedEdges2.size() ==
-          Catch::Approx(2. * edges["edge_from"].size()));
+      Catch::Approx(2. * edges["edge_from"].size()));
   }
 }

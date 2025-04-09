@@ -22,14 +22,19 @@ namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 namespace pcm = pylimer_tools::sim::mehp;
 
+#ifndef PYLIMER_TEST_FIXTURES_DIR
+#define PYLIMER_TEST_FIXTURES_DIR "../pylimer_tools/tests/fixtures"
+#endif
+
 TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
 {
   std::cout << "Running test \"Force Balance Benchmarks\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
   std::string largeInputFile =
-    suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
+    suspectedPath +
+    "/structure/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
   if (std::filesystem::exists(largeInputFile)) {
     universeSeq.initializeFromDataSequence({ { largeInputFile } });
     pe::Universe universe = universeSeq.atIndex(0);
@@ -45,7 +50,7 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
     auto duration_ref = std::chrono::duration_cast<std::chrono::microseconds>(
       end_ref - start_ref);
     std::cout << "Reference Time (FB1) to beat: "
-              << std::duration_to_string(duration_ref) << " " << std::endl;
+      << std::duration_to_string(duration_ref) << " " << std::endl;
 
     // BENCHMARK_ADVANCED("MEHP LD_MMA " +
     //                    largeInputFile)(Catch::Benchmark::Chronometer meter)
@@ -66,7 +71,8 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
     // };
 
     for (pcm::SLESolver solverChoice :
-         { // pcm::SIMPLICIAL_LLT,
+         {
+           // pcm::SIMPLICIAL_LLT,
            //                                    pcm::SIMPLICIAL_DLT,
            //                                    pcm::SPARSE_LU,
            //                                    pcm::SPARSE_QR,
@@ -84,11 +90,10 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
         forceBalancer.runForceRelaxation(
           pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
           1e-3,
-          1.0,
           solverChoice);
       } catch (const std::exception& e) {
         std::cerr << "Exception for solver " << solverChoice << ": " << e.what()
-                  << std::endl;
+          << std::endl;
         continue;
       }
 
@@ -100,7 +105,7 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
         std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
       std::cout << "Solver (FB2): " << solverChoice
-                << ", Time: " << std::duration_to_string(duration) << std::endl;
+        << ", Time: " << std::duration_to_string(duration) << std::endl;
     }
   }
 }
@@ -119,7 +124,13 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
 
   std::vector<int> chainLengths = pu::initializeWithValue(50, 100);
   generator.addRandomlyFunctionalizedStrands(
-    50, chainLengths, 7.2, 1, 2, 1, true);
+    50,
+    chainLengths,
+    7.2,
+    1,
+    2,
+    1,
+    true);
 
   CHECK_THAT(generator.getCurrentNrOfAvailableCrosslinkSites(),
              Catch::Matchers::WithinRel(50 * 100 * 7.2, 0.01));
@@ -147,7 +158,7 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
   auto duration_ref =
     std::chrono::duration_cast<std::chrono::microseconds>(end_ref - start_ref);
   std::cout << "Reference Time (FB1) to beat: "
-            << std::duration_to_string(duration_ref) << " " << std::endl;
+    << std::duration_to_string(duration_ref) << " " << std::endl;
   CHECK(referenceForceBalancer.getNrOfActiveNodes(1e-1) == 0);
 
   // BENCHMARK_ADVANCED("MEHP LD_MMA " +
@@ -164,7 +175,8 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
   // };
 
   for (pcm::SLESolver solverChoice :
-       { // pcm::SIMPLICIAL_LLT,
+       {
+         // pcm::SIMPLICIAL_LLT,
          //                                    pcm::SIMPLICIAL_DLT,
          //                                    pcm::SPARSE_LU,
          //                                    pcm::SPARSE_QR,
@@ -181,11 +193,10 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
       forceBalancer.runForceRelaxation(
         pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
         1e-3,
-        1.0,
         solverChoice);
     } catch (const std::exception& e) {
       std::cerr << "Exception for solver " << solverChoice << ": " << e.what()
-                << std::endl;
+        << std::endl;
       continue;
     }
     auto end = std::chrono::high_resolution_clock::now();
@@ -198,6 +209,6 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
     CHECK(forceBalancer.getNrOfActiveNodes() == 0);
 
     std::cout << "Solver (FB2): " << solverChoice
-              << ", Time: " << std::duration_to_string(duration) << std::endl;
+      << ", Time: " << std::duration_to_string(duration) << std::endl;
   }
 }

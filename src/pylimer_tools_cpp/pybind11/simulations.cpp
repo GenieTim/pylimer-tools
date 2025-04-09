@@ -1960,7 +1960,7 @@ init_pylimer_bound_sim(py::module_& m)
     .def("write_restart_file",
          &dpd::DPDSimulator::writeRestartFile,
          R"pbdoc(
-          Explicitily force the writing of a restart file, now!
+          Explicitly force the writing of a restart file, now!
 
           Arguments:
           - file (str): the file path and name of the restart file to be written.

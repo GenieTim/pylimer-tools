@@ -21,17 +21,21 @@ namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 namespace pcm = pylimer_tools::sim::mehp;
 
+#ifndef PYLIMER_TEST_FIXTURES_DIR
+#define PYLIMER_TEST_FIXTURES_DIR "../pylimer_tools/tests/fixtures"
+#endif
+
 TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
 {
   std::cout << "Running test \"MEHP Force Balance2 runs\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   SECTION("MEHP Force Balance2 3D case")
   {
     std::string largeInputFile =
-      suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
+      suspectedPath + "/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       std::cout << "Reading file " << largeInputFile << std::endl;
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
@@ -193,7 +197,7 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
     CHECK(std::filesystem::exists(suspectedPath));
     universeSeq.initializeFromDataSequence(
       { { suspectedPath +
-          "structure/equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
+          "/structure/equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
           "333_2d_t_7500001.structure.out" } });
     CHECK(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
@@ -268,10 +272,10 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   std::string inputFile =
-    suspectedPath + "structure/network_100_a_46.structure.out";
+    suspectedPath + "/structure/network_100_a_46.structure.out";
   if (std::filesystem::exists(inputFile)) {
     CHECK(std::filesystem::exists(suspectedPath));
     std::cout << "Reading file " << inputFile << std::endl;
@@ -314,10 +318,10 @@ TEST_CASE("MEHP Force Balance2 can run with swapping slip-links",
     << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   std::string inputFile =
-    suspectedPath + "structure/network_100_a_46.structure.out";
+    suspectedPath + "/structure/network_100_a_46.structure.out";
   if (std::filesystem::exists(inputFile)) {
     CHECK(std::filesystem::exists(suspectedPath));
     std::cout << "Reading file " << inputFile << std::endl;
@@ -1642,12 +1646,12 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   // a structure with lots of dangling things that can and will be entangled,
   // yet the entanglements removed
   std::string inputFile =
-    suspectedPath + "mc_own-si_pdms_crosslinked_melt_464_a_77_r_1.71_wsol_0."
+    suspectedPath + "/structure/mc_own-si_pdms_crosslinked_melt_464_a_77_r_1.71_wsol_0."
                     "0114_f_4_v_1.structure.out";
 
   std::cout << "Reading file " << inputFile << std::endl;
@@ -1712,12 +1716,12 @@ TEST_CASE("Temporary force balance 2 test case",
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/tmp/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   // a structure with lots of dangling things that can and will be entangled,
   // yet the entanglements removed
   std::string inputFile =
-    suspectedPath + "mc_own-si_pdms_crosslinked_melt_2590_a_221_2410_monoa_271_"
+    suspectedPath + "/structures/tmp/mc_own-si_pdms_crosslinked_melt_2590_a_221_2410_monoa_271_"
                     "r_1.44_wsol_0.278_f_4_v_1.structure.out";
 
   std::cout << "Reading file " << inputFile << std::endl;
