@@ -260,9 +260,11 @@ MEHPForceBalance2::MEHPForceBalance2(
           }
           springFrom.push_back(oldVertexIdToNewLinkId[newLinkIdStack.top()]);
           springTo.push_back(oldVertexIdToNewLinkId[neighbor]);
+          springContourLength.push_back(currentSpringContourLength + 1);
           edge_followed[edge] = true;
           // close the strand
           newStrandId += 1;
+          currentSpringContourLength = 0;
         }
       }
 
@@ -294,6 +296,7 @@ MEHPForceBalance2::MEHPForceBalance2(
     for (const auto& [fst, snd] : pairsOfAtoms) {
       springFrom.push_back(oldVertexIdToNewLinkId[fst]);
       springTo.push_back(oldVertexIdToNewLinkId[snd]);
+      springContourLength.push_back(1.);
     }
   }
 
@@ -318,6 +321,10 @@ MEHPForceBalance2::MEHPForceBalance2(
     Eigen::ArrayXi(this->initialConfig.nrOfSprings * 3);
   this->initialConfig.springCoordinateIndexB =
     Eigen::ArrayXi(this->initialConfig.nrOfSprings * 3);
+  this->initialConfig.springContourLength =
+    Eigen::VectorXd(this->initialConfig.nrOfSprings);
+  this->initialConfig.springBoxOffset =
+    Eigen::VectorXd(this->initialConfig.nrOfSprings * 3);
 
   Eigen::VectorXd baseCoordinates = u.getAssumedVertexCoordinates(this->box);
 
