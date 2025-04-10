@@ -1113,9 +1113,9 @@ TEST_CASE("Large universe can be used", "[Universe][entity]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
   universeSeq.initializeFromDataSequence(
-    { { suspectedPath + "lammps_data_file.out" } });
+    { { suspectedPath + "/lammps_data_file.out" } });
   CHECK(universeSeq.getLength() == 1);
 
   pe::Universe universe = universeSeq.atIndex(0);
