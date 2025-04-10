@@ -175,6 +175,7 @@ namespace utils {
   MAKE_REMOVE_ROW(Eigen::ArrayXi);
   MAKE_REMOVE_ROW(Eigen::ArrayXd);
   MAKE_REMOVE_ROW(Eigen::ArrayXb);
+#undef MAKE_REMOVE_ROW
 
   /**
    * @brief Remove sequential rows from an Eigen vector
@@ -206,6 +207,168 @@ namespace utils {
   MAKE_REMOVE_ROWS(Eigen::ArrayXi);
   MAKE_REMOVE_ROWS(Eigen::ArrayXd);
   MAKE_REMOVE_ROWS(Eigen::ArrayXb);
+
+#undef MAKE_REMOVE_ROWS
+
+  /**
+   * @brief Remove multiple sequential rows from an Eigen vector based on
+   * indices
+   *
+   * @param vec the Eigen vector to remove the rows from
+   * @param indicesToRemove the indices of the rows to remove
+   * @param isSorted whether the indices are already sorted in descending order
+   * @param isUnique whether the indices are unique or not
+   */
+#define MAKE_REMOVE_ROWS(EIGEN_TYPE)                                           \
+  static inline void removeRows(EIGEN_TYPE& vec,                               \
+                                std::vector<size_t>& indicesToRemove,          \
+                                bool isSorted = false,                         \
+                                bool isUnique = false)                         \
+  {                                                                            \
+    if (indicesToRemove.empty())                                               \
+      return;                                                                  \
+                                                                               \
+    /* Sort indices in descending order */                                     \
+    if (!isSorted) {                                                           \
+      std::ranges::sort(indicesToRemove, std::greater<size_t>());              \
+    }                                                                          \
+                                                                               \
+    /* Remove duplicates */                                                    \
+    if (!isUnique) {                                                           \
+      indicesToRemove.erase(std::ranges::unique(indicesToRemove).begin(),      \
+                            indicesToRemove.end());                            \
+    }                                                                          \
+    /* Check if the largest index is valid */                                  \
+    if (indicesToRemove[0] >= vec.size()) {                                    \
+      throw std::out_of_range("Index out of range");                           \
+    }                                                                          \
+                                                                               \
+    size_t j = 0;                                                              \
+    for (size_t i = 0; i < vec.size(); ++i) {                                  \
+      if (j < indicesToRemove.size() && i == indicesToRemove[j]) {             \
+        ++j;                                                                   \
+      } else {                                                                 \
+        vec[i - j] = vec[i];                                                   \
+      }                                                                        \
+    }                                                                          \
+                                                                               \
+    vec.conservativeResize(vec.size() - indicesToRemove.size());               \
+  }
+
+  MAKE_REMOVE_ROWS(Eigen::VectorXd);
+  MAKE_REMOVE_ROWS(Eigen::VectorXi);
+  MAKE_REMOVE_ROWS(Eigen::ArrayXi);
+  MAKE_REMOVE_ROWS(Eigen::ArrayXd);
+  MAKE_REMOVE_ROWS(Eigen::ArrayXb);
+
+#undef MAKE_REMOVE_ROWS
+
+  /**
+   * @brief Remove multiple sequential rows from an Eigen vector based on
+   * indices
+   *
+   * @param vec the Eigen vector to remove the rows from
+   * @param indicesToRemove the indices of the rows to remove
+   * @param isSorted whether the indices are already sorted in descending order
+   * @param isUnique whether the indices are unique or not
+   */
+  template<typename T>
+  static inline void removeRows(std::vector<T>& vec,
+                                std::vector<size_t>& indicesToRemove,
+                                bool isSorted = false,
+                                bool isUnique = false)
+  {
+    if (indicesToRemove.empty())
+      return;
+
+    /* Sort indices in descending order */
+    if (!isSorted) {
+      std::ranges::sort(indicesToRemove, std::greater<size_t>());
+    }
+
+    /* Remove duplicates */
+    if (!isUnique) {
+      indicesToRemove.erase(std::ranges::unique(indicesToRemove).begin(),
+                            indicesToRemove.end());
+    }
+    /* Check if the largest index is valid */
+    if (indicesToRemove[0] >= vec.size()) {
+      throw std::out_of_range("Index out of range");
+    }
+
+    size_t j = 0;
+    for (size_t i = 0; i < vec.size(); ++i) {
+      if (j < indicesToRemove.size() && i == indicesToRemove[j]) {
+        ++j;
+      } else {
+        vec[i - j] = vec[i];
+      }
+    }
+
+    vec.resize(vec.size() - indicesToRemove.size());
+  }
+
+  static inline std::vector<long int> getMappingForRenumbering(
+    const std::vector<size_t>& removedValues,
+    const size_t nRemovableValues)
+  {
+    // make sure things are sorted
+    for (long int i = removedValues.size() - 2; i >= 0; --i) {
+      INVALIDARG_EXP_IFN(
+        removedValues[i - 1] < removedValues[i],
+        "Values to remove must be sorted descending and unique, got values " +
+          std::to_string(removedValues[i]) + "@" + std::to_string(i) + " and " +
+          std::to_string(removedValues[i - 1]) + "@" + std::to_string(i - 1) +
+          ".");
+    }
+
+    // for performance reasons, first assemble a new mapping
+    std::vector<long int> newMapping(nRemovableValues, -1);
+    long int idxInDeletedStrands = removedValues.size() - 1;
+    long int nDeletedSoFar = 0;
+    for (size_t i = 0; i < nRemovableValues; ++i) {
+      if (idxInDeletedStrands >= 0 && i == removedValues[idxInDeletedStrands]) {
+        idxInDeletedStrands -= 1;
+        nDeletedSoFar += 1;
+      } else {
+        newMapping[i] = i - nDeletedSoFar;
+      }
+    }
+
+    return newMapping;
+  }
+
+  /**
+   * In a vector of vectors of indices to another structure,
+   * renumber the indices to compensate for indices that have been removed in
+   * the other structure.
+   *
+   * @param v the vector of vectors to renumber
+   * @param removedValues the numbers that have been removed
+   * @param nRemovableValues the maximum of the numbers
+   */
+  static inline void renumberWithMapping(
+    std::vector<std::vector<size_t>>& v,
+    const std::vector<long int>& newMapping)
+  {
+    // then, apply this mapping to all strands
+    for (size_t linkI = 0; linkI < v.size(); ++linkI) {
+      for (size_t& strandIdx : v[linkI]) {
+        assert(newMapping[strandIdx] > 0);
+        strandIdx = newMapping[strandIdx];
+      }
+    }
+  }
+
+  template<typename VecType>
+  static inline void renumberWithMapping(
+    VecType& v,
+    const std::vector<long int>& newMapping)
+  {
+    for (size_t i = 0; i < v.size(); ++i) {
+      v[i] = newMapping[v[i]];
+    }
+  }
 
   template<typename T>
   static inline T last(const std::vector<T>& v)

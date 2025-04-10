@@ -3412,7 +3412,7 @@ namespace sim {
 
             bool found = false;
 
-            std::unordered_set<size_t> partialSpringIndices =
+            std::vector<size_t> partialSpringIndices =
               this->getPartialSpringIndicesOfLink(net, xlinkIdx);
             for (size_t attemptedEdge : partialSpringIndices) {
               if (attemptedEdge == partialSpringIdx) {
@@ -4530,7 +4530,7 @@ namespace sim {
       double objectiveDisplacementContributors = 0.0;
       bool cautionPrimaryLoop = false;
 
-      std::unordered_set<size_t> partialSpringIndices =
+      std::vector<size_t> partialSpringIndices =
         this->getPartialSpringIndicesOfLink(net, linkIdx);
 
       for (const size_t globalSpringIndex : partialSpringIndices) {
@@ -4654,10 +4654,9 @@ namespace sim {
       Eigen::VectorXi& debugNrSpringsVisited,
       const double oneOverSpringPartitionUpperLimit) const
     {
-      std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
       Eigen::Matrix3d stress = Eigen::Matrix3d::Zero();
 
-      std::unordered_set<size_t> partialSpringIndices =
+      const std::vector<size_t> partialSpringIndices =
         this->getPartialSpringIndicesOfLink(net, linkIdx);
 
       for (const size_t globalSpringIndex : partialSpringIndices) {
@@ -4715,7 +4714,7 @@ namespace sim {
     {
       Eigen::Vector3d force = Eigen::Vector3d::Zero();
 
-      std::unordered_set<size_t> partialSpringIndices =
+      std::vector<size_t> partialSpringIndices =
         this->getPartialSpringIndicesOfLink(net, linkIdx);
 
       for (const size_t globalSpringIndex : partialSpringIndices) {

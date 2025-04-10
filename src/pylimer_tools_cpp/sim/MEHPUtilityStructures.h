@@ -177,8 +177,8 @@ namespace sim::mehp {
     Eigen::ArrayXi springCoordinateIndexB;
     Eigen::ArrayXi springIndexA;
     Eigen::ArrayXi springIndexB;
-    Eigen::VectorXd springBoxOffset;  // the "PBC" for each spring
-    Eigen::ArrayXi strandIdxOfSpring; // the mapping from spring to strand
+    Eigen::VectorXd springBoxOffset;    // the "PBC" for each spring
+    Eigen::ArrayXi strandIndexOfSpring; // the mapping from spring to strand
 
     Eigen::ArrayXi oldAtomIds;
     Eigen::ArrayXi oldAtomTypes;

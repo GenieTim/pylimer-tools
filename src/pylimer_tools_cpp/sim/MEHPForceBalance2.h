@@ -14,7 +14,6 @@
 #include <nlopt.hpp>
 #include <random>
 #include <string>
-#include <unordered_set>
 #include <vector>
 #ifdef CEREALIZABLE
 #include "../utils/CerealUtils.h"
@@ -182,18 +181,6 @@ public:
                           const std::function<void()>& cleanupInterrupt);
 
   /**
-   * @brief Remove crosslinkers which do not have any springs with a certain
-   * minimum length
-   *
-   * @param net
-   * @param displacements
-   * @param tolerance
-   */
-  size_t removeInactiveCrosslinks(ForceBalance2Network& net,
-                                  Eigen::VectorXd& displacements,
-                                  double tolerance) const;
-
-  /**
    * @brief Remove springs that exert a stress higher than
    * `this->springBreakingLength`
    *
@@ -203,33 +190,6 @@ public:
    */
   size_t breakTooLongStrands(ForceBalance2Network& net,
                              Eigen::VectorXd& displacements) const;
-
-  /**
-   * @brief Remove double listed springs from crosslinkers
-   *
-   * @param net
-   */
-  void removeDuplicateListedStrandsFromLinks(ForceBalance2Network& net) const;
-
-  void removeDuplicateListedStrandsFromLink(
-    ForceBalance2Network& net,
-    size_t linkIdx,
-    bool allowOnEntanglement = false) const;
-
-  size_t removePrimaryLoops(ForceBalance2Network& net,
-                            Eigen::VectorXd& displacements) const;
-
-  /**
-   * @brief Remove a spring (and all its parts, incl. slip-links) from the
-   * structures
-   *
-   * @param net
-   * @param displacements
-   * @param strandIdx
-   */
-  void removeStrand(ForceBalance2Network& net,
-                    Eigen::VectorXd& displacements,
-                    const size_t strandIdx) const;
 
   /**
    * @brief break a spring, given its partial spring index
@@ -244,27 +204,75 @@ public:
                    const size_t partialSpringIdx) const;
 
   /**
-   * @brief Remove a spring, but also all springs that are connected to it
-   * and are connected via entanglement links.
+   * @brief Decide for each spring if it should be removed,
+   * remove them, then remove orphaned links
    *
-   * @param net
-   * @param displacements
-   * @param strandIdx
+   * @param net the network
+   * @param displacements the current displacements
+   * @param inactiveRemovalCutoff the cut-off for the activity tolerance
+   * criterion
+   * @return the number of links removed
    */
-  void removeStrandFollowingEntanglementLinks(ForceBalance2Network& net,
-                                              Eigen::VectorXd& displacements,
-                                              const size_t strandIdx) const;
+  size_t removeInactiveLinks(ForceBalance2Network& net,
+                             Eigen::VectorXd& displacements,
+                             const double inactiveRemovalCutoff) const;
 
   /**
-   * @brief Remove a certain link from the structures
+   * @brief Decide for each spring if it should be removed
    *
-   * @param net
-   * @param displacements
-   * @param linkIdx
+   * @param net the network
+   * @param displacements the current displacements
+   * @param inactiveRemovalCutoff the cut-off for the activity tolerance
+   * criterion
+   * @return a vector of true/false for each spring, true if it should be
+   * removed
    */
-  void removeLink(ForceBalance2Network& net,
-                  Eigen::VectorXd& displacements,
-                  const size_t linkIdx) const;
+  Eigen::ArrayXb markInactiveSpringsToDelete(
+    const ForceBalance2Network& net,
+    const Eigen::VectorXd& displacements,
+    const double inactiveRemovalCutoff) const;
+
+  /**
+   * @brief Delete the springs indicated by `toDelete` from the network
+   *
+   * @param net the network to be modified
+   * @param springsToDeleteIndices a vector of indices of springs to be removed
+   */
+  void removeSprings(ForceBalance2Network& net,
+                     std::vector<size_t>& springsToDeleteIndices) const;
+
+  /**
+   * @brief Replace the two springs traversing a two-functional
+   * crosslinkers with a single spring
+   *
+   * @param net the network to be modified
+   * @param displacements the current displacements, will be modified
+   * @return the number of bifunctional links replaced by 0-functional links
+   */
+  size_t unlinkBifunctionalLinks(ForceBalance2Network& net,
+                                 Eigen::VectorXd& displacements) const;
+
+  /**
+   * @brief Remove links without any springs
+   *
+   * @param net the network to be modified
+   * @param displacements the current displacements, will be modified
+   * @return the number of 0-functional links removed
+   */
+  size_t removeZerofunctionalLinks(ForceBalance2Network& net,
+                                   Eigen::VectorXd& displacements) const;
+
+  /**
+   * @brief Remove duplicate springs from a given link
+   *
+   * @param net the network to be modified
+   * @param linkIdx the index of the link to adjust
+   * @param allowOnEntanglement whether
+   */
+  void removeDuplicateListedStrandsFromLink(
+    ForceBalance2Network& net,
+    size_t linkIdx,
+    bool allowOnEntanglement = false) const;
 
   /**
    * @brief Merge two springs around a given cross-link
@@ -300,16 +308,6 @@ public:
                     const size_t keptSpringIdx,
                     const size_t linkToReduce,
                     bool skipEigenResize = false) const;
-
-  /**
-   * @brief Replace the two springs traversing a two-functional
-   * crosslinkers with a single spring
-   *
-   * @param net
-   * @param displacements
-   */
-  size_t removeBifunctionalCrosslinks(ForceBalance2Network& net,
-                                      Eigen::VectorXd& displacements) const;
 
   /**
    * @brief Deform the system to match the specified box
@@ -413,7 +411,7 @@ public:
   double getSolubleWeightFraction(const double tolerance = 1e-3)
   {
     return this->computeSolubleWeightFraction(
-      &this->initialConfig, this->currentDisplacements, tolerance);
+      this->initialConfig, this->currentDisplacements, tolerance);
   }
 
   /**
@@ -425,7 +423,7 @@ public:
   double getDanglingWeightFraction(const double tolerance = 1e-3)
   {
     return this->computeDanglingWeightFraction(
-      &this->initialConfig, this->currentDisplacements, tolerance);
+      this->initialConfig, this->currentDisplacements, tolerance);
   }
 
   /**
@@ -437,7 +435,7 @@ public:
   double getActiveWeightFraction(const double tolerance = 1e-3)
   {
     return this->computeActiveWeightFraction(
-      &this->initialConfig, this->currentDisplacements, tolerance);
+      this->initialConfig, this->currentDisplacements, tolerance);
   }
 
   /**
@@ -450,7 +448,7 @@ public:
   double countActiveClusteredAtoms(const double tolerance = 1e-3)
   {
     return this->countActiveClusteredAtoms(
-      &this->initialConfig, this->currentDisplacements, tolerance);
+      this->initialConfig, this->currentDisplacements, tolerance);
   }
 
   /**
@@ -477,7 +475,7 @@ public:
    * @param tolerance
    * @return double
    */
-  double computeDanglingWeightFraction(ForceBalance2Network* net,
+  double computeDanglingWeightFraction(ForceBalance2Network& net,
                                        const Eigen::VectorXd& u,
                                        const double tolerance = 1e-3) const;
 
@@ -489,7 +487,7 @@ public:
    * @param tolerance
    * @return double
    */
-  double computeActiveWeightFraction(ForceBalance2Network* net,
+  double computeActiveWeightFraction(ForceBalance2Network& net,
                                      const Eigen::VectorXd& u,
                                      const double tolerance = 1e-3) const;
 
@@ -504,7 +502,7 @@ public:
    * (first) and links (second) connected in any way to active springs
    */
   std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
-    const ForceBalance2Network* net,
+    const ForceBalance2Network& net,
     const Eigen::VectorXd& u,
     const double tolerance = 1e-3) const;
 
@@ -517,7 +515,7 @@ public:
    * @param tolerance
    * @return double
    */
-  double countActiveClusteredAtoms(ForceBalance2Network* net,
+  double countActiveClusteredAtoms(ForceBalance2Network& net,
                                    const Eigen::VectorXd& u,
                                    const double tolerance = 1e-3) const;
 
@@ -530,7 +528,7 @@ public:
    * @param tolerance
    * @return double
    */
-  double computeSolubleWeightFraction(ForceBalance2Network* net,
+  double computeSolubleWeightFraction(ForceBalance2Network& net,
                                       const Eigen::VectorXd& u,
                                       const double tolerance = 1e-3) const;
 
@@ -543,7 +541,7 @@ public:
    * considered inactive
    * @return std::vector<long int> the atom ids
    */
-  std::vector<long int> getIndicesOfActiveNodes(const ForceBalance2Network* net,
+  std::vector<long int> getIndicesOfActiveNodes(const ForceBalance2Network& net,
                                                 const Eigen::VectorXd& u,
                                                 double tolerance = 1e-3) const;
 
@@ -931,30 +929,23 @@ public:
    *
    * @param net
    * @param linkIdx
-   * @return std::unordered_set<size_t>
+   * @return std::vector<size_t>
    */
-  std::unordered_set<size_t> getPartialSpringIndicesOfLink(
+  std::vector<size_t> getPartialSpringIndicesOfLink(
     const ForceBalance2Network& net,
     const size_t linkIdx) const
   {
     INVALIDARG_EXP_IFN(linkIdx < net.nrOfLinks,
                        "The requested link does not exist");
-    std::unordered_set<size_t> partialSpringIndices;
+    std::vector<size_t> partialSpringIndices;
 
-    std::vector<size_t> springIndices = net.strandIndicesOfLink[linkIdx];
+    std::vector<size_t> strandIndices = net.strandIndicesOfLink[linkIdx];
 
-    for (size_t spring_index = 0; spring_index < springIndices.size();
-         ++spring_index) {
-      std::vector<size_t> springsPartners =
-        net.linkIndicesOfStrand[springIndices[spring_index]];
-      for (size_t partner_idx = 0; partner_idx < springsPartners.size() - 1;
-           ++partner_idx) {
-        if (springsPartners[partner_idx] == linkIdx ||
-            springsPartners[partner_idx + 1] == linkIdx) {
-          size_t globalSpringIndex =
-            net.springIndicesOfStrand[(springIndices[spring_index])]
-                                     [partner_idx];
-          partialSpringIndices.insert(globalSpringIndex);
+    for (size_t strandIdx : strandIndices) {
+      std::vector<size_t> springs = net.springIndicesOfStrand[strandIdx];
+      for (size_t springIdx : springs) {
+        if (this->isPartOfSpring(net, linkIdx, springIdx)) {
+          partialSpringIndices.push_back(springIdx);
         }
       }
     }
@@ -1297,7 +1288,7 @@ protected:
    * @param tolerance
    * @return int
    */
-  int countNrOfActiveStrands(const ForceBalance2Network* net,
+  int countNrOfActiveStrands(const ForceBalance2Network& net,
                              const Eigen::VectorXd& u,
                              const double tolerance = 1e-3) const
   {
@@ -1330,21 +1321,21 @@ protected:
    * @param tolerance
    * @return Eigen::ArrayXb
    */
-  Eigen::ArrayXb findActiveStrands(const ForceBalance2Network* net,
+  Eigen::ArrayXb findActiveStrands(const ForceBalance2Network& net,
                                    const Eigen::VectorXd& u,
                                    const double tolerance = 1e-3) const
   {
     Eigen::VectorXd partialSpringVectors = this->evaluateSpringVectors(
-      *net, u, this->is2D, this->assumeBoxLargeEnough);
-    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net->nrOfStrands, false);
+      net, u, this->is2D, this->assumeBoxLargeEnough);
+    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net.nrOfStrands, false);
 
-    for (size_t i = 0; i < net->nrOfSprings; ++i) {
-      result[net->strandIdxOfSpring[i]] =
-        result[net->strandIdxOfSpring[i]] ||
+    for (size_t i = 0; i < net.nrOfSprings; ++i) {
+      result[net.strandIndexOfSpring[i]] =
+        result[net.strandIndexOfSpring[i]] ||
         !this->distanceIsWithinTolerance(
           partialSpringVectors.segment(3 * i, 3),
           tolerance,
-          net->springContourLength[net->strandIdxOfSpring[i]]);
+          net.springContourLength[net.strandIndexOfSpring[i]]);
     }
 
     return result;
@@ -1353,7 +1344,7 @@ protected:
   Eigen::ArrayXb findActiveStrands(const double tolerance = 1e-3) const
   {
     return this->findActiveStrands(
-      &this->initialConfig, this->currentDisplacements, tolerance);
+      this->initialConfig, this->currentDisplacements, tolerance);
   }
 
   /**
@@ -1367,23 +1358,23 @@ protected:
    * @param tolerance
    * @return Eigen::ArrayXb
    */
-  Eigen::ArrayXb findActiveStrandsInDir(const ForceBalance2Network* net,
+  Eigen::ArrayXb findActiveStrandsInDir(const ForceBalance2Network& net,
                                         const Eigen::VectorXd& u,
                                         const int dir,
                                         const double tolerance = 1e-3) const
   {
     INVALIDARG_EXP_IFN(dir >= 0 && dir < 3, "Invalid direction");
     Eigen::VectorXd partialSpringVectors = this->evaluateSpringVectors(
-      *net, u, this->is2D, this->assumeBoxLargeEnough);
-    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net->nrOfStrands, false);
+      net, u, this->is2D, this->assumeBoxLargeEnough);
+    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net.nrOfStrands, false);
 
-    for (size_t i = 0; i < net->nrOfSprings; ++i) {
-      result[net->strandIdxOfSpring[i]] =
-        result[net->strandIdxOfSpring[i]] ||
+    for (size_t i = 0; i < net.nrOfSprings; ++i) {
+      result[net.strandIndexOfSpring[i]] =
+        result[net.strandIndexOfSpring[i]] ||
         !this->distanceIsWithinTolerance(
           Eigen::Vector3d(partialSpringVectors[3 * i + dir], 0, 0),
           tolerance,
-          net->springContourLength[net->strandIdxOfSpring[i]]);
+          net.springContourLength[net.strandIndexOfSpring[i]]);
     }
 
     return result;
@@ -1393,7 +1384,7 @@ protected:
                                         const double tolerance = 1e-3) const
   {
     return this->findActiveStrandsInDir(
-      &this->initialConfig, this->currentDisplacements, dir, tolerance);
+      this->initialConfig, this->currentDisplacements, dir, tolerance);
   }
 
   /**
@@ -1429,19 +1420,19 @@ protected:
    * @return for each spring whether it may be considered active (tolerance
    * criterion)
    */
-  Eigen::ArrayXb findActiveSprings(const ForceBalance2Network* net,
+  Eigen::ArrayXb findActiveSprings(const ForceBalance2Network& net,
                                    const Eigen::VectorXd& u,
                                    const double tolerance = 1e-3) const
   {
     Eigen::VectorXd springVectors = this->evaluateSpringVectors(
-      *net, u, this->is2D, this->assumeBoxLargeEnough);
-    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net->nrOfSprings, false);
+      net, u, this->is2D, this->assumeBoxLargeEnough);
+    Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net.nrOfSprings, false);
 
-    for (size_t i = 0; i < net->nrOfSprings; ++i) {
+    for (size_t i = 0; i < net.nrOfSprings; ++i) {
       result[i] = !this->distanceIsWithinTolerance(
         springVectors.segment(3 * i, 3),
         tolerance,
-        net->springContourLength[net->strandIdxOfSpring[i]]);
+        net.springContourLength[net.strandIndexOfSpring[i]]);
     }
 
     return result;
@@ -1450,7 +1441,7 @@ protected:
   Eigen::ArrayXb findActiveSprings(const double tolerance = 1e-3) const
   {
     return this->findActiveSprings(
-      &this->initialConfig, this->currentDisplacements, tolerance);
+      this->initialConfig, this->currentDisplacements, tolerance);
   }
 
   /**
