@@ -739,8 +739,11 @@ namespace entities {
       throw std::runtime_error("Failed to instantiate result vector.");
     }
     // complexity: O(|v|*d)
-    if (igraph_degree(
-          &this->graph, &degrees, igraph_vss_all(), IGRAPH_ALL, false)) {
+    if (igraph_degree(&this->graph,
+                      &degrees,
+                      igraph_vss_all(),
+                      IGRAPH_ALL,
+                      IGRAPH_LOOPS_TWICE)) {
       throw std::runtime_error("Failed to determine degree of vertices");
     }
 

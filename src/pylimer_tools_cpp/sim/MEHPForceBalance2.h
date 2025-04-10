@@ -43,7 +43,7 @@ private:
   Eigen::VectorXd currentDisplacements;
   // configuration
   bool is2D = false;
-  bool assumeBoxLargeEnough = true;
+  bool assumeBoxLargeEnough = false;
   double kappa = 1.0;
   int crossLinkerType = 2;
   int entanglementType = 3;
