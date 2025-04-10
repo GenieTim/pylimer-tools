@@ -78,7 +78,8 @@ setupAllOutputs(pcd::DPDSimulator& simulator,
 TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator][long]")
 {
   std::cout << "Running test \"DPD Simulator Works\"" << std::endl;
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
@@ -214,7 +215,8 @@ TEST_CASE("DPD Simulator Restart Files Work", "[analysis][DPDSimulator]")
 {
   std::cout << "Running test \"DPD Simulator Restart Files Work\"" << std::endl;
 
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
@@ -275,7 +277,8 @@ TEST_CASE("DPD Simulator Restart Files Work", "[analysis][DPDSimulator]")
 TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator][long]")
 {
   std::cout << "Running test \"DPD Simulator Can Cross-link\"" << std::endl;
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
@@ -356,7 +359,8 @@ TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
   std::cout << "Running test \"DPD Simulator Computes Correct Forces\""
             << std::endl;
   // note that the random force might lead to deviations compared to LAMMPS
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
@@ -442,7 +446,8 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
 {
   std::cout << "Running test \"DPD Simulator Converts Correctly\"" << std::endl;
   // note that the random force might lead to deviations compared to LAMMPS
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
@@ -478,7 +483,8 @@ TEST_CASE("DPD can deform box", "[analysis][DPDSimulator][long]")
 {
   std::cout << "Running test \"DPD can deform box\"" << std::endl;
 
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
@@ -553,7 +559,8 @@ TEST_CASE("DPD can deform box", "[analysis][DPDSimulator][long]")
 TEST_CASE("New PBC computation is correct", "[analysis][DPDSimulator][1proc]")
 {
   std::cout << "Running test \"New PBC computation is correct\"" << std::endl;
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
@@ -605,7 +612,8 @@ TEST_CASE("For large systems the PBC method does not matter",
   std::cout
     << "Running test \"For large systems the PBC method does not matter\""
     << std::endl;
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile = suspectedPath +
@@ -684,7 +692,8 @@ TEST_CASE("DPD Simulator's restart files are accurate",
           "[analysis][DPDSimulator][1proc][long]")
 {
   // note that the random force might lead to deviations compared to LAMMPS
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =

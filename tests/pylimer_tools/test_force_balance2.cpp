@@ -373,70 +373,69 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   std::string inputFile =
-    suspectedPath + "structure/network_100_a_46.structure.out";
-  if (std::filesystem::exists(inputFile)) {
-    CHECK(std::filesystem::exists(suspectedPath));
-    std::cout << "Reading file " << inputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    CHECK(universeSeq.getLength() == 1);
-    pe::Universe universe = universeSeq.atIndex(0);
-    std::cout << "Read file. " << std::endl;
-    pcm::MEHPForceBalance2 forceBalancer =
-      pcm::MEHPForceBalance2(universe, 1000, 2.0, 0.0, 100);
-    forceBalancer.configAssumeBoxLargeEnough(true);
-    size_t nrOfAddedLinks =
-      forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
-    CHECK(nrOfAddedLinks >= 100);
-    // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+    suspectedPath + "/structure/network_100_a_46.structure.out";
 
-    pcm::ForceBalance2Network net = forceBalancer.getNetwork();
-    Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
-    size_t numRemoved =
-      forceBalancer.removeBifunctionalCrosslinks(net, displacements);
-    CHECK_NOTHROW(forceBalancer.validateNetwork());
-    CHECK(numRemoved > 0);
+  REQUIRE(std::filesystem::exists(inputFile));
+  CHECK(std::filesystem::exists(suspectedPath));
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  CHECK(universeSeq.getLength() == 1);
+  pe::Universe universe = universeSeq.atIndex(0);
+  std::cout << "Read file. " << std::endl;
+  pcm::MEHPForceBalance2 forceBalancer =
+    pcm::MEHPForceBalance2(universe, 1000, 2.0, 0.0, 100);
+  forceBalancer.configAssumeBoxLargeEnough(true);
+  size_t nrOfAddedLinks =
+    forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
+  CHECK(nrOfAddedLinks >= 100);
+  // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
-    // run a while to get inactive links
-    forceBalancer.runForceRelaxation();
-    net = forceBalancer.getNetwork();
-    displacements = forceBalancer.getCurrentDisplacements();
-    // due to the randomness, it _could_ be one day that actually all strands
-    // are active. unlikely, but I can imagine it to be possible.
-    size_t numInactiveRemoved =
-      forceBalancer.removeInactiveCrosslinks(net, displacements, 0.1);
-    CHECK_NOTHROW(forceBalancer.validateNetwork());
-    CHECK(numInactiveRemoved > 0);
-    CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
+  pcm::ForceBalance2Network net = forceBalancer.getNetwork();
+  Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
+  size_t numRemoved =
+    forceBalancer.removeBifunctionalCrosslinks(net, displacements);
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
+  CHECK(numRemoved > 0);
 
-    ////////////////////////////////////////////////////////////////
-    forceBalancer = pcm::MEHPForceBalance2(universe, 1000, 2.0, 0.0, 100);
-    nrOfAddedLinks =
-      forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
-    CHECK(nrOfAddedLinks >= 100);
-    // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
-    // check that all f = 2 have already been removed
-    // they have not, since more f = 2 are produced by
-    // numInactiveRemoved = forceBalancer.removeBifunctionalCrosslinks(
-    //       net, displacements, partitions);
-    // CHECK(numInactiveRemoved == 0);
+  // run a while to get inactive links
+  forceBalancer.runForceRelaxation();
+  net = forceBalancer.getNetwork();
+  displacements = forceBalancer.getCurrentDisplacements();
+  // due to the randomness, it _could_ be one day that actually all strands
+  // are active. unlikely, but I can imagine it to be possible.
+  size_t numInactiveRemoved =
+    forceBalancer.removeInactiveCrosslinks(net, displacements, 0.1);
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
+  CHECK(numInactiveRemoved > 0);
+  CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
 
-    // run a while to get inactive links
-    forceBalancer.runForceRelaxation();
-    net = forceBalancer.getNetwork();
-    displacements = forceBalancer.getCurrentDisplacements();
-    // due to the randomness, it _could_ be one day that actually all strands
-    // are active. unlikely, but I can imagine it to be possible.
-    numInactiveRemoved =
-      forceBalancer.removeInactiveCrosslinks(net, displacements, 0.1);
-    CHECK(numInactiveRemoved > 0);
-    numInactiveRemoved =
-      forceBalancer.removeBifunctionalCrosslinks(net, displacements);
-    CHECK(numInactiveRemoved > 0);
-    CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
-  }
+  ////////////////////////////////////////////////////////////////
+  forceBalancer = pcm::MEHPForceBalance2(universe, 1000, 2.0, 0.0, 100);
+  nrOfAddedLinks = forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
+  CHECK(nrOfAddedLinks >= 100);
+  // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+  // check that all f = 2 have already been removed
+  // they have not, since more f = 2 are produced by
+  // numInactiveRemoved = forceBalancer.removeBifunctionalCrosslinks(
+  //       net, displacements, partitions);
+  // CHECK(numInactiveRemoved == 0);
+
+  // run a while to get inactive links
+  forceBalancer.runForceRelaxation();
+  net = forceBalancer.getNetwork();
+  displacements = forceBalancer.getCurrentDisplacements();
+  // due to the randomness, it _could_ be one day that actually all strands
+  // are active. unlikely, but I can imagine it to be possible.
+  numInactiveRemoved =
+    forceBalancer.removeInactiveCrosslinks(net, displacements, 0.1);
+  CHECK(numInactiveRemoved > 0);
+  numInactiveRemoved =
+    forceBalancer.removeBifunctionalCrosslinks(net, displacements);
+  CHECK(numInactiveRemoved > 0);
+  CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
 }
 
 TEST_CASE(
@@ -448,69 +447,67 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   std::string inputFile =
-    suspectedPath + "structure/network_100_a_46.structure.out";
-  if (std::filesystem::exists(inputFile)) {
-    CHECK(std::filesystem::exists(suspectedPath));
-    std::cout << "Reading file " << inputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    CHECK(universeSeq.getLength() == 1);
-    pe::Universe universe = universeSeq.atIndex(0);
-    std::cout << "Read file. " << std::endl;
-    pcm::MEHPForceBalance2 forceBalancer =
-      pcm::MEHPForceBalance2(universe, 1000, 2.0, 0.0, 100);
-    size_t nrOfAddedLinks =
-      forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
-    CHECK(nrOfAddedLinks >= 100);
-    // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+    suspectedPath + "/structure/network_100_a_46.structure.out";
+  REQUIRE(std::filesystem::exists(inputFile));
+  CHECK(std::filesystem::exists(suspectedPath));
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  CHECK(universeSeq.getLength() == 1);
+  pe::Universe universe = universeSeq.atIndex(0);
+  std::cout << "Read file. " << std::endl;
+  pcm::MEHPForceBalance2 forceBalancer =
+    pcm::MEHPForceBalance2(universe, 1000, 2.0, 0.0, 100);
+  size_t nrOfAddedLinks =
+    forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
+  CHECK(nrOfAddedLinks >= 100);
+  // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
-    pcm::ForceBalance2Network net = forceBalancer.getNetwork();
-    Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
-    size_t numRemoved =
-      forceBalancer.removeBifunctionalCrosslinks(net, displacements);
-    CHECK_NOTHROW(forceBalancer.validateNetwork());
-    CHECK(numRemoved > 0);
+  pcm::ForceBalance2Network net = forceBalancer.getNetwork();
+  Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
+  size_t numRemoved =
+    forceBalancer.removeBifunctionalCrosslinks(net, displacements);
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
+  CHECK(numRemoved > 0);
 
-    // run a while to get inactive links
-    forceBalancer.runForceRelaxation();
-    net = forceBalancer.getNetwork();
-    displacements = forceBalancer.getCurrentDisplacements();
-    // due to the randomness, it _could_ be one day that actually all strands
-    // are active. unlikely, but I can imagine it to be possible.
-    size_t numInactiveRemoved =
-      forceBalancer.removeInactiveCrosslinks(net, displacements, 0.1);
-    CHECK_NOTHROW(forceBalancer.validateNetwork());
-    CHECK(numInactiveRemoved > 0);
-    CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
+  // run a while to get inactive links
+  forceBalancer.runForceRelaxation();
+  net = forceBalancer.getNetwork();
+  displacements = forceBalancer.getCurrentDisplacements();
+  // due to the randomness, it _could_ be one day that actually all strands
+  // are active. unlikely, but I can imagine it to be possible.
+  size_t numInactiveRemoved =
+    forceBalancer.removeInactiveCrosslinks(net, displacements, 0.1);
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
+  CHECK(numInactiveRemoved > 0);
+  CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
 
-    ////////////////////////////////////////////////////////////////
-    forceBalancer = pcm::MEHPForceBalance2(universe, 1000, 2.0, 0.0, 100);
-    nrOfAddedLinks =
-      forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
-    CHECK(nrOfAddedLinks >= 100);
-    // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
-    // check that all f = 2 have already been removed
-    // they have not, since more f = 2 are produced by
-    // numInactiveRemoved = forceBalancer.removeBifunctionalCrosslinks(
-    //       net, displacements, partitions);
-    // CHECK(numInactiveRemoved == 0);
+  ////////////////////////////////////////////////////////////////
+  forceBalancer = pcm::MEHPForceBalance2(universe, 1000, 2.0, 0.0, 100);
+  nrOfAddedLinks = forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
+  CHECK(nrOfAddedLinks >= 100);
+  // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+  // check that all f = 2 have already been removed
+  // they have not, since more f = 2 are produced by
+  // numInactiveRemoved = forceBalancer.removeBifunctionalCrosslinks(
+  //       net, displacements, partitions);
+  // CHECK(numInactiveRemoved == 0);
 
-    // run a while to get inactive links
-    CHECK_NOTHROW(forceBalancer.runForceRelaxation());
-    net = forceBalancer.getNetwork();
-    displacements = forceBalancer.getCurrentDisplacements();
-    // due to the randomness, it _could_ be one day that actually all strands
-    // are active. unlikely, but I can imagine it to be possible.
-    numInactiveRemoved =
-      forceBalancer.removeInactiveCrosslinks(net, displacements, 0.1);
-    CHECK(numInactiveRemoved > 0);
-    numInactiveRemoved =
-      forceBalancer.removeBifunctionalCrosslinks(net, displacements);
-    CHECK(numInactiveRemoved > 0);
-    CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
-  }
+  // run a while to get inactive links
+  CHECK_NOTHROW(forceBalancer.runForceRelaxation());
+  net = forceBalancer.getNetwork();
+  displacements = forceBalancer.getCurrentDisplacements();
+  // due to the randomness, it _could_ be one day that actually all strands
+  // are active. unlikely, but I can imagine it to be possible.
+  numInactiveRemoved =
+    forceBalancer.removeInactiveCrosslinks(net, displacements, 0.1);
+  CHECK(numInactiveRemoved > 0);
+  numInactiveRemoved =
+    forceBalancer.removeBifunctionalCrosslinks(net, displacements);
+  CHECK(numInactiveRemoved > 0);
+  CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
 }
 
 TEST_CASE(
@@ -521,7 +518,7 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   SECTION("MEHP Force Balance2 3D case")
   {
@@ -746,7 +743,7 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   SECTION("MEHP Force Balance2 3D case")
   {
@@ -754,72 +751,48 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
     // maximum is at perfect crystal structure -> must be all active.
     std::string inputFile =
       suspectedPath +
+      "/structure/"
       "3d-diamond-lattice_10x10x10_a_3_d_0.85_v_0.V-fixed.structure.out";
-    if (std::filesystem::exists(inputFile)) {
-      std::cout << "Reading file " << inputFile << std::endl;
-      universeSeq.initializeFromDataSequence({ { inputFile } });
-      pe::Universe universe = universeSeq.atIndex(0);
-      std::cout << "Read file " << inputFile << std::endl;
+    REQUIRE(std::filesystem::exists(inputFile));
+    std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { inputFile } });
+    pe::Universe universe = universeSeq.atIndex(0);
+    std::cout << "Read file " << inputFile << std::endl;
 
-      std::vector<pe::Molecule> molecules =
-        universe.getChainsWithCrosslinker(2);
-      for (pe::Molecule mol : molecules) {
-        CHECK(mol.getType() == pe::NETWORK_STRAND);
+    std::vector<pe::Molecule> molecules = universe.getChainsWithCrosslinker(2);
+    for (pe::Molecule mol : molecules) {
+      CHECK(mol.getType() == pe::NETWORK_STRAND);
+    }
+
+    SECTION("Without entanglements")
+    {
+      pcm::MEHPForceBalance2 forceBalancer =
+        pcm::MEHPForceBalance2(universe, 2, false);
+      size_t initialNSprings = forceBalancer.getNrOfStrands();
+
+      SECTION("For large enough box")
+      {
+        forceBalancer.configAssumeBoxLargeEnough(true);
+        CHECK(forceBalancer.getNrOfActiveStrands() ==
+              forceBalancer.getNrOfStrands());
+        double initialResidual = forceBalancer.getDisplacementResidualNorm();
+        CHECK(std::isfinite(initialResidual));
+        CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+          pcm::StructureSimplificationMode::ALL_TIM));
+        CHECK(forceBalancer.getNrOfIterations() > 0);
+        CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+        CHECK(forceBalancer.getNrOfActiveStrands() ==
+              forceBalancer.getNrOfStrands());
+        CHECK(forceBalancer.getNrOfStrands() == initialNSprings);
+        CHECK_THAT(forceBalancer.getActiveWeightFraction(),
+                   Catch::Matchers::WithinRel(1.0));
+        CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
+                   Catch::Matchers::WithinAbs(0.0, 1e-9));
+        CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
       }
 
-      SECTION("Without entanglements")
+      SECTION("For not large enough box")
       {
-        pcm::MEHPForceBalance2 forceBalancer =
-          pcm::MEHPForceBalance2(universe, 2, false);
-        size_t initialNSprings = forceBalancer.getNrOfStrands();
-
-        SECTION("For large enough box")
-        {
-          forceBalancer.configAssumeBoxLargeEnough(true);
-          CHECK(forceBalancer.getNrOfActiveStrands() ==
-                forceBalancer.getNrOfStrands());
-          double initialResidual = forceBalancer.getDisplacementResidualNorm();
-          CHECK(std::isfinite(initialResidual));
-          CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-            pcm::StructureSimplificationMode::ALL_TIM));
-          CHECK(forceBalancer.getNrOfIterations() > 0);
-          CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-          CHECK(forceBalancer.getNrOfActiveStrands() ==
-                forceBalancer.getNrOfStrands());
-          CHECK(forceBalancer.getNrOfStrands() == initialNSprings);
-          CHECK_THAT(forceBalancer.getActiveWeightFraction(),
-                     Catch::Matchers::WithinRel(1.0));
-          CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
-                     Catch::Matchers::WithinAbs(0.0, 1e-9));
-          CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
-        }
-
-        SECTION("For not large enough box")
-        {
-          forceBalancer.configAssumeBoxLargeEnough(false);
-          CHECK(forceBalancer.getNrOfActiveStrands() ==
-                forceBalancer.getNrOfStrands());
-          double initialResidual = forceBalancer.getDisplacementResidualNorm();
-          CHECK(std::isfinite(initialResidual));
-          REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-            pcm::StructureSimplificationMode::ALL_TIM));
-          CHECK(forceBalancer.getNrOfIterations() > 0);
-          CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-          CHECK(forceBalancer.getNrOfActiveStrands() ==
-                forceBalancer.getNrOfStrands());
-          CHECK(forceBalancer.getNrOfStrands() == initialNSprings);
-          CHECK_THAT(forceBalancer.getActiveWeightFraction(),
-                     Catch::Matchers::WithinRel(1.0));
-          CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
-                     Catch::Matchers::WithinAbs(0.0, 1e-9));
-          CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
-        }
-      }
-
-      SECTION("With entanglements")
-      {
-        pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(
-          universe, 400, 2.0, 0.0, 100, 0.0, "a533d", 2, false);
         forceBalancer.configAssumeBoxLargeEnough(false);
         CHECK(forceBalancer.getNrOfActiveStrands() ==
               forceBalancer.getNrOfStrands());
@@ -831,12 +804,35 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
         CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
         CHECK(forceBalancer.getNrOfActiveStrands() ==
               forceBalancer.getNrOfStrands());
+        CHECK(forceBalancer.getNrOfStrands() == initialNSprings);
         CHECK_THAT(forceBalancer.getActiveWeightFraction(),
                    Catch::Matchers::WithinRel(1.0));
         CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
                    Catch::Matchers::WithinAbs(0.0, 1e-9));
         CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
       }
+    }
+
+    SECTION("With entanglements")
+    {
+      pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(
+        universe, 400, 2.0, 0.0, 100, 0.0, "a533d", 2, false);
+      forceBalancer.configAssumeBoxLargeEnough(false);
+      CHECK(forceBalancer.getNrOfActiveStrands() ==
+            forceBalancer.getNrOfStrands());
+      double initialResidual = forceBalancer.getDisplacementResidualNorm();
+      CHECK(std::isfinite(initialResidual));
+      REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
+        pcm::StructureSimplificationMode::ALL_TIM));
+      CHECK(forceBalancer.getNrOfIterations() > 0);
+      CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+      CHECK(forceBalancer.getNrOfActiveStrands() ==
+            forceBalancer.getNrOfStrands());
+      CHECK_THAT(forceBalancer.getActiveWeightFraction(),
+                 Catch::Matchers::WithinRel(1.0));
+      CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
+                 Catch::Matchers::WithinAbs(0.0, 1e-9));
+      CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
     }
   }
 }
@@ -847,13 +843,13 @@ TEST_CASE("MEHP Force Balance2 Gives Identical Results for Different PBC "
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   // perfect diamond network = fully connected =>
   // maximum is at perfect crystal structure -> must be all active.
   std::string inputFile =
     suspectedPath +
-    "3d-diamond-lattice_5x5x5_a_3_d_0.85_imperfect.structure.out";
+    "/structure/3d-diamond-lattice_5x5x5_a_3_d_0.85_imperfect.structure.out";
   if (std::filesystem::exists(inputFile)) {
     std::cout << "Reading file " << inputFile << std::endl;
     universeSeq.initializeFromDataSequence({ { inputFile } });
@@ -935,12 +931,13 @@ TEST_CASE("MEHP Force Balance2 Gives Identical Results for Different PBC p = 1",
 
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   // perfect diamond network = fully connected =>
   // maximum is at perfect crystal structure -> must be all active.
   std::string inputFile =
     suspectedPath +
+    "/structure/"
     "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
     "structure.out-equilibration_do_crosslink.structure.out";
   if (std::filesystem::exists(inputFile)) {
@@ -1100,9 +1097,10 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
-  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
+  std::string inputFile =
+    suspectedPath + "/structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     std::cout << "Reading file " << inputFile << std::endl;
     universeSeq.initializeFromDataSequence({ { inputFile } });
@@ -1142,10 +1140,11 @@ TEST_CASE("Particular MEHP Force Balance2 Example",
 
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   std::string inputFile =
     suspectedPath +
+    "/structure/"
     "crosslinked_p_1_0.5_melt_100_a_158_100_xlinks_v_13.V-fixed.structure.out-"
     "equilibration_do_crosslink.structure.out";
   if (std::filesystem::exists(inputFile)) {
@@ -1174,10 +1173,11 @@ TEST_CASE("MEHPForceBalance2 Random sampling example",
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   std::string inputFile =
     suspectedPath +
+    "/structure/"
     "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
     "structure.out-equilibration_do_crosslink.structure.out";
   if (std::filesystem::exists(inputFile)) {
@@ -1312,10 +1312,10 @@ TEST_CASE("MEHPForceBalance2 Random sampling example small",
     << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   std::string inputFile =
-    suspectedPath + "square_lattice_2x2_a_5.2d.structure.out";
+    suspectedPath + "/structure/square_lattice_2x2_a_5.2d.structure.out";
   if (std::filesystem::exists(inputFile)) {
     std::cout << "Reading file " << inputFile << std::endl;
     universeSeq.initializeFromDataSequence({ { inputFile } });
@@ -1402,63 +1402,6 @@ TEST_CASE("MEHPForceBalance2 Random sampling example small",
   }
 }
 
-TEST_CASE("MEHPForceBalance2 Conversion of structure is equal for both methods",
-          "[analysis][MEHPForceBalance2]")
-{
-  std::cout
-    << "Running test \"Conversion of structure is equal for both methods\""
-    << std::endl;
-  pe::UniverseSequence universeSeq = pe::UniverseSequence();
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
-
-  std::string inputFile =
-    suspectedPath +
-    "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
-    "structure.out-equilibration_do_crosslink.structure.out";
-  if (std::filesystem::exists(inputFile)) {
-    std::cout << "Reading file " << inputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    pe::Universe universe = universeSeq.atIndex(0);
-    std::cout << "Read file " << inputFile << std::endl;
-
-    // randomly sample NO slip-links
-    pcm::MEHPForceBalance2 forceBalancerNewConversion =
-      pcm::MEHPForceBalance2(universe, 0, 6.0, 0.0, 0, 3.0, "");
-    forceBalancerNewConversion.configAssumeBoxLargeEnough(false);
-
-    pcm::MEHPForceBalance2 forceBalancerOldConversion =
-      pcm::MEHPForceBalance2(universe, 2, false, false, false);
-    forceBalancerOldConversion.configAssumeBoxLargeEnough(false);
-
-    // check to make sure the links are actually placed identically
-    CHECK(forceBalancerNewConversion.getNetwork().springIndexA.isApprox(
-      forceBalancerOldConversion.getNetwork().springIndexA));
-    CHECK(forceBalancerNewConversion.getNetwork().springIndexB.isApprox(
-      forceBalancerOldConversion.getNetwork().springIndexB));
-    CHECK(forceBalancerNewConversion.getNetwork().coordinates.isApprox(
-      forceBalancerOldConversion.getNetwork().coordinates));
-    CHECK(forceBalancerNewConversion.getNetwork().springBoxOffset.isApprox(
-      forceBalancerOldConversion.getNetwork().springBoxOffset));
-
-    // and of course the corresponding computations
-    CHECK_THAT(forceBalancerOldConversion.getDisplacementResidualNorm(),
-               Catch::Matchers::WithinRel(
-                 forceBalancerNewConversion.getDisplacementResidualNorm()));
-    CHECK_THAT(
-      forceBalancerOldConversion.getPressure(),
-      Catch::Matchers::WithinRel(forceBalancerNewConversion.getPressure()));
-
-    // std::cout << "FB 1:" << std::endl;
-    // outputNetwork(forceBalancerNewConversion.getNetwork(),
-    //               forceBalancerNewConversion.getCurrentDisplacements(),
-    //               forceBalancerNewConversion.getSpringPartitions());
-    // std::cout << "\n\n\nFB 2:" << std::endl;
-    // outputNetwork(forceBalancerOldConversion.getNetwork(),
-    //               forceBalancerOldConversion.getCurrentDisplacements(),
-    //               forceBalancerOldConversion.getSpringPartitions());
-  }
-}
-
 TEST_CASE(
   "MEHPForceBalance2 Adding slip-links does not influence other springs",
   "[analysis][MEHPForceBalance2][long]")
@@ -1467,10 +1410,11 @@ TEST_CASE(
     << "Running test \"Adding slip-links does not influence other springs\""
     << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   std::string inputFile =
     suspectedPath +
+    "/structure/"
     "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
     "structure.out-equilibration_do_crosslink.structure.out";
   std::cout << "Reading file " << inputFile << std::endl;
@@ -1525,13 +1469,14 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   // a structure with lots of dangling things that can and will be entangled,
   // yet the entanglements removed
   std::string inputFile =
-    suspectedPath + "mc_own-si_pdms_crosslinked_melt_464_a_77_r_1.71_wsol_0."
-                    "0114_f_4_v_1.structure.out";
+    suspectedPath +
+    "/structure/mc_own-si_pdms_crosslinked_melt_464_a_77_r_1.71_wsol_0."
+    "0114_f_4_v_1.structure.out";
 
   std::cout << "Reading file " << inputFile << std::endl;
   universeSeq.initializeFromDataSequence({ { inputFile } });
@@ -1731,7 +1676,7 @@ TEST_CASE("Temporary force balance 2 test case",
   // yet the entanglements removed
   std::string inputFile =
     suspectedPath +
-    "/structures/tmp/mc_own-si_pdms_crosslinked_melt_2590_a_221_2410_monoa_271_"
+    "/tmp/mc_own-si_pdms_crosslinked_melt_2590_a_221_2410_monoa_271_"
     "r_1.44_wsol_0.278_f_4_v_1.structure.out";
 
   std::cout << "Reading file " << inputFile << std::endl;

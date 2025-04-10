@@ -225,11 +225,11 @@ public:
    *
    * @param net
    * @param displacements
-   * @param springIdx
+   * @param strandIdx
    */
   void removeStrand(ForceBalance2Network& net,
                     Eigen::VectorXd& displacements,
-                    const size_t springIdx) const;
+                    const size_t strandIdx) const;
 
   /**
    * @brief break a spring, given its partial spring index
@@ -249,11 +249,11 @@ public:
    *
    * @param net
    * @param displacements
-   * @param springIdx
+   * @param strandIdx
    */
   void removeStrandFollowingEntanglementLinks(ForceBalance2Network& net,
                                               Eigen::VectorXd& displacements,
-                                              const size_t springIdx) const;
+                                              const size_t strandIdx) const;
 
   /**
    * @brief Remove a certain link from the structures

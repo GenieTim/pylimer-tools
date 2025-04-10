@@ -203,7 +203,7 @@ MEHPForceBalance2::MEHPForceBalance2(
         }
 
         if (addSpring) {
-          assert(newLinkIdStack.size() > 0);
+          assert(!newLinkIdStack.empty());
           // link this new link to the previous link
           if (springIndicesOfStrand.size() <= currentStrandIdx) {
             assert(currentStrandIdx == springIndicesOfStrand.size());
@@ -215,20 +215,38 @@ MEHPForceBalance2::MEHPForceBalance2(
             springIndicesOfStrand[currentStrandIdx].push_back(
               springFrom.size());
           }
-          linkIndicesOfStrand[currentStrandIdx].push_back(
-            addNewLink ? nextLinkIdx : oldVertexIdToNewLinkId[currentVertex]);
           springFrom.push_back(newLinkIdStack.top());
 
           if (oldVertexIdToNewLinkId[currentVertex] >= 0) {
             assert(!addNewLink);
+            assert(!entanglementsAsSprings);
+            assert(pairOfAtom[currentVertex] >= 0);
             springTo.push_back(oldVertexIdToNewLinkId[currentVertex]);
           } else {
             assert(addNewLink);
             springTo.push_back(nextLinkIdx);
           }
+          linkIndicesOfStrand[currentStrandIdx].push_back(springTo.back());
+
+          assert(linkIndicesOfStrand[currentStrandIdx].size() - 1 ==
+            springIndicesOfStrand[currentStrandIdx].size());
+          assert(linkIndicesOfStrand[currentStrandIdx].size() >= 2);
+          assert(springFrom.size() == springTo.size());
+          assert(
+            linkIndicesOfStrand[currentStrandIdx]
+            [linkIndicesOfStrand[currentStrandIdx].size() -
+              2] == springFrom.back());
+          assert(linkIndicesOfStrand[currentStrandIdx].back() ==
+            springTo.back());
+
           springBoxOffsets.emplace_back(Eigen::Vector3d::Zero());
           springContourLength.push_back(currentSpringContourLength);
           currentSpringContourLength = 0;
+
+          // we have visited this, need to remember for next springs
+          if (!addNewLink) {
+            newLinkIdStack.push(springTo.back());
+          }
         }
         if (addNewStrand) {
           assert(addSpring);
@@ -302,8 +320,20 @@ MEHPForceBalance2::MEHPForceBalance2(
           }
           linkIndicesOfStrand[currentStrandIdx].push_back(
             oldVertexIdToNewLinkId[neighbor]);
+          assert(linkIndicesOfStrand[currentStrandIdx].size() - 1 ==
+            springIndicesOfStrand[currentStrandIdx].size());
           springFrom.push_back(newLinkIdStack.top());
           springTo.push_back(oldVertexIdToNewLinkId[neighbor]);
+          assert(linkIndicesOfStrand[currentStrandIdx].size() >= 2);
+          assert(springFrom.size() == springTo.size());
+          assert(
+            linkIndicesOfStrand[currentStrandIdx]
+            [linkIndicesOfStrand[currentStrandIdx].size() -
+              2] == springFrom[springFrom.size() - 1]);
+          assert(
+            linkIndicesOfStrand[currentStrandIdx]
+            [linkIndicesOfStrand[currentStrandIdx].size() -
+              1] == springTo[springTo.size() - 1]);
           springContourLength.push_back(currentSpringContourLength + 1);
           edge_followed[edge] = true;
           // compute box offset
@@ -415,7 +445,7 @@ MEHPForceBalance2::MEHPForceBalance2(
 
   // link between springs and strands
   this->initialConfig.strandIdxOfSpring =
-    Eigen::ArrayXi(this->initialConfig.nrOfSprings);
+    Eigen::ArrayXi::Constant(this->initialConfig.nrOfSprings, -1);
   for (size_t strandIdx = 0; strandIdx < springIndicesOfStrand.size();
        ++strandIdx) {
     std::vector<size_t>& springIndices = springIndicesOfStrand[strandIdx];
@@ -1030,16 +1060,16 @@ MEHPForceBalance2::removeInactiveCrosslinks(ForceBalance2Network& net,
   //        this->removePrimaryLoops(net, displacements);
   // RUNTIME_EXP_IFN(this->validateNetwork(net, displacements), "Invalid
   // internal network representation"); first, we remove all inactive springs
-  for (long int springIdx = net.nrOfStrands - 1; springIdx >= 0; --springIdx) {
-    if (springIdx >= net.nrOfStrands) {
-      springIdx = net.nrOfStrands - 1;
+  for (long int strandIdx = net.nrOfStrands - 1; strandIdx >= 0; --strandIdx) {
+    if (strandIdx >= net.nrOfStrands) {
+      strandIdx = net.nrOfStrands - 1;
       continue;
     }
-    std::vector<size_t> involvedPartialSprings =
-      net.springIndicesOfStrand[springIdx];
-    assert(involvedPartialSprings.size() > 0);
+    std::vector<size_t> involvedSprings =
+      net.springIndicesOfStrand[strandIdx];
+    assert(involvedSprings.size() > 0);
     bool isActive = false;
-    for (size_t partialSpringIdx : involvedPartialSprings) {
+    for (size_t springIdx : involvedSprings) {
       RUNTIME_EXP_IFN(
         net.coordinates.size() == displacements.size(),
         "Expected coordinates and displacements to have same size, got " +
@@ -1047,9 +1077,9 @@ MEHPForceBalance2::removeInactiveCrosslinks(ForceBalance2Network& net,
         std::to_string(displacements.size()) + ".");
       // assert(net.coordinates.size() == displacements.size());
       Eigen::Vector3d distance =
-        this->evaluateSpringVector(net, displacements, partialSpringIdx);
+        this->evaluateSpringVector(net, displacements, springIdx);
       const double contourLength =
-        net.springContourLength[net.strandIdxOfSpring[partialSpringIdx]];
+        net.springContourLength[net.strandIdxOfSpring[springIdx]];
       if (!this->distanceIsWithinTolerance(
         distance,
         tolerance,
@@ -1066,8 +1096,7 @@ MEHPForceBalance2::removeInactiveCrosslinks(ForceBalance2Network& net,
 #endif
       this->removeStrandFollowingEntanglementLinks(net,
                                                    displacements,
-
-                                                   springIdx);
+                                                   strandIdx);
 
 #ifndef NDEBUG
       assert(this->validateNetwork(net, displacements));
@@ -1077,8 +1106,11 @@ MEHPForceBalance2::removeInactiveCrosslinks(ForceBalance2Network& net,
   }
 
   // then, we remove all crosslinkers that are 0- or 1-functional
-  for (long int crosslinkIdx = net.nrOfNodes - 1; crosslinkIdx >= 0;
+  for (long int crosslinkIdx = net.nrOfLinks; crosslinkIdx >= 0;
        --crosslinkIdx) {
+    if (net.linkIsEntanglement[crosslinkIdx]) {
+      continue;
+    }
     assert(net.strandIndicesOfLink.size() > crosslinkIdx);
     if (net.strandIndicesOfLink[crosslinkIdx].size() == 0 // f = 0
     ) {
@@ -1114,7 +1146,7 @@ MEHPForceBalance2::removeInactiveCrosslinks(ForceBalance2Network& net,
       std::cout << "Effectively removed f = 1 x-link " << newCrosslinkIdx
                 << std::endl;
 #endif
-      crosslinkIdx = std::min<long int>(crosslinkIdx, net.nrOfNodes - 1);
+      crosslinkIdx = std::min<long int>(crosslinkIdx, net.nrOfLinks - 1);
       // => we should ever only have 2-functional entanglement links that
       // could be merged after this.
 
@@ -1179,25 +1211,25 @@ MEHPForceBalance2::breakTooLongStrands(ForceBalance2Network& net,
  *
  * @param net
  * @param displacements
- * @param springIdx
+ * @param strandIdx
  */
 void
 MEHPForceBalance2::removeStrand(ForceBalance2Network& net,
                                 Eigen::VectorXd& displacements,
-                                const size_t springIdx) const
+                                const size_t strandIdx) const
 {
 #ifdef DEBUG_REMOVAL
   std::cout << "Starting to remove spring " << springIdx << std::endl;
 #endif
-  INVALIDARG_EXP_IFN(springIdx < net.nrOfStrands,
+  INVALIDARG_EXP_IFN(strandIdx < net.nrOfStrands,
                      "Can only remove springs, not partial springs.");
 #ifndef NDEBUG
   Eigen::VectorXd allTotalSpringDistancesBefore =
     this->evaluateStrandLengths(net, displacements);
 #endif
 
-  std::vector<size_t> affectedLinks = net.linkIndicesOfStrand[springIdx];
-  std::vector<size_t> uniqueAffectedLinks = net.linkIndicesOfStrand[springIdx];
+  std::vector<size_t> affectedLinks = net.linkIndicesOfStrand[strandIdx];
+  std::vector<size_t> uniqueAffectedLinks = net.linkIndicesOfStrand[strandIdx];
   std::sort(uniqueAffectedLinks.begin(), uniqueAffectedLinks.end());
   uniqueAffectedLinks.erase(
     std::unique(uniqueAffectedLinks.begin(), uniqueAffectedLinks.end()),
@@ -1208,10 +1240,10 @@ MEHPForceBalance2::removeStrand(ForceBalance2Network& net,
     RUNTIME_EXP_IFN(
       std::find(net.strandIndicesOfLink[affectedLinkIdx].begin(),
         net.strandIndicesOfLink[affectedLinkIdx].end(),
-        springIdx) != net.strandIndicesOfLink[affectedLinkIdx].end(),
+        strandIdx) != net.strandIndicesOfLink[affectedLinkIdx].end(),
       "Link must have a connection to the spring, too. Did not find "
       "spring " +
-      std::to_string(springIdx) + " in link " +
+      std::to_string(strandIdx) + " in link " +
       std::to_string(affectedLinkIdx) + ", got " +
       pylimer_tools::utils::join(
         net.strandIndicesOfLink[affectedLinkIdx].begin(),
@@ -1221,7 +1253,7 @@ MEHPForceBalance2::removeStrand(ForceBalance2Network& net,
     if (net.linkIsEntanglement[affectedLinkIdx]) {
       RUNTIME_EXP_IFN(
         net.strandIndicesOfLink[affectedLinkIdx].size() <= 2,
-        "Expect slip-link to be associated with 2 springs only, got " +
+        "Expect entanglement to be associated with 2 springs only, got " +
         pylimer_tools::utils::join(
           net.strandIndicesOfLink[affectedLinkIdx].begin(),
           net.strandIndicesOfLink[affectedLinkIdx].end(),
@@ -1230,10 +1262,10 @@ MEHPForceBalance2::removeStrand(ForceBalance2Network& net,
     }
 
     size_t found =
-      std::erase(net.strandIndicesOfLink[affectedLinkIdx], springIdx);
+      std::erase(net.strandIndicesOfLink[affectedLinkIdx], strandIdx);
 
     RUNTIME_EXP_IFN(found > 0,
-                    "Expected to find spring " + std::to_string(springIdx) +
+                    "Expected to find spring " + std::to_string(strandIdx) +
                     " in link " + std::to_string(affectedLinkIdx) +
                     " but did not, got " +
                     pylimer_tools::utils::join(
@@ -1253,47 +1285,47 @@ MEHPForceBalance2::removeStrand(ForceBalance2Network& net,
     }
   }
 
-  std::vector<size_t> affectedPartialSprings =
-    net.springIndicesOfStrand[springIdx];
-  assert(affectedPartialSprings.size() > 0);
+  std::vector<size_t> affectedSprings =
+    net.springIndicesOfStrand[strandIdx];
+  assert(affectedSprings.size() > 0);
   net.nrOfStrands -= 1;
-  net.nrOfSprings -= affectedPartialSprings.size();
+  net.nrOfSprings -= affectedSprings.size();
 
   // actually spring remove stuff
   net.springIndicesOfStrand.erase(net.springIndicesOfStrand.begin() +
-                                  springIdx);
-  net.linkIndicesOfStrand.erase(net.linkIndicesOfStrand.begin() + springIdx);
-  pylimer_tools::utils::removeRow(net.springContourLength, springIdx);
-  pylimer_tools::utils::removeRow(net.springIsEntanglement, springIdx);
+                                  strandIdx);
+  net.linkIndicesOfStrand.erase(net.linkIndicesOfStrand.begin() + strandIdx);
 
   // need to remove descending
-  std::sort(affectedPartialSprings.begin(),
-            affectedPartialSprings.end(),
+  std::sort(affectedSprings.begin(),
+            affectedSprings.end(),
             std::greater<size_t>());
-  for (size_t partialSpringIdx : affectedPartialSprings) {
-    pylimer_tools::utils::removeRow(net.springIndexA, partialSpringIdx);
+  for (size_t springIdx : affectedSprings) {
+    pylimer_tools::utils::removeRow(net.springIndexA, springIdx);
     pylimer_tools::utils::removeRows(
       net.springCoordinateIndexA,
-      3 * partialSpringIdx,
+      3 * springIdx,
       3);
-    pylimer_tools::utils::removeRow(net.springIndexB, partialSpringIdx);
+    pylimer_tools::utils::removeRow(net.springIndexB, springIdx);
     pylimer_tools::utils::removeRows(
       net.springCoordinateIndexB,
-      3 * partialSpringIdx,
+      3 * springIdx,
       3);
     pylimer_tools::utils::removeRows(
       net.springBoxOffset,
-      3 * partialSpringIdx,
+      3 * springIdx,
       3);
-    pylimer_tools::utils::removeRow(net.strandIdxOfSpring, partialSpringIdx);
+    pylimer_tools::utils::removeRow(net.strandIdxOfSpring, springIdx);
+    pylimer_tools::utils::removeRow(net.springContourLength, springIdx);
+    pylimer_tools::utils::removeRow(net.springIsEntanglement, springIdx);
   }
 
   // renumber the remaining stuff
   // first, renumber the springs
   for (size_t linkIdx = 0; linkIdx < net.nrOfLinks; ++linkIdx) {
     for (size_t i = 0; i < net.strandIndicesOfLink[linkIdx].size(); ++i) {
-      assert(net.strandIndicesOfLink[linkIdx][i] != springIdx);
-      if (net.strandIndicesOfLink[linkIdx][i] > springIdx) {
+      assert(net.strandIndicesOfLink[linkIdx][i] != strandIdx);
+      if (net.strandIndicesOfLink[linkIdx][i] > strandIdx) {
         net.strandIndicesOfLink[linkIdx][i] -= 1;
       }
     }
@@ -1301,17 +1333,16 @@ MEHPForceBalance2::removeStrand(ForceBalance2Network& net,
 
   // then, update the partial springs
   // decrease by one if larger then springIdx
-  assert((net.strandIdxOfSpring != springIdx).all());
-  net.strandIdxOfSpring -= (net.strandIdxOfSpring > springIdx).cast<int>();
+  assert((net.strandIdxOfSpring != strandIdx).all());
+  net.strandIdxOfSpring -= (net.strandIdxOfSpring > strandIdx).cast<int>();
 
   assert(net.springIndicesOfStrand.size() == net.nrOfStrands);
-  for (size_t loopingSpringIdx = 0; loopingSpringIdx < net.nrOfStrands;
-       ++loopingSpringIdx) {
-    for (size_t i = 0; i < net.springIndicesOfStrand[loopingSpringIdx].size();
-         ++i) {
-      for (size_t partialSpringIdx : affectedPartialSprings) {
-        if (net.springIndicesOfStrand[loopingSpringIdx][i] > partialSpringIdx) {
-          net.springIndicesOfStrand[loopingSpringIdx][i] -= 1;
+  for (size_t loopingStrandIdx = 0; loopingStrandIdx < net.nrOfStrands;
+       ++loopingStrandIdx) {
+    for (unsigned long& i : net.springIndicesOfStrand[loopingStrandIdx]) {
+      for (size_t springIdx : affectedSprings) {
+        if (i > springIdx) {
+          i -= 1;
         }
       }
     }
@@ -1350,24 +1381,24 @@ MEHPForceBalance2::removeStrand(ForceBalance2Network& net,
                       springsOfLink.end(),
                       std::string(", ")) +
                     ".");
-    std::vector<size_t> involvedPartialSprings;
-    involvedPartialSprings.reserve(2);
+    std::vector<size_t> involvedSprings;
+    involvedSprings.reserve(2);
     for (int springInLinkIdx = springsOfLink.size() - 1; springInLinkIdx >= 0;
          --springInLinkIdx) {
       for (size_t partialSpringIdx :
            net.springIndicesOfStrand[springsOfLink[springInLinkIdx]]) {
         if (net.springIndexA[partialSpringIdx] == slipLinkIdx ||
             net.springIndexB[partialSpringIdx] == slipLinkIdx) {
-          involvedPartialSprings.push_back(partialSpringIdx);
+          involvedSprings.push_back(partialSpringIdx);
         }
       }
     }
     RUNTIME_EXP_IFN(
-      involvedPartialSprings.size() >= springsOfLink.size(),
+      involvedSprings.size() >= springsOfLink.size(),
       "Expected more or equal number of partial springs (" +
-      std::to_string(involvedPartialSprings.size()) + "; " +
-      pylimer_tools::utils::join(involvedPartialSprings.begin(),
-        involvedPartialSprings.end(),
+      std::to_string(involvedSprings.size()) + "; " +
+      pylimer_tools::utils::join(involvedSprings.begin(),
+        involvedSprings.end(),
         std::string(", ")) +
       ") than springs (" + std::to_string(springsOfLink.size()) + "; " +
       pylimer_tools::utils::join(
@@ -1376,35 +1407,34 @@ MEHPForceBalance2::removeStrand(ForceBalance2Network& net,
     // RUNTIME_EXP_IFN(springsOfLink.size() % 2 == 0, "Expected link to
     // have an even number of components, got " +
     // std::to_string(springsOfLink.size()) + ".");
-    if (involvedPartialSprings.size() > 0) {
+    if (involvedSprings.size() > 0) {
       RUNTIME_EXP_IFN(
-        involvedPartialSprings.size() == 2,
+        involvedSprings.size() == 2,
         "Expected only 2 involved partial springs, got: " +
-        pylimer_tools::utils::join(involvedPartialSprings.begin(),
-          involvedPartialSprings.end(),
+        pylimer_tools::utils::join(involvedSprings.begin(),
+          involvedSprings.end(),
           std::string(", ")) +
         " for springs " +
         pylimer_tools::utils::join(
           springsOfLink.begin(), springsOfLink.end(), std::string(", ")) +
-        " when removing spring " + std::to_string(springIdx) + ".");
-      assert(involvedPartialSprings.size() == 2);
-      size_t partialSpringToKeep =
-        std::min(involvedPartialSprings[0], involvedPartialSprings[1]);
-      size_t partialSpringToRemove =
-        std::max(involvedPartialSprings[0], involvedPartialSprings[1]);
-      assert(partialSpringToKeep != partialSpringToRemove);
-      assert(net.strandIdxOfSpring[partialSpringToKeep] ==
-        net.strandIdxOfSpring[partialSpringToRemove]);
+        " when removing spring " + std::to_string(strandIdx) + ".");
+      assert(involvedSprings.size() == 2);
+      size_t springToKeep =
+        std::min(involvedSprings[0], involvedSprings[1]);
+      size_t springToRemove =
+        std::max(involvedSprings[0], involvedSprings[1]);
+      assert(springToKeep != springToRemove);
+      assert(net.strandIdxOfSpring[springToKeep] ==
+        net.strandIdxOfSpring[springToRemove]);
       // actually do the merge
       this->mergeSprings(net,
                          displacements,
-
-                         partialSpringToRemove,
-                         partialSpringToKeep,
+                         springToRemove,
+                         springToKeep,
                          slipLinkIdx);
       // total distance changes -> cannot use for checking the total
       // distance
-      springIsAffected[net.strandIdxOfSpring[partialSpringToKeep]] = true;
+      springIsAffected[net.strandIdxOfSpring[springToKeep]] = true;
     }
 
     assert(net.strandIndicesOfLink[slipLinkIdx].empty());
@@ -1423,7 +1453,7 @@ MEHPForceBalance2::removeStrand(ForceBalance2Network& net,
     this->evaluateStrandLengths(net, displacements);
   assert(allTotalSpringDistancesAfter.size() == net.nrOfStrands);
   for (size_t i = 0; i < net.nrOfStrands; ++i) {
-    size_t correspondingOldIdx = i >= springIdx ? i + 1 : i;
+    size_t correspondingOldIdx = i >= strandIdx ? i + 1 : i;
     if (springIsAffected[i]) {
       // when slip-links are removed, the overall distance must reduce.
       RUNTIME_EXP_IFN(allTotalSpringDistancesBefore[correspondingOldIdx] +
@@ -1449,23 +1479,27 @@ MEHPForceBalance2::removeStrand(ForceBalance2Network& net,
  *
  * @param net
  * @param displacements
- * @param springIdx
+ * @param strandIdx
  */
 void
 MEHPForceBalance2::removeStrandFollowingEntanglementLinks(
   ForceBalance2Network& net,
   Eigen::VectorXd& displacements,
-  const size_t springIdx) const
+  const size_t strandIdx) const
 {
-  std::vector<size_t> springsToRemove = { springIdx };
-  std::vector<size_t> linksToRemove = net.linkIndicesOfStrand[springIdx];
-  assert(springsToRemove.size() > 0);
-  std::ranges::sort(springsToRemove, std::greater<>());
-  for (const size_t springIdxToDelete : springsToRemove) {
+  std::vector<size_t> strandsToRemove = { strandIdx };
+  std::vector<size_t> linksToRemove = net.linkIndicesOfStrand[strandIdx];
+  // filter linksToRemove, only keep if they are type entanglement
+  std::erase_if(linksToRemove,
+                [&net](const size_t linkIdx) {
+                  return !net.linkIsEntanglement[linkIdx];
+                });
+  assert(strandsToRemove.size() > 0);
+  std::ranges::sort(strandsToRemove, std::greater<>());
+  for (const size_t strandIdxToDelete : strandsToRemove) {
     this->removeStrand(net,
                        displacements,
-
-                       springIdxToDelete);
+                       strandIdxToDelete);
   }
   std::ranges::sort(linksToRemove, std::greater<>());
   for (size_t linkIdxToDelete : linksToRemove) {
@@ -1529,6 +1563,18 @@ MEHPForceBalance2::removeLink(ForceBalance2Network& net,
     net.nrOfNodes -= 1;
     pylimer_tools::utils::removeRow(net.oldAtomIds, linkIdx);
     pylimer_tools::utils::removeRow(net.oldAtomTypes, linkIdx);
+  } else {
+    // remove entanglement springs associated with this link
+    for (size_t i = 0; i < net.nrOfSprings; ++i) {
+      if (net.springIndexA[i] == linkIdx || net.springIndexB[i] == linkIdx) {
+        assert(net.springIsEntanglement[i]);
+        pylimer_tools::utils::removeRow(net.springIndexA, i);
+        pylimer_tools::utils::removeRow(net.springIndexB, i);
+        pylimer_tools::utils::removeRow(net.springIsEntanglement, i);
+        pylimer_tools::utils::removeRow(net.springContourLength, i);
+        pylimer_tools::utils::removeRows(net.springBoxOffset, 3 * i, 3);
+      }
+    }
   }
   net.nrOfLinks -= 1;
   pylimer_tools::utils::removeRow(net.linkIsEntanglement, linkIdx);
@@ -2154,8 +2200,11 @@ MEHPForceBalance2::removeBifunctionalCrosslinks(
   Eigen::VectorXd& displacements) const
 {
   size_t numRemoved = 0;
-  for (long int crosslinkIdx = net.nrOfNodes - 1; crosslinkIdx >= 0;
+  for (long int crosslinkIdx = net.nrOfLinks - 1; crosslinkIdx >= 0;
        --crosslinkIdx) {
+    if (net.linkIsEntanglement[crosslinkIdx]) {
+      continue;
+    }
     if (net.strandIndicesOfLink[crosslinkIdx].size() == 2) {
       std::vector<size_t> springsToMerge =
         net.strandIndicesOfLink[crosslinkIdx];
@@ -2498,9 +2547,12 @@ int
 MEHPForceBalance2::getNumIntraChainSlipLinks() const
 {
   int result = 0;
-  for (size_t i = this->initialConfig.nrOfNodes;
+  for (size_t i = 0;
        i < this->initialConfig.nrOfLinks;
        ++i) {
+    if (!this->initialConfig.linkIsEntanglement[i]) {
+      continue;
+    }
     if (this->initialConfig.strandIndicesOfLink[i].size() < 2) {
       result += 1;
     }
@@ -2756,8 +2808,10 @@ MEHPForceBalance2::evaluateStressTensorLinkBased(
   Eigen::VectorXi debugNrSpringsVisited =
     Eigen::VectorXi::Zero(net.nrOfSprings);
 
-  size_t nrOfLinksToInspect = crosslinksOnly ? net.nrOfNodes : net.nrOfLinks;
-  for (size_t linkIdx = 0; linkIdx < nrOfLinksToInspect; ++linkIdx) {
+  for (size_t linkIdx = 0; linkIdx < net.nrOfLinks; ++linkIdx) {
+    if (crosslinksOnly && net.linkIsEntanglement[linkIdx]) {
+      continue;
+    }
     Eigen::Matrix3d stressOnLink =
       this->evaluateStressOnLink(linkIdx, net, u, debugNrSpringsVisited);
     /* spring contribution to the overall stress tensor */
@@ -2922,7 +2976,10 @@ MEHPForceBalance2::getEffectiveFunctionalityOfAtoms(double tolerance) const
 
   Eigen::VectorXi nrOfActiveSpringsConnected =
     this->getNrOfActiveStrandsConnected(tolerance);
-  for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
+  for (size_t i = 0; i < this->initialConfig.nrOfLinks; i++) {
+    if (this->initialConfig.linkIsEntanglement[i]) {
+      continue;
+    }
     results.emplace(this->initialConfig.oldAtomIds[i],
                     nrOfActiveSpringsConnected[i]);
   }
@@ -3000,20 +3057,25 @@ MEHPForceBalance2::findClusteredToActive(const ForceBalance2Network* net,
   Eigen::ArrayXb nodeIsActive = Eigen::ArrayXb::Constant(net->nrOfNodes, false);
   while (hadChanged) {
     hadChanged = false;
-    for (size_t i = 0; i < net->nrOfNodes; ++i) {
-      if (nodeIsActive(i)) {
+    size_t crosslinkIdx = 0;
+    for (size_t linkIdx = 0; linkIdx < net->nrOfLinks; ++linkIdx) {
+      if (net->linkIsEntanglement[linkIdx]) {
         continue;
       }
-      for (size_t springIdx : net->strandIndicesOfLink[i]) {
+      if (nodeIsActive(crosslinkIdx)) {
+        continue;
+      }
+      for (size_t springIdx : net->strandIndicesOfLink[crosslinkIdx]) {
         if (springIsActive[springIdx]) {
           hadChanged = true;
-          nodeIsActive(i) = true;
-          for (size_t innerSpringIdx : net->strandIndicesOfLink[i]) {
+          nodeIsActive(crosslinkIdx) = true;
+          for (size_t innerSpringIdx : net->strandIndicesOfLink[crosslinkIdx]) {
             springIsActive[innerSpringIdx] = true;
           }
           break;
         }
       }
+      crosslinkIdx += 1;
     }
   }
 
@@ -3090,7 +3152,6 @@ MEHPForceBalance2::computeSolubleWeightFraction(ForceBalance2Network* net,
 std::vector<long int>
 MEHPForceBalance2::getIndicesOfActiveNodes(const ForceBalance2Network* net,
                                            const Eigen::VectorXd& u,
-
                                            double tolerance) const
 {
   std::vector<long int> results;
@@ -3099,14 +3160,19 @@ MEHPForceBalance2::getIndicesOfActiveNodes(const ForceBalance2Network* net,
   // find all active springs
   Eigen::ArrayXb springIsActive = this->findActiveStrands(net, u, tolerance);
 
-  for (size_t i = 0; i < net->nrOfNodes; i++) {
+  size_t crosslinkIdx = 0;
+  for (size_t i = 0; i < net->nrOfLinks; i++) {
+    if (net->linkIsEntanglement[i]) {
+      continue;
+    }
     std::vector<size_t> springIndices = net->strandIndicesOfLink[i];
     for (const size_t springIndex : springIndices) {
       if (springIsActive[springIndex]) {
-        results.push_back(i);
+        results.push_back(crosslinkIdx);
         break;
       }
     }
+    crosslinkIdx += 1;
   }
 
   return results;
@@ -3184,6 +3250,10 @@ MEHPForceBalance2::getCurrentSpringLengths() const
 Eigen::VectorXi
 MEHPForceBalance2::getNrOfActiveStrandsConnected(const double tolerance) const
 {
+  if (this->initialConfig.nrOfLinks != this->initialConfig.nrOfNodes) {
+    RUNTIME_EXP(
+      "This method, `getNrOfActiveStrandsConnected`, is not yet implemented for entangled systems.");
+  }
   Eigen::VectorXi nrOfActiveSpringsConnected =
     Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
   Eigen::ArrayXb springIsActive = this->findActiveStrands(tolerance);
@@ -3210,6 +3280,10 @@ MEHPForceBalance2::getNrOfActiveStrandsConnected(const double tolerance) const
 Eigen::VectorXi
 MEHPForceBalance2::getNrOfActiveSpringsConnected(const double tolerance) const
 {
+  if (this->initialConfig.nrOfLinks != this->initialConfig.nrOfNodes) {
+    RUNTIME_EXP(
+      "This method, `getNrOfActiveStrandsConnected`, is not yet implemented for entangled systems.");
+  }
   Eigen::VectorXi nrOfActivePartialSpringsConnected =
     Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
   Eigen::ArrayXb partialSpringIsActive = this->findActiveSprings(tolerance);
@@ -3454,13 +3528,12 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
   /**
    * Test the assumptions on slip-links
    */
-  for (size_t linkIdx = 0; linkIdx < net.nrOfLinks;
-       ++linkIdx) {
+  for (size_t linkIdx = 0; linkIdx < net.nrOfLinks; ++linkIdx) {
     if (net.linkIsEntanglement[linkIdx]) {
       RUNTIME_EXP_IFN(
         net.strandIndicesOfLink[linkIdx].size() == 2 ||
         net.strandIndicesOfLink[linkIdx].size() == 1,
-        "Expect each slip-link to be involved in exactly one or two "
+        "Expect each entanglement to be involved in exactly one or two "
         "springs, "
         "got " +
         std::to_string(net.strandIndicesOfLink[linkIdx].size()) + ".");
@@ -3496,14 +3569,14 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
       RUNTIME_EXP_IFN(
         ((net.springIndexA[partialSpringIdx] == partner0 &&
           net.springIndexB[partialSpringIdx] == partner1)),
-        "Expect linkIndicesOfSprings and localToGlobalSpringIndex "
+        "Expect linkIndicesOfStrand and springIndicesOfStrand "
         "ordering to correspond. Got partner0 = " +
-        std::to_string(partner0) + ", partner1 = " +
-        std::to_string(partner1) + " vs. springs part indices " +
-        std::to_string(net.springIndexA[partialSpringIdx]) + " and " +
-        std::to_string(net.springIndexB[partialSpringIdx]) + " in spring " +
-        std::to_string(i) + " (partial: " + std::to_string(partialSpringIdx) +
-        ") with global indices " +
+        std::to_string(partner0) +
+        ", partner1 = " + std::to_string(partner1) +
+        " vs. those of the spring " + std::to_string(partialSpringIdx) +
+        ": " + std::to_string(net.springIndexA[partialSpringIdx]) + " and " +
+        std::to_string(net.springIndexB[partialSpringIdx]) + " in strand " +
+        std::to_string(i) + " with spring indices " +
         pylimer_tools::utils::join(net.springIndicesOfStrand[i].begin(),
           net.springIndicesOfStrand[i].end(),
           std::string(", ")) +
@@ -3526,7 +3599,7 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
       RUNTIME_EXP_IFN(net.linkIsEntanglement[link_idx] ==
                       ((j != 0) && (j != (links.size() - 1))),
                       "Cross-links must be first and last in a spring, "
-                      "slip-links in-between. Found discrepancy at " +
+                      "entanglements in-between. Found discrepancy at " +
                       std::to_string(j) + "/" + std::to_string(links.size()) +
                       " in spring " + std::to_string(i) + ".")
       std::vector<size_t> thisLinksSprings = net.strandIndicesOfLink[link_idx];
@@ -3538,12 +3611,14 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
         std::to_string(i) + " in link " + std::to_string(link_idx) + ".");
     }
   }
-  for (size_t i = net.nrOfNodes; i < net.nrOfLinks; ++i) {
-    RUNTIME_EXP_IFN(nrOfMentions[i] == 2,
-                    "Expect each slip-link to be mentioned twice in the "
-                    "links-of-springs mapping, but " +
-                    std::to_string(i) + " was mentioned " +
-                    std::to_string(nrOfMentions[i]) + " times.");
+  for (size_t i = 0; i < net.nrOfLinks; ++i) {
+    if (net.linkIsEntanglement[i]) {
+      RUNTIME_EXP_IFN(nrOfMentions[i] == 2,
+                      "Expect each entanglement to be mentioned twice in the "
+                      "links-of-springs mapping, but " +
+                      std::to_string(i) + " was mentioned " +
+                      std::to_string(nrOfMentions[i]) + " times.");
+    }
   }
 
   /**
@@ -3582,6 +3657,11 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
         " but expected " + std::to_string(3 * partialEndB + dir) +
         " with dir = " + std::to_string(dir) + ".");
     }
+    RUNTIME_EXP_IFN(net.strandIdxOfSpring[i] >= 0 ||
+                    net.springIsEntanglement[i],
+                    "A spring must either be entangled or linked to a strand. "
+                    "This seems not to be the case for spring " +
+                    std::to_string(i) + ".");
   }
 
   /**
