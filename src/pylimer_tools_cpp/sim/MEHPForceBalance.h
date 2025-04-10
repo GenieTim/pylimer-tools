@@ -1827,30 +1827,23 @@ namespace sim {
        *
        * @param net
        * @param linkIdx
-       * @return std::unordered_set<size_t>
+       * @return std::vector<size_t>
        */
-      std::unordered_set<size_t> getPartialSpringIndicesOfLink(
+      std::vector<size_t> getPartialSpringIndicesOfLink(
         const ForceBalanceNetwork& net,
         const size_t linkIdx) const
       {
         INVALIDARG_EXP_IFN(linkIdx < net.nrOfLinks,
                            "The requested link does not exist");
-        std::unordered_set<size_t> partialSpringIndices;
+        std::vector<size_t> partialSpringIndices;
 
         std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
 
-        for (size_t spring_index = 0; spring_index < springIndices.size();
-             ++spring_index) {
-          std::vector<size_t> springsPartners =
-            net.linkIndicesOfSprings[springIndices[spring_index]];
-          for (size_t partner_idx = 0; partner_idx < springsPartners.size() - 1;
-               ++partner_idx) {
-            if (springsPartners[partner_idx] == linkIdx ||
-                springsPartners[partner_idx + 1] == linkIdx) {
-              size_t globalSpringIndex =
-                net.localToGlobalSpringIndex[(springIndices[spring_index])]
-                                            [partner_idx];
-              partialSpringIndices.insert(globalSpringIndex);
+        for (size_t springIdx : springIndices) {
+          for (size_t partialSpringIdx :
+               net.localToGlobalSpringIndex[springIdx]) {
+            if (this->isPartOfSpring(net, linkIdx, partialSpringIdx)) {
+              partialSpringIndices.push_back(partialSpringIdx);
             }
           }
         }

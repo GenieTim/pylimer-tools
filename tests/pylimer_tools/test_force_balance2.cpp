@@ -303,16 +303,15 @@ TEST_CASE(
     Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
     CHECK(net.nrOfSprings > 0);
     size_t numRemoved =
-      forceBalancer.removeBifunctionalCrosslinks(net, displacements);
+      forceBalancer.unlinkBifunctionalLinks(net, displacements);
     CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
     CHECK(numRemoved > 0);
-    // numRemoved = forceBalancer.removeInactiveCrosslinks(net, displacements,
+    // numRemoved = forceBalancer.removeInactiveLinks(net, displacements,
     // partitions, 1e-20); CHECK(numRemoved == 204); // TODO: analyze these
     size_t nrOfSpringsBefore = net.nrOfSprings;
     CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
     // remove all springs...
-    numRemoved =
-      forceBalancer.removeInactiveCrosslinks(net, displacements, 1e5);
+    numRemoved = forceBalancer.removeInactiveLinks(net, displacements, 1e5);
     CHECK(net.nrOfSprings == 0);
     CHECK(numRemoved > 0);
   }
@@ -395,8 +394,7 @@ TEST_CASE(
 
   pcm::ForceBalance2Network net = forceBalancer.getNetwork();
   Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
-  size_t numRemoved =
-    forceBalancer.removeBifunctionalCrosslinks(net, displacements);
+  size_t numRemoved = forceBalancer.unlinkBifunctionalLinks(net, displacements);
   CHECK_NOTHROW(forceBalancer.validateNetwork());
   CHECK(numRemoved > 0);
 
@@ -407,7 +405,7 @@ TEST_CASE(
   // due to the randomness, it _could_ be one day that actually all strands
   // are active. unlikely, but I can imagine it to be possible.
   size_t numInactiveRemoved =
-    forceBalancer.removeInactiveCrosslinks(net, displacements, 0.1);
+    forceBalancer.removeInactiveLinks(net, displacements, 0.1);
   CHECK_NOTHROW(forceBalancer.validateNetwork());
   CHECK(numInactiveRemoved > 0);
   CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
@@ -430,10 +428,10 @@ TEST_CASE(
   // due to the randomness, it _could_ be one day that actually all strands
   // are active. unlikely, but I can imagine it to be possible.
   numInactiveRemoved =
-    forceBalancer.removeInactiveCrosslinks(net, displacements, 0.1);
+    forceBalancer.removeInactiveLinks(net, displacements, 0.1);
   CHECK(numInactiveRemoved > 0);
   numInactiveRemoved =
-    forceBalancer.removeBifunctionalCrosslinks(net, displacements);
+    forceBalancer.unlinkBifunctionalLinks(net, displacements);
   CHECK(numInactiveRemoved > 0);
   CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
 }
@@ -467,8 +465,7 @@ TEST_CASE(
 
   pcm::ForceBalance2Network net = forceBalancer.getNetwork();
   Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
-  size_t numRemoved =
-    forceBalancer.removeBifunctionalCrosslinks(net, displacements);
+  size_t numRemoved = forceBalancer.unlinkBifunctionalLinks(net, displacements);
   CHECK_NOTHROW(forceBalancer.validateNetwork());
   CHECK(numRemoved > 0);
 
@@ -479,7 +476,7 @@ TEST_CASE(
   // due to the randomness, it _could_ be one day that actually all strands
   // are active. unlikely, but I can imagine it to be possible.
   size_t numInactiveRemoved =
-    forceBalancer.removeInactiveCrosslinks(net, displacements, 0.1);
+    forceBalancer.removeInactiveLinks(net, displacements, 0.1);
   CHECK_NOTHROW(forceBalancer.validateNetwork());
   CHECK(numInactiveRemoved > 0);
   CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
@@ -502,10 +499,10 @@ TEST_CASE(
   // due to the randomness, it _could_ be one day that actually all strands
   // are active. unlikely, but I can imagine it to be possible.
   numInactiveRemoved =
-    forceBalancer.removeInactiveCrosslinks(net, displacements, 0.1);
+    forceBalancer.removeInactiveLinks(net, displacements, 0.1);
   CHECK(numInactiveRemoved > 0);
   numInactiveRemoved =
-    forceBalancer.removeBifunctionalCrosslinks(net, displacements);
+    forceBalancer.unlinkBifunctionalLinks(net, displacements);
   CHECK(numInactiveRemoved > 0);
   CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
 }
