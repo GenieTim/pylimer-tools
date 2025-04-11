@@ -21,7 +21,8 @@ namespace pu = pylimer_tools::utils;
 TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
 {
   std::cout << "Running test \"Eigen behaves as required\"" << std::endl;
-  SECTION("Summation works with repeated indices") {
+  SECTION("Summation works with repeated indices")
+  {
     Eigen::VectorXd testVec = Eigen::VectorXd::Zero(10);
     Eigen::ArrayXi testIdx = Eigen::ArrayXi::Zero(5);
     testIdx << 0, 0, 5, 5, 1;
@@ -32,7 +33,8 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
     REQUIRE(testVec[2] == 0.0);
   }
 
-  SECTION("Summation works with different repeated indices") {
+  SECTION("Summation works with different repeated indices")
+  {
     Eigen::VectorXd testVec = Eigen::VectorXd::Zero(10);
     Eigen::ArrayXi testIdx = Eigen::ArrayXi::Zero(5);
     testIdx << 0, 0, 5, 5, 1;
@@ -49,7 +51,8 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
     REQUIRE(resultsVec[4] == Catch::Approx(6.));
   }
 
-  SECTION("Casting bool to double results in 1.0/0.0") {
+  SECTION("Casting bool to double results in 1.0/0.0")
+  {
     auto gen = std::bind(std::uniform_int_distribution<>(0, 1),
                          std::default_random_engine());
     Eigen::Array<bool, 1, 100> boolArray;
@@ -67,7 +70,8 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
     }
   }
 
-  SECTION("Empty vectors are empty") {
+  SECTION("Empty vectors are empty")
+  {
     Eigen::VectorXd v = Eigen::VectorXd::Zero(0);
     CHECK(v.size() == 0);
     Eigen::ArrayXi a = Eigen::ArrayXi::Zero(0);
@@ -90,7 +94,8 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
   //   CHECK(diff[2] == Catch::Approx(4.37942));
   // }
 
-  SECTION("Entries can be swapped") {
+  SECTION("Entries can be swapped")
+  {
     Eigen::VectorXi testVec(11);
     testVec = Eigen::VectorXi::LinSpaced(11, 0, 10);
     CHECK(testVec[4] == 4);
@@ -102,7 +107,8 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
 TEST_CASE("Vector Rows can be removed", "[Eigen]")
 {
   std::cout << "Running test \"Vector Rows can be removed\"" << std::endl;
-  SECTION("VectorXi") {
+  SECTION("VectorXi")
+  {
     Eigen::VectorXi testVec(11);
     testVec = Eigen::VectorXi::LinSpaced(11, 0, 10);
     CHECK(testVec[4] == 4);
@@ -120,7 +126,8 @@ TEST_CASE("Vector Rows can be removed", "[Eigen]")
   }
 
   // same for VectorXd
-  SECTION("VectorXd") {
+  SECTION("VectorXd")
+  {
     Eigen::VectorXd testVec(11);
     testVec = Eigen::VectorXd::LinSpaced(11, 0, 10);
     CHECK(testVec[4] == 4.);
@@ -138,7 +145,8 @@ TEST_CASE("Vector Rows can be removed", "[Eigen]")
   }
 
   // and for array xi
-  SECTION("ArrayXi") {
+  SECTION("ArrayXi")
+  {
     Eigen::ArrayXi testVec(11);
     testVec = Eigen::VectorXi::LinSpaced(11, 0, 10);
     CHECK(testVec[4] == 4);
@@ -155,7 +163,8 @@ TEST_CASE("Vector Rows can be removed", "[Eigen]")
     CHECK(testVec[4] == 7);
   }
 
-  SECTION("std::vector") {
+  SECTION("std::vector")
+  {
     std::vector<int> testVec = { 1, 124, 12, 42, 41, 132, 12, 123, 5, 12, 412 };
 
     CHECK(testVec.size() == 11);
@@ -187,7 +196,7 @@ TEST_CASE("First occurence is found", "[VectorUtils]")
 TEST_CASE("Elements can be found and conditionally added", "[VectorUtils]")
 {
   std::cout << "Running test \"Elements can be found and conditionally added\""
-    << std::endl;
+            << std::endl;
   std::vector<int> testVec;
   testVec.push_back(1);
   testVec.push_back(10000);
@@ -225,16 +234,13 @@ TEST_CASE("Elements are inserted to a sorted vector")
 
 TEST_CASE("Row removal works")
 {
-  std::vector<size_t> vec = { 1, 7, 23, 4, 1, 4, 2, 5, 1, 2, 3, 4, 5, 6, 7, 8,
-                              9, 10 };
+  std::cout << "Running test \"Row removal works\"" << std::endl;
+  std::vector<size_t> vec = { 1, 7, 23, 4, 1, 4, 2, 5, 1,
+                              2, 3, 4,  5, 6, 7, 8, 9, 10 };
   size_t sizeBefore = vec.size();
 
-  std::vector<size_t> toRemove = std::vector<size_t>({ {
-    1, 2, 3, 2
-  } });
-  pylimer_tools::utils::removeRows(vec,
-                                   toRemove
-    );
+  std::vector<size_t> toRemove = std::vector<size_t>({ { 1, 2, 3, 2 } });
+  pylimer_tools::utils::removeRows(vec, toRemove);
   CHECK(vec.size() == sizeBefore - 3);
   CHECK(vec[0] == 1);
   CHECK(vec[1] == 1);
@@ -243,9 +249,16 @@ TEST_CASE("Row removal works")
 
 TEST_CASE("Index renumbering works")
 {
-  std::vector<size_t> testVecWithIndices = { 15, 1, 2, 3, 4, 5, 7, 9, 10, 13,
-                                             14 };
-  const std::vector<size_t> removedIndices = { 0, 6, 8, 11, 12 };
+  std::cout << "Running test \"Index renumbering works\"" << std::endl;
+  std::vector<size_t> testVecWithIndices = {
+    15, 1, 2, 3, 4, 5, 7, 9, 10, 13, 14
+  };
+  std::vector<size_t> removedIndices = { 0, 6, 8, 11, 12 };
+
+  CHECK_THROWS(
+    pylimer_tools::utils::getMappingForRenumbering(removedIndices, 16));
+
+  std::ranges::sort(removedIndices, std::greater<size_t>());
 
   const std::vector<long int> mapping =
     pylimer_tools::utils::getMappingForRenumbering(removedIndices, 16);
@@ -264,8 +277,12 @@ TEST_CASE("Index renumbering works")
 
 TEST_CASE("Append and Prepend works")
 {
+  std::cout << "Running test \"Append and Prepend works\"" << std::endl;
   std::vector<size_t> vec = { 1, 2, 3, 4, 5 };
-  SECTION("Basic, single value") {
+  size_t sizeBefore = vec.size();
+
+  SECTION("Basic, single value")
+  {
     pylimer_tools::utils::prepend(vec, { 0 });
     CHECK(vec[0] == 0);
     CHECK(vec[1] == 1);
@@ -274,7 +291,8 @@ TEST_CASE("Append and Prepend works")
     CHECK(vec.size() == 7);
   }
 
-  SECTION("Prepend, multiple values") {
+  SECTION("Prepend, multiple values")
+  {
     pylimer_tools::utils::prepend(vec, { 0, 1, 2 });
     CHECK(vec[0] == 0);
     CHECK(vec[1] == 1);
@@ -283,29 +301,64 @@ TEST_CASE("Append and Prepend works")
     CHECK(vec.size() == 8);
   }
 
-  SECTION("Append, multiple values") {
+  SECTION("Append, multiple values")
+  {
     pylimer_tools::utils::append(vec, { 3, 4, 5 });
-    CHECK(vec[0] == 0);
+    CHECK(vec[0] == 1);
     CHECK(vec[5] == 3);
     CHECK(vec[6] == 4);
     CHECK(vec[7] == 5);
     CHECK(vec.size() == 8);
   }
 
-  SECTION("Inverse append") {
+  SECTION("Inverse append")
+  {
     pylimer_tools::utils::append_inverse(vec, { 10, 11, 12 });
-    CHECK(vec[0] == 0);
+    CHECK(vec[0] == 1);
     CHECK(vec[5] == 12);
     CHECK(vec[6] == 11);
     CHECK(vec.size() == 8);
   }
 
-  SECTION("Inverse prepend") {
+  SECTION("Inverse prepend")
+  {
     pylimer_tools::utils::prepend_inverse(vec, { 7, 8, 9 });
     CHECK(vec[0] == 9);
     CHECK(vec[1] == 8);
     CHECK(vec[2] == 7);
-    CHECK(vec[3] == 0);
+    CHECK(vec[3] == 1);
     CHECK(vec.size() == 8);
+  }
+
+  SECTION("Append, with offset")
+  {
+    pylimer_tools::utils::append(vec, { 3, 4, 5 }, 1, 1);
+    CHECK(vec[0] == 1);
+    CHECK(vec.size() == sizeBefore + 1);
+    CHECK(vec.back() == 4);
+    pylimer_tools::utils::append_inverse(vec, { 6, 7, 8, 9, 10 }, 2, 3);
+    CHECK(vec.size() == sizeBefore + 1);
+    pylimer_tools::utils::append_inverse(vec, { 6, 7, 8, 9, 10 }, 2, 1);
+    CHECK(vec.size() == sizeBefore + 3);
+    CHECK(vec.back() == 7);
+    CHECK(vec[vec.size() - 2] == 8);
+  }
+
+  SECTION("Prepend, with offset")
+  {
+    pylimer_tools::utils::prepend(vec, { 3, 4, 5 }, 1, 1);
+    CHECK(vec[0] == 4);
+    CHECK(vec[1] == 1);
+    CHECK(vec.back() == 5);
+    CHECK(vec.size() == sizeBefore + 1);
+    pylimer_tools::utils::prepend_inverse(vec, { 6, 7, 8, 9, 10 }, 2, 3);
+    CHECK(vec.size() == sizeBefore + 1);
+    pylimer_tools::utils::prepend_inverse(vec, { 6, 7, 8, 9, 10 }, 2, 1);
+    CHECK(vec.size() == sizeBefore + 3);
+    CHECK(vec.back() == 5);
+    CHECK(vec[0] == 8);
+    CHECK(vec[1] == 7);
+    CHECK(vec[2] == 4);
+    CHECK(vec[3] == 1);
   }
 }
