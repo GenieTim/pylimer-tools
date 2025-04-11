@@ -263,18 +263,6 @@ public:
                                    Eigen::VectorXd& displacements) const;
 
   /**
-   * @brief Remove duplicate springs from a given link
-   *
-   * @param net the network to be modified
-   * @param linkIdx the index of the link to adjust
-   * @param allowOnEntanglement whether
-   */
-  void removeDuplicateListedStrandsFromLink(
-    ForceBalance2Network& net,
-    size_t linkIdx,
-    bool allowOnEntanglement = false) const;
-
-  /**
    * @brief Deform the system to match the specified box
    *
    * @param newBox the box to deform to
@@ -286,7 +274,7 @@ public:
    *
    * @return pylimer_tools::entities::Universe
    */
-  pylimer_tools::entities::Universe getCrosslinkerVerse() const;
+  [[nodiscard]] pylimer_tools::entities::Universe getCrosslinkerVerse() const;
 
   double getDefaultMeanBondLength() const { return this->defaultBondLength; }
 
@@ -1161,10 +1149,10 @@ protected:
    * @param linkToReduce the index of the link to combine the springs around
    */
   void mergeSpringsWithoutRemoval(ForceBalance2Network& net,
-    const Eigen::VectorXd& u,
-                    const size_t removedSpringIdx,
-                    const size_t keptSpringIdx,
-                    const size_t linkToReduce) const;
+                                  const Eigen::VectorXd& u,
+                                  const size_t removedSpringIdx,
+                                  const size_t keptSpringIdx,
+                                  const size_t linkToReduce) const;
 
   /**
    * @brief Evaluate the pressure of the network at specific displacements
