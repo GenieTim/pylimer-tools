@@ -20,13 +20,15 @@ extern "C"
 namespace pylimer_tools {
 namespace utils {
   template<typename T>
-  static inline void removeIfContained(std::vector<T>& vec, const T& value)
+  static inline void
+  removeIfContained(std::vector<T>& vec, const T& value)
   {
     vec.erase(std::remove(vec.begin(), vec.end(), value), vec.end());
   }
 
   template<typename T>
-  static inline bool contains(std::vector<T>& vec, const T value)
+  static inline bool
+  contains(std::vector<T>& vec, const T value)
   {
     if (std::find(vec.begin(), vec.end(), value) == vec.end()) {
       return false;
@@ -35,7 +37,8 @@ namespace utils {
   }
 
   template<typename T>
-  static inline bool addIfNotContained(std::vector<T>& vec, const T value)
+  static inline bool
+  addIfNotContained(std::vector<T>& vec, const T value)
   {
     if (std::find(vec.begin(), vec.end(), value) == vec.end()) {
       vec.push_back(value);
@@ -45,7 +48,8 @@ namespace utils {
   }
 
   template<typename T>
-  static inline T max_element(std::vector<T>& vec, const T defaultMax)
+  static inline T
+  max_element(std::vector<T>& vec, const T defaultMax)
   {
     if (vec.size() == 0) {
       return defaultMax;
@@ -58,7 +62,8 @@ namespace utils {
   }
 
   template<typename T>
-  static inline size_t index_of(std::vector<T>& vec, const T val)
+  static inline size_t
+  index_of(std::vector<T>& vec, const T val)
   {
     auto it = std::find(vec.begin(), vec.end(), val);
     if (it == vec.end()) {
@@ -68,8 +73,9 @@ namespace utils {
   }
 
   template<typename T>
-  static inline bool equal(const std::vector<T>& vec1,
-                           const std::vector<T>& vec2)
+  static inline bool
+  equal(const std::vector<T>& vec1,
+        const std::vector<T>& vec2)
   {
     if (vec1.size() != vec2.size()) {
       return false;
@@ -82,16 +88,17 @@ namespace utils {
     return true;
   }
 
-  static inline std::vector<double> segmentwise_norm(
+  static inline std::vector<double>
+  segmentwise_norm(
     const Eigen::VectorXd& vecs,
     const size_t segmentSize = 3)
   {
     INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
     INVALIDARG_EXP_IFN(vecs.size() % segmentSize == 0,
                        "The size of the supplied vector, " +
-                         std::to_string(vecs.size()) +
-                         " is not a multiple of the segment size, " +
-                         std::to_string(segmentSize) + ".");
+                       std::to_string(vecs.size()) +
+                       " is not a multiple of the segment size, " +
+                       std::to_string(segmentSize) + ".");
     std::vector<double> results;
     results.reserve(vecs.size() / segmentSize);
     for (size_t i = 0; i < vecs.size() / segmentSize; i++) {
@@ -100,15 +107,16 @@ namespace utils {
     return results;
   }
 
-  static inline double segmentwise_norm_max(const Eigen::VectorXd& vecs,
-                                            const size_t segmentSize = 3)
+  static inline double
+  segmentwise_norm_max(const Eigen::VectorXd& vecs,
+                       const size_t segmentSize = 3)
   {
     INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
     INVALIDARG_EXP_IFN(vecs.size() % segmentSize == 0,
                        "The size of the supplied vector, " +
-                         std::to_string(vecs.size()) +
-                         " is not a multiple of the segment size, " +
-                         std::to_string(segmentSize) + ".");
+                       std::to_string(vecs.size()) +
+                       " is not a multiple of the segment size, " +
+                       std::to_string(segmentSize) + ".");
     double result = 0.; //-DBL_MAX;
 
     for (size_t i = 0; i < vecs.size() / segmentSize; i++) {
@@ -118,15 +126,16 @@ namespace utils {
     return result;
   }
 
-  static inline double segmentwise_norm_mean(const Eigen::VectorXd& vecs,
-                                             const size_t segmentSize = 3)
+  static inline double
+  segmentwise_norm_mean(const Eigen::VectorXd& vecs,
+                        const size_t segmentSize = 3)
   {
     INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
     INVALIDARG_EXP_IFN(vecs.size() % segmentSize == 0,
                        "The size of the supplied vector, " +
-                         std::to_string(vecs.size()) +
-                         " is not a multiple of the segment size, " +
-                         std::to_string(segmentSize) + ".");
+                       std::to_string(vecs.size()) +
+                       " is not a multiple of the segment size, " +
+                       std::to_string(segmentSize) + ".");
     double result = 0.; //-DBL_MAX;
     double denominator = 1. / static_cast<double>(vecs.size() / segmentSize);
 
@@ -138,7 +147,8 @@ namespace utils {
   }
 
   template<typename IN>
-  static inline bool all_components_finite(const IN& vec)
+  static inline bool
+  all_components_finite(const IN& vec)
   {
     for (size_t i = 0; i < vec.size(); ++i) {
       if (!std::isfinite(vec[i])) {
@@ -273,10 +283,11 @@ namespace utils {
    * @param isUnique whether the indices are unique or not
    */
   template<typename T>
-  static inline void removeRows(std::vector<T>& vec,
-                                std::vector<size_t>& indicesToRemove,
-                                bool isSorted = false,
-                                bool isUnique = false)
+  static inline void
+  removeRows(std::vector<T>& vec,
+             std::vector<size_t>& indicesToRemove,
+             bool isSorted = false,
+             bool isUnique = false)
   {
     if (indicesToRemove.empty())
       return;
@@ -308,7 +319,8 @@ namespace utils {
     vec.resize(vec.size() - indicesToRemove.size());
   }
 
-  static inline std::vector<long int> getMappingForRenumbering(
+  static inline std::vector<long int>
+  getMappingForRenumbering(
     const std::vector<size_t>& removedValues,
     const size_t nRemovableValues)
   {
@@ -317,9 +329,9 @@ namespace utils {
       INVALIDARG_EXP_IFN(
         removedValues[i - 1] < removedValues[i],
         "Values to remove must be sorted descending and unique, got values " +
-          std::to_string(removedValues[i]) + "@" + std::to_string(i) + " and " +
-          std::to_string(removedValues[i - 1]) + "@" + std::to_string(i - 1) +
-          ".");
+        std::to_string(removedValues[i]) + "@" + std::to_string(i) + " and " +
+        std::to_string(removedValues[i - 1]) + "@" + std::to_string(i - 1) +
+        ".");
     }
 
     // for performance reasons, first assemble a new mapping
@@ -347,21 +359,23 @@ namespace utils {
    * @param removedValues the numbers that have been removed
    * @param nRemovableValues the maximum of the numbers
    */
-  static inline void renumberWithMapping(
-    std::vector<std::vector<size_t>>& v,
+  static inline void
+  renumberWithMapping(
+    std::vector<std::vector<size_t> >& v,
     const std::vector<long int>& newMapping)
   {
     // then, apply this mapping to all strands
     for (size_t linkI = 0; linkI < v.size(); ++linkI) {
       for (size_t& strandIdx : v[linkI]) {
-        assert(newMapping[strandIdx] > 0);
+        assert(newMapping[strandIdx] >= 0);
         strandIdx = newMapping[strandIdx];
       }
     }
   }
 
   template<typename VecType>
-  static inline void renumberWithMapping(
+  static inline void
+  renumberWithMapping(
     VecType& v,
     const std::vector<long int>& newMapping)
   {
@@ -370,10 +384,79 @@ namespace utils {
     }
   }
 
+  /**
+   * @brief Gets the last element of a vector. Throws an exception if the vector is empty.
+   *
+   * @tparam T the vector's type
+   * @param v the vector to get the last element from
+   * @return the last element of the vector
+   */
   template<typename T>
-  static inline T last(const std::vector<T>& v)
+  static inline T
+  last(const std::vector<T>& v)
   {
+    if (v.empty()) {
+      throw std::runtime_error("Cannot get last element from an empty vector.");
+    }
     return v[v.size() - 1];
+  }
+
+  /**
+   * @brief Appends elements from another vector to the end of the current vector.
+   *
+   * @tparam T The type of elements in the vectors.
+   * @param v The vector to which to append elements.
+   * @param other The vector from which to append elements.
+   * @note The order of elements in the current vector remains unchanged.
+   */
+  template<typename T>
+  static inline void
+  append(std::vector<T>& v, const std::vector<T>& other)
+  {
+    v.insert(v.end(), other.begin(), other.end());
+  }
+
+  /**
+   * @brief Appends elements from the end another vector to the end of the current vector.
+   *
+   * @tparam T The type of elements in the vectors.
+   * @param v The vector to which to append elements.
+   * @param other The vector from which to append elements.
+   * @note The order of elements in the current vector remains unchanged.
+   */
+  template<typename T>
+  static inline void
+  append_inverse(std::vector<T>& v, const std::vector<T>& other)
+  {
+    v.insert(v.end(), other.rbegin(), other.rend());
+  }
+
+  /**
+   * @brief Prepends elements from another vector to the beginning of the current vector.
+   *
+   * @tparam T The type of elements in the vectors.
+   * @param v The vector to which to prepend elements.
+   * @param other The vector from which to prepend elements.
+   */
+  template<typename T>
+  static inline void
+  prepend(std::vector<T>& v, const std::vector<T>& other)
+  {
+    v.insert(v.begin(), other.begin(), other.end());
+  }
+
+  /**
+   * @brief Prepends elements from the end of another vector to the beginning of the current vector.
+   *
+   * @tparam T The type of elements in the vectors.
+   * @param v The vector to which to prepend elements.
+   * @param other The vector from which to prepend elements.
+   */
+  template<typename T>
+  static inline void
+  prepend_inverse(std::vector<T>& v, const std::vector<T>& other)
+  {
+    v.insert(v.begin(), other.rbegin(), other.rend());
   }
 
   /**
@@ -392,9 +475,10 @@ namespace utils {
    * of the vector if not found.
    */
   template<typename T>
-  static inline size_t first_occuring_index(const std::vector<T>& v,
-                                            const T value,
-                                            size_t start = 0)
+  static inline size_t
+  first_occuring_index(const std::vector<T>& v,
+                       const T value,
+                       size_t start = 0)
   {
     if (v[start] == value) {
       for (long int i = start; i >= 0; i--) {
@@ -421,7 +505,8 @@ namespace utils {
    * @return true|false
    */
   template<typename T0, typename T1>
-  static inline bool set_has_key(const T0 map, const T1 key)
+  static inline bool
+  set_has_key(const T0 map, const T1 key)
   {
 #if __cplusplus >= 202002L
     // C++20 (and later) code
@@ -439,7 +524,8 @@ namespace utils {
    * @return true|false
    */
   template<typename T0, typename T1>
-  static inline bool map_has_key(const T0 map, const T1 key)
+  static inline bool
+  map_has_key(const T0 map, const T1 key)
   {
 #if __cplusplus >= 202002L
     // C++20 (and later) code
@@ -450,8 +536,9 @@ namespace utils {
   }
 
   template<typename IN>
-  static inline std::vector<IN> interleave(const std::vector<IN>& in1,
-                                           const std::vector<IN>& in2)
+  static inline std::vector<IN>
+  interleave(const std::vector<IN>& in1,
+             const std::vector<IN>& in2)
   {
     size_t size = in1.size();
     assert(size == in2.size());
@@ -467,7 +554,8 @@ namespace utils {
   }
 
   template<typename IN>
-  static inline bool vector_has_duplicates(const std::vector<IN>& vec)
+  static inline bool
+  vector_has_duplicates(const std::vector<IN>& vec)
   {
     std::vector<IN> vecSorted;
     vecSorted.reserve(vec.size());
@@ -478,17 +566,18 @@ namespace utils {
   }
 
   template<typename IN>
-  static inline bool vector_approx_equal(const IN& v1,
-                                         const IN& v2,
-                                         const double absEps = 1e-12,
-                                         bool echo = false)
+  static inline bool
+  vector_approx_equal(const IN& v1,
+                      const IN& v2,
+                      const double absEps = 1e-12,
+                      bool echo = false)
   {
     assert(v1.size() == v2.size());
     for (size_t i = 0; i < v1.size(); ++i) {
       if (!APPROX_EQUAL(v1[i], v2[i], absEps)) {
         if (echo) {
           std::cout << "Detected unequality: v1[" << i << "] = " << v1[i]
-                    << ", v2[" << i << "] = " << v2[i] << std::endl;
+            << ", v2[" << i << "] = " << v2[i] << std::endl;
         }
         return false;
       }
@@ -497,17 +586,18 @@ namespace utils {
   }
 
   template<typename IN>
-  static inline bool vector_approx_rel_equal(const IN& v1,
-                                             const IN& v2,
-                                             const double eps = 1e-12,
-                                             bool echo = false)
+  static inline bool
+  vector_approx_rel_equal(const IN& v1,
+                          const IN& v2,
+                          const double eps = 1e-12,
+                          bool echo = false)
   {
     assert(v1.size() == v2.size());
     for (size_t i = 0; i < v1.size(); ++i) {
       if (!APPROX_REL_EQUAL(v1[i], v2[i], eps)) {
         if (echo) {
           std::cout << "Detected unequality: v1[" << i << "] = " << v1[i]
-                    << ", v2[" << i << "] = " << v2[i] << std::endl;
+            << ", v2[" << i << "] = " << v2[i] << std::endl;
         }
         return false;
       }
@@ -516,8 +606,9 @@ namespace utils {
   }
 
   template<typename IN>
-  static inline void eraseIndices(std::vector<IN> from,
-                                  std::vector<long int>& indices)
+  static inline void
+  eraseIndices(std::vector<IN> from,
+               std::vector<long int>& indices)
   {
     for (auto index : indices) {
       from.erase(index);
@@ -542,8 +633,9 @@ namespace utils {
   MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(igraph_vector);
   MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(igraph_vector_int);
 
-  static inline void StdVectorToIgraphVectorT(std::vector<std::string>& vectR,
-                                              igraph_strvector_t* v)
+  static inline void
+  StdVectorToIgraphVectorT(std::vector<std::string>& vectR,
+                           igraph_strvector_t* v)
   {
     size_t n = vectR.size();
     igraph_strvector_resize(v, n);
@@ -576,7 +668,8 @@ namespace utils {
   MAKE_CONVERSION_FROM_IGRAPH_VEC_TO_STD(igraph_strvector);
 
   template<typename IN>
-  static inline std::vector<IN> initializeWithValue(size_t n, IN value)
+  static inline std::vector<IN>
+  initializeWithValue(size_t n, IN value)
   {
     std::vector<IN> result = std::vector<IN>(n, value);
     // for (size_t i = 0; i < n; ++i) {
@@ -593,7 +686,8 @@ namespace utils {
    * @param value the element to add
    */
   template<typename IN>
-  static inline void addToSorted(std::vector<IN>& vec, IN value)
+  static inline void
+  addToSorted(std::vector<IN>& vec, IN value)
   {
     auto it = std::upper_bound(vec.begin(), vec.end(), value);
     vec.insert(it, value);
