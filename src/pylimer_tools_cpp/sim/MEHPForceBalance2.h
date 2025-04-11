@@ -275,41 +275,6 @@ public:
     bool allowOnEntanglement = false) const;
 
   /**
-   * @brief Merge two springs around a given cross-link
-   *
-   * @param net
-   * @param displacements
-   * @param removedStrandIdx
-   * @param keptStrandIdx
-   * @param linkToReduce the index of the link to remove (combine the springs
-   * around)
-   */
-  void mergeStrands(ForceBalance2Network& net,
-                    const Eigen::VectorXd& displacements,
-                    const size_t removedStrandIdx,
-                    const size_t keptStrandIdx,
-                    const size_t linkToReduce) const;
-
-  /**
-   * @brief Merge two springs around a given cross-link
-   *
-   * This does not require the resulting network to be valid.
-   *
-   * @param net
-   * @param displacements
-   * @param removedSpringIdx
-   * @param keptSpringIdx
-   * @param linkToReduce
-   * @param skipEigenResize
-   */
-  void mergeSprings(ForceBalance2Network& net,
-                    const Eigen::VectorXd& displacements,
-                    const size_t removedSpringIdx,
-                    const size_t keptSpringIdx,
-                    const size_t linkToReduce,
-                    bool skipEigenResize = false) const;
-
-  /**
    * @brief Deform the system to match the specified box
    *
    * @param newBox the box to deform to
@@ -1186,6 +1151,20 @@ protected:
    *
    */
   void completeInitialization();
+
+  /**
+   * @brief Merge two springs around a given link
+   *
+   * @param net
+   * @param removedSpringIdx
+   * @param keptSpringIdx
+   * @param linkToReduce the index of the link to combine the springs around
+   */
+  void mergeSpringsWithoutRemoval(ForceBalance2Network& net,
+    const Eigen::VectorXd& u,
+                    const size_t removedSpringIdx,
+                    const size_t keptSpringIdx,
+                    const size_t linkToReduce) const;
 
   /**
    * @brief Evaluate the pressure of the network at specific displacements
