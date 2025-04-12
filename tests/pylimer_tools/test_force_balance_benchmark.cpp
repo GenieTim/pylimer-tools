@@ -81,7 +81,6 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
            pcm::BICGSTAB }) {
       pcm::MEHPForceBalance2 forceBalancer =
         pcm::MEHPForceBalance2(universe, 2);
-      forceBalancer.configAssumeBoxLargeEnough(false);
 
       auto start = std::chrono::high_resolution_clock::now();
 
@@ -177,7 +176,6 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
          pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
          pcm::BICGSTAB }) {
     pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(universe, 2);
-    forceBalancer.configAssumeBoxLargeEnough(false);
 
     auto start = std::chrono::high_resolution_clock::now();
 
