@@ -239,6 +239,7 @@ public:
    * @param springsToDeleteIndices a vector of indices of springs to be removed
    */
   void removeSprings(ForceBalance2Network& net,
+                                 Eigen::VectorXd& displacements,
                      std::vector<size_t>& springsToDeleteIndices) const;
 
   /**
@@ -1442,6 +1443,16 @@ protected:
   bool isLoopingSpring(const ForceBalance2Network& net, size_t springIdx) const
   {
     return (net.springIndexA[springIdx] == net.springIndexB[springIdx]);
+  }
+
+  bool isLoopingStrand(const ForceBalance2Network& net, size_t strandIdx) const
+  {
+    if (net.linkIndicesOfStrand[strandIdx].size() == 0) {
+      return false;
+    }
+    assert(net.linkIndicesOfStrand[strandIdx].size() >= 2);
+    return (net.linkIndicesOfStrand[strandIdx][0] ==
+            net.linkIndicesOfStrand[strandIdx].back());
   }
 
   double getDenominatorOfPartialSpring(const ForceBalance2Network& net,

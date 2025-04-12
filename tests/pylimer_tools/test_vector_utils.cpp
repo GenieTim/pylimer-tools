@@ -235,16 +235,54 @@ TEST_CASE("Elements are inserted to a sorted vector")
 TEST_CASE("Row removal works")
 {
   std::cout << "Running test \"Row removal works\"" << std::endl;
-  std::vector<size_t> vec = { 1, 7, 23, 4, 1, 4, 2, 5, 1,
-                              2, 3, 4,  5, 6, 7, 8, 9, 10 };
-  size_t sizeBefore = vec.size();
 
-  std::vector<size_t> toRemove = std::vector<size_t>({ { 1, 2, 3, 2 } });
-  pylimer_tools::utils::removeRows(vec, toRemove);
-  CHECK(vec.size() == sizeBefore - 3);
-  CHECK(vec[0] == 1);
-  CHECK(vec[1] == 1);
-  CHECK(vec[2] == 4);
+  SECTION("For 1D vector")
+  {
+    std::vector<size_t> vec = { 1, 7, 23, 4, 1, 4, 2, 5, 1,
+                                2, 3, 4,  5, 6, 7, 8, 9, 10 };
+    size_t sizeBefore = vec.size();
+
+    std::vector<size_t> toRemove = std::vector<size_t>({ { 1, 2, 3, 2 } });
+    pylimer_tools::utils::removeRows(vec, toRemove);
+    CHECK(vec.size() == sizeBefore - 3);
+    CHECK(vec[0] == 1);
+    CHECK(vec[1] == 1);
+    CHECK(vec[2] == 4);
+  }
+
+  SECTION("For 2D vector")
+  {
+    std::vector<std::vector<size_t>> vecOfVecs = {
+      { 1, 2, 3, 4, 3 }, { 5, 6, 7 }, { 8, 9, 10 }, {}, { 11, 12, 13, 14, 15 }
+    };
+    size_t sizeBefore = vecOfVecs.size();
+    std::vector<size_t> toRemove = std::vector<size_t>({ { 1, 2, 3, 2 } });
+    pylimer_tools::utils::removeRows(vecOfVecs, toRemove);
+    CHECK(vecOfVecs.size() == sizeBefore - 3);
+    CHECK(vecOfVecs.size() == 2);
+    CHECK(vecOfVecs[0][0] == 1);
+    CHECK(vecOfVecs[0][1] == 2);
+    CHECK(vecOfVecs[0][2] == 3);
+    CHECK(vecOfVecs[0].size() == 5);
+    CHECK(vecOfVecs[1][0] == 11);
+    CHECK(vecOfVecs[1][1] == 12);
+    CHECK(vecOfVecs[1].size() == 5);
+  }
+
+  SECTION("For Eigen vector")
+  {
+    Eigen::VectorXd eigenVec = Eigen::VectorXd::LinSpaced(10, 0, 90);
+    CHECK(eigenVec.size() == 10);
+    CHECK(eigenVec(0) == 0);
+    CHECK(eigenVec(1) == 10);
+    CHECK(eigenVec(2) == 20);
+    std::vector<size_t> toRemove = std::vector<size_t>({ { 1, 2, 3, 2 } });
+    pylimer_tools::utils::removeRows(eigenVec, toRemove);
+    CHECK(eigenVec.size() == 10 - 3);
+    CHECK(eigenVec(0) == 0);
+    CHECK(eigenVec(1) == 40);
+    CHECK(eigenVec(2) == 50);
+  }
 }
 
 TEST_CASE("Index renumbering works")
@@ -361,4 +399,20 @@ TEST_CASE("Append and Prepend works")
     CHECK(vec[2] == 4);
     CHECK(vec[3] == 1);
   }
+}
+
+TEST_CASE("Duplicates are removed")
+{
+  std::cout << "Running test \"Duplicates are removed\"" << std::endl;
+  std::vector<size_t> vec = { 1, 7, 77, 7, 3, 3, 3, 4, 4, 2, 2, 4, 4, 5 };
+  size_t sizeBefore = vec.size();
+
+  pylimer_tools::utils::sort_remove_duplicates(vec);
+
+  CHECK(vec.size() == sizeBefore - 7);
+  CHECK(vec[0] == 1);
+  CHECK(vec[1] == 2);
+  CHECK(vec[2] == 3);
+  CHECK(vec[3] == 4);
+  CHECK(vec[4] == 5);
 }

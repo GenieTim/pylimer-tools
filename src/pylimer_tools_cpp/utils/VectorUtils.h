@@ -377,7 +377,8 @@ namespace utils {
                                                                                \
     size_t j = 0;                                                              \
     for (size_t i = 0; i < vec.size(); ++i) {                                  \
-      if (j < indicesToRemove.size() && i == indicesToRemove[j]) {             \
+      if (j < indicesToRemove.size() &&                                        \
+          i == indicesToRemove[indicesToRemove.size() - j - 1]) {              \
         ++j;                                                                   \
       } else {                                                                 \
         vec[i - j] = vec[i];                                                   \
@@ -487,6 +488,7 @@ namespace utils {
     // then, apply this mapping to all strands
     for (size_t linkI = 0; linkI < v.size(); ++linkI) {
       for (size_t& strandIdx : v[linkI]) {
+        assert(strandIdx < newMapping.size());
         assert(newMapping[strandIdx] >= 0);
         strandIdx = newMapping[strandIdx];
       }
@@ -499,6 +501,10 @@ namespace utils {
     const std::vector<long int>& newMapping)
   {
     for (size_t i = 0; i < v.size(); ++i) {
+      assert(v[i] >= 0 && v[i] < newMapping.size());
+      // the following assertion fails if the mapping is < 0,
+      // which may happen if the value is one that should have been removed
+      assert(newMapping[v[i]] >= 0);
       v[i] = newMapping[v[i]];
     }
   }
@@ -632,6 +638,13 @@ namespace utils {
                          std::to_string(endOffset) + " vs. a total size of " +
                          std::to_string(other.size()) + ".");
     v.insert(v.begin(), other.rbegin() + startOffset, other.rend() - endOffset);
+  }
+
+  template<typename T>
+  static inline void sort_remove_duplicates(std::vector<T>& v)
+  {
+    std::ranges::sort(v);
+    v.erase(std::ranges::unique(v).begin(), v.end());
   }
 
   /**
