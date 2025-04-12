@@ -14,9 +14,11 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <future>
 #include <iostream>
 #include <set>
 #include <string>
+#include <unistd.h>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -714,6 +716,7 @@ MEHPForceBalance2::runForceRelaxation(
         std::cout << "Checking and possibly removing inactive cross-links"
                   << std::endl;
 #endif
+
         Eigen::ArrayXb springIsToDelete =
           this->markInactiveSpringsToDelete(this->initialConfig,
                                             this->currentDisplacements,
@@ -721,12 +724,15 @@ MEHPForceBalance2::runForceRelaxation(
         size_t toDeleteCount = springIsToDelete.count();
         std::vector<size_t> springIndicesToDelete;
         springIndicesToDelete.reserve(toDeleteCount);
-        for (size_t i = 0; i < springIsToDelete.size(); ++i) {
-          if (springIsToDelete[i]) {
-            springIndicesToDelete.push_back(i);
+        for (size_t i = springIsToDelete.size(); i > 0; --i) {
+          if (springIsToDelete[i - 1]) {
+            springIndicesToDelete.push_back(i - 1);
           }
         }
-        this->removeSprings(this->initialConfig, springIndicesToDelete);
+        // std::ranges::sort(springIndicesToDelete, std::greater<>());
+        this->removeSprings(this->initialConfig,
+                            this->currentDisplacements,
+                            springIndicesToDelete);
         nRemovedThisLoop += toDeleteCount;
       }
       if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
@@ -1021,7 +1027,9 @@ MEHPForceBalance2::breakSpring(ForceBalance2Network& net,
                                const size_t partialSpringIdx) const
 {
   this->removeSprings(
-    net, net.springIndicesOfStrand[net.strandIndexOfSpring[partialSpringIdx]]);
+    net,
+    displacements,
+    net.springIndicesOfStrand[net.strandIndexOfSpring[partialSpringIdx]]);
 };
 
 /**
@@ -1043,12 +1051,13 @@ MEHPForceBalance2::removeInactiveLinks(ForceBalance2Network& net,
   size_t toDeleteCount = springIsToDelete.count();
   std::vector<size_t> springIndicesToDelete;
   springIndicesToDelete.reserve(toDeleteCount);
-  for (size_t i = 0; i < springIsToDelete.size(); ++i) {
-    if (springIsToDelete[i]) {
-      springIndicesToDelete.push_back(i);
+  for (size_t i = springIsToDelete.size(); i > 0; --i) {
+    if (springIsToDelete[i - 1]) {
+      springIndicesToDelete.push_back(i - 1);
     }
   }
-  this->removeSprings(net, springIndicesToDelete);
+  // std::ranges::sort(springIndicesToDelete, std::greater<>());
+  this->removeSprings(net, displacements, springIndicesToDelete);
   this->unlinkBifunctionalLinks(net, displacements);
   return this->removeZerofunctionalLinks(net, displacements);
 };
@@ -1126,14 +1135,24 @@ MEHPForceBalance2::unlinkBifunctionalLinks(ForceBalance2Network& net,
                                                      springIndices[0]));
       assert(!pylimer_tools::utils::contains<size_t>(removedSprings,
                                                      springIndices[1]));
+      if (!net.linkIsEntanglement[linkIdx] &&
+          net.strandIndexOfSpring[springIndices[0]] ==
+            net.strandIndexOfSpring[springIndices[1]]) {
+        // annoying primary loop we don't want to handle now.
+        continue;
+      }
       // merge these two springs,
       // unlink this link
       this->mergeSpringsWithoutRemoval(
         net, displacements, springIndices[0], springIndices[1], linkIdx);
       removedSprings.push_back(springIndices[0]);
+      assert(net.strandIndexOfSpring[springIndices[0]] < 0);
+      numRemoved += 1;
     }
   }
-  this->removeSprings(net, removedSprings);
+
+  std::ranges::sort(removedSprings, std::greater<>());
+  this->removeSprings(net, displacements, removedSprings);
 
 #ifndef NDEBUG
   assert(this->validateNetwork(net, displacements));
@@ -1185,11 +1204,23 @@ MEHPForceBalance2::mergeSpringsWithoutRemoval(ForceBalance2Network& net,
   bool removedIsA = net.springIndexA[removedSpringIdx] == linkToReduce;
   size_t otherEndRemoved = removedIsA ? net.springIndexB[removedSpringIdx]
                                       : net.springIndexA[removedSpringIdx];
+  const size_t removedStrandIdx = net.strandIndexOfSpring[removedSpringIdx];
+  assert(pylimer_tools::utils::contains(net.strandIndicesOfLink[linkToReduce],
+                                        removedStrandIdx));
+  assert(pylimer_tools::utils::contains(
+    net.linkIndicesOfStrand[removedStrandIdx], linkToReduce));
+  const size_t keptStrandIdx = net.strandIndexOfSpring[keptSpringIdx];
+  assert(pylimer_tools::utils::contains(net.strandIndicesOfLink[linkToReduce],
+                                        keptStrandIdx));
+  assert(pylimer_tools::utils::contains(net.linkIndicesOfStrand[keptStrandIdx],
+                                        linkToReduce));
   if (!isStrandMerger) {
     assert(XOR(keptIsA, removedIsA));
+    assert(net.linkIndicesOfStrand[removedStrandIdx][0] != linkToReduce);
+    assert(net.linkIndicesOfStrand[removedStrandIdx].back() != linkToReduce);
+    assert(net.linkIndicesOfStrand[keptStrandIdx][0] != linkToReduce);
+    assert(net.linkIndicesOfStrand[keptStrandIdx].back() != linkToReduce);
   }
-  const size_t removedStrandIdx = net.strandIndexOfSpring[removedSpringIdx];
-  const size_t keptStrandIdx = net.strandIndexOfSpring[keptSpringIdx];
 
   net.springIndexA[keptSpringIdx] = keptIsA ? otherEndRemoved : otherEndKept;
   net.springIndexB[keptSpringIdx] = keptIsA ? otherEndKept : otherEndRemoved;
@@ -1203,28 +1234,46 @@ MEHPForceBalance2::mergeSpringsWithoutRemoval(ForceBalance2Network& net,
       3 * net.springIndexB[keptSpringIdx] + dir;
   }
 
-  pylimer_tools::utils::removeIfContained(net.strandIndicesOfLink[linkToReduce],
-                                          removedStrandIdx);
-
-  // reset the removed spring
-  net.springIndexA[removedSpringIdx] = -1;
-  net.springIndexB[removedSpringIdx] = -1;
-  if (!isStrandMerger) {
-    net.strandIndexOfSpring[removedSpringIdx] = -1;
-  }
-
+  assert(net.springIndicesOfStrand[keptStrandIdx].size() + 1 ==
+         net.linkIndicesOfStrand[keptStrandIdx].size());
+  // merge strands if needed
   if (isStrandMerger) {
+
     std::vector<size_t> removedStrandsLinks =
       net.linkIndicesOfStrand[removedStrandIdx];
+    assert(removedStrandsLinks[0] == linkToReduce ||
+           removedStrandsLinks.back() == linkToReduce);
     std::vector<size_t> removedStrandsSprings =
       net.springIndicesOfStrand[removedStrandIdx];
-    // adjust links to strands
-    for (size_t springIdx : removedStrandsLinks) {
+    assert(removedStrandsSprings[0] == removedSpringIdx ||
+           removedStrandsSprings.back() == removedSpringIdx);
+    // adjust link of springs to strands
+    for (const size_t springIdx : removedStrandsSprings) {
       assert(net.strandIndexOfSpring[springIdx] == removedStrandIdx);
-      net.strandIndexOfSpring[springIdx] =
-        net.strandIndexOfSpring[keptStrandIdx];
+      net.strandIndexOfSpring[springIdx] = keptStrandIdx;
+    }
+    // adjust link of links to strands
+    // need to remove duplicates since the strand may have more than one link to
+    // the link (in case of a primary loop), while the link will still have only
+    // one link to the strand
+    std::vector<size_t> uniqueRemovedStrandsLinks = removedStrandsLinks;
+    pylimer_tools::utils::sort_remove_duplicates(uniqueRemovedStrandsLinks);
+    for (const size_t linkIdx : uniqueRemovedStrandsLinks) {
+      assert(pylimer_tools::utils::contains(net.strandIndicesOfLink[linkIdx],
+                                            removedStrandIdx));
+      for (size_t& strandIdx : net.strandIndicesOfLink[linkIdx]) {
+        if (strandIdx == removedStrandIdx) {
+          strandIdx = keptStrandIdx;
+          break;
+        }
+      }
+      pylimer_tools::utils::sort_remove_duplicates(
+        net.strandIndicesOfLink[linkIdx]);
+      assert(!pylimer_tools::utils::contains(net.strandIndicesOfLink[linkIdx],
+                                             removedStrandIdx));
     }
 
+    // start with moving the links and springs to the new strand
     bool invertSpringDirections = false;
     // make sure to keep directionality of the strand
     if (!keptIsA && removedIsA) {
@@ -1232,20 +1281,21 @@ MEHPForceBalance2::mergeSpringsWithoutRemoval(ForceBalance2Network& net,
       assert(net.linkIndicesOfStrand[keptStrandIdx].back() == linkToReduce);
       assert(removedStrandsLinks[0] == linkToReduce);
       net.linkIndicesOfStrand[keptStrandIdx].pop_back();
-      pylimer_tools::utils::append(net.linkIndicesOfStrand[keptStrandIdx],
-                                   removedStrandsLinks);
-      assert(net.springIndicesOfStrand[keptStrandIdx].back() ==
+      pylimer_tools::utils::append(
+        net.linkIndicesOfStrand[keptStrandIdx], removedStrandsLinks, 1);
+      assert(net.springIndicesOfStrand[removedStrandIdx][0] ==
              removedSpringIdx);
-      net.springIndicesOfStrand[keptStrandIdx].pop_back();
-      pylimer_tools::utils::append(net.springIndicesOfStrand[keptStrandIdx],
-                                   removedStrandsSprings);
+      assert(net.springIndicesOfStrand[keptStrandIdx].back() == keptSpringIdx);
+      pylimer_tools::utils::append(
+        net.springIndicesOfStrand[keptStrandIdx], removedStrandsSprings, 1);
     } else if (keptIsA && !removedIsA) {
       // direction is the same, but inverse
       assert(net.linkIndicesOfStrand[keptStrandIdx][0] == linkToReduce);
       assert(removedStrandsLinks.back() == linkToReduce);
       removedStrandsLinks.pop_back();
-      pylimer_tools::utils::prepend(net.linkIndicesOfStrand[keptStrandIdx],
-                                    removedStrandsLinks);
+      net.linkIndicesOfStrand[keptStrandIdx][0] = removedStrandsLinks.back();
+      pylimer_tools::utils::prepend(
+        net.linkIndicesOfStrand[keptStrandIdx], removedStrandsLinks, 0, 1);
       assert(removedStrandsSprings.back() == removedSpringIdx);
       removedStrandsSprings.pop_back();
       pylimer_tools::utils::prepend(net.springIndicesOfStrand[keptStrandIdx],
@@ -1255,8 +1305,9 @@ MEHPForceBalance2::mergeSpringsWithoutRemoval(ForceBalance2Network& net,
       assert(net.linkIndicesOfStrand[keptStrandIdx][0] == linkToReduce);
       assert(removedStrandsLinks[0] == linkToReduce);
 
+      net.linkIndicesOfStrand[keptStrandIdx][0] = removedStrandsLinks[1];
       pylimer_tools::utils::prepend_inverse(
-        net.linkIndicesOfStrand[keptStrandIdx], removedStrandsLinks, 0, 1);
+        net.linkIndicesOfStrand[keptStrandIdx], removedStrandsLinks, 0, 2);
       pylimer_tools::utils::prepend_inverse(
         net.springIndicesOfStrand[keptStrandIdx], removedStrandsSprings, 0, 1);
       // need to swap some things in the strand indices
@@ -1268,6 +1319,7 @@ MEHPForceBalance2::mergeSpringsWithoutRemoval(ForceBalance2Network& net,
       assert(net.linkIndicesOfStrand[keptStrandIdx].back() == linkToReduce);
 
       removedStrandsLinks.pop_back();
+      net.linkIndicesOfStrand[keptStrandIdx].pop_back();
       removedStrandsSprings.pop_back();
 
       pylimer_tools::utils::append_inverse(
@@ -1277,7 +1329,6 @@ MEHPForceBalance2::mergeSpringsWithoutRemoval(ForceBalance2Network& net,
       // need to swap some things in the strand indices
       invertSpringDirections = true;
     }
-
     if (invertSpringDirections) {
       for (size_t springIdx : removedStrandsSprings) {
         if (springIdx == removedSpringIdx) {
@@ -1291,9 +1342,56 @@ MEHPForceBalance2::mergeSpringsWithoutRemoval(ForceBalance2Network& net,
         net.springBoxOffset.segment(3 * springIdx, 3) *= -1.;
       }
     }
+
+    // reset the removed strand
+    net.linkIndicesOfStrand[removedStrandIdx].clear();
+    net.springIndicesOfStrand[removedStrandIdx].clear();
+    // and link
+    assert(net.strandIndicesOfLink[linkToReduce].size() <= 2);
   }
 
-  // TODO: continue here...
+  // reset the removed spring
+  net.springIndexA[removedSpringIdx] = -1;
+  net.springIndexB[removedSpringIdx] = -1;
+  net.strandIndexOfSpring[removedSpringIdx] = -1;
+  if (!isStrandMerger) {
+    pylimer_tools::utils::removeIfContained(
+      net.springIndicesOfStrand[keptStrandIdx], removedSpringIdx);
+    // the removal of the link <> strand relationship is a bit more complex,
+    // since it could have been involved in the same strand twice, as a primary
+    // loop.
+    assert(XOR(keptIsA, removedIsA));
+    assert(keptStrandIdx == removedStrandIdx);
+    assert(pylimer_tools::utils::contains(
+      net.linkIndicesOfStrand[keptStrandIdx], linkToReduce));
+    pylimer_tools::utils::removeIfContained(
+      net.linkIndicesOfStrand[keptStrandIdx], linkToReduce);
+    assert(net.strandIndicesOfLink[linkToReduce].size() == 1);
+    assert(net.strandIndicesOfLink[linkToReduce][0] == keptStrandIdx);
+  }
+  net.strandIndicesOfLink[linkToReduce].clear();
+
+  // some more validation checks
+  assert(net.springIndicesOfStrand[keptStrandIdx].size() + 1 ==
+         net.linkIndicesOfStrand[keptStrandIdx].size());
+  assert(!pylimer_tools::utils::contains(
+    net.springIndicesOfStrand[keptStrandIdx], removedSpringIdx));
+  // end is relevant, as the unlinked link, in the case of a cross-link,
+  // could have been involved in the same strand twice, as both ends.
+  bool linkIsEnd =
+    net.linkIndicesOfStrand[keptStrandIdx].back() == linkToReduce ||
+    net.linkIndicesOfStrand[keptStrandIdx][0] == linkToReduce;
+  assert(!(linkIsEnd && !isStrandMerger));
+  assert(!pylimer_tools::utils::contains(net.linkIndicesOfStrand[keptStrandIdx],
+                                         linkToReduce) ||
+         linkIsEnd);
+  assert(!pylimer_tools::utils::contains(net.strandIndicesOfLink[linkToReduce],
+                                         removedStrandIdx) ||
+         linkIsEnd);
+
+#ifndef NDEBUG
+  assert(this->validateNetwork(net, u));
+#endif
 }
 
 /**
@@ -1329,7 +1427,10 @@ MEHPForceBalance2::removeZerofunctionalLinks(
   // actually do remove these links
   REMOVE_ROWS(net.linkIsEntanglement);
   REMOVE_ROWS(net.strandIndicesOfLink);
+  REMOVE_ROWS(net.oldAtomIds);
+  REMOVE_ROWS(net.oldAtomTypes);
 #undef REMOVE_ROWS
+
 #define REMOVE_ROWS(vector)                                                    \
   pylimer_tools::utils::removeRows(vector, linksWithDirsToRemove, true, true)
 
@@ -1381,16 +1482,17 @@ MEHPForceBalance2::removeZerofunctionalLinks(
 void
 MEHPForceBalance2::removeSprings(
   ForceBalance2Network& net,
+  Eigen::VectorXd& displacements,
   std::vector<size_t>& springsToDeleteIndices) const
 {
   // make sure things are sorted
   for (long int i = springsToDeleteIndices.size() - 2; i >= 0; --i) {
     INVALIDARG_EXP_IFN(
-      springsToDeleteIndices[i - 1] < springsToDeleteIndices[i],
+      springsToDeleteIndices[i + 1] < springsToDeleteIndices[i],
       "Indices must be sorted descending and unique, got values " +
         std::to_string(springsToDeleteIndices[i]) + "@" + std::to_string(i) +
-        " and " + std::to_string(springsToDeleteIndices[i - 1]) + "@" +
-        std::to_string(i - 1) + ".");
+        " and " + std::to_string(springsToDeleteIndices[i + 1]) + "@" +
+        std::to_string(i + 1) + ".");
   }
 
   // check which strands to remove
@@ -1400,11 +1502,17 @@ MEHPForceBalance2::removeSprings(
       strandsToDelete.push_back(net.strandIndexOfSpring[i]);
     }
   }
+  for (size_t strandIdx = 0; strandIdx < net.nrOfStrands; ++strandIdx) {
+    if (net.linkIndicesOfStrand[strandIdx].empty()) {
+      assert(net.springIndicesOfStrand[strandIdx].empty());
+      strandsToDelete.push_back(strandIdx);
+    }
+  }
   std::ranges::sort(strandsToDelete, std::greater<size_t>());
   // remove duplicate strands
   strandsToDelete.erase(std::ranges::unique(strandsToDelete).begin(),
                         strandsToDelete.end());
-  // assert that all indices of those strands will be removed as well
+  // assert that all springs of those strands will be removed without lefovers
   for (size_t strandIdx : strandsToDelete) {
     for (size_t springIdx : net.springIndicesOfStrand[strandIdx]) {
       INVALIDARG_EXP_IFN(
@@ -1412,16 +1520,55 @@ MEHPForceBalance2::removeSprings(
           springsToDeleteIndices, springIdx, std::greater<size_t>()),
         "Spring " + std::to_string(springIdx) + " of strand " +
           std::to_string(strandIdx) +
-          " should be removed as well, as all springs of a strand.");
+          " should be removed as well, as all springs of this strand.");
     }
   }
+
+  // unlink the strands to be deleted from the links
+  for (size_t strandIdx : strandsToDelete) {
+    for (size_t linkIdx : net.linkIndicesOfStrand[strandIdx]) {
+      pylimer_tools::utils::removeIfContained(net.strandIndicesOfLink[linkIdx],
+                                              strandIdx);
+    }
+  }
+
+#ifndef NDEBUG
+  for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
+    if (net.strandIndexOfSpring[springIdx] >= 0) {
+      if (std::ranges::binary_search(
+            springsToDeleteIndices, springIdx, std::greater<size_t>())) {
+        RUNTIME_EXP_IFN(
+          std::ranges::binary_search(strandsToDelete,
+                                     net.strandIndexOfSpring[springIdx],
+                                     std::greater<size_t>()),
+          "Expected strand " +
+            std::to_string(net.strandIndexOfSpring[springIdx]) + " of spring " +
+            std::to_string(springIdx) + " to be removed, but it is not.");
+      } else {
+        RUNTIME_EXP_IFN(
+          !std::ranges::binary_search(strandsToDelete,
+                                      net.strandIndexOfSpring[springIdx],
+                                      std::greater<size_t>()),
+          "Expected not to remove strand " +
+            std::to_string(net.strandIndexOfSpring[springIdx]) + " of spring " +
+            std::to_string(springIdx) + ", but it is.");
+      }
+    } else {
+      RUNTIME_EXP_IFN(std::ranges::binary_search(springsToDeleteIndices,
+                                                 springIdx,
+                                                 std::greater<size_t>()),
+                      "Expected to delete spring " + std::to_string(springIdx) +
+                        " since it's without strand");
+    }
+  }
+#endif
 
   // actually remove some rows
 #define REMOVE_ROWS(vector)                                                    \
   pylimer_tools::utils::removeRows(vector, springsToDeleteIndices, true, true)
 
-  REMOVE_ROWS(net.springIndicesOfStrand);
   REMOVE_ROWS(net.springContourLength);
+  REMOVE_ROWS(net.strandIndexOfSpring);
   REMOVE_ROWS(net.springIsEntanglement);
   REMOVE_ROWS(net.springIndexA);
   REMOVE_ROWS(net.springIndexB);
@@ -1450,7 +1597,7 @@ MEHPForceBalance2::removeSprings(
   pylimer_tools::utils::removeRows(
     net.linkIndicesOfStrand, strandsToDelete, true, true);
   pylimer_tools::utils::removeRows(
-    net.linkIndicesOfStrand, strandsToDelete, true, true);
+    net.springIndicesOfStrand, strandsToDelete, true, true);
 
   // renumber relationships
   // first, change the indices of the strands
@@ -1475,7 +1622,7 @@ MEHPForceBalance2::removeSprings(
   net.nrOfSprings -= springsToDeleteIndices.size();
 
 #ifndef NDEBUG
-  this->validateNetwork(net, this->currentDisplacements);
+  this->validateNetwork(net, displacements);
 #endif
 };
 
@@ -2238,22 +2385,32 @@ MEHPForceBalance2::computeActiveWeightFraction(ForceBalance2Network& net,
   if (net.nrOfStrands < 1) {
     return 0.;
   }
-  // find all active springs
-  Eigen::ArrayXb activeSprings = this->findActiveStrands(net, u, tolerance);
-  if (activeSprings.count() == 0) {
+  // find all active strands
+  Eigen::ArrayXb activeStrands = this->findActiveStrands(net, u, tolerance);
+  if (activeStrands.count() == 0) {
     return 0.;
   }
-  // as of now, the springsContourLength is equal to the number of bonds
-  // from cross-link to cross-link. therefore, the number of atoms of each
-  // of these springs is one less
-  Eigen::ArrayXd allActiveAtomsPerChains =
-    activeSprings.cast<double>() *
-    (net.springContourLength.array() - Eigen::ArrayXd::Ones(net.nrOfSprings));
+
+  Eigen::ArrayXb activeLinks = Eigen::ArrayXb::Constant(net.nrOfLinks, false);
+  double nActiveAtomsFromSprings = 0;
+  for (size_t strandIdx = 0; strandIdx < net.nrOfStrands; ++strandIdx) {
+    if (!activeStrands[strandIdx]) {
+      continue;
+    }
+    for (size_t linkIdx : net.linkIndicesOfStrand[strandIdx]) {
+      activeLinks[linkIdx] = true;
+    }
+    // as of now, the springsContourLength is equal to the number of bonds
+    // from link to link. therefore, the number of atoms of each
+    // of these springs is one less
+    for (size_t springIdx : net.springIndicesOfStrand[strandIdx]) {
+      nActiveAtomsFromSprings += net.springContourLength[strandIdx] - 1;
+    }
+  }
 
   // TODO: currently, the weight of the atoms is ignored
   // normalize by the number of atoms
-  return (allActiveAtomsPerChains.matrix().sum() +
-          this->getNrOfActiveNodes(tolerance)) /
+  return (nActiveAtomsFromSprings + activeLinks.count()) /
          (static_cast<double>(this->universe.getNrOfAtoms()));
 }
 
@@ -2698,6 +2855,8 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
     RUNTIME_EXP_IFN(net.strandIndexOfSpring.maxCoeff() < net.nrOfStrands,
                     "Partial spring must map to full spring, which must have "
                     "a lower index.");
+  }
+  if (net.nrOfSprings > 0) {
     RUNTIME_EXP_IFN(net.springCoordinateIndexA.maxCoeff() < 3 * net.nrOfLinks,
                     "Part coordinates must map to coordinates.");
     RUNTIME_EXP_IFN(net.springCoordinateIndexB.maxCoeff() < 3 * net.nrOfLinks,
@@ -2711,27 +2870,26 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
   /**
    * Test reversibility of link <-> spring mapping
    */
-  for (size_t link_idx = 0; link_idx < net.nrOfLinks; ++link_idx) {
-    std::vector<size_t> thisLinksSprings = net.strandIndicesOfLink[link_idx];
-    std::sort(thisLinksSprings.begin(), thisLinksSprings.end());
-    auto last = std::unique(thisLinksSprings.begin(), thisLinksSprings.end());
-    RUNTIME_EXP_IFN(last == thisLinksSprings.end(),
+  for (size_t linkIdx = 0; linkIdx < net.nrOfLinks; ++linkIdx) {
+    std::vector<size_t> thisLinksStrands = net.strandIndicesOfLink[linkIdx];
+    std::sort(thisLinksStrands.begin(), thisLinksStrands.end());
+    auto last = std::unique(thisLinksStrands.begin(), thisLinksStrands.end());
+    RUNTIME_EXP_IFN(last == thisLinksStrands.end(),
                     "Expect each link to only have one back-link to the "
-                    "springs, found back-links " +
-                      pylimer_tools::utils::join(thisLinksSprings.begin(),
-                                                 thisLinksSprings.end(),
+                    "strand, found back-links " +
+                      pylimer_tools::utils::join(thisLinksStrands.begin(),
+                                                 thisLinksStrands.end(),
                                                  std::string("_")) +
-                      " for link " + std::to_string(link_idx) + ".");
-    for (size_t spring_idx : thisLinksSprings) {
-      std::vector<size_t> thisSpringsLinks =
-        net.linkIndicesOfStrand[spring_idx];
+                      " for link " + std::to_string(linkIdx) + ".");
+    for (const size_t strandIdx : thisLinksStrands) {
+      std::vector<size_t> thisSpringsLinks = net.linkIndicesOfStrand[strandIdx];
       RUNTIME_EXP_IFN(std::find(thisSpringsLinks.begin(),
                                 thisSpringsLinks.end(),
-                                link_idx) != thisSpringsLinks.end(),
-                      "Spring must have a connection to the link, too. Did "
+                                linkIdx) != thisSpringsLinks.end(),
+                      "Strand must have a connection to the link, too. Did "
                       "not find link " +
-                        std::to_string(link_idx) + " in spring " +
-                        std::to_string(spring_idx) + ".");
+                        std::to_string(linkIdx) + " in strand " +
+                        std::to_string(strandIdx) + ".");
     }
   }
 
@@ -2741,31 +2899,49 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
   for (size_t linkIdx = 0; linkIdx < net.nrOfLinks; ++linkIdx) {
     if (net.linkIsEntanglement[linkIdx]) {
       RUNTIME_EXP_IFN(
-        net.strandIndicesOfLink[linkIdx].size() == 2 ||
-          net.strandIndicesOfLink[linkIdx].size() == 1,
-        "Expect each entanglement to be involved in exactly one or two "
-        "springs, "
+        net.strandIndicesOfLink[linkIdx].size() <= 2,
+        "Expect each entanglement to be involved in at most two strands, "
         "got " +
           std::to_string(net.strandIndicesOfLink[linkIdx].size()) + ".");
+      std::vector<size_t> springIndices =
+        this->getPartialSpringIndicesOfLink(net, linkIdx);
+      bool anyIsPrimaryLoop = false;
+      for (size_t springIndex : springIndices) {
+        anyIsPrimaryLoop =
+          anyIsPrimaryLoop || this->isLoopingSpring(net, springIndex);
+      }
+      if (springIndices.size() == 2 && anyIsPrimaryLoop) {
+        RUNTIME_EXP_IFN(
+          net.strandIndicesOfLink[linkIdx].size() == 1,
+          "Bifunctional entanglement link must be involved in "
+          "only one strand. Got " +
+            std::to_string(net.strandIndicesOfLink[linkIdx].size()) +
+            " for link " + std::to_string(linkIdx) + ".");
+      }
+      RUNTIME_EXP_IFN(springIndices.size() % 2 == 0 || anyIsPrimaryLoop,
+                      "Entanglements must be either zero-, bi- or "
+                      "tetrafunctional links. Got f = " +
+                        std::to_string(springIndices.size()) + " for link " +
+                        std::to_string(linkIdx) + ".");
     }
   }
 
   /**
    * Test the validitiy of springs and their mapping
    */
-  Eigen::ArrayXi nrOfMentions = Eigen::ArrayXi::Zero(net.nrOfLinks);
+  Eigen::ArrayXi nrOfLinkMentionsInStrands =
+    Eigen::ArrayXi::Zero(net.nrOfLinks);
   for (size_t i = 0; i < net.nrOfStrands; ++i) {
-    RUNTIME_EXP_IFN(net.linkIndicesOfStrand[i].size() >= 2,
-                    "Each spring requires at least two links, got " +
+    RUNTIME_EXP_IFN(net.linkIndicesOfStrand[i].size() >= 2 ||
+                      net.linkIndicesOfStrand[i].size() == 0,
+                    "Each strand requires at least two links, got " +
                       std::to_string(net.linkIndicesOfStrand[i].size()) +
                       " at i = " + std::to_string(i) + ".");
-    RUNTIME_EXP_IFN(net.springContourLength[i] > 0,
-                    "Unexpected spring contour length, got " +
-                      std::to_string(net.springContourLength[i]) +
-                      " for spring " + std::to_string(i) + ".");
     RUNTIME_EXP_IFN(
-      net.springIndicesOfStrand[i].size() ==
-        net.linkIndicesOfStrand[i].size() - 1,
+      (net.springIndicesOfStrand[i].size() ==
+       net.linkIndicesOfStrand[i].size() - 1) ||
+        (net.linkIndicesOfStrand[i].empty() &&
+         net.springIndicesOfStrand[i].empty()),
       "Require a global index for each local one, got " +
         std::to_string(net.springIndicesOfStrand[i].size()) +
         " != " + std::to_string(net.linkIndicesOfStrand[i].size() - 1) +
@@ -2773,9 +2949,9 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
     for (size_t partialIdx = 0;
          partialIdx < net.springIndicesOfStrand[i].size();
          ++partialIdx) {
-      size_t partialSpringIdx = net.springIndicesOfStrand[i][partialIdx];
-      size_t partner0 = net.linkIndicesOfStrand[i][partialIdx];
-      size_t partner1 = net.linkIndicesOfStrand[i][partialIdx + 1];
+      const size_t partialSpringIdx = net.springIndicesOfStrand[i][partialIdx];
+      const size_t partner0 = net.linkIndicesOfStrand[i][partialIdx];
+      const size_t partner1 = net.linkIndicesOfStrand[i][partialIdx + 1];
       RUNTIME_EXP_IFN(
         ((net.springIndexA[partialSpringIdx] == partner0 &&
           net.springIndexB[partialSpringIdx] == partner1)),
@@ -2805,29 +2981,45 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
     std::vector<size_t> links = net.linkIndicesOfStrand[i];
     for (size_t j = 0; j < links.size(); ++j) {
       size_t link_idx = links[j];
-      nrOfMentions[link_idx] += 1;
+      nrOfLinkMentionsInStrands[link_idx] += 1;
       RUNTIME_EXP_IFN(net.linkIsEntanglement[link_idx] ==
                         ((j != 0) && (j != (links.size() - 1))),
                       "Cross-links must be first and last in a spring, "
                       "entanglements in-between. Found discrepancy at " +
                         std::to_string(j) + "/" + std::to_string(links.size()) +
                         " in spring " + std::to_string(i) + ".")
-      std::vector<size_t> thisLinksSprings = net.strandIndicesOfLink[link_idx];
+      std::vector<size_t> thisLinksStrands = net.strandIndicesOfLink[link_idx];
       RUNTIME_EXP_IFN(
-        std::find(thisLinksSprings.begin(), thisLinksSprings.end(), i) !=
-          thisLinksSprings.end(),
-        "Link must have a connection to the spring, too. Did not find "
-        "spring " +
+        std::ranges::find(thisLinksStrands, i) != thisLinksStrands.end(),
+        "Link must have a connection to the strand, too. Did not find "
+        "strand " +
           std::to_string(i) + " in link " + std::to_string(link_idx) + ".");
+    }
+  }
+  Eigen::ArrayXi nrOfLinkMentionsInSprings =
+    Eigen::ArrayXi::Zero(net.nrOfLinks);
+  for (size_t i = 0; i < net.nrOfSprings; ++i) {
+    if (net.springIndexA[i] >= 0 && net.springIndexB[i] >= 0) {
+      nrOfLinkMentionsInSprings[net.springIndexA[i]] += 1;
+      nrOfLinkMentionsInSprings[net.springIndexB[i]] += 1;
     }
   }
   for (size_t i = 0; i < net.nrOfLinks; ++i) {
     if (net.linkIsEntanglement[i]) {
-      RUNTIME_EXP_IFN(nrOfMentions[i] == 2,
-                      "Expect each entanglement to be mentioned twice in the "
-                      "links-of-springs mapping, but " +
-                        std::to_string(i) + " was mentioned " +
-                        std::to_string(nrOfMentions[i]) + " times.");
+      RUNTIME_EXP_IFN(
+        nrOfLinkMentionsInStrands[i] <= 2,
+        "Expect each entanglement to be mentioned at most twice in the "
+        "links-of-springs mapping, but " +
+          std::to_string(i) + " was mentioned " +
+          std::to_string(nrOfLinkMentionsInStrands[i]) + " times.");
+      RUNTIME_EXP_IFN(
+        nrOfLinkMentionsInSprings[i] == 4 ||
+          nrOfLinkMentionsInSprings[i] == 2 ||
+          nrOfLinkMentionsInSprings[i] == 0,
+        "Expect each entanglement to be mentioned 0, 2 or 4 times in the "
+        "spring end indices, but " +
+          std::to_string(i) + " was mentioned " +
+          std::to_string(nrOfLinkMentionsInSprings[i]) + " times.");
     }
   }
 
@@ -2835,54 +3027,70 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
    * Test the validity of partial springs and their mapping
    */
   for (size_t i = 0; i < net.nrOfSprings; i++) {
-    const size_t partialEndA = net.springIndexA[i];
-    const size_t partialEndB = net.springIndexB[i];
-    RUNTIME_EXP_IFN(partialEndA < net.nrOfLinks,
+    const long int partialEndA = net.springIndexA[i];
+    const long int partialEndB = net.springIndexB[i];
+    RUNTIME_EXP_IFN(net.springContourLength[i] > 0,
+                    "Unexpected spring contour length, got " +
+                      std::to_string(net.springContourLength[i]) +
+                      " for spring " + std::to_string(i) + ".");
+    RUNTIME_EXP_IFN(partialEndA < static_cast<long int>(net.nrOfLinks),
                     "Cannot have a spring (" + std::to_string(i) +
                       ") part larger " + std::to_string(partialEndA) +
                       " than the nr of links (" +
                       std::to_string(net.nrOfLinks) + ").");
-    RUNTIME_EXP_IFN(partialEndB < net.nrOfLinks,
+    RUNTIME_EXP_IFN(partialEndB < static_cast<long int>(net.nrOfLinks),
                     "Cannot have a spring (" + std::to_string(i) +
                       ") part larger " + std::to_string(partialEndB) +
                       " than the nr of links (" +
                       std::to_string(net.nrOfLinks) + ").");
-    RUNTIME_EXP_IFN(net.springCoordinateIndexA[3 * i] % 3 == 0,
-                    "Expected spring part coordinates to be sequentially "
-                    "built from spring parts.");
-    RUNTIME_EXP_IFN(net.springCoordinateIndexB[3 * i] % 3 == 0,
-                    "Expected spring part coordinates to be sequentially "
-                    "built from spring parts.");
-    for (int dir = 0; dir < 3; ++dir) {
-      RUNTIME_EXP_IFN(
-        net.springCoordinateIndexA[3 * i + dir] == 3 * partialEndA + dir,
-        "Spring part index and coordinate index must match. Got " +
-          std::to_string(net.springCoordinateIndexA[3 * i + dir]) +
-          " but expected " + std::to_string(3 * partialEndA + dir) +
-          " with dir = " + std::to_string(dir) + ".");
-      RUNTIME_EXP_IFN(
-        net.springCoordinateIndexB[3 * i + dir] == 3 * partialEndB + dir,
-        "Spring part index and coordinate index must match. Got " +
-          std::to_string(net.springCoordinateIndexB[3 * i + dir]) +
-          " but expected " + std::to_string(3 * partialEndB + dir) +
-          " with dir = " + std::to_string(dir) + ".");
-    }
-    RUNTIME_EXP_IFN(net.strandIndexOfSpring[i] >= 0,
-                    "A spring must have an associated strand."
-                    "This seems not to be the case for spring " +
-                      std::to_string(i) + ".");
-    if (net.springIsEntanglement[i]) {
-      RUNTIME_EXP_IFN(
-        net.linkIndicesOfStrand[net.strandIndexOfSpring[i]].size() == 2,
-        "Entangled strands must have exactly two links, strand " +
-          std::to_string(net.strandIndexOfSpring[i]) + " has " +
-          std::to_string(
-            net.linkIndicesOfStrand[net.strandIndexOfSpring[i]].size()) +
-          " links.");
-      RUNTIME_EXP_IFN(net.springContourLength[i] == 1,
-                      "Entangled springs must have a contour length of 1, got" +
-                        std::to_string(net.springContourLength[i]) +
-                        "for spring" + std::to_string(i) + ".");
+    if (partialEndA < 0) {
+      RUNTIME_EXP_IFN(partialEndA == -1 && partialEndB == -1,
+                      "Negative spring part indices may only be -1.");
+      RUNTIME_EXP_IFN(net.strandIndexOfSpring[i] == -1,
+                      "Expect disabled spring to also have a disabled strand.");
+    } else {
+      RUNTIME_EXP_IFN(partialEndB >= 0,
+                      "Unexpected spring part index, got " +
+                        std::to_string(partialEndB) + " for spring " +
+                        std::to_string(i) + ".");
+      RUNTIME_EXP_IFN(net.springCoordinateIndexA[3 * i] % 3 == 0,
+                      "Expected spring part coordinates to be sequentially "
+                      "built from spring parts.");
+      RUNTIME_EXP_IFN(net.springCoordinateIndexB[3 * i] % 3 == 0,
+                      "Expected spring part coordinates to be sequentially "
+                      "built from spring parts.");
+      for (int dir = 0; dir < 3; ++dir) {
+        RUNTIME_EXP_IFN(
+          net.springCoordinateIndexA[3 * i + dir] == 3 * partialEndA + dir,
+          "Spring part index and coordinate index must match. Got " +
+            std::to_string(net.springCoordinateIndexA[3 * i + dir]) +
+            " but expected " + std::to_string(3 * partialEndA + dir) +
+            " with dir = " + std::to_string(dir) + ".");
+        RUNTIME_EXP_IFN(
+          net.springCoordinateIndexB[3 * i + dir] == 3 * partialEndB + dir,
+          "Spring part index and coordinate index must match. Got " +
+            std::to_string(net.springCoordinateIndexB[3 * i + dir]) +
+            " but expected " + std::to_string(3 * partialEndB + dir) +
+            " with dir = " + std::to_string(dir) + ".");
+      }
+      RUNTIME_EXP_IFN(net.strandIndexOfSpring[i] >= 0,
+                      "A spring must have an associated strand."
+                      "This seems not to be the case for spring " +
+                        std::to_string(i) + ".");
+      if (net.springIsEntanglement[i]) {
+        RUNTIME_EXP_IFN(
+          net.linkIndicesOfStrand[net.strandIndexOfSpring[i]].size() == 2,
+          "Entangled strands must have exactly two links, strand " +
+            std::to_string(net.strandIndexOfSpring[i]) + " has " +
+            std::to_string(
+              net.linkIndicesOfStrand[net.strandIndexOfSpring[i]].size()) +
+            " links.");
+        RUNTIME_EXP_IFN(
+          net.springContourLength[i] == 1,
+          "Entangled springs must have a contour length of 1, got" +
+            std::to_string(net.springContourLength[i]) + "for spring" +
+            std::to_string(i) + ".");
+      }
     }
   }
 
