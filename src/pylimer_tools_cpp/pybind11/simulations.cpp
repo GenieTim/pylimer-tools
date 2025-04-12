@@ -1356,15 +1356,6 @@ init_pylimer_bound_sim(py::module_& m)
            Arguments:
                 - values: a list of OutputConfiguration structs
       )pbdoc")
-    .def("config_assume_box_large_enough",
-         &mehp::MEHPForceBalance2::configAssumeBoxLargeEnough,
-         R"pbdoc(
-           Configure whether to run PBC on the bonds or not.
-
-           If your bonds could get larger than half the box length, this must be kept false (default).
-           Otherwise, you can set it to true and therewith get some securities.
-          )pbdoc",
-         py::arg("box_large_enough") = false)
     .def("config_mean_bond_length",
          &mehp::MEHPForceBalance2::configMeanBondLength,
          R"pbdoc(

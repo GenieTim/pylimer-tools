@@ -42,7 +42,6 @@ private:
   Eigen::VectorXd currentDisplacements;
   // configuration
   bool is2D = false;
-  bool assumeBoxLargeEnough = false;
   double kappa = 1.0;
   int crossLinkerType = 2;
   int entanglementType = 3;
@@ -324,11 +323,6 @@ public:
                          this->initialConfig.springContourLength.size(),
                        "Contour length must have the correct dimensions.");
     this->initialConfig.springContourLength = springsContourLengths;
-  }
-
-  void configAssumeBoxLargeEnough(const bool assumption)
-  {
-    this->assumeBoxLargeEnough = assumption;
   }
 
   void configMeanBondLength(const double meanBondLength)
@@ -642,7 +636,7 @@ public:
                                        const size_t springIdx) const
   {
     return this->evaluateSpringVector(
-      net, u, springIdx, this->is2D, this->assumeBoxLargeEnough);
+      net, u, springIdx, this->is2D);
   }
 
   /**
@@ -658,8 +652,7 @@ public:
   Eigen::Vector3d evaluateSpringVector(const ForceBalance2Network& net,
                                        const Eigen::VectorXd& u,
                                        const size_t springIdx,
-                                       bool is2d,
-                                       bool boxLargeEnough) const
+                                       bool is2d) const
   {
     Eigen::Vector3d dist =
       ((net.coordinates.segment(3 * net.springIndexB(springIdx), 3) +
@@ -667,10 +660,6 @@ public:
        (net.coordinates.segment(3 * net.springIndexA(springIdx), 3) +
         u.segment(3 * net.springIndexA(springIdx), 3))) +
       net.springBoxOffset.segment(3 * springIdx, 3);
-
-    if (boxLargeEnough) {
-      this->box.handlePBC<Eigen::Vector3d>(dist);
-    }
 
     if (is2d) {
       dist[2] = 0.0;
@@ -684,19 +673,17 @@ public:
    * @param net the network
    * @param u the current displacements
    * @param is2D
-   * @param assumeLarge
    * @return the vectors of the springs
    */
   Eigen::VectorXd evaluateSpringVectors(const ForceBalance2Network& net,
                                         const Eigen::VectorXd& u,
-                                        const bool is2D,
-                                        const bool assumeLarge) const;
+                                        const bool is2D) const;
 
   Eigen::VectorXd evaluateSpringVectors(const ForceBalance2Network& net,
                                         const Eigen::VectorXd& u) const
   {
     return this->evaluateSpringVectors(
-      net, u, this->is2D, this->assumeBoxLargeEnough);
+      net, u, this->is2D);
   };
 
   /**
@@ -802,20 +789,19 @@ public:
                                          const size_t linkIdx) const
   {
     return this->evaluateSpringVectorTo(
-      net, u, springIdx, linkIdx, this->is2D, this->assumeBoxLargeEnough);
+      net, u, springIdx, linkIdx, this->is2D);
   }
 
   Eigen::Vector3d evaluateSpringVectorTo(const ForceBalance2Network& net,
                                          const Eigen::VectorXd& u,
                                          const size_t springIdx,
                                          const size_t linkIdx,
-                                         bool is2d,
-                                         bool boxLargeEnough) const
+                                         bool is2d) const
   {
     assert(this->isPartOfSpring(net, linkIdx, springIdx));
 
     Eigen::Vector3d dist =
-      this->evaluateSpringVector(net, u, springIdx, is2d, boxLargeEnough);
+      this->evaluateSpringVector(net, u, springIdx, is2d);
 
     return dist * (net.springIndexA(springIdx) == linkIdx ? -1. : 1.);
   }
@@ -835,18 +821,17 @@ public:
                                            const size_t linkIdx) const
   {
     return this->evaluateSpringVectorFrom(
-      net, u, springIdx, linkIdx, this->is2D, this->assumeBoxLargeEnough);
+      net, u, springIdx, linkIdx, this->is2D);
   }
 
   Eigen::Vector3d evaluateSpringVectorFrom(const ForceBalance2Network& net,
                                            const Eigen::VectorXd& u,
                                            const size_t springIdx,
                                            const size_t linkIdx,
-                                           bool is2d,
-                                           bool boxLargeEnough) const
+                                           bool is2d) const
   {
     return -1. * this->evaluateSpringVectorTo(
-                   net, u, springIdx, linkIdx, is2d, boxLargeEnough);
+                   net, u, springIdx, linkIdx, is2d);
   }
 
   ForceBalance2Network getNetwork() { return this->initialConfig; }
@@ -1294,7 +1279,7 @@ protected:
                                    const double tolerance = 1e-3) const
   {
     Eigen::VectorXd partialSpringVectors = this->evaluateSpringVectors(
-      net, u, this->is2D, this->assumeBoxLargeEnough);
+      net, u, this->is2D);
     Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net.nrOfStrands, false);
 
     for (size_t i = 0; i < net.nrOfSprings; ++i) {
@@ -1333,7 +1318,7 @@ protected:
   {
     INVALIDARG_EXP_IFN(dir >= 0 && dir < 3, "Invalid direction");
     Eigen::VectorXd partialSpringVectors = this->evaluateSpringVectors(
-      net, u, this->is2D, this->assumeBoxLargeEnough);
+      net, u, this->is2D);
     Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net.nrOfStrands, false);
 
     for (size_t i = 0; i < net.nrOfSprings; ++i) {
@@ -1393,7 +1378,7 @@ protected:
                                    const double tolerance = 1e-3) const
   {
     Eigen::VectorXd springVectors = this->evaluateSpringVectors(
-      net, u, this->is2D, this->assumeBoxLargeEnough);
+      net, u, this->is2D);
     Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net.nrOfSprings, false);
 
     for (size_t i = 0; i < net.nrOfSprings; ++i) {
