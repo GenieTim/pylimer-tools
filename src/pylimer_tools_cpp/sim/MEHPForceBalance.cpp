@@ -280,7 +280,7 @@ namespace sim {
 
           do {
 #ifndef NDEBUG
-            this->validateNetwork();
+            assert(this->validateNetwork());
 #endif
             nRemovedThisLoop = 0;
             if (simplificationMode ==
@@ -766,7 +766,7 @@ namespace sim {
             net, displacements, springPartitions, springIdx);
 
 #ifndef NDEBUG
-          this->validateNetwork(net, displacements, springPartitions);
+          assert(this->validateNetwork(net, displacements, springPartitions));
 #endif
           numRemoved += 1;
         }
@@ -2197,7 +2197,6 @@ namespace sim {
       }
 #endif
 
-      size_t fullSpringIdx = net.partialToFullSpringIndex[keptSpringIdx];
       // handle links
       std::vector<size_t> removedSpringsLinks =
         net.linkIndicesOfSprings[removedSpringIdx];
@@ -2570,7 +2569,7 @@ namespace sim {
       size_t newKeptSpringIdx = (keptSpringIdx < removedSpringIdx)
                                   ? keptSpringIdx
                                   : (keptSpringIdx - 1);
-      // addmittedly, this is possibly dangerous, as it could hide
+      // admittedly, this is possibly dangerous, as it could hide
       // other mistakes
       double newTotalForNormalization =
         springPartitions(net.localToGlobalSpringIndex[newKeptSpringIdx]).sum();
