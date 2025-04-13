@@ -39,163 +39,116 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
     std::string largeInputFile =
       suspectedPath +
       "/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
-    if (std::filesystem::exists(largeInputFile)) {
-      std::cout << "Reading file " << largeInputFile << std::endl;
-      universeSeq.initializeFromDataSequence({ { largeInputFile } });
-      pe::Universe universe2 = universeSeq.atIndex(0);
-      std::cout << "Read file " << largeInputFile << std::endl;
+    REQUIRE(std::filesystem::exists(largeInputFile));
+    std::cout << "Reading file " << largeInputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { largeInputFile } });
+    pe::Universe universe2 = universeSeq.atIndex(0);
+    std::cout << "Read file " << largeInputFile << std::endl;
 
-      // BENCHMARK_ADVANCED("MEHP LD_MMA " + largeInputFile)
-      // (Catch::Benchmark::Chronometer meter)
-      // {
-      //   pcm::MEHPForceBalance2 forceBalancer3 =
-      //     pcm::MEHPForceBalance2(universe2, 2);
-      //   meter.measure([&forceBalancer3] {
-      //     forceBalancer3.runForceRelaxation("LD_MMA");
-      //     return forceBalancer3.getNrOfIterations();
-      //   });
-      // };
-      // BENCHMARK_ADVANCED("MEHP LD_LBFGS " + largeInputFile)
-      // (Catch::Benchmark::Chronometer meter)
-      // {
-      //   pcm::MEHPForceBalance2 forceBalancer3 =
-      //     pcm::MEHPForceBalance2(universe2, 2);
-      //   meter.measure([&forceBalancer3] {
-      //     forceBalancer3.runForceRelaxation("LD_LBFGS");
-      //     return forceBalancer3.getNrOfIterations();
-      //   });
-      // };
+    double nrOfChains = 1.e4;
+    CHECK(static_cast<double>(universe2.getMolecules(2).size()) ==
+          Catch::Approx(nrOfChains));
+    pcm::MEHPForceBalance2 forceBalancer2 =
+      pcm::MEHPForceBalance2(universe2, 2);
+    size_t nStrandsFb = forceBalancer2.getNrOfStrands();
+    size_t nSpringsFb = forceBalancer2.getNrOfSprings();
 
-      double nrOfChains = 1.e4;
-      CHECK(static_cast<double>(universe2.getMolecules(2).size()) ==
-            Catch::Approx(nrOfChains));
-      pcm::MEHPForceBalance2 forceBalancer2 =
-        pcm::MEHPForceBalance2(universe2, 2);
-
-      // SECTION("Stress tensor computations are equivalent")
-      // {
-      Eigen::Matrix3d stressTensor1 = forceBalancer2.getStressTensor();
-      Eigen::Matrix3d stressTensor2 = forceBalancer2.getStressTensorLinkBased();
-      for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; j < 3; ++j) {
-          CHECK(stressTensor1(i, j) == Catch::Approx(stressTensor2(i, j)));
-        }
+    // SECTION("Stress tensor computations are equivalent")
+    // {
+    Eigen::Matrix3d stressTensor1 = forceBalancer2.getStressTensor();
+    Eigen::Matrix3d stressTensor2 = forceBalancer2.getStressTensorLinkBased();
+    for (size_t i = 0; i < 3; ++i) {
+      for (size_t j = 0; j < 3; ++j) {
+        CHECK(stressTensor1(i, j) == Catch::Approx(stressTensor2(i, j)));
       }
+    }
 
-      SECTION("Actual balance results in correct phantom results")
-      {
-        std::cout << "Doing phantom force balance" << std::endl;
-        pcm::MEHPForceRelaxation forceRelaxer =
-          pcm::MEHPForceRelaxation(universe2, 2);
-        // the strands are different -> cannot compare the distances anymore
-        // CHECK((forceBalancer2.getCurrentSpringDistances() -
-        // forceRelaxer.getCurrentSpringDistances()).isMuchSmallerThan(1e-12));
-        CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
-        CHECK(forceBalancer2.getNrOfIterations() == 0);
-        CHECK(forceBalancer2.getVolume() ==
-              Catch::Approx(universe2.getVolume()));
-        CHECK(forceBalancer2.getVolume() ==
-              Catch::Approx(97.383096 * 97.383096 * 97.383096));
-        // initial system values
-        CHECK_THAT(
-          forceBalancer2.getPressure(),
-          Catch::Matchers::WithinAbs(forceRelaxer.getPressure(), 1e-5));
-        CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0061105865));
-        CHECK_THAT(
-          forceRelaxer.getResidual(),
-          Catch::Matchers::WithinAbs(forceBalancer2.getResidual(), 1e-5));
+    SECTION("Actual balance results in correct phantom results")
+    {
+      std::cout << "Doing phantom force balance" << std::endl;
+      pcm::MEHPForceRelaxation forceRelaxer =
+        pcm::MEHPForceRelaxation(universe2, 2);
+      forceRelaxer.configAssumeBoxLargeEnough(false);
 
-        // run force relaxation
-        CHECK_NOTHROW(forceBalancer2.runForceRelaxation());
-        CHECK_NOTHROW(forceBalancer2.validateNetwork());
-        CHECK(forceBalancer2.getNrOfStrands() == 9859);
-        CHECK(forceBalancer2.getNrOfIterations() > 1);
-        CHECK(forceBalancer2.getResidual() < 1e-5);
-        CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+      CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
+      CHECK(forceBalancer2.getNrOfIterations() == 0);
+      CHECK(forceBalancer2.getVolume() == Catch::Approx(universe2.getVolume()));
+      CHECK(forceBalancer2.getVolume() ==
+            Catch::Approx(97.383096 * 97.383096 * 97.383096));
+      // initial system values
+      CHECK_THAT(forceBalancer2.getPressure(),
+                 Catch::Matchers::WithinAbs(forceRelaxer.getPressure(), 1e-5));
+      CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0061105865));
+      CHECK_THAT(
+        forceRelaxer.getResidual(),
+        Catch::Matchers::WithinAbs(forceBalancer2.getResidual(), 1e-5));
 
-        // conversion factors
-        double kb = 1.381e-23; // Boltzmann, J/K
-        double T = 300.;       // Temperature, K
-        double sigmaToNm = 0.616;
-        double sigmaToM = sigmaToNm * 1.e-9;
-        double slope = 0.00393 / (sigmaToNm * sigmaToNm); // sigma^2/(g/mol)
-        double beadMass = 161.;                           // g/mol
-        double Nb = 80.; // nr of beads per strand
-        double conversionFactor =
-          (forceBalancer2.getNetwork().springContourLength.mean() / Nb) * 3. *
-          kb * T / (slope * beadMass); // J/sigma^2
-        CHECK(conversionFactor / (sigmaToM * sigmaToM * 79.) ==
-              Catch::Approx(0.0002450018));
-        double nu =
-          nrOfChains / (forceBalancer2.getVolume() * sigmaToM * sigmaToM *
-                        sigmaToM); // chain number density, m^-3
-        CHECK(nu == Catch::Approx(4.63241e25));
+      // run force relaxation
+      CHECK_NOTHROW(forceBalancer2.runForceRelaxation());
+      CHECK_NOTHROW(forceBalancer2.validateNetwork());
+      CHECK(forceBalancer2.getNrOfStrands() == nStrandsFb);
+      CHECK(forceBalancer2.getNrOfSprings() == nSpringsFb);
+      CHECK(forceBalancer2.getNrOfIterations() > 1);
+      CHECK(forceBalancer2.getResidual() < 1e-5);
+      CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
 
-        // final values
-        CHECK(forceBalancer2.getPressure() ==
-              Catch::Approx(0.153806 / 79.)); // LJ Units [?]
-        CHECK(
-          forceBalancer2.getPressure() * conversionFactor /
-            (sigmaToM * sigmaToM * sigmaToM) ==
-          Catch::Approx(61172.8878)); // shear modulus from the pressure, MPa
-        double b02 = slope * beadMass;
-        // (forceBalancer2.getDefaultR0Square() / (expectedNb2));
-        CHECK(forceBalancer2.getGammaFactor(1.) ==
-              Catch::Approx(forceBalancer2.getGammaFactors(1.).mean()));
-        CHECK(
-          forceBalancer2.getGammaFactors(b02).mean() ==
-          Catch::Approx((forceBalancer2.getGammaFactorsInDir(b02, 0).mean() +
-                         forceBalancer2.getGammaFactorsInDir(b02, 1).mean() +
-                         forceBalancer2.getGammaFactorsInDir(b02, 2).mean())));
-        CHECK(forceBalancer2.getGammaFactor(b02) ==
-              Catch::Approx(forceBalancer2.getGammaFactors(b02).mean()));
-        CHECK_THAT(
-          forceBalancer2.getGammaFactor(b02) * kb * T * nu,
-          Catch::Matchers::WithinRel(61308.3, 0.03)); // ANT shear modulus, Pa
-        CHECK_THAT(forceBalancer2.getGammaFactor(b02),
-                   Catch::Matchers::WithinRel(
-                     forceBalancer2.getGammaFactor(b02, nrOfChains), 0.03));
-        CHECK_THAT(
-          forceBalancer2.getGammaFactor(b02, nrOfChains),
-          Catch::Matchers::WithinRel(
-            0.319446, 0.03)); // "correct" gamma factor, see Mathematica script
-        // conversion-less Mathematica script: 42.6132
-        CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-        // TODO: find better, more accurate tests here
-        CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
-        CHECK(forceBalancer2.getNrOfActiveStrands() > 1);
-        CHECK(forceBalancer2.getNrOfActiveStrands() <=
-              (forceBalancer2.getNrOfActiveStrandsInDir(0) +
-               forceBalancer2.getNrOfActiveStrandsInDir(1) +
-               forceBalancer2.getNrOfActiveStrandsInDir(2)));
-        CHECK(forceBalancer2.getAverageSpringLength() > 1.0);
-        CHECK(forceBalancer2.getEffectiveFunctionalityOfAtoms().size() ==
-              forceBalancer2.getNrOfNodes());
-      }
-      // also
-      SECTION("Actual balance results in correct slip-link results")
-      {
-        std::cout << "Doing non-phantom force balance" << std::endl;
-        pcm::MEHPForceRelaxation forceRelaxer =
-          pcm::MEHPForceRelaxation(universe2, 2);
-        // the strands are different -> cannot compare the distances anymore
-        // CHECK((forceBalancer2.getCurrentSpringDistances() -
-        // forceRelaxer.getCurrentSpringDistances()).isMuchSmallerThan(1e-12));
-        CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
-        CHECK(forceBalancer2.getNrOfIterations() == 0);
-        CHECK(forceBalancer2.getVolume() ==
-              Catch::Approx(universe2.getVolume()));
-        CHECK(forceBalancer2.getVolume() ==
-              Catch::Approx(97.383096 * 97.383096 * 97.383096));
-        // initial system values
-        CHECK(forceBalancer2.getPressure() ==
-              Catch::Approx(forceRelaxer.getPressure()));
-        CHECK_THAT(forceBalancer2.getPressure(),
-                   Catch::Matchers::WithinRel(0.0061105865, 1e-3));
-      }
-    } else {
-      std::cout << "Skipping large file PDMS MEHP run" << std::endl;
-      CHECK(true);
+      // conversion factors
+      double kb = 1.381e-23; // Boltzmann, J/K
+      double T = 300.;       // Temperature, K
+      double sigmaToNm = 0.616;
+      double sigmaToM = sigmaToNm * 1.e-9;
+      double slope = 0.00393 / (sigmaToNm * sigmaToNm); // sigma^2/(g/mol)
+      double beadMass = 161.;                           // g/mol
+      double Nb = 80.; // nr of beads per strand
+      double conversionFactor =
+        (forceBalancer2.getNetwork().springContourLength.mean() / Nb) * 3. *
+        kb * T / (slope * beadMass); // J/sigma^2
+      CHECK(conversionFactor / (sigmaToM * sigmaToM * 79.) ==
+            Catch::Approx(0.0002450018));
+      double nu =
+        nrOfChains / (forceBalancer2.getVolume() * sigmaToM * sigmaToM *
+                      sigmaToM); // chain number density, m^-3
+      CHECK(nu == Catch::Approx(4.63241e25));
+
+      // final values
+      CHECK(forceBalancer2.getPressure() ==
+            Catch::Approx(0.153806 / 79.)); // LJ Units [?]
+      CHECK(forceBalancer2.getPressure() * conversionFactor /
+              (sigmaToM * sigmaToM * sigmaToM) ==
+            Catch::Approx(61172.8878)); // shear modulus from the pressure, MPa
+      double b02 = slope * beadMass;
+      // (forceBalancer2.getDefaultR0Square() / (expectedNb2));
+      CHECK(forceBalancer2.getGammaFactor(1.) ==
+            Catch::Approx(forceBalancer2.getGammaFactors(1.).mean()));
+      CHECK(
+        forceBalancer2.getGammaFactors(b02).mean() ==
+        Catch::Approx((forceBalancer2.getGammaFactorsInDir(b02, 0).mean() +
+                       forceBalancer2.getGammaFactorsInDir(b02, 1).mean() +
+                       forceBalancer2.getGammaFactorsInDir(b02, 2).mean())));
+      CHECK(forceBalancer2.getGammaFactor(b02) ==
+            Catch::Approx(forceBalancer2.getGammaFactors(b02).mean()));
+      CHECK_THAT(
+        forceBalancer2.getGammaFactor(b02) * kb * T * nu,
+        Catch::Matchers::WithinRel(61308.3, 0.03)); // ANT shear modulus, Pa
+      CHECK_THAT(forceBalancer2.getGammaFactor(b02),
+                 Catch::Matchers::WithinRel(
+                   forceBalancer2.getGammaFactor(b02, nrOfChains), 0.03));
+      CHECK_THAT(
+        forceBalancer2.getGammaFactor(b02, nrOfChains),
+        Catch::Matchers::WithinRel(
+          0.319446, 0.03)); // "correct" gamma factor, see Mathematica script
+      // conversion-less Mathematica script: 42.6132
+      CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+      // TODO: find better, more accurate tests here
+      CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
+      CHECK(forceBalancer2.getNrOfActiveStrands() > 1);
+      CHECK(forceBalancer2.getNrOfActiveStrands() <=
+            (forceBalancer2.getNrOfActiveStrandsInDir(0) +
+             forceBalancer2.getNrOfActiveStrandsInDir(1) +
+             forceBalancer2.getNrOfActiveStrandsInDir(2)));
+      CHECK(forceBalancer2.getAverageSpringLength() > 1.0);
+      CHECK(forceBalancer2.getEffectiveFunctionalityOfAtoms().size() ==
+            forceBalancer2.getNrOfNodes());
     }
   }
 
@@ -214,64 +167,34 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
     CHECK(forceBalancer.getNrOfIterations() == 0);
     CHECK(forceBalancer.getVolume() == Catch::Approx(universe.getVolume()));
     forceBalancer.runForceRelaxation();
-    CHECK(forceBalancer.getNrOfNodes() != universe.getNrOfAtoms());
-    CHECK(forceBalancer.getNrOfIterations() <= 5);
+    CHECK(forceBalancer.getNrOfNodes() < universe.getNrOfAtoms());
     CHECK(forceBalancer.getNrOfIterations() >= 1);
     CHECK(universe.getAtomsOfType(2).size() == 7200);
-    CHECK(forceBalancer.getExitReason() == pcm::ExitReason::MAX_STEPS);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
-    // run again, this time fully
-    pcm::MEHPForceBalance2 forceBalancer2 =
-      pcm::MEHPForceBalance2(universe, 2, true);
-    forceBalancer2.runForceRelaxation();
-    CHECK(forceBalancer2.getNrOfIterations() > 5);
-    CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-    CHECK(forceBalancer2.getGammaFactor(1., forceBalancer2.getNrOfStrands()) ==
+    CHECK(forceBalancer.getGammaFactor(1., forceBalancer.getNrOfStrands()) ==
           Catch::Approx(1. / 3.).epsilon(0.001));
-    auto stressTensor = forceBalancer2.getStressTensor();
-    CHECK(forceBalancer2.getPressure() ==
+    auto stressTensor = forceBalancer.getStressTensor();
+    CHECK(forceBalancer.getPressure() ==
           Catch::Approx(
             (stressTensor(0, 0) + stressTensor(1, 1) + stressTensor(2, 2)) / 3.)
             .epsilon(0.02));
-    CHECK_NOTHROW(forceBalancer2.validateNetwork());
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
     // TODO: find better, more accurate tests here
-    CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
-    CHECK(forceBalancer2.getNrOfActiveStrands() > 1);
-    CHECK(forceBalancer2.getAverageSpringLength() > 1.0);
-    CHECK(forceBalancer2.getEffectiveFunctionalityOfAtoms().size() ==
-          forceBalancer2.getNrOfNodes());
+    CHECK(forceBalancer.getNrOfActiveNodes() > 1);
+    CHECK(forceBalancer.getNrOfActiveStrands() > 1);
+    CHECK(forceBalancer.getAverageSpringLength() > 1.0);
+    CHECK(forceBalancer.getEffectiveFunctionalityOfAtoms().size() ==
+          forceBalancer.getNrOfNodes());
 
-    pe::Universe universe3 = forceBalancer2.getCrosslinkerVerse();
-    CHECK(universe3.getNrOfAtoms() == forceBalancer2.getNrOfNodes());
-    CHECK(universe3.getNrOfBonds() == forceBalancer2.getNrOfStrands());
+    pe::Universe universe3 = forceBalancer.getCrosslinkerVerse();
+    CHECK(universe3.getNrOfAtoms() == forceBalancer.getNrOfNodes());
+    CHECK(universe3.getNrOfBonds() == forceBalancer.getNrOfStrands());
     CHECK(universe3.getAtomsOfType(2).size() == universe3.getNrOfAtoms());
-
-    // try out different algorithms
-    std::vector<std::string> algorithms = { "LD_MMA",
-                                            // "LD_TNEWTON_PRECOND_RESTART",
-                                            // "GD_STOGO",
-                                            "LD_SLSQP",
-                                            "GN_DIRECT" };
-
-    // for (std::string algorithm : algorithms) {
-    //   pcm::MEHPForceBalance2 forceBalancerN =
-    //     pcm::MEHPForceBalance2(universe, 2);
-    //   std::cout << "Testing algorithm " << algorithm << std::endl;
-    //   auto start = std::chrono::high_resolution_clock::now();
-    //   forceBalancerN.runForceRelaxation(true, 15, algorithm.c_str(), 10000);
-    //   auto stop = std::chrono::high_resolution_clock::now();
-    //   CHECK(forceBalancerN.getGammaEq() ==
-    //         Catch::Approx(forceBalancer2.getGammaEq()));
-    //   CHECK(forceBalancerN.getFinalPressure() ==
-    //         Catch::Approx(forceBalancer2.getFinalPressure()));
-    //   auto duration = duration_cast<std::chrono::microseconds>(stop - start);
-    //   std::cout << "Took: " << duration.count() << std::endl;
-    // }
   }
 }
 
 TEST_CASE(
-  "MEHP Force Balance2 can randomly add slip-links ignoring crosslinkers",
+  "MEHP Force Balance2 can randomly add entanglements ignoring crosslinkers",
   "[analysis][MEHPForceBalance2]")
 {
   std::cout << "Running test \"MEHP Force Balance2 can randomly add slip-links "
@@ -305,9 +228,6 @@ TEST_CASE(
       forceBalancer.unlinkBifunctionalLinks(net, displacements);
     CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
     CHECK(numRemoved > 0);
-    // numRemoved = forceBalancer.removeInactiveLinks(net, displacements,
-    // partitions, 1e-20); CHECK(numRemoved == 204); // TODO: analyze these
-    size_t nrOfSpringsBefore = net.nrOfSprings;
     CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
     // remove all springs...
     numRemoved = forceBalancer.removeInactiveLinks(net, displacements, 1e5);
@@ -316,51 +236,11 @@ TEST_CASE(
   }
 }
 
-TEST_CASE("MEHP Force Balance2 can run with swapping slip-links",
-          "[analysis][MEHPForceBalance2][long]")
-{
-  std::cout
-    << "Running test \"MEHP Force Balance2 can run with swapping slip-links\""
-    << std::endl;
-  pe::UniverseSequence universeSeq = pe::UniverseSequence();
-  CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
-
-  std::string inputFile =
-    suspectedPath + "/structure/network_100_a_46.structure.out";
-  if (std::filesystem::exists(inputFile)) {
-    CHECK(std::filesystem::exists(suspectedPath));
-    std::cout << "Reading file " << inputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    CHECK(universeSeq.getLength() == 1);
-    pe::Universe universe = universeSeq.atIndex(0);
-    std::cout << "Read file. " << std::endl;
-    pcm::MEHPForceBalance2 forceBalancer =
-      pcm::MEHPForceBalance2(universe, 250, 2.0, 0.0, 25, 0, "12309asdseed");
-    size_t nrOfAddedLinks =
-      forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
-    CHECK(nrOfAddedLinks >= 25);
-    // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
-    pe::Box oldBox = universe.getBox();
-    pe::Box newBox =
-      pe::Box(4 * oldBox.getLx(), 0.5 * oldBox.getLy(), 0.5 * oldBox.getLz());
-    forceBalancer.deformTo(newBox);
-
-    SECTION("Assuming too small box")
-    {
-
-      CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-        pcm::StructureSimplificationMode::ALL_TIM));
-    }
-  }
-}
-
-TEST_CASE(
-  "MEHP Force Balance2 can randomly add and remove slip-links with small box",
-  "[analysis][MEHPForceBalance2]")
+TEST_CASE("MEHP Force Balance2 can randomly add and remove entanglements",
+          "[analysis][MEHPForceBalance2]")
 {
   std::cout << "Running test \"MEHP Force Balance2 can randomly add and remove "
-               "slip-links with small box\""
+               "entanglements\""
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
@@ -449,6 +329,8 @@ TEST_CASE(
       CHECK_NOTHROW(forceBalancer2.runForceRelaxation());
       CHECK(forceBalancer2.getNrOfIterations() > 1);
       CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+      CHECK_THAT(forceBalancer2.getSolubleWeightFraction(),
+                 Catch::Matchers::WithinAbs(1., 0.01));
     }
   }
 }
@@ -509,22 +391,18 @@ TEST_CASE("MEHP Force Balance2 Free chains collapse",
   CHECK(forceBalancer.getNrOfStrands() == forceBalancer.getNrOfSprings());
   CHECK(forceBalancer.getNrOfStrands() == nrOfBeads / nrOfBeadsPerChain);
 
-  SECTION("Not large enough box")
-  {
-
-    CHECK_NOTHROW(forceBalancer.runForceRelaxation());
-    CHECK(forceBalancer.getNrOfIterations() > 0);
-    CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-    CHECK(forceBalancer.getNrOfActiveStrands() == 0);
-    CHECK(forceBalancer.getActiveWeightFraction() == 0.);
-    CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
-               Catch::Matchers::WithinRel(1.));
-    CHECK_THAT(forceBalancer.getDanglingWeightFraction(),
-               Catch::Matchers::WithinAbs(0., 1e-9));
-    CHECK(forceBalancer.getAverageSpringLength() >= 0.0);
-    CHECK(forceBalancer.getAverageSpringLength() <= 3e-6);
-    CHECK_NOTHROW(forceBalancer.validateNetwork());
-  }
+  CHECK_NOTHROW(forceBalancer.runForceRelaxation());
+  CHECK(forceBalancer.getNrOfIterations() > 0);
+  CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+  CHECK(forceBalancer.getNrOfActiveStrands() == 0);
+  CHECK(forceBalancer.getActiveWeightFraction() == 0.);
+  CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
+             Catch::Matchers::WithinRel(1.));
+  CHECK_THAT(forceBalancer.getDanglingWeightFraction(),
+             Catch::Matchers::WithinAbs(0., 1e-9));
+  CHECK(forceBalancer.getAverageSpringLength() >= 0.0);
+  CHECK(forceBalancer.getAverageSpringLength() <= 3e-6);
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
 }
 
 TEST_CASE("MEHP Force Balance2 Entanglement Beads Are Removed",
@@ -581,15 +459,12 @@ TEST_CASE("MEHP Force Balance2 Entanglement Beads Are Removed",
     CHECK(forceBalancer.getNrOfStrands() == forceBalancer.getNrOfSprings());
     CHECK(forceBalancer.getNrOfStrands() == nrOfBeads / nrOfBeadsPerChain + 3);
 
-    SECTION("Not large enough box")
-    {
-      CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-        pcm::StructureSimplificationMode::ALL_TIM));
-      CHECK(forceBalancer.getNrOfIterations() > 0);
-      CHECK(forceBalancer.getNrOfActiveStrands() == 0);
-      CHECK(forceBalancer.getNrOfStrands() == 0);
-      CHECK_NOTHROW(forceBalancer.validateNetwork());
-    }
+    CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+      pcm::StructureSimplificationMode::ALL_TIM));
+    CHECK(forceBalancer.getNrOfIterations() > 0);
+    CHECK(forceBalancer.getNrOfActiveStrands() == 0);
+    CHECK(forceBalancer.getNrOfStrands() == 0);
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
   }
   SECTION("Entanglement springs")
   {
@@ -598,15 +473,12 @@ TEST_CASE("MEHP Force Balance2 Entanglement Beads Are Removed",
     CHECK(forceBalancer.getNrOfStrands() == forceBalancer.getNrOfSprings());
     CHECK(forceBalancer.getNrOfStrands() == nrOfBeads / nrOfBeadsPerChain + 3);
 
-    SECTION("Not large enough box")
-    {
-      CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-        pcm::StructureSimplificationMode::ALL_TIM));
-      CHECK(forceBalancer.getNrOfIterations() > 0);
-      CHECK(forceBalancer.getNrOfActiveStrands() == 0);
-      CHECK(forceBalancer.getNrOfStrands() == 0);
-      CHECK_NOTHROW(forceBalancer.validateNetwork());
-    }
+    CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+      pcm::StructureSimplificationMode::ALL_TIM));
+    CHECK(forceBalancer.getNrOfIterations() > 0);
+    CHECK(forceBalancer.getNrOfActiveStrands() == 0);
+    CHECK(forceBalancer.getNrOfStrands() == 0);
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
   }
 }
 
@@ -645,32 +517,50 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
         pcm::MEHPForceBalance2(universe, 2, false);
       size_t initialNSprings = forceBalancer.getNrOfStrands();
 
-      SECTION("For not large enough box")
-      {
-
-        CHECK(forceBalancer.getNrOfActiveStrands() ==
-              forceBalancer.getNrOfStrands());
-        double initialResidual = forceBalancer.getDisplacementResidualNorm();
-        CHECK(std::isfinite(initialResidual));
-        REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-          pcm::StructureSimplificationMode::ALL_TIM));
-        CHECK(forceBalancer.getNrOfIterations() > 0);
-        CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-        CHECK(forceBalancer.getNrOfActiveStrands() ==
-              forceBalancer.getNrOfStrands());
-        CHECK(forceBalancer.getNrOfStrands() == initialNSprings);
-        CHECK_THAT(forceBalancer.getActiveWeightFraction(),
-                   Catch::Matchers::WithinRel(1.0));
-        CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
-                   Catch::Matchers::WithinAbs(0.0, 1e-9));
-        CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
-      }
+      CHECK(forceBalancer.getNrOfActiveStrands() ==
+            forceBalancer.getNrOfStrands());
+      double initialResidual = forceBalancer.getDisplacementResidualNorm();
+      CHECK(std::isfinite(initialResidual));
+      REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
+        pcm::StructureSimplificationMode::ALL_TIM));
+      CHECK(forceBalancer.getNrOfIterations() > 0);
+      CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+      CHECK(forceBalancer.getNrOfActiveStrands() ==
+            forceBalancer.getNrOfStrands());
+      CHECK(forceBalancer.getNrOfStrands() == initialNSprings);
+      CHECK_THAT(forceBalancer.getActiveWeightFraction(),
+                 Catch::Matchers::WithinRel(1.0));
+      CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
+                 Catch::Matchers::WithinAbs(0.0, 1e-9));
+      CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
     }
 
-    SECTION("With entanglements")
+    SECTION("With entanglement links")
     {
       pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(
-        universe, 400, 2.0, 0.0, 100, 0.0, "a533d", 2, false);
+        universe, 400, 2.0, 0.0, 100, 0.0, "a533d", 2, false, false, false);
+
+      CHECK(forceBalancer.getNrOfActiveStrands() ==
+            forceBalancer.getNrOfStrands());
+      double initialResidual = forceBalancer.getDisplacementResidualNorm();
+      CHECK(std::isfinite(initialResidual));
+      REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
+        pcm::StructureSimplificationMode::ALL_TIM));
+      CHECK(forceBalancer.getNrOfIterations() > 0);
+      CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+      CHECK(forceBalancer.getNrOfActiveStrands() ==
+            forceBalancer.getNrOfStrands());
+      CHECK_THAT(forceBalancer.getActiveWeightFraction(),
+                 Catch::Matchers::WithinRel(1.0));
+      CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
+                 Catch::Matchers::WithinAbs(0.0, 1e-9));
+      CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
+    }
+
+    SECTION("With entanglement springs")
+    {
+      pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(
+        universe, 400, 2.0, 0.0, 100, 0.0, "a533d", 2, false, false, true);
 
       CHECK(forceBalancer.getNrOfActiveStrands() ==
             forceBalancer.getNrOfStrands());
@@ -691,10 +581,13 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
   }
 }
 
-TEST_CASE("MEHP Force Balance2 Gives Identical Results for Different PBC "
-          "imperfect Diamond Network",
+TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
+          "& springs in diamond network",
           "[analysis][MEHPForceBalance2]")
 {
+  std::cout << "Running test \"MEHPForceBalance2 gives approx. same results "
+               "for entanglement links & springs in diamond network\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
@@ -704,83 +597,82 @@ TEST_CASE("MEHP Force Balance2 Gives Identical Results for Different PBC "
   std::string inputFile =
     suspectedPath +
     "/structure/3d-diamond-lattice_5x5x5_a_3_d_0.85_imperfect.structure.out";
-  if (std::filesystem::exists(inputFile)) {
-    std::cout << "Reading file " << inputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    pe::Universe universe = universeSeq.atIndex(0);
-    std::cout << "Read file " << inputFile << std::endl;
+  REQUIRE(std::filesystem::exists(inputFile));
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  std::cout << "Read file " << inputFile << std::endl;
 
-    pcm::MEHPForceBalance forceBalanceConventional =
-      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 250, 2.0, 0.0, 100, 2.0, "a533d", 2, false);
-    forceBalanceConventional.configAssumeBoxLargeEnough(true);
+  auto entanglements =
+    pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
+      universe, 250, 2.5, 0., 10, 3, "a533d");
 
-    pcm::MEHPForceBalance2 forceBalanceNew = pcm::MEHPForceBalance2(
-      universe, 250, 2.0, 0.0, 100, 2.0, "a533d", 2, false);
+  pcm::MEHPForceBalance2 forceBalanceLinks =
+    pcm::MEHPForceBalance2(universe, entanglements, 2, false, false);
 
-    CHECK(forceBalanceConventional.getStressTensor().isApprox(
-      forceBalanceNew.getStressTensor()));
+  pcm::MEHPForceBalance2 forceBalanceSprings =
+    pcm::MEHPForceBalance2(universe, entanglements, 2, false, true);
 
-    double initialResidual =
-      forceBalanceConventional.getDisplacementResidualNorm();
-    CHECK(initialResidual ==
-          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
+  CHECK(forceBalanceLinks.getStressTensor().isApprox(
+    forceBalanceSprings.getStressTensor()));
 
-    forceBalanceConventional.runForceRelaxation();
-    forceBalanceNew.runForceRelaxation();
+  double initialResidual = forceBalanceLinks.getDisplacementResidualNorm();
+  CHECK(initialResidual ==
+        Catch::Approx(forceBalanceSprings.getDisplacementResidualNorm()));
 
-    CHECK(forceBalanceConventional.getStressTensor().isApprox(
-      forceBalanceNew.getStressTensor()));
-    CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
-          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
-    CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
-               Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
-    CHECK(forceBalanceConventional.getNrOfSprings() ==
-          forceBalanceNew.getNrOfSprings());
-    CHECK(forceBalanceConventional.getCurrentDisplacements().isApprox(
-      forceBalanceNew.getCurrentDisplacements()));
+  forceBalanceLinks.runForceRelaxation();
+  forceBalanceSprings.runForceRelaxation();
 
-    forceBalanceConventional.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM, 0.01);
-    forceBalanceNew.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM, 0.01);
+  CHECK(forceBalanceLinks.getStressTensor().isApprox(
+    forceBalanceSprings.getStressTensor()));
+  CHECK(forceBalanceLinks.getDisplacementResidualNorm() ==
+        Catch::Approx(forceBalanceSprings.getDisplacementResidualNorm()));
+  CHECK_THAT(
+    forceBalanceLinks.getIdsOfActiveNodes(),
+    Catch::Matchers::Equals(forceBalanceSprings.getIdsOfActiveNodes()));
+  CHECK(forceBalanceLinks.getNrOfSprings() <
+        forceBalanceSprings.getNrOfSprings());
 
-    CHECK(forceBalanceConventional.getStressTensor().isApprox(
-      forceBalanceNew.getStressTensor()));
-    CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
-          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
-    CHECK(forceBalanceConventional.getNrOfSprings() ==
-          forceBalanceNew.getNrOfSprings());
-    CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
-               Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
-    CHECK(forceBalanceConventional.getNrOfSprings() ==
-          forceBalanceNew.getNrOfSprings());
-    CHECK(forceBalanceConventional.getCurrentDisplacements().isApprox(
-      forceBalanceNew.getCurrentDisplacements()));
+  forceBalanceLinks.runForceRelaxation(
+    pcm::StructureSimplificationMode::ALL_TIM, 0.01);
+  forceBalanceSprings.runForceRelaxation(
+    pcm::StructureSimplificationMode::ALL_TIM, 0.01);
 
-    forceBalanceConventional.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM, 0.01);
-    forceBalanceNew.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM, 0.01);
+  CHECK(forceBalanceLinks.getStressTensor().isApprox(
+    forceBalanceSprings.getStressTensor()));
+  CHECK(forceBalanceLinks.getDisplacementResidualNorm() ==
+        Catch::Approx(forceBalanceSprings.getDisplacementResidualNorm()));
+  CHECK(forceBalanceLinks.getNrOfSprings() ==
+        forceBalanceSprings.getNrOfSprings());
+  CHECK_THAT(
+    forceBalanceLinks.getIdsOfActiveNodes(),
+    Catch::Matchers::Equals(forceBalanceSprings.getIdsOfActiveNodes()));
+  CHECK(forceBalanceLinks.getNrOfSprings() <
+        forceBalanceSprings.getNrOfSprings());
 
-    CHECK(forceBalanceConventional.getNrOfSprings() ==
-          forceBalanceNew.getNrOfSprings());
-    CHECK(forceBalanceConventional.getStressTensor().isApprox(
-      forceBalanceNew.getStressTensor()));
-    CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
-          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
-    CHECK(forceBalanceConventional.getCurrentDisplacements().isApprox(
-      forceBalanceNew.getCurrentDisplacements()));
-    CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
-               Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
-  }
+  forceBalanceLinks.runForceRelaxation(
+    pcm::StructureSimplificationMode::ALL_TIM, 0.01);
+  forceBalanceSprings.runForceRelaxation(
+    pcm::StructureSimplificationMode::ALL_TIM, 0.01);
+
+  CHECK(forceBalanceLinks.getNrOfSprings() <
+        forceBalanceSprings.getNrOfSprings());
+  CHECK(forceBalanceLinks.getStressTensor().isApprox(
+    forceBalanceSprings.getStressTensor()));
+  CHECK(forceBalanceLinks.getDisplacementResidualNorm() ==
+        Catch::Approx(forceBalanceSprings.getDisplacementResidualNorm()));
+  CHECK_THAT(
+    forceBalanceLinks.getIdsOfActiveNodes(),
+    Catch::Matchers::Equals(forceBalanceSprings.getIdsOfActiveNodes()));
 }
 
-TEST_CASE("MEHP Force Balance2 Gives Identical Results for Different PBC p = 1",
+TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
+          "& springs in p = 1 network",
           "[analysis][MEHPForceBalance2][long]")
 {
-  std::cout << "Running test \"MEHP Force Balance2 Gives Identical Results for "
-               "Different PBC p = 1\""
+  std::cout << "Running test \"MEHPForceBalance2 gives approx. same results "
+               "for entanglement links "
+               "& springs in p = 1 network\""
             << std::endl;
 
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -794,65 +686,52 @@ TEST_CASE("MEHP Force Balance2 Gives Identical Results for Different PBC p = 1",
     "/structure/"
     "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
     "structure.out-equilibration_do_crosslink.structure.out";
-  if (std::filesystem::exists(inputFile)) {
-    std::cout << "Reading file " << inputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    pe::Universe universe = universeSeq.atIndex(0);
-    std::cout << "Read file " << inputFile << std::endl;
+  REQUIRE(std::filesystem::exists(inputFile));
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  std::cout << "Read file " << inputFile << std::endl;
 
-    pcm::MEHPForceBalance forceBalanceConventional =
-      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 25, 2.0, 0.0, 20, 2.0, "a533d", 2, false);
-    forceBalanceConventional.configAssumeBoxLargeEnough(true);
+  auto entanglements =
+    pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
+      universe, 25, 2.5, 0., 5, 2, "*a533d");
 
-    pcm::MEHPForceBalance2 forceBalanceNew = pcm::MEHPForceBalance2(
-      universe, 25, 2.0, 0.0, 20, 2.0, "a533d", 2, false);
+  pcm::MEHPForceBalance2 forceBalanceLinks =
+    pcm::MEHPForceBalance2(universe, entanglements, 2, false, false);
 
-    CHECK(forceBalanceConventional.getStressTensor().isApprox(
-      forceBalanceNew.getStressTensor()));
+  pcm::MEHPForceBalance2 forceBalanceSprings =
+    pcm::MEHPForceBalance2(universe, entanglements, 2, false, true);
 
-    double initialResidual =
-      forceBalanceConventional.getDisplacementResidualNorm();
-    CHECK(initialResidual ==
-          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
+  CHECK(forceBalanceLinks.getStressTensor().isApprox(
+    forceBalanceSprings.getStressTensor()));
 
-    forceBalanceConventional.runForceRelaxation();
-    forceBalanceNew.runForceRelaxation();
+  double initialResidual = forceBalanceLinks.getDisplacementResidualNorm();
+  CHECK(initialResidual ==
+        Catch::Approx(forceBalanceSprings.getDisplacementResidualNorm()));
 
-    CHECK(forceBalanceConventional.getStressTensor().isApprox(
-      forceBalanceNew.getStressTensor()));
-    CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
-          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
-    CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
-               Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
+  forceBalanceLinks.runForceRelaxation();
+  forceBalanceSprings.runForceRelaxation();
 
-    forceBalanceConventional.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM, 0.01);
-    forceBalanceNew.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM, 0.01);
+  CHECK(forceBalanceLinks.getStressTensor().isApprox(
+    forceBalanceSprings.getStressTensor()));
+  CHECK(forceBalanceLinks.getDisplacementResidualNorm() ==
+        Catch::Approx(forceBalanceSprings.getDisplacementResidualNorm()));
+  CHECK_THAT(
+    forceBalanceLinks.getIdsOfActiveNodes(),
+    Catch::Matchers::Equals(forceBalanceSprings.getIdsOfActiveNodes()));
 
-    CHECK(forceBalanceConventional.getStressTensor().isApprox(
-      forceBalanceNew.getStressTensor()));
-    CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
-          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
-    CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
-               Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
+  forceBalanceLinks.runForceRelaxation(
+    pcm::StructureSimplificationMode::ALL_TIM, 0.01);
+  forceBalanceSprings.runForceRelaxation(
+    pcm::StructureSimplificationMode::ALL_TIM, 0.01);
 
-    forceBalanceConventional.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM, 0.01);
-    forceBalanceNew.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM, 0.01);
-
-    CHECK(forceBalanceConventional.getStressTensor().isApprox(
-      forceBalanceNew.getStressTensor()));
-    CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
-          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
-    CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
-               Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
-  } else {
-    std::cout << "File " << inputFile << " does not exists. Skipping test."
-              << std::endl;
-  }
+  CHECK(forceBalanceLinks.getStressTensor().isApprox(
+    forceBalanceSprings.getStressTensor()));
+  CHECK(forceBalanceLinks.getDisplacementResidualNorm() ==
+        Catch::Approx(forceBalanceSprings.getDisplacementResidualNorm()));
+  CHECK_THAT(
+    forceBalanceLinks.getIdsOfActiveNodes(),
+    Catch::Matchers::Equals(forceBalanceSprings.getIdsOfActiveNodes()));
 }
 
 TEST_CASE("MEHP Force Balance2 does not collapse",
@@ -882,38 +761,35 @@ TEST_CASE("MEHP Force Balance2 does not collapse",
     { { 1, 1, 1, 1, 3, 3, 3, 3, 5, 5, 5, 5, 7, 7, 7, 7 } },
     { { 2, 9, 4, 11, 2, 4, 10, 12, 9, 11, 6, 8, 6, 8, 10, 12 } });
 
-  SECTION("Assuming too small box")
-  {
-    pcm::MEHPForceBalance2 forceBalanceNew =
-      pcm::MEHPForceBalance2(universe, 2, true);
-    CHECK_NOTHROW(forceBalanceNew.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM));
-    CHECK(forceBalanceNew.getNrOfIterations() > 0);
-    CHECK(forceBalanceNew.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-    CHECK(forceBalanceNew.getNrOfActiveStrands() ==
-          forceBalanceNew.getNrOfStrands());
-    // compare to what we expect
-    CHECK(forceBalanceNew.getNrOfActiveStrands() == 8);
+  pcm::MEHPForceBalance2 forceBalanceNew =
+    pcm::MEHPForceBalance2(universe, 2, true);
+  CHECK_NOTHROW(forceBalanceNew.runForceRelaxation(
+    pcm::StructureSimplificationMode::ALL_TIM));
+  CHECK(forceBalanceNew.getNrOfIterations() > 0);
+  CHECK(forceBalanceNew.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+  CHECK(forceBalanceNew.getNrOfActiveStrands() ==
+        forceBalanceNew.getNrOfStrands());
+  // compare to what we expect
+  CHECK(forceBalanceNew.getNrOfActiveStrands() == 8);
 
-    CHECK(forceBalanceNew.getNrOfActiveStrands() <=
-          (forceBalanceNew.getNrOfActiveStrandsInDir(0) +
-           forceBalanceNew.getNrOfActiveStrandsInDir(1) +
-           forceBalanceNew.getNrOfActiveStrandsInDir(2)));
-    CHECK(forceBalanceNew.getNrOfActiveNodes() == 4);
-    CHECK(forceBalanceNew.getAverageSpringLength() == Catch::Approx(5.0));
-    // forceBalanceNew.setSpringContourLengths(
-    //   Eigen::VectorXd::Constant(forceBalanceNew.getNrOfSprings(), 5.));
-    // TODO: check this again
-    CHECK_THAT(forceBalanceNew.getGammaFactor(1., 100),
-               Catch::Matchers::WithinAbs(1.0, 1e-2));
-    CHECK_THAT(forceBalanceNew.getPressure(),
-               Catch::Matchers::WithinAbs(1. / 30., 1e-3));
-    // outputNetwork(forceBalanceNew.getNetwork(),
-    //               forceBalanceNew.getCurrentDisplacements(),
-    //               forceBalanceNew.getSpringPartitions());
-    CHECK_THAT(forceBalanceNew.getSolubleWeightFraction(),
-               Catch::Matchers::WithinAbs(0.0, 1e-9));
-  }
+  CHECK(forceBalanceNew.getNrOfActiveStrands() <=
+        (forceBalanceNew.getNrOfActiveStrandsInDir(0) +
+         forceBalanceNew.getNrOfActiveStrandsInDir(1) +
+         forceBalanceNew.getNrOfActiveStrandsInDir(2)));
+  CHECK(forceBalanceNew.getNrOfActiveNodes() == 4);
+  CHECK(forceBalanceNew.getAverageSpringLength() == Catch::Approx(5.0));
+  // forceBalanceNew.setSpringContourLengths(
+  //   Eigen::VectorXd::Constant(forceBalanceNew.getNrOfSprings(), 5.));
+  // TODO: check this again
+  CHECK_THAT(forceBalanceNew.getGammaFactor(1., 100),
+             Catch::Matchers::WithinAbs(1.0, 1e-2));
+  CHECK_THAT(forceBalanceNew.getPressure(),
+             Catch::Matchers::WithinAbs(1. / 30., 1e-3));
+  // outputNetwork(forceBalanceNew.getNetwork(),
+  //               forceBalanceNew.getCurrentDisplacements(),
+  //               forceBalanceNew.getSpringPartitions());
+  CHECK_THAT(forceBalanceNew.getSolubleWeightFraction(),
+             Catch::Matchers::WithinAbs(0.0, 1e-9));
 };
 
 TEST_CASE(
@@ -929,31 +805,30 @@ TEST_CASE(
 
   std::string inputFile =
     suspectedPath + "/structure/melt_83_a_100.structure.out";
-  if (std::filesystem::exists(inputFile)) {
-    std::cout << "Reading file " << inputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    pe::Universe universe = universeSeq.atIndex(0);
-    std::cout << "Read file " << inputFile << std::endl;
+  REQUIRE(std::filesystem::exists(inputFile));
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  std::cout << "Read file " << inputFile << std::endl;
 
-    pcm::MEHPForceBalance2 forceBalancer =
-      pcm::MEHPForceBalance2(universe, 1000, 2.0, 0.0, 100, 5, "my_seed_fb12");
+  pcm::MEHPForceBalance2 forceBalancer =
+    pcm::MEHPForceBalance2(universe, 1000, 2.0, 0.0, 100, 5, "my_seed_fb12");
 
-    CHECK_NOTHROW(forceBalancer.validateNetwork());
-    double initialResidual = forceBalancer.getDisplacementResidualNorm();
-    CHECK(std::isfinite(initialResidual));
-    CHECK(forceBalancer.getNumExtraAtoms() > 100);
-    CHECK(forceBalancer.getNetwork().nrOfSprings >
-          forceBalancer.getNetwork().nrOfStrands);
-    CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM));
-    CHECK(forceBalancer.getNrOfIterations() > 0);
-    CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-    CHECK(forceBalancer.getNrOfActiveStrands() == 0);
-    CHECK(forceBalancer.getNrOfActiveStrandsInDir(0) == 0);
-    CHECK(forceBalancer.getNrOfActiveStrandsInDir(1) == 0);
-    CHECK(forceBalancer.getNrOfActiveStrandsInDir(2) == 0);
-    CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
-  }
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
+  double initialResidual = forceBalancer.getDisplacementResidualNorm();
+  CHECK(std::isfinite(initialResidual));
+  CHECK(forceBalancer.getNumExtraAtoms() > 100);
+  CHECK(forceBalancer.getNetwork().nrOfSprings >
+        forceBalancer.getNetwork().nrOfStrands);
+  CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+    pcm::StructureSimplificationMode::ALL_TIM));
+  CHECK(forceBalancer.getNrOfIterations() > 0);
+  CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+  CHECK(forceBalancer.getNrOfActiveStrands() == 0);
+  CHECK(forceBalancer.getNrOfActiveStrandsInDir(0) == 0);
+  CHECK(forceBalancer.getNrOfActiveStrandsInDir(1) == 0);
+  CHECK(forceBalancer.getNrOfActiveStrandsInDir(2) == 0);
+  CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
 }
 
 TEST_CASE("Particular MEHP Force Balance2 Example",
@@ -978,227 +853,10 @@ TEST_CASE("Particular MEHP Force Balance2 Example",
   std::cout << "Read file " << inputFile << std::endl;
 
   pcm::MEHPForceBalance2 forceBalancer =
-    pcm::MEHPForceBalance2(universe, 2, false, true, false);
+    pcm::MEHPForceBalance2(universe, 2);
   double pressBefore = forceBalancer.getPressure();
   CHECK_NOTHROW(forceBalancer.runForceRelaxation());
   CHECK(pressBefore > forceBalancer.getPressure());
-}
-
-TEST_CASE("MEHPForceBalance2 Random sampling example",
-          "[analysis][MEHPForceBalance2][long]")
-{
-  std::cout << "Running test \"MEHPForceBalance2 Random sampling example\""
-            << std::endl;
-  pe::UniverseSequence universeSeq = pe::UniverseSequence();
-  CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
-
-  std::string inputFile =
-    suspectedPath +
-    "/structure/"
-    "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
-    "structure.out-equilibration_do_crosslink.structure.out";
-  if (std::filesystem::exists(inputFile)) {
-    std::cout << "Reading file " << inputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    pe::Universe universe = universeSeq.atIndex(0);
-    std::cout << "Read file " << inputFile << std::endl;
-
-    // generate the same slip-links twice,
-    // once for each assumption
-    pcm::MEHPForceBalance forceBalancerLargeOldSampling =
-      pcm::MEHPForceBalance(universe, 2, false, false, false);
-    forceBalancerLargeOldSampling.configAssumeBoxLargeEnough(true);
-    forceBalancerLargeOldSampling.randomlyAddSliplinks(
-      1000, 6.0, 900, 3.0, false, 53467829);
-
-    pcm::MEHPForceBalance2 forceBalancerSmallOldSampling1 =
-      pcm::MEHPForceBalance2(
-        universe, 1000, 6.0, 0.0, 900, 3.0, "seed53467829");
-
-    pcm::MEHPForceBalance2 forceBalancerSmallOldSampling2 =
-      pcm::MEHPForceBalance2(
-        universe, 1000, 6.0, 0.0, 900, 3.0, "seed53467829");
-
-    // initially
-    CHECK_THAT(forceBalancerSmallOldSampling1.getDisplacementResidualNorm(),
-               Catch::Matchers::WithinRel(
-                 forceBalancerSmallOldSampling2.getDisplacementResidualNorm()));
-
-    // check that the order does not matter
-    // after adding slip-links
-    CHECK(forceBalancerLargeOldSampling.getPressure() <=
-          forceBalancerSmallOldSampling1.getPressure());
-    CHECK_THAT(forceBalancerSmallOldSampling1.getDisplacementResidualNorm(),
-               Catch::Matchers::WithinRel(
-                 forceBalancerSmallOldSampling2.getDisplacementResidualNorm()));
-    CHECK_THAT(
-      forceBalancerSmallOldSampling1.getPressure(),
-      Catch::Matchers::WithinRel(forceBalancerSmallOldSampling2.getPressure()));
-
-    // it is actually thinkable that the following fails for certain scenarios.
-    // however, in general, it should not
-    CHECK(forceBalancerLargeOldSampling.getDisplacementResidualNorm() <=
-          forceBalancerSmallOldSampling1.getDisplacementResidualNorm());
-    CHECK(forceBalancerLargeOldSampling.getDisplacementResidualNorm() <=
-          forceBalancerSmallOldSampling1.getDisplacementResidualNorm());
-
-    // check to make sure the slip-links are actually placed identically
-    CHECK(forceBalancerLargeOldSampling.getNetwork().springIndexA.isApprox(
-      forceBalancerSmallOldSampling1.getNetwork().springIndexA));
-    CHECK(forceBalancerSmallOldSampling1.getNetwork().springIndexB.isApprox(
-      forceBalancerSmallOldSampling2.getNetwork().springIndexB));
-
-    pcm::MEHPForceBalance2 forceBalancerSmallNewSampling =
-      pcm::MEHPForceBalance2(universe, 1000, 6.0, 0.0, 900, 3.0, "53467829");
-
-    CHECK_THAT(forceBalancerSmallNewSampling.getNrOfSprings(),
-               Catch::Matchers::WithinRel(
-                 forceBalancerSmallOldSampling1.getNrOfSprings(), 0.1));
-    CHECK_THAT(forceBalancerSmallNewSampling.getPressure(),
-               Catch::Matchers::WithinRel(
-                 forceBalancerSmallOldSampling1.getPressure(), 0.5));
-    CHECK_THAT(
-      forceBalancerSmallNewSampling.getDisplacementResidualNorm(),
-      Catch::Matchers::WithinRel(
-        forceBalancerSmallOldSampling1.getDisplacementResidualNorm(), 0.5));
-
-    // check that the spring vectors are equal
-    Eigen::VectorXd springVectorsSmallOldSampling =
-      forceBalancerSmallOldSampling1.evaluateStrandVectors(
-        forceBalancerSmallOldSampling1.getNetwork(),
-        forceBalancerSmallOldSampling1.getCurrentDisplacements());
-    Eigen::VectorXd springVectorsSmallNewSampling =
-      forceBalancerSmallNewSampling.evaluateStrandVectors(
-        forceBalancerSmallNewSampling.getNetwork(),
-        forceBalancerSmallNewSampling.getCurrentDisplacements());
-    REQUIRE(forceBalancerSmallOldSampling1.getNetwork().nrOfSprings ==
-            forceBalancerSmallNewSampling.getNetwork().nrOfSprings);
-
-    CHECK(
-      springVectorsSmallOldSampling.isApprox(springVectorsSmallNewSampling));
-
-    CHECK_THAT(forceBalancerSmallNewSampling.getPressure(),
-               Catch::Matchers::WithinRel(
-                 forceBalancerLargeOldSampling.getPressure(), 0.5));
-    CHECK_THAT(
-      forceBalancerSmallNewSampling.getDisplacementResidualNorm(),
-      Catch::Matchers::WithinRel(
-        forceBalancerLargeOldSampling.getDisplacementResidualNorm(), 0.5));
-
-    CHECK_THAT(
-      forceBalancerLargeOldSampling.getForceMagnitudeVector().mean(),
-      Catch::Matchers::WithinRel(
-        Eigen::median(forceBalancerLargeOldSampling.getForceMagnitudeVector()),
-        0.25));
-    CHECK_THAT(
-      forceBalancerSmallOldSampling1.getForceMagnitudeVector().mean(),
-      Catch::Matchers::WithinRel(
-        Eigen::median(forceBalancerSmallOldSampling1.getForceMagnitudeVector()),
-        0.25));
-    CHECK_THAT(
-      forceBalancerSmallOldSampling2.getForceMagnitudeVector().mean(),
-      Catch::Matchers::WithinRel(
-        Eigen::median(forceBalancerSmallOldSampling2.getForceMagnitudeVector()),
-        0.25));
-    CHECK_THAT(
-      forceBalancerSmallNewSampling.getForceMagnitudeVector().mean(),
-      Catch::Matchers::WithinRel(
-        Eigen::median(forceBalancerSmallNewSampling.getForceMagnitudeVector()),
-        0.25));
-
-    // DEBUG:
-    // Eigen::VectorXd magnitudeVector =
-    //   forceBalancerSmallOldSampling1.getForceMagnitudeVector();
-    // size_t maxIndex;
-    // double maxValue = magnitudeVector.maxCoeff(&maxIndex);
-  } else {
-    std::cerr << "File " << inputFile << " does not exist." << std::endl;
-  }
-}
-
-TEST_CASE("MEHPForceBalance2 Random sampling example small",
-          "[analysis][MEHPForceBalance2]")
-{
-  std::cout
-    << "Running test \"MEHPForceBalance2 Random sampling example small\""
-    << std::endl;
-  pe::UniverseSequence universeSeq = pe::UniverseSequence();
-  CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
-
-  std::string inputFile =
-    suspectedPath + "/structure/square_lattice_2x2_a_5.2d.structure.out";
-  if (std::filesystem::exists(inputFile)) {
-    std::cout << "Reading file " << inputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    pe::Universe universe = universeSeq.atIndex(0);
-    std::cout << "Read file " << inputFile << std::endl;
-
-    // generate the same slip-links twice,
-    // once for each assumption
-    pcm::MEHPForceBalance2 forceBalancer =
-      pcm::MEHPForceBalance2(universe, 12, 6.0, 0., 11, 3, "seed86573452");
-
-    pcm::MEHPForceBalance2 forceBalancer2 =
-      pcm::MEHPForceBalance2(universe, 12, 6.0, 0., 6, 3, "seed86573452");
-
-    pcm::MEHPForceBalance2 forceBalancer3 =
-      pcm::MEHPForceBalance2(universe, 12, 6.0, 0., 6, 3, "seed86573452");
-
-    // initially
-    CHECK_THAT(
-      forceBalancer2.getDisplacementResidualNorm(),
-      Catch::Matchers::WithinRel(forceBalancer3.getDisplacementResidualNorm()));
-
-    // after adding slip-links
-    CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());
-    CHECK_THAT(
-      forceBalancer2.getDisplacementResidualNorm(),
-      Catch::Matchers::WithinRel(forceBalancer3.getDisplacementResidualNorm()));
-    CHECK_THAT(forceBalancer2.getPressure(),
-               Catch::Matchers::WithinRel(forceBalancer3.getPressure()));
-    // it is actually thinkable that the following fails for certain scenarios.
-    // however, in general, it should not
-    CHECK(forceBalancer.getDisplacementResidualNorm() <=
-          forceBalancer2.getDisplacementResidualNorm());
-    CHECK(forceBalancer.getDisplacementResidualNorm() <=
-          forceBalancer2.getDisplacementResidualNorm());
-
-    pcm::MEHPForceBalance2 forceBalancer4 = pcm::MEHPForceBalance2(
-      universe, 12, 6.0, 0.0, 11, 3.0, "seed86573452", 2, true);
-
-    CHECK_THAT(forceBalancer4.getPressure(),
-               Catch::Matchers::WithinRel(forceBalancer2.getPressure(), 0.1));
-    CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
-               Catch::Matchers::WithinRel(
-                 forceBalancer2.getDisplacementResidualNorm(), 0.1));
-
-    CHECK_THAT(forceBalancer4.getPressure(),
-               Catch::Matchers::WithinRel(forceBalancer.getPressure(), 0.1));
-    CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
-               Catch::Matchers::WithinRel(
-                 forceBalancer.getDisplacementResidualNorm(), 0.1));
-
-    // std::cout << "FB 1:" << std::endl;
-    // outputNetwork(forceBalancer.getNetwork(),
-    //               forceBalancer.getCurrentDisplacements(),
-    //               forceBalancer.getSpringPartitions());
-    // std::cout << "FB 2:" << std::endl;
-    // outputNetwork(forceBalancer2.getNetwork(),
-    //               forceBalancer2.getCurrentDisplacements(),
-    //               forceBalancer2.getSpringPartitions());
-    // std::cout << "FB 3:" << std::endl;
-    // outputNetwork(forceBalancer3.getNetwork(),
-    //               forceBalancer3.getCurrentDisplacements(),
-    //               forceBalancer3.getSpringPartitions());
-    // std::cout << "FB 4:" << std::endl;
-    // outputNetwork(forceBalancer4.getNetwork(),
-    //               forceBalancer4.getCurrentDisplacements(),
-    //               forceBalancer4.getSpringPartitions());
-  } else {
-    std::cerr << "File " << inputFile << " does not exist." << std::endl;
-  }
 }
 
 TEST_CASE(
@@ -1227,17 +885,18 @@ TEST_CASE(
     pcm::MEHPForceBalance2(universe);
   pcm::MEHPForceBalance2 forceBalancerOldSamplingSmall =
     pcm::MEHPForceBalance2(universe, 1000, 6.0, 0.0, 900);
-  Eigen::VectorXd springVectorsWithoutSlipLinks =
+  Eigen::VectorXd springVectorsWithoutEntanglements =
     forceBalancerWithoutEntanglements.evaluateStrandVectors(
       forceBalancerWithoutEntanglements.getNetwork(),
       forceBalancerWithoutEntanglements.getCurrentDisplacements());
 
-  Eigen::VectorXd springVectorsWithSlipLinks =
+  Eigen::VectorXd springVectorsWithEntanglements =
     forceBalancerOldSamplingSmall.evaluateStrandVectors(
       forceBalancerOldSamplingSmall.getNetwork(),
       forceBalancerOldSamplingSmall.getCurrentDisplacements());
 
-  CHECK(springVectorsWithoutSlipLinks.isApprox(springVectorsWithSlipLinks));
+  CHECK(
+    springVectorsWithoutEntanglements.isApprox(springVectorsWithEntanglements));
 
   // and the same for sampling method 2
   pcm::MEHPForceBalance2 forceBalancer2 =
@@ -1454,6 +1113,69 @@ TEST_CASE(
         forceBalancerPhantom.getSolubleWeightFraction());
 };
 
+TEST_CASE("MEHPForceBalance2 phantom with and without removal is the same",
+          "[analysis][MEHPForceBalance2]")
+{
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  CHECK(universeSeq.getLength() == 0);
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+
+  // a structure with lots of dangling things that can and will be entangled,
+  // yet the entanglements removed
+  std::string inputFile =
+    suspectedPath +
+    "/structure/mc_own-si_pdms_crosslinked_melt_464_a_77_r_1.71_wsol_0."
+    "0114_f_4_v_1.structure.out";
+
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  auto masses = universe.getMasses();
+  std::cout << "Read file " << inputFile << std::endl;
+
+  pcm::MEHPForceBalance2 forceBalancerPhantom =
+    pcm::MEHPForceBalance2(universe, 2, false);
+  pcm::MEHPForceBalance2 forceBalancerPhantomRem =
+    pcm::MEHPForceBalance2(universe, 2, false);
+
+  CHECK(forceBalancerPhantom.getNrOfSprings() ==
+        forceBalancerPhantomRem.getNrOfSprings());
+  CHECK_THAT(
+    forceBalancerPhantom.getResidual(),
+    Catch::Matchers::WithinRel(forceBalancerPhantomRem.getResidual(), 0.001));
+  CHECK_THAT(forceBalancerPhantom.getSolubleWeightFraction(),
+             Catch::Matchers::WithinRel(
+               forceBalancerPhantomRem.getSolubleWeightFraction(), 0.001));
+  CHECK_THAT(
+    forceBalancerPhantom.getGamma(),
+    Catch::Matchers::WithinRel(forceBalancerPhantomRem.getGamma(), 0.001));
+  CHECK_THAT(forceBalancerPhantom.getDanglingWeightFraction(),
+             Catch::Matchers::WithinRel(
+               forceBalancerPhantomRem.getDanglingWeightFraction(), 0.001));
+
+  // run with and without simplification
+  forceBalancerPhantom.runForceRelaxation(
+    pcm::StructureSimplificationMode::NO_SIMPLIFICATION);
+  forceBalancerPhantomRem.runForceRelaxation(
+    pcm::StructureSimplificationMode::ALL_TIM);
+
+  // compare results
+  CHECK(forceBalancerPhantom.getNrOfSprings() <
+        forceBalancerPhantomRem.getNrOfSprings());
+  CHECK_THAT(
+    forceBalancerPhantom.getResidual(),
+    Catch::Matchers::WithinRel(forceBalancerPhantomRem.getResidual(), 0.001));
+  CHECK_THAT(forceBalancerPhantom.getSolubleWeightFraction(),
+             Catch::Matchers::WithinRel(
+               forceBalancerPhantomRem.getSolubleWeightFraction(), 0.001));
+  CHECK_THAT(
+    forceBalancerPhantom.getGamma(),
+    Catch::Matchers::WithinRel(forceBalancerPhantomRem.getGamma(), 0.001));
+  CHECK_THAT(forceBalancerPhantom.getDanglingWeightFraction(),
+             Catch::Matchers::WithinRel(
+               forceBalancerPhantomRem.getDanglingWeightFraction(), 0.001));
+}
+
 TEST_CASE("Temporary force balance 2 test case",
           "[analysis][MEHPForceBalance2][long]")
 {
@@ -1617,4 +1339,255 @@ TEST_CASE("MEHPFB2 Basic conversion test",
   CHECK(net.springBoxOffset.segment<3>(4 * 3, 3).isApprox(
     Eigen::Vector3d(10., 10., 10.)));
   CHECK(net.springContourLength[4] == 6);
+}
+
+TEST_CASE("All MEHP Force Balance2 vs. Force Relaxation Phantom Comparisons",
+          "[analysis][MEHPForceBalance2][MEHPForceRelaxation][long]")
+{
+  std::cout << "Running test \"MEHP Force Balance2 vs. Force Relaxation "
+               "Phantom Comparisons\""
+            << std::endl;
+
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+  std::vector<std::string> files = {
+    "3d-diamond-lattice_10x10x10_a_3_d_0.85_imperfect.structure.out",
+    "3d-diamond-lattice_10x10x10_a_3_d_0.85_v_0.V-fixed.structure.out",
+    "3d-diamond-lattice_3x3x3_a_23_d_3_v_0.structure.out",
+    "3d-diamond-lattice_5x5x5_a_3_d_0.85_imperfect.structure.out",
+    "3d-diamond-lattice_5x5x5_a_3_d_0.85_v_0.V-fixed.structure.out",
+    "crosslinked_M10000_N39_p_0.9.out",
+    "crosslinked_p_0.98_melt_100_a_3_50_xlinks_v_14.converted.structure.out-"
+    "equilibration_do_crosslink.structure.out",
+    "crosslinked_p_0.98_melt_100_a_38_50_xlinks_v_22.structure.out-"
+    "equilibration_do_crosslink.structure.out",
+    "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
+    "structure.out-equilibration_do_crosslink.structure.out",
+    "crosslinked_p_1_0.5_melt_100_a_158_100_xlinks_v_13.V-fixed.structure.out-"
+    "equilibration_do_crosslink.structure.out",
+    "crosslinked_p_1_1_melt_100_a_3_50_xlinks_v_1.V-fixed.structure.out-finish_"
+    "crosslinking.structure.out",
+    "equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0.333_2d_t_7500001."
+    "structure.out",
+    "mc_own-si_pdms_crosslinked_melt_464_a_77_r_1.71_wsol_0.0114_f_4_v_1."
+    "structure.out",
+    "melt_213_a_47_106_xlinks_v_1.structure.out",
+    "melt_83_a_100.structure.out",
+    "network_100_a_46.structure.out",
+    "network_p_1_100_a_38_50_xlinks.structure.out",
+    "square_lattice_2x2_a_5.2d.structure.out"
+  };
+
+  size_t nFilesFound = 0;
+  for (const std::string& file : files) {
+    pe::UniverseSequence universeSeq = pe::UniverseSequence();
+    REQUIRE(universeSeq.getLength() == 0);
+    std::string inputFile = suspectedPath + "/structure/" + file;
+    if (!std::filesystem::exists(inputFile)) {
+      std::cerr << "File not found: " << inputFile << std::endl;
+      continue;
+    }
+
+    nFilesFound += 1;
+    std::cout << "Processing file: " << file << std::endl;
+
+    universeSeq.initializeFromDataSequence({ { inputFile } });
+    pe::Universe universe = universeSeq.atIndex(0);
+
+    pcm::MEHPForceBalance2 forceBalance2 = pcm::MEHPForceBalance2(universe);
+
+    pcm::MEHPForceRelaxation forceRelaxation =
+      pcm::MEHPForceRelaxation(universe);
+    forceRelaxation.configAssumeBoxLargeEnough(false);
+
+    CHECK_THAT(forceBalance2.getGamma(),
+               Catch::Matchers::WithinRel(forceRelaxation.getGamma(), 1e-3));
+    CHECK_THAT(forceBalance2.getStressTensor().trace(),
+               Catch::Matchers::WithinRel(
+                 forceRelaxation.getStressTensor().trace(), 1e-3));
+    CHECK_THAT(forceBalance2.getResidual(),
+               Catch::Matchers::WithinRel(forceRelaxation.getResidual(), 1e-3));
+    CHECK_THAT(forceBalance2.getSolubleWeightFraction(),
+               Catch::Matchers::WithinRel(
+                 forceRelaxation.getSolubleWeightFraction(), 1e-3));
+    CHECK_THAT(forceBalance2.getDanglingWeightFraction(),
+               Catch::Matchers::WithinRel(
+                 forceRelaxation.getDanglingWeightFraction(), 1e-3));
+    // CHECK_THAT(forceBalance2.getActiveWeightFraction(),
+    // Catch::Matchers::WithinRel(forceRelaxation.getActiveWeightFraction(),
+    // 1e-3));
+
+    auto start_fb2 = std::chrono::high_resolution_clock::now();
+    forceBalance2.runForceRelaxation();
+    auto end_fb2 = std::chrono::high_resolution_clock::now();
+    auto duration_fb2 = std::chrono::duration_cast<std::chrono::microseconds>(
+      end_fb2 - start_fb2);
+    std::cout << "Time of Force Balance 2: "
+              << std::duration_to_string(duration_fb2) << " " << std::endl;
+
+    auto start_fr = std::chrono::high_resolution_clock::now();
+    while (forceRelaxation.suggestsRerun()) {
+      forceRelaxation.runForceRelaxation();
+    }
+    auto end_fr = std::chrono::high_resolution_clock::now();
+    auto duration_fr =
+      std::chrono::duration_cast<std::chrono::microseconds>(end_fr - start_fr);
+    std::cout << "Time of Force Relaxation: "
+              << std::duration_to_string(duration_fr) << " " << std::endl;
+
+    CHECK_THAT(forceBalance2.getGamma(),
+               Catch::Matchers::WithinRel(forceRelaxation.getGamma(), 1e-3));
+    CHECK_THAT(forceBalance2.getStressTensor().trace(),
+               Catch::Matchers::WithinRel(
+                 forceRelaxation.getStressTensor().trace(), 1e-3));
+    CHECK_THAT(forceBalance2.getResidual(),
+               Catch::Matchers::WithinRel(forceRelaxation.getResidual(), 1e-3));
+    CHECK_THAT(forceBalance2.getSolubleWeightFraction(),
+               Catch::Matchers::WithinRel(
+                 forceRelaxation.getSolubleWeightFraction(), 1e-3));
+    CHECK_THAT(forceBalance2.getDanglingWeightFraction(),
+               Catch::Matchers::WithinRel(
+                 forceRelaxation.getDanglingWeightFraction(), 1e-3));
+    // CHECK_THAT(forceBalance2.getActiveWeightFraction(),
+    // Catch::Matchers::WithinRel(forceRelaxation.getActiveWeightFraction(),
+    // 1e-3));
+  }
+
+  REQUIRE(static_cast<double>(nFilesFound) >
+          static_cast<double>(files.size()) * 0.75);
+}
+
+TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
+          "Simplification",
+          "[analysis][MEHPForceBalance2][MEHPForceBalance][long]")
+{
+  std::cout << "Running test \"All MEHP Force Balance 1 vs. 2 Comparisons with "
+               "Entanglements and Simplification\""
+            << std::endl;
+
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+  std::vector<std::string> files = {
+    "3d-diamond-lattice_10x10x10_a_3_d_0.85_imperfect.structure.out",
+    "3d-diamond-lattice_10x10x10_a_3_d_0.85_v_0.V-fixed.structure.out",
+    "3d-diamond-lattice_3x3x3_a_23_d_3_v_0.structure.out",
+    "3d-diamond-lattice_5x5x5_a_3_d_0.85_imperfect.structure.out",
+    "3d-diamond-lattice_5x5x5_a_3_d_0.85_v_0.V-fixed.structure.out",
+    "crosslinked_M10000_N39_p_0.9.out",
+    "crosslinked_p_0.98_melt_100_a_3_50_xlinks_v_14.converted.structure.out-"
+    "equilibration_do_crosslink.structure.out",
+    "crosslinked_p_0.98_melt_100_a_38_50_xlinks_v_22.structure.out-"
+    "equilibration_do_crosslink.structure.out",
+    "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
+    "structure.out-equilibration_do_crosslink.structure.out",
+    "crosslinked_p_1_0.5_melt_100_a_158_100_xlinks_v_13.V-fixed.structure.out-"
+    "equilibration_do_crosslink.structure.out",
+    "crosslinked_p_1_1_melt_100_a_3_50_xlinks_v_1.V-fixed.structure.out-finish_"
+    "crosslinking.structure.out",
+    "equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0.333_2d_t_7500001."
+    "structure.out",
+    "mc_own-si_pdms_crosslinked_melt_464_a_77_r_1.71_wsol_0.0114_f_4_v_1."
+    "structure.out",
+    "melt_213_a_47_106_xlinks_v_1.structure.out",
+    "melt_83_a_100.structure.out",
+    "network_100_a_46.structure.out",
+    "network_p_1_100_a_38_50_xlinks.structure.out",
+    "square_lattice_2x2_a_5.2d.structure.out"
+  };
+
+  size_t nFilesFound = 0;
+  for (const std::string& file : files) {
+    pe::UniverseSequence universeSeq = pe::UniverseSequence();
+    REQUIRE(universeSeq.getLength() == 0);
+    std::string inputFile = suspectedPath + "/structure/" + file;
+    if (!std::filesystem::exists(inputFile)) {
+      std::cerr << "File not found: " << inputFile << std::endl;
+      continue;
+    }
+
+    nFilesFound += 1;
+    std::cout << "Processing file: " << inputFile << std::endl;
+
+    universeSeq.initializeFromDataSequence({ { inputFile } });
+    pe::Universe universe = universeSeq.atIndex(0);
+
+    // use the same entanglements for both force balances
+    auto entanglements =
+      pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
+        universe,
+        0.01 * universe.getNrOfAtoms(),
+        2.5,
+        0.,
+        0,
+        2,
+        "t35ts33d",
+        2,
+        true,
+        true);
+
+    pcm::MEHPForceBalance2 forceBalance2 =
+      pcm::MEHPForceBalance2(universe, entanglements);
+
+    pcm::MEHPForceBalance forceBalance =
+      pcm::MEHPForceBalance::constructWithSlipLinks(universe, entanglements);
+    forceBalance.configAssumeBoxLargeEnough(false);
+
+    // validate initial values
+    CHECK_THAT(forceBalance2.getGamma(),
+               Catch::Matchers::WithinRel(forceBalance.getGamma(), 1e-3));
+    CHECK_THAT(
+      forceBalance2.getStressTensor().trace(),
+      Catch::Matchers::WithinRel(forceBalance.getStressTensor().trace(), 1e-3));
+    CHECK_THAT(forceBalance2.getResidual(),
+               Catch::Matchers::WithinRel(forceBalance.getResidual(), 1e-3));
+    CHECK_THAT(forceBalance2.getSolubleWeightFraction(),
+               Catch::Matchers::WithinRel(
+                 forceBalance.getSolubleWeightFraction(), 1e-3));
+    CHECK_THAT(forceBalance2.getDanglingWeightFraction(),
+               Catch::Matchers::WithinRel(
+                 forceBalance.getDanglingWeightFraction(), 1e-3));
+    CHECK_THAT(
+      forceBalance2.getActiveWeightFraction(),
+      Catch::Matchers::WithinRel(forceBalance.getActiveWeightFraction(), 1e-3));
+
+    auto start_fr = std::chrono::high_resolution_clock::now();
+    forceBalance.runForceRelaxation(
+      5000, 1e-9, -1., pcm::StructureSimplificationMode::ALL_TIM);
+    auto end_fr = std::chrono::high_resolution_clock::now();
+    auto duration_fr =
+      std::chrono::duration_cast<std::chrono::microseconds>(end_fr - start_fr);
+    std::cout << "Time of Force Balance 1: "
+              << std::duration_to_string(duration_fr) << " " << std::endl;
+
+    auto start_fb2 = std::chrono::high_resolution_clock::now();
+    forceBalance2.runForceRelaxation(pcm::StructureSimplificationMode::ALL_TIM);
+    auto end_fb2 = std::chrono::high_resolution_clock::now();
+    auto duration_fb2 = std::chrono::duration_cast<std::chrono::microseconds>(
+      end_fb2 - start_fb2);
+    std::cout << "Time of Force Balance 2: "
+              << std::duration_to_string(duration_fb2) << " " << std::endl;
+
+    if (forceBalance.getExitReason() != pcm::ExitReason::MAX_STEPS) {
+      CHECK_THAT(forceBalance2.getGamma(),
+                 Catch::Matchers::WithinRel(forceBalance.getGamma(), 1e-3));
+      CHECK_THAT(forceBalance2.getStressTensor().trace(),
+                 Catch::Matchers::WithinRel(
+                   forceBalance.getStressTensor().trace(), 1e-3));
+      CHECK_THAT(forceBalance2.getResidual(),
+                 Catch::Matchers::WithinRel(forceBalance.getResidual(), 1e-3));
+      CHECK_THAT(forceBalance2.getSolubleWeightFraction(),
+                 Catch::Matchers::WithinRel(
+                   forceBalance.getSolubleWeightFraction(), 1e-3));
+      CHECK_THAT(forceBalance2.getDanglingWeightFraction(),
+                 Catch::Matchers::WithinRel(
+                   forceBalance.getDanglingWeightFraction(), 1e-3));
+      CHECK_THAT(forceBalance2.getActiveWeightFraction(),
+                 Catch::Matchers::WithinRel(
+                   forceBalance.getActiveWeightFraction(), 1e-3));
+    } else {
+      std::cerr << "Force Balance 1 did not converge for file: " << inputFile
+                << std::endl;
+    }
+  }
+
+  REQUIRE(static_cast<double>(nFilesFound) >
+          static_cast<double>(files.size()) * 0.75);
 }
