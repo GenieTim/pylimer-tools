@@ -498,8 +498,15 @@ MEHPForceBalance2::MEHPForceBalance2(
     (this->initialConfig.linkIsEntanglement == false).count();
 
   if (!entanglementsAsSprings) {
-    assert(this->initialConfig.springContourLength.sum() ==
-           this->universe.getNrOfBonds());
+    size_t contourLengthSum = this->initialConfig.springContourLength.sum();
+    assert(contourLengthSum == this->universe.getNrOfBonds());
+    assert(this->initialConfig.linkIsEntanglement.count() ==
+           entanglements.pairsOfAtoms.size());
+    assert(this->initialConfig.springIsEntanglement.count() == 0);
+    assert(contourLengthSum - this->initialConfig.nrOfSprings +
+             2*this->initialConfig.nrOfLinks - this->initialConfig.nrOfNodes
+             ==
+           this->universe.getNrOfAtoms());
   } else {
     assert(this->initialConfig.springContourLength.sum() ==
            this->universe.getNrOfBonds() +
@@ -629,6 +636,10 @@ MEHPForceBalance2::runForceRelaxation(
         triplets.push_back(Eigen::Triplet<double>(
           linkIdx * 3 + dir, linkIdx * 3 + dir, diagonal(linkIdx * 3 + dir)));
       }
+    }
+
+    if (triplets.empty()) {
+      break;
     }
 
     Eigen::SparseMatrix<double> sysMatrix(this->initialConfig.nrOfLinks * 3,
@@ -770,7 +781,7 @@ MEHPForceBalance2::runForceRelaxation(
 
       nRemovedInIteration += nRemovedThisLoop;
     } while (nRemovedThisLoop > 0);
-    
+
     // after removal, the residual changed, might even have increased
     // beyond initial
     // -> reset previous and current to prevent change to iterative
@@ -843,8 +854,7 @@ MEHPForceBalance2::getDisplacementResidualNormFor(
     (net.springCoordinateIndexA != net.springCoordinateIndexB).cast<double>();
   Eigen::ArrayXd forces = Eigen::ArrayXd::Zero(3 * net.nrOfLinks);
   Eigen::ArrayXd distances =
-    this->evaluateSpringVectors(net, u, this->is2D)
-      .array();
+    this->evaluateSpringVectors(net, u, this->is2D).array();
   forces(net.springCoordinateIndexA) +=
     (this->kappa * oneOverSpringPartitions * distances *
      loopPartialSpringEliminator);
@@ -1688,8 +1698,7 @@ MEHPForceBalance2::displaceToMeanPosition(
   Eigen::ArrayXd objectiveDisplacement =
     Eigen::ArrayXd::Zero(3 * net.nrOfLinks);
   Eigen::ArrayXd partialSpringDistances =
-    this->evaluateSpringVectors(net, u, this->is2D)
-      .array();
+    this->evaluateSpringVectors(net, u, this->is2D).array();
   objectiveDisplacement(net.springCoordinateIndexA) +=
     (oneOverSpringPartitions * partialSpringDistances);
   objectiveDisplacement(net.springCoordinateIndexB) -=
@@ -1809,15 +1818,15 @@ MEHPForceBalance2::displaceToMeanPosition(const ForceBalance2Network& net,
   u.segment(3 * linkIdx, 3) += objectiveDisplacement * denominator;
 
 #ifndef NDEBUG
-    const Eigen::Vector3d forceAfter = this->getForceOn(net, u, linkIdx);
+  const Eigen::Vector3d forceAfter = this->getForceOn(net, u, linkIdx);
 
-    // this is only true if we don't have "full" PBC
-    assert((pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
-      forceAfter, Eigen::Vector3d::Zero(), 0.01)));
-    if (!pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
-          forceBefore, Eigen::Vector3d::Zero(), 0.01)) {
-      assert(forceBefore.squaredNorm() >= forceAfter.squaredNorm());
-    }
+  // this is only true if we don't have "full" PBC
+  assert((pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
+    forceAfter, Eigen::Vector3d::Zero(), 0.01)));
+  if (!pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
+        forceBefore, Eigen::Vector3d::Zero(), 0.01)) {
+    assert(forceBefore.squaredNorm() >= forceAfter.squaredNorm());
+  }
 #endif
 
   double dist = (objectiveDisplacement * denominator).squaredNorm();
@@ -2398,32 +2407,32 @@ MEHPForceBalance2::computeActiveWeightFraction(ForceBalance2Network& net,
   if (net.nrOfStrands < 1) {
     return 0.;
   }
-  // find all active strands
-  Eigen::ArrayXb activeStrands = this->findActiveStrands(net, u, tolerance);
-  if (activeStrands.count() == 0) {
+  // find all active springs
+  Eigen::ArrayXb activeSprings = this->findActiveSprings(net, u, tolerance);
+  if (activeSprings.count() == 0) {
     return 0.;
   }
 
   Eigen::ArrayXb activeLinks = Eigen::ArrayXb::Constant(net.nrOfLinks, false);
-  double nActiveAtomsFromSprings = 0;
-  for (size_t strandIdx = 0; strandIdx < net.nrOfStrands; ++strandIdx) {
-    if (!activeStrands[strandIdx]) {
+  for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
+    if (!activeSprings[springIdx]) {
       continue;
     }
-    for (size_t linkIdx : net.linkIndicesOfStrand[strandIdx]) {
-      activeLinks[linkIdx] = true;
-    }
-    // as of now, the springsContourLength is equal to the number of bonds
-    // from link to link. therefore, the number of atoms of each
-    // of these springs is one less
-    for (size_t springIdx : net.springIndicesOfStrand[strandIdx]) {
-      nActiveAtomsFromSprings += net.springContourLength[strandIdx] - 1;
-    }
+    activeLinks[net.springIndexA[springIdx]] = true;
+    activeLinks[net.springIndexB[springIdx]] = true;
   }
+  // as of now, the springsContourLength is equal to the number of bonds
+  // from link to link. therefore, the number of atoms of each
+  // of these springs is one less
+  double nActiveAtomsFromSprings =
+    ((net.springContourLength.array() - Eigen::ArrayXd::Ones(net.nrOfSprings)) *
+     activeSprings.cast<double>())
+      .sum();
 
   // TODO: currently, the weight of the atoms is ignored
   // normalize by the number of atoms
-  return (nActiveAtomsFromSprings + activeLinks.count()) /
+  return (nActiveAtomsFromSprings + activeLinks.count() -
+          net.springIsEntanglement.count()) /
          (static_cast<double>(this->universe.getNrOfAtoms()));
 }
 
@@ -2481,10 +2490,10 @@ MEHPForceBalance2::countActiveClusteredAtoms(ForceBalance2Network& net,
 
   std::vector<pylimer_tools::entities::Universe> clusters =
     this->universe.getClusters();
-  std::vector<long int> atomIdxToClusterIdx(this->universe.getNrOfAtoms());
+  std::vector<long int> vertexIdxToClusterIdx(this->universe.getNrOfAtoms());
   for (size_t i = 0; i < clusters.size(); ++i) {
     for (const pylimer_tools::entities::Atom& atom : clusters[i].getAtoms()) {
-      atomIdxToClusterIdx[this->universe.getIdxByAtomId(atom.getId())] = i;
+      vertexIdxToClusterIdx[this->universe.getIdxByAtomId(atom.getId())] = i;
     }
   }
 
@@ -2497,7 +2506,7 @@ MEHPForceBalance2::countActiveClusteredAtoms(ForceBalance2Network& net,
   for (const long int& nodeIdx : activeNodeIndices) {
     long int universeAtomIdx =
       this->universe.getIdxByAtomId(net.oldAtomIds[nodeIdx]);
-    clusterIsActive[atomIdxToClusterIdx[universeAtomIdx]] = true;
+    clusterIsActive[vertexIdxToClusterIdx[universeAtomIdx]] = true;
   }
 
   double nClusteredAtoms = 0.;
@@ -2544,7 +2553,7 @@ MEHPForceBalance2::getIndicesOfActiveNodes(const ForceBalance2Network& net,
   results.reserve(net.nrOfNodes);
 
   // find all active springs
-  Eigen::ArrayXb springIsActive = this->findActiveStrands(net, u, tolerance);
+  Eigen::ArrayXb strandIsActive = this->findActiveStrands(net, u, tolerance);
 
   size_t crosslinkIdx = 0;
   for (size_t i = 0; i < net.nrOfLinks; i++) {
@@ -2553,7 +2562,7 @@ MEHPForceBalance2::getIndicesOfActiveNodes(const ForceBalance2Network& net,
     }
     std::vector<size_t> springIndices = net.strandIndicesOfLink[i];
     for (const size_t springIndex : springIndices) {
-      if (springIsActive[springIndex]) {
+      if (strandIsActive[springIndex]) {
         results.push_back(crosslinkIdx);
         break;
       }
@@ -2707,6 +2716,10 @@ MEHPForceBalance2::getGammaFactor(double b02, int nrOfChains) const
 {
   if (b02 < 0) {
     b02 = this->defaultBondLength * this->defaultBondLength;
+  }
+
+  if (this->getNrOfSprings() == 0) {
+    return 0.;
   }
 
   Eigen::VectorXd gammaFactors = this->getGammaFactors(b02);
@@ -2926,10 +2939,9 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
           anyIsPrimaryLoop || this->isLoopingSpring(net, springIndex);
         nEntanglementSprings += (net.springIsEntanglement[springIndex]);
       }
-      if (springIndices.size() - nEntanglementSprings == 2 &&
-          anyIsPrimaryLoop) {
+      if (springIndices.size() - nEntanglementSprings == 2) {
         RUNTIME_EXP_IFN(
-          net.strandIndicesOfLink[linkIdx].size() == 1,
+          net.strandIndicesOfLink[linkIdx].size() - nEntanglementSprings == 1,
           "Bifunctional entanglement link must be involved in "
           "only one strand. Got " +
             std::to_string(net.strandIndicesOfLink[linkIdx].size()) +

@@ -5759,6 +5759,10 @@ namespace sim {
         b02 = this->defaultBondLength * this->defaultBondLength;
       }
 
+      if (this->getNrOfSprings() == 0) {
+        return 0.;
+      }
+
       Eigen::VectorXd gammaFactors = this->getGammaFactors(b02);
 
       if (nrOfChains < 1) {
