@@ -99,6 +99,9 @@ MEHPForceBalance2::MEHPForceBalance2(
       INVALIDARG_EXP_IFN(vertexDegrees[i] == 2,
                          "Only 'normal' strand bead are currently allowed "
                          "entanglement targets.");
+      INVALIDARG_EXP_IFN(pairsOfAtoms[pairOfAtom[i]].first !=
+                           pairsOfAtoms[pairOfAtom[i]].second,
+                         "");
     }
   }
 
@@ -247,7 +250,13 @@ MEHPForceBalance2::MEHPForceBalance2(
           assert(linkIndicesOfStrand[currentStrandIdx].back() ==
                  springTo.back());
 
-          springBoxOffsets.emplace_back(Eigen::Vector3d::Zero());
+          springBoxOffsets.emplace_back(
+            addNewLink
+              ? Eigen::Vector3d::Zero()
+              : this->box.getOffset(currentPosition -
+                                    newLinkPositions[springFrom.back()])
+            // Eigen::Vector3d::Zero()
+          );
           springContourLength.push_back(currentSpringContourLength);
           currentSpringContourLength = 0;
 
@@ -384,14 +393,17 @@ MEHPForceBalance2::MEHPForceBalance2(
 
   if (entanglementsAsSprings) {
     for (const auto& [fst, snd] : pairsOfAtoms) {
-      assert(oldVertexIdToNewLinkId[this->universe.getIdxByAtomId(fst)] >= 0);
-      springFrom.push_back(
-        oldVertexIdToNewLinkId[this->universe.getIdxByAtomId(fst)]);
-      assert(oldVertexIdToNewLinkId[this->universe.getIdxByAtomId(snd)] >= 0);
-      springTo.push_back(
-        oldVertexIdToNewLinkId[this->universe.getIdxByAtomId(snd)]);
+      const long int newLink1 =
+        oldVertexIdToNewLinkId[this->universe.getIdxByAtomId(fst)];
+      const long int newLink2 =
+        oldVertexIdToNewLinkId[this->universe.getIdxByAtomId(snd)];
+      assert(newLink1 >= 0);
+      assert(newLink2 >= 0);
+      springFrom.push_back(newLink1);
+      springTo.push_back(newLink2);
       springContourLength.push_back(1.);
-      springBoxOffsets.emplace_back(Eigen::Vector3d::Zero());
+      springBoxOffsets.emplace_back(this->box.getOffset(
+        newLinkPositions[newLink2] - newLinkPositions[newLink1]));
       linkIndicesOfStrand.push_back({ springFrom.back(), springTo.back() });
       springIndicesOfStrand.push_back({ springFrom.size() - 1 });
       currentStrandIdx += 1;
@@ -504,8 +516,8 @@ MEHPForceBalance2::MEHPForceBalance2(
            entanglements.pairsOfAtoms.size());
     assert(this->initialConfig.springIsEntanglement.count() == 0);
     assert(contourLengthSum - this->initialConfig.nrOfSprings +
-             2*this->initialConfig.nrOfLinks - this->initialConfig.nrOfNodes
-             ==
+             2 * this->initialConfig.nrOfLinks -
+             this->initialConfig.nrOfNodes ==
            this->universe.getNrOfAtoms());
   } else {
     assert(this->initialConfig.springContourLength.sum() ==
