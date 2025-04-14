@@ -109,6 +109,9 @@ MEHPForceBalance2::MEHPForceBalance2(
   Eigen::VectorXd vertexCoordinates =
     u.getUnwrappedVertexCoordinates(this->box);
   assert(vertexCoordinates.size() == u.getNrOfAtoms() * 3);
+  Eigen::VectorXd effectiveCoordinates = vertexCoordinates;
+  std::vector<bool> hasEffectiveCoordinates =
+    pylimer_tools::utils::initializeWithValue(u.getNrOfAtoms(), false);
 
   std::vector<long int> oldVertexIdToNewLinkId =
     pylimer_tools::utils::initializeWithValue<long int>(u.getNrOfAtoms(), -1);
@@ -158,8 +161,10 @@ MEHPForceBalance2::MEHPForceBalance2(
     std::stack<igraph_integer_t> vertexStack;
     vertexStack.push(vIdx);
     std::stack<size_t> newLinkIdStack;
+    std::stack<size_t> addedVertexIdStack;
     Eigen::Vector3d currentPosition = vertexCoordinates.segment<3>(3 * vIdx, 3);
     while (!vertexStack.empty()) {
+      assert(addedVertexIdStack.size() == newLinkIdStack.size());
       igraph_integer_t currentVertex = vertexStack.top();
 
       Eigen::Vector3d distanceToCurrent =
@@ -233,6 +238,15 @@ MEHPForceBalance2::MEHPForceBalance2(
             assert(!entanglementsAsSprings);
             assert(pairOfAtom[currentVertex] >= 0);
             springTo.push_back(oldVertexIdToNewLinkId[currentVertex]);
+            // since the paired atom may have a different position, we need to
+            // account for that here for PBC later to work
+            Eigen::Vector3d dist =
+              newLinkPositions[oldVertexIdToNewLinkId[currentVertex]] -
+              currentPosition;
+            this->box.handlePBC(dist);
+            currentPosition += dist;
+            effectiveCoordinates.segment(3 * currentVertex, 3) =
+              currentPosition;
           } else {
             assert(addNewLink);
             springTo.push_back(nextLinkIdx);
@@ -250,19 +264,30 @@ MEHPForceBalance2::MEHPForceBalance2(
           assert(linkIndicesOfStrand[currentStrandIdx].back() ==
                  springTo.back());
 
+          // hack to compensate for issues arising from the fact that
+          // each entanglement link has two original bead positions,
+          // which may differ by multiple boxes.
+          // what we care about is that entanglement which is closer
+          // on the current strand.
+          // newLinkPositions[springFrom.back()]
+          Eigen::Vector3d targetPositionDistance =
+            effectiveCoordinates.segment(3 * addedVertexIdStack.top(), 3) -
+            currentPosition;
+          // this->box.handlePBC(targetPositionDistance);
+          // Eigen::Vector3d targetPosition = currentPosition +
+          // targetPositionDistance; Eigen::Vector3d computedDistance =
+          //   newLinkPositions[springFrom.back()] - currentPosition;
+
           springBoxOffsets.emplace_back(
-            addNewLink
-              ? Eigen::Vector3d::Zero()
-              : this->box.getOffset(currentPosition -
-                                    newLinkPositions[springFrom.back()])
-            // Eigen::Vector3d::Zero()
-          );
+            addNewLink ? Eigen::Vector3d::Zero()
+                       : this->box.getOffset(targetPositionDistance));
           springContourLength.push_back(currentSpringContourLength);
           currentSpringContourLength = 0;
 
           // we have visited this, need to remember for next springs
           if (!addNewLink) {
             newLinkIdStack.push(springTo.back());
+            addedVertexIdStack.push(currentVertex);
           }
         }
         if (addNewStrand) {
@@ -275,13 +300,18 @@ MEHPForceBalance2::MEHPForceBalance2(
           oldVertexIdToNewLinkId[currentVertex] = nextLinkIdx;
           newLinkIdxToOldVertexIdx.push_back(currentVertex);
           newLinkPositions.push_back(currentPosition);
+          effectiveCoordinates.segment(3 * currentVertex, 3) = currentPosition;
 
           newLinkIdStack.push(nextLinkIdx);
+          addedVertexIdStack.push(currentVertex);
           nextLinkIdx += 1;
           assert(newLinkIdxToOldVertexIdx.size() == nextLinkIdx);
           assert(newLinkIdxToOldVertexIdx.size() == newLinkPositions.size());
         }
       }
+
+      assert(newLinkIdStack.top() ==
+             oldVertexIdToNewLinkId[addedVertexIdStack.top()]);
 
       bool goDeeper = false;
       for (igraph_integer_t i = 0; i < igraph_vector_int_size(neighbors); ++i) {
@@ -355,7 +385,9 @@ MEHPForceBalance2::MEHPForceBalance2(
           edge_followed[edge] = true;
           // compute box offset
           Eigen::Vector3d distance =
-            newLinkPositions[oldVertexIdToNewLinkId[neighbor]] -
+            effectiveCoordinates.segment(
+              3 * addedVertexIdStack.top(),
+              3) - // newLinkPositions[oldVertexIdToNewLinkId[neighbor]] -
             currentPosition;
           springBoxOffsets.emplace_back(this->box.getOffset(distance));
 
@@ -372,6 +404,7 @@ MEHPForceBalance2::MEHPForceBalance2(
         }
         if (oldVertexIdToNewLinkId[currentVertex] == newLinkIdStack.top()) {
           newLinkIdStack.pop();
+          addedVertexIdStack.pop();
           if (newLinkIdStack.empty()) {
             break;
           }
@@ -2102,20 +2135,32 @@ MEHPForceBalance2::evaluateStrandLengths(const ForceBalance2Network& net,
   }
 
   return springLengths;
+}
+Eigen::Vector3d
+MEHPForceBalance2::evaluateStrandVector(const ForceBalance2Network& net,
+                                        const Eigen::VectorXd u,
+                                        const size_t strandIdx) const
+{
+  INVALIDARG_EXP_IFN(strandIdx < net.nrOfStrands, "Invalid strand index.");
+  Eigen::Vector3d result = Eigen::Vector3d::Zero();
+  for (size_t springIdx : net.springIndicesOfStrand[strandIdx]) {
+    result += this->evaluateSpringVector(net, u, springIdx);
+  }
+  return result;
 };
 
 Eigen::VectorXd
 MEHPForceBalance2::evaluateStrandVectors(const ForceBalance2Network& net,
-                                         Eigen::VectorXd u) const
+                                         const Eigen::VectorXd u) const
 {
   Eigen::VectorXd partialSpringVectors = this->evaluateSpringVectors(net, u);
-  Eigen::VectorXd springVectors = Eigen::VectorXd::Zero(3 * net.nrOfStrands);
+  Eigen::VectorXd strandVectors = Eigen::VectorXd::Zero(3 * net.nrOfStrands);
   for (size_t i = 0; i < net.nrOfSprings; ++i) {
-    springVectors.segment(net.strandIndexOfSpring[i], 3) +=
+    strandVectors.segment(net.strandIndexOfSpring[i], 3) +=
       partialSpringVectors.segment(3 * i, 3);
   }
 
-  return springVectors;
+  return strandVectors;
 }
 
 double

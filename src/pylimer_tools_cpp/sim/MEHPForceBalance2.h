@@ -701,8 +701,17 @@ public:
    * @param u the current displacements
    * @return the strand end-to-end vectors
    */
+  Eigen::Vector3d evaluateStrandVector(const ForceBalance2Network& net,
+                                        const Eigen::VectorXd u,
+                                        const size_t strandIdx) const;
+  /**
+   *
+   * @param net the network
+   * @param u the current displacements
+   * @return the strand end-to-end vectors
+   */
   Eigen::VectorXd evaluateStrandVectors(const ForceBalance2Network& net,
-                                        Eigen::VectorXd u) const;
+                                        const Eigen::VectorXd u) const;
 
   /**
    * @brief Sum the partitions up to a given link in a spring
