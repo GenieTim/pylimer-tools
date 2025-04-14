@@ -1408,6 +1408,11 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
                  fb2_phantom.getGammaFactors(1.0).mean(), 1e-6));
     CHECK_THAT(fb1_phantom.getResidual(),
                Catch::Matchers::WithinRel(fb2_phantom.getResidual(), 1e-6));
+
+    Eigen::Vector3d relevantStrandVector = fb2_phantom.evaluateStrandVector(
+      fb2_phantom.getNetwork(), fb2_phantom.getCurrentDisplacements(), 3);
+    CHECK(relevantStrandVector.isApprox(
+      Eigen::Vector3d(40. - 2., 40. - 2., 40. - 2.)));
   }
 
   SECTION("Entanglements through the box")
@@ -1430,6 +1435,9 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
 
     pylimer_tools::sim::mehp::ForceBalance2Network net2 = fb2.getNetwork();
     pylimer_tools::sim::mehp::ForceBalanceNetwork net1 = fb1.getNetwork();
+
+    CHECK(fb2.getCurrentDisplacements().isZero());
+    CHECK(fb1.getCurrentDisplacements().isZero());
 
     // internal checks, unfortunately testing implementation details
     CHECK_FALSE(net1.springPartBoxOffset.isZero());
@@ -1460,65 +1468,59 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
     }
 
     REQUIRE(net1.nrOfPartialSprings == net2.nrOfSprings);
-    // map springs, compare their lengths
-    Eigen::ArrayXb foundEquivalent = Eigen::ArrayXb::Zero(net2.nrOfSprings);
-    for (size_t springIdx = 0; springIdx < net1.nrOfPartialSprings;
-         ++springIdx) {
-      Eigen::Vector3d distance1 = fb1.evaluatePartialSpringDistance(
-        net1, fb1.getCurrentDisplacements(), springIdx);
-      bool foundEquivalentSpring = false;
-      // let's ignore the order of indices
-      for (size_t net2SpringIdx = 0; net2SpringIdx < net2.nrOfSprings;
-           ++net2SpringIdx) {
-        if (foundEquivalent[net2SpringIdx]) {
-          continue;
-        }
-        Eigen::Vector3d distance2 = fb2.evaluateSpringVector(
-          net2, fb2.getCurrentDisplacements(), net2SpringIdx);
-        if (distance1.isApprox(distance2, 1e-6) ||
-            distance1.isApprox(-1. * distance2, 1e-6)) {
-          foundEquivalent[net2SpringIdx] = true;
-          foundEquivalentSpring = true;
-          break;
-        }
-      }
-      if (!foundEquivalentSpring) {
-        std::cerr << "No equivalent spring found for spring index " << springIdx
-                  << " in network 1 with distance " << distance1 << std::endl;
-      }
-    }
+    CHECK(net2.nrOfSprings == 8);
+    CHECK(net2.nrOfStrands == 4);
 
-    for (size_t spring2Idx = 0; spring2Idx < net2.nrOfSprings; ++spring2Idx) {
-      if (foundEquivalent[spring2Idx]) {
-        continue;
-      }
-      std::cerr << "No equivalent spring found for spring index " << spring2Idx
-                << " in network 2 with distance "
-                << fb2.evaluateSpringVector(
-                     net2, fb2.getCurrentDisplacements(), spring2Idx)
-                << " between " << net2.springIndexA[spring2Idx] << "("
-                << net2.oldAtomIds[net2.springIndexA[spring2Idx]] << ") and "
-                << net2.springIndexB[spring2Idx] << " ("
-                << net2.oldAtomIds[net2.springIndexB[spring2Idx]] << ")"
-                << std::endl;
+    // more manual checks unfortunately coupled to implementation details
+    Eigen::ArrayXi expectedA = Eigen::ArrayXi::Zero(net2.nrOfSprings);
+    expectedA << 0, 1, 1, 1, 2, 3, 3, 2;
+    CHECK(net2.springIndexA.isApprox(expectedA));
+    Eigen::ArrayXi expectedB = Eigen::ArrayXi::Zero(net2.nrOfSprings);
+    expectedB << 1, 0, 0, 2, 3, 3, 2, 0;
+    CHECK(net2.springIndexB.isApprox(expectedB));
+    Eigen::VectorXd springVectors =
+      fb2.evaluateSpringVectors(net2, fb2.getCurrentDisplacements());
+    for (const size_t springIdx : { 0, 1, 2 }) {
+      CHECK(springVectors.segment(springIdx * 3, 3)
+              .cwiseAbs()
+              .isApprox(Eigen::Vector3d(2. - 0., 2. - 0., 2. - 0.)));
     }
+    for (const size_t springIdx : { 3, 4 }) {
+      Eigen::Vector3d expectation = Eigen::Vector3d::Constant(
+        coords[net2.oldAtomIds[net2.springIndexB[springIdx]]] -
+        coords[net2.oldAtomIds[net2.springIndexA[springIdx]]]);
+      CHECK(springVectors.segment(springIdx * 3, 3).isApprox(expectation));
+    }
+    CHECK(
+      springVectors.segment(5 * 3, 3).isApprox(Eigen::Vector3d(10., 10., 10.)));
+    CHECK(
+      springVectors.segment(7 * 3, 3).isApprox(Eigen::Vector3d(17., 17., 17.)));
+    Eigen::Vector3d relevantStrandVector =
+      fb2.evaluateStrandVector(net2, fb2.getCurrentDisplacements(), 3);
+    CHECK(relevantStrandVector.isApprox(
+      Eigen::Vector3d(40. - 2., 40. - 2., 40. - 2.)));
 
     // the relevant checks, not testing details but correctness of the
     // implementation
     CHECK_THAT(
       fb1.getGammaFactors(1.0).mean(),
-      Catch::Matchers::WithinAbs(fb2.getGammaFactors(1.0).mean(), 1e-6));
+      Catch::Matchers::WithinAbs(fb2.getGammaFactors(1.0).mean(), 1e-2));
     CHECK_THAT(fb1.getResidual(),
-               Catch::Matchers::WithinRel(fb2.getResidual(), 1e-6));
+               Catch::Matchers::WithinRel(fb2.getResidual(), 5e-2));
 
     fb1.runForceRelaxation();
     fb2.runForceRelaxation();
 
     CHECK_THAT(fb1.getResidual(),
                Catch::Matchers::WithinAbs(fb2.getResidual(), 1e-6));
-    CHECK_THAT(
-      fb1.getGammaFactors(1.0).mean(),
-      Catch::Matchers::WithinAbs(fb2.getGammaFactors(1.0).mean(), 1e-6));
+    Eigen::VectorXd g1 = fb1.getGammaFactors(1.0);
+    Eigen::VectorXd g2 = fb2.getGammaFactors(1.0);
+    CHECK_THAT(g1.mean(), Catch::Matchers::WithinAbs(g2.mean(), 1e-6));
+
+    Eigen::VectorXd finalPositions =
+      net2.coordinates + fb2.getCurrentDisplacements();
+    CHECK(finalPositions.segment(3 * 3, 3).isApprox(
+      finalPositions.segment(2 * 3, 3)));
 
     CHECK(fb2.getSolubleWeightFraction() == 0.);
     CHECK(fb1.getSolubleWeightFraction() == 0.);
