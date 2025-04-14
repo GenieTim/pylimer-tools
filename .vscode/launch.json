@@ -26,8 +26,8 @@
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
-        "[MEHPForceBalance2]"
-        // "Randomly functionalized chains collapse"
+        //"[MEHPForceBalance2]"
+        "All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and Simplification"
       ],
       "env": {
         "MallocNanoZone": "0",
