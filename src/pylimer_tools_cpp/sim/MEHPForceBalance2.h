@@ -1297,6 +1297,11 @@ protected:
                       << this->evaluateSpringVector(net, u, springIdx).norm()
                       << ", " << net.springContourLength[springIdx] << "), ";
           }
+          std::cerr << std::endl << "Links of this strand are: \n";
+          for (size_t linkIdx :
+               net.linkIndicesOfStrand[net.strandIndexOfSpring[i]]) {
+            std::cerr << linkIdx << " (" << net.oldAtomIds[linkIdx] << "), ";
+          }
           std::cerr << std::endl;
         }
         assert(activeSprings[i]);

@@ -3,15 +3,12 @@
 // #include <ranges>
 // #include <string_view>
 #include <Eigen/Dense>
-#include <algorithm>
 #include <chrono>
-#include <cstring>
 #include <iomanip>
 #include <iostream>
 #include <regex>
 #include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
 namespace std {
@@ -62,7 +59,7 @@ duration_to_string(Duration duration)
 namespace pylimer_tools {
 namespace utils {
 
-  static bool isUpper(std::string str)
+  static bool isUpper(const std::string& str)
   {
     for (size_t i = 0; i < str.length(); ++i) {
       if (!std::isupper(str[i])) {
