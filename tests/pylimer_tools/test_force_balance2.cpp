@@ -1525,7 +1525,7 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
       Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-5));
     CHECK_THAT(fb1.getResidual(),
                Catch::Matchers::WithinRel(fb2.getResidual(), 1e-5));
-it
+
     fb1.runForceRelaxation(25000,
                            1e-13,
                            fb1.getDisplacementResidualNorm(-1.),
