@@ -1461,15 +1461,13 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
     CHECK(net1.coordinates.segment(3 * 1, 3).isApprox(
       net2.coordinates.segment(3 * 1, 3)));
     REQUIRE(net1.nrOfLinks == net2.nrOfLinks);
-    for (size_t linkIdx = 0; linkIdx < net1.nrOfLinks; ++linkIdx) {
-      CHECK(net2.coordinates.segment(3 * linkIdx, 3)
-              .isApprox(
-                Eigen::Vector3d::Constant(coords[net2.oldAtomIds[linkIdx]])));
-    }
 
     REQUIRE(net1.nrOfPartialSprings == net2.nrOfSprings);
     CHECK(net2.nrOfSprings == 8);
     CHECK(net2.nrOfStrands == 4);
+
+    CHECK_THAT(fb1.getForceOn(1).norm(),
+               Catch::Matchers::WithinRel(fb2.getForceOn(1).norm()));
 
     // more manual checks unfortunately coupled to implementation details
     Eigen::ArrayXi expectedA = Eigen::ArrayXi::Zero(net2.nrOfSprings);
@@ -1478,37 +1476,47 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
     Eigen::ArrayXi expectedB = Eigen::ArrayXi::Zero(net2.nrOfSprings);
     expectedB << 1, 0, 0, 2, 3, 3, 2, 0;
     CHECK(net2.springIndexB.isApprox(expectedB));
-    Eigen::VectorXd springVectors =
+    Eigen::VectorXd springVectors2 =
       fb2.evaluateSpringVectors(net2, fb2.getCurrentDisplacements());
     for (const size_t springIdx : { 0, 1, 2 }) {
-      CHECK(springVectors.segment(springIdx * 3, 3)
+      CHECK(springVectors2.segment(springIdx * 3, 3)
               .cwiseAbs()
-              .isApprox(Eigen::Vector3d(2. - 0., 2. - 0., 2. - 0.)));
+              .isApproxToConstant(2. - 0.));
     }
-    for (const size_t springIdx : { 3, 4 }) {
-      Eigen::Vector3d expectation = Eigen::Vector3d::Constant(
-        coords[net2.oldAtomIds[net2.springIndexB[springIdx]]] -
-        coords[net2.oldAtomIds[net2.springIndexA[springIdx]]]);
-      CHECK(springVectors.segment(springIdx * 3, 3).isApprox(expectation));
-    }
-    CHECK(
-      springVectors.segment(5 * 3, 3).isApprox(Eigen::Vector3d(10., 10., 10.)));
-    CHECK(
-      springVectors.segment(7 * 3, 3).isApprox(Eigen::Vector3d(17., 17., 17.)));
+    CHECK(springVectors2.segment(5 * 3, 3).isApproxToConstant(10.));
+    CHECK(springVectors2.segment(6 * 3, 3).isApproxToConstant(23.5 - 14.5));
+    CHECK(springVectors2.segment(7 * 3, 3).isApproxToConstant(40. - 23.5));
     Eigen::Vector3d relevantStrandVector =
       fb2.evaluateStrandVector(net2, fb2.getCurrentDisplacements(), 3);
     CHECK(relevantStrandVector.isApprox(
       Eigen::Vector3d(40. - 2., 40. - 2., 40. - 2.)));
 
+    // same for fb1, where the coordinates are slightly different due to
+    // averaging positions of the two involved beads
+    Eigen::VectorXd springVectors1 =
+      fb1.evaluatePartialSpringVectors(net1, fb1.getCurrentDisplacements());
+    Eigen::ArrayXi expectedA1 = Eigen::ArrayXi::Zero(net1.nrOfPartialSprings);
+    expectedA1 << 0, 0, 2, 3, 3, 2, 0, 0;
+    CHECK(net1.springPartIndexA.isApprox(expectedA1));
+    Eigen::ArrayXi expectedB1 = Eigen::ArrayXi::Zero(net1.nrOfPartialSprings);
+    expectedB1 << 1, 2, 3, 3, 2, 1, 1, 1;
+    CHECK(net1.springPartIndexB.isApprox(expectedB1));
+    CHECK(springVectors1.segment(0 * 3, 3).isApproxToConstant(2. - 0.));
+    CHECK(springVectors1.segment(6 * 3, 3).isApproxToConstant(2. - 0.));
+    CHECK(springVectors1.segment(7 * 3, 3).isApproxToConstant(2. - 0.));
+    CHECK(springVectors1.segment(3 * 3, 3).isApproxToConstant(-(10.)));
+    CHECK(springVectors1.segment(2 * 3, 3).isApproxToConstant(-(23.5 - 14.5)));
+    CHECK(springVectors1.segment(1 * 3, 3).isApproxToConstant(-(40. - 23.5)));
+
     // the relevant checks, not testing details but correctness of the
     // implementation
     CHECK_THAT(
       fb1.getGammaFactors(1.0).mean(),
-      Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-2));
+      Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-5));
     CHECK_THAT(fb1.getResidual(),
-               Catch::Matchers::WithinRel(fb2.getResidual(), 1e-1));
+               Catch::Matchers::WithinRel(fb2.getResidual(), 1e-5));
 
-    fb1.runForceRelaxation();
+    fb1.runForceRelaxation(300, 1e-13, 1.);
     fb2.runForceRelaxation();
 
     CHECK_THAT(fb1.getResidual(),
@@ -1521,21 +1529,131 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
       net1.coordinates + fb1.getCurrentDisplacements();
     Eigen::VectorXd finalPositions2 =
       net2.coordinates + fb2.getCurrentDisplacements();
+    Eigen::VectorXd springVectorsAfter1 =
+      fb1.evaluatePartialSpringVectors(net1, fb1.getCurrentDisplacements());
+    Eigen::VectorXd springVectorsAfter2 =
+      fb2.evaluateSpringVectors(net2, fb2.getCurrentDisplacements());
     for (size_t i = 0; i < net2.nrOfLinks; ++i) {
       // check that everything is on the diagonal
       CHECK(finalPositions1.segment(3 * i, 3).isApproxToConstant(
         finalPositions1[3 * i]));
       CHECK(finalPositions2.segment(3 * i, 3).isApproxToConstant(
         finalPositions2[3 * i]));
+      CHECK(springVectorsAfter1.segment(3 * i, 3).isApproxToConstant(
+        springVectorsAfter1[3 * i]));
+      CHECK(springVectorsAfter2.segment(3 * i, 3).isApproxToConstant(
+        springVectorsAfter2[3 * i]));
     }
 
     CHECK(fb2.getSolubleWeightFraction() == 0.);
     CHECK(fb1.getSolubleWeightFraction() == 0.);
 
     // and another test of the internals, unfortunately
-    Eigen::VectorXd springVectorsAfter =
-      fb2.evaluateSpringVectors(net2, fb2.getCurrentDisplacements());
+    CHECK(springVectorsAfter2.segment(0 * 3, 3).isApprox(
+      -1. * springVectorsAfter2.segment(1 * 3, 3)));
+    CHECK(springVectorsAfter2.segment(1 * 3, 3).isApprox(
+      springVectorsAfter2.segment(2 * 3, 3)));
 
+    // from Mathematica solution
+    CHECK_THAT(finalPositions1[3 * 0] - finalPositions1[3 * 1],
+               Catch::Matchers::WithinRel(-0.45977, 1e-3));
+    CHECK_THAT(finalPositions1[3 * 1] - finalPositions1[3 * 2],
+               Catch::Matchers::WithinRel(-1.14943, 1e-3));
+    CHECK_THAT(finalPositions1[3 * 2] - finalPositions1[3 * 3],
+               Catch::Matchers::WithinRel(-1.66667, 1e-3));
+
+    CHECK_THAT(finalPositions2[3 * 0] - finalPositions2[3 * 1],
+               Catch::Matchers::WithinRel(-0.45977, 1e-3));
+    CHECK_THAT(finalPositions2[3 * 1] - finalPositions2[3 * 2],
+               Catch::Matchers::WithinRel(-1.14943, 1e-3));
+    CHECK_THAT(finalPositions2[3 * 2] - finalPositions2[3 * 3],
+               Catch::Matchers::WithinRel(-1.66667, 1e-3));
+
+    CHECK_NOTHROW(fb2.validateNetwork());
+  }
+
+  SECTION("Entanglements through the box, direct copy of network")
+  {
+    // our entanglements that spawn through the box
+    entanglements.pairsOfAtoms.push_back(std::make_pair(3, 24));
+    entanglements.pairsOfAtoms.push_back(std::make_pair(5, 14));
+    entanglements.pairOfAtom[3] = 0;
+    entanglements.pairOfAtom[24] = 0;
+    entanglements.pairOfAtom[5] = 1;
+    entanglements.pairOfAtom[14] = 1;
+
+    pylimer_tools::sim::mehp::MEHPForceBalance fb1 =
+      pylimer_tools::sim::mehp::MEHPForceBalance::constructWithSlipLinks(
+        universe, entanglements);
+    fb1.configAssumeBoxLargeEnough(false);
+
+    pylimer_tools::sim::mehp::ForceBalanceNetwork net1 = fb1.getNetwork();
+    pylimer_tools::sim::mehp::ForceBalance2Network net2;
+    for (size_t dir = 0; dir < 3; ++dir) {
+      net2.L[dir] = net1.L[dir];
+      net2.boxHalfs[dir] = net1.boxHalfs[dir];
+    }
+    net2.nrOfLinks = net1.nrOfLinks;
+    net2.nrOfNodes = net1.nrOfNodes;
+    net2.nrOfSprings = net1.nrOfPartialSprings;
+    net2.nrOfStrands = net1.nrOfSprings;
+    net2.springIndexA = net1.springPartIndexA;
+    net2.springIndexB = net1.springPartIndexB;
+    net2.coordinates = net1.coordinates;
+    net2.linkIndicesOfStrand = net1.linkIndicesOfSprings;
+    net2.springBoxOffset = net1.springPartBoxOffset;
+    net2.springIndicesOfStrand = net1.localToGlobalSpringIndex;
+    net2.linkIsEntanglement = net1.linkIsSliplink;
+    net2.strandIndexOfSpring = net1.partialToFullSpringIndex;
+    net2.strandIndicesOfLink = net1.springIndicesOfLinks;
+
+    // what needs a bit more translation
+    net2.springIsEntanglement = Eigen::ArrayXb::Zero(net2.nrOfSprings);
+    net2.springContourLength = Eigen::VectorXd::Zero(net2.nrOfSprings);
+    for (size_t i = 0; i < net2.nrOfSprings; ++i) {
+      net2.springContourLength[i] =
+        net1.springsContourLength[net1.partialToFullSpringIndex[i]] *
+        fb1.getSpringPartitions()[i];
+    }
+    net2.springCoordinateIndexA = Eigen::ArrayXi::Zero(3 * net2.nrOfSprings);
+    net2.springCoordinateIndexB = Eigen::ArrayXi::Zero(3 * net2.nrOfSprings);
+    for (size_t i = 0; i < net2.nrOfSprings; ++i) {
+      for (size_t dir = 0; dir < 3; ++dir) {
+        net2.springCoordinateIndexA[3 * i + dir] =
+          net2.springIndexA[i] * 3 + dir;
+        net2.springCoordinateIndexB[3 * i + dir] =
+          net2.springIndexB[i] * 3 + dir;
+      }
+    }
+    net2.oldAtomTypes = Eigen::VectorXi::Zero(net2.nrOfLinks);
+    net2.oldAtomIds = Eigen::VectorXi::Zero(net2.nrOfLinks);
+
+    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
+      pylimer_tools::sim::mehp::MEHPForceBalance2(net2);
+
+    CHECK_THAT(
+      fb1.getGammaFactors(1.0).mean(),
+      Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-5));
+    CHECK_THAT(fb1.getResidual(),
+               Catch::Matchers::WithinRel(fb2.getResidual(), 1e-5));
+
+    fb1.runForceRelaxation(300,
+                           1e-13,
+                           1.,
+                           pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                           1e-12,
+                           false,
+                           pcm::LinkSwappingMode::NO_SWAPPING,
+                           1e5,
+                           -1.);
+    fb2.runForceRelaxation();
+
+    CHECK_THAT(
+      fb1.getGammaFactors(1.0).mean(),
+      Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-5));
+    CHECK_THAT(fb1.getResidual(),
+               Catch::Matchers::WithinRel(fb2.getResidual(), 1e-5));
+    CHECK_NOTHROW(fb2.validateNetwork());
   }
 }
 
