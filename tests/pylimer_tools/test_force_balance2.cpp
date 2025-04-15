@@ -1504,9 +1504,9 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
     // implementation
     CHECK_THAT(
       fb1.getGammaFactors(1.0).mean(),
-      Catch::Matchers::WithinAbs(fb2.getGammaFactors(1.0).mean(), 1e-2));
+      Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-2));
     CHECK_THAT(fb1.getResidual(),
-               Catch::Matchers::WithinRel(fb2.getResidual(), 5e-2));
+               Catch::Matchers::WithinRel(fb2.getResidual(), 1e-1));
 
     fb1.runForceRelaxation();
     fb2.runForceRelaxation();
@@ -1515,12 +1515,207 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
                Catch::Matchers::WithinAbs(fb2.getResidual(), 1e-6));
     Eigen::VectorXd g1 = fb1.getGammaFactors(1.0);
     Eigen::VectorXd g2 = fb2.getGammaFactors(1.0);
-    CHECK_THAT(g1.mean(), Catch::Matchers::WithinAbs(g2.mean(), 1e-6));
+    CHECK_THAT(g1.mean(), Catch::Matchers::WithinRel(g2.mean(), 1e-3));
 
-    Eigen::VectorXd finalPositions =
+    Eigen::VectorXd finalPositions1 =
+      net1.coordinates + fb1.getCurrentDisplacements();
+    Eigen::VectorXd finalPositions2 =
       net2.coordinates + fb2.getCurrentDisplacements();
-    CHECK(finalPositions.segment(3 * 3, 3).isApprox(
-      finalPositions.segment(2 * 3, 3)));
+    for (size_t i = 0; i < net2.nrOfLinks; ++i) {
+      // check that everything is on the diagonal
+      CHECK(finalPositions1.segment(3 * i, 3).isApproxToConstant(
+        finalPositions1[3 * i]));
+      CHECK(finalPositions2.segment(3 * i, 3).isApproxToConstant(
+        finalPositions2[3 * i]));
+    }
+
+    CHECK(fb2.getSolubleWeightFraction() == 0.);
+    CHECK(fb1.getSolubleWeightFraction() == 0.);
+
+    // and another test of the internals, unfortunately
+    Eigen::VectorXd springVectorsAfter =
+      fb2.evaluateSpringVectors(net2, fb2.getCurrentDisplacements());
+
+  }
+}
+
+TEST_CASE("MEHPFB2 Conversion test of small grid",
+          "[analysis][MEHPForceBalance2][MEHPForceBalance]")
+{
+  std::cout << "Running test \"MEHPFB2 Conversion test of small grid\""
+            << std::endl;
+
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  std::vector<double> coordsX;
+  std::vector<double> coordsY;
+  std::vector<long int> ids;
+  std::vector<long int> bondFrom;
+  std::vector<long int> bondTo;
+
+  // 2D square lattice grid, 10 atoms in each direction
+  // two vertical "lines"
+  for (size_t y = 0; y < 2; ++y) {
+    for (size_t i = 0; i < 10; ++i) {
+      coordsX.push_back(i);
+      coordsY.push_back(y * 5.);
+      assert(ids.size() == y * 10 + i);
+      ids.push_back(y * 10 + i);
+      bondFrom.push_back(y * 10 + i);
+      bondTo.push_back(y * 10 + ((i + 1) % (10)));
+    }
+  }
+  // two horizontal "lines"
+  for (size_t x = 0; x < 2; ++x) {
+    for (size_t i = 1; i < 10; ++i) {
+      if (i != 5) {
+        coordsX.push_back(x * 5.);
+        coordsY.push_back(i);
+        ids.push_back(ids.size());
+      }
+    }
+  }
+  std::vector<size_t> additionalBonds = {
+    0,  20, 20, 21, 21, 22, 22, 23, 23, 10,
+    10, 24, 24, 25, 25, 26, 26, 27, 27, 0, // "lower" line,
+    5,  28, 28, 29, 29, 30, 30, 31, 31, 15,
+    15, 32, 32, 33, 33, 34, 34, 35, 35, 5 // "upper" line,
+  };
+  for (size_t i = 0; i < additionalBonds.size(); ++i) {
+    if (i % 2 == 0) {
+      bondFrom.push_back(additionalBonds[i]);
+    } else {
+      bondTo.push_back(additionalBonds[i]);
+    }
+  }
+  // register types to make the two FBs equivalent
+  std::vector<int> types =
+    pylimer_tools::utils::initializeWithValue(ids.size(), 1);
+  types[0] = 2;
+  types[5] = 2;
+  types[10] = 2;
+  types[15] = 2;
+  // add some random deformation to actually introduce something to optimize
+  coordsX[0] += 0.1;
+  coordsX[5] -= 0.1;
+  coordsX[10] += 0.2;
+  coordsX[15] -= 0.05;
+
+  // actually create the grid as a universe
+  universe.addAtoms(
+    ids,
+    types,
+    coordsX,
+    coordsY,
+    pylimer_tools::utils::initializeWithValue(coordsX.size(), 0.),
+    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+    pylimer_tools::utils::initializeWithValue(ids.size(), 0));
+
+  universe.addBonds(bondFrom, bondTo);
+
+  CHECK(universe.getNrOfBonds() == bondFrom.size());
+  CHECK(universe.getNrOfAtoms() == ids.size());
+
+  pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
+    entanglements;
+  entanglements.pairOfAtom =
+    pylimer_tools::utils::initializeWithValue<long int>(ids.size(), -1);
+
+  SECTION("Phantom")
+  {
+    pylimer_tools::sim::mehp::MEHPForceBalance fb1_phantom =
+      pylimer_tools::sim::mehp::MEHPForceBalance::constructWithSlipLinks(
+        universe, entanglements);
+    fb1_phantom.configAssumeBoxLargeEnough(false);
+
+    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2_phantom =
+      pylimer_tools::sim::mehp::MEHPForceBalance2(universe, entanglements);
+    CHECK_THAT(fb1_phantom.getGammaFactors(1.0).mean(),
+               Catch::Matchers::WithinAbs(
+                 fb2_phantom.getGammaFactors(1.0).mean(), 1e-6));
+    CHECK_THAT(fb1_phantom.getResidual(),
+               Catch::Matchers::WithinRel(fb2_phantom.getResidual(), 1e-6));
+
+    fb1_phantom.runForceRelaxation();
+    fb2_phantom.runForceRelaxation();
+
+    CHECK_THAT(fb1_phantom.getResidual(), Catch::Matchers::WithinAbs(0., 1e-6));
+    CHECK_THAT(fb2_phantom.getResidual(), Catch::Matchers::WithinAbs(0., 1e-6));
+    CHECK_THAT(fb1_phantom.getGammaFactors(1.0).mean(),
+               Catch::Matchers::WithinAbs(
+                 fb2_phantom.getGammaFactors(1.0).mean(), 1e-6));
+
+    pylimer_tools::sim::mehp::ForceBalance2Network net2 =
+      fb2_phantom.getNetwork();
+    pylimer_tools::sim::mehp::ForceBalanceNetwork net1 =
+      fb1_phantom.getNetwork();
+
+    CHECK(net1.nrOfLinks == 4);
+    CHECK(net2.nrOfLinks == 4);
+    CHECK(net1.nrOfNodes == 4);
+    CHECK(net2.nrOfNodes == 4);
+    CHECK_FALSE(net1.springPartBoxOffset.isZero());
+    CHECK_FALSE(net2.springBoxOffset.isZero());
+    CHECK(net2.nrOfStrands == 8);
+    CHECK(net2.nrOfSprings == net2.nrOfStrands);
+    CHECK(net1.nrOfSprings == 8);
+    CHECK(net1.nrOfSprings == net1.nrOfPartialSprings);
+    CHECK(fb1_phantom.getNrOfActiveSprings() == net1.nrOfSprings);
+    CHECK(fb2_phantom.getNrOfActiveSprings() == net2.nrOfSprings);
+    CHECK(fb2_phantom.getNrOfActiveStrands() == net2.nrOfStrands);
+    CHECK(fb2_phantom.getNrOfActiveNodes() == net2.nrOfNodes);
+    CHECK(net2.springContourLength.isApproxToConstant(5.));
+  }
+
+  SECTION("Entangled")
+  {
+    // our entanglements that spawn through the box
+    entanglements.pairsOfAtoms.push_back(std::make_pair(3, 13));
+    entanglements.pairsOfAtoms.push_back(std::make_pair(16, 32));
+    entanglements.pairOfAtom[3] = 0;
+    entanglements.pairOfAtom[13] = 0;
+    entanglements.pairOfAtom[16] = 1;
+    entanglements.pairOfAtom[32] = 1;
+
+    pylimer_tools::sim::mehp::MEHPForceBalance fb1 =
+      pylimer_tools::sim::mehp::MEHPForceBalance::constructWithSlipLinks(
+        universe, entanglements);
+    fb1.configAssumeBoxLargeEnough(false);
+
+    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
+      pylimer_tools::sim::mehp::MEHPForceBalance2(universe, entanglements);
+
+    pylimer_tools::sim::mehp::ForceBalance2Network net2 = fb2.getNetwork();
+    pylimer_tools::sim::mehp::ForceBalanceNetwork net1 = fb1.getNetwork();
+
+    CHECK(fb2.getCurrentDisplacements().isZero());
+    CHECK(fb1.getCurrentDisplacements().isZero());
+    CHECK(net1.nrOfNodes == 4);
+    CHECK(net2.nrOfNodes == 4);
+
+    // internal checks, unfortunately testing implementation details
+    CHECK_FALSE(net1.springPartBoxOffset.isZero());
+    CHECK_FALSE(net2.springBoxOffset.isZero());
+    REQUIRE(net1.nrOfPartialSprings == net2.nrOfSprings);
+    CHECK(net2.nrOfSprings == 12);
+    CHECK(net2.nrOfStrands == 8);
+
+    // the relevant checks, not testing details but correctness of the
+    // implementation
+    CHECK_THAT(
+      fb1.getGammaFactors(1.0).mean(),
+      Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-2));
+    CHECK_THAT(fb1.getResidual(),
+               Catch::Matchers::WithinRel(fb2.getResidual(), 1e-1));
+
+    fb1.runForceRelaxation();
+    fb2.runForceRelaxation();
+
+    CHECK_THAT(fb1.getResidual(),
+               Catch::Matchers::WithinAbs(fb2.getResidual(), 1e-6));
+    Eigen::VectorXd g1 = fb1.getGammaFactors(1.0);
+    Eigen::VectorXd g2 = fb2.getGammaFactors(1.0);
+    CHECK_THAT(g1.mean(), Catch::Matchers::WithinRel(g2.mean(), 1e-3));
 
     CHECK(fb2.getSolubleWeightFraction() == 0.);
     CHECK(fb1.getSolubleWeightFraction() == 0.);

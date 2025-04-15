@@ -383,13 +383,25 @@ MEHPForceBalance2::MEHPForceBalance2(
                                 1] == springTo[springTo.size() - 1]);
           springContourLength.push_back(currentSpringContourLength + 1);
           edge_followed[edge] = true;
+          //
+          Eigen::Vector3d targetPos = effectiveCoordinates.segment(
+            3 * neighbor,
+            3); // newLinkPositions[oldVertexIdToNewLinkId[neighbor]]
+          Eigen::Vector3d lastStepToTarget = currentPosition - targetPos;
+          this->box.handlePBC(lastStepToTarget);
+          Eigen::Vector3d actualTargetPos = currentPosition - lastStepToTarget;
+          Eigen::Vector3d previousPos =
+            effectiveCoordinates.segment(3 * addedVertexIdStack.top(), 3);
+          Eigen::Vector3d isDistance =
+            targetPos - effectiveCoordinates.segment(
+                          3 * newLinkIdxToOldVertexIdx[newLinkIdStack.top()],
+                          3); // previousPos;
+          Eigen::Vector3d shouldBeDistance = actualTargetPos - previousPos;
           // compute box offset
-          Eigen::Vector3d distance =
-            effectiveCoordinates.segment(
-              3 * addedVertexIdStack.top(),
-              3) - // newLinkPositions[oldVertexIdToNewLinkId[neighbor]] -
-            currentPosition;
-          springBoxOffsets.emplace_back(this->box.getOffset(distance));
+          // Eigen::Vector3d distance = targetPos - previousPos;
+          // springBoxOffsets.emplace_back(this->box.getOffset(-1. * distance));
+          springBoxOffsets.emplace_back(shouldBeDistance - isDistance);
+          assert(this->box.isValidOffset(springBoxOffsets.back()));
 
           // close the strand
           currentStrandIdx += 1;

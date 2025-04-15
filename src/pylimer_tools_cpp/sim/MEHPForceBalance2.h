@@ -702,8 +702,8 @@ public:
    * @return the strand end-to-end vectors
    */
   Eigen::Vector3d evaluateStrandVector(const ForceBalance2Network& net,
-                                        const Eigen::VectorXd u,
-                                        const size_t strandIdx) const;
+                                       const Eigen::VectorXd u,
+                                       const size_t strandIdx) const;
   /**
    *
    * @param net the network
@@ -1288,32 +1288,31 @@ protected:
     Eigen::ArrayXb activeSprings = this->findActiveSprings(net, u, tolerance);
 
     for (size_t i = 0; i < net.nrOfSprings; ++i) {
-      if (this->isLoopingSpring(net, i)) {
-        continue;
-      }
 #ifndef NDEBUG
       // we assert that all springs of a strand are active, it cannot be that
       // one is not
-      if (result[net.strandIndexOfSpring[i]] && this->nrOfStepsDone > 0) {
-        if (!activeSprings[i]) {
-          std::cerr << "Warning: Strand " << net.strandIndexOfSpring[i]
-                    << " is marked active, while spring " << i << " is not."
-                    << std::endl;
-          std::cerr << "In this strand are: " << std::endl;
-          for (size_t springIdx :
-               net.springIndicesOfStrand[net.strandIndexOfSpring[i]]) {
-            std::cerr << springIdx << " (" << activeSprings[springIdx] << ", "
-                      << this->evaluateSpringVector(net, u, springIdx).norm()
-                      << ", " << net.springContourLength[springIdx] << "), ";
+      if (!this->isLoopingSpring(net, i)) {
+        if (result[net.strandIndexOfSpring[i]] && this->nrOfStepsDone > 0) {
+          if (!activeSprings[i]) {
+            std::cerr << "Warning: Strand " << net.strandIndexOfSpring[i]
+                      << " is marked active, while spring " << i << " is not."
+                      << std::endl;
+            std::cerr << "In this strand are: " << std::endl;
+            for (size_t springIdx :
+                 net.springIndicesOfStrand[net.strandIndexOfSpring[i]]) {
+              std::cerr << springIdx << " (" << activeSprings[springIdx] << ", "
+                        << this->evaluateSpringVector(net, u, springIdx).norm()
+                        << ", " << net.springContourLength[springIdx] << "), ";
+            }
+            std::cerr << std::endl << "Links of this strand are: \n";
+            for (size_t linkIdx :
+                 net.linkIndicesOfStrand[net.strandIndexOfSpring[i]]) {
+              std::cerr << linkIdx << " (" << net.oldAtomIds[linkIdx] << "), ";
+            }
+            std::cerr << std::endl;
           }
-          std::cerr << std::endl << "Links of this strand are: \n";
-          for (size_t linkIdx :
-               net.linkIndicesOfStrand[net.strandIndexOfSpring[i]]) {
-            std::cerr << linkIdx << " (" << net.oldAtomIds[linkIdx] << "), ";
-          }
-          std::cerr << std::endl;
+          assert(activeSprings[i]);
         }
-        assert(activeSprings[i]);
       }
 #endif
 
