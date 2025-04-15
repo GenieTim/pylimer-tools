@@ -168,7 +168,7 @@ MEHPForceBalance2::MEHPForceBalance2(
       igraph_integer_t currentVertex = vertexStack.top();
 
       Eigen::Vector3d distanceToCurrent =
-        vertexCoordinates.segment<3>(currentVertex * 3, 3) - currentPosition;
+        effectiveCoordinates.segment<3>(currentVertex * 3, 3) - currentPosition;
       this->box.handlePBC(distanceToCurrent);
       currentPosition += distanceToCurrent;
 
@@ -208,6 +208,14 @@ MEHPForceBalance2::MEHPForceBalance2(
             oldVertexIdToNewLinkId[currentVertex] = std::max(
               oldVertexIdToNewLinkId[fst], oldVertexIdToNewLinkId[snd]);
           }
+          // since the paired atom may have a different position, we need to
+          // account for that here for PBC later to work.
+          Eigen::Vector3d dist = effectiveCoordinates.segment(
+                                   3 * (fst == currentVertex ? snd : fst), 3) -
+                                 currentPosition;
+          this->box.handlePBC(dist);
+          currentPosition += dist * (addNewLink ? 0.5 : 1.);
+          effectiveCoordinates.segment(3 * currentVertex, 3) = currentPosition;
           addSpring = true;
         } else if (vertexDegrees[currentVertex] > 2 ||
                    vertexDegrees[currentVertex] == 1) {
@@ -238,13 +246,6 @@ MEHPForceBalance2::MEHPForceBalance2(
             assert(!entanglementsAsSprings);
             assert(pairOfAtom[currentVertex] >= 0);
             springTo.push_back(oldVertexIdToNewLinkId[currentVertex]);
-            // since the paired atom may have a different position, we need to
-            // account for that here for PBC later to work
-            Eigen::Vector3d dist =
-              newLinkPositions[oldVertexIdToNewLinkId[currentVertex]] -
-              currentPosition;
-            this->box.handlePBC(dist);
-            currentPosition += dist;
             effectiveCoordinates.segment(3 * currentVertex, 3) =
               currentPosition;
           } else {
