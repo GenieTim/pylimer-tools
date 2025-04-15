@@ -1288,7 +1288,17 @@ TEST_CASE("MEHPFB2 Basic conversion test",
   CHECK_THAT(fb1.getResidual(),
              Catch::Matchers::WithinRel(fb2.getResidual(), 1e-6));
 
-  fb1.runForceRelaxation();
+  fb1.runForceRelaxation(25000,
+                         1e-13,
+                         fb1.getDisplacementResidualNorm(-1.),
+                         pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                         1e-12,
+                         false,
+                         pcm::LinkSwappingMode::NO_SWAPPING,
+                         1e5,
+                         -1.,
+                         0,
+                         true);
   fb2.runForceRelaxation();
 
   CHECK_THAT(fb1.getResidual(),
@@ -1515,8 +1525,18 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
       Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-5));
     CHECK_THAT(fb1.getResidual(),
                Catch::Matchers::WithinRel(fb2.getResidual(), 1e-5));
-
-    fb1.runForceRelaxation(300, 1e-13, 1.);
+it
+    fb1.runForceRelaxation(25000,
+                           1e-13,
+                           fb1.getDisplacementResidualNorm(-1.),
+                           pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                           1e-12,
+                           false,
+                           pcm::LinkSwappingMode::NO_SWAPPING,
+                           1e5,
+                           -1.,
+                           0,
+                           true);
     fb2.runForceRelaxation();
 
     CHECK_THAT(fb1.getResidual(),
@@ -1599,6 +1619,8 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
     net2.nrOfStrands = net1.nrOfSprings;
     net2.springIndexA = net1.springPartIndexA;
     net2.springIndexB = net1.springPartIndexB;
+    net2.springCoordinateIndexA = net1.springPartCoordinateIndexA;
+    net2.springCoordinateIndexB = net1.springPartCoordinateIndexB;
     net2.coordinates = net1.coordinates;
     net2.linkIndicesOfStrand = net1.linkIndicesOfSprings;
     net2.springBoxOffset = net1.springPartBoxOffset;
@@ -1610,20 +1632,11 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
     // what needs a bit more translation
     net2.springIsEntanglement = Eigen::ArrayXb::Zero(net2.nrOfSprings);
     net2.springContourLength = Eigen::VectorXd::Zero(net2.nrOfSprings);
+    Eigen::VectorXd springPartitions = fb1.getSpringPartitions();
     for (size_t i = 0; i < net2.nrOfSprings; ++i) {
       net2.springContourLength[i] =
         net1.springsContourLength[net1.partialToFullSpringIndex[i]] *
-        fb1.getSpringPartitions()[i];
-    }
-    net2.springCoordinateIndexA = Eigen::ArrayXi::Zero(3 * net2.nrOfSprings);
-    net2.springCoordinateIndexB = Eigen::ArrayXi::Zero(3 * net2.nrOfSprings);
-    for (size_t i = 0; i < net2.nrOfSprings; ++i) {
-      for (size_t dir = 0; dir < 3; ++dir) {
-        net2.springCoordinateIndexA[3 * i + dir] =
-          net2.springIndexA[i] * 3 + dir;
-        net2.springCoordinateIndexB[3 * i + dir] =
-          net2.springIndexB[i] * 3 + dir;
-      }
+        springPartitions[i];
     }
     net2.oldAtomTypes = Eigen::VectorXi::Zero(net2.nrOfLinks);
     net2.oldAtomIds = Eigen::VectorXi::Zero(net2.nrOfLinks);
@@ -1636,23 +1649,66 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
       Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-5));
     CHECK_THAT(fb1.getResidual(),
                Catch::Matchers::WithinRel(fb2.getResidual(), 1e-5));
+    for (size_t i = 0; i < net2.nrOfLinks; ++i) {
+      CHECK_THAT(fb1.getForceOn(i).norm(),
+                 Catch::Matchers::WithinRel(fb2.getForceOn(i).norm(), 1e-5));
+    }
+    for (size_t i = 0; i < net2.nrOfSprings; ++i) {
+      Eigen::Vector3d springVec1 = fb1.evaluatePartialSpringDistance(
+        net1, fb1.getCurrentDisplacements(), i);
+      Eigen::Vector3d springVec2 =
+        fb2.evaluateSpringVector(net2, fb2.getCurrentDisplacements(), i);
+      for (size_t dir = 0; dir < 3; ++dir) {
+        CHECK_THAT(springVec1[dir],
+                   Catch::Matchers::WithinRel(springVec2[dir], 1e-5));
+      }
+    }
 
-    fb1.runForceRelaxation(300,
+    fb1.runForceRelaxation(25000,
                            1e-13,
-                           1.,
+                           fb1.getDisplacementResidualNorm(-1.),
                            pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
                            1e-12,
                            false,
                            pcm::LinkSwappingMode::NO_SWAPPING,
                            1e5,
-                           -1.);
+                           -1.,
+                           0,
+                           true);
     fb2.runForceRelaxation();
 
     CHECK_THAT(
-      fb1.getGammaFactors(1.0).mean(),
+      fb1.getGammaFactors(1.0, -1.).mean(),
       Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-5));
-    CHECK_THAT(fb1.getResidual(),
-               Catch::Matchers::WithinRel(fb2.getResidual(), 1e-5));
+    CHECK_THAT(fb1.getDisplacementResidualNorm(-1.),
+               Catch::Matchers::WithinAbs(fb2.getResidual(), 1e-5));
+    for (size_t i = 0; i < net2.nrOfLinks; ++i) {
+      CHECK_THAT(fb1.getForceOn(i, -1.).norm(),
+                 Catch::Matchers::WithinAbs(fb2.getForceOn(i).norm(), 1e-5));
+    }
+    for (size_t i = 0; i < net2.nrOfSprings; ++i) {
+      Eigen::Vector3d springVec1 = fb1.evaluatePartialSpringDistance(
+        net1, fb1.getCurrentDisplacements(), i);
+      Eigen::Vector3d springVec2 =
+        fb2.evaluateSpringVector(net2, fb2.getCurrentDisplacements(), i);
+      for (size_t dir = 0; dir < 3; ++dir) {
+        CHECK_THAT(springVec1[dir],
+                   Catch::Matchers::WithinRel(springVec2[dir], 1e-5));
+      }
+    }
+    fb2.setCurrentDisplacements(fb1.getCurrentDisplacements());
+    CHECK(
+      fb2.getCurrentDisplacements().isApprox(fb1.getCurrentDisplacements()));
+    CHECK(fb1.getSpringPartitions().isApprox(springPartitions));
+    CHECK(fb2.getNetwork().coordinates.isApprox(fb1.getNetwork().coordinates));
+    CHECK(fb2.getNetwork().springBoxOffset.isApprox(
+      fb1.getNetwork().springPartBoxOffset));
+    CHECK(fb2.evaluateSpringVectors(net2, fb2.getCurrentDisplacements())
+            .isApprox(fb1.evaluatePartialSpringVectors(
+              net1, fb1.getCurrentDisplacements())));
+    CHECK_THAT(
+      fb1.getGammaFactors(1.0, -1.).mean(),
+      Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-5));
     CHECK_NOTHROW(fb2.validateNetwork());
   }
 }
@@ -1826,7 +1882,17 @@ TEST_CASE("MEHPFB2 Conversion test of small grid",
     CHECK_THAT(fb1.getResidual(),
                Catch::Matchers::WithinRel(fb2.getResidual(), 1e-1));
 
-    fb1.runForceRelaxation();
+    fb1.runForceRelaxation(25000,
+                           1e-13,
+                           fb1.getDisplacementResidualNorm(-1.),
+                           pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                           1e-12,
+                           false,
+                           pcm::LinkSwappingMode::NO_SWAPPING,
+                           1e5,
+                           -1.,
+                           0,
+                           true);
     fb2.runForceRelaxation();
 
     CHECK_THAT(fb1.getResidual(),
