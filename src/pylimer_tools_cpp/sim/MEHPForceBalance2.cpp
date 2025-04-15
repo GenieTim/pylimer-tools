@@ -110,8 +110,6 @@ MEHPForceBalance2::MEHPForceBalance2(
     u.getUnwrappedVertexCoordinates(this->box);
   assert(vertexCoordinates.size() == u.getNrOfAtoms() * 3);
   Eigen::VectorXd effectiveCoordinates = vertexCoordinates;
-  std::vector<bool> hasEffectiveCoordinates =
-    pylimer_tools::utils::initializeWithValue(u.getNrOfAtoms(), false);
 
   std::vector<long int> oldVertexIdToNewLinkId =
     pylimer_tools::utils::initializeWithValue<long int>(u.getNrOfAtoms(), -1);
