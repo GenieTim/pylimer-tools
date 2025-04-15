@@ -1866,6 +1866,9 @@ TEST_CASE("MEHPFB2 Conversion test of small grid",
     CHECK(fb1.getCurrentDisplacements().isZero());
     CHECK(net1.nrOfNodes == 4);
     CHECK(net2.nrOfNodes == 4);
+    CHECK(fb2.getNrOfActiveSprings() == net2.nrOfSprings);
+    CHECK(fb1.getNrOfActiveSprings() == net1.nrOfSprings);
+    CHECK(fb1.getNrOfActivePartialSprings() == net1.nrOfPartialSprings);
 
     // internal checks, unfortunately testing implementation details
     CHECK_FALSE(net1.springPartBoxOffset.isZero());
@@ -1876,10 +1879,16 @@ TEST_CASE("MEHPFB2 Conversion test of small grid",
 
     // the relevant checks, not testing details but correctness of the
     // implementation
+    for (size_t strandIdx = 0; strandIdx < net2.nrOfStrands; ++strandIdx) {
+      Eigen::Vector3d strandVector = fb2.evaluateStrandVector(
+        net2, fb2.getCurrentDisplacements(), strandIdx);
+      CHECK_THAT(strandVector.squaredNorm(),
+                 Catch::Matchers::WithinAbs(5 * 5. + 0 + 0, 3));
+    }
     CHECK_THAT(
-      fb1.getGammaFactors(1.0).mean(),
+      fb1.getGammaFactors(1.0, -1.).mean(),
       Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-2));
-    CHECK_THAT(fb1.getResidual(),
+    CHECK_THAT(fb1.getDisplacementResidualNorm(-1.),
                Catch::Matchers::WithinRel(fb2.getResidual(), 1e-1));
 
     fb1.runForceRelaxation(25000,
@@ -1895,14 +1904,97 @@ TEST_CASE("MEHPFB2 Conversion test of small grid",
                            true);
     fb2.runForceRelaxation();
 
-    CHECK_THAT(fb1.getResidual(),
+    CHECK_THAT(fb1.getDisplacementResidualNorm(-1.),
                Catch::Matchers::WithinAbs(fb2.getResidual(), 1e-6));
-    Eigen::VectorXd g1 = fb1.getGammaFactors(1.0);
+    Eigen::VectorXd g1 = fb1.getGammaFactors(1.0, -1.);
     Eigen::VectorXd g2 = fb2.getGammaFactors(1.0);
     CHECK_THAT(g1.mean(), Catch::Matchers::WithinRel(g2.mean(), 1e-3));
+    CHECK(fb2.getNrOfActiveSprings() == net2.nrOfSprings);
+    CHECK(fb1.getNrOfActiveSprings() == net1.nrOfSprings);
+    CHECK(fb1.getNrOfActivePartialSprings() == net1.nrOfPartialSprings);
 
     CHECK(fb2.getSolubleWeightFraction() == 0.);
     CHECK(fb1.getSolubleWeightFraction() == 0.);
+  }
+
+  SECTION("Entangled, direct copy of network")
+  {
+    // our entanglements that spawn through the box
+    entanglements.pairsOfAtoms.push_back(std::make_pair(3, 13));
+    entanglements.pairsOfAtoms.push_back(std::make_pair(16, 32));
+    entanglements.pairOfAtom[3] = 0;
+    entanglements.pairOfAtom[13] = 0;
+    entanglements.pairOfAtom[16] = 1;
+    entanglements.pairOfAtom[32] = 1;
+
+    pylimer_tools::sim::mehp::MEHPForceBalance fb1 =
+      pylimer_tools::sim::mehp::MEHPForceBalance::constructWithSlipLinks(
+        universe, entanglements);
+    fb1.configAssumeBoxLargeEnough(false);
+
+    pylimer_tools::sim::mehp::ForceBalanceNetwork net1 = fb1.getNetwork();
+    pylimer_tools::sim::mehp::ForceBalance2Network net2;
+    for (size_t dir = 0; dir < 3; ++dir) {
+      net2.L[dir] = net1.L[dir];
+      net2.boxHalfs[dir] = net1.boxHalfs[dir];
+    }
+    net2.nrOfLinks = net1.nrOfLinks;
+    net2.nrOfNodes = net1.nrOfNodes;
+    net2.nrOfSprings = net1.nrOfPartialSprings;
+    net2.nrOfStrands = net1.nrOfSprings;
+    net2.springIndexA = net1.springPartIndexA;
+    net2.springIndexB = net1.springPartIndexB;
+    net2.springCoordinateIndexA = net1.springPartCoordinateIndexA;
+    net2.springCoordinateIndexB = net1.springPartCoordinateIndexB;
+    net2.coordinates = net1.coordinates;
+    net2.linkIndicesOfStrand = net1.linkIndicesOfSprings;
+    net2.springBoxOffset = net1.springPartBoxOffset;
+    net2.springIndicesOfStrand = net1.localToGlobalSpringIndex;
+    net2.linkIsEntanglement = net1.linkIsSliplink;
+    net2.strandIndexOfSpring = net1.partialToFullSpringIndex;
+    net2.strandIndicesOfLink = net1.springIndicesOfLinks;
+
+    // what needs a bit more translation
+    net2.springIsEntanglement = Eigen::ArrayXb::Zero(net2.nrOfSprings);
+    net2.springContourLength = Eigen::VectorXd::Zero(net2.nrOfSprings);
+    Eigen::VectorXd springPartitions = fb1.getSpringPartitions();
+    for (size_t i = 0; i < net2.nrOfSprings; ++i) {
+      net2.springContourLength[i] =
+        net1.springsContourLength[net1.partialToFullSpringIndex[i]] *
+        springPartitions[i];
+    }
+    net2.oldAtomTypes = Eigen::VectorXi::Zero(net2.nrOfLinks);
+    net2.oldAtomIds = Eigen::VectorXi::Zero(net2.nrOfLinks);
+
+    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
+      pylimer_tools::sim::mehp::MEHPForceBalance2(net2);
+
+    // the relevant checks, not testing details but correctness of the
+    // implementation
+    CHECK_THAT(
+      fb1.getGammaFactors(1.0, -1.).mean(),
+      Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-3));
+    CHECK_THAT(fb1.getDisplacementResidualNorm(-1.),
+               Catch::Matchers::WithinRel(fb2.getResidual(), 1e-3));
+
+    fb1.runForceRelaxation(25000,
+                           1e-13,
+                           fb1.getDisplacementResidualNorm(-1.),
+                           pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                           1e-12,
+                           false,
+                           pcm::LinkSwappingMode::NO_SWAPPING,
+                           1e5,
+                           -1.,
+                           0,
+                           true);
+    fb2.runForceRelaxation();
+
+    CHECK_THAT(fb1.getDisplacementResidualNorm(-1.),
+               Catch::Matchers::WithinAbs(fb2.getResidual(), 1e-6));
+    Eigen::VectorXd g1 = fb1.getGammaFactors(1.0, -1.);
+    Eigen::VectorXd g2 = fb2.getGammaFactors(1.0);
+    CHECK_THAT(g1.mean(), Catch::Matchers::WithinRel(g2.mean(), 1e-3));
   }
 }
 
