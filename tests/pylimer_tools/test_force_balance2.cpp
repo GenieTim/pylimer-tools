@@ -1211,8 +1211,9 @@ TEST_CASE("Temporary force balance 2 test case",
     pcm::StructureSimplificationMode::NO_SIMPLIFICATION));
 };
 
-TEST_CASE("MEHPFB2 Basic conversion test",
-          "[analysis][MEHPForceBalance2][MEHPForceBalance][StructureConversion]")
+TEST_CASE(
+  "MEHPFB2 Basic conversion test",
+  "[analysis][MEHPForceBalance2][MEHPForceBalance][StructureConversion]")
 {
   std::cout << "Running test \"MEHPFB2 Basic conversion test\"" << std::endl;
 
@@ -1354,8 +1355,9 @@ TEST_CASE("MEHPFB2 Basic conversion test",
   CHECK(net.springContourLength[4] == 6);
 }
 
-TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
-          "[analysis][MEHPForceBalance2][MEHPForceBalance][StructureConversion]")
+TEST_CASE(
+  "MEHPFB2 Conversion test with PBC-breaking entanglements",
+  "[analysis][MEHPForceBalance2][MEHPForceBalance][StructureConversion]")
 {
   std::cout << "Running test \"MEHPFB2 Conversion test with PBC-breaking "
                "entanglements\""
@@ -1713,8 +1715,9 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
   }
 }
 
-TEST_CASE("MEHPFB2 Conversion test of small grid",
-          "[analysis][MEHPForceBalance2][MEHPForceBalance][StructureConversion]")
+TEST_CASE(
+  "MEHPFB2 Conversion test of small grid",
+  "[analysis][MEHPForceBalance2][MEHPForceBalance][StructureConversion]")
 {
   std::cout << "Running test \"MEHPFB2 Conversion test of small grid\""
             << std::endl;
@@ -2271,29 +2274,23 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
     forceBalance.configAssumeBoxLargeEnough(false);
 
     // validate initial values
-    // hard to compare, since they change based on
-    // how the structure is converted
-    // CHECK_THAT(
-    //   forceBalance2.getGammaFactors(1.).sum(),
-    //   Catch::Matchers::WithinRel(forceBalance.getGammaFactors(1.).sum(),
-    //   1e-3));
-    // CHECK_THAT(
-    //   forceBalance2.getStressTensor().trace(),
-    //   Catch::Matchers::WithinRel(forceBalance.getStressTensor().trace(),
-    //   1e-3));
-    // CHECK_THAT(forceBalance2.getResidual(),
-    //            Catch::Matchers::WithinRel(forceBalance.getResidual(),
-    //            1e-3));
-    // CHECK_THAT(forceBalance2.getSolubleWeightFraction(),
-    //            Catch::Matchers::WithinRel(
-    //              forceBalance.getSolubleWeightFraction(), 1e-3));
-    // CHECK_THAT(forceBalance2.getDanglingWeightFraction(),
-    //            Catch::Matchers::WithinRel(
-    //              forceBalance.getDanglingWeightFraction(), 1e-3));
-    // CHECK_THAT(
-    //   forceBalance2.getActiveWeightFraction(),
-    //   Catch::Matchers::WithinRel(forceBalance.getActiveWeightFraction(),
-    //   1e-3));
+    CHECK_THAT(
+      forceBalance2.getGammaFactors(1.).sum(),
+      Catch::Matchers::WithinRel(forceBalance.getGammaFactors(1.).sum(), 1e-3));
+    CHECK_THAT(
+      forceBalance2.getStressTensor().trace(),
+      Catch::Matchers::WithinRel(forceBalance.getStressTensor().trace(), 1e-3));
+    CHECK_THAT(forceBalance2.getResidual(),
+               Catch::Matchers::WithinRel(forceBalance.getResidual(), 1e-3));
+    CHECK_THAT(forceBalance2.getSolubleWeightFraction(),
+               Catch::Matchers::WithinRel(
+                 forceBalance.getSolubleWeightFraction(), 1e-3));
+    CHECK_THAT(forceBalance2.getDanglingWeightFraction(),
+               Catch::Matchers::WithinRel(
+                 forceBalance.getDanglingWeightFraction(), 1e-3));
+    CHECK_THAT(
+      forceBalance2.getActiveWeightFraction(),
+      Catch::Matchers::WithinRel(forceBalance.getActiveWeightFraction(), 1e-3));
 
     auto start_fr = std::chrono::high_resolution_clock::now();
     forceBalance.runForceRelaxation(

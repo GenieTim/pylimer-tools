@@ -270,7 +270,8 @@ MEHPForceBalance2::MEHPForceBalance2(
             (addNewLink
                ? currentPosition
                : newLinkPositions[oldVertexIdToNewLinkId[currentVertex]]) -
-            newLinkPositions[oldVertexIdToNewLinkId[springFromVertexIdx.back()]];
+            newLinkPositions
+              [oldVertexIdToNewLinkId[springFromVertexIdx.back()]];
 
           Eigen::Vector3d offset = shouldBeDistance - isDistance;
           assert(this->box.isValidOffset(offset));
@@ -389,7 +390,8 @@ MEHPForceBalance2::MEHPForceBalance2(
           // coordinates of the beads
           Eigen::Vector3d isDistance =
             newLinkPositions[oldVertexIdToNewLinkId[neighbor]] -
-            newLinkPositions[oldVertexIdToNewLinkId[springFromVertexIdx.back()]];
+            newLinkPositions
+              [oldVertexIdToNewLinkId[springFromVertexIdx.back()]];
 
           // compute box offset
           // Eigen::Vector3d distance = targetPos - previousPos;
@@ -432,14 +434,14 @@ MEHPForceBalance2::MEHPForceBalance2(
 
   if (entanglementsAsSprings) {
     for (const auto& [fst, snd] : pairsOfAtoms) {
-      const long int newLink1 =
-        oldVertexIdToNewLinkId[this->universe.getIdxByAtomId(fst)];
-      const long int newLink2 =
-        oldVertexIdToNewLinkId[this->universe.getIdxByAtomId(snd)];
+      size_t fstVertexIdx = this->universe.getIdxByAtomId(fst);
+      size_t sndVertexIdx = this->universe.getIdxByAtomId(snd);
+      const long int newLink1 = oldVertexIdToNewLinkId[fstVertexIdx];
+      const long int newLink2 = oldVertexIdToNewLinkId[sndVertexIdx];
       assert(newLink1 >= 0);
       assert(newLink2 >= 0);
-      springFromVertexIdx.push_back(fst);
-      springToVertexIdx.push_back(snd);
+      springFromVertexIdx.push_back(fstVertexIdx);
+      springToVertexIdx.push_back(sndVertexIdx);
       springContourLength.push_back(1.);
       springBoxOffsets.emplace_back(this->box.getOffset(
         newLinkPositions[newLink2] - newLinkPositions[newLink1]));
@@ -1477,7 +1479,8 @@ MEHPForceBalance2::mergeSpringsWithoutRemoval(ForceBalance2Network& net,
          otherEndRemoved);
   Eigen::Vector3d distanceAfter =
     this->evaluateSpringVectorFrom(net, u, keptSpringIdx, otherEndKept);
-  assert(totalDistance.isApprox(distanceAfter));
+  assert(totalDistance.isApprox(distanceAfter) ||
+         (totalDistance.isZero(1e-12) && distanceAfter.isZero(1e-12)));
 
 #ifndef NDEBUG
   assert(this->validateNetwork(net, u));
