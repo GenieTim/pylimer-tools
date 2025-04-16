@@ -132,10 +132,10 @@ MEHPForceBalance2::MEHPForceBalance2(
     nVerticesWithRelevantDegree / 2 + pairsOfAtoms.size();
 
   // data targets
-  std::vector<size_t> springFrom;
-  springFrom.reserve(nSpringsExpected);
-  std::vector<size_t> springTo;
-  springTo.reserve(nSpringsExpected);
+  std::vector<size_t> springFromVertexIdx;
+  springFromVertexIdx.reserve(nSpringsExpected);
+  std::vector<size_t> springToVertexIdx;
+  springToVertexIdx.reserve(nSpringsExpected);
   std::vector<size_t> springContourLength;
   springContourLength.reserve(nSpringsExpected);
   std::vector<Eigen::Vector3d> springBoxOffsets;
@@ -230,62 +230,60 @@ MEHPForceBalance2::MEHPForceBalance2(
           if (springIndicesOfStrand.size() <= currentStrandIdx) {
             assert(currentStrandIdx == springIndicesOfStrand.size());
             springIndicesOfStrand.push_back(
-              std::vector<size_t>{ { springFrom.size() } });
+              std::vector<size_t>{ { springFromVertexIdx.size() } });
             linkIndicesOfStrand.push_back(
               std::vector<size_t>{ newLinkIdStack.top() });
           } else {
             springIndicesOfStrand[currentStrandIdx].push_back(
-              springFrom.size());
+              springFromVertexIdx.size());
           }
-          springFrom.push_back(newLinkIdStack.top());
+          springFromVertexIdx.push_back(addedVertexIdStack.top());
 
           if (oldVertexIdToNewLinkId[currentVertex] >= 0) {
             assert(!addNewLink);
             assert(!entanglementsAsSprings);
             assert(pairOfAtom[currentVertex] >= 0);
-            springTo.push_back(oldVertexIdToNewLinkId[currentVertex]);
             effectiveCoordinates.segment(3 * currentVertex, 3) =
               currentPosition;
           } else {
             assert(addNewLink);
-            springTo.push_back(nextLinkIdx);
           }
-          linkIndicesOfStrand[currentStrandIdx].push_back(springTo.back());
+          springToVertexIdx.push_back(currentVertex);
+          linkIndicesOfStrand[currentStrandIdx].push_back(
+            addNewLink ? nextLinkIdx : oldVertexIdToNewLinkId[currentVertex]);
 
           assert(linkIndicesOfStrand[currentStrandIdx].size() - 1 ==
                  springIndicesOfStrand[currentStrandIdx].size());
           assert(linkIndicesOfStrand[currentStrandIdx].size() >= 2);
-          assert(springFrom.size() == springTo.size());
-          assert(
-            linkIndicesOfStrand[currentStrandIdx]
-                               [linkIndicesOfStrand[currentStrandIdx].size() -
-                                2] == springFrom.back());
-          assert(linkIndicesOfStrand[currentStrandIdx].back() ==
-                 springTo.back());
+          assert(springFromVertexIdx.size() == springToVertexIdx.size());
 
-          // hack to compensate for issues arising from the fact that
           // each entanglement link has two original bead positions,
           // which may differ by multiple boxes.
-          // what we care about is that entanglement which is closer
-          // on the current strand.
-          // newLinkPositions[springFrom.back()]
-          Eigen::Vector3d targetPositionDistance =
-            effectiveCoordinates.segment(3 * addedVertexIdStack.top(), 3) -
-            currentPosition;
-          // this->box.handlePBC(targetPositionDistance);
-          // Eigen::Vector3d targetPosition = currentPosition +
-          // targetPositionDistance; Eigen::Vector3d computedDistance =
-          //   newLinkPositions[springFrom.back()] - currentPosition;
+          // should be distance: the distance that is "correct" by following the
+          // strand
+          Eigen::Vector3d shouldBeDistance =
+            currentPosition -
+            effectiveCoordinates.segment<3>(3 * springFromVertexIdx.back(), 3);
+          // is distance: the distance that would be calculated using the
+          // coordinates of the beads
+          Eigen::Vector3d isDistance =
+            (addNewLink
+               ? currentPosition
+               : newLinkPositions[oldVertexIdToNewLinkId[currentVertex]]) -
+            newLinkPositions[oldVertexIdToNewLinkId[springFromVertexIdx.back()]];
 
+          Eigen::Vector3d offset = shouldBeDistance - isDistance;
+          assert(this->box.isValidOffset(offset));
           springBoxOffsets.emplace_back(
-            addNewLink ? Eigen::Vector3d::Zero()
-                       : this->box.getOffset(targetPositionDistance));
+            offset); // addNewLink ? Eigen::Vector3d::Zero()
+          // : offset
           springContourLength.push_back(currentSpringContourLength);
           currentSpringContourLength = 0;
 
           // we have visited this, need to remember for next springs
           if (!addNewLink) {
-            newLinkIdStack.push(springTo.back());
+            newLinkIdStack.push(
+              oldVertexIdToNewLinkId[springToVertexIdx.back()]);
             addedVertexIdStack.push(currentVertex);
           }
         }
@@ -357,29 +355,21 @@ MEHPForceBalance2::MEHPForceBalance2(
           if (springIndicesOfStrand.size() <= currentStrandIdx) {
             assert(currentStrandIdx == springIndicesOfStrand.size());
             springIndicesOfStrand.push_back(
-              std::vector<size_t>{ { springFrom.size() } });
+              std::vector<size_t>{ { springFromVertexIdx.size() } });
             linkIndicesOfStrand.push_back(
               std::vector<size_t>{ newLinkIdStack.top() });
           } else {
             springIndicesOfStrand[currentStrandIdx].push_back(
-              springFrom.size());
+              springFromVertexIdx.size());
           }
           linkIndicesOfStrand[currentStrandIdx].push_back(
             oldVertexIdToNewLinkId[neighbor]);
           assert(linkIndicesOfStrand[currentStrandIdx].size() - 1 ==
                  springIndicesOfStrand[currentStrandIdx].size());
-          springFrom.push_back(newLinkIdStack.top());
-          springTo.push_back(oldVertexIdToNewLinkId[neighbor]);
+          springFromVertexIdx.push_back(addedVertexIdStack.top());
+          springToVertexIdx.push_back(neighbor);
           assert(linkIndicesOfStrand[currentStrandIdx].size() >= 2);
-          assert(springFrom.size() == springTo.size());
-          assert(
-            linkIndicesOfStrand[currentStrandIdx]
-                               [linkIndicesOfStrand[currentStrandIdx].size() -
-                                2] == springFrom[springFrom.size() - 1]);
-          assert(
-            linkIndicesOfStrand[currentStrandIdx]
-                               [linkIndicesOfStrand[currentStrandIdx].size() -
-                                1] == springTo[springTo.size() - 1]);
+          assert(springFromVertexIdx.size() == springToVertexIdx.size());
           springContourLength.push_back(currentSpringContourLength + 1);
           edge_followed[edge] = true;
           //
@@ -389,13 +379,18 @@ MEHPForceBalance2::MEHPForceBalance2(
           Eigen::Vector3d lastStepToTarget = currentPosition - targetPos;
           this->box.handlePBC(lastStepToTarget);
           Eigen::Vector3d actualTargetPos = currentPosition - lastStepToTarget;
-          Eigen::Vector3d previousPos =
-            effectiveCoordinates.segment(3 * addedVertexIdStack.top(), 3);
+
+          // should be distance: the distance that is "correct" by following the
+          // strand
+          Eigen::Vector3d shouldBeDistance =
+            actualTargetPos -
+            effectiveCoordinates.segment<3>(3 * springFromVertexIdx.back(), 3);
+          // is distance: the distance that would be calculated using the
+          // coordinates of the beads
           Eigen::Vector3d isDistance =
-            targetPos - effectiveCoordinates.segment(
-                          3 * newLinkIdxToOldVertexIdx[newLinkIdStack.top()],
-                          3); // previousPos;
-          Eigen::Vector3d shouldBeDistance = actualTargetPos - previousPos;
+            newLinkPositions[oldVertexIdToNewLinkId[neighbor]] -
+            newLinkPositions[oldVertexIdToNewLinkId[springFromVertexIdx.back()]];
+
           // compute box offset
           // Eigen::Vector3d distance = targetPos - previousPos;
           // springBoxOffsets.emplace_back(this->box.getOffset(-1. * distance));
@@ -443,13 +438,14 @@ MEHPForceBalance2::MEHPForceBalance2(
         oldVertexIdToNewLinkId[this->universe.getIdxByAtomId(snd)];
       assert(newLink1 >= 0);
       assert(newLink2 >= 0);
-      springFrom.push_back(newLink1);
-      springTo.push_back(newLink2);
+      springFromVertexIdx.push_back(fst);
+      springToVertexIdx.push_back(snd);
       springContourLength.push_back(1.);
       springBoxOffsets.emplace_back(this->box.getOffset(
         newLinkPositions[newLink2] - newLinkPositions[newLink1]));
-      linkIndicesOfStrand.push_back({ springFrom.back(), springTo.back() });
-      springIndicesOfStrand.push_back({ springFrom.size() - 1 });
+      linkIndicesOfStrand.push_back({ static_cast<unsigned long>(newLink1),
+                                      static_cast<unsigned long>(newLink2) });
+      springIndicesOfStrand.push_back({ springFromVertexIdx.size() - 1 });
       currentStrandIdx += 1;
       assert(springIndicesOfStrand.size() == currentStrandIdx);
     }
@@ -457,10 +453,10 @@ MEHPForceBalance2::MEHPForceBalance2(
 
   // the difficult part is done, now
   // we can fill the network data structure
-  assert(springFrom.size() == springTo.size());
-  assert(springContourLength.size() == springFrom.size());
-  assert(springFrom.size() == springBoxOffsets.size());
-  this->initialConfig.nrOfSprings = springFrom.size();
+  assert(springFromVertexIdx.size() == springToVertexIdx.size());
+  assert(springContourLength.size() == springFromVertexIdx.size());
+  assert(springFromVertexIdx.size() == springBoxOffsets.size());
+  this->initialConfig.nrOfSprings = springFromVertexIdx.size();
   this->initialConfig.nrOfStrands = springIndicesOfStrand.size();
   this->initialConfig.springIndicesOfStrand = springIndicesOfStrand;
   this->initialConfig.linkIndicesOfStrand = linkIndicesOfStrand;
@@ -496,16 +492,20 @@ MEHPForceBalance2::MEHPForceBalance2(
 
   // convert the springs
   for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
-    assert(springFrom[i] < nextLinkIdx);
-    assert(springTo[i] < nextLinkIdx);
-    this->initialConfig.springIndexA(i) = springFrom[i];
-    this->initialConfig.springIndexB(i) = springTo[i];
+    assert(APPROX_WITHIN(
+      oldVertexIdToNewLinkId[springFromVertexIdx[i]], 0, nextLinkIdx - 1, 0.2));
+    assert(APPROX_WITHIN(
+      oldVertexIdToNewLinkId[springToVertexIdx[i]], 0, nextLinkIdx - 1, 0.2));
+    this->initialConfig.springIndexA(i) =
+      oldVertexIdToNewLinkId[springFromVertexIdx[i]];
+    this->initialConfig.springIndexB(i) =
+      oldVertexIdToNewLinkId[springToVertexIdx[i]];
     this->initialConfig.springContourLength(i) = springContourLength[i];
     for (size_t dir = 0; dir < 3; ++dir) {
       this->initialConfig.springCoordinateIndexA(3 * i + dir) =
-        (springFrom[i] * 3 + dir);
+        (this->initialConfig.springIndexA(i) * 3 + dir);
       this->initialConfig.springCoordinateIndexB(3 * i + dir) =
-        (springTo[i] * 3 + dir);
+        (this->initialConfig.springIndexB(i) * 3 + dir);
     }
 
     this->initialConfig.springBoxOffset.segment(3 * i, 3) = springBoxOffsets[i];
