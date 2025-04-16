@@ -1155,14 +1155,13 @@ MEHPForceBalance2::markInactiveSpringsToDelete(
   const double inactiveRemovalCutoff) const
 {
   Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net.nrOfSprings, false);
-  Eigen::ArrayXb activeSprings =
-    this->findActiveSprings(net, displacements, inactiveRemovalCutoff);
+  Eigen::ArrayXb activeStrands =
+    this->findActiveStrands(net, displacements, inactiveRemovalCutoff);
 
   for (size_t strandIdx = 0; strandIdx < net.nrOfStrands; ++strandIdx) {
-    // if one end is inactive, we mark the whole strands as inactive
-    if (!activeSprings[net.springIndicesOfStrand[strandIdx][0]] ||
-        !activeSprings[pylimer_tools::utils::last(
-          net.springIndicesOfStrand[strandIdx])]) {
+    // if one end is inactive, we mark the whole strands as inactive.
+    // an exception
+    if (!activeStrands[strandIdx]) {
       for (const size_t springIdx : net.springIndicesOfStrand[strandIdx]) {
         result[springIdx] = true;
       }
@@ -2640,19 +2639,17 @@ MEHPForceBalance2::getIndicesOfActiveNodes(const ForceBalance2Network& net,
   // find all active springs
   Eigen::ArrayXb strandIsActive = this->findActiveStrands(net, u, tolerance);
 
-  size_t crosslinkIdx = 0;
   for (size_t i = 0; i < net.nrOfLinks; i++) {
     if (net.linkIsEntanglement[i]) {
       continue;
     }
-    std::vector<size_t> springIndices = net.strandIndicesOfLink[i];
-    for (const size_t springIndex : springIndices) {
-      if (strandIsActive[springIndex]) {
-        results.push_back(crosslinkIdx);
+
+    for (const size_t strandIdx : net.strandIndicesOfLink[i]) {
+      if (strandIsActive[strandIdx]) {
+        results.push_back(i);
         break;
       }
     }
-    crosslinkIdx += 1;
   }
 
   return results;

@@ -1287,15 +1287,93 @@ protected:
     Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net.nrOfStrands, false);
     Eigen::ArrayXb activeSprings = this->findActiveSprings(net, u, tolerance);
 
+    for (size_t i = 0; i < net.nrOfStrands; ++i) {
+      // without any springs, the strand is inactive
+      if (net.springIndicesOfStrand[i].size() == 0) {
+        continue;
+      }
+      // with one spring, the strand is active if the spring is active
+      if (net.springIndicesOfStrand[i].size() == 1) {
+        result[i] = activeSprings[net.springIndicesOfStrand[i][0]];
+        continue;
+      }
+      // with more springs, the strand is certainly active
+      // if the first and last spring are active
+      bool isActive0 = activeSprings[net.springIndicesOfStrand[i][0]];
+      bool isActiveN = activeSprings[net.springIndicesOfStrand[i].back()];
+      if (isActive0 && isActiveN) {
+        result[i] = true;
+        continue;
+      }
+      // however, there is one case where the
+      // strand would not yet be marked as active, even though it is:
+      // when one end is inactive,
+      // because it is bifunctional and in a sandwich with the same entanglement
+      // link
+      if (!isActive0) {
+        size_t crossLinkIdx = net.linkIndicesOfStrand[i][0];
+        size_t entanglementLinkIdx = net.linkIndicesOfStrand[i][1];
+        for (size_t strandOfXlink : net.strandIndicesOfLink[crossLinkIdx]) {
+          if (strandOfXlink == i) {
+            continue;
+          }
+          if (net.linkIndicesOfStrand[strandOfXlink][0] == crossLinkIdx &&
+              net.linkIndicesOfStrand[strandOfXlink][1] ==
+                entanglementLinkIdx) {
+            isActive0 = true;
+            break;
+          }
+          if (net.linkIndicesOfStrand[strandOfXlink].back() == crossLinkIdx &&
+              net.linkIndicesOfStrand
+                  [strandOfXlink]
+                  [net.linkIndicesOfStrand[strandOfXlink].size() - 2] ==
+                entanglementLinkIdx) {
+            isActive0 = true;
+            break;
+          }
+        }
+
+        if (!isActiveN) {
+          size_t crossLinkIdx = net.linkIndicesOfStrand[i].back();
+          size_t entanglementLinkIdx =
+            net.linkIndicesOfStrand[i][net.linkIndicesOfStrand[i].size() - 2];
+          for (size_t strandOfXlink : net.strandIndicesOfLink[crossLinkIdx]) {
+            if (strandOfXlink == i) {
+              continue;
+            }
+            if (net.linkIndicesOfStrand[strandOfXlink][0] == crossLinkIdx &&
+                net.linkIndicesOfStrand[strandOfXlink][1] ==
+                  entanglementLinkIdx) {
+              isActiveN = true;
+              break;
+            }
+            if (net.linkIndicesOfStrand[strandOfXlink].back() == crossLinkIdx &&
+                net.linkIndicesOfStrand
+                    [strandOfXlink]
+                    [net.linkIndicesOfStrand[strandOfXlink].size() - 2] ==
+                  entanglementLinkIdx) {
+              isActiveN = true;
+              break;
+            }
+          }
+        }
+
+        if (isActive0 && isActiveN) {
+          result[i] = true;
+        }
+      }
+    }
+
     for (size_t i = 0; i < net.nrOfSprings; ++i) {
 #ifndef NDEBUG
       // we assert that all springs of a strand are active, it cannot be that
       // one is not
-      if (!this->isLoopingSpring(net, i) && result[net.strandIndexOfSpring[i]]) {
+      if (!this->isLoopingSpring(net, i) &&
+          result[net.strandIndexOfSpring[i]]) {
         // this may fail in the cases:
         // 1. a primary loop / entanglement
-        // 2. a cross-link that is only connected to the same entanglement link twice (or less)
-        // assert(activeSprings[i]);
+        // 2. a cross-link that is only connected to the same entanglement link
+        // twice (or less) assert(activeSprings[i]);
       }
 #endif
 
