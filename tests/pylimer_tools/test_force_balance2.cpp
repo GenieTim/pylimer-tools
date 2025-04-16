@@ -1212,7 +1212,7 @@ TEST_CASE("Temporary force balance 2 test case",
 };
 
 TEST_CASE("MEHPFB2 Basic conversion test",
-          "[analysis][MEHPForceBalance2][MEHPForceBalance]")
+          "[analysis][MEHPForceBalance2][MEHPForceBalance][StructureConversion]")
 {
   std::cout << "Running test \"MEHPFB2 Basic conversion test\"" << std::endl;
 
@@ -1355,7 +1355,7 @@ TEST_CASE("MEHPFB2 Basic conversion test",
 }
 
 TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
-          "[analysis][MEHPForceBalance2][MEHPForceBalance]")
+          "[analysis][MEHPForceBalance2][MEHPForceBalance][StructureConversion]")
 {
   std::cout << "Running test \"MEHPFB2 Conversion test with PBC-breaking "
                "entanglements\""
@@ -1714,7 +1714,7 @@ TEST_CASE("MEHPFB2 Conversion test with PBC-breaking entanglements",
 }
 
 TEST_CASE("MEHPFB2 Conversion test of small grid",
-          "[analysis][MEHPForceBalance2][MEHPForceBalance]")
+          "[analysis][MEHPForceBalance2][MEHPForceBalance][StructureConversion]")
 {
   std::cout << "Running test \"MEHPFB2 Conversion test of small grid\""
             << std::endl;
@@ -1885,6 +1885,8 @@ TEST_CASE("MEHPFB2 Conversion test of small grid",
       CHECK_THAT(strandVector.squaredNorm(),
                  Catch::Matchers::WithinAbs(5 * 5. + 0 + 0, 3));
     }
+    CHECK_THAT(net2.springBoxOffset.cwiseAbs().maxCoeff(),
+               Catch::Matchers::WithinRel(10., 1e-6));
     CHECK_THAT(
       fb1.getGammaFactors(1.0, -1.).mean(),
       Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-2));
@@ -1999,7 +2001,7 @@ TEST_CASE("MEHPFB2 Conversion test of small grid",
 }
 
 TEST_CASE("MEHPFB2 Basic conversion test with entanglements",
-          "[analysis][MEHPForceBalance2]")
+          "[analysis][MEHPForceBalance2][StructureConversion]")
 {
   std::cout
     << "Running test \"MEHPFB2 Basic conversion test with entanglements\""
