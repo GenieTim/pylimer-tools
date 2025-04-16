@@ -1339,7 +1339,6 @@ init_pylimer_bound_sim(py::module_& m)
       py::arg("simplification_mode") =
         mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
       py::arg("inactive_removal_cutoff") = 1e-3,
-      py::arg("one_over_spring_partition_upper_limit") = 1.0,
       py::arg("sle_solver") = mehp::SLESolver::DEFAULT)
     .def("deform_to",
          &mehp::MEHPForceBalance2::deformTo,
@@ -1405,8 +1404,7 @@ init_pylimer_bound_sim(py::module_& m)
          R"pbdoc(
            Helper method to debug and/or understand what happens to certain links when being displaced.
           )pbdoc",
-         py::arg("link_idx"),
-         py::arg("one_over_spring_partition_upper_limit") = 1.0)
+         py::arg("link_idx"))
     .def("get_neighbour_link_indices",
          &mehp::MEHPForceBalance2::getNeighbourLinkIndices,
          R"pbdoc()pbdoc",
@@ -1515,7 +1513,6 @@ init_pylimer_bound_sim(py::module_& m)
          R"pbdoc(
            Returns the stress tensor at the current state of the simulation.
       )pbdoc",
-         py::arg("one_over_spring_partition_upper_limit") = 1.,
          py::arg("xlinks_only") = false)
     .def("get_gamma_factor",
          &mehp::MEHPForceBalance2::getGammaFactor,
@@ -1535,15 +1532,13 @@ init_pylimer_bound_sim(py::module_& m)
            :param nr_of_chains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs.
       )pbdoc",
          py::arg("b02") = -1.0,
-         py::arg("nr_of_chains") = -1,
-         py::arg("one_over_spring_partition_upper_limit") = 1.)
+         py::arg("nr_of_chains") = -1)
     .def("get_gamma_factors",
          &mehp::MEHPForceBalance2::getGammaFactors,
          R"pbdoc(
            Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
       )pbdoc",
-         py::arg("b02"),
-         py::arg("one_over_spring_partition_upper_limit") = 1.)
+         py::arg("b02"))
     .def("get_gamma_factors_in_dir",
          &mehp::MEHPForceBalance2::getGammaFactorsInDir,
          R"pbdoc(
@@ -1553,8 +1548,7 @@ init_pylimer_bound_sim(py::module_& m)
                 :param direction: the direction in which to compute the gamma factors (0: x, 1: y, 2: z)
            )pbdoc",
          py::arg("b02"),
-         py::arg("direction"),
-         py::arg("one_over_spring_partition_upper_limit") = 1.)
+         py::arg("direction"))
     .def("get_nr_of_nodes",
          &mehp::MEHPForceBalance2::getNrOfNodes,
          R"pbdoc(
@@ -1571,8 +1565,7 @@ init_pylimer_bound_sim(py::module_& m)
          &mehp::MEHPForceBalance2::getWeightedSpringLengths,
          R"pbdoc(
            Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
-           )pbdoc",
-         py::arg("one_over_spring_partition_upper_limit") = 1.)
+           )pbdoc")
     .def("get_displacements",
          &mehp::MEHPForceBalance2::getCurrentDisplacements,
          R"pbdoc(
@@ -1592,8 +1585,7 @@ init_pylimer_bound_sim(py::module_& m)
          &mehp::MEHPForceBalance2::getDisplacementResidualNorm,
          R"pbdoc(
            Get the current link displacement residual norm.
-      )pbdoc",
-         py::arg("one_over_spring_partition_upper_limit") = 1.)
+      )pbdoc")
     .def("get_ids_of_active_nodes",
          &mehp::MEHPForceBalance2::getIdsOfActiveNodes,
          R"pbdoc(

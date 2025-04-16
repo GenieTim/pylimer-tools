@@ -1291,12 +1291,11 @@ protected:
 #ifndef NDEBUG
       // we assert that all springs of a strand are active, it cannot be that
       // one is not
-      if (!this->isLoopingSpring(net, i) &&
-          result[net.strandIndexOfSpring[i]]) {
+      if (!this->isLoopingSpring(net, i) && result[net.strandIndexOfSpring[i]]) {
         // this may fail in the cases:
         // 1. a primary loop / entanglement
-        // 2. a cross-link that is only connected to the same entanglement link
-        // twice (or less) assert(activeSprings[i]);
+        // 2. a cross-link that is only connected to the same entanglement link twice (or less)
+        // assert(activeSprings[i]);
       }
 #endif
 

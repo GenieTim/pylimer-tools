@@ -2479,18 +2479,32 @@ MEHPForceBalance2::computeActiveWeightFraction(ForceBalance2Network& net,
     return 0.;
   }
   // find all active springs
-  Eigen::ArrayXb activeSprings = this->findActiveSprings(net, u, tolerance);
-  if (activeSprings.count() == 0) {
+  Eigen::ArrayXb activeStrands = this->findActiveStrands(net, u, tolerance);
+  if (activeStrands.count() == 0) {
     return 0.;
   }
 
+  // we re-assign the active links and springs
+  // this is due to some topological peculiarities:
+  // for example, if we have an entanglement link a and a cross-link b,
+  // it's possible to have a scenario …-a-b-a-…, in which case these two
+  // springs would otherwise be considered inactive,
+  // even though they should belong to the active fraction.
   Eigen::ArrayXb activeLinks = Eigen::ArrayXb::Constant(net.nrOfLinks, false);
-  for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
-    if (!activeSprings[springIdx]) {
+  Eigen::ArrayXb activeSprings =
+    Eigen::ArrayXb::Constant(net.nrOfSprings, false);
+
+  for (size_t strandIdx = 0; strandIdx < net.nrOfStrands; ++strandIdx) {
+    if (!activeStrands[strandIdx]) {
       continue;
     }
-    activeLinks[net.springIndexA[springIdx]] = true;
-    activeLinks[net.springIndexB[springIdx]] = true;
+
+    for (size_t linkIdx : net.linkIndicesOfStrand[strandIdx]) {
+      activeLinks[linkIdx] = true;
+    }
+    for (size_t springIdx : net.springIndicesOfStrand[strandIdx]) {
+      activeSprings[springIdx] = true;
+    }
   }
   // as of now, the springsContourLength is equal to the number of bonds
   // from link to link. therefore, the number of atoms of each

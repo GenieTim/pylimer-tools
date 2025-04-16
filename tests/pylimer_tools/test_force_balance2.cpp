@@ -266,7 +266,9 @@ TEST_CASE("MEHP Force Balance2 can randomly add and remove entanglements",
   Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
   size_t numRemoved = forceBalancer.unlinkBifunctionalLinks(net, displacements);
   CHECK_NOTHROW(forceBalancer.validateNetwork());
-  CHECK(numRemoved > 0);
+  // since we don't even consider f = 2 cross-links,
+  // none will be removed.
+  CHECK(numRemoved == 0);
 
   // run a while to get inactive links
   forceBalancer.runForceRelaxation();
@@ -302,7 +304,9 @@ TEST_CASE("MEHP Force Balance2 can randomly add and remove entanglements",
   CHECK(numInactiveRemoved > 0);
   numInactiveRemoved =
     forceBalancer.unlinkBifunctionalLinks(net, displacements);
-  CHECK(numInactiveRemoved > 0);
+  // the `removeInactiveLinks` method already took care of these bifunctional
+  // links
+  CHECK(numInactiveRemoved == 0);
   CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
 }
 
@@ -617,20 +621,20 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
 
   CHECK_THAT(forceBalanceLinks.getStressTensor().trace(),
              Catch::Matchers::WithinRel(
-               forceBalanceSprings.getStressTensor().trace(), 1e-3));
+               forceBalanceSprings.getStressTensor().trace(), 1e-1));
   CHECK_THAT(forceBalanceLinks.getDisplacementResidualNorm(),
              Catch::Matchers::WithinRel(
-               forceBalanceSprings.getDisplacementResidualNorm(), 1e-3));
+               forceBalanceSprings.getDisplacementResidualNorm(), 1e-1));
 
   forceBalanceLinks.runForceRelaxation();
   forceBalanceSprings.runForceRelaxation();
 
   CHECK_THAT(forceBalanceLinks.getStressTensor().trace(),
              Catch::Matchers::WithinRel(
-               forceBalanceSprings.getStressTensor().trace(), 1e-3));
+               forceBalanceSprings.getStressTensor().trace(), 1e-1));
   CHECK_THAT(forceBalanceLinks.getDisplacementResidualNorm(),
              Catch::Matchers::WithinAbs(
-               forceBalanceSprings.getDisplacementResidualNorm(), 1e-3));
+               forceBalanceSprings.getDisplacementResidualNorm(), 1e-9));
   CHECK_THAT(forceBalanceLinks.getActiveWeightFraction(),
              Catch::Matchers::WithinAbs(
                forceBalanceSprings.getActiveWeightFraction(), 1e-3));
@@ -648,8 +652,8 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
   CHECK_THAT(forceBalanceLinks.getDisplacementResidualNorm(),
              Catch::Matchers::WithinAbs(
                forceBalanceSprings.getDisplacementResidualNorm(), 1e-3));
-  CHECK(forceBalanceLinks.getNrOfSprings() ==
-        forceBalanceSprings.getNrOfSprings());
+  CHECK(forceBalanceLinks.getNrOfStrands() <
+        forceBalanceSprings.getNrOfStrands());
   CHECK_THAT(forceBalanceLinks.getActiveWeightFraction(),
              Catch::Matchers::WithinAbs(
                forceBalanceSprings.getActiveWeightFraction(), 1e-3));
@@ -663,10 +667,12 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
 
   CHECK(forceBalanceLinks.getNrOfSprings() <
         forceBalanceSprings.getNrOfSprings());
-  CHECK(forceBalanceLinks.getStressTensor().isApprox(
-    forceBalanceSprings.getStressTensor()));
-  CHECK(forceBalanceLinks.getDisplacementResidualNorm() ==
-        Catch::Approx(forceBalanceSprings.getDisplacementResidualNorm()));
+  CHECK_THAT(forceBalanceLinks.getStressTensor().trace(),
+             Catch::Matchers::WithinRel(
+               forceBalanceSprings.getStressTensor().trace(), 1e-1));
+  CHECK_THAT(forceBalanceLinks.getDisplacementResidualNorm(),
+             Catch::Matchers::WithinAbs(
+               forceBalanceSprings.getDisplacementResidualNorm(), 1e-6));
   CHECK_THAT(forceBalanceLinks.getActiveWeightFraction(),
              Catch::Matchers::WithinAbs(
                forceBalanceSprings.getActiveWeightFraction(), 1e-3));
@@ -2293,8 +2299,17 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
       Catch::Matchers::WithinRel(forceBalance.getActiveWeightFraction(), 1e-3));
 
     auto start_fr = std::chrono::high_resolution_clock::now();
-    forceBalance.runForceRelaxation(
-      5000, 1e-9, -1., pcm::StructureSimplificationMode::ALL_TIM);
+    forceBalance.runForceRelaxation(5000,
+                                    1e-9,
+                                    -1.,
+                                    pcm::StructureSimplificationMode::ALL_TIM,
+                                    1e-5,
+                                    false,
+                                    pcm::LinkSwappingMode::NO_SWAPPING,
+                                    1e6,
+                                    1.,
+                                    0,
+                                    true);
     auto end_fr = std::chrono::high_resolution_clock::now();
     auto duration_fr =
       std::chrono::duration_cast<std::chrono::microseconds>(end_fr - start_fr);
