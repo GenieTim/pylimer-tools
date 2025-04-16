@@ -1291,28 +1291,12 @@ protected:
 #ifndef NDEBUG
       // we assert that all springs of a strand are active, it cannot be that
       // one is not
-      if (!this->isLoopingSpring(net, i)) {
-        if (result[net.strandIndexOfSpring[i]] && this->nrOfStepsDone > 0) {
-          if (!activeSprings[i]) {
-            std::cerr << "Warning: Strand " << net.strandIndexOfSpring[i]
-                      << " is marked active, while spring " << i << " is not."
-                      << std::endl;
-            std::cerr << "In this strand are: " << std::endl;
-            for (size_t springIdx :
-                 net.springIndicesOfStrand[net.strandIndexOfSpring[i]]) {
-              std::cerr << springIdx << " (" << activeSprings[springIdx] << ", "
-                        << this->evaluateSpringVector(net, u, springIdx).norm()
-                        << ", " << net.springContourLength[springIdx] << "), ";
-            }
-            std::cerr << std::endl << "Links of this strand are: \n";
-            for (size_t linkIdx :
-                 net.linkIndicesOfStrand[net.strandIndexOfSpring[i]]) {
-              std::cerr << linkIdx << " (" << net.oldAtomIds[linkIdx] << "), ";
-            }
-            std::cerr << std::endl;
-          }
-          assert(activeSprings[i]);
-        }
+      if (!this->isLoopingSpring(net, i) &&
+          result[net.strandIndexOfSpring[i]]) {
+        // this may fail in the cases:
+        // 1. a primary loop / entanglement
+        // 2. a cross-link that is only connected to the same entanglement link
+        // twice (or less) assert(activeSprings[i]);
       }
 #endif
 
