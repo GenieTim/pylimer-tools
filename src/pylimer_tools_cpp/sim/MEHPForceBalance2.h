@@ -89,7 +89,7 @@ public:
   }
 
 
-  MEHPForceBalance2(const ForceBalanceNetwork& net1, const bool is2D = false)
+  MEHPForceBalance2(const ForceBalanceNetwork& net1, Eigen::VectorXd springPartitions, const bool is2D = false)
   {
     this->is2D = is2D;
 
@@ -117,7 +117,6 @@ public:
     // what needs a bit more translation
     net2.springIsEntanglement = Eigen::ArrayXb::Zero(net2.nrOfSprings);
     net2.springContourLength = Eigen::VectorXd::Zero(net2.nrOfSprings);
-    Eigen::VectorXd springPartitions = fb1.getSpringPartitions();
     for (size_t i = 0; i < net2.nrOfSprings; ++i) {
       net2.springContourLength[i] =
         net1.springsContourLength[net1.partialToFullSpringIndex[i]] *
