@@ -1616,41 +1616,9 @@ TEST_CASE(
     fb1.configAssumeBoxLargeEnough(false);
 
     pylimer_tools::sim::mehp::ForceBalanceNetwork net1 = fb1.getNetwork();
-    pylimer_tools::sim::mehp::ForceBalance2Network net2;
-    for (size_t dir = 0; dir < 3; ++dir) {
-      net2.L[dir] = net1.L[dir];
-      net2.boxHalfs[dir] = net1.boxHalfs[dir];
-    }
-    net2.nrOfLinks = net1.nrOfLinks;
-    net2.nrOfNodes = net1.nrOfNodes;
-    net2.nrOfSprings = net1.nrOfPartialSprings;
-    net2.nrOfStrands = net1.nrOfSprings;
-    net2.springIndexA = net1.springPartIndexA;
-    net2.springIndexB = net1.springPartIndexB;
-    net2.springCoordinateIndexA = net1.springPartCoordinateIndexA;
-    net2.springCoordinateIndexB = net1.springPartCoordinateIndexB;
-    net2.coordinates = net1.coordinates;
-    net2.linkIndicesOfStrand = net1.linkIndicesOfSprings;
-    net2.springBoxOffset = net1.springPartBoxOffset;
-    net2.springIndicesOfStrand = net1.localToGlobalSpringIndex;
-    net2.linkIsEntanglement = net1.linkIsSliplink;
-    net2.strandIndexOfSpring = net1.partialToFullSpringIndex;
-    net2.strandIndicesOfLink = net1.springIndicesOfLinks;
-
-    // what needs a bit more translation
-    net2.springIsEntanglement = Eigen::ArrayXb::Zero(net2.nrOfSprings);
-    net2.springContourLength = Eigen::VectorXd::Zero(net2.nrOfSprings);
-    Eigen::VectorXd springPartitions = fb1.getSpringPartitions();
-    for (size_t i = 0; i < net2.nrOfSprings; ++i) {
-      net2.springContourLength[i] =
-        net1.springsContourLength[net1.partialToFullSpringIndex[i]] *
-        springPartitions[i];
-    }
-    net2.oldAtomTypes = Eigen::VectorXi::Zero(net2.nrOfLinks);
-    net2.oldAtomIds = Eigen::VectorXi::Zero(net2.nrOfLinks);
 
     pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
-      pylimer_tools::sim::mehp::MEHPForceBalance2(net2);
+      pylimer_tools::sim::mehp::MEHPForceBalance2(net1);
 
     CHECK_THAT(
       fb1.getGammaFactors(1.0).mean(),
@@ -1944,41 +1912,9 @@ TEST_CASE(
     fb1.configAssumeBoxLargeEnough(false);
 
     pylimer_tools::sim::mehp::ForceBalanceNetwork net1 = fb1.getNetwork();
-    pylimer_tools::sim::mehp::ForceBalance2Network net2;
-    for (size_t dir = 0; dir < 3; ++dir) {
-      net2.L[dir] = net1.L[dir];
-      net2.boxHalfs[dir] = net1.boxHalfs[dir];
-    }
-    net2.nrOfLinks = net1.nrOfLinks;
-    net2.nrOfNodes = net1.nrOfNodes;
-    net2.nrOfSprings = net1.nrOfPartialSprings;
-    net2.nrOfStrands = net1.nrOfSprings;
-    net2.springIndexA = net1.springPartIndexA;
-    net2.springIndexB = net1.springPartIndexB;
-    net2.springCoordinateIndexA = net1.springPartCoordinateIndexA;
-    net2.springCoordinateIndexB = net1.springPartCoordinateIndexB;
-    net2.coordinates = net1.coordinates;
-    net2.linkIndicesOfStrand = net1.linkIndicesOfSprings;
-    net2.springBoxOffset = net1.springPartBoxOffset;
-    net2.springIndicesOfStrand = net1.localToGlobalSpringIndex;
-    net2.linkIsEntanglement = net1.linkIsSliplink;
-    net2.strandIndexOfSpring = net1.partialToFullSpringIndex;
-    net2.strandIndicesOfLink = net1.springIndicesOfLinks;
-
-    // what needs a bit more translation
-    net2.springIsEntanglement = Eigen::ArrayXb::Zero(net2.nrOfSprings);
-    net2.springContourLength = Eigen::VectorXd::Zero(net2.nrOfSprings);
-    Eigen::VectorXd springPartitions = fb1.getSpringPartitions();
-    for (size_t i = 0; i < net2.nrOfSprings; ++i) {
-      net2.springContourLength[i] =
-        net1.springsContourLength[net1.partialToFullSpringIndex[i]] *
-        springPartitions[i];
-    }
-    net2.oldAtomTypes = Eigen::VectorXi::Zero(net2.nrOfLinks);
-    net2.oldAtomIds = Eigen::VectorXi::Zero(net2.nrOfLinks);
 
     pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
-      pylimer_tools::sim::mehp::MEHPForceBalance2(net2);
+      pylimer_tools::sim::mehp::MEHPForceBalance2(net1);
 
     // the relevant checks, not testing details but correctness of the
     // implementation

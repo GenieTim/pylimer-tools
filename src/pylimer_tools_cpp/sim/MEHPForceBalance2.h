@@ -88,6 +88,49 @@ public:
     this->completeInitialization();
   }
 
+
+  MEHPForceBalance2(const ForceBalanceNetwork& net1, const bool is2D = false)
+  {
+    this->is2D = is2D;
+
+    pylimer_tools::sim::mehp::ForceBalance2Network net2;
+    for (size_t dir = 0; dir < 3; ++dir) {
+      net2.L[dir] = net1.L[dir];
+      net2.boxHalfs[dir] = net1.boxHalfs[dir];
+    }
+    net2.nrOfLinks = net1.nrOfLinks;
+    net2.nrOfNodes = net1.nrOfNodes;
+    net2.nrOfSprings = net1.nrOfPartialSprings;
+    net2.nrOfStrands = net1.nrOfSprings;
+    net2.springIndexA = net1.springPartIndexA;
+    net2.springIndexB = net1.springPartIndexB;
+    net2.springCoordinateIndexA = net1.springPartCoordinateIndexA;
+    net2.springCoordinateIndexB = net1.springPartCoordinateIndexB;
+    net2.coordinates = net1.coordinates;
+    net2.linkIndicesOfStrand = net1.linkIndicesOfSprings;
+    net2.springBoxOffset = net1.springPartBoxOffset;
+    net2.springIndicesOfStrand = net1.localToGlobalSpringIndex;
+    net2.linkIsEntanglement = net1.linkIsSliplink;
+    net2.strandIndexOfSpring = net1.partialToFullSpringIndex;
+    net2.strandIndicesOfLink = net1.springIndicesOfLinks;
+
+    // what needs a bit more translation
+    net2.springIsEntanglement = Eigen::ArrayXb::Zero(net2.nrOfSprings);
+    net2.springContourLength = Eigen::VectorXd::Zero(net2.nrOfSprings);
+    Eigen::VectorXd springPartitions = fb1.getSpringPartitions();
+    for (size_t i = 0; i < net2.nrOfSprings; ++i) {
+      net2.springContourLength[i] =
+        net1.springsContourLength[net1.partialToFullSpringIndex[i]] *
+        springPartitions[i];
+    }
+    net2.oldAtomTypes = Eigen::VectorXi::Zero(net2.nrOfLinks);
+    net2.oldAtomIds = Eigen::VectorXi::Zero(net2.nrOfLinks);
+
+    this->initialConfig = net2;
+    this->box = pylimer_tools::entities::Box(net1.L[0], net1.L[1], net1.L[2]);
+    this->completeInitialization();
+  }
+
   /**
    * @brief Instantiate this simulator with randomly chosen slip-links.
    *

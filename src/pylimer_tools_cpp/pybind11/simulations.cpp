@@ -242,8 +242,53 @@ init_pylimer_bound_sim(py::module_& m)
                   &mehp::ForceBalanceNetwork::springsContourLength)
     .def_readonly("partial_to_full_spring_index",
                   &mehp::ForceBalanceNetwork::partialToFullSpringIndex)
+    .def_readonly("spring_part_box_offset",
+                  &mehp::ForceBalance2Network::springPartBoxOffset)
     // .def_readonly("springIsActive", &mehp::Network::springIsActive)
     ;
+
+  py::class_<mehp::ForceBalance2Network>(m,
+                                         "SimplifiedBalance2Network",
+                                         R"pbdoc(
+A more efficient structure of the network for use in MEHP force balance 2.
+Consists usually only of the cross- and entanglement-links.
+
+The terminology is a bit more consistent here:
+the strands are the chains between two junctions ("nodes"), whereas the 
+links will be both these nodes as well as entanglement-links, 
+and finally springs will be any number of connected bonds between links.
+)pbdoc")
+    .def_readonly("box_lengths", &mehp::ForceBalance2Network::L)
+    .def_readonly("nr_of_crosslinks", &mehp::ForceBalance2Network::nrOfNodes)
+    .def_readonly("nr_of_links", &mehp::ForceBalance2Network::nrOfLinks)
+    .def_readonly("nr_of_strands", &mehp::ForceBalance2Network::nrOfStrands)
+    .def_readonly("nr_of_springs", &mehp::ForceBalance2Network::nrOfSprings)
+    // .def_readonly("nrOfLoops", &mehp::Network::nrOfLoops)
+    .def_readonly("coordinates", &mehp::ForceBalance2Network::coordinates)
+    .def_readonly("old_atom_ids", &mehp::ForceBalance2Network::oldAtomIds)
+    .def_readonly("old_atom_types", &mehp::ForceBalance2Network::oldAtomTypes)
+    .def_readonly("spring_coordinate_index_a",
+                  &mehp::ForceBalance2Network::springCoordinateIndexA)
+    .def_readonly("spring_coordinate_index_b",
+                  &mehp::ForceBalance2Network::springCoordinateIndexB)
+    .def_readonly("spring_index_a", &mehp::ForceBalance2Network::springIndexA)
+    .def_readonly("spring_index_b", &mehp::ForceBalance2Network::springIndexB)
+    .def_readonly("link_is_entanglement",
+                  &mehp::ForceBalance2Network::linkIsEntanglement)
+    .def_readonly("spring_contour_length",
+                  &mehp::ForceBalance2Network::springsContourLength)
+    .def_readonly("spring_indices_of_strand",
+                  &mehp::ForceBalance2Network::springIndicesOfStrand)
+    .def_readonly("strand_indices_of_link",
+                  &mehp::ForceBalance2Network::strandIndicesOfLink)
+    .def_readonly("link_indices_of_strand",
+                  &mehp::ForceBalance2Network::linkIndicesOfStrand)
+    .def_readonly("nr_of_crosslink_swaps_endured",
+                  &mehp::ForceBalance2Network::nrOfCrosslinkSwapsEndured)
+    .def_readonly("strand_index_of_spring",
+                  &mehp::ForceBalance2Network::strandIndexOfSpring)
+    .def_readonly("spring_box_offset",
+                  &mehp::ForceBalance2Network::springBoxOffset);
 
   ////////////////////////////////////////////////////////////////
   // MARK: Force evaluators
@@ -357,6 +402,10 @@ init_pylimer_bound_sim(py::module_& m)
                                         "MEHPForceRelaxation",
                                         R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
+
+    This is the first of three force relaxation methods available in this library.
+    The relevant feature of this implementation is the configurable spring potential.
+    Consequently, it offers a variety of configurable non-linear solvers using NLoptLib.
      )pbdoc")
     .def(py::init<pe::Universe,
                   int,
@@ -693,6 +742,12 @@ init_pylimer_bound_sim(py::module_& m)
                                      "MEHPForceBalance",
                                      R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
+
+    This is the second implementation in the group of MEHP provided by this package.
+    The distinct feature here is the slip-links: a form of entanglement,
+    represented as an entanglement link, just like a four-functional cross-link,
+    but with the ability to slip along the two associated strands, therewith
+    adjusting the fraction of the contour length on both sides of the link.
      )pbdoc")
     .def(py::init<pe::Universe, int, bool, bool, bool>(),
          R"pbdoc(
@@ -1283,23 +1338,86 @@ init_pylimer_bound_sim(py::module_& m)
                                       "MEHPForceBalance2",
                                       R"pbdoc(
      A small simulation tool for quickly minimizing the force between the cross-linker beads.
+
+     This is the third implementation of the MEHP. 
+     It's the fastest implementation by using a simple spring model only, disabling the non-linear
+     periodic boundary conditions, and instead builds a sparse linear system of equations that's readily solved.
+     However, it allows entanglements to be represented as additional links or/and springs,
+     although without slipping along the chain.
       )pbdoc")
-    .def(py::init<pe::Universe, int, bool, bool, bool>(),
+    .def(py::init<pe::Universe, int, bool>(),
          R"pbdoc(
            Instantiate the simulator for a certain universe.
 
-           :param universe: the universe to simulate with
+           :param universe: the universe giving the basic connectivity to compute with
            :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
-           :param is2D: Whether to ignore the z direction.
+           :param is_2d: Whether to ignore the z direction.
            :param kappa: the spring constant
            :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
            :param remove_dangling_chains: whether to keep or remove obviously dangling chains when setting up the network
            )pbdoc",
          py::arg("universe"),
          py::arg("crosslinker_type") = 2,
+         py::arg("is_2d") = false)
+    .def(py::init<
+           pe::Universe,
+           pylimer_tools::topo::entanglement_detection::AtomPairEntanglements,
+           int,
+           bool,
+           bool>(),
+         R"pbdoc(
+           Instantiate the simulator for a certain universe with the given entanglements.
+
+           :param universe: the universe giving the basic connectivity to compute with
+           :param entanglements: the entanglements to use in the computation
+           :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
+           :param is_2d: Whether to ignore the z direction.
+           :param entanglements_as_springs: whether to use the entanglements as springs instead of links
+           )pbdoc",
+         py::arg("universe"),
+         py::arg("entanglements"),
+         py::arg("crosslinker_type") = 2,
          py::arg("is_2d") = false,
-         py::arg("remove_2functional_crosslinkers") = false,
-         py::arg("remove_dangling_chains") = false)
+         py::arg("entanglements_as_springs") = false)
+
+    .def(py::init<pe::Universe,
+                  size_t,
+                  double,
+                  double,
+                  size_t,
+                  double,
+                  std::string,
+                  int,
+                  bool,
+                  bool,
+                  bool>(),
+         R"pbdoc(
+     Instantiate this simulator with randomly chosen slip-links.
+
+     :param universe: the universe containing the basic atoms and connectivity
+     :param nr_of_entanglements_to_sample: the number of entanglements to sample
+     :param upper_cutoff: maximum distance from one sampled bead to its partner
+     :param lower_cutoff: minimum distance from one sampled bead to its partner
+     :param minimum_nr_of_entanglements: the minimum number of entanglements that should be sampled
+     :param same_strand_cutoff: distance from one sampled bead to its pair within the same strand
+     :param seed: the seed for the random number generator
+     :param cross_linker_type:
+     :param is_2d:
+     :param filter_entanglements:
+     :param entanglements_as_springs: whether to model the entanglements as merged beads or beads with 1 spring in between
+   )pbdoc",
+         py::arg("universe"),
+         py::arg("nr_of_entanglements_to_sample"),
+         py::arg("upper_sampling_cutoff") = 1.2,
+         py::arg("lower_sampling_cutoff") = 0.0,
+         py::arg("minimum_nr_of_sliplinks") = 0,
+         py::arg("same_strand_cutoff") = 3,
+         py::arg("seed") = "",
+         py::arg("crosslinker_type") = 2,
+         py::arg("is_2d") = false,
+         py::arg("skip_dangling_soluble_entanglements") = true,
+         py::arg("entanglements_as_springs") = true)
+
     .def("__copy__",
          [](const mehp::MEHPForceBalance2& self) {
            return mehp::MEHPForceBalance2(self);
