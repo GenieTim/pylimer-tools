@@ -1478,8 +1478,8 @@ MEHPForceBalance2::mergeSpringsWithoutRemoval(ForceBalance2Network& net,
          otherEndRemoved);
   Eigen::Vector3d distanceAfter =
     this->evaluateSpringVectorFrom(net, u, keptSpringIdx, otherEndKept);
-  assert(totalDistance.isApprox(distanceAfter) ||
-         (totalDistance.isZero(1e-12) && distanceAfter.isZero(1e-12)));
+  assert(pylimer_tools::utils::vector_approx_equal(
+    totalDistance, distanceAfter, 1e-9));
 
 #ifndef NDEBUG
   assert(this->validateNetwork(net, u));
