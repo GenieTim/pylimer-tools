@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="SimplifiedNetwork" href="pylimer_tools_cpp.SimplifiedNetwork.html" /><link rel="prev" title="SimpleSpringMEHPForceEvaluator" href="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="SimplifiedNetwork" href="pylimer_tools_cpp.SimplifiedNetwork.html" /><link rel="prev" title="SimplifiedBalance2Network" href="pylimer_tools_cpp.SimplifiedBalance2Network.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
         <title>SimplifiedBalanceNetwork - PylimerTools documentation</title>
@@ -259,6 +259,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.OutputConfiguration.html">OutputConfiguration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SLESolver.html">SLESolver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">SimpleSpringMEHPForceEvaluator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
@@ -382,19 +383,22 @@ whereas a partial spring is the spring between a cross-link and an entanglement-
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_indices_of_links" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_indices_of_links"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_indices_of_links</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_coordinate_index_a" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_coordinate_index_a"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_part_coordinate_index_a</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_box_offset" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_box_offset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_part_box_offset</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_coordinate_index_b" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_coordinate_index_b"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_part_coordinate_index_b</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_coordinate_index_a" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_coordinate_index_a"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_part_coordinate_index_a</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_index_a" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_index_a"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_part_index_a</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_coordinate_index_b" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_coordinate_index_b"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_part_coordinate_index_b</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_index_b" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_index_b"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_part_index_b</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_index_a" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_index_a"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_part_index_a</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.volume" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.volume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">volume</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_index_b" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_index_b"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_part_index_b</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.volume" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.volume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">volume</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -492,6 +496,11 @@ whereas a partial spring is the spring between a cross-link and an entanglement-
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_box_offset">
+<span class="sig-name descname"><span class="pre">spring_part_box_offset</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_box_offset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_coordinate_index_a">
 <span class="sig-name descname"><span class="pre">spring_part_coordinate_index_a</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_coordinate_index_a" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -534,14 +543,14 @@ whereas a partial spring is the spring between a cross-link and an entanglement-
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">
+          <a class="prev-page" href="pylimer_tools_cpp.SimplifiedBalance2Network.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">SimpleSpringMEHPForceEvaluator</div>
+                <div class="title">SimplifiedBalance2Network</div>
                 
               </div>
             </a>
@@ -594,6 +603,7 @@ whereas a partial spring is the spring between a cross-link and an entanglement-
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_a"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.spring_index_a</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_b"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.spring_index_b</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_indices_of_links"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.spring_indices_of_links</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_box_offset"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.spring_part_box_offset</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_coordinate_index_a"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.spring_part_coordinate_index_a</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_coordinate_index_b"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.spring_part_coordinate_index_b</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_part_index_a"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.spring_part_index_a</span></code></a></li>

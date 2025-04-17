@@ -28,6 +28,7 @@ SimplifiedBalanceNetwork
       ~SimplifiedBalanceNetwork.spring_index_a
       ~SimplifiedBalanceNetwork.spring_index_b
       ~SimplifiedBalanceNetwork.spring_indices_of_links
+      ~SimplifiedBalanceNetwork.spring_part_box_offset
       ~SimplifiedBalanceNetwork.spring_part_coordinate_index_a
       ~SimplifiedBalanceNetwork.spring_part_coordinate_index_b
       ~SimplifiedBalanceNetwork.spring_part_index_a
@@ -54,6 +55,7 @@ SimplifiedBalanceNetwork
    .. autoattribute:: spring_index_a
    .. autoattribute:: spring_index_b
    .. autoattribute:: spring_indices_of_links
+   .. autoattribute:: spring_part_box_offset
    .. autoattribute:: spring_part_coordinate_index_a
    .. autoattribute:: spring_part_coordinate_index_b
    .. autoattribute:: spring_part_index_a

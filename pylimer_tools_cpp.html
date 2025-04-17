@@ -259,6 +259,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.OutputConfiguration.html">OutputConfiguration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SLESolver.html">SLESolver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">SimpleSpringMEHPForceEvaluator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
@@ -426,7 +427,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceBalance</span></code></a>(self, universe[, ...])</p></td>
 <td><p>A small simulation tool for quickly minimizing the force between the cross-linker beads.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceBalance2</span></code></a>(self, universe[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceBalance2</span></code></a>(*args, **kwargs)</p></td>
 <td><p>A small simulation tool for quickly minimizing the force between the cross-linker beads.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.MEHPForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceEvaluator</span></code></a>(self)</p></td>
@@ -468,22 +469,25 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator" title="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleSpringMEHPForceEvaluator</span></code></a>(self[, kappa])</p></td>
 <td><p>This is equal to a spring evaluator for Gaussian chains.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork" title="pylimer_tools_cpp.SimplifiedBalanceNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html#pylimer_tools_cpp.SimplifiedBalance2Network" title="pylimer_tools_cpp.SimplifiedBalance2Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedBalance2Network</span></code></a></p></td>
+<td><p>A more efficient structure of the network for use in MEHP force balance 2.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork" title="pylimer_tools_cpp.SimplifiedBalanceNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork</span></code></a></p></td>
 <td><p>A more efficient structure of the network for use in MEHP force balance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedNetwork.html#pylimer_tools_cpp.SimplifiedNetwork" title="pylimer_tools_cpp.SimplifiedNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedNetwork</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedNetwork.html#pylimer_tools_cpp.SimplifiedNetwork" title="pylimer_tools_cpp.SimplifiedNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedNetwork</span></code></a></p></td>
 <td><p>A more efficient structure of the network for use in MEHP.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.StructureSimplificationMode.html#pylimer_tools_cpp.StructureSimplificationMode" title="pylimer_tools_cpp.StructureSimplificationMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StructureSimplificationMode</span></code></a>(self, value)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.StructureSimplificationMode.html#pylimer_tools_cpp.StructureSimplificationMode" title="pylimer_tools_cpp.StructureSimplificationMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StructureSimplificationMode</span></code></a>(self, value)</p></td>
 <td><p>Members:</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Universe</span></code></a>(self, Lx, Ly, Lz)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Universe</span></code></a>(self, Lx, Ly, Lz)</p></td>
 <td><p>Represents a full Polymer Network structure, a collection of molecules.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniverseSequence</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniverseSequence</span></code></a>(self)</p></td>
 <td><p>This class represents a sequence of Universes, with the Universe's data only being read on request.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html#pylimer_tools_cpp.ZScoreMaxDistanceProvider" title="pylimer_tools_cpp.ZScoreMaxDistanceProvider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZScoreMaxDistanceProvider</span></code></a>(self, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html#pylimer_tools_cpp.ZScoreMaxDistanceProvider" title="pylimer_tools_cpp.ZScoreMaxDistanceProvider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZScoreMaxDistanceProvider</span></code></a>(self, ...)</p></td>
 <td><p>For MC generation, converts the <span class="math notranslate nohighlight">\(N\)</span> to a maximum distance within which to sample. The distance will be calculated as <span class="math notranslate nohighlight">\(\text{std_multiplier} \times \sqrt{N \times \text{in_sqrt_multiplier}}\)</span>. Useful only for performance improvements in large systems.</p></td>
 </tr>
 </tbody>

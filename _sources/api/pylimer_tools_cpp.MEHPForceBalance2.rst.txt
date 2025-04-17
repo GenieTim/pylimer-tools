@@ -16,16 +16,10 @@ MEHPForceBalance2
 
    .. autosummary::
 
-      ~MEHPForceBalance2.add_sliplinks
-      ~MEHPForceBalance2.add_sliplinks_based_on_cycles
-      ~MEHPForceBalance2.config_assume_box_large_enough
-      ~MEHPForceBalance2.config_entanglement_type
       ~MEHPForceBalance2.config_mean_bond_length
-      ~MEHPForceBalance2.config_simplification_frequency
       ~MEHPForceBalance2.config_spring_breaking_distance
       ~MEHPForceBalance2.config_spring_constant
       ~MEHPForceBalance2.config_step_output
-      ~MEHPForceBalance2.construct_with_random_sliplinks
       ~MEHPForceBalance2.deform_to
       ~MEHPForceBalance2.evaluate_partial_spring_distance
       ~MEHPForceBalance2.evaluate_partial_spring_distance_from
@@ -34,7 +28,6 @@ MEHPForceBalance2
       ~MEHPForceBalance2.get_crosslinker_universe
       ~MEHPForceBalance2.get_current_partial_spring_lengths
       ~MEHPForceBalance2.get_current_partial_spring_vectors
-      ~MEHPForceBalance2.get_current_spring_vectors
       ~MEHPForceBalance2.get_dangling_weight_fraction
       ~MEHPForceBalance2.get_default_mean_bond_length
       ~MEHPForceBalance2.get_displacement_residual_norm
@@ -63,22 +56,14 @@ MEHPForceBalance2
       ~MEHPForceBalance2.get_overall_spring_lengths
       ~MEHPForceBalance2.get_pressure
       ~MEHPForceBalance2.get_soluble_weight_fraction
-      ~MEHPForceBalance2.get_spring_partitions
-      ~MEHPForceBalance2.get_springpartition_indices_of_sliplink
       ~MEHPForceBalance2.get_stress_on
       ~MEHPForceBalance2.get_stress_tensor
       ~MEHPForceBalance2.get_stress_tensor_link_based
       ~MEHPForceBalance2.get_weighted_partial_spring_lengths
       ~MEHPForceBalance2.inspect_displacement_to_mean_position_update
-      ~MEHPForceBalance2.inspect_parametrisation_optimsation_for_link
-      ~MEHPForceBalance2.inspect_spring_partition_update
-      ~MEHPForceBalance2.move_sliplinks_to_their_best_branch
-      ~MEHPForceBalance2.randomly_add_sliplinks
       ~MEHPForceBalance2.run_force_relaxation
       ~MEHPForceBalance2.set_displacements
       ~MEHPForceBalance2.set_spring_contour_lengths
-      ~MEHPForceBalance2.set_spring_partitions
-      ~MEHPForceBalance2.swap_sliplinks_incl_xlinks
       ~MEHPForceBalance2.validate_network
 
    .. rubric:: Attributes Documentation
@@ -87,16 +72,10 @@ MEHPForceBalance2
 
    .. rubric:: Methods Documentation
 
-   .. automethod:: add_sliplinks
-   .. automethod:: add_sliplinks_based_on_cycles
-   .. automethod:: config_assume_box_large_enough
-   .. automethod:: config_entanglement_type
    .. automethod:: config_mean_bond_length
-   .. automethod:: config_simplification_frequency
    .. automethod:: config_spring_breaking_distance
    .. automethod:: config_spring_constant
    .. automethod:: config_step_output
-   .. automethod:: construct_with_random_sliplinks
    .. automethod:: deform_to
    .. automethod:: evaluate_partial_spring_distance
    .. automethod:: evaluate_partial_spring_distance_from
@@ -105,7 +84,6 @@ MEHPForceBalance2
    .. automethod:: get_crosslinker_universe
    .. automethod:: get_current_partial_spring_lengths
    .. automethod:: get_current_partial_spring_vectors
-   .. automethod:: get_current_spring_vectors
    .. automethod:: get_dangling_weight_fraction
    .. automethod:: get_default_mean_bond_length
    .. automethod:: get_displacement_residual_norm
@@ -134,20 +112,12 @@ MEHPForceBalance2
    .. automethod:: get_overall_spring_lengths
    .. automethod:: get_pressure
    .. automethod:: get_soluble_weight_fraction
-   .. automethod:: get_spring_partitions
-   .. automethod:: get_springpartition_indices_of_sliplink
    .. automethod:: get_stress_on
    .. automethod:: get_stress_tensor
    .. automethod:: get_stress_tensor_link_based
    .. automethod:: get_weighted_partial_spring_lengths
    .. automethod:: inspect_displacement_to_mean_position_update
-   .. automethod:: inspect_parametrisation_optimsation_for_link
-   .. automethod:: inspect_spring_partition_update
-   .. automethod:: move_sliplinks_to_their_best_branch
-   .. automethod:: randomly_add_sliplinks
    .. automethod:: run_force_relaxation
    .. automethod:: set_displacements
    .. automethod:: set_spring_contour_lengths
-   .. automethod:: set_spring_partitions
-   .. automethod:: swap_sliplinks_incl_xlinks
    .. automethod:: validate_network

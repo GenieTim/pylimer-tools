@@ -1,0 +1,53 @@
+SimplifiedBalance2Network
+=========================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: SimplifiedBalance2Network
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~SimplifiedBalance2Network.box_lengths
+      ~SimplifiedBalance2Network.coordinates
+      ~SimplifiedBalance2Network.link_indices_of_strand
+      ~SimplifiedBalance2Network.link_is_entanglement
+      ~SimplifiedBalance2Network.nr_of_crosslinks
+      ~SimplifiedBalance2Network.nr_of_links
+      ~SimplifiedBalance2Network.nr_of_springs
+      ~SimplifiedBalance2Network.nr_of_strands
+      ~SimplifiedBalance2Network.old_atom_ids
+      ~SimplifiedBalance2Network.old_atom_types
+      ~SimplifiedBalance2Network.spring_box_offset
+      ~SimplifiedBalance2Network.spring_contour_length
+      ~SimplifiedBalance2Network.spring_coordinate_index_a
+      ~SimplifiedBalance2Network.spring_coordinate_index_b
+      ~SimplifiedBalance2Network.spring_index_a
+      ~SimplifiedBalance2Network.spring_index_b
+      ~SimplifiedBalance2Network.spring_indices_of_strand
+      ~SimplifiedBalance2Network.strand_index_of_spring
+      ~SimplifiedBalance2Network.strand_indices_of_link
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: box_lengths
+   .. autoattribute:: coordinates
+   .. autoattribute:: link_indices_of_strand
+   .. autoattribute:: link_is_entanglement
+   .. autoattribute:: nr_of_crosslinks
+   .. autoattribute:: nr_of_links
+   .. autoattribute:: nr_of_springs
+   .. autoattribute:: nr_of_strands
+   .. autoattribute:: old_atom_ids
+   .. autoattribute:: old_atom_types
+   .. autoattribute:: spring_box_offset
+   .. autoattribute:: spring_contour_length
+   .. autoattribute:: spring_coordinate_index_a
+   .. autoattribute:: spring_coordinate_index_b
+   .. autoattribute:: spring_index_a
+   .. autoattribute:: spring_index_b
+   .. autoattribute:: spring_indices_of_strand
+   .. autoattribute:: strand_index_of_spring
+   .. autoattribute:: strand_indices_of_link
