@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.15.0)
+# export compile commands for clang-tidy
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Fix behavior of CMAKE_CXX_STANDARD when targeting macOS.
 if (POLICY CMP0025)

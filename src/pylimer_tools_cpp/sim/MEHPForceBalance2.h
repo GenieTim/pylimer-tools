@@ -88,8 +88,9 @@ public:
     this->completeInitialization();
   }
 
-
-  MEHPForceBalance2(const ForceBalanceNetwork& net1, Eigen::VectorXd springPartitions, const bool is2D = false)
+  MEHPForceBalance2(const ForceBalanceNetwork& net1,
+                    Eigen::VectorXd springPartitions,
+                    const bool is2D = false)
   {
     this->is2D = is2D;
 

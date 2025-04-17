@@ -1639,7 +1639,7 @@ namespace utils {
           { static_cast<size_t>(forceBalanceNetwork.springIndexA(i)),
             static_cast<size_t>(forceBalanceNetwork.springIndexB(i)) };
         forceBalanceNetwork.linkIndicesOfSprings.push_back(linkIndices);
-        forceBalanceNetwork.localToGlobalSpringIndex.push_back({ { i } });
+        forceBalanceNetwork.localToGlobalSpringIndex.push_back({ i });
       }
       forceBalanceNetwork.springPartBoxOffset =
         this->box.getOffset(forceBalanceNetwork.coordinates(

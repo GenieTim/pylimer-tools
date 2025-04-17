@@ -230,7 +230,7 @@ MEHPForceBalance2::MEHPForceBalance2(
           if (springIndicesOfStrand.size() <= currentStrandIdx) {
             assert(currentStrandIdx == springIndicesOfStrand.size());
             springIndicesOfStrand.push_back(
-              std::vector<size_t>{ { springFromVertexIdx.size() } });
+              std::vector<size_t>{ springFromVertexIdx.size() });
             linkIndicesOfStrand.push_back(
               std::vector<size_t>{ newLinkIdStack.top() });
           } else {
@@ -356,7 +356,7 @@ MEHPForceBalance2::MEHPForceBalance2(
           if (springIndicesOfStrand.size() <= currentStrandIdx) {
             assert(currentStrandIdx == springIndicesOfStrand.size());
             springIndicesOfStrand.push_back(
-              std::vector<size_t>{ { springFromVertexIdx.size() } });
+              std::vector<size_t>{ springFromVertexIdx.size() });
             linkIndicesOfStrand.push_back(
               std::vector<size_t>{ newLinkIdStack.top() });
           } else {
