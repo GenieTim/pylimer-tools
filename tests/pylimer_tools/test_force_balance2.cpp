@@ -1617,8 +1617,11 @@ TEST_CASE(
 
     pylimer_tools::sim::mehp::ForceBalanceNetwork net1 = fb1.getNetwork();
 
+    Eigen::VectorXd partitions = fb1.getSpringPartitions();
+
     pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
-      pylimer_tools::sim::mehp::MEHPForceBalance2(net1);
+      pylimer_tools::sim::mehp::MEHPForceBalance2(net1, partitions);
+    pylimer_tools::sim::mehp::ForceBalance2Network net2 = fb2.getNetwork();
 
     CHECK_THAT(
       fb1.getGammaFactors(1.0).mean(),
@@ -1675,7 +1678,7 @@ TEST_CASE(
     fb2.setCurrentDisplacements(fb1.getCurrentDisplacements());
     CHECK(
       fb2.getCurrentDisplacements().isApprox(fb1.getCurrentDisplacements()));
-    CHECK(fb1.getSpringPartitions().isApprox(springPartitions));
+    CHECK(fb1.getSpringPartitions().isApprox(partitions));
     CHECK(fb2.getNetwork().coordinates.isApprox(fb1.getNetwork().coordinates));
     CHECK(fb2.getNetwork().springBoxOffset.isApprox(
       fb1.getNetwork().springPartBoxOffset));
@@ -1912,9 +1915,11 @@ TEST_CASE(
     fb1.configAssumeBoxLargeEnough(false);
 
     pylimer_tools::sim::mehp::ForceBalanceNetwork net1 = fb1.getNetwork();
+    Eigen::VectorXd partitions = fb1.getSpringPartitions();
 
     pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
-      pylimer_tools::sim::mehp::MEHPForceBalance2(net1);
+      pylimer_tools::sim::mehp::MEHPForceBalance2(net1, partitions);
+    pylimer_tools::sim::mehp::ForceBalance2Network net2 = fb2.getNetwork();
 
     // the relevant checks, not testing details but correctness of the
     // implementation

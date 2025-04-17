@@ -243,7 +243,7 @@ init_pylimer_bound_sim(py::module_& m)
     .def_readonly("partial_to_full_spring_index",
                   &mehp::ForceBalanceNetwork::partialToFullSpringIndex)
     .def_readonly("spring_part_box_offset",
-                  &mehp::ForceBalance2Network::springPartBoxOffset)
+                  &mehp::ForceBalanceNetwork::springPartBoxOffset)
     // .def_readonly("springIsActive", &mehp::Network::springIsActive)
     ;
 
@@ -276,15 +276,13 @@ and finally springs will be any number of connected bonds between links.
     .def_readonly("link_is_entanglement",
                   &mehp::ForceBalance2Network::linkIsEntanglement)
     .def_readonly("spring_contour_length",
-                  &mehp::ForceBalance2Network::springsContourLength)
+                  &mehp::ForceBalance2Network::springContourLength)
     .def_readonly("spring_indices_of_strand",
                   &mehp::ForceBalance2Network::springIndicesOfStrand)
     .def_readonly("strand_indices_of_link",
                   &mehp::ForceBalance2Network::strandIndicesOfLink)
     .def_readonly("link_indices_of_strand",
                   &mehp::ForceBalance2Network::linkIndicesOfStrand)
-    .def_readonly("nr_of_crosslink_swaps_endured",
-                  &mehp::ForceBalance2Network::nrOfCrosslinkSwapsEndured)
     .def_readonly("strand_index_of_spring",
                   &mehp::ForceBalance2Network::strandIndexOfSpring)
     .def_readonly("spring_box_offset",
