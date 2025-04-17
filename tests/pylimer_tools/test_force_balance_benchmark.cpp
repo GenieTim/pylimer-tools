@@ -4,10 +4,7 @@
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance2.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceEvaluator.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceRelaxation.h"
-<<<<<<< HEAD
-=======
 #include "../../src/pylimer_tools_cpp/utils/MCUniverseGenerator.h"
->>>>>>> 5475b245807d0527e70aafdf7647730fba8b6ad3
 #include "../../src/pylimer_tools_cpp/utils/StringUtils.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
@@ -25,14 +22,19 @@ namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 namespace pcm = pylimer_tools::sim::mehp;
 
+#ifndef PYLIMER_TEST_FIXTURES_DIR
+#define PYLIMER_TEST_FIXTURES_DIR "../pylimer_tools/tests/fixtures"
+#endif
+
 TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
 {
   std::cout << "Running test \"Force Balance Benchmarks\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
   std::string largeInputFile =
-    suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
+    suspectedPath +
+    "/structure/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
   if (std::filesystem::exists(largeInputFile)) {
     universeSeq.initializeFromDataSequence({ { largeInputFile } });
     pe::Universe universe = universeSeq.atIndex(0);
@@ -50,19 +52,20 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
     std::cout << "Reference Time (FB1) to beat: "
               << std::duration_to_string(duration_ref) << " " << std::endl;
 
-    BENCHMARK_ADVANCED("MEHP LD_MMA " +
-                       largeInputFile)(Catch::Benchmark::Chronometer meter)
-    {
-      pcm::MEHPForceRelaxation forceRelaxer =
-        pcm::MEHPForceRelaxation(universe, 2);
-      forceRelaxer.configAssumeBoxLargeEnough(false);
+    // BENCHMARK_ADVANCED("MEHP LD_MMA " +
+    //                    largeInputFile)(Catch::Benchmark::Chronometer meter)
+    // {
+    //   pcm::MEHPForceRelaxation forceRelaxer =
+    //     pcm::MEHPForceRelaxation(universe, 2);
+    //   forceRelaxer.configAssumeBoxLargeEnough(false);
 
     //   meter.measure([&forceRelaxer, &referenceForceBalancer] {
     //     forceRelaxer.runForceRelaxation("LD_MMA");
 
     //     CHECK_THAT(
     //       forceRelaxer.getGamma(),
-    //       Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(), 1e-2));
+    //       Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(),
+    //       1e-2));
     //     return forceRelaxer.getNrOfIterations();
     //   });
     // };
@@ -78,7 +81,6 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
            pcm::BICGSTAB }) {
       pcm::MEHPForceBalance2 forceBalancer =
         pcm::MEHPForceBalance2(universe, 2);
-      forceBalancer.configAssumeBoxLargeEnough(false);
 
       auto start = std::chrono::high_resolution_clock::now();
 
@@ -86,7 +88,6 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
         forceBalancer.runForceRelaxation(
           pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
           1e-3,
-          1.0,
           solverChoice);
       } catch (const std::exception& e) {
         std::cerr << "Exception for solver " << solverChoice << ": " << e.what()
@@ -137,8 +138,9 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
 
   pe::Universe universe = generator.getUniverse();
 
-  pcm::MEHPForceBalance referenceForceBalancer =
-    pcm::MEHPForceBalance(universe, 2); // using a different crosslinkerType here makes things faster
+  pcm::MEHPForceBalance referenceForceBalancer = pcm::MEHPForceBalance(
+    universe,
+    2); // using a different crosslinkerType here makes things faster
   referenceForceBalancer.configAssumeBoxLargeEnough(false);
 
   auto start_ref = std::chrono::high_resolution_clock::now();
@@ -174,7 +176,6 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
          pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
          pcm::BICGSTAB }) {
     pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(universe, 2);
-    forceBalancer.configAssumeBoxLargeEnough(false);
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -182,7 +183,6 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
       forceBalancer.runForceRelaxation(
         pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
         1e-3,
-        1.0,
         solverChoice);
     } catch (const std::exception& e) {
       std::cerr << "Exception for solver " << solverChoice << ": " << e.what()

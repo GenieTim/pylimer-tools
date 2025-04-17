@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.15.0)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 cmake_policy(SET CMP0077 NEW)
 
@@ -48,6 +49,7 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(Catch2)
+add_compile_definitions(PYLIMER_TEST_FIXTURES_DIR="${CMAKE_CURRENT_LIST_DIR}/pylimer_tools/fixtures")
 
 # and other needed packages
 # setupIgraph()
@@ -58,7 +60,9 @@ FetchContent_MakeAvailable(Catch2)
 # endif()
 
 # add sources & targets
-add_subdirectory(../src/pylimer_tools_cpp pylimer_tools.out)
+if (NOT TARGET pylimer_tools)
+	add_subdirectory(../src/pylimer_tools_cpp pylimer_tools.out)
+endif ()
 
 add_library(test_sources 
 	OBJECT 

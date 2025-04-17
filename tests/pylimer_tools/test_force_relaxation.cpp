@@ -239,12 +239,13 @@ TEST_CASE(
   std::cout << "Running test \"MEHP Force Relaxation2 runs\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   SECTION("MEHP Force Relaxation2 3D case")
   {
     std::string largeInputFile =
-      suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
+      suspectedPath +
+      "/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);
@@ -446,13 +447,14 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   SECTION("3D case")
   {
     // TODO: correct values (& forces?)
     std::string largeInputFile =
-      suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
+      suspectedPath +
+      "/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);
@@ -582,12 +584,12 @@ TEST_CASE(
   return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   SECTION("3D case")
   {
     std::string largeInputFile =
-      suspectedPath + "xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
+      suspectedPath + "/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);
@@ -840,7 +842,7 @@ TEST_CASE("Fully active chains are fully active",
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  const std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   SECTION("MEHP Force Relaxation 3D case")
   {
@@ -848,6 +850,7 @@ TEST_CASE("Fully active chains are fully active",
     // maximum is at perfect crystal structure -> must be all active.
     std::string inputFile =
       suspectedPath +
+      "/structure/"
       "3d-diamond-lattice_10x10x10_a_3_d_0.85_v_0.V-fixed.structure.out";
     if (std::filesystem::exists(inputFile)) {
       std::cout << "Reading file " << inputFile << std::endl;
