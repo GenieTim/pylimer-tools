@@ -27,7 +27,7 @@ find_package(LAPACKE)
 # include(FindLAPACKLibs)
 
 # if (LAPACKLIBS_FOUND)
-if(LAPACKE_FOUND)
+if(LAPACKE_FOUND AND LAPACKE_INCLUDE_DIRS)
 	include_directories(${LAPACKE_INCLUDE_DIRS})
 	include_directories(${CMAKE_CURRENT_LIST_DIR}/lapacke-extra)
 	add_definitions(-DEIGEN_USE_LAPACKE)

@@ -8,6 +8,7 @@
 #include <iostream>
 #include <random>
 #include <string>
+
 extern "C"
 {
 #include <igraph/igraph.h>
@@ -229,4 +230,189 @@ TEST_CASE("Elements are inserted to a sorted vector")
   for (size_t i = 1; i < vec.size(); ++i) {
     CHECK(vec[i] > vec[i - 1]);
   }
+}
+
+TEST_CASE("Row removal works")
+{
+  std::cout << "Running test \"Row removal works\"" << std::endl;
+
+  SECTION("For 1D vector")
+  {
+    std::vector<size_t> vec = { 1, 7, 23, 4, 1, 4, 2, 5, 1,
+                                2, 3, 4,  5, 6, 7, 8, 9, 10 };
+    size_t sizeBefore = vec.size();
+
+    std::vector<size_t> toRemove = std::vector<size_t>({ { 1, 2, 3, 2 } });
+    pylimer_tools::utils::removeRows(vec, toRemove);
+    CHECK(vec.size() == sizeBefore - 3);
+    CHECK(vec[0] == 1);
+    CHECK(vec[1] == 1);
+    CHECK(vec[2] == 4);
+  }
+
+  SECTION("For 2D vector")
+  {
+    std::vector<std::vector<size_t>> vecOfVecs = {
+      { 1, 2, 3, 4, 3 }, { 5, 6, 7 }, { 8, 9, 10 }, {}, { 11, 12, 13, 14, 15 }
+    };
+    size_t sizeBefore = vecOfVecs.size();
+    std::vector<size_t> toRemove = std::vector<size_t>({ { 1, 2, 3, 2 } });
+    pylimer_tools::utils::removeRows(vecOfVecs, toRemove);
+    CHECK(vecOfVecs.size() == sizeBefore - 3);
+    CHECK(vecOfVecs.size() == 2);
+    CHECK(vecOfVecs[0][0] == 1);
+    CHECK(vecOfVecs[0][1] == 2);
+    CHECK(vecOfVecs[0][2] == 3);
+    CHECK(vecOfVecs[0].size() == 5);
+    CHECK(vecOfVecs[1][0] == 11);
+    CHECK(vecOfVecs[1][1] == 12);
+    CHECK(vecOfVecs[1].size() == 5);
+  }
+
+  SECTION("For Eigen vector")
+  {
+    Eigen::VectorXd eigenVec = Eigen::VectorXd::LinSpaced(10, 0, 90);
+    CHECK(eigenVec.size() == 10);
+    CHECK(eigenVec(0) == 0);
+    CHECK(eigenVec(1) == 10);
+    CHECK(eigenVec(2) == 20);
+    std::vector<size_t> toRemove = std::vector<size_t>({ { 1, 2, 3, 2 } });
+    pylimer_tools::utils::removeRows(eigenVec, toRemove);
+    CHECK(eigenVec.size() == 10 - 3);
+    CHECK(eigenVec(0) == 0);
+    CHECK(eigenVec(1) == 40);
+    CHECK(eigenVec(2) == 50);
+  }
+}
+
+TEST_CASE("Index renumbering works")
+{
+  std::cout << "Running test \"Index renumbering works\"" << std::endl;
+  std::vector<size_t> testVecWithIndices = {
+    15, 1, 2, 3, 4, 5, 7, 9, 10, 13, 14
+  };
+  std::vector<size_t> removedIndices = { 0, 6, 8, 11, 12 };
+
+  CHECK_THROWS(
+    pylimer_tools::utils::getMappingForRenumbering(removedIndices, 16));
+
+  std::ranges::sort(removedIndices, std::greater<size_t>());
+
+  const std::vector<long int> mapping =
+    pylimer_tools::utils::getMappingForRenumbering(removedIndices, 16);
+  CHECK(mapping.size() == 16);
+
+  CHECK_NOTHROW(
+    pylimer_tools::utils::renumberWithMapping(testVecWithIndices, mapping));
+  CHECK(testVecWithIndices[0] == 15 - removedIndices.size());
+  CHECK(testVecWithIndices[1] == 0);
+  CHECK(testVecWithIndices[2] == 1);
+  CHECK(testVecWithIndices[3] == 2);
+  CHECK(testVecWithIndices[4] == 3);
+  CHECK(testVecWithIndices[5] == 4);
+  CHECK(testVecWithIndices[6] == 5);
+}
+
+TEST_CASE("Append and Prepend works")
+{
+  std::cout << "Running test \"Append and Prepend works\"" << std::endl;
+  std::vector<size_t> vec = { 1, 2, 3, 4, 5 };
+  size_t sizeBefore = vec.size();
+
+  SECTION("Basic, single value")
+  {
+    pylimer_tools::utils::prepend(vec, { 0 });
+    CHECK(vec[0] == 0);
+    CHECK(vec[1] == 1);
+    pylimer_tools::utils::append(vec, { 6 });
+    CHECK(vec[6] == 6);
+    CHECK(vec.size() == 7);
+  }
+
+  SECTION("Prepend, multiple values")
+  {
+    pylimer_tools::utils::prepend(vec, { 0, 1, 2 });
+    CHECK(vec[0] == 0);
+    CHECK(vec[1] == 1);
+    CHECK(vec[2] == 2);
+    CHECK(vec[3] == 1);
+    CHECK(vec.size() == 8);
+  }
+
+  SECTION("Append, multiple values")
+  {
+    pylimer_tools::utils::append(vec, { 3, 4, 5 });
+    CHECK(vec[0] == 1);
+    CHECK(vec[5] == 3);
+    CHECK(vec[6] == 4);
+    CHECK(vec[7] == 5);
+    CHECK(vec.size() == 8);
+  }
+
+  SECTION("Inverse append")
+  {
+    pylimer_tools::utils::append_inverse(vec, { 10, 11, 12 });
+    CHECK(vec[0] == 1);
+    CHECK(vec[5] == 12);
+    CHECK(vec[6] == 11);
+    CHECK(vec.size() == 8);
+  }
+
+  SECTION("Inverse prepend")
+  {
+    pylimer_tools::utils::prepend_inverse(vec, { 7, 8, 9 });
+    CHECK(vec[0] == 9);
+    CHECK(vec[1] == 8);
+    CHECK(vec[2] == 7);
+    CHECK(vec[3] == 1);
+    CHECK(vec.size() == 8);
+  }
+
+  SECTION("Append, with offset")
+  {
+    pylimer_tools::utils::append(vec, { 3, 4, 5 }, 1, 1);
+    CHECK(vec[0] == 1);
+    CHECK(vec.size() == sizeBefore + 1);
+    CHECK(vec.back() == 4);
+    pylimer_tools::utils::append_inverse(vec, { 6, 7, 8, 9, 10 }, 2, 3);
+    CHECK(vec.size() == sizeBefore + 1);
+    pylimer_tools::utils::append_inverse(vec, { 6, 7, 8, 9, 10 }, 2, 1);
+    CHECK(vec.size() == sizeBefore + 3);
+    CHECK(vec.back() == 7);
+    CHECK(vec[vec.size() - 2] == 8);
+  }
+
+  SECTION("Prepend, with offset")
+  {
+    pylimer_tools::utils::prepend(vec, { 3, 4, 5 }, 1, 1);
+    CHECK(vec[0] == 4);
+    CHECK(vec[1] == 1);
+    CHECK(vec.back() == 5);
+    CHECK(vec.size() == sizeBefore + 1);
+    pylimer_tools::utils::prepend_inverse(vec, { 6, 7, 8, 9, 10 }, 2, 3);
+    CHECK(vec.size() == sizeBefore + 1);
+    pylimer_tools::utils::prepend_inverse(vec, { 6, 7, 8, 9, 10 }, 2, 1);
+    CHECK(vec.size() == sizeBefore + 3);
+    CHECK(vec.back() == 5);
+    CHECK(vec[0] == 8);
+    CHECK(vec[1] == 7);
+    CHECK(vec[2] == 4);
+    CHECK(vec[3] == 1);
+  }
+}
+
+TEST_CASE("Duplicates are removed")
+{
+  std::cout << "Running test \"Duplicates are removed\"" << std::endl;
+  std::vector<size_t> vec = { 1, 7, 77, 7, 3, 3, 3, 4, 4, 2, 2, 4, 4, 5 };
+  size_t sizeBefore = vec.size();
+
+  pylimer_tools::utils::sort_remove_duplicates(vec);
+
+  CHECK(vec.size() == sizeBefore - 7);
+  CHECK(vec[0] == 1);
+  CHECK(vec[1] == 2);
+  CHECK(vec[2] == 3);
+  CHECK(vec[3] == 4);
+  CHECK(vec[4] == 5);
 }

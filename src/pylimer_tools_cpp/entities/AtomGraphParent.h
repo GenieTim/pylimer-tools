@@ -5,14 +5,17 @@ extern "C"
 {
 #include <igraph/igraph.h>
 }
+
 #include "../utils/CerealUtils.h"
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtils.h"
 #include "Atom.h"
 #include <Eigen/Dense>
 #include <algorithm>
+#include <functional>
 #include <limits.h>
 #include <map>
+#include <memory>
 #include <unordered_map>
 #include <vector>
 
@@ -23,9 +26,11 @@ namespace entities {
   {
   public:
     AtomGraphParent();
+
     // rule of three:
     // 1. destructor (to destroy the graph)
     virtual ~AtomGraphParent();
+
     // 2. copy constructor
     // AtomGraphParent(const AtomGraphParent &src) {
     //   igraph_copy(&this->graph, &src.graph);
@@ -35,6 +40,24 @@ namespace entities {
     //   std::swap(this->graph, src.graph);
     //   return *this;
     // };
+
+    /**
+     * @brief Get a mutable copy of the underlying igraph_t structure wrapped in
+     * a unique_ptr
+     *
+     * This creates and returns a new igraph_t structure that is a copy of the
+     * internal graph. The unique_ptr will automatically handle destruction of
+     * both the igraph_t structure and the allocated memory when it goes out of
+     * scope.
+     *
+     * @return igraph_t a copy of the graph
+     */
+    igraph_t getCopyOfGraph() const
+    {
+      igraph_t graphCopy;
+      igraph_copy(&graphCopy, &this->graph);
+      return graphCopy;
+    }
 
     std::vector<long int> getEdgeIdsFromTo(const long int vertexId1,
                                            const long int vertexId2) const;
@@ -200,7 +223,9 @@ namespace entities {
      * @return Atom
      */
     Atom getAtomByVertexIdx(const long int vertexIdx) const;
+
     Atom getSimpleAtomByVertexIdx(const long int vertexIdx) const;
+
     Atom getComplexAtomByVertexIdx(const long int vertexIdx) const;
 
     /**
@@ -451,6 +476,48 @@ namespace entities {
      */
     std::map<std::string, std::vector<long int>> getBonds() const;
 
+    Eigen::VectorXd getAssumedVertexCoordinates(const Box& box) const
+    {
+      igraph_vector_int_t order;
+      igraph_vector_int_init(&order, this->getNrOfVertices());
+      igraph_vector_int_t parents;
+      igraph_vector_int_init(&parents, this->getNrOfVertices());
+      igraph_dfs(&this->graph,
+                 0,
+                 IGRAPH_ALL,
+                 true,
+                 &order,
+                 nullptr,
+                 &parents,
+                 nullptr,
+                 nullptr,
+                 nullptr,
+                 nullptr);
+      assert(igraph_vector_int_size(&order) == this->getNrOfVertices());
+      assert(igraph_vector_int_size(&parents) == this->getNrOfVertices());
+
+      Eigen::VectorXd coordinates = this->getUnwrappedVertexCoordinates(box);
+
+      // use the parents and order to reconstruct the coordinates based on the
+      // bonds
+      for (igraph_integer_t i = 0; i < this->getNrOfVertices(); ++i) {
+        if (igraph_vector_int_get(&order, i) >= 0 &&
+            igraph_vector_int_get(&parents, i) >= 0) {
+          Eigen::Vector3d distance =
+            coordinates.segment<3>(3 * igraph_vector_int_get(&order, i), 3) -
+            coordinates.segment<3>(3 * igraph_vector_int_get(&parents, i), 3);
+          box.handlePBC(distance);
+          coordinates.segment<3>(3 * igraph_vector_int_get(&order, i), 3) =
+            coordinates.segment<3>(3 * igraph_vector_int_get(&parents, i), 3) +
+            distance;
+        }
+      }
+
+      igraph_vector_int_destroy(&order);
+      igraph_vector_int_destroy(&parents);
+      return coordinates;
+    };
+
     /**
      * @brief Get the Assumed Vertex Coordinates
      * This means, the coordinates are derived ignoring the image flags,
@@ -471,6 +538,10 @@ namespace entities {
       if (vertexIds.size() * 3 != results.size()) {
         throw std::invalid_argument(
           "The results must have size 3*the number of atoms to query.");
+      }
+
+      if (vertexIds.size() == 0) {
+        return results;
       }
 
       igraph_vector_int_t vertex_ids;
@@ -526,18 +597,23 @@ namespace entities {
   protected:
     igraph_t graph;
     bool atomsHaveCustomAttributes = false;
+
     igraph_vs_t getVerticesWithDegreeSelector(int degree) const;
+
     std::vector<long int> getVerticesWithDegree(int degree) const;
+
     std::vector<long int> getVerticesWithDegree(
       std::function<bool(int)> selector) const;
+
     std::vector<long int> getVerticesWithDegree(
       const igraph_t* someGraph,
       std::function<bool(int)> selector) const;
+
     std::vector<long int> getVerticesWithDegree(const igraph_t* someGraph,
                                                 std::vector<int> degrees) const;
+
     bool checkIfAtomsHaveCustomAttributes() const;
   };
-
 } // namespace entities
 } // namespace pylimer_tools
 

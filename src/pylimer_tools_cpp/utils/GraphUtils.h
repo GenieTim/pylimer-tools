@@ -1,23 +1,20 @@
 #pragma once
 
-#include <algorithm>
 // #include <iostream>
-#include <iterator>
-#include <map>
-#include <set>
 #include <string>
-#include <unordered_map>
 #include <vector>
+
 extern "C"
 {
 #include <igraph/igraph.h>
 }
+
 #include "./VectorUtils.h"
 
 static inline igraph_integer_t
 castToIgraphInt(igraph_real_t c)
 {
-  return static_cast<igraph_integer_t>(std::lround(c));
+  return std::lround(c);
 }
 
 template<typename INTT>
@@ -29,7 +26,6 @@ igraphRealToInt(igraph_real_t c)
 
 namespace pylimer_tools {
 namespace utils {
-
   template<typename IN>
   static bool graphHasVertexWithProperty(igraph_t* graph,
                                          std::string propertyName,

@@ -280,7 +280,7 @@ namespace sim {
 
           do {
 #ifndef NDEBUG
-            this->validateNetwork();
+            assert(this->validateNetwork());
 #endif
             nRemovedThisLoop = 0;
             if (simplificationMode ==
@@ -766,7 +766,7 @@ namespace sim {
             net, displacements, springPartitions, springIdx);
 
 #ifndef NDEBUG
-          this->validateNetwork(net, displacements, springPartitions);
+          assert(this->validateNetwork(net, displacements, springPartitions));
 #endif
           numRemoved += 1;
         }
@@ -2197,7 +2197,6 @@ namespace sim {
       }
 #endif
 
-      size_t fullSpringIdx = net.partialToFullSpringIndex[keptSpringIdx];
       // handle links
       std::vector<size_t> removedSpringsLinks =
         net.linkIndicesOfSprings[removedSpringIdx];
@@ -2570,7 +2569,7 @@ namespace sim {
       size_t newKeptSpringIdx = (keptSpringIdx < removedSpringIdx)
                                   ? keptSpringIdx
                                   : (keptSpringIdx - 1);
-      // addmittedly, this is possibly dangerous, as it could hide
+      // admittedly, this is possibly dangerous, as it could hide
       // other mistakes
       double newTotalForNormalization =
         springPartitions(net.localToGlobalSpringIndex[newKeptSpringIdx]).sum();
@@ -3412,7 +3411,7 @@ namespace sim {
 
             bool found = false;
 
-            std::unordered_set<size_t> partialSpringIndices =
+            std::vector<size_t> partialSpringIndices =
               this->getPartialSpringIndicesOfLink(net, xlinkIdx);
             for (size_t attemptedEdge : partialSpringIndices) {
               if (attemptedEdge == partialSpringIdx) {
@@ -4530,7 +4529,7 @@ namespace sim {
       double objectiveDisplacementContributors = 0.0;
       bool cautionPrimaryLoop = false;
 
-      std::unordered_set<size_t> partialSpringIndices =
+      std::vector<size_t> partialSpringIndices =
         this->getPartialSpringIndicesOfLink(net, linkIdx);
 
       for (const size_t globalSpringIndex : partialSpringIndices) {
@@ -4654,10 +4653,9 @@ namespace sim {
       Eigen::VectorXi& debugNrSpringsVisited,
       const double oneOverSpringPartitionUpperLimit) const
     {
-      std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
       Eigen::Matrix3d stress = Eigen::Matrix3d::Zero();
 
-      std::unordered_set<size_t> partialSpringIndices =
+      const std::vector<size_t> partialSpringIndices =
         this->getPartialSpringIndicesOfLink(net, linkIdx);
 
       for (const size_t globalSpringIndex : partialSpringIndices) {
@@ -4715,7 +4713,7 @@ namespace sim {
     {
       Eigen::Vector3d force = Eigen::Vector3d::Zero();
 
-      std::unordered_set<size_t> partialSpringIndices =
+      std::vector<size_t> partialSpringIndices =
         this->getPartialSpringIndicesOfLink(net, linkIdx);
 
       for (const size_t globalSpringIndex : partialSpringIndices) {
@@ -5759,6 +5757,10 @@ namespace sim {
     {
       if (b02 < 0) {
         b02 = this->defaultBondLength * this->defaultBondLength;
+      }
+
+      if (this->getNrOfSprings() == 0) {
+        return 0.;
       }
 
       Eigen::VectorXd gammaFactors = this->getGammaFactors(b02);

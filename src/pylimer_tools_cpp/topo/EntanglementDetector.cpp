@@ -10,9 +10,7 @@
 
 namespace pylimer_tools {
 namespace topo {
-
   namespace entanglement_detection {
-
     /**
      * @brief Randomly find pairs of atoms that are close together and could be
      * entanglements
@@ -29,6 +27,7 @@ namespace topo {
      * @param ignoreCrosslinks whether to ignore cross-link atoms when sampling.
      * Careful: if you don't ignore them, the same-strand policy might not work
      * correctly.
+     * @param filterDanglingAndSoluble
      * @return AtomPairEntanglements
      */
     AtomPairEntanglements randomlyFindEntanglements(
@@ -197,7 +196,7 @@ namespace topo {
                !ignoreMolecule[atomToStrand[atomVertexIdx1]])) {
             pairOfAtom[atomVertexIdx2] = pairsOfAtoms.size();
             pairOfAtom[atomVertexIdx1] = pairsOfAtoms.size();
-            pairsOfAtoms.push_back(std::make_pair(a1.getId(), a2.getId()));
+            pairsOfAtoms.emplace_back(a1.getId(), a2.getId());
           } else {
             pairOfAtom[atomVertexIdx2] = -2;
             pairOfAtom[atomVertexIdx1] = -2;
@@ -232,9 +231,9 @@ namespace topo {
                numLinksFoundInIteration > 0);
 
       // reset internal thing
-      for (size_t i = 0; i < pairOfAtom.size(); ++i) {
-        if (pairOfAtom[i] == -2) {
-          pairOfAtom[i] = -1;
+      for (long& i : pairOfAtom) {
+        if (i == -2) {
+          i = -1;
         }
       }
 
@@ -243,7 +242,6 @@ namespace topo {
       result.pairOfAtom = pairOfAtom;
       return result;
     }
-
   }
 }
 }

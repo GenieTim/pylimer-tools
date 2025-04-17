@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+
 extern "C"
 {
 #include <igraph/igraph.h>
@@ -23,14 +24,14 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
   std::cout << "Running test \"UniverseSequence can be used\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   SECTION("Reading from dump file works")
   {
     universeSeq.initializeFromDumpFile(
-      suspectedPath + "lammps_data_file_small.out",
-      suspectedPath + "lammps_dump_small.lammpstrj");
+      suspectedPath + "/lammps_data_file_small.out",
+      suspectedPath + "/lammps_dump_small.lammpstrj");
     REQUIRE(universeSeq.getLength() == 1);
     REQUIRE_THROWS(universeSeq.atIndex(1));
     REQUIRE(universeSeq.atIndex(0).getNrOfAtoms() == 12);
@@ -44,7 +45,7 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
   SECTION("Reading from data files works")
   {
     universeSeq.initializeFromDataSequence(
-      { { suspectedPath + "lammps_data_file.out" } });
+      { { suspectedPath + "/lammps_data_file.out" } });
     REQUIRE(universeSeq.getLength() == 1);
 
     pe::Universe universe = universeSeq.atIndex(0);
@@ -63,24 +64,24 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
   SECTION("Empty dump files throw")
   {
     universeSeq.initializeFromDumpFile(suspectedPath +
-                                         "lammps_data_file_small.out",
-                                       suspectedPath + "empty_file.txt");
+                                         "/lammps_data_file_small.out",
+                                       suspectedPath + "/empty_file.txt");
     REQUIRE_THROWS(universeSeq.next());
   }
 
   SECTION("Broken box is detected")
   {
     universeSeq.initializeFromDumpFile(
-      suspectedPath + "lammps_data_file_small.out",
-      suspectedPath + "lammps_dump_small_broken_box.lammpstrj");
+      suspectedPath + "/lammps_data_file_small.out",
+      suspectedPath + "/lammps_dump_small_broken_box.lammpstrj");
     REQUIRE_THROWS(universeSeq.next());
   }
 
   SECTION("Missing box is augmented")
   {
     universeSeq.initializeFromDumpFile(
-      suspectedPath + "lammps_data_file_small.out",
-      suspectedPath + "lammps_dump_small_no_box.lammpstrj");
+      suspectedPath + "/lammps_data_file_small.out",
+      suspectedPath + "/lammps_dump_small_no_box.lammpstrj");
     pe::Universe universe = universeSeq.atIndex(0);
     REQUIRE(universe.getBox().getLx() ==
             3.2182950030000001e+01 + 3.2182950030000001e+01);
@@ -89,8 +90,8 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
   SECTION("Unwrapped atoms are read too")
   {
     universeSeq.initializeFromDumpFile(
-      suspectedPath + "lammps_data_file_small.out",
-      suspectedPath + "lammps_dump_small_unwrapped.lammpstrj");
+      suspectedPath + "/lammps_data_file_small.out",
+      suspectedPath + "/lammps_dump_small_unwrapped.lammpstrj");
     pe::Universe universe = universeSeq.atIndex(0);
     REQUIRE(universe.getNrOfAtoms() == 12);
   }
@@ -98,7 +99,7 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
   SECTION("Angles are read, too")
   {
     universeSeq.initializeFromDataSequence(
-      { { suspectedPath + "lammps_data_file_small_wangles.out" } });
+      { { suspectedPath + "/lammps_data_file_small_wangles.out" } });
     REQUIRE(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.next();
     REQUIRE(universe.getNrOfAngles() == 1);
@@ -107,8 +108,8 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
   SECTION("MSD computation works")
   {
     universeSeq.initializeFromDumpFile(
-      suspectedPath + "lammps_data_file_small.out",
-      suspectedPath + "lammps_dump_small_3step.lammpstrj");
+      suspectedPath + "/lammps_data_file_small.out",
+      suspectedPath + "/lammps_dump_small_3step.lammpstrj");
     REQUIRE(universeSeq.getLength() == 3);
     std::vector<long int> atomIds = { 10000, 20000, 30000 };
     std::unordered_map<long int, double> msdForAtoms =
@@ -120,8 +121,8 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
   SECTION("Ree computation works")
   {
     universeSeq.initializeFromDumpFile(
-      suspectedPath + "lammps_data_file_small.out",
-      suspectedPath + "lammps_dump_small_3step.lammpstrj");
+      suspectedPath + "/lammps_data_file_small.out",
+      suspectedPath + "/lammps_dump_small_3step.lammpstrj");
     REQUIRE(universeSeq.getLength() == 3);
     std::vector<long int> atomIdsFrom = { 10000, 20000, 30000 };
     std::vector<long int> atomIdsTo = { 10000, 20000, 30000 };
@@ -182,9 +183,9 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
 
   SECTION("Reading large files is sensibly fast")
   {
-    universeSeq.initializeFromDumpFile(suspectedPath + "big_dump_file_data.out",
-                                       suspectedPath +
-                                         "big_dump_file.lammpstrj");
+    universeSeq.initializeFromDumpFile(
+      suspectedPath + "/big_dump_file_data.out",
+      suspectedPath + "/big_dump_file.lammpstrj");
     // can be queried "randomly"
     pe::Universe universe = universeSeq.atIndex(10);
     REQUIRE(universe.getNrOfAtoms() == 32);

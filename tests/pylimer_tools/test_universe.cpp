@@ -11,6 +11,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+
 extern "C"
 {
 #include <igraph/igraph.h>
@@ -237,14 +238,21 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
      * 8-7
      */
     universe.setBox(pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0));
-    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },   // id
-                      { { 1, 1, 1, 2, 1, 2, 2, 1 } },   // type
-                      { { -5, 5, 5, -5, 7, 1, 1, 7 } }, // x
-                      { { -5, -5, 5, 5, 0, 0, 0, 0 } }, // y
-                      { { 1, 1, 1, 1, -5, -5, 5, 5 } }, // z
-                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },   // nx
-                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },   // ny
-                      { { 1, 1, 1, 1, 1, 1, 1, 1 } }    // nz
+    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },
+                      // id
+                      { { 1, 1, 1, 2, 1, 2, 2, 1 } },
+                      // type
+                      { { -5, 5, 5, -5, 7, 1, 1, 7 } },
+                      // x
+                      { { -5, -5, 5, 5, 0, 0, 0, 0 } },
+                      // y
+                      { { 1, 1, 1, 1, -5, -5, 5, 5 } },
+                      // z
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },
+                      // nx
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },
+                      // ny
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } } // nz
     );
     universe.addBonds(8,
                       { { 1, 2, 3, 4, 5, 6, 7, 8 } },
@@ -286,19 +294,36 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     #
     # *4
     */
-    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },       // id
-                      { { 1, 1, 1, 2, 1, 2, 2, 1 } },       // type
-                      { { 1.25, 2, 3, 1.01, 2, 4, 1, 1 } }, // x
-                      { { 1, 1, 1, 4.01, 2, 1, 2, 3 } },    // y
-                      { { 1, 1, 1, 1.01, 1, 1, 1, 1 } },    // z
-                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },       // nx
-                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },       // ny
-                      { { 1, 1, 1, 1, 1, 1, 1, 1 } }        // nz
+    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },
+                      // id
+                      { { 1, 1, 1, 2, 1, 2, 2, 1 } },
+                      // type
+                      { { 1.25, 2, 3, 1.01, 2, 4, 1, 1 } },
+                      // x
+                      { { 1, 1, 1, 4.01, 2, 1, 2, 3 } },
+                      // y
+                      { { 1, 1, 1, 1.01, 1, 1, 1, 1 } },
+                      // z
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },
+                      // nx
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },
+                      // ny
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } } // nz
     );
     universe.addBonds(7,
                       { { 1, 2, 3, 6, 5, 7, 7 } },
                       { { 2, 3, 6, 5, 7, 1, 8 } },
                       { { 1, 1, 1, 1, 1, 1, 11 } });
+
+    SECTION("Graph copy can be accessed")
+    {
+      igraph_t graph = universe.getCopyOfGraph();
+      CHECK(igraph_vcount(&graph) == universe.getNrOfAtoms());
+      CHECK(igraph_ecount(&graph) == universe.getNrOfBonds());
+      igraph_integer_t degree;
+      igraph_degree_1(&graph, &degree, 0, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
+      CHECK(degree == 2);
+    }
 
     SECTION("Atoms can be replaced")
     {
@@ -702,14 +727,21 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     #
     # *7-*6-5
     */
-    universe.addAtoms({ { 1, 2, 3, 5, 6, 7 } }, // id
-                      { { 1, 1, 1, 1, 2, 2 } }, // type
-                      { { 3, 2, 2, 2, 2, 2 } }, // x
-                      { { 1, 1, 1, 1, 1, 1 } }, // y
-                      { { 1, 1, 1, 1, 1, 1 } }, // z
-                      { { 1, 1, 1, 1, 1, 1 } }, // nx
-                      { { 1, 1, 1, 1, 1, 1 } }, // ny
-                      { { 1, 1, 1, 1, 1, 1 } }  // nz
+    universe.addAtoms({ { 1, 2, 3, 5, 6, 7 } },
+                      // id
+                      { { 1, 1, 1, 1, 2, 2 } },
+                      // type
+                      { { 3, 2, 2, 2, 2, 2 } },
+                      // x
+                      { { 1, 1, 1, 1, 1, 1 } },
+                      // y
+                      { { 1, 1, 1, 1, 1, 1 } },
+                      // z
+                      { { 1, 1, 1, 1, 1, 1 } },
+                      // nx
+                      { { 1, 1, 1, 1, 1, 1 } },
+                      // ny
+                      { { 1, 1, 1, 1, 1, 1 } } // nz
     );
     universe.addBonds(4, { { 1, 2, 5, 6 } }, { { 2, 3, 6, 7 } });
     CHECK(universe.getNrOfBonds() == 4);
@@ -749,14 +781,21 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       // 9-8
       // | |
       // ↳-*7-*6-5
-      universe.addAtoms({ { 8, 9 } }, // id
-                        { { 1, 1 } }, // type
-                        { { 0, 1 } }, // x
-                        { { 2, 3 } }, // y
-                        { { 0, 0 } }, // z
-                        { { 1, 1 } }, // nx
-                        { { 1, 1 } }, // ny
-                        { { 1, 1 } }  // nz
+      universe.addAtoms({ { 8, 9 } },
+                        // id
+                        { { 1, 1 } },
+                        // type
+                        { { 0, 1 } },
+                        // x
+                        { { 2, 3 } },
+                        // y
+                        { { 0, 0 } },
+                        // z
+                        { { 1, 1 } },
+                        // nx
+                        { { 1, 1 } },
+                        // ny
+                        { { 1, 1 } } // nz
       );
       universe.addBonds(3, { { 7, 8, 9 } }, { { 8, 9, 7 } });
       CHECK(universe.getNrOfBonds() == 7);
@@ -874,14 +913,21 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
   {
     const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
     universe.setBox(box);
-    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },             // id
-                      { { 2, 1, 1, 1, 2, 1, 1, 1 } },             // type
-                      { { 1., 2., 3., 4., 9., -10., -9., -8. } }, // x
-                      { { 1., 2., 3., 4., 9., -10., -9., -8. } }, // y
-                      { { 1., 2., 3., 4., 9., -10., -9., -8. } }, // z
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },             // nx
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },             // ny
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } }              // nz
+    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },
+                      // id
+                      { { 2, 1, 1, 1, 2, 1, 1, 1 } },
+                      // type
+                      { { 1., 2., 3., 4., 9., -10., -9., -8. } },
+                      // x
+                      { { 1., 2., 3., 4., 9., -10., -9., -8. } },
+                      // y
+                      { { 1., 2., 3., 4., 9., -10., -9., -8. } },
+                      // z
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },
+                      // nx
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },
+                      // ny
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } } // nz
     );
 
     std::vector<double> distances = { 0., 1., 2., 3. };
@@ -970,20 +1016,12 @@ TEST_CASE("Coordinates work")
     universe.addAtoms(
       { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 } },
       { { 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1 } },
-      { { 0.,
-          2.5,
-          5,
-          7.5,
-          0.1,
-          2.5,
-          5,
-          7.5,
-          -0.1,
-          5.,
-          0.,
-          5. } }, // x with slight (0.1) deviation, so we don't start perfect
-      { { 0.1, 0., -0.1, 0., 5., 5., 5., 5., 2.5, 2.5, 7.5, 7.5 } }, // y
-      { { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. } },        // z
+      { { 0., 2.5, 5, 7.5, 0.1, 2.5, 5, 7.5, -0.1, 5., 0., 5. } },
+      // x with slight (0.1) deviation, so we don't start perfect
+      { { 0.1, 0., -0.1, 0., 5., 5., 5., 5., 2.5, 2.5, 7.5, 7.5 } },
+      // y
+      { { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. } },
+      // z
       { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
       { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
       { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } });
@@ -1043,14 +1081,21 @@ TEST_CASE("Coordinates work")
   {
     const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
     universe.setBox(box);
-    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
-                      { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
-                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x
-                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // y
-                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // z
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // nx
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // ny
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } }      // nz
+    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },
+                      // id
+                      { { 2, 1, 1, 1, 2, 1, 1, 1 } },
+                      // type
+                      { { 1, 2, 3, 4, 9, -10, -9, -8 } },
+                      // x
+                      { { 1, 2, 3, 4, 9, -10, -9, -8 } },
+                      // y
+                      { { 1, 2, 3, 4, 9, -10, -9, -8 } },
+                      // z
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },
+                      // nx
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },
+                      // ny
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } } // nz
     );
     std::vector<long int> indices = { { 1, 2, 3 } };
     Eigen::VectorXd coordinates =
@@ -1068,9 +1113,9 @@ TEST_CASE("Large universe can be used", "[Universe][entity]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  const std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
   universeSeq.initializeFromDataSequence(
-    { { suspectedPath + "lammps_data_file.out" } });
+    { { suspectedPath + "/lammps_data_file.out" } });
   CHECK(universeSeq.getLength() == 1);
 
   pe::Universe universe = universeSeq.atIndex(0);
@@ -1085,5 +1130,42 @@ TEST_CASE("Large universe can be used", "[Universe][entity]")
       universe.interpolateEdges(2, 2.);
     CHECK(interpolatedEdges2.size() ==
           Catch::Approx(2. * edges["edge_from"].size()));
+  }
+}
+
+TEST_CASE("Vertex coordinates are assumed for tree-like structures",
+          "[Universe][entity]")
+{
+  std::cout << "Running test \"Vertex coordinates are assumed for tree-like "
+               "structures\""
+            << std::endl;
+
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  std::vector<double> coords = { 0.0, 1.0, 10.0, 21.0, 22.0, 3.0, 2.0, 3.0 };
+  std::vector<long int> ids = { 0, 1, 2, 3, 4, 5, 6, 7 };
+  universe.addAtoms(ids,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 1),
+                    coords,
+                    coords,
+                    coords,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0));
+  std::vector<long int> bondFrom = { 0, 1, 2, 3, 3, 4, 6 };
+  std::vector<long int> bondTo = { 1, 2, 3, 4, 6, 5, 7 };
+  universe.addBonds(bondFrom, bondTo);
+
+  CHECK(universe.getNrOfBonds() == bondFrom.size());
+  CHECK(universe.getNrOfAtoms() == ids.size());
+
+  Eigen::VectorXd assumedCoordinates =
+    universe.getAssumedVertexCoordinates(universe.getBox());
+  // for each bond, check that the bond-length is shorter than the half box,
+  // even without PBC
+  for (size_t i = 0; i < bondFrom.size(); ++i) {
+    Eigen::Vector3d bondVector =
+      (assumedCoordinates.segment(3 * bondTo[i], 3) -
+       assumedCoordinates.segment(3 * bondFrom[i], 3));
+    CHECK(bondVector.norm() < 5.);
   }
 }
