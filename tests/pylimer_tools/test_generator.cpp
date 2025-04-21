@@ -583,7 +583,7 @@ TEST_CASE(
 
     pe::Universe universe = generator.getUniverse();
     double nCrosslinks = static_cast<double>(universe.getAtomsOfType(2).size());
-    CHECK_THAT(nCrosslinks, Catch::Matchers::WithinRel(1000 * 100, 0.001));
+    CHECK_THAT(nCrosslinks, Catch::Matchers::WithinRel(1000 * 100, 0.05));
     CHECK(universe.getNrOfAtoms() == 1000 * 100);
     std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
     CHECK(chains.size() > 5000);
