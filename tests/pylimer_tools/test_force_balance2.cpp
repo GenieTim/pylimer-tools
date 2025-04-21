@@ -2287,6 +2287,16 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
       std::cerr << "Force Balance 1 did not converge for file: " << inputFile
                 << std::endl;
     }
+
+    // validate conversion by using FB1's network for FB2
+    pcm::MEHPForceBalance2 forceBalance21 = pcm::MEHPForceBalance2(
+      forceBalance.getNetwork(), forceBalance.getSpringPartitions());
+    forceBalance21.runForceRelaxation(
+      pcm::StructureSimplificationMode::ALL_TIM);
+    REQUIRE_THAT(forceBalance21.getGammaFactors(1.).sum(),
+            Catch::Matchers::WithinRel(forceBalance2.getGammaFactors(1.).sum(),
+                                       1e-3));
+    REQUIRE(forceBalance2.getNrOfStrands() == forceBalance21.getNrOfStrands());
   }
 
   REQUIRE(static_cast<double>(nFilesFound) >
