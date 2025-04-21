@@ -358,7 +358,7 @@ TEST_CASE(
     REQUIRE(std::filesystem::exists(suspectedPath));
     universeSeq.initializeFromDataSequence(
       { { suspectedPath +
-          "structure/equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
+          "/structure/equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
           "333_2d_t_7500001.structure.out" } });
     REQUIRE(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
@@ -427,7 +427,7 @@ TEST_CASE(
 
   SECTION("Simple melt case")
   {
-    std::string dataFile = suspectedPath + "lammps_data_file.out";
+    std::string dataFile = suspectedPath + "/lammps_data_file.out";
     universeSeq.initializeFromDataSequence({ { dataFile } });
     pe::Universe universe = universeSeq.atIndex(0);
     pcm::MEHPForceRelaxation forceRelaxer =
