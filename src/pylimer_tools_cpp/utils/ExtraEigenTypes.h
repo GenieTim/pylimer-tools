@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Eigen/Dense>
+#include <Eigen/SparseCore>
 
 namespace Eigen {
 
@@ -25,6 +26,24 @@ median(const Eigen::DenseBase<Derived>& d)
 {
   typename Derived::PlainObject m{ d.replicate(1, 1) };
   return median(m);
+}
+
+static inline bool isSelfAdjoint(const SparseMatrix<double>& mat, double tol = 1e-9) {
+  if (mat.rows() != mat.cols()) return false; // Must be square
+
+  for (int k = 0; k < mat.outerSize(); ++k) {
+    for (Eigen::SparseMatrix<double>::InnerIterator it(mat, k); it; ++it) {
+      int row = it.row();
+      int col = it.col();
+      double value = it.value();
+
+      // Check symmetry within tolerance
+      if (std::abs(value - mat.coeff(col, row)) > tol) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 }
 

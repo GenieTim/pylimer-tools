@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance.h"
+#include "../../src/pylimer_tools_cpp/utils/MCUniverseGenerator.h"
 
 #include <unistd.h>
 
@@ -2094,6 +2095,52 @@ TEST_CASE("MEHPFB2 Basic conversion test with entanglements",
     CHECK(net.oldAtomIds[4] == 5);
     CHECK(net.oldAtomIds[5] == 9);
   }
+}
+
+TEST_CASE("Selective MC Generated Structure Solves",
+          "[MEHPForceBalance2][MCUniverseGenerator][long]")
+{
+  // ({'n_beads_xlinks': 227, 'n_xlink_chains': 192, 'n_beads_zero': 6,
+  // 'n_chains_zero': 45141, 'p': np.float64(0.1571533651866583),
+  // 'functionality_per_xlink_chain': np.int64(879), 'n_beads': 22,
+  // 'n_beads_mono': 239, 'n_chains': 95330, 'n_chains_mono': 4669,
+  // 'disable_loops': False, 'params':
+  // <pylimer_doctorate_utils.polymer_parameter_provider.Parameters object at
+  // 0x10ae9d460>, 'remove_wsol': True}
+
+  // 3 passes, 2 does not
+  double scaleDownBy = 2.;
+
+  pylimer_tools::utils::MCUniverseGenerator generator =
+    pylimer_tools::utils::MCUniverseGenerator(
+      21.118005279044613 / std::cbrt(scaleDownBy),
+      21.118005279044613 / std::cbrt(scaleDownBy),
+      21.118005279044613 / std::cbrt(scaleDownBy));
+  generator.setMeanSquaredBeadDistance(1.0647);
+  generator.addRandomlyFunctionalizedStrands(
+    2,
+    pylimer_tools::utils::initializeWithValue(
+      2, static_cast<int>(217 / scaleDownBy)),
+    0.9407504937458855,
+    7,
+    2,
+    1);
+  int nStrands = 886 / scaleDownBy;
+  generator.addStrands(
+    nStrands, pylimer_tools::utils::initializeWithValue(nStrands, 318), 1);
+  // int nStrandsMono = 114 / scaleDownBy;
+  // generator.addMonofunctionalStrands(
+  //   nStrandsMono, pylimer_tools::utils::initializeWithValue(nStrandsMono, 127));
+  generator.useZScoreMaxDistance(2.);
+  CHECK_NOTHROW(generator.linkStrandsToConversion(0.12327785585899244));
+
+  pcm::MEHPForceBalance2 fb2 = generator.getForceBalance2();
+  CHECK_NOTHROW(fb2.validateNetwork());
+  CHECK_NOTHROW(
+    fb2.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                           1e-5,
+                           pcm::SLESolver::CONJUGATE_GRADIENT));
+  CHECK(fb2.getPressure() < 1e-3);
 }
 
 TEST_CASE("All MEHP Force Balance2 vs. Force Relaxation Phantom Comparisons",

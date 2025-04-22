@@ -704,6 +704,16 @@ MEHPForceBalance2::runForceRelaxation(
                                           this->initialConfig.nrOfLinks * 3);
     sysMatrix.setFromTriplets(triplets.begin(), triplets.end());
 
+#ifndef NDEBUG
+    // verify that the matrix fulfills the requirements of the gradient descent
+    bool isSelfAdjoint = Eigen::isSelfAdjoint(sysMatrix);
+    assert(isSelfAdjoint);
+    // test whether the system matrix is positive definite (it's not guaranteed!)
+    // Eigen::VectorXd x = Eigen::VectorXd::Random(sysMatrix.rows());
+    // double result = x.transpose() * sysMatrix * x;
+    // std::cout << "Quadratic test result: " << result << std::endl;
+#endif
+
     Eigen::VectorXd finalCoordinates;
 
 #define COMPUTE_SOLVE(solver)                                                  \
@@ -733,14 +743,14 @@ MEHPForceBalance2::runForceRelaxation(
       case SLESolver::CONJUGATE_GRADIENT:
       case SLESolver::CONJUGATE_GRADIENT_DIAGONALIZED: {
         Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
-                                 Eigen::Lower,
+                                 Eigen::Lower | Eigen::Upper,
                                  Eigen::DiagonalPreconditioner<double>>
           solver;
         SOLVE_ITERATIVE(solver);
       }
       case SLESolver::CONJUGATE_GRADIENT_IDENTITY: {
         Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
-                                 Eigen::Lower,
+                                 Eigen::Lower | Eigen::Upper,
                                  Eigen::IdentityPreconditioner>
           solver;
         SOLVE_ITERATIVE(solver);
