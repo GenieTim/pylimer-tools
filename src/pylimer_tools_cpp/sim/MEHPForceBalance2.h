@@ -137,7 +137,11 @@ public:
         springPartitions[i];
     }
     net2.oldAtomTypes = Eigen::VectorXi::Zero(net2.nrOfLinks);
-    net2.oldAtomIds = Eigen::VectorXi::Zero(net2.nrOfLinks);
+    net2.oldAtomIds = Eigen::VectorXi::Constant(net2.nrOfLinks, -1);
+    for (size_t i = 0; i < net2.nrOfNodes; ++i) {
+      net2.oldAtomIds[i] = net1.oldAtomIds[i];
+      net2.oldAtomTypes[i] = net1.oldAtomTypes[i];
+    }
 
     this->initialConfig = net2;
     this->box = pylimer_tools::entities::Box(net1.L[0], net1.L[1], net1.L[2]);
@@ -1362,88 +1366,85 @@ protected:
         result[i] = activeSprings[net.springIndicesOfStrand[i][0]];
         continue;
       }
-      // with more springs, the strand is certainly active
+      // with more springs, the strand is certainly active,
       // if the first and last spring are active
+      // (springs in between may be active due to the other involved strands)
       bool isActive0 = activeSprings[net.springIndicesOfStrand[i][0]];
       bool isActiveN = activeSprings[net.springIndicesOfStrand[i].back()];
-      if (isActive0 && isActiveN) {
-        result[i] = true;
-        continue;
-      }
+
       // however, there is one case where the
       // strand would not yet be marked as active, even though it is:
       // when one end is inactive,
       // because it is bifunctional and in a sandwich with the same entanglement
       // link
       if (!isActive0) {
-        size_t crossLinkIdx = net.linkIndicesOfStrand[i][0];
-        size_t entanglementLinkIdx = net.linkIndicesOfStrand[i][1];
-        for (size_t strandOfXlink : net.strandIndicesOfLink[crossLinkIdx]) {
+        const size_t crossLinkIdx0 = net.linkIndicesOfStrand[i][0];
+        const size_t entanglementLinkIdx0 = net.linkIndicesOfStrand[i][1];
+        assert(!net.linkIsEntanglement[crossLinkIdx0]);
+        assert(net.linkIsEntanglement[entanglementLinkIdx0]);
+        for (size_t strandOfXlink : net.strandIndicesOfLink[crossLinkIdx0]) {
           if (strandOfXlink == i) {
             continue;
           }
-          if (net.linkIndicesOfStrand[strandOfXlink][0] == crossLinkIdx &&
+          if (net.linkIndicesOfStrand[strandOfXlink][0] == crossLinkIdx0 &&
               net.linkIndicesOfStrand[strandOfXlink][1] ==
-                entanglementLinkIdx) {
+                entanglementLinkIdx0) {
             isActive0 = true;
             break;
           }
-          if (net.linkIndicesOfStrand[strandOfXlink].back() == crossLinkIdx &&
+          if (net.linkIndicesOfStrand[strandOfXlink].back() == crossLinkIdx0 &&
               net.linkIndicesOfStrand
                   [strandOfXlink]
                   [net.linkIndicesOfStrand[strandOfXlink].size() - 2] ==
-                entanglementLinkIdx) {
+                entanglementLinkIdx0) {
             isActive0 = true;
             break;
           }
         }
 
         if (!isActiveN) {
-          size_t crossLinkIdx = net.linkIndicesOfStrand[i].back();
-          size_t entanglementLinkIdx =
+          const size_t crossLinkIdxN = net.linkIndicesOfStrand[i].back();
+          const size_t entanglementLinkIdxN =
             net.linkIndicesOfStrand[i][net.linkIndicesOfStrand[i].size() - 2];
-          for (size_t strandOfXlink : net.strandIndicesOfLink[crossLinkIdx]) {
+          assert(!net.linkIsEntanglement[crossLinkIdxN]);
+          assert(net.linkIsEntanglement[entanglementLinkIdxN]);
+          for (size_t strandOfXlink : net.strandIndicesOfLink[crossLinkIdxN]) {
             if (strandOfXlink == i) {
               continue;
             }
-            if (net.linkIndicesOfStrand[strandOfXlink][0] == crossLinkIdx &&
+            if (net.linkIndicesOfStrand[strandOfXlink][0] == crossLinkIdxN &&
                 net.linkIndicesOfStrand[strandOfXlink][1] ==
-                  entanglementLinkIdx) {
+                  entanglementLinkIdxN) {
               isActiveN = true;
               break;
             }
-            if (net.linkIndicesOfStrand[strandOfXlink].back() == crossLinkIdx &&
+            if (net.linkIndicesOfStrand[strandOfXlink].back() ==
+                  crossLinkIdxN &&
                 net.linkIndicesOfStrand
                     [strandOfXlink]
                     [net.linkIndicesOfStrand[strandOfXlink].size() - 2] ==
-                  entanglementLinkIdx) {
+                  entanglementLinkIdxN) {
               isActiveN = true;
               break;
             }
           }
         }
-
-        if (isActive0 && isActiveN) {
-          result[i] = true;
+        // we can, however, anticipate the activeness of dangling links
+        // and mark the strand as inactive in that case
+        if (net.linkIndicesOfStrand[i][0] !=
+            net.linkIndicesOfStrand[i].back()) {
+          if (net.strandIndicesOfLink[net.linkIndicesOfStrand[i][0]].size() ==
+              1) {
+            isActive0 = false;
+          }
+          if (net.strandIndicesOfLink[net.linkIndicesOfStrand[i].back()]
+                .size() == 1) {
+            isActiveN = false;
+          }
         }
-      }
-    }
 
-    for (size_t i = 0; i < net.nrOfSprings; ++i) {
-#ifndef NDEBUG
-      // we assert that all springs of a strand are active, it cannot be that
-      // one is not
-      if (!this->isLoopingSpring(net, i) &&
-          result[net.strandIndexOfSpring[i]]) {
-        // this may fail in the cases:
-        // 1. a primary loop / entanglement
-        // 2. a cross-link that is only connected to the same entanglement link
-        // twice (or less) assert(activeSprings[i]);
+        result[i] = isActive0 && isActiveN;
       }
-#endif
-
-      result[net.strandIndexOfSpring[i]] =
-        result[net.strandIndexOfSpring[i]] || activeSprings[i];
     }
 
     return result;

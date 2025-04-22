@@ -803,18 +803,20 @@ MEHPForceBalance2::runForceRelaxation(
                                             this->currentDisplacements,
                                             inactiveRemovalCutoff);
         size_t toDeleteCount = springIsToDelete.count();
-        std::vector<size_t> springIndicesToDelete;
-        springIndicesToDelete.reserve(toDeleteCount);
-        for (size_t i = springIsToDelete.size(); i > 0; --i) {
-          if (springIsToDelete[i - 1]) {
-            springIndicesToDelete.push_back(i - 1);
+        if (toDeleteCount > 0) {
+          std::vector<size_t> springIndicesToDelete;
+          springIndicesToDelete.reserve(toDeleteCount);
+          for (size_t i = springIsToDelete.size(); i > 0; --i) {
+            if (springIsToDelete[i - 1]) {
+              springIndicesToDelete.push_back(i - 1);
+            }
           }
+          // std::ranges::sort(springIndicesToDelete, std::greater<>());
+          this->removeSprings(this->initialConfig,
+                              this->currentDisplacements,
+                              springIndicesToDelete);
+          nRemovedThisLoop += toDeleteCount;
         }
-        // std::ranges::sort(springIndicesToDelete, std::greater<>());
-        this->removeSprings(this->initialConfig,
-                            this->currentDisplacements,
-                            springIndicesToDelete);
-        nRemovedThisLoop += toDeleteCount;
       }
       if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
           simplificationMode == StructureSimplificationMode::ALL_TIM) {
