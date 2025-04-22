@@ -808,12 +808,12 @@ TEST_CASE("MEHP Force Balance2 does not collapse",
              Catch::Matchers::WithinAbs(0.0, 1e-9));
 };
 
-TEST_CASE(
-  "MEHP Force Balance2 correctly collapses melts even with random slip-links",
-  "[analysis][MEHPForceBalance2]")
+TEST_CASE("MEHP Force Balance2 correctly collapses melts even with random "
+          "entanglements",
+          "[analysis][MEHPForceBalance2]")
 {
   std::cout << "Running test \"MEHP Force Balance2 correctly collapses melts "
-               "even with random slip-links\""
+               "even with random entanglements\""
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
@@ -827,24 +827,101 @@ TEST_CASE(
   pe::Universe universe = universeSeq.atIndex(0);
   std::cout << "Read file " << inputFile << std::endl;
 
-  pcm::MEHPForceBalance2 forceBalancer =
-    pcm::MEHPForceBalance2(universe, 1000, 2.0, 0.0, 100, 5, "my_seed_fb12");
+  SECTION("Phantom")
+  {
+    pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(universe);
+    pcm::ForceBalance2Network net0 = forceBalancer.getNetwork();
+    CHECK(net0.nrOfStrands == 83);
+    CHECK(net0.nrOfNodes == 2 * 83);
+    for (size_t i = 0; i < net0.nrOfLinks; ++i) {
+      CHECK(!net0.linkIsEntanglement[i]);
+      CHECK(net0.strandIndicesOfLink[i].size() == 1);
+    }
 
-  CHECK_NOTHROW(forceBalancer.validateNetwork());
-  double initialResidual = forceBalancer.getDisplacementResidualNorm();
-  CHECK(std::isfinite(initialResidual));
-  CHECK(forceBalancer.getNumExtraAtoms() > 100);
-  CHECK(forceBalancer.getNetwork().nrOfSprings >
-        forceBalancer.getNetwork().nrOfStrands);
-  CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-    pcm::StructureSimplificationMode::ALL_TIM));
-  CHECK(forceBalancer.getNrOfIterations() > 0);
-  CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-  CHECK(forceBalancer.getNrOfActiveStrands() == 0);
-  CHECK(forceBalancer.getNrOfActiveStrandsInDir(0) == 0);
-  CHECK(forceBalancer.getNrOfActiveStrandsInDir(1) == 0);
-  CHECK(forceBalancer.getNrOfActiveStrandsInDir(2) == 0);
-  CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
+    double initialResidual = forceBalancer.getDisplacementResidualNorm();
+    CHECK(std::isfinite(initialResidual));
+    CHECK(forceBalancer.getNumExtraAtoms() == 0);
+    CHECK(forceBalancer.getNetwork().nrOfSprings ==
+          forceBalancer.getNetwork().nrOfStrands);
+    CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+      pcm::StructureSimplificationMode::ALL_TIM));
+    pcm::ForceBalance2Network net = forceBalancer.getNetwork();
+    CHECK(forceBalancer.getNrOfIterations() > 0);
+    CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+    CHECK(forceBalancer.getNrOfActiveStrands() == 0);
+    CHECK(forceBalancer.getNrOfActiveStrandsInDir(0) == 0);
+    CHECK(forceBalancer.getNrOfActiveStrandsInDir(1) == 0);
+    CHECK(forceBalancer.getNrOfActiveStrandsInDir(2) == 0);
+    CHECK(net.nrOfSprings == 0);
+    CHECK(net.nrOfStrands == 0);
+    CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
+  }
+
+  SECTION("Entangled with links")
+  {
+    pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(
+      universe, 1000, 2.0, 0.0, 100, 5, "my_seed_fb12", 2, false, false, false);
+    pcm::ForceBalance2Network net0 = forceBalancer.getNetwork();
+    CHECK(net0.nrOfStrands == 83);
+    CHECK(net0.nrOfNodes == 2 * 83);
+    for (size_t i = 0; i < net0.nrOfLinks; ++i) {
+      if (!net0.linkIsEntanglement[i]) {
+        CHECK(net0.strandIndicesOfLink[i].size() == 1);
+        bool any =
+          net0.linkIndicesOfStrand[net0.strandIndicesOfLink[i][0]][0] == i ||
+          net0.linkIndicesOfStrand[net0.strandIndicesOfLink[i][0]].back() == i;
+        CHECK(any);
+      }
+    }
+
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
+    double initialResidual = forceBalancer.getDisplacementResidualNorm();
+    CHECK(std::isfinite(initialResidual));
+    CHECK(forceBalancer.getNumExtraAtoms() > 100);
+    CHECK(forceBalancer.getNetwork().nrOfSprings >
+          forceBalancer.getNetwork().nrOfStrands);
+    CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+      pcm::StructureSimplificationMode::ALL_TIM));
+    pcm::ForceBalance2Network net = forceBalancer.getNetwork();
+    CHECK(forceBalancer.getNrOfIterations() > 0);
+    CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+    CHECK(forceBalancer.getNrOfActiveStrands() == 0);
+    CHECK(forceBalancer.getNrOfActiveStrandsInDir(0) == 0);
+    CHECK(forceBalancer.getNrOfActiveStrandsInDir(1) == 0);
+    CHECK(forceBalancer.getNrOfActiveStrandsInDir(2) == 0);
+    CHECK(net.nrOfSprings == 0);
+    CHECK(net.nrOfStrands == 0);
+    CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
+  }
+
+  SECTION("Entangled with springs")
+  {
+    pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(
+      universe, 1000, 2.0, 0.0, 100, 5, "my_seed_fb12", 2, false, false, true);
+    pcm::ForceBalance2Network net0 = forceBalancer.getNetwork();
+    CHECK(net0.nrOfStrands == 83 + net0.springIsEntanglement.count());
+    CHECK(net0.nrOfNodes == 2 * 83);
+
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
+    double initialResidual = forceBalancer.getDisplacementResidualNorm();
+    CHECK(std::isfinite(initialResidual));
+    CHECK(forceBalancer.getNumExtraAtoms() > 100);
+    CHECK(forceBalancer.getNetwork().nrOfSprings >
+          forceBalancer.getNetwork().nrOfStrands);
+    CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+      pcm::StructureSimplificationMode::ALL_TIM));
+    pcm::ForceBalance2Network net = forceBalancer.getNetwork();
+    CHECK(forceBalancer.getNrOfIterations() > 0);
+    CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+    CHECK(forceBalancer.getNrOfActiveStrands() == 0);
+    CHECK(forceBalancer.getNrOfActiveStrandsInDir(0) == 0);
+    CHECK(forceBalancer.getNrOfActiveStrandsInDir(1) == 0);
+    CHECK(forceBalancer.getNrOfActiveStrandsInDir(2) == 0);
+    CHECK(net.nrOfSprings == 0);
+    CHECK(net.nrOfStrands == 0);
+    CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
+  }
 }
 
 TEST_CASE("Particular MEHP Force Balance2 Example",
@@ -2277,7 +2354,7 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
 
     auto start_fr = std::chrono::high_resolution_clock::now();
     forceBalance.runForceRelaxation(5000,
-                                    1e-9/forceBalance.getResidual(),
+                                    1e-9 / forceBalance.getResidual(),
                                     -1.,
                                     pcm::StructureSimplificationMode::ALL_TIM,
                                     1e-5,
