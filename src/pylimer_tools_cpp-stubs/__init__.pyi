@@ -1160,6 +1160,15 @@ class MCUniverseGenerator:
                        due to the universe missing, some methods will not work;
                        you won't be able to query the fraction of active and dangling and soluble structures, for example.
         """
+    def get_force_balance2(self) -> ...:
+        """
+                      Get an instance of the force balance procedure.
+                      This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
+                      
+                      Note: 
+                            due to the universe missing, some methods will not work;
+                            you won't be able to query the fraction of active and dangling and soluble structures, for example.
+        """
     def get_force_relaxation(self) -> ...:
         """
                  Get an instance of the force relaxation procedure.

@@ -5,6 +5,7 @@
 #include "../entities/EigenNeighbourList.h"
 #include "../entities/Universe.h"
 #include "../sim/MEHPForceBalance.h"
+#include "../sim/MEHPForceBalance2.h"
 #include "../sim/MEHPForceRelaxation.h"
 #include "../sim/MEHPUtilityStructures.h"
 #include "../utils/BoolUtils.h"
@@ -1672,6 +1673,18 @@ namespace utils {
       Eigen::VectorXd springPartitions = Eigen::VectorXd::Ones(net.nrOfSprings);
       pylimer_tools::sim::mehp::MEHPForceBalance balance =
         pylimer_tools::sim::mehp::MEHPForceBalance(net, springPartitions);
+      balance.validateNetwork();
+      return balance;
+    }
+
+    pylimer_tools::sim::mehp::MEHPForceBalance2 getForceBalance2() const
+    {
+      pylimer_tools::sim::mehp::ForceBalanceNetwork net =
+        this->convertToForceBalanceNetwork();
+
+      Eigen::VectorXd springPartitions = Eigen::VectorXd::Ones(net.nrOfSprings);
+      pylimer_tools::sim::mehp::MEHPForceBalance2 balance =
+        pylimer_tools::sim::mehp::MEHPForceBalance2(net, springPartitions);
       balance.validateNetwork();
       return balance;
     }
