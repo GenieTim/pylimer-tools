@@ -2401,9 +2401,8 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
       universe, forceBalance.getNetwork(), forceBalance.getSpringPartitions());
     forceBalance21.runForceRelaxation(
       pcm::StructureSimplificationMode::ALL_TIM);
-    CHECK_THAT(forceBalance21.getGammaFactors(1.).sum(),
-               Catch::Matchers::WithinRel(
-                 forceBalance2.getGammaFactors(1.).sum(), 1e-3));
+    CHECK_THAT_OR_ZERO(forceBalance21.getGammaFactors(1.).sum(),
+                       forceBalance2.getGammaFactors(1.).sum());
     // CHECK(forceBalance2.getNrOfStrands() == forceBalance21.getNrOfStrands());
     // if (forceBalance2.getNrOfStrands() != forceBalance21.getNrOfStrands()) {
     //   pcm::ForceBalance2Network net2 = forceBalance2.getNetwork();

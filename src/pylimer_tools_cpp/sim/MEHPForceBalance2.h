@@ -1316,25 +1316,26 @@ protected:
    * @param tolerance
    * @return int
    */
-  int countNrOfActiveStrands(const ForceBalance2Network& net,
-                             const Eigen::VectorXd& u,
-                             const double tolerance = 1e-6) const
+  [[nodiscard]] int countNrOfActiveStrands(const ForceBalance2Network& net,
+                                           const Eigen::VectorXd& u,
+                                           const double tolerance = 1e-6) const
   {
     return (this->findActiveStrands(net, u, tolerance)).count();
   }
 
-  int countNrOfActiveStrands(const double tolerance = 1e-6) const
+  [[nodiscard]] int countNrOfActiveStrands(const double tolerance = 1e-6) const
   {
     return (this->findActiveStrands(tolerance) == true).count();
   }
 
-  int countNrOfActiveStrandsInDir(const int dir,
-                                  const double tolerance = 1e-6) const
+  [[nodiscard]] int countNrOfActiveStrandsInDir(
+    const int dir,
+    const double tolerance = 1e-6) const
   {
     return (this->findActiveStrandsInDir(dir, tolerance) == true).count();
   }
 
-  int countNrOfActiveSprings(const double tolerance = 1e-6) const
+  [[nodiscard]] int countNrOfActiveSprings(const double tolerance = 1e-6) const
   {
     return (this->findActiveSprings(tolerance) == true).count();
   }
@@ -1355,10 +1356,11 @@ protected:
   {
     Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net.nrOfStrands, false);
     Eigen::ArrayXb activeSprings = this->findActiveSprings(net, u, tolerance);
+    const size_t nActiveSprings = activeSprings.count();
 
     for (size_t i = 0; i < net.nrOfStrands; ++i) {
       // without any springs, the strand is inactive
-      if (net.springIndicesOfStrand[i].size() == 0) {
+      if (net.springIndicesOfStrand[i].empty()) {
         continue;
       }
       // with one spring, the strand is active if the spring is active
@@ -1369,7 +1371,9 @@ protected:
       // with more springs, the strand is certainly active,
       // if the first and last spring are active
       // (springs in between may be active due to the other involved strands)
+      assert(!this->isLoopingSpring(net, net.springIndicesOfStrand[i][0]));
       bool isActive0 = activeSprings[net.springIndicesOfStrand[i][0]];
+      assert(!this->isLoopingSpring(net, net.springIndicesOfStrand[i].back()));
       bool isActiveN = activeSprings[net.springIndicesOfStrand[i].back()];
 
       // however, there is one case where the
@@ -1390,7 +1394,7 @@ protected:
               net.linkIndicesOfStrand[strandOfXlink][1] ==
                 entanglementLinkIdx0) {
             isActive0 = true;
-            break;
+            // break;
           }
           if (net.linkIndicesOfStrand[strandOfXlink].back() == crossLinkIdx0 &&
               net.linkIndicesOfStrand
@@ -1398,53 +1402,53 @@ protected:
                   [net.linkIndicesOfStrand[strandOfXlink].size() - 2] ==
                 entanglementLinkIdx0) {
             isActive0 = true;
-            break;
+            // break;
           }
         }
-
-        if (!isActiveN) {
-          const size_t crossLinkIdxN = net.linkIndicesOfStrand[i].back();
-          const size_t entanglementLinkIdxN =
-            net.linkIndicesOfStrand[i][net.linkIndicesOfStrand[i].size() - 2];
-          assert(!net.linkIsEntanglement[crossLinkIdxN]);
-          assert(net.linkIsEntanglement[entanglementLinkIdxN]);
-          for (size_t strandOfXlink : net.strandIndicesOfLink[crossLinkIdxN]) {
-            if (strandOfXlink == i) {
-              continue;
-            }
-            if (net.linkIndicesOfStrand[strandOfXlink][0] == crossLinkIdxN &&
-                net.linkIndicesOfStrand[strandOfXlink][1] ==
-                  entanglementLinkIdxN) {
-              isActiveN = true;
-              break;
-            }
-            if (net.linkIndicesOfStrand[strandOfXlink].back() ==
-                  crossLinkIdxN &&
-                net.linkIndicesOfStrand
-                    [strandOfXlink]
-                    [net.linkIndicesOfStrand[strandOfXlink].size() - 2] ==
-                  entanglementLinkIdxN) {
-              isActiveN = true;
-              break;
-            }
-          }
-        }
-        // we can, however, anticipate the activeness of dangling links
-        // and mark the strand as inactive in that case
-        if (net.linkIndicesOfStrand[i][0] !=
-            net.linkIndicesOfStrand[i].back()) {
-          if (net.strandIndicesOfLink[net.linkIndicesOfStrand[i][0]].size() ==
-              1) {
-            isActive0 = false;
-          }
-          if (net.strandIndicesOfLink[net.linkIndicesOfStrand[i].back()]
-                .size() == 1) {
-            isActiveN = false;
-          }
-        }
-
-        result[i] = isActive0 && isActiveN;
       }
+
+      if (!isActiveN) {
+        const size_t crossLinkIdxN = net.linkIndicesOfStrand[i].back();
+        const size_t entanglementLinkIdxN =
+          net.linkIndicesOfStrand[i][net.linkIndicesOfStrand[i].size() - 2];
+        assert(!net.linkIsEntanglement[crossLinkIdxN]);
+        assert(net.linkIsEntanglement[entanglementLinkIdxN]);
+        for (size_t strandOfXlink : net.strandIndicesOfLink[crossLinkIdxN]) {
+          if (strandOfXlink == i) {
+            continue;
+          }
+          if (net.linkIndicesOfStrand[strandOfXlink][0] == crossLinkIdxN &&
+              net.linkIndicesOfStrand[strandOfXlink][1] ==
+                entanglementLinkIdxN) {
+            isActiveN = true;
+            // break;
+          }
+          if (net.linkIndicesOfStrand[strandOfXlink].back() == crossLinkIdxN &&
+              net.linkIndicesOfStrand
+                  [strandOfXlink]
+                  [net.linkIndicesOfStrand[strandOfXlink].size() - 2] ==
+                entanglementLinkIdxN) {
+            isActiveN = true;
+            // break;
+          }
+        }
+      }
+      // we can, however, anticipate the activeness of dangling links
+      // and mark the strand as inactive in that case
+      if (net.linkIndicesOfStrand[i][0] != net.linkIndicesOfStrand[i].back()) {
+        assert(!net.linkIsEntanglement[net.linkIndicesOfStrand[i][0]]);
+        if (net.strandIndicesOfLink[net.linkIndicesOfStrand[i][0]].size() ==
+            1) {
+          isActive0 = false;
+        }
+        assert(!net.linkIsEntanglement[net.linkIndicesOfStrand[i].back()]);
+        if (net.strandIndicesOfLink[net.linkIndicesOfStrand[i].back()].size() ==
+            1) {
+          isActiveN = false;
+        }
+      }
+
+      result[i] = isActive0 && isActiveN;
     }
 
     return result;
