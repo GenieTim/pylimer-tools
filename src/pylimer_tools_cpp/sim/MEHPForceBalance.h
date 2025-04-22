@@ -1117,9 +1117,11 @@ namespace sim {
         // find all active springs
         Eigen::ArrayXb activeSprings =
           this->findActiveSprings(net, u, springPartitions, tolerance);
-        if (activeSprings.count() == 0) {
+        const double nActiveSprings = activeSprings.count();
+        if (nActiveSprings == 0) {
           return 0.;
         }
+
         // as of now, the springsContourLength is equal to the number of bonds
         // from cross-link to cross-link. therefore, the number of atoms of each
         // of these springs is one less
@@ -1130,8 +1132,8 @@ namespace sim {
 
         // TODO: currently, the weight of the atoms is ignored
         // normalize by the number of atoms
-        return (allActiveAtomsPerChains.matrix().sum() +
-                this->getNrOfActiveNodes(tolerance)) /
+        const double nActiveNodes = this->getNrOfActiveNodes(tolerance);
+        return (allActiveAtomsPerChains.matrix().sum() + nActiveNodes) /
                (static_cast<double>(this->universe.getNrOfAtoms()));
       }
 
@@ -2487,22 +2489,18 @@ namespace sim {
                                        const Eigen::VectorXd& springPartitions,
                                        const double tolerance = 1e-3) const
       {
-        Eigen::VectorXd partialSpringVectors =
-          this->evaluatePartialSpringVectors(
-            *net, u, this->is2D, this->assumeBoxLargeEnough);
+        Eigen::ArrayXb activePartialSprings =
+          this->findActivePartialSprings(net, u, springPartitions, tolerance);
+        const double nActivePartialSprings = activePartialSprings.count();
         Eigen::ArrayXb result =
           Eigen::ArrayXb::Constant(net->nrOfSprings, false);
 
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           result[net->partialToFullSpringIndex[i]] =
-            result[net->partialToFullSpringIndex[i]] ||
-            !this->distanceIsWithinTolerance(
-              partialSpringVectors.segment(3 * i, 3),
-              tolerance,
-              net->springsContourLength[net->partialToFullSpringIndex[i]],
-              springPartitions[i]);
+            result[net->partialToFullSpringIndex[i]] || activePartialSprings[i];
         }
 
+        const double nActiveSprings = result.count();
         return result;
       }
 
@@ -2600,6 +2598,7 @@ namespace sim {
 
         return result;
       }
+
       Eigen::ArrayXb findActivePartialSprings(
         const double tolerance = 1e-3) const
       {

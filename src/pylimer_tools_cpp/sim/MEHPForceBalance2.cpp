@@ -2475,8 +2475,6 @@ MEHPForceBalance2::computeActiveWeightFraction(ForceBalance2Network& net,
                                                const Eigen::VectorXd& u,
                                                const double tolerance) const
 {
-  INVALIDARG_EXP_IFN(net.nrOfLinks * 3 == u.size(),
-                     "Link displacements and network don't match");
   if (net.nrOfStrands < 1) {
     return 0.;
   }
@@ -3114,7 +3112,7 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
       if (isEntanglementStrand) {
         RUNTIME_EXP_IFN(
           net.linkIsEntanglement[link_idx],
-          "Expected ends of entanglement spring to be entaglement links.");
+          "Expected ends of entanglement spring to be entanglement links.");
       } else {
         RUNTIME_EXP_IFN(net.linkIsEntanglement[link_idx] ==
                           ((j != 0) && (j != (links.size() - 1))),
