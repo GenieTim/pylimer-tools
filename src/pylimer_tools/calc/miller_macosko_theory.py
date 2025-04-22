@@ -812,7 +812,7 @@ def compute_probability_that_bifunctional_monomer_is_dangling(
     return scipy.special.binom(2, 1) * (p_f_b_out) * ((1.0 - p_f_b_out))
 
 
-def predict_gelation_point(r: float, f: int, b2: int = 1) -> float:
+def predict_gelation_point(r: float, f: int, b2: float = 1) -> float:
     """
     Compute the gelation point :math:`p_{gel}` as theoretically predicted
     (gelation point = critical extent of reaction for gelation)

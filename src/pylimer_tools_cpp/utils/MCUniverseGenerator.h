@@ -1473,11 +1473,17 @@ namespace utils {
             forceRelaxationNetwork.springIndexB(i) * 3 + dir;
         }
       }
+
+      // compute the box offset for the springs
+      const Eigen::VectorXd actualDistance =
+        forceRelaxationNetwork.coordinates(
+          forceRelaxationNetwork.springCoordinateIndexB) -
+        forceRelaxationNetwork.coordinates(
+          forceRelaxationNetwork.springCoordinateIndexA);
+      Eigen::VectorXd expectedDistance = actualDistance;
+      this->box.handlePBC(expectedDistance);
       forceRelaxationNetwork.springBoxOffset =
-        this->box.getOffset(forceRelaxationNetwork.coordinates(
-                              forceRelaxationNetwork.springCoordinateIndexB) -
-                            forceRelaxationNetwork.coordinates(
-                              forceRelaxationNetwork.springCoordinateIndexA));
+        expectedDistance - actualDistance;
 
       forceRelaxationNetwork.meanSpringContourLength =
         forceRelaxationNetwork.springsContourLength.size() > 0
@@ -1667,25 +1673,25 @@ namespace utils {
 
     pylimer_tools::sim::mehp::MEHPForceBalance getForceBalance() const
     {
-      pylimer_tools::sim::mehp::ForceBalanceNetwork net =
+      const pylimer_tools::sim::mehp::ForceBalanceNetwork net =
         this->convertToForceBalanceNetwork();
 
       Eigen::VectorXd springPartitions = Eigen::VectorXd::Ones(net.nrOfSprings);
       pylimer_tools::sim::mehp::MEHPForceBalance balance =
         pylimer_tools::sim::mehp::MEHPForceBalance(net, springPartitions);
-      balance.validateNetwork();
+      assert(balance.validateNetwork());
       return balance;
     }
 
     pylimer_tools::sim::mehp::MEHPForceBalance2 getForceBalance2() const
     {
-      pylimer_tools::sim::mehp::ForceBalanceNetwork net =
+      const pylimer_tools::sim::mehp::ForceBalanceNetwork net =
         this->convertToForceBalanceNetwork();
 
       Eigen::VectorXd springPartitions = Eigen::VectorXd::Ones(net.nrOfSprings);
       pylimer_tools::sim::mehp::MEHPForceBalance2 balance =
         pylimer_tools::sim::mehp::MEHPForceBalance2(net, springPartitions);
-      balance.validateNetwork();
+      assert(balance.validateNetwork());
       return balance;
     }
 
