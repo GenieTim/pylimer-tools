@@ -155,7 +155,7 @@ namespace sim {
         size_t numUseableChains = 0;
         for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
           pylimer_tools::entities::Molecule chain = crossLinkerChains[i];
-          if (chain.getLength() < 2) {
+          if (chain.getNrOfBonds() < 1) {
             continue;
           }
           std::vector<pylimer_tools::entities::Atom> linedUpAtoms =

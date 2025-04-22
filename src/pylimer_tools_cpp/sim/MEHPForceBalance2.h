@@ -88,13 +88,26 @@ public:
     this->completeInitialization();
   }
 
-  MEHPForceBalance2(const ForceBalanceNetwork& net1,
+  MEHPForceBalance2(const pylimer_tools::entities::Universe& universe,
+                    const ForceBalance2Network& net,
+                    const bool is2D = false)
+  {
+    this->universe = universe;
+    this->is2D = is2D;
+    this->initialConfig = net;
+    this->box = pylimer_tools::entities::Box(net.L[0], net.L[1], net.L[2]);
+    this->completeInitialization();
+  }
+
+  MEHPForceBalance2(const pylimer_tools::entities::Universe& u,
+                    const ForceBalanceNetwork& net1,
                     Eigen::VectorXd springPartitions,
                     const bool is2D = false)
   {
+    this->universe = u;
     this->is2D = is2D;
 
-    pylimer_tools::sim::mehp::ForceBalance2Network net2;
+    pylimer_tools::sim::mehp::ForceBalance2Network net2 = {};
     for (size_t dir = 0; dir < 3; ++dir) {
       net2.L[dir] = net1.L[dir];
       net2.boxHalfs[dir] = net1.boxHalfs[dir];
@@ -130,6 +143,15 @@ public:
     this->box = pylimer_tools::entities::Box(net1.L[0], net1.L[1], net1.L[2]);
     this->completeInitialization();
   }
+
+  MEHPForceBalance2(const ForceBalanceNetwork& net1,
+                    const Eigen::VectorXd& springPartitions,
+                    const bool is2D = false)
+    : MEHPForceBalance2(
+        pylimer_tools::entities::Universe(net1.L[0], net1.L[1], net1.L[2]),
+        net1,
+        springPartitions,
+        is2D) {};
 
   /**
    * @brief Instantiate this simulator with randomly chosen slip-links.

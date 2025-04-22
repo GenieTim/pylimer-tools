@@ -47,7 +47,7 @@ namespace utils {
     std::vector<double> xlinkX;
     std::vector<double> xlinkY;
     std::vector<double> xlinkZ;
-    std::vector<std::vector<long int> > strandsOfXlink;
+    std::vector<std::vector<long int>> strandsOfXlink;
     std::vector<int> xlinkChainId;
 
     std::vector<long int> strandFrom;
@@ -61,9 +61,7 @@ namespace utils {
   class MaxDistanceProvider
   {
   public:
-    virtual ~MaxDistanceProvider()
-    {
-    }
+    virtual ~MaxDistanceProvider() {}
 
     virtual double getMaxDistance(const double N) = 0;
   };
@@ -94,7 +92,7 @@ namespace utils {
   public:
     ZScoreMaxDistanceProvider(const double stdMult, const double innerMult = 1.)
       : innerMultiplier(innerMult)
-        , stdMultiplier(stdMult)
+      , stdMultiplier(stdMult)
     {
     }
 
@@ -255,7 +253,7 @@ namespace utils {
 
       // Sample the strands
       assert(this->simplifiedUniverse.strandFrom.size() ==
-        this->simplifiedUniverse.strandTo.size());
+             this->simplifiedUniverse.strandTo.size());
       double prevBeadDistance = this->beadDistance;
       double prevMeanSquaredBeadDistance = this->meanSquaredBeadDistance;
       for (size_t strandI = 0;
@@ -291,9 +289,7 @@ namespace utils {
 
           if (nBeadsInStrand > 0) {
             coordinates = this->sampleStrandCoordinates(
-              strandEnd1,
-              strandEnd2,
-              nBeadsInStrand);
+              strandEnd1, strandEnd2, nBeadsInStrand);
             bondsFrom.push_back(strandEnd1 + 1);
             bondsTo.push_back(currentId);
             bondsFrom.push_back(strandEnd2 + 1);
@@ -301,7 +297,7 @@ namespace utils {
           } else {
             RUNTIME_EXP_IFN(nBeadsInStrand == 0,
                             "Cannot generate chain with " +
-                            std::to_string(nBeadsInStrand) + " beads.");
+                              std::to_string(nBeadsInStrand) + " beads.");
             bondsFrom.push_back(strandEnd1 + 1);
             bondsTo.push_back(strandEnd2 + 1);
           }
@@ -313,7 +309,7 @@ namespace utils {
                           "Inconsistent coordinate size");
           RUNTIME_EXP_IFN(!coordinates.array().isNaN().any(),
                           "Coordinates contain NaN in strand " +
-                          std::to_string(strandI + 1));
+                            std::to_string(strandI + 1));
           for (size_t i = 0; i < nBeadsInStrand; ++i) {
             ids.push_back(currentId);
             if (i > 0) {
@@ -330,7 +326,7 @@ namespace utils {
       }
 
       assert(xs.size() == ys.size() && xs.size() == zs.size() &&
-        xs.size() == ids.size() && types.size() == nrOfAtoms);
+             xs.size() == ids.size() && types.size() == nrOfAtoms);
       this->beadDistance = prevBeadDistance;
       this->meanSquaredBeadDistance = prevMeanSquaredBeadDistance;
 
@@ -356,7 +352,7 @@ namespace utils {
                          "Length of coordinates must be a multiple of 3");
       INVALIDARG_EXP_IFN(crosslinkerFunctionality >= 0,
                          "Expecting positive cross-linker functionality, got " +
-                         std::to_string(crosslinkerFunctionality) + ".");
+                           std::to_string(crosslinkerFunctionality) + ".");
       int nCrosslinkerBefore = this->remainingCrossLinkerFunctionality.size();
 
       size_t nrOfCrosslinkers = coordinates.size() / 3;
@@ -364,7 +360,7 @@ namespace utils {
       this->addXlinkAtoms(nrOfCrosslinkers, crossLinkerAtomType, coordinates);
 
       this->remainingCrossLinkerFunctionality.reserve(nCrosslinkerBefore +
-        nrOfCrosslinkers);
+                                                      nrOfCrosslinkers);
       this->originalNrOfAvailableCrosslinkSites +=
         crosslinkerFunctionality * nrOfCrosslinkers;
       this->nrOfAvailableCrosslinkSites +=
@@ -397,9 +393,7 @@ namespace utils {
         this->generateRandomPositions(nrOfCrosslinkers, whiteNoise);
 
       this->addCrosslinkersAt(
-        randomPos,
-        crosslinkerFunctionality,
-        crossLinkerAtomType);
+        randomPos, crosslinkerFunctionality, crossLinkerAtomType);
     };
 
     /**
@@ -479,25 +473,20 @@ namespace utils {
               this->addStrand(lengthToPrevious,
                               strandAtomType,
                               UNCONNECTED,
-                              lastSampledBead < 0
-                                ? EMPTY_BACKGROUND
-                                : UNCONNECTED);
+                              lastSampledBead < 0 ? EMPTY_BACKGROUND
+                                                  : UNCONNECTED);
               nEffectiveStrands += 1;
             }
 
             // order matters here for the displacements afterwards
             if (lastSampledBead >= 0) {
               this->linkStrandToCrosslink(
-                currentSpringIdx,
-                nCrosslinksBefore + nCrosslinks - 1,
-                true);
+                currentSpringIdx, nCrosslinksBefore + nCrosslinks - 1, true);
             }
 
             if (i > 0) {
               this->linkStrandToCrosslink(
-                currentSpringIdx,
-                nCrosslinksBefore + nCrosslinks,
-                true);
+                currentSpringIdx, nCrosslinksBefore + nCrosslinks, true);
             }
 
             strandIdOfCrosslink.push_back(nCrosslinksBefore + strandI);
@@ -522,9 +511,7 @@ namespace utils {
                           EMPTY_BACKGROUND);
           if (lastSampledBead >= 0) {
             this->linkStrandToCrosslink(
-              currentSpringIdx,
-              nCrosslinksBefore + nCrosslinks - 1,
-              true);
+              currentSpringIdx, nCrosslinksBefore + nCrosslinks - 1, true);
           }
 
           nEffectiveStrands += 1;
@@ -538,10 +525,7 @@ namespace utils {
       RUNTIME_EXP_IFN(nCrosslinks == newCrosslinkFunctionality.size(),
                       "Did not register the expected number of cross-links.");
       this->addCrosslinkers(
-        nCrosslinks,
-        crosslinkerFunctionality,
-        crosslinkerAtomType,
-        whiteNoise);
+        nCrosslinks, crosslinkerFunctionality, crosslinkerAtomType, whiteNoise);
       for (size_t newXlinOffset = 0; newXlinOffset < nCrosslinks;
            ++newXlinOffset) {
         this->simplifiedUniverse
@@ -598,11 +582,11 @@ namespace utils {
             RUNTIME_EXP_IFN(
               distance < maxDistance * 2.,
               "Distance adjustment does not seem to be correct: got " +
-              std::to_string(distance) + " for chain with " +
-              std::to_string(
-                this->simplifiedUniverse.beadsInStrand[newStrandIdx]) +
-              " beads and " + std::to_string(this->beadDistance) +
-              " distance.");
+                std::to_string(distance) + " for chain with " +
+                std::to_string(
+                  this->simplifiedUniverse.beadsInStrand[newStrandIdx]) +
+                " beads and " + std::to_string(this->beadDistance) +
+                " distance.");
           }
 #endif
         }
@@ -713,10 +697,10 @@ namespace utils {
     {
       INVALIDARG_EXP_IFN(beadsPerChains.size() == nrOfStrands,
                          "Nr of strands (" + std::to_string(nrOfStrands) +
-                         ") must be equal to the number "
-                         "of chainLengths (" +
-                         std::to_string(beadsPerChains.size()) +
-                         ") provided.");
+                           ") must be equal to the number "
+                           "of chainLengths (" +
+                           std::to_string(beadsPerChains.size()) +
+                           ") provided.");
 
       for (size_t i = 0; i < nrOfStrands; ++i) {
         this->simplifiedUniverse.strandBeadType.push_back(strandAtomType);
@@ -747,11 +731,9 @@ namespace utils {
     {
       const std::vector<int> chainLengths =
         pylimer_tools::utils::initializeWithValue<int>(nrOfStrands,
-          chainLength);
+                                                       chainLength);
       return this->addMonofunctionalStrands(
-        nrOfStrands,
-        chainLengths,
-        strandAtomType);
+        nrOfStrands, chainLengths, strandAtomType);
     }
 
     /**
@@ -800,7 +782,7 @@ namespace utils {
     {
       const std::vector<int> chainLengths =
         pylimer_tools::utils::initializeWithValue<int>(nrOfStrands,
-          chainLength);
+                                                       chainLength);
       return this->addStrands(nrOfStrands, chainLengths, strandAtomType);
     }
 
@@ -813,15 +795,15 @@ namespace utils {
     {
       // validation
       INVALIDARG_EXP_IFN(strandIdx >= 0 &&
-                         strandIdx <
-                         this->simplifiedUniverse.strandFrom.size(),
+                           strandIdx <
+                             this->simplifiedUniverse.strandFrom.size(),
                          "Strand index out of range.");
       INVALIDARG_EXP_IFN(
         this->simplifiedUniverse.strandTo[strandIdx] < 0,
         "Expected second strand end of strand " + std::to_string(strandIdx) +
-        " to be free, got " +
-        std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
-        " for strand " + std::to_string(strandIdx) + ".");
+          " to be free, got " +
+          std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
+          " for strand " + std::to_string(strandIdx) + ".");
       RUNTIME_EXP_IFN(this->nrOfAvailableCrosslinkSites > 0,
                       "No available cross-link sites left.");
 
@@ -830,9 +812,9 @@ namespace utils {
         INVALIDARG_EXP_IFN(
           this->simplifiedUniverse.strandTo[strandIdx] == UNCONNECTED,
           "Expected second strand end of strand " + std::to_string(strandIdx) +
-          " to be free, got " +
-          std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
-          " for strand " + std::to_string(strandIdx) + ".");
+            " to be free, got " +
+            std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
+            " for strand " + std::to_string(strandIdx) + ".");
         const double timesNForR02 =
           this->simplifiedUniverse.meanSquaredBeadDistanceInStrand[strandIdx] *
           cInfinity;
@@ -842,7 +824,7 @@ namespace utils {
           this->simplifiedUniverse.strandFrom[strandIdx],
           static_cast<double>(
             this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
-          timesNForR02,
+            timesNForR02,
           this->maxDistanceProvider->getMaxDistance(static_cast<double>(
             this->simplifiedUniverse.beadsInStrand[strandIdx] + 1)));
 
@@ -880,7 +862,7 @@ namespace utils {
      */
     void linkStrandsCallback(
       std::function<BackTrackStatus(const MCUniverseGenerator&, long int)>
-      linkingController,
+        linkingController,
       double cInfinity = 1.)
     {
 #ifndef NDEBUG
@@ -911,9 +893,7 @@ namespace utils {
       }
       availableStrandEnds.shrink_to_fit();
       std::shuffle(
-        availableStrandEnds.begin(),
-        availableStrandEnds.end(),
-        this->rng);
+        availableStrandEnds.begin(), availableStrandEnds.end(), this->rng);
 
       std::vector<size_t> availableCrosslinkSites;
       availableCrosslinkSites.reserve(this->nrOfAvailableCrosslinkSites);
@@ -943,27 +923,27 @@ namespace utils {
           size_t strandIdx = availableStrandEnds[sampleIdx];
           const double timesNForR02 =
             this->simplifiedUniverse
-            .meanSquaredBeadDistanceInStrand[strandIdx] *
+              .meanSquaredBeadDistanceInStrand[strandIdx] *
             cInfinity;
           RUNTIME_EXP_IFN(
             this->simplifiedUniverse.strandTo[strandIdx] < 0,
             "Expected second strand end to be free, got " +
-            std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
-            " for strand " + std::to_string(strandIdx) + ".");
+              std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
+              " for strand " + std::to_string(strandIdx) + ".");
 
           if (this->simplifiedUniverse.strandFrom[strandIdx] >= 0) {
             RUNTIME_EXP_IFN(
               this->simplifiedUniverse.strandTo[strandIdx] == UNCONNECTED,
               "Expected second strand end to be free, got " +
-              std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
-              " for strand " + std::to_string(strandIdx) + ".");
+                std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
+                " for strand " + std::to_string(strandIdx) + ".");
             // we don't have free cross-link choice
             // find one that follows the desired end-to-end distribution
             long int partnerCrosslinker = this->findAppropriateLink(
               this->simplifiedUniverse.strandFrom[strandIdx],
               static_cast<double>(
                 this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
-              timesNForR02,
+                timesNForR02,
               this->maxDistanceProvider->getMaxDistance(
                 this->simplifiedUniverse.beadsInStrand[strandIdx] + 1));
 
@@ -989,7 +969,7 @@ namespace utils {
               removedCrosslinkSites.push(crosslinkIdxIdx);
               availableCrosslinkSites.pop_back();
             } while (this->remainingCrossLinkerFunctionality[crosslinkIdxIdx] <
-                     1 &&
+                       1 &&
                      availableCrosslinkSites.size() > 0);
 
             if (availableCrosslinkSites.size() == 0) {
@@ -1060,8 +1040,8 @@ namespace utils {
         APPROX_WITHIN(
           targetCrossLinkerConversion, currentCrosslinkerConversion, 1., 1e-6),
         "Cross-linker conversion must be between " +
-        std::to_string(currentCrosslinkerConversion) + " and 1, got " +
-        std::to_string(targetCrossLinkerConversion) + ".");
+          std::to_string(currentCrosslinkerConversion) + " and 1, got " +
+          std::to_string(targetCrossLinkerConversion) + ".");
 
       long int potentialNewBonds = 0;
       for (size_t i = 0; i < this->simplifiedUniverse.strandFrom.size(); ++i) {
@@ -1117,7 +1097,7 @@ namespace utils {
     {
       INVALIDARG_EXP_IFN(APPROX_WITHIN(targetSolubleFraction, 0., 1., 1e-8),
                          "Soluble fraction must be between 0 and 1, got " +
-                         std::to_string(targetSolubleFraction) + ".");
+                           std::to_string(targetSolubleFraction) + ".");
 
       size_t nAtomsTotal = this->getCurrentNrOfAtoms();
 
@@ -1128,12 +1108,12 @@ namespace utils {
 
       this->linkStrandsCallback(
         [targetSolubleFraction,
-          nAtomsTotal,
-          &status,
-          &nSteps,
-          &lastStep,
-          &currentStep](const MCUniverseGenerator& gen,
-                        long int nStrandsRemaining) {
+         nAtomsTotal,
+         &status,
+         &nSteps,
+         &lastStep,
+         &currentStep](const MCUniverseGenerator& gen,
+                       long int nStrandsRemaining) {
           if (currentStep == 0) {
             // go all in, we want to jump to end to know when to stop
             nSteps = nStrandsRemaining;
@@ -1164,10 +1144,10 @@ namespace utils {
           // finally, calculate the soluble fraction
           double solubleFraction =
             1. - forceRelaxer.countActiveClusteredAtoms() /
-            static_cast<double>(nAtomsTotal);
+                   static_cast<double>(nAtomsTotal);
           std::cout << "Got w_sol = " << solubleFraction << " at step "
-            << currentStep << " (+" << nSteps << ") with "
-            << nStrandsRemaining << " strands remaining." << std::endl;
+                    << currentStep << " (+" << nSteps << ") with "
+                    << nStrandsRemaining << " strands remaining." << std::endl;
           if (solubleFraction > targetSolubleFraction) {
             nSteps /= 2;
             status = BackTrackStatus::TRACK_FORWARD;
@@ -1200,8 +1180,7 @@ namespace utils {
         // remove this strand from the cross-linker
         size_t xlink = this->simplifiedUniverse.strandFrom[strandIdx];
         pylimer_tools::utils::removeIfContained<long int>(
-          this->simplifiedUniverse.strandsOfXlink[xlink],
-          strandIdx);
+          this->simplifiedUniverse.strandsOfXlink[xlink], strandIdx);
         this->remainingCrossLinkerFunctionality[xlink] += 1;
         this->nrOfAvailableCrosslinkSites += 1;
       }
@@ -1209,8 +1188,7 @@ namespace utils {
         // remove this strand from the cross-linker
         size_t xlink = this->simplifiedUniverse.strandTo[strandIdx];
         pylimer_tools::utils::removeIfContained<long int>(
-          this->simplifiedUniverse.strandsOfXlink[xlink],
-          strandIdx);
+          this->simplifiedUniverse.strandsOfXlink[xlink], strandIdx);
         this->remainingCrossLinkerFunctionality[xlink] += 1;
         this->nrOfAvailableCrosslinkSites += 1;
       }
@@ -1250,14 +1228,14 @@ namespace utils {
     void removeCrosslink(size_t crosslinkIdx)
     {
       INVALIDARG_EXP_IFN(crosslinkIdx <
-                         this->simplifiedUniverse.xlinkTypes.size(),
+                           this->simplifiedUniverse.xlinkTypes.size(),
                          "Crosslink to be removed is out of range.");
 
       // re-connect the strands to account for the removed cross-link
       for (size_t i = 0; i < this->simplifiedUniverse.strandFrom.size(); ++i) {
         INVALIDARG_EXP_IFN(
           this->simplifiedUniverse.strandFrom[i] != crosslinkIdx &&
-          this->simplifiedUniverse.strandTo[i] != crosslinkIdx,
+            this->simplifiedUniverse.strandTo[i] != crosslinkIdx,
           "The to-be removed cross-link is still connected.");
         if (this->simplifiedUniverse.strandFrom[i] > crosslinkIdx) {
           this->simplifiedUniverse.strandFrom[i] -= 1;
@@ -1337,7 +1315,7 @@ namespace utils {
       // now that we know which springs and nodes are soluble,
       // we can remove them
       RUNTIME_EXP_IFN(activeSprings.size() ==
-                      this->simplifiedUniverse.strandFrom.size(),
+                        this->simplifiedUniverse.strandFrom.size(),
                       "Number of springs does not match the number of strands. "
                       "Therefore, the mapping would be incorrect.");
 
@@ -1529,7 +1507,7 @@ namespace utils {
      * @return pylimer_tools::sim::mehp::ForceBalanceNetwork
      */
     pylimer_tools::sim::mehp::ForceBalanceNetwork convertToForceBalanceNetwork()
-    const
+      const
     {
       pylimer_tools::sim::mehp::ForceBalanceNetwork forceBalanceNetwork;
       forceBalanceNetwork.L[0] = this->box.getLx();
@@ -1806,12 +1784,12 @@ namespace utils {
         "Inconsistent sizes in simplified universe.");
       RUNTIME_EXP_IFN(
         all_equal<size_t>(6,
-          this->simplifiedUniverse.xlinkTypes.size(),
-          this->simplifiedUniverse.xlinkX.size(),
-          this->simplifiedUniverse.xlinkY.size(),
-          this->simplifiedUniverse.xlinkZ.size(),
-          this->remainingCrossLinkerFunctionality.size(),
-          this->simplifiedUniverse.xlinkChainId.size()),
+                          this->simplifiedUniverse.xlinkTypes.size(),
+                          this->simplifiedUniverse.xlinkX.size(),
+                          this->simplifiedUniverse.xlinkY.size(),
+                          this->simplifiedUniverse.xlinkZ.size(),
+                          this->remainingCrossLinkerFunctionality.size(),
+                          this->simplifiedUniverse.xlinkChainId.size()),
         "Inconsistent sizes in simplified universe.");
 
       long int nCrosslinks = this->simplifiedUniverse.xlinkX.size();
@@ -1828,13 +1806,13 @@ namespace utils {
              this->simplifiedUniverse.strandsOfXlink[xlinkIdx]) {
           RUNTIME_EXP_IFN(
             this->simplifiedUniverse.strandFrom[subStrandIdx] == xlinkIdx ||
-            this->simplifiedUniverse.strandTo[subStrandIdx] == xlinkIdx,
+              this->simplifiedUniverse.strandTo[subStrandIdx] == xlinkIdx,
             "Inconsistent links int list of cross-links <> strands.");
         }
         if (xlinkIdx > 0) {
           RUNTIME_EXP_IFN(
             this->simplifiedUniverse.xlinkChainId[xlinkIdx] >=
-            this->simplifiedUniverse.xlinkChainId[xlinkIdx - 1],
+              this->simplifiedUniverse.xlinkChainId[xlinkIdx - 1],
             "Expected the chain ID to increase with cross-link index.");
         }
       }
@@ -1852,7 +1830,7 @@ namespace utils {
 
         if (this->simplifiedUniverse.beadsInStrand[strandIdx] == 0) {
           RUNTIME_EXP_IFN(this->simplifiedUniverse.strandFrom[strandIdx] >= 0 &&
-                          this->simplifiedUniverse.strandTo[strandIdx] >= 0,
+                            this->simplifiedUniverse.strandTo[strandIdx] >= 0,
                           "Expected a valid cross-link index as a strand "
                           "origin and destination for empty length strands.");
         }
@@ -1908,10 +1886,7 @@ namespace utils {
     Eigen::VectorXd sampleFreeChainCoordinates(int chainLen)
     {
       Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
-        chainLen,
-        this->beadDistance,
-        this->meanSquaredBeadDistance,
-        this->rng);
+        chainLen, this->beadDistance, this->meanSquaredBeadDistance, this->rng);
 
       if (this->nMcSteps > 0) {
         pylimer_tools::sim::equilibrateChainWithMC(
@@ -1924,9 +1899,7 @@ namespace utils {
       }
 
       Eigen::Vector3d from = Eigen::Vector3d(
-        this->distX(this->rng),
-        this->distY(this->rng),
-        this->distZ(this->rng));
+        this->distX(this->rng), this->distY(this->rng), this->distZ(this->rng));
 
       positions += from.replicate(chainLen, 1);
       return positions;
@@ -1944,10 +1917,7 @@ namespace utils {
       INVALIDARG_EXP_IFN(idxFrom < this->simplifiedUniverse.xlinkTypes.size(),
                          "Invalid index for dangling chain start");
       Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
-        chainLen,
-        this->beadDistance,
-        this->meanSquaredBeadDistance,
-        this->rng);
+        chainLen, this->beadDistance, this->meanSquaredBeadDistance, this->rng);
 
       if (this->nMcSteps > 0) {
         pylimer_tools::sim::equilibrateChainWithMC(
@@ -2028,22 +1998,22 @@ namespace utils {
       INVALIDARG_EXP_IFN(
         strandIdx < this->simplifiedUniverse.strandFrom.size(),
         "The strand index " + std::to_string(strandIdx) +
-        " is out of bounds, only " +
-        std::to_string(this->simplifiedUniverse.strandFrom.size()) +
-        " strands have been registered.");
+          " is out of bounds, only " +
+          std::to_string(this->simplifiedUniverse.strandFrom.size()) +
+          " strands have been registered.");
       INVALIDARG_EXP_IFN(
         this->simplifiedUniverse.strandFrom[strandIdx] == UNCONNECTED ||
-        this->simplifiedUniverse.strandTo[strandIdx] == UNCONNECTED,
+          this->simplifiedUniverse.strandTo[strandIdx] == UNCONNECTED,
         "Require one end to be free to be connected to");
       if (!ignoreInexistent) {
         INVALIDARG_EXP_IFN(crosslinkIdx <
-                           this->remainingCrossLinkerFunctionality.size(),
+                             this->remainingCrossLinkerFunctionality.size(),
                            "The chosen crosslink " +
-                           std::to_string(crosslinkIdx) + " does not exist.");
+                             std::to_string(crosslinkIdx) + " does not exist.");
         INVALIDARG_EXP_IFN(
           this->remainingCrossLinkerFunctionality[crosslinkIdx] > 0,
           "The crosslink " + std::to_string(crosslinkIdx) +
-          " is already fully linked.");
+            " is already fully linked.");
         this->remainingCrossLinkerFunctionality[crosslinkIdx] -= 1;
         this->nrOfAvailableCrosslinkSites -= 1;
         this->simplifiedUniverse.strandsOfXlink[crosslinkIdx].push_back(
@@ -2101,7 +2071,7 @@ namespace utils {
         this->simplifiedUniverse.xlinkZ.push_back(coordinates(3 * i + 2));
 
         this->simplifiedUniverse.xlinkChainId.push_back(currentNrOfJunctions +
-          i);
+                                                        i);
         this->simplifiedUniverse.strandsOfXlink.push_back({});
       }
 
@@ -2230,7 +2200,7 @@ namespace utils {
                                  const double maxDistance)
     {
       RUNTIME_EXP_IFN(this->simplifiedUniverse.xlinkTypes.size() ==
-                      this->remainingCrossLinkerFunctionality.size(),
+                        this->remainingCrossLinkerFunctionality.size(),
                       "Invalid internal state, number of and remaining "
                       "cross-link functionalities mismatch");
 
@@ -2245,10 +2215,7 @@ namespace utils {
         size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
         for (int i = 0; i < nCrosslinks; ++i) {
           double thisWeight = this->evaluatePartnerProbability(
-            from,
-            i,
-            normalisationFactorInExponential,
-            maxDistance);
+            from, i, normalisationFactorInExponential, maxDistance);
           if (thisWeight <= 0.0) {
             continue;
           }
@@ -2271,10 +2238,7 @@ namespace utils {
         for (int i = 0; i < acceptableIndices.size(); ++i) {
           int crosslinkIdx = acceptableIndices(i);
           double thisWeight = this->evaluatePartnerProbability(
-            from,
-            crosslinkIdx,
-            normalisationFactorInExponential,
-            maxDistance);
+            from, crosslinkIdx, normalisationFactorInExponential, maxDistance);
           if (thisWeight <= 0.0) {
             continue;
           }
@@ -2287,15 +2251,15 @@ namespace utils {
       if (suitableMatches.size() == 0) {
         if (maxDistance > 0.) {
           std::cerr << "No suitable partner found within max distance. "
-            "Increasing for this link."
-            << std::endl;
+                       "Increasing for this link."
+                    << std::endl;
           return this->findAppropriateLink(from, desiredR02, -1.);
         }
         return -1;
       }
 
       std::discrete_distribution<long int> weightDist(matchWeights.begin(),
-        matchWeights.end());
+                                                      matchWeights.end());
       return suitableMatches[weightDist(this->rng)];
     }
 
@@ -2330,33 +2294,31 @@ namespace utils {
           size_t xlinkIdxOnStrand1 =
             respectXlinkChains
               ? pylimer_tools::utils::first_occuring_index(
-                this->simplifiedUniverse.xlinkChainId,
-                strand1,
-                from)
+                  this->simplifiedUniverse.xlinkChainId, strand1, from)
               : from;
           assert(xlinkIdxOnStrand1 <
-            this->simplifiedUniverse.xlinkChainId.size());
+                 this->simplifiedUniverse.xlinkChainId.size());
           while (this->simplifiedUniverse.xlinkChainId[xlinkIdxOnStrand1] ==
-                 strand1 &&
+                   strand1 &&
                  xlinkIdxOnStrand1 <
-                 this->simplifiedUniverse.xlinkChainId.size()) {
+                   this->simplifiedUniverse.xlinkChainId.size()) {
             for (size_t partnersSubStrand :
                  this->simplifiedUniverse.strandsOfXlink[xlinkIdxOnStrand1]) {
               assert(this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
-                xlinkIdxOnStrand1 ||
-                this->simplifiedUniverse.strandTo[partnersSubStrand] ==
-                xlinkIdxOnStrand1);
+                       xlinkIdxOnStrand1 ||
+                     this->simplifiedUniverse.strandTo[partnersSubStrand] ==
+                       xlinkIdxOnStrand1);
               long int otherStrandEnd =
                 this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
-                xlinkIdxOnStrand1
+                    xlinkIdxOnStrand1
                   ? this->simplifiedUniverse.strandTo[partnersSubStrand]
                   : this->simplifiedUniverse.strandFrom[partnersSubStrand];
               bool wouldBeSecondaryLoop = false;
               if (otherStrandEnd >= 0) {
                 // more complex logic to consider cross-link chains
                 wouldBeSecondaryLoop =
-                ((strand2 ==
-                  this->simplifiedUniverse.xlinkChainId[otherStrandEnd]));
+                  ((strand2 ==
+                    this->simplifiedUniverse.xlinkChainId[otherStrandEnd]));
               }
               if (wouldBeSecondaryLoop) {
                 thisWeight *= this->secondaryLoopProbability;
@@ -2394,9 +2356,7 @@ namespace utils {
       if (idealCutoff > 0.) {
         Eigen::VectorXd newCoordinates = this->getCrosslinkCoordinates();
         this->xlinkNeighbourList.initialize(
-          newCoordinates,
-          this->box,
-          idealCutoff);
+          newCoordinates, this->box, idealCutoff);
       }
     }
 
