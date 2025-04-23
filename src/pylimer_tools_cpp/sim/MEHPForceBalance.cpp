@@ -100,9 +100,11 @@ namespace sim {
                 << initialResidualToUse
                 // "with " << independentVertexSets.size() << "vertex sets."
                 << std::endl;
-      std::cout << "Swapping mode is " << allowSlipLinksToPassEachOther
+      std::cout << "Swapping mode is " << allowSlipLinksToPassEachOther << " ("
+                << LinkSwappingModeNames[allowSlipLinksToPassEachOther] << ")"
                 << " while simplification mode is " << simplificationMode
-                << std::endl;
+                << " (" << StructureSimplificationModeNames[simplificationMode]
+                << ")" << std::endl;
       std::cout << "Using oneOverSpringPartitionUpperLimit = "
                 << oneOverSpringPartitionUpperLimit << std::endl;
       double currentResidual = initialResidual;

@@ -245,7 +245,7 @@ TEST_CASE(
   {
     std::string largeInputFile =
       suspectedPath +
-      "/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
+      "/structure/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);
@@ -454,7 +454,7 @@ TEST_CASE(
     // TODO: correct values (& forces?)
     std::string largeInputFile =
       suspectedPath +
-      "/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
+      "/structure/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);
@@ -589,7 +589,7 @@ TEST_CASE(
   SECTION("3D case")
   {
     std::string largeInputFile =
-      suspectedPath + "/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
+      suspectedPath + "/structure/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);

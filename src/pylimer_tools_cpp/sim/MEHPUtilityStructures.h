@@ -12,51 +12,113 @@
 
 namespace pylimer_tools {
 namespace sim::mehp {
+#define STRUCTURE_SIMPLIFICATION_MODES                                         \
+  X(NO_SIMPLIFICATION, "No Simplification")                                    \
+  X(X2F_ONLY, "Two-function cross-links only")                                 \
+  X(INACTIVE_ONLY, "Inactive links only")                                      \
+  X(ALL_TIM, "All, à la Tim")                                                  \
+  X(ALL_ANDREI, "All, à la Andrei")
+
   enum StructureSimplificationMode
   {
-    NO_SIMPLIFICATION,
-    X2F_ONLY,
-    INACTIVE_ONLY,
-    ALL_TIM,
-    ALL_ANDREI
+#define X(e, s) e,
+    STRUCTURE_SIMPLIFICATION_MODES
+#undef X
   };
+
+  static std::string StructureSimplificationModeNames[] = {
+#define X(e, s) s,
+    STRUCTURE_SIMPLIFICATION_MODES
+#undef X
+  };
+
+#define LINK_SWAPPING_MODES                                                    \
+  X(NO_SWAPPING, "No Swapping")                                                \
+  X(SLIPLINKS_ONLY, "Sliplinks only")                                          \
+  X(ALL, "All")                                                                \
+  X(ALL_CYCLE, "All, restrict to cycles")                                      \
+  X(ALL_MC, "All MC")                                                          \
+  X(ALL_MC_CYCLE, "All MC, restrict to cycles")                                \
+  X(ALL_MC_TRY, "All MC, attempt the move")                                    \
+  X(ALL_MC_TRY_CYCLE, "All MC, restrict to cycles, attempt the move")
 
   enum LinkSwappingMode
   {
-    NO_SWAPPING,
-    SLIPLINKS_ONLY,
-    ALL,
-    ALL_CYCLE,
-    ALL_MC,
-    ALL_MC_CYCLE,
-    ALL_MC_TRY,
-    ALL_MC_TRY_CYCLE,
+#define X(e, s) e,
+    LINK_SWAPPING_MODES
+#undef X
   };
+
+  static std::string LinkSwappingModeNames[] = {
+#define X(e, s) s,
+    LINK_SWAPPING_MODES
+#undef X
+  };
+
+#define EXIT_REASONS                                                           \
+  X(UNSET, "Unset")                                                            \
+  X(F_TOLERANCE, "F Tolerance")                                                \
+  X(X_TOLERANCE, "X Tolerance")                                                \
+  X(MAX_STEPS, "Max Steps")                                                    \
+  X(NO_STEPS_POSSIBLE, "No Steps Possible")                                    \
+  X(FAILURE, "Failure")                                                        \
+  X(INTERRUPT, "Interrupt")                                                    \
+  X(OTHER, "Other")
 
   enum ExitReason
   {
-    UNSET,
-    F_TOLERANCE,
-    X_TOLERANCE,
-    MAX_STEPS,
-    NO_STEPS_POSSIBLE,
-    FAILURE,
-    INTERRUPT,
-    OTHER
+#define X(e, s) e,
+    EXIT_REASONS
+#undef X
   };
+
+  static std::string ExitReasonNames[] = {
+#define X(e, s) s,
+    EXIT_REASONS
+#undef X
+  };
+
+#define SLE_SOLVERS                                                            \
+  X(DEFAULT, "default")                                                        \
+  /* direct methods */                                                         \
+  X(SIMPLICIAL_LLT, "SimplicialLLT")                                           \
+  X(SIMPLICIAL_LDLT, "SimplicialLDLT")                                         \
+  X(SPARSE_LU, "SparseLU")                                                     \
+  X(SPARSE_QR, "SparseQR")                                                     \
+  /* iterative methods */                                                      \
+  X(CONJUGATE_GRADIENT, "ConjugateGradient")                                   \
+  X(CONJUGATE_GRADIENT_DIAGONALIZED,                                           \
+    "ConjugateGradient, DiagonalPreconditioner")                               \
+  X(CONJUGATE_GRADIENT_IDENTITY, "ConjugateGradient, IdentityPreconditioner")  \
+  X(CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY,                                    \
+    "ConjugateGradient, IncompleteCholeskyPreconditioner")                     \
+  X(LEAST_SQUARES_CONJUGATE_GRADIENT, "LeastSquaresConjugateGradient")         \
+  X(LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED,                             \
+    "LeastSquaresConjugateGradient, DiagonalPreconditioner")                   \
+  X(LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY,                                 \
+    "LeastSquaresConjugateGradient, IdentityPreconditioner")                   \
+  X(BICGSTAB, "BiCGSTAB")                                                      \
+  X(BICGSTAB_DIAGONALIZED, "BiCGSTAB, DiagonalPreconditioner")                 \
+  X(BICGSTAB_IDENTITY, "BiCGSTAB, IdentityPreconditioner")                     \
+  X(BICGSTAB_INCOMPLETE_LU, "BiCGSTAB, IncompleteLUTPreconditioner")
 
   enum SLESolver
   {
-    DEFAULT,
-    SIMPLICIAL_LLT,
-    SIMPLICIAL_DLT,
-    SPARSE_LU,
-    SPARSE_QR,
-    CONJUGATE_GRADIENT,
-    CONJUGATE_GRADIENT_DIAGONALIZED,
-    CONJUGATE_GRADIENT_IDENTITY,
-    LEAST_SQUARES_CONJUGATE_GRADIENT,
-    BICGSTAB
+#define X(e, s) e,
+    SLE_SOLVERS
+#undef X
+  };
+
+  static std::string SLESolverNames[] = {
+#define X(e, s) s,
+    SLE_SOLVERS
+#undef X
+  };
+
+  static SLESolver allSLESolvers[] = {
+#define X(e, s) SLESolver::e,
+    SLE_SOLVERS
+#undef X
   };
 
   // typedef Eigen::Array<Eigen::ArrayXi, Eigen::Dynamic, 1> ArrayXArrayXi;
