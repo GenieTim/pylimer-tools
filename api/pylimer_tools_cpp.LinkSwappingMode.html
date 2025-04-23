@@ -321,15 +321,18 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.LinkSwappingMode">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">LinkSwappingMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.LinkSwappingMode" title="pylimer_tools_cpp.LinkSwappingMode"><span class="pre">pylimer_tools_cpp.LinkSwappingMode</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.LinkSwappingMode" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>How slip-links may act when they reach each-other or even a cross-link.</p>
 <p>Members:</p>
-<p>NO_SWAPPING</p>
-<p>SLIPLINKS_ONLY</p>
-<p>ALL</p>
-<p>ALL_CYCLE</p>
-<p>ALL_MC</p>
-<p>ALL_MC_CYCLE</p>
-<p>ALL_MC_TRY</p>
-<p>ALL_MC_TRY_CYCLE</p>
+<blockquote>
+<div><p>NO_SWAPPING : No Swapping</p>
+<p>SLIPLINKS_ONLY : Sliplinks only</p>
+<p>ALL : All</p>
+<p>ALL_CYCLE : All, restrict to cycles</p>
+<p>ALL_MC : All MC</p>
+<p>ALL_MC_CYCLE : All MC, restrict to cycles</p>
+<p>ALL_MC_TRY : All MC, attempt the move</p>
+<p>ALL_MC_TRY_CYCLE : All MC, restrict to cycles, attempt the move</p>
+</div></blockquote>
 <p class="rubric">Attributes Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">

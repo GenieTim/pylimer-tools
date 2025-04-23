@@ -321,15 +321,26 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">SLESolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.SLESolver" title="pylimer_tools_cpp.SLESolver"><span class="pre">pylimer_tools_cpp.SLESolver</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.SLESolver" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Solver for sparse linear equation systems</p>
 <p>Members:</p>
-<p>DEFAULT</p>
-<p>SIMPLICIAL_LLT</p>
-<p>SIMPLICIAL_DLT</p>
-<p>SPARSE_LU</p>
-<p>SPARSE_QR</p>
-<p>CONJUGATE_GRADIENT</p>
-<p>LEAST_SQUARES_CONJUGATE_GRADIENT</p>
-<p>BICGSTAB</p>
+<blockquote>
+<div><p>DEFAULT : default</p>
+<p>SIMPLICIAL_LLT : SimplicialLLT</p>
+<p>SIMPLICIAL_LDLT : SimplicialLDLT</p>
+<p>SPARSE_LU : SparseLU</p>
+<p>SPARSE_QR : SparseQR</p>
+<p>CONJUGATE_GRADIENT : ConjugateGradient</p>
+<p>CONJUGATE_GRADIENT_DIAGONALIZED : ConjugateGradient, DiagonalPreconditioner</p>
+<p>CONJUGATE_GRADIENT_IDENTITY : ConjugateGradient, IdentityPreconditioner</p>
+<p>CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY : ConjugateGradient, IncompleteCholeskyPreconditioner</p>
+<p>LEAST_SQUARES_CONJUGATE_GRADIENT : LeastSquaresConjugateGradient</p>
+<p>LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED : LeastSquaresConjugateGradient, DiagonalPreconditioner</p>
+<p>LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY : LeastSquaresConjugateGradient, IdentityPreconditioner</p>
+<p>BICGSTAB : BiCGSTAB</p>
+<p>BICGSTAB_DIAGONALIZED : BiCGSTAB, DiagonalPreconditioner</p>
+<p>BICGSTAB_IDENTITY : BiCGSTAB, IdentityPreconditioner</p>
+<p>BICGSTAB_INCOMPLETE_LU : BiCGSTAB, IncompleteLUTPreconditioner</p>
+</div></blockquote>
 <p class="rubric">Attributes Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -337,7 +348,25 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.BICGSTAB" title="pylimer_tools_cpp.SLESolver.BICGSTAB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BICGSTAB</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT" title="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CONJUGATE_GRADIENT</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_DIAGONALIZED" title="pylimer_tools_cpp.SLESolver.BICGSTAB_DIAGONALIZED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BICGSTAB_DIAGONALIZED</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_IDENTITY" title="pylimer_tools_cpp.SLESolver.BICGSTAB_IDENTITY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BICGSTAB_IDENTITY</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_INCOMPLETE_LU" title="pylimer_tools_cpp.SLESolver.BICGSTAB_INCOMPLETE_LU"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BICGSTAB_INCOMPLETE_LU</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT" title="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CONJUGATE_GRADIENT</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED" title="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CONJUGATE_GRADIENT_DIAGONALIZED</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_IDENTITY" title="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_IDENTITY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CONJUGATE_GRADIENT_IDENTITY</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY" title="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.DEFAULT" title="pylimer_tools_cpp.SLESolver.DEFAULT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT</span></code></a></p></td>
@@ -346,7 +375,13 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT" title="pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_DLT" title="pylimer_tools_cpp.SLESolver.SIMPLICIAL_DLT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SIMPLICIAL_DLT</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED" title="pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY" title="pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LDLT" title="pylimer_tools_cpp.SLESolver.SIMPLICIAL_LDLT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SIMPLICIAL_LDLT</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT" title="pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SIMPLICIAL_LLT</span></code></a></p></td>
@@ -370,12 +405,42 @@
 <p class="rubric">Attributes Documentation</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.BICGSTAB">
-<span class="sig-name descname"><span class="pre">BICGSTAB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.BICGSTAB:</span> <span class="pre">9&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BICGSTAB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.BICGSTAB:</span> <span class="pre">12&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.BICGSTAB_DIAGONALIZED">
+<span class="sig-name descname"><span class="pre">BICGSTAB_DIAGONALIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.BICGSTAB_DIAGONALIZED:</span> <span class="pre">13&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_DIAGONALIZED" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.BICGSTAB_IDENTITY">
+<span class="sig-name descname"><span class="pre">BICGSTAB_IDENTITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.BICGSTAB_IDENTITY:</span> <span class="pre">14&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_IDENTITY" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.BICGSTAB_INCOMPLETE_LU">
+<span class="sig-name descname"><span class="pre">BICGSTAB_INCOMPLETE_LU</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.BICGSTAB_INCOMPLETE_LU:</span> <span class="pre">15&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_INCOMPLETE_LU" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT">
 <span class="sig-name descname"><span class="pre">CONJUGATE_GRADIENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.CONJUGATE_GRADIENT:</span> <span class="pre">5&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED">
+<span class="sig-name descname"><span class="pre">CONJUGATE_GRADIENT_DIAGONALIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED:</span> <span class="pre">6&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_IDENTITY">
+<span class="sig-name descname"><span class="pre">CONJUGATE_GRADIENT_IDENTITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.CONJUGATE_GRADIENT_IDENTITY:</span> <span class="pre">7&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_IDENTITY" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY">
+<span class="sig-name descname"><span class="pre">CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY:</span> <span class="pre">8&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -385,12 +450,22 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT">
-<span class="sig-name descname"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT:</span> <span class="pre">8&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT:</span> <span class="pre">9&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.SIMPLICIAL_DLT">
-<span class="sig-name descname"><span class="pre">SIMPLICIAL_DLT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.SIMPLICIAL_DLT:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_DLT" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED">
+<span class="sig-name descname"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED:</span> <span class="pre">10&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY">
+<span class="sig-name descname"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY:</span> <span class="pre">11&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.SIMPLICIAL_LDLT">
+<span class="sig-name descname"><span class="pre">SIMPLICIAL_LDLT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.SIMPLICIAL_LDLT:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LDLT" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -479,10 +554,18 @@
 <li><a class="reference internal" href="#">SLESolver</a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver"><code class="docutils literal notranslate"><span class="pre">SLESolver</span></code></a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.BICGSTAB"><code class="docutils literal notranslate"><span class="pre">SLESolver.BICGSTAB</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_DIAGONALIZED"><code class="docutils literal notranslate"><span class="pre">SLESolver.BICGSTAB_DIAGONALIZED</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_IDENTITY"><code class="docutils literal notranslate"><span class="pre">SLESolver.BICGSTAB_IDENTITY</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_INCOMPLETE_LU"><code class="docutils literal notranslate"><span class="pre">SLESolver.BICGSTAB_INCOMPLETE_LU</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT"><code class="docutils literal notranslate"><span class="pre">SLESolver.CONJUGATE_GRADIENT</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED"><code class="docutils literal notranslate"><span class="pre">SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_IDENTITY"><code class="docutils literal notranslate"><span class="pre">SLESolver.CONJUGATE_GRADIENT_IDENTITY</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY"><code class="docutils literal notranslate"><span class="pre">SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.DEFAULT"><code class="docutils literal notranslate"><span class="pre">SLESolver.DEFAULT</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT"><code class="docutils literal notranslate"><span class="pre">SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_DLT"><code class="docutils literal notranslate"><span class="pre">SLESolver.SIMPLICIAL_DLT</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED"><code class="docutils literal notranslate"><span class="pre">SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY"><code class="docutils literal notranslate"><span class="pre">SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LDLT"><code class="docutils literal notranslate"><span class="pre">SLESolver.SIMPLICIAL_LDLT</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT"><code class="docutils literal notranslate"><span class="pre">SLESolver.SIMPLICIAL_LLT</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SPARSE_LU"><code class="docutils literal notranslate"><span class="pre">SLESolver.SPARSE_LU</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SPARSE_QR"><code class="docutils literal notranslate"><span class="pre">SLESolver.SPARSE_QR</span></code></a></li>

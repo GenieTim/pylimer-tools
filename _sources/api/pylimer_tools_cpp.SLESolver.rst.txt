@@ -11,10 +11,18 @@ SLESolver
    .. autosummary::
 
       ~SLESolver.BICGSTAB
+      ~SLESolver.BICGSTAB_DIAGONALIZED
+      ~SLESolver.BICGSTAB_IDENTITY
+      ~SLESolver.BICGSTAB_INCOMPLETE_LU
       ~SLESolver.CONJUGATE_GRADIENT
+      ~SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED
+      ~SLESolver.CONJUGATE_GRADIENT_IDENTITY
+      ~SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY
       ~SLESolver.DEFAULT
       ~SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT
-      ~SLESolver.SIMPLICIAL_DLT
+      ~SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED
+      ~SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY
+      ~SLESolver.SIMPLICIAL_LDLT
       ~SLESolver.SIMPLICIAL_LLT
       ~SLESolver.SPARSE_LU
       ~SLESolver.SPARSE_QR
@@ -24,10 +32,18 @@ SLESolver
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: BICGSTAB
+   .. autoattribute:: BICGSTAB_DIAGONALIZED
+   .. autoattribute:: BICGSTAB_IDENTITY
+   .. autoattribute:: BICGSTAB_INCOMPLETE_LU
    .. autoattribute:: CONJUGATE_GRADIENT
+   .. autoattribute:: CONJUGATE_GRADIENT_DIAGONALIZED
+   .. autoattribute:: CONJUGATE_GRADIENT_IDENTITY
+   .. autoattribute:: CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY
    .. autoattribute:: DEFAULT
    .. autoattribute:: LEAST_SQUARES_CONJUGATE_GRADIENT
-   .. autoattribute:: SIMPLICIAL_DLT
+   .. autoattribute:: LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED
+   .. autoattribute:: LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY
+   .. autoattribute:: SIMPLICIAL_LDLT
    .. autoattribute:: SIMPLICIAL_LLT
    .. autoattribute:: SPARSE_LU
    .. autoattribute:: SPARSE_QR
