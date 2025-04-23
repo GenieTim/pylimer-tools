@@ -43,7 +43,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Install dev dependencies
-        run: sudo apt-get install bison flex
+        run: sudo apt-get install bison flex libopenblas-dev
 
       - name: Generate Documentation
         run: ./bin/make-docs.sh
