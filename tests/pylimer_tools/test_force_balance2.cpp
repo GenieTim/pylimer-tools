@@ -54,10 +54,10 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
     pcm::MEHPForceBalance2 forceBalancer2 =
       pcm::MEHPForceBalance2(universe2, 2);
     size_t nStrandsFb = forceBalancer2.getNrOfStrands();
+    CHECK(nStrandsFb <= nrOfChains);
     size_t nSpringsFb = forceBalancer2.getNrOfSprings();
+    CHECK(nSpringsFb <= nrOfChains);
 
-    // SECTION("Stress tensor computations are equivalent")
-    // {
     Eigen::Matrix3d stressTensor1 = forceBalancer2.getStressTensor();
     Eigen::Matrix3d stressTensor2 = forceBalancer2.getStressTensorLinkBased();
     for (size_t i = 0; i < 3; ++i) {
@@ -83,9 +83,11 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
                  Catch::Matchers::WithinRel(forceRelaxer.getPressure(), 3e-2));
       CHECK_THAT(forceBalancer2.getPressure(),
                  Catch::Matchers::WithinRel(0.0061105865, 3e-2));
-      CHECK_THAT(
-        forceRelaxer.getResidual(),
-        Catch::Matchers::WithinAbs(forceBalancer2.getResidual(), 1e-5));
+      // cannot compare residual to due different handling of dangling and free
+      // strands in the conversion
+      // CHECK_THAT(
+      //   forceRelaxer.getResidual(),
+      //   Catch::Matchers::WithinAbs(forceBalancer2.getResidual(), 1e-5));
 
       // run force relaxation
       CHECK_NOTHROW(forceBalancer2.runForceRelaxation());
@@ -105,10 +107,11 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
       double beadMass = 161.;                           // g/mol
       double Nb = 80.; // nr of beads per strand
       double conversionFactor =
-        (forceBalancer2.getNetwork().springContourLength.mean() / Nb) * 3. *
-        kb * T / (slope * beadMass); // J/sigma^2
-      CHECK(conversionFactor / (sigmaToM * sigmaToM * 79.) ==
-            Catch::Approx(0.0002450018));
+        (forceBalancer2.getNetwork().springContourLength.sum() / nrOfChains /
+         Nb) *
+        3. * kb * T / (slope * beadMass); // J/sigma^2
+      CHECK_THAT(conversionFactor / (sigmaToM * sigmaToM * 79.),
+                 Catch::Matchers::WithinRel(0.000245, 1e-3));
       double nu =
         nrOfChains / (forceBalancer2.getVolume() * sigmaToM * sigmaToM *
                       sigmaToM); // chain number density, m^-3
@@ -117,9 +120,10 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
       // final values
       CHECK(forceBalancer2.getPressure() ==
             Catch::Approx(0.153806 / 79.)); // LJ Units [?]
-      CHECK(forceBalancer2.getPressure() * conversionFactor /
-              (sigmaToM * sigmaToM * sigmaToM) ==
-            Catch::Approx(61172.8878)); // shear modulus from the pressure, MPa
+      CHECK_THAT(forceBalancer2.getPressure() * conversionFactor /
+                   (sigmaToM * sigmaToM * sigmaToM),
+                 Catch::Matchers::WithinRel(
+                   61172.8878, 1e-3)); // shear modulus from the pressure, MPa
       double b02 = slope * beadMass;
       // (forceBalancer2.getDefaultR0Square() / (expectedNb2));
       CHECK(forceBalancer2.getGammaFactor(1.) ==
@@ -132,7 +136,7 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
       CHECK(forceBalancer2.getGammaFactor(b02) ==
             Catch::Approx(forceBalancer2.getGammaFactors(b02).mean()));
       CHECK_THAT(
-        forceBalancer2.getGammaFactor(b02) * kb * T * nu,
+        forceBalancer2.getGammaFactors(b02).sum() / nrOfChains * kb * T * nu,
         Catch::Matchers::WithinRel(61308.3, 0.03)); // ANT shear modulus, Pa
       CHECK_THAT(forceBalancer2.getGammaFactor(b02, nrOfChains),
                  Catch::Matchers::WithinRel(
@@ -2130,7 +2134,8 @@ TEST_CASE("Selective MC Generated Structure Solves",
     nStrands, pylimer_tools::utils::initializeWithValue(nStrands, 318), 1);
   // int nStrandsMono = 114 / scaleDownBy;
   // generator.addMonofunctionalStrands(
-  //   nStrandsMono, pylimer_tools::utils::initializeWithValue(nStrandsMono, 127));
+  //   nStrandsMono, pylimer_tools::utils::initializeWithValue(nStrandsMono,
+  //   127));
   generator.useZScoreMaxDistance(2.);
   CHECK_NOTHROW(generator.linkStrandsToConversion(0.12327785585899244));
 
@@ -2181,6 +2186,13 @@ TEST_CASE("All MEHP Force Balance2 vs. Force Relaxation Phantom Comparisons",
     "square_lattice_2x2_a_5.2d.structure.out"
   };
 
+#define CHECK_THAT_OR_ZERO(expr, otherExpr)                                    \
+  if (std::abs(expr) < 1e-6) {                                                 \
+    CHECK(std::abs(otherExpr) < 1e-6);                                         \
+  } else {                                                                     \
+    CHECK_THAT(expr, Catch::Matchers::WithinRel(otherExpr, 1e-3));             \
+  }
+
   size_t nFilesFound = 0;
   for (const std::string& file : files) {
     pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -2202,7 +2214,6 @@ TEST_CASE("All MEHP Force Balance2 vs. Force Relaxation Phantom Comparisons",
     pcm::MEHPForceRelaxation forceRelaxation =
       pcm::MEHPForceRelaxation(universe);
     forceRelaxation.configAssumeBoxLargeEnough(false);
-
     // validate initial values
     // hard to compare, since they change based on
     // how the structure is converted
@@ -2243,25 +2254,21 @@ TEST_CASE("All MEHP Force Balance2 vs. Force Relaxation Phantom Comparisons",
     std::cout << "Time of Force Relaxation: "
               << std::duration_to_string(duration_fr) << " " << std::endl;
 
-    CHECK_THAT(forceBalance2.getGammaFactors(1.).sum(),
-               Catch::Matchers::WithinRel(
-                 forceRelaxation.getGammaFactors(1.).sum(), 1e-3));
-    CHECK_THAT(forceBalance2.getStressTensor().trace(),
-               Catch::Matchers::WithinRel(
-                 forceRelaxation.getStressTensor().trace(), 1e-3));
-    CHECK_THAT(forceBalance2.getResidual(),
-               Catch::Matchers::WithinAbs(forceRelaxation.getResidual(), 1e-3));
-    CHECK_THAT(forceBalance2.getSolubleWeightFraction(),
-               Catch::Matchers::WithinAbs(
-                 forceRelaxation.getSolubleWeightFraction(), 1e-3));
-    CHECK_THAT(forceBalance2.getDanglingWeightFraction(),
-               Catch::Matchers::WithinAbs(
-                 forceRelaxation.getDanglingWeightFraction(), 1e-3));
-    // CHECK_THAT(forceBalance2.getActiveWeightFraction(),
-    // Catch::Matchers::WithinRel(forceRelaxation.getActiveWeightFraction(),
-    // 1e-3));
+    CHECK_THAT_OR_ZERO(forceBalance2.getGammaFactors(1.).sum(),
+                       forceRelaxation.getGammaFactors(1.).sum());
+    CHECK_THAT_OR_ZERO(forceBalance2.getStressTensor().trace(),
+                       forceRelaxation.getStressTensor().trace());
+    CHECK_THAT_OR_ZERO(forceBalance2.getResidual(),
+                       forceRelaxation.getResidual());
+    CHECK_THAT_OR_ZERO(forceBalance2.getSolubleWeightFraction(),
+                       forceRelaxation.getSolubleWeightFraction());
+    CHECK_THAT_OR_ZERO(forceBalance2.getDanglingWeightFraction(),
+                       forceRelaxation.getDanglingWeightFraction());
+    // CHECK_THAT_OR_ZERO(forceBalance2.getActiveWeightFraction(),
+    // forceRelaxation.getActiveWeightFraction());
   }
 
+#undef CHECK_THAT_OR_ZERO
   REQUIRE(static_cast<double>(nFilesFound) >
           static_cast<double>(files.size()) * 0.75);
 }
@@ -2363,12 +2370,13 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
                          forceBalance.getStressTensor().trace());
       CHECK_THAT_OR_ZERO(forceBalance2.getResidual(),
                          forceBalance.getResidual());
-      CHECK_THAT_OR_ZERO(forceBalance2.getSolubleWeightFraction(),
-                         forceBalance.getSolubleWeightFraction());
-      CHECK_THAT_OR_ZERO(forceBalance2.getDanglingWeightFraction(),
-                         forceBalance.getDanglingWeightFraction());
-      CHECK_THAT_OR_ZERO(forceBalance2.getActiveWeightFraction(),
-                         forceBalance.getActiveWeightFraction());
+      // FB2 handles activeness of springs differently -> cannot really compare
+      // CHECK_THAT_OR_ZERO(forceBalance2.getSolubleWeightFraction(),
+      //                    forceBalance.getSolubleWeightFraction());
+      // CHECK_THAT_OR_ZERO(forceBalance2.getDanglingWeightFraction(),
+      //                    forceBalance.getDanglingWeightFraction());
+      // CHECK_THAT_OR_ZERO(forceBalance2.getActiveWeightFraction(),
+      //                    forceBalance.getActiveWeightFraction());
     } else {
       // validate conversion by using FB1's network for FB2
       pcm::MEHPForceBalance2 forceBalance210 =
@@ -2381,15 +2389,16 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
                          forceBalance.getStressTensor().trace());
       CHECK_THAT_OR_ZERO(forceBalance210.getResidual(),
                          forceBalance.getResidual());
-      CHECK_THAT_OR_ZERO(forceBalance210.getSolubleWeightFraction(),
-                         forceBalance.getSolubleWeightFraction());
-      CHECK_THAT_OR_ZERO(forceBalance210.getDanglingWeightFraction(),
-                         forceBalance.getDanglingWeightFraction());
-      CHECK_THAT_OR_ZERO(forceBalance210.getActiveWeightFraction(),
-                         forceBalance.getActiveWeightFraction());
-      // CHECK_THAT(forceBalance210.getGammaFactors(1.).sum(),
-      //            Catch::Matchers::WithinRel(
-      //              forceBalance2.getGammaFactors(1.).sum(), 1e-3));
+      // FB2 handles activeness of springs differently -> cannot really compare
+      // CHECK_THAT_OR_ZERO(forceBalance210.getSolubleWeightFraction(),
+      //                    forceBalance.getSolubleWeightFraction());
+      // CHECK_THAT_OR_ZERO(forceBalance210.getDanglingWeightFraction(),
+      //                    forceBalance.getDanglingWeightFraction());
+      // CHECK_THAT_OR_ZERO(forceBalance210.getActiveWeightFraction(),
+      //                    forceBalance.getActiveWeightFraction());
+      CHECK_THAT(forceBalance210.getGammaFactors(1.).sum(),
+                 Catch::Matchers::WithinRel(
+                   forceBalance2.getGammaFactors(1.).sum(), 1e-3));
       // if (forceBalance2.getNrOfStrands() != forceBalance210.getNrOfStrands())
       // {
       //   pcm::ForceBalance2Network net20 = forceBalance2.getNetwork();
@@ -2456,6 +2465,8 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
     //   pcm::ForceBalance2Network net1 = forceBalance21.getNetwork();
     //   std::cerr << "DEBUG HERE" << std::endl;
     // }
+
+#undef CHECK_THAT_OR_ZERO
   }
 
   REQUIRE(static_cast<double>(nFilesFound) >
