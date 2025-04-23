@@ -135,6 +135,7 @@ vendor/igraph
 vendor/nlopt
 vendor/cereal
 vendor/*-skbuild*
+vendor/suitesparse
 
 # build targets
 coverage.html

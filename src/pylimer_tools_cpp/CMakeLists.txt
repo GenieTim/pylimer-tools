@@ -11,16 +11,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # other options we offer
 if (NOT DEFINED CODE_COVERAGE)
-	option(CODE_COVERAGE "Collect coverage from test library" OFF)
-endif()
+    option(CODE_COVERAGE "Collect coverage from test library" OFF)
+endif ()
 
 if (NOT DEFINED CEREALIZABLE)
-	option(CEREALIZABLE "Enable serialisation of various classes" ON)
-endif()
+    option(CEREALIZABLE "Enable serialisation of various classes" ON)
+endif ()
 if (CEREALIZABLE)
-	add_definitions(-DCEREALIZABLE)
-	add_compile_definitions(CEREALIZABLE)
-endif()
+    add_definitions(-DCEREALIZABLE)
+    add_compile_definitions(CEREALIZABLE)
+endif ()
 
 # add dependencies
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMakeLists.txt)
@@ -28,41 +28,41 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/../../vendor/myConfigureFile.cmake)
 
 # Check if we need to add -lstdc++fs or -lc++fs or nothing
-if(DEFINED CMAKE_CXX_STANDARD AND CMAKE_CXX_STANDARD LESS 17)
-  set(STD_FS_NO_LIB_NEEDED TRUE)
-elseif(MSVC)
-  set(STD_FS_NO_LIB_NEEDED TRUE)
-else()
-  file(
-    WRITE ${CMAKE_CURRENT_BINARY_DIR}/main.cpp
-    "#include <filesystem>\nint main(int argc, char ** argv) {\n  std::filesystem::path p(argv[0]);\n  return p.string().length();\n}"
-  )
-  try_compile(
-    STD_FS_NO_LIB_NEEDED ${CMAKE_CURRENT_BINARY_DIR}
-    SOURCES ${CMAKE_CURRENT_BINARY_DIR}/main.cpp
-    COMPILE_DEFINITIONS -std=c++17)
-  try_compile(
-    STD_FS_NEEDS_STDCXXFS ${CMAKE_CURRENT_BINARY_DIR}
-    SOURCES ${CMAKE_CURRENT_BINARY_DIR}/main.cpp
-    COMPILE_DEFINITIONS -std=c++17
-    LINK_LIBRARIES stdc++fs)
-  try_compile(
-    STD_FS_NEEDS_CXXFS ${CMAKE_CURRENT_BINARY_DIR}
-    SOURCES ${CMAKE_CURRENT_BINARY_DIR}/main.cpp
-    COMPILE_DEFINITIONS -std=c++17
-    LINK_LIBRARIES c++fs)
-endif()
+if (DEFINED CMAKE_CXX_STANDARD AND CMAKE_CXX_STANDARD LESS 17)
+    set(STD_FS_NO_LIB_NEEDED TRUE)
+elseif (MSVC)
+    set(STD_FS_NO_LIB_NEEDED TRUE)
+else ()
+    file(
+            WRITE ${CMAKE_CURRENT_BINARY_DIR}/main.cpp
+            "#include <filesystem>\nint main(int argc, char ** argv) {\n  std::filesystem::path p(argv[0]);\n  return p.string().length();\n}"
+    )
+    try_compile(
+            STD_FS_NO_LIB_NEEDED ${CMAKE_CURRENT_BINARY_DIR}
+            SOURCES ${CMAKE_CURRENT_BINARY_DIR}/main.cpp
+            COMPILE_DEFINITIONS -std=c++17)
+    try_compile(
+            STD_FS_NEEDS_STDCXXFS ${CMAKE_CURRENT_BINARY_DIR}
+            SOURCES ${CMAKE_CURRENT_BINARY_DIR}/main.cpp
+            COMPILE_DEFINITIONS -std=c++17
+            LINK_LIBRARIES stdc++fs)
+    try_compile(
+            STD_FS_NEEDS_CXXFS ${CMAKE_CURRENT_BINARY_DIR}
+            SOURCES ${CMAKE_CURRENT_BINARY_DIR}/main.cpp
+            COMPILE_DEFINITIONS -std=c++17
+            LINK_LIBRARIES c++fs)
+endif ()
 
-if(${STD_FS_NEEDS_STDCXXFS})
-  set(STD_FS_LIB stdc++fs)
-elseif(${STD_FS_NEEDS_CXXFS})
-  set(STD_FS_LIB c++fs)
-elseif(${STD_FS_NO_LIB_NEEDED})
-  set(STD_FS_LIB "")
-else()
-  message(WARNING "Unknown C++17 compiler - not passing -lstdc++fs")
-  set(STD_FS_LIB "")
-endif()
+if (${STD_FS_NEEDS_STDCXXFS})
+    set(STD_FS_LIB stdc++fs)
+elseif (${STD_FS_NEEDS_CXXFS})
+    set(STD_FS_LIB c++fs)
+elseif (${STD_FS_NO_LIB_NEEDED})
+    set(STD_FS_LIB "")
+else ()
+    message(WARNING "Unknown C++17 compiler - not passing -lstdc++fs")
+    set(STD_FS_LIB "")
+endif ()
 
 # register dependencies
 add_dependencies(pylimer_tools igraph::igraph)
@@ -71,12 +71,18 @@ add_dependencies(pylimer_tools nlopt)
 include_directories(${nlopt_INCLUDE_DIRS})
 add_dependencies(pylimer_tools cerealLib)
 include_directories(${cereal_INCLUDE_DIRS})
+add_dependencies(pylimer_tools suitesparse)
+include_directories(${suitesparse_INCLUDE_DIRS})
 add_dependencies(pylimer_tools Spectra)
 include_directories(${Spectra_INCLUDE_DIRS})
 
-target_link_libraries(pylimer_tools PUBLIC 
-	${igraph_LIBRARIES} 
-	${nlopt_LIBRARIES}
+find_package(BLAS) # required for suitesparse
+
+target_link_libraries(pylimer_tools PUBLIC
+        ${igraph_LIBRARIES}
+        ${nlopt_LIBRARIES}
+        suitesparse #${suitesparse_LIBRARIES}
+        BLAS::BLAS
 )
 target_link_libraries(pylimer_tools PRIVATE ${STD_FS_LIB})
 
@@ -85,88 +91,88 @@ target_link_libraries(pylimer_tools PRIVATE ${STD_FS_LIB})
 target_link_libraries(pylimer_tools PUBLIC Eigen3::Eigen)
 
 if (LAPACKE_FOUND)
-	include_directories(${LAPACKE_LIBRARY_DIRS})
-	target_link_libraries(pylimer_tools PUBLIC ${LAPACKE_LIBRARIES})
-endif()
+    include_directories(${LAPACKE_LIBRARY_DIRS})
+    target_link_libraries(pylimer_tools PUBLIC ${LAPACKE_LIBRARIES})
+endif ()
 
 message(STATUS "pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS}, Spectra from ${Spectra_INCLUDE_DIRS} and cereal from ${cereal_INCLUDE_DIRS}")
 
 # optional additional dependencies
 IF (WIN32)
-		message(AUTHOR_WARNING "On Windows, OpenMP will not be used")
-elseif(CODE_COVERAGE)
-		message(AUTHOR_WARNING "Code-coverage is enabled, openmp will not be used")
-else()
-	find_package(OpenMP)
-	if (OpenMP_CXX_FOUND)
-		include_directories(${OpenMP_CXX_INCLUDE_DIRS})
-		# target_link_libraries(pylimer_tools PRIVATE ${OpenMP_CXX_LIBRARIES})
-		target_link_libraries(pylimer_tools PUBLIC OpenMP::OpenMP_CXX)
-		add_definitions(-DOPENMP_FOUND=true)
-		message(STATUS "Found OpenMP")
-	else()
-		message(AUTHOR_WARNING "Did not find OpenMP")
-	endif()
-endif()
+    message(AUTHOR_WARNING "On Windows, OpenMP will not be used")
+elseif (CODE_COVERAGE)
+    message(AUTHOR_WARNING "Code-coverage is enabled, openmp will not be used")
+else ()
+    find_package(OpenMP)
+    if (OpenMP_CXX_FOUND)
+        include_directories(${OpenMP_CXX_INCLUDE_DIRS})
+        # target_link_libraries(pylimer_tools PRIVATE ${OpenMP_CXX_LIBRARIES})
+        target_link_libraries(pylimer_tools PUBLIC OpenMP::OpenMP_CXX)
+        add_definitions(-DOPENMP_FOUND=true)
+        message(STATUS "Found OpenMP")
+    else ()
+        message(AUTHOR_WARNING "Did not find OpenMP")
+    endif ()
+endif ()
 
 set_property(TARGET pylimer_tools PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 target_sources(pylimer_tools
-	PRIVATE
-		${CMAKE_CURRENT_LIST_DIR}/entities/AtomGraphParent.cpp
-		${CMAKE_CURRENT_LIST_DIR}/entities/Molecule.cpp
-		${CMAKE_CURRENT_LIST_DIR}/entities/Universe.cpp
-		${CMAKE_CURRENT_LIST_DIR}/entities/UniverseSequence.cpp
-		${CMAKE_CURRENT_LIST_DIR}/entities/NeighbourList.cpp
-		${CMAKE_CURRENT_LIST_DIR}/entities/EigenNeighbourList.cpp
+        PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/entities/AtomGraphParent.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/entities/Molecule.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/entities/Universe.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/entities/UniverseSequence.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/entities/NeighbourList.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/entities/EigenNeighbourList.cpp
 
-		${CMAKE_CURRENT_LIST_DIR}/io/AveFileReader.cpp
-		${CMAKE_CURRENT_LIST_DIR}/io/DataFileParser.cpp
-		${CMAKE_CURRENT_LIST_DIR}/io/DumpFileParser.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/io/AveFileReader.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/io/DataFileParser.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/io/DumpFileParser.cpp
 
-		${CMAKE_CURRENT_LIST_DIR}/calc/Correlator.cpp
-		${CMAKE_CURRENT_LIST_DIR}/calc/NormalModeAnalyzer.cpp
-		
-		${CMAKE_CURRENT_LIST_DIR}/topo/EntanglementDetector.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/calc/Correlator.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/calc/NormalModeAnalyzer.cpp
 
-		${CMAKE_CURRENT_LIST_DIR}/sim/OutputSupportingSimulation.cpp
-		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceEvaluator.cpp
-		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceRelaxation.cpp
-		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance.cpp
-		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance2.cpp
-		${CMAKE_CURRENT_LIST_DIR}/sim/DPDSimulator.cpp
-	PUBLIC
-		${CMAKE_CURRENT_LIST_DIR}/entities/Box.h
-		${CMAKE_CURRENT_LIST_DIR}/entities/Atom.h
-		${CMAKE_CURRENT_LIST_DIR}/entities/Molecule.h
-		${CMAKE_CURRENT_LIST_DIR}/entities/Universe.h
-		${CMAKE_CURRENT_LIST_DIR}/entities/UniverseSequence.h
-		${CMAKE_CURRENT_LIST_DIR}/entities/NeighbourList.h
-		${CMAKE_CURRENT_LIST_DIR}/entities/EigenNeighbourList.h
+        ${CMAKE_CURRENT_LIST_DIR}/topo/EntanglementDetector.cpp
 
-		${CMAKE_CURRENT_LIST_DIR}/io/AveFileReader.h
-		${CMAKE_CURRENT_LIST_DIR}/io/DataFileParser.h
-		${CMAKE_CURRENT_LIST_DIR}/io/DumpFileParser.h
-		${CMAKE_CURRENT_LIST_DIR}/utils/CerealUtils.h
-		${CMAKE_CURRENT_LIST_DIR}/utils/ExtraEigenTypes.h
-		${CMAKE_CURRENT_LIST_DIR}/utils/GraphUtils.h
-		${CMAKE_CURRENT_LIST_DIR}/utils/PerformanceTimer.h
-		${CMAKE_CURRENT_LIST_DIR}/utils/VectorUtils.h
+        ${CMAKE_CURRENT_LIST_DIR}/sim/OutputSupportingSimulation.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceEvaluator.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceRelaxation.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance2.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/sim/DPDSimulator.cpp
+        PUBLIC
+        ${CMAKE_CURRENT_LIST_DIR}/entities/Box.h
+        ${CMAKE_CURRENT_LIST_DIR}/entities/Atom.h
+        ${CMAKE_CURRENT_LIST_DIR}/entities/Molecule.h
+        ${CMAKE_CURRENT_LIST_DIR}/entities/Universe.h
+        ${CMAKE_CURRENT_LIST_DIR}/entities/UniverseSequence.h
+        ${CMAKE_CURRENT_LIST_DIR}/entities/NeighbourList.h
+        ${CMAKE_CURRENT_LIST_DIR}/entities/EigenNeighbourList.h
 
-		${CMAKE_CURRENT_LIST_DIR}/calc/Correlator.h
-		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPanalysis.h
-		${CMAKE_CURRENT_LIST_DIR}/calc/MMTanalysis.h
-		${CMAKE_CURRENT_LIST_DIR}/calc/NormalModeAnalyzer.h
+        ${CMAKE_CURRENT_LIST_DIR}/io/AveFileReader.h
+        ${CMAKE_CURRENT_LIST_DIR}/io/DataFileParser.h
+        ${CMAKE_CURRENT_LIST_DIR}/io/DumpFileParser.h
+        ${CMAKE_CURRENT_LIST_DIR}/utils/CerealUtils.h
+        ${CMAKE_CURRENT_LIST_DIR}/utils/ExtraEigenTypes.h
+        ${CMAKE_CURRENT_LIST_DIR}/utils/GraphUtils.h
+        ${CMAKE_CURRENT_LIST_DIR}/utils/PerformanceTimer.h
+        ${CMAKE_CURRENT_LIST_DIR}/utils/VectorUtils.h
 
-		${CMAKE_CURRENT_LIST_DIR}/topo/EntanglementDetector.h
+        ${CMAKE_CURRENT_LIST_DIR}/calc/Correlator.h
+        ${CMAKE_CURRENT_LIST_DIR}/calc/MEHPanalysis.h
+        ${CMAKE_CURRENT_LIST_DIR}/calc/MMTanalysis.h
+        ${CMAKE_CURRENT_LIST_DIR}/calc/NormalModeAnalyzer.h
 
-		${CMAKE_CURRENT_LIST_DIR}/sim/OutputSupportingSimulation.h
-		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPUtilityStructures.h
-		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceEvaluator.h
-		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceRelaxation.h
-		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance2.h
-		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance.h
-		${CMAKE_CURRENT_LIST_DIR}/sim/DPDSimulator.h
+        ${CMAKE_CURRENT_LIST_DIR}/topo/EntanglementDetector.h
+
+        ${CMAKE_CURRENT_LIST_DIR}/sim/OutputSupportingSimulation.h
+        ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPUtilityStructures.h
+        ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceEvaluator.h
+        ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceRelaxation.h
+        ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance2.h
+        ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance.h
+        ${CMAKE_CURRENT_LIST_DIR}/sim/DPDSimulator.h
 )
 # ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance2.cpp
 # ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance2.h
@@ -190,24 +196,24 @@ target_sources(pylimer_tools
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
 
 if (CODE_COVERAGE)
-	set(ENABLE_COVERAGE ON)
-	if (CMAKE_BUILD_TYPE EQUAL "RELEASE")
-		message(WARNING "Using coverage reduces build type to debug from release")
-	endif()
-	include(CodeCoverage)
-	append_coverage_compiler_flags()
-else()
-	message("Code Coverage is disabled.")
-endif()
+    set(ENABLE_COVERAGE ON)
+    if (CMAKE_BUILD_TYPE EQUAL "RELEASE")
+        message(WARNING "Using coverage reduces build type to debug from release")
+    endif ()
+    include(CodeCoverage)
+    append_coverage_compiler_flags()
+else ()
+    message("Code Coverage is disabled.")
+endif ()
 
 if (LEAK_ANALYSIS)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
-	set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
-	target_link_libraries(pylimer_tools 
-		PRIVATE
-		-fsanitize=address
-	)
-endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
+    set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
+    target_link_libraries(pylimer_tools
+            PRIVATE
+            -fsanitize=address
+    )
+endif ()
 
 OUTPUT_FLAGS(pylimer_tools)
 
