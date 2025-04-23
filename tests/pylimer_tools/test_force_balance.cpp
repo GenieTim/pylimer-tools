@@ -544,7 +544,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
   SECTION("MEHP Force Balance 3D case")
   {
     std::string largeInputFile =
-      suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
+      suspectedPath + "structure/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       std::cout << "Reading file " << largeInputFile << std::endl;
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
@@ -1290,7 +1290,7 @@ TEST_CASE("MEHP Force Balance runs with non-network",
   SECTION("MEHP Force Balance 3D case")
   {
     std::string largeInputFile =
-      suspectedPath + "xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
+      suspectedPath + "structure/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);

@@ -41,7 +41,7 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
   {
     std::string largeInputFile =
       suspectedPath +
-      "/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
+      "/structure/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
     REQUIRE(std::filesystem::exists(largeInputFile));
     std::cout << "Reading file " << largeInputFile << std::endl;
     universeSeq.initializeFromDataSequence({ { largeInputFile } });
@@ -328,7 +328,7 @@ TEST_CASE(
   SECTION("MEHP Force Balance2 3D case")
   {
     std::string largeInputFile =
-      suspectedPath + "xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
+      suspectedPath + "structure/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);
@@ -2113,7 +2113,7 @@ TEST_CASE("Selective MC Generated Structure Solves",
   // 0x10ae9d460>, 'remove_wsol': True}
 
   // 3 passes, 2 does not
-  double scaleDownBy = 2.;
+  double scaleDownBy = 1.;
 
   pylimer_tools::utils::MCUniverseGenerator generator =
     pylimer_tools::utils::MCUniverseGenerator(
@@ -2125,8 +2125,8 @@ TEST_CASE("Selective MC Generated Structure Solves",
     2,
     pylimer_tools::utils::initializeWithValue(
       2, static_cast<int>(217 / scaleDownBy)),
-    0.9407504937458855,
-    7,
+    7*0.9407504937458855,
+    1,
     2,
     1);
   int nStrands = 886 / scaleDownBy;
@@ -2144,7 +2144,7 @@ TEST_CASE("Selective MC Generated Structure Solves",
   CHECK_NOTHROW(
     fb2.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
                            1e-5,
-                           pcm::SLESolver::CONJUGATE_GRADIENT));
+                           pcm::SLESolver::SIMPLICIAL_LDLT));
   CHECK(fb2.getPressure() < 1e-3);
 }
 
@@ -2183,7 +2183,9 @@ TEST_CASE("All MEHP Force Balance2 vs. Force Relaxation Phantom Comparisons",
     "melt_83_a_100.structure.out",
     "network_100_a_46.structure.out",
     "network_p_1_100_a_38_50_xlinks.structure.out",
-    "square_lattice_2x2_a_5.2d.structure.out"
+    "square_lattice_2x2_a_5.2d.structure.out",
+    "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out",
+    "xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out"
   };
 
 #define CHECK_THAT_OR_ZERO(expr, otherExpr)                                    \
@@ -2310,7 +2312,9 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
     "melt_83_a_100.structure.out",
     "network_100_a_46.structure.out",
     "network_p_1_100_a_38_50_xlinks.structure.out",
-    "square_lattice_2x2_a_5.2d.structure.out"
+    "square_lattice_2x2_a_5.2d.structure.out",
+    "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out",
+    "xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out"
   };
 
   size_t nFilesFound = 0;

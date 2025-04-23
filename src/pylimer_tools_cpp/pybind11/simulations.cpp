@@ -705,34 +705,29 @@ and finally springs will be any number of connected bonds between links.
 
   ////////////////////////////////////////////////////////////////
   // MARK: Configuration Enums
-  py::enum_<mehp::StructureSimplificationMode>(m, "StructureSimplificationMode")
-    .value("NO_SIMPLIFICATION",
-           mehp::StructureSimplificationMode::NO_SIMPLIFICATION)
-    .value("X2F_ONLY", mehp::StructureSimplificationMode::X2F_ONLY)
-    .value("INACTIVE_ONLY", mehp::StructureSimplificationMode::INACTIVE_ONLY)
-    .value("ALL_TIM", mehp::StructureSimplificationMode::ALL_TIM)
-    .value("ALL_ANDREI", mehp::StructureSimplificationMode::ALL_ANDREI);
+  py::enum_<mehp::StructureSimplificationMode>(
+    m,
+    "StructureSimplificationMode",
+    "How the structure shall be simplified during the optimization in order to "
+    "remove non-trapped entanglement links.")
+#define X(e, name)                                                             \
+  .value(STRINGINFY(e), mehp::StructureSimplificationMode::e, name)
+    STRUCTURE_SIMPLIFICATION_MODES;
+#undef X
 
-  py::enum_<mehp::LinkSwappingMode>(m, "LinkSwappingMode")
-    .value("NO_SWAPPING", mehp::LinkSwappingMode::NO_SWAPPING)
-    .value("SLIPLINKS_ONLY", mehp::LinkSwappingMode::SLIPLINKS_ONLY)
-    .value("ALL", mehp::LinkSwappingMode::ALL)
-    .value("ALL_CYCLE", mehp::LinkSwappingMode::ALL_CYCLE)
-    .value("ALL_MC", mehp::LinkSwappingMode::ALL_MC)
-    .value("ALL_MC_CYCLE", mehp::LinkSwappingMode::ALL_MC_CYCLE)
-    .value("ALL_MC_TRY", mehp::LinkSwappingMode::ALL_MC_TRY)
-    .value("ALL_MC_TRY_CYCLE", mehp::LinkSwappingMode::ALL_MC_TRY_CYCLE);
+  py::enum_<mehp::LinkSwappingMode>(
+    m,
+    "LinkSwappingMode",
+    "How slip-links may act when they reach each-other or even a cross-link.")
+#define X(e, name) .value(STRINGINFY(e), mehp::LinkSwappingMode::e, name)
+    LINK_SWAPPING_MODES;
+#undef X
 
-  py::enum_<mehp::SLESolver>(m, "SLESolver")
-    .value("DEFAULT", mehp::SLESolver::DEFAULT)
-    .value("SIMPLICIAL_LLT", mehp::SLESolver::SIMPLICIAL_LLT)
-    .value("SIMPLICIAL_DLT", mehp::SLESolver::SIMPLICIAL_DLT)
-    .value("SPARSE_LU", mehp::SLESolver::SPARSE_LU)
-    .value("SPARSE_QR", mehp::SLESolver::SPARSE_QR)
-    .value("CONJUGATE_GRADIENT", mehp::SLESolver::CONJUGATE_GRADIENT)
-    .value("LEAST_SQUARES_CONJUGATE_GRADIENT",
-           mehp::SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT)
-    .value("BICGSTAB", mehp::SLESolver::BICGSTAB);
+  py::enum_<mehp::SLESolver>(
+    m, "SLESolver", "Solver for sparse linear equation systems")
+#define X(e, name) .value(STRINGINFY(e), mehp::SLESolver::e, name)
+    SLE_SOLVERS;
+#undef X
 
   ////////////////////////////////////////////////////////////////
   // MARK: Force Balance

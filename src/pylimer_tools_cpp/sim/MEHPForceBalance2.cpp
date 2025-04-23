@@ -617,10 +617,12 @@ MEHPForceBalance2::runForceRelaxation(
     this->assembleOneOverSpringPartition(this->initialConfig);
   const double initialResidual = this->getDisplacementResidualNormFor(
     this->initialConfig, this->currentDisplacements, oneOverSpringPartitions);
-  std::cout << "Starting force balance procedure "
-            << "with " << initialResidual << " as initial residual."
+  std::cout << "Starting force balance procedure with a "
+            << SLESolverNames[solverChoice] << " (" << solverChoice << ")"
+            << " solver. Initial residual is " << initialResidual << std::endl;
+  std::cout << "Simplification mode is " << simplificationMode << " ("
+            << StructureSimplificationModeNames[simplificationMode] << ")"
             << std::endl;
-  std::cout << "Simplification mode is " << simplificationMode << std::endl;
   double currentResidual = initialResidual;
   size_t iterationsDone = 0;
 
@@ -708,23 +710,31 @@ MEHPForceBalance2::runForceRelaxation(
     // verify that the matrix fulfills the requirements of the gradient descent
     bool isSelfAdjoint = Eigen::isSelfAdjoint(sysMatrix);
     assert(isSelfAdjoint);
-    // test whether the system matrix is positive definite (it's not guaranteed!)
-    // Eigen::VectorXd x = Eigen::VectorXd::Random(sysMatrix.rows());
-    // double result = x.transpose() * sysMatrix * x;
-    // std::cout << "Quadratic test result: " << result << std::endl;
+    // test whether the system matrix is positive definite (it's not
+    // guaranteed!) Eigen::VectorXd x =
+    // Eigen::VectorXd::Random(sysMatrix.rows()); double result = x.transpose()
+    // * sysMatrix * x; std::cout << "Quadratic test result: " << result <<
+    // std::endl;
 #endif
 
     Eigen::VectorXd finalCoordinates;
 
+#define SOLVER_FAILED(action)                                                  \
+  this->exitReason = ExitReason::FAILURE;                                      \
+  RUNTIME_EXP(std::to_string(action) + " with solver " +                       \
+              std::to_string(solverChoice) + " (" +                            \
+              std::to_string(SLESolverNames[solverChoice]) +                   \
+              "). Solver info: " + std::to_string(solver.info()));
+
 #define COMPUTE_SOLVE(solver)                                                  \
   solver.compute(sysMatrix);                                                   \
-  RUNTIME_EXP_IFN(solver.info() == Eigen::Success,                             \
-                  "System matrix computation failed. Solver info: " +          \
-                    std::to_string(solver.info()));                            \
+  if (solver.info() != Eigen::Success) {                                       \
+    SOLVER_FAILED("System matrix computation failed");                                \
+  }                                                                            \
   finalCoordinates = solver.solve(constants);                                  \
-  RUNTIME_EXP_IFN(solver.info() == Eigen::Success,                             \
-                  "System could not be solved. Solver info: " +                \
-                    std::to_string(solver.info()));
+  if (solver.info() != Eigen::Success) {                                       \
+    SOLVER_FAILED("System could not be solved");                               \
+  }
 
 #define ADD_ITERATIONS(solver) iterationsDone += solver.iterations();
 
@@ -755,13 +765,45 @@ MEHPForceBalance2::runForceRelaxation(
           solver;
         SOLVE_ITERATIVE(solver);
       }
-      case SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT: {
-        Eigen::LeastSquaresConjugateGradient<Eigen::SparseMatrix<double>>
+      case SLESolver::CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY: {
+        Eigen::ConjugateGradient<
+          Eigen::SparseMatrix<double>,
+          Eigen::Lower | Eigen::Upper,
+          Eigen::IncompleteCholesky<double, Eigen::Lower | Eigen::Upper>>
           solver;
         SOLVE_ITERATIVE(solver);
       }
-      case SLESolver::BICGSTAB: {
-        Eigen::BiCGSTAB<Eigen::SparseMatrix<double>> solver;
+      case SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT:
+      case SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED: {
+        Eigen::LeastSquaresConjugateGradient<
+          Eigen::SparseMatrix<double>,
+          Eigen::LeastSquareDiagonalPreconditioner<double>>
+          solver;
+        SOLVE_ITERATIVE(solver);
+      }
+      case SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY: {
+        Eigen::LeastSquaresConjugateGradient<Eigen::SparseMatrix<double>,
+                                             Eigen::IdentityPreconditioner>
+          solver;
+        SOLVE_ITERATIVE(solver);
+      }
+      case SLESolver::BICGSTAB:
+      case SLESolver::BICGSTAB_DIAGONALIZED: {
+        Eigen::BiCGSTAB<Eigen::SparseMatrix<double>,
+                        Eigen::DiagonalPreconditioner<double>>
+          solver;
+        SOLVE_ITERATIVE(solver);
+      }
+      case SLESolver::BICGSTAB_IDENTITY: {
+        Eigen::BiCGSTAB<Eigen::SparseMatrix<double>,
+                        Eigen::IdentityPreconditioner>
+          solver;
+        SOLVE_ITERATIVE(solver);
+      }
+      case SLESolver::BICGSTAB_INCOMPLETE_LU: {
+        Eigen::BiCGSTAB<Eigen::SparseMatrix<double>,
+                        Eigen::IncompleteLUT<double>>
+          solver;
         SOLVE_ITERATIVE(solver);
       }
       // direct solvers
@@ -769,7 +811,7 @@ MEHPForceBalance2::runForceRelaxation(
         Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> solver;
         SOLVE_DIRECT(solver);
       }
-      case SLESolver::SIMPLICIAL_DLT: {
+      case SLESolver::SIMPLICIAL_LDLT: {
         Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> solver;
         SOLVE_DIRECT(solver);
       }
@@ -785,6 +827,12 @@ MEHPForceBalance2::runForceRelaxation(
       default:
         throw std::runtime_error("This solver is not implemented.");
     }
+
+#undef SOLVER_FAILED
+#undef COMPUTE_SOLVE
+#undef ADD_ITERATIONS
+#undef SOLVE_ITERATIVE
+#undef SOLVE_DIRECT
 
     this->currentDisplacements =
       finalCoordinates - this->initialConfig.coordinates;

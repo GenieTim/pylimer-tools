@@ -1,3 +1,4 @@
+#include "../../src/pylimer_tools_cpp/calc/MEHPanalysis.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance.h"
@@ -35,76 +36,86 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
   std::string largeInputFile =
     suspectedPath +
     "/structure/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
-  if (std::filesystem::exists(largeInputFile)) {
-    universeSeq.initializeFromDataSequence({ { largeInputFile } });
-    pe::Universe universe = universeSeq.atIndex(0);
+  REQUIRE(std::filesystem::exists(largeInputFile));
+  universeSeq.initializeFromDataSequence({ { largeInputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
 
-    pcm::MEHPForceBalance referenceForceBalancer =
-      pcm::MEHPForceBalance(universe, 2);
-    referenceForceBalancer.configAssumeBoxLargeEnough(false);
+  pcm::MEHPForceBalance referenceForceBalancer =
+    pcm::MEHPForceBalance(universe, 2);
+  referenceForceBalancer.configAssumeBoxLargeEnough(false);
 
-    auto start_ref = std::chrono::high_resolution_clock::now();
+  auto start_ref = std::chrono::high_resolution_clock::now();
 
-    referenceForceBalancer.runForceRelaxation();
-    auto end_ref = std::chrono::high_resolution_clock::now();
-    auto duration_ref = std::chrono::duration_cast<std::chrono::microseconds>(
-      end_ref - start_ref);
-    std::cout << "Reference Time (FB1) to beat: "
-              << std::duration_to_string(duration_ref) << " " << std::endl;
+  referenceForceBalancer.runForceRelaxation();
+  auto end_ref = std::chrono::high_resolution_clock::now();
+  auto duration_ref =
+    std::chrono::duration_cast<std::chrono::microseconds>(end_ref - start_ref);
+  std::cout << "Reference Time (FB1) to beat: "
+            << std::duration_to_string(duration_ref) << " " << std::endl;
 
-    // BENCHMARK_ADVANCED("MEHP LD_MMA " +
-    //                    largeInputFile)(Catch::Benchmark::Chronometer meter)
-    // {
-    //   pcm::MEHPForceRelaxation forceRelaxer =
-    //     pcm::MEHPForceRelaxation(universe, 2);
-    //   forceRelaxer.configAssumeBoxLargeEnough(false);
+  // BENCHMARK_ADVANCED("MEHP LD_MMA " +
+  //                    largeInputFile)(Catch::Benchmark::Chronometer meter)
+  // {
+  //   pcm::MEHPForceRelaxation forceRelaxer =
+  //     pcm::MEHPForceRelaxation(universe, 2);
+  //   forceRelaxer.configAssumeBoxLargeEnough(false);
 
-    //   meter.measure([&forceRelaxer, &referenceForceBalancer] {
-    //     forceRelaxer.runForceRelaxation("LD_MMA");
+  //   meter.measure([&forceRelaxer, &referenceForceBalancer] {
+  //     forceRelaxer.runForceRelaxation("LD_MMA");
 
-    //     CHECK_THAT(
-    //       forceRelaxer.getGamma(),
-    //       Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(),
-    //       1e-2));
-    //     return forceRelaxer.getNrOfIterations();
-    //   });
-    // };
+  //     CHECK_THAT(
+  //       forceRelaxer.getGamma(),
+  //       Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(),
+  //       1e-2));
+  //     return forceRelaxer.getNrOfIterations();
+  //   });
+  // };
 
-    for (pcm::SLESolver solverChoice :
-         { // pcm::SIMPLICIAL_LLT,
-           //                                    pcm::SIMPLICIAL_DLT,
-           //                                    pcm::SPARSE_LU,
-           //                                    pcm::SPARSE_QR,
-           pcm::CONJUGATE_GRADIENT,
-           pcm::CONJUGATE_GRADIENT_IDENTITY,
-           pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
-           pcm::BICGSTAB }) {
-      pcm::MEHPForceBalance2 forceBalancer =
-        pcm::MEHPForceBalance2(universe, 2);
+  for (pcm::SLESolver solverChoice :
+       // { // pcm::SIMPLICIAL_LLT,
+       //   pcm::SIMPLICIAL_LDLT,
+       //   //                                    pcm::SPARSE_LU,
+       //   //                                    pcm::SPARSE_QR,
+       //   pcm::CONJUGATE_GRADIENT,
+       //   pcm::CONJUGATE_GRADIENT_IDENTITY,
+       //   pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
+       //   pcm::BICGSTAB }
+       pylimer_tools::sim::mehp::allSLESolvers) {
 
-      auto start = std::chrono::high_resolution_clock::now();
-
-      try {
-        forceBalancer.runForceRelaxation(
-          pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
-          1e-3,
-          solverChoice);
-      } catch (const std::exception& e) {
-        std::cerr << "Exception for solver " << solverChoice << ": " << e.what()
-                  << std::endl;
-        continue;
-      }
-
-      CHECK_THAT(
-        forceBalancer.getGamma(),
-        Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(), 1e-4));
-      auto end = std::chrono::high_resolution_clock::now();
-      auto duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-
-      std::cout << "Solver (FB2): " << solverChoice
-                << ", Time: " << std::duration_to_string(duration) << std::endl;
+    // need to exclude some very slow cases
+    if (solverChoice == pcm::SLESolver::SPARSE_QR) {
+      continue;
     }
+
+    pcm::MEHPForceBalance2
+      forceBalancer = // pcm::MEHPForceBalance2(universe, 2);
+      pcm::MEHPForceBalance2(universe,
+                             referenceForceBalancer.getNetwork(),
+                             referenceForceBalancer.getSpringPartitions(),
+                             false);
+    auto start = std::chrono::high_resolution_clock::now();
+
+    try {
+      forceBalancer.runForceRelaxation(
+        pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+        1e-3,
+        solverChoice);
+    } catch (const std::exception& e) {
+      std::cerr << "Exception for solver " << pcm::SLESolverNames[solverChoice]
+                << " (" << solverChoice << "): " << e.what() << std::endl;
+      continue;
+    }
+
+    CHECK_THAT(
+      forceBalancer.getGamma(),
+      Catch::Matchers::WithinRel(referenceForceBalancer.getGamma(), 1e-4));
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+    std::cout << "Solver (FB2): " << pcm::SLESolverNames[solverChoice] << " ("
+              << solverChoice
+              << "), Time: " << std::duration_to_string(duration) << std::endl;
   }
 }
 
@@ -167,16 +178,21 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
   // };
 
   for (pcm::SLESolver solverChoice :
-       { // pcm::SIMPLICIAL_LLT,
-         //                                    pcm::SIMPLICIAL_DLT,
-         //                                    pcm::SPARSE_LU,
-         //                                    pcm::SPARSE_QR,
-         pcm::CONJUGATE_GRADIENT,
-         pcm::CONJUGATE_GRADIENT_IDENTITY,
-         pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
-         pcm::BICGSTAB }) {
-    pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(universe, 2);
-
+       // { // pcm::SIMPLICIAL_LLT,
+       //   pcm::SIMPLICIAL_LDLT,
+       //   //                                    pcm::SPARSE_LU,
+       //   //                                    pcm::SPARSE_QR,
+       //   pcm::CONJUGATE_GRADIENT,
+       //   pcm::CONJUGATE_GRADIENT_IDENTITY,
+       //   pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
+       //   pcm::BICGSTAB }
+       pylimer_tools::sim::mehp::allSLESolvers) {
+    pcm::MEHPForceBalance2
+      forceBalancer = // pcm::MEHPForceBalance2(universe, 2);
+      pcm::MEHPForceBalance2(universe,
+                             referenceForceBalancer.getNetwork(),
+                             referenceForceBalancer.getSpringPartitions(),
+                             false);
     auto start = std::chrono::high_resolution_clock::now();
 
     try {
@@ -185,8 +201,8 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
         1e-3,
         solverChoice);
     } catch (const std::exception& e) {
-      std::cerr << "Exception for solver " << solverChoice << ": " << e.what()
-                << std::endl;
+      std::cerr << "Exception for solver " << pcm::SLESolverNames[solverChoice]
+                << " (" << solverChoice << "): " << e.what() << std::endl;
       continue;
     }
     auto end = std::chrono::high_resolution_clock::now();
@@ -198,7 +214,8 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
       Catch::Matchers::WithinAbs(referenceForceBalancer.getGamma(), 1e-5));
     CHECK(forceBalancer.getNrOfActiveNodes() == 0);
 
-    std::cout << "Solver (FB2): " << solverChoice
-              << ", Time: " << std::duration_to_string(duration) << std::endl;
+    std::cout << "Solver (FB2): " << pcm::SLESolverNames[solverChoice] << " ("
+              << solverChoice
+              << "), Time: " << std::duration_to_string(duration) << std::endl;
   }
 }
