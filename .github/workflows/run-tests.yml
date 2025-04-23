@@ -46,7 +46,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Install dev dependencies
-        run: sudo apt-get install bison flex lcov libeigen3-dev libopenblas-dev
+        run: sudo apt-get install bison flex lcov libeigen3-dev
 
       - name: Run Tests
         run: ./bin/run-tests-short.sh

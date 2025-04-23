@@ -7,12 +7,10 @@
 // #include "../utils/MemoryUtil.h"
 #include <Eigen/Dense>
 #include <Eigen/IterativeLinearSolvers>
-#include <Eigen/KLUSupport>
 #include <Eigen/SparseCholesky>
 #include <Eigen/SparseCore>
 #include <Eigen/SparseLU>
 #include <Eigen/SparseQR>
-#include <Eigen/UmfPackSupport>
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -731,7 +729,7 @@ MEHPForceBalance2::runForceRelaxation(
 #define COMPUTE_SOLVE(solver)                                                  \
   solver.compute(sysMatrix);                                                   \
   if (solver.info() != Eigen::Success) {                                       \
-    SOLVER_FAILED("System matrix computation failed");                         \
+    SOLVER_FAILED("System matrix computation failed");                                \
   }                                                                            \
   finalCoordinates = solver.solve(constants);                                  \
   if (solver.info() != Eigen::Success) {                                       \
@@ -824,14 +822,6 @@ MEHPForceBalance2::runForceRelaxation(
       case SLESolver::SPARSE_QR: {
         Eigen::SparseQR<Eigen::SparseMatrix<double>, Eigen::COLAMDOrdering<int>>
           solver;
-        SOLVE_DIRECT(solver);
-      }
-      case SLESolver::UMF_PACK_LU: {
-        Eigen::UmfPackLU<Eigen::SparseMatrix<double>> solver;
-        SOLVE_DIRECT(solver);
-      }
-      case SLESolver::KLU: {
-        Eigen::KLU<Eigen::SparseMatrix<double>> solver;
         SOLVE_DIRECT(solver);
       }
       default:

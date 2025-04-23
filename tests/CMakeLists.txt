@@ -101,7 +101,6 @@ endif()
 add_dependencies(test_sources pylimer_tools)
 include_directories(${igraph_INCLUDE_DIRS})
 include_directories(${Spectra_INCLUDE_DIRS})
-include_directories(${suitesparse_INCLUDE_DIRS})
 include_directories(${nlopt_INCLUDE_DIRS})
 include_directories(${cereal_INCLUDE_DIRS})
 include_directories(${EIGEN3_INCLUDE_DIRS})
@@ -112,6 +111,8 @@ target_link_libraries(test_sources
 PRIVATE
 	Catch2::Catch2
 	pylimer_tools
+	${igraph_LIBRARIES}
+	${nlopt_LIBRARIES}
 )
 
 add_executable(pylimer_tests pylimer_tools/test.cpp)
@@ -124,6 +125,8 @@ target_link_libraries(pylimer_tests
 	Catch2::Catch2WithMain
 	test_sources
 	pylimer_tools
+	${igraph_LIBRARIES}
+	${nlopt_LIBRARIES}
 )
 
 add_library(header_test_sources
