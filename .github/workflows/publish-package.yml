@@ -103,7 +103,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Install additional dependencies
-        run: brew install bison flex libomp
+        run: brew install bison flex libomp libopenblas-dev
 
       - name: Build
         run: ./bin/build-wheel.sh
