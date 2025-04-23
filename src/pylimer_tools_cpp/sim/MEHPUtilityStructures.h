@@ -85,8 +85,6 @@ namespace sim::mehp {
   X(SIMPLICIAL_LDLT, "SimplicialLDLT")                                         \
   X(SPARSE_LU, "SparseLU")                                                     \
   X(SPARSE_QR, "SparseQR")                                                     \
-  X(UMF_PACK_LU, "UmfPackLU")                                                  \
-  X(KLU, "KLU")                                                  \
   /* iterative methods */                                                      \
   X(CONJUGATE_GRADIENT, "ConjugateGradient")                                   \
   X(CONJUGATE_GRADIENT_DIAGONALIZED,                                           \
