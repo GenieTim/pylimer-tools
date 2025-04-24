@@ -1,5 +1,8 @@
 #pragma once
 
+#include <Eigen/Sparse>
+#include <fstream>
+
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 
@@ -28,8 +31,11 @@ median(const Eigen::DenseBase<Derived>& d)
   return median(m);
 }
 
-static inline bool isSelfAdjoint(const SparseMatrix<double>& mat, double tol = 1e-9) {
-  if (mat.rows() != mat.cols()) return false; // Must be square
+static inline bool
+isSelfAdjoint(const SparseMatrix<double>& mat, double tol = 1e-9)
+{
+  if (mat.rows() != mat.cols())
+    return false; // Must be square
 
   for (int k = 0; k < mat.outerSize(); ++k) {
     for (Eigen::SparseMatrix<double>::InnerIterator it(mat, k); it; ++it) {
@@ -45,6 +51,42 @@ static inline bool isSelfAdjoint(const SparseMatrix<double>& mat, double tol = 1
   }
   return true;
 }
+
+static inline void
+saveSparseMatrix(const Eigen::SparseMatrix<double>& mat,
+                 const std::string& filename)
+{
+  std::ofstream file(filename);
+  if (!file.is_open())
+    return;
+
+  file << "%%MatrixMarket matrix coordinate real general\n";
+  file << mat.rows() << " " << mat.cols() << " " << mat.nonZeros() << "\n";
+
+  for (int k = 0; k < mat.outerSize(); ++k) {
+    for (Eigen::SparseMatrix<double>::InnerIterator it(mat, k); it; ++it) {
+      file << (it.row() + 1) << " " << (it.col() + 1) << " " << it.value()
+           << "\n";
+    }
+  }
+
+  file.close();
+}
+
+static inline void
+saveDenseVector(const Eigen::VectorXd& vec, const std::string& filename)
+{
+  std::ofstream file(filename);
+  if (!file.is_open())
+    return;
+
+  for (int i = 0; i < vec.size(); ++i) {
+    file << vec[i] << "\n";
+  }
+
+  file.close();
+}
+
 }
 
 #ifdef OPENMP_FOUND

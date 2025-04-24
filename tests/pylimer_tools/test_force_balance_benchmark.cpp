@@ -27,7 +27,7 @@ namespace pcm = pylimer_tools::sim::mehp;
 #define PYLIMER_TEST_FIXTURES_DIR "../pylimer_tools/tests/fixtures"
 #endif
 
-TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
+TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long][FBBenchmark]")
 {
   std::cout << "Running test \"Force Balance Benchmarks\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -120,7 +120,7 @@ TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long]")
 }
 
 TEST_CASE("Force Balance Benchmarks randomly functionalized",
-          "[MEHPForceBalance][MEHPForceBalance2][benchmark][long]")
+          "[MEHPForceBalance][MEHPForceBalance2][benchmark][long][FBBenchmark]")
 {
   std::cout
     << "Running test \"Force Balance Benchmarks randomly functionalized\""

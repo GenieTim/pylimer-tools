@@ -589,7 +589,8 @@ TEST_CASE(
   SECTION("3D case")
   {
     std::string largeInputFile =
-      suspectedPath + "/structure/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
+      suspectedPath +
+      "/structure/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);

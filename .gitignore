@@ -142,15 +142,14 @@ _skbuild
 
 _cmake_test_compile
 
-docs/_autosummary
-pylimer_tools_lcoverage.info
-tests/pylimer_tools/fixtures/xlinked_0.90015_pdms_1e4_a_78_bs_t_807536.structure.out
-
-tests/pylimer_tools/fixtures/xlinked_0.94995_pdms_1e4_a_78_bs_t_1711038.structure.out
-tests/pylimer_tools/fixtures/structure/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out
-
 output*.txt
 
-tests/pylimer_tools/fixtures/structure/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out
+docs/_autosummary
+pylimer_tools_lcoverage.info
 
+# too large input files
+tests/pylimer_tools/fixtures/structure/xlinked_0.90015_pdms_1e4_a_78_bs_t_807536.structure.out
+tests/pylimer_tools/fixtures/structure/xlinked_0.94995_pdms_1e4_a_78_bs_t_1711038.structure.out
+tests/pylimer_tools/fixtures/structure/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out
+tests/pylimer_tools/fixtures/structure/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out
 tests/pylimer_tools/fixtures/tmp-test-data-file.out

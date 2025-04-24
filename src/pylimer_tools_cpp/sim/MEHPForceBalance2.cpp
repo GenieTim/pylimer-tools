@@ -5,6 +5,7 @@
 #include "../utils/StringUtils.h"
 #include "../utils/VectorUtils.h"
 // #include "../utils/MemoryUtil.h"
+#include "../utils/ExtraEigenSolvers.h"
 #include <Eigen/Dense>
 #include <Eigen/IterativeLinearSolvers>
 #include <Eigen/SparseCholesky>
@@ -591,6 +592,8 @@ MEHPForceBalance2::runForceRelaxation(
   const StructureSimplificationMode simplificationMode,
   const double inactiveRemovalCutoff,
   const SLESolver solverChoice,
+  const double residualReduction,
+  const int maxIterations,
   const std::function<bool()>& shouldInterrupt,
   const std::function<void()>& cleanupInterrupt)
 {
@@ -705,16 +708,32 @@ MEHPForceBalance2::runForceRelaxation(
     Eigen::SparseMatrix<double> sysMatrix(this->initialConfig.nrOfLinks * 3,
                                           this->initialConfig.nrOfLinks * 3);
     sysMatrix.setFromTriplets(triplets.begin(), triplets.end());
+    sysMatrix.makeCompressed();
 
 #ifndef NDEBUG
     // verify that the matrix fulfills the requirements of the gradient descent
     bool isSelfAdjoint = Eigen::isSelfAdjoint(sysMatrix);
     assert(isSelfAdjoint);
     // test whether the system matrix is positive definite (it's not
-    // guaranteed!) Eigen::VectorXd x =
-    // Eigen::VectorXd::Random(sysMatrix.rows()); double result = x.transpose()
-    // * sysMatrix * x; std::cout << "Quadratic test result: " << result <<
-    // std::endl;
+    // guaranteed!)
+    // Eigen::VectorXd x =
+    // Eigen::VectorXd::Random(sysMatrix.rows());
+    // double result = x.transpose() * sysMatrix * x;
+    // std::cout << "Quadratic test result: " << result << std::endl;
+    // test whether the system matrix is full rank
+    // std::cout << "Rank of matrix: " <<
+    // Eigen::FullPivLU<Eigen::MatrixXd>(sysMatrix).rank()
+    // << " for " << sysMatrix.rows() << "x" << sysMatrix.cols() << "matrix" <<
+    // std::endl; Eigen::SparseLU<Eigen::SparseMatrix<double>> luSolver;
+    // luSolver.compute(sysMatrix);
+    // std::cout << "LU decomposition info: " << luSolver.info() << " had
+    // determinant " << luSolver.determinant() << std::endl;
+    // ...
+
+    // Eigen::saveSparseMatrix(
+    //   sysMatrix, "sysMatrix_" + std::to_string(constants.size()) + ".mtx");
+    // Eigen::saveDenseVector(
+    //   constants, "constants_" + std::to_string(constants.size()) + ".txt");
 #endif
 
     Eigen::VectorXd finalCoordinates;
@@ -727,24 +746,32 @@ MEHPForceBalance2::runForceRelaxation(
               "). Solver info: " + std::to_string(solver.info()));
 
 #define COMPUTE_SOLVE(solver)                                                  \
-  solver.compute(sysMatrix);                                                   \
-  if (solver.info() != Eigen::Success) {                                       \
-    SOLVER_FAILED("System matrix computation failed");                                \
-  }                                                                            \
-  finalCoordinates = solver.solve(constants);                                  \
-  if (solver.info() != Eigen::Success) {                                       \
-    SOLVER_FAILED("System could not be solved");                               \
+  if (constants.isZero(1e-9)) {                                                \
+    finalCoordinates = Eigen::VectorXd::Zero(constants.size());                \
+  } else {                                                                     \
+    solver.compute(sysMatrix);                                                 \
+    if (solver.info() != Eigen::Success) {                                     \
+      SOLVER_FAILED("System matrix computation failed");                       \
+    }                                                                          \
+    finalCoordinates = solver.solve(constants);                                \
+    if (solver.info() != Eigen::Success) {                                     \
+      SOLVER_FAILED("System could not be solved");                             \
+    }                                                                          \
   }
 
 #define ADD_ITERATIONS(solver) iterationsDone += solver.iterations();
 
 #define SOLVE_ITERATIVE(solver)                                                \
+  solver.setTolerance(residualReduction);                                      \
+  solver.setMaxIterations(maxIterations);                                      \
   COMPUTE_SOLVE(solver);                                                       \
   ADD_ITERATIONS(solver);                                                      \
+  this->exitReason = ExitReason::X_TOLERANCE;                                  \
   break;
 
 #define SOLVE_DIRECT(solver)                                                   \
   COMPUTE_SOLVE(solver);                                                       \
+  this->exitReason = ExitReason::X_TOLERANCE;                                  \
   break;
 
     switch (solverChoice) {
@@ -805,6 +832,38 @@ MEHPForceBalance2::runForceRelaxation(
                         Eigen::IncompleteLUT<double>>
           solver;
         SOLVE_ITERATIVE(solver);
+      }
+      case SLESolver::GRADIENT_DESCENT: {
+        int solverIterations = 0;
+        finalCoordinates = Eigen::gradientDescent(sysMatrix,
+                                                  constants,
+                                                  0.01,
+                                                  residualReduction,
+                                                  maxIterations,
+                                                  solverIterations);
+        if (solverIterations >= maxIterations) {
+          this->exitReason = ExitReason::MAX_STEPS;
+        } else {
+          this->exitReason = ExitReason::X_TOLERANCE;
+        }
+        iterationsDone += solverIterations;
+        break;
+      }
+      case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN: {
+        int solverIterations = 0;
+        finalCoordinates = Eigen::gradientDescentBarzilaiBorwein(sysMatrix,
+                                                  constants,
+                                                  0.01,
+                                                  residualReduction,
+                                                  maxIterations,
+                                                  solverIterations);
+        if (solverIterations >= maxIterations) {
+          this->exitReason = ExitReason::MAX_STEPS;
+        } else {
+          this->exitReason = ExitReason::X_TOLERANCE;
+        }
+        iterationsDone += solverIterations;
+        break;
       }
       // direct solvers
       case SLESolver::SIMPLICIAL_LLT: {
@@ -920,8 +979,7 @@ MEHPForceBalance2::runForceRelaxation(
   // finish up
   this->closeAllOutputs();
 
-  // query solution & exit reason
-  this->exitReason = ExitReason::X_TOLERANCE;
+  // some last output and additions
   this->nrOfStepsDone += iterationsDone;
   std::cout << iterationsDone << " steps done. "
             << "Current residual: " << currentResidual << ". "
