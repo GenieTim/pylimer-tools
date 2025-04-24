@@ -340,6 +340,8 @@
 <p>BICGSTAB_DIAGONALIZED : BiCGSTAB, DiagonalPreconditioner</p>
 <p>BICGSTAB_IDENTITY : BiCGSTAB, IdentityPreconditioner</p>
 <p>BICGSTAB_INCOMPLETE_LU : BiCGSTAB, IncompleteLUTPreconditioner</p>
+<p>GRADIENT_DESCENT : GradientDescent</p>
+<p>GRADIENT_DESCENT_BARZILAI_BORWEIN : GradientDescent (Barzilai-Borwein method)</p>
 </div></blockquote>
 <p class="rubric">Attributes Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
@@ -370,6 +372,12 @@
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.DEFAULT" title="pylimer_tools_cpp.SLESolver.DEFAULT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT" title="pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GRADIENT_DESCENT</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN" title="pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GRADIENT_DESCENT_BARZILAI_BORWEIN</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT" title="pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT</span></code></a></p></td>
@@ -446,6 +454,16 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.DEFAULT">
 <span class="sig-name descname"><span class="pre">DEFAULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.DEFAULT:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.DEFAULT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT">
+<span class="sig-name descname"><span class="pre">GRADIENT_DESCENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.GRADIENT_DESCENT:</span> <span class="pre">16&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN">
+<span class="sig-name descname"><span class="pre">GRADIENT_DESCENT_BARZILAI_BORWEIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN:</span> <span class="pre">17&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -562,6 +580,8 @@
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_IDENTITY"><code class="docutils literal notranslate"><span class="pre">SLESolver.CONJUGATE_GRADIENT_IDENTITY</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY"><code class="docutils literal notranslate"><span class="pre">SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.DEFAULT"><code class="docutils literal notranslate"><span class="pre">SLESolver.DEFAULT</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT"><code class="docutils literal notranslate"><span class="pre">SLESolver.GRADIENT_DESCENT</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN"><code class="docutils literal notranslate"><span class="pre">SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT"><code class="docutils literal notranslate"><span class="pre">SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED"><code class="docutils literal notranslate"><span class="pre">SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY"><code class="docutils literal notranslate"><span class="pre">SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY</span></code></a></li>
