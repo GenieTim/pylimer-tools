@@ -1432,13 +1432,15 @@ and finally springs will be any number of connected bonds between links.
       [](mehp::MEHPForceBalance2& sim,
          const mehp::StructureSimplificationMode simplificationMode,
          const double inactiveRemovalCutoff,
-         const mehp::SLESolver solverChoice) {
+         const mehp::SLESolver solverChoice,
+         const double tolerance,
+         const int maxIterations) {
         return sim.runForceRelaxation(
           simplificationMode,
           inactiveRemovalCutoff,
           solverChoice,
-          TODO,
-          TODO,
+          tolerance,
+          maxIterations,
           []() { return PyErr_CheckSignals() != 0; },
           []() { throw py::error_already_set(); });
       },
@@ -1448,11 +1450,15 @@ and finally springs will be any number of connected bonds between links.
            :param simplification_mode: How to simplify the structure during the minimization.
            :param inactive_removal_cutoff: The tolerance in distance units of the partial spring length to count as active, relevant if simplification mode is specified to be something other than NO_SIMPLIFICATION.
            :param sle_solver: The solver to use for the system of linear equations (SLE).
+           :param tolerance: The stopping condition/tolerance for the SLE solver if it's an iterative one.
+           :param max_iterations: The maximum number of iterations to perform if the SLE solver is an iterative one.
            )pbdoc",
       py::arg("simplification_mode") =
         mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
       py::arg("inactive_removal_cutoff") = 1e-3,
-      py::arg("sle_solver") = mehp::SLESolver::DEFAULT)
+      py::arg("sle_solver") = mehp::SLESolver::DEFAULT,
+      py::arg("tolerance") = 1e-12,
+      py::arg("max_iterations") = 10000)
     .def("deform_to",
          &mehp::MEHPForceBalance2::deformTo,
          R"pbdoc(

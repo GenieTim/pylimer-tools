@@ -27,7 +27,8 @@ namespace pcm = pylimer_tools::sim::mehp;
 #define PYLIMER_TEST_FIXTURES_DIR "../pylimer_tools/tests/fixtures"
 #endif
 
-TEST_CASE("Force Balance Benchmarks", "[MEHPForceBalance2][benchmark][long][FBBenchmark]")
+TEST_CASE("Force Balance Benchmarks",
+          "[MEHPForceBalance2][benchmark][long][FBBenchmark]")
 {
   std::cout << "Running test \"Force Balance Benchmarks\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -187,6 +188,12 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
        //   pcm::LEAST_SQUARES_CONJUGATE_GRADIENT,
        //   pcm::BICGSTAB }
        pylimer_tools::sim::mehp::allSLESolvers) {
+
+    // need to exclude some very slow cases
+    if (solverChoice == pcm::SLESolver::SPARSE_QR) {
+      continue;
+    }
+
     pcm::MEHPForceBalance2
       forceBalancer = // pcm::MEHPForceBalance2(universe, 2);
       pcm::MEHPForceBalance2(universe,

@@ -2114,7 +2114,7 @@ TEST_CASE("Selective MC Generated Structure Solves",
   // 0x10ae9d460>, 'remove_wsol': True}
 
   // 3 passes, 2 does not
-  double scaleDownBy = 1./10.;
+  double scaleDownBy = 1. / 10.;
 
   pylimer_tools::utils::MCUniverseGenerator generator =
     pylimer_tools::utils::MCUniverseGenerator(
@@ -2143,9 +2143,10 @@ TEST_CASE("Selective MC Generated Structure Solves",
   pcm::MEHPForceBalance2 fb2 = generator.getForceBalance2();
   CHECK_NOTHROW(fb2.validateNetwork());
   // fb2.CHECK_NOTHROW(
-    fb2.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
-                           1e-5,
-                           pcm::SLESolver::GRADIENT_DESCENT);//);
+  fb2.runForceRelaxation(
+    pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+    1e-5,
+    pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN); //);
   CHECK(fb2.getPressure() < 1e-3);
 }
 

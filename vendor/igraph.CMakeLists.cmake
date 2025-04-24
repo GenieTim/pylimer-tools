@@ -2,65 +2,65 @@ include(ExternalProject)
 # include(FetchContent)
 
 if (NOT DEFINED vendor_suffix)
-	set(vendor_suffix "")
-endif()
+    set(vendor_suffix "")
+endif ()
 
 # download, compile & install igraph
 if (NOT DEFINED igraph_LOADED)
-	find_package(igraph "0.10.15...<1.1.0")
+    find_package(igraph "0.10.15...<1.1.0")
 
-	# if (${igraph_FOUND} AND TARGET igraph::igraph)
-	# 	message("Found igraph library")
-	# 	set(igraph_LIBRARIES igraph::igraph)
-	# 	get_target_property(l_igraph_INCLUDE_DIRS igraph::igraph INTERFACE_INCLUDE_DIRECTORIES)
-	# 	set(igraph_INCLUDE_DIRS "${l_igraph_INCLUDE_DIRS}")
-	# else()
-		if (NOT TARGET igraphLib)
+    # if (${igraph_FOUND} AND TARGET igraph::igraph)
+    # 	message("Found igraph library")
+    # 	set(igraph_LIBRARIES igraph::igraph)
+    # 	get_target_property(l_igraph_INCLUDE_DIRS igraph::igraph INTERFACE_INCLUDE_DIRECTORIES)
+    # 	set(igraph_INCLUDE_DIRS "${l_igraph_INCLUDE_DIRS}")
+    # else()
+    if (NOT TARGET igraphLib)
 
-			if(WIN32)
-				set(LIBRARY_PREFIX "")
-				set(LIBRARY_SUFFIX ".lib")
-			else()
-				set(LIBRARY_PREFIX "lib")
-				set(LIBRARY_SUFFIX ".a")
-			endif()
+        if (WIN32)
+            set(LIBRARY_PREFIX "")
+            set(LIBRARY_SUFFIX ".lib")
+        else ()
+            set(LIBRARY_PREFIX "lib")
+            set(LIBRARY_SUFFIX ".a")
+        endif ()
 
-			set(igraph_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}")
-			set(igraph_EXTRA_CMAKE_ARGS "")
-			if (DEFINED ENV{BISON_EXECUTABLE})
-				set(igraph_EXTRA_CMAKE_ARGS "-DBISON_EXECUTABLE=$ENV{BISON_EXECUTABLE}")
-			endif()
+        set(igraph_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}")
+        set(igraph_EXTRA_CMAKE_ARGS "")
+        if (DEFINED ENV{BISON_EXECUTABLE})
+            set(igraph_EXTRA_CMAKE_ARGS "-DBISON_EXECUTABLE=$ENV{BISON_EXECUTABLE}")
+        endif ()
 
-			ExternalProject_Add(
-					igraphLib
-					GIT_REPOSITORY https://github.com/GenieTim/igraph.git # https://github.com/igraph/igraph.git
-					GIT_TAG a27b9387c290c1f9d38aaff82b54600177f19826 # 635b432eff0a89580ac9bb98068d2fbc8ef374f2 # 0.10.15
-					PREFIX ${igraph_PREFIX_PATH}
-					INSTALL_DIR ${igraph_PREFIX_PATH}/igraphLib-install
-					CMAKE_ARGS ${igraph_EXTRA_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=OFF -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true
-					BUILD_COMMAND ${CMAKE_COMMAND} --build ${igraph_PREFIX_PATH}/src/igraphLib-build --config Release
-					BUILD_BYPRODUCTS ${igraph_PREFIX_PATH}/igraphLib-install/lib/${LIBRARY_PREFIX}igraph${LIBRARY_SUFFIX}
-			)
-			# FetchContent_MakeAvailable(igraphLib)
-			add_library(igraph::igraph SHARED IMPORTED)
-			add_dependencies(igraph::igraph igraphLib)
-			if (MSVC)
-				set(igraph_INCLUDE_DIRS "${igraph_PREFIX_PATH}/igraphLib-install/include" "${igraph_PREFIX_PATH}/src/igraphLib/msvc/include")
-			else()
-				set(igraph_INCLUDE_DIRS "${igraph_PREFIX_PATH}/igraphLib-install/include")
-			endif()
-			file(GLOB igraph_LIBRARIES "${igraph_PREFIX_PATH}/igraphLib-install/lib/${LIBRARY_PREFIX}igraph.*")
-			if (NOT igraph_LIBRARIES)
-				# message("WARNING: igraph_LIBRARIES empty")
-				set(igraph_LIBRARIES "${igraph_PREFIX_PATH}/igraphLib-install/lib/${LIBRARY_PREFIX}igraph${LIBRARY_SUFFIX}")
-				# file(GLOB_RECURSE igraph_LIBRARIES "${igraph_PREFIX_PATH}/*.a")
-			endif()
-			message("Hoping igraph_LIBRARIES will be compiled to: ${igraph_LIBRARIES}")
-			set_target_properties(igraph::igraph PROPERTIES IMPORTED_LOCATION ${igraph_LIBRARIES})
-			set(igraph_LOADED ON)
-		endif()
-	# endif()
-endif()
+        ExternalProject_Add(
+                igraphLib
+                GIT_REPOSITORY https://github.com/GenieTim/igraph.git # https://github.com/igraph/igraph.git
+                GIT_TAG a27b9387c290c1f9d38aaff82b54600177f19826 # 635b432eff0a89580ac9bb98068d2fbc8ef374f2 # 0.10.15
+                PREFIX ${igraph_PREFIX_PATH}
+                INSTALL_DIR ${igraph_PREFIX_PATH}/igraphLib-install
+                CMAKE_ARGS ${igraph_EXTRA_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=OFF -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true
+                BUILD_COMMAND ${CMAKE_COMMAND} --build ${igraph_PREFIX_PATH}/src/igraphLib-build --config Release
+                BUILD_BYPRODUCTS ${igraph_PREFIX_PATH}/igraphLib-install/lib/${LIBRARY_PREFIX}igraph${LIBRARY_SUFFIX}
+        )
+        # FetchContent_MakeAvailable(igraphLib)
+        add_library(igraph::igraph SHARED IMPORTED)
+        add_dependencies(igraph::igraph igraphLib)
+        if (MSVC)
+            set(igraph_INCLUDE_DIRS "${igraph_PREFIX_PATH}/igraphLib-install/include" "${igraph_PREFIX_PATH}/src/igraphLib/msvc/include")
+        else ()
+            set(igraph_INCLUDE_DIRS "${igraph_PREFIX_PATH}/igraphLib-install/include")
+        endif ()
+        file(GLOB igraph_LIBRARIES "${igraph_PREFIX_PATH}/igraphLib-install/lib/${LIBRARY_PREFIX}igraph.*")
+        if (NOT igraph_LIBRARIES)
+            # message("WARNING: igraph_LIBRARIES empty")
+            set(igraph_LIBRARIES "${igraph_PREFIX_PATH}/igraphLib-install/lib/${LIBRARY_PREFIX}igraph${LIBRARY_SUFFIX}")
+            # file(GLOB_RECURSE igraph_LIBRARIES "${igraph_PREFIX_PATH}/*.a")
+        endif ()
+        message("Hoping igraph_LIBRARIES will be compiled to: ${igraph_LIBRARIES}")
+        set_target_properties(igraph::igraph PROPERTIES IMPORTED_LOCATION ${igraph_LIBRARIES})
+        set(igraph_LOADED ON)
+    endif ()
+    # endif()
+endif ()
 
 # find_package(igraph REQUIRED)
 # if(igraph_FOUND)

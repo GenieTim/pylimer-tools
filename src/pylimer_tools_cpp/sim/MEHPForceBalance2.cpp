@@ -851,12 +851,13 @@ MEHPForceBalance2::runForceRelaxation(
       }
       case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN: {
         int solverIterations = 0;
-        finalCoordinates = Eigen::gradientDescentBarzilaiBorwein(sysMatrix,
-                                                  constants,
-                                                  0.01,
-                                                  residualReduction,
-                                                  maxIterations,
-                                                  solverIterations);
+        finalCoordinates =
+          Eigen::gradientDescentBarzilaiBorwein(sysMatrix,
+                                                constants,
+                                                0.01,
+                                                residualReduction,
+                                                maxIterations,
+                                                solverIterations);
         if (solverIterations >= maxIterations) {
           this->exitReason = ExitReason::MAX_STEPS;
         } else {
