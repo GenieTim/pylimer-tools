@@ -3,9 +3,9 @@
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
-endif()
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif ()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
@@ -15,25 +15,25 @@ string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_REL
 # set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O3")
 
 if (NOT DEFINED HIGH_PERFORMANCE)
-	option(HIGH_PERFORMANCE "Add even more compiler flags to improve performance" OFF)
-endif()
+    option(HIGH_PERFORMANCE "Add even more compiler flags to improve performance" OFF)
+endif ()
 
 if (HIGH_PERFORMANCE)
-	if (MSVC)
-		add_compile_options(/03)
-	else()
-		add_compile_options(-O3 -march=native)
-	endif()
-endif()
+    if (MSVC)
+        add_compile_options(/03)
+    else ()
+        add_compile_options(-O3 -march=native)
+    endif ()
+endif ()
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-#  -Wall -Wextra -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Woverloaded-virtual  -Wno-unused
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wredundant-decls -Wstrict-overflow=5 -Wmissing-declarations -Wmissing-include-dirs -Wswitch-default -Wundef -Weffc++")
-endif()
+if (CMAKE_COMPILER_IS_GNUCXX)
+    #  -Wall -Wextra -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Woverloaded-virtual  -Wno-unused
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wredundant-decls -Wstrict-overflow=5 -Wmissing-declarations -Wmissing-include-dirs -Wswitch-default -Wundef -Weffc++")
+endif ()
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 function(OUTPUT_FLAGS target_name)
-get_target_property(COMPILE_DEFS ${target_name} COMPILE_DEFINITIONS)
-message(STATUS "Compile definitions of ${target_name} are ${COMPILE_DEFS} for build type ${CMAKE_BUILD_TYPE}")
+    get_target_property(COMPILE_DEFS ${target_name} COMPILE_DEFINITIONS)
+    message(STATUS "Compile definitions of ${target_name} are ${COMPILE_DEFS} for build type ${CMAKE_BUILD_TYPE}")
 endfunction()

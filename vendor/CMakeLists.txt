@@ -1,8 +1,8 @@
 # Install (incl. download) dependencies where applicable
 
 if (NOT DEFINED vendor_suffix)
-	set(vendor_suffix "")
-endif()
+    set(vendor_suffix "")
+endif ()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake-modules")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")

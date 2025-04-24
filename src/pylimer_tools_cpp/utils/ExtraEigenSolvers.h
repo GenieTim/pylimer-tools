@@ -5,6 +5,7 @@
 namespace Eigen {
 // Function to perform Gradient Descent with residual-based stopping criterion
 // Barzilai-Borwein method to solve Ax = b
+// Could benefit from a preconditioner
 template<typename MatrixType>
 static inline Eigen::VectorXd
 gradientDescentBarzilaiBorwein(const MatrixType& A,
@@ -44,6 +45,9 @@ gradientDescentBarzilaiBorwein(const MatrixType& A,
   return x;
 }
 
+// Function to perform Gradient Descent with residual-based stopping criterion
+// as documented in Wikipedia
+// Could benefit from a preconditioner
 template<typename MatrixType>
 static inline Eigen::VectorXd
 gradientDescent(const MatrixType& A,
@@ -63,7 +67,7 @@ gradientDescent(const MatrixType& A,
     Eigen::VectorXd Ar = A * gradient;
     double stepSize = gradient.dot(gradient) / gradient.dot(Ar);
     x = x + stepSize * gradient;
-    iterations += 1;
+    iteration += 1;
     // reset to "correct" gradient after every 100 iterations
     // against floating point precision issues
     if (iteration % 100 == 0) {
