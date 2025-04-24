@@ -219,16 +219,22 @@ public:
    * @param simplificationMode
    * @param inactiveRemovalCutoff
    * @param solver
+   * @param residualReduction
+   * @param maxIterations
    */
   void runForceRelaxation(const StructureSimplificationMode simplificationMode =
                             StructureSimplificationMode::NO_SIMPLIFICATION,
                           const double inactiveRemovalCutoff = 1e-3,
-                          const SLESolver solver = SLESolver::DEFAULT)
+                          const SLESolver solver = SLESolver::DEFAULT,
+                          const double residualReduction = 1e-13,
+                          const int maxIterations = 10000)
   {
     this->runForceRelaxation(
       simplificationMode,
       inactiveRemovalCutoff,
       solver,
+      residualReduction,
+      maxIterations,
       []() { return false; },
       []() {});
   }
@@ -238,13 +244,17 @@ public:
    *
    * @param simplificationMode
    * @param inactiveRemovalCutoff
-   * @param solver
+   * @param solverChoice
+   * @param residualReduction
+   * @param maxIterations
    * @param shouldInterrupt
    * @param cleanupInterrupt
    */
-  void runForceRelaxation(const StructureSimplificationMode simplificationMode,
-                          const double inactiveRemovalCutoff,
-                          const SLESolver solver,
+  void runForceRelaxation(StructureSimplificationMode simplificationMode,
+                          double inactiveRemovalCutoff,
+                          SLESolver solverChoice,
+                          double residualReduction,
+                          int maxIterations,
                           const std::function<bool()>& shouldInterrupt,
                           const std::function<void()>& cleanupInterrupt);
 

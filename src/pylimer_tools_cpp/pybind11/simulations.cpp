@@ -1437,6 +1437,8 @@ and finally springs will be any number of connected bonds between links.
           simplificationMode,
           inactiveRemovalCutoff,
           solverChoice,
+          TODO,
+          TODO,
           []() { return PyErr_CheckSignals() != 0; },
           []() { throw py::error_already_set(); });
       },

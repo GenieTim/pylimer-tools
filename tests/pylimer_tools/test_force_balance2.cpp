@@ -328,7 +328,8 @@ TEST_CASE(
   SECTION("MEHP Force Balance2 3D case")
   {
     std::string largeInputFile =
-      suspectedPath + "structure/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
+      suspectedPath +
+      "structure/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);
@@ -2113,7 +2114,7 @@ TEST_CASE("Selective MC Generated Structure Solves",
   // 0x10ae9d460>, 'remove_wsol': True}
 
   // 3 passes, 2 does not
-  double scaleDownBy = 1.;
+  double scaleDownBy = 1./10.;
 
   pylimer_tools::utils::MCUniverseGenerator generator =
     pylimer_tools::utils::MCUniverseGenerator(
@@ -2125,7 +2126,7 @@ TEST_CASE("Selective MC Generated Structure Solves",
     2,
     pylimer_tools::utils::initializeWithValue(
       2, static_cast<int>(217 / scaleDownBy)),
-    7*0.9407504937458855,
+    7 * 0.9407504937458855,
     1,
     2,
     1);
@@ -2141,10 +2142,10 @@ TEST_CASE("Selective MC Generated Structure Solves",
 
   pcm::MEHPForceBalance2 fb2 = generator.getForceBalance2();
   CHECK_NOTHROW(fb2.validateNetwork());
-  CHECK_NOTHROW(
+  // fb2.CHECK_NOTHROW(
     fb2.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
                            1e-5,
-                           pcm::SLESolver::SIMPLICIAL_LDLT));
+                           pcm::SLESolver::GRADIENT_DESCENT);//);
   CHECK(fb2.getPressure() < 1e-3);
 }
 
