@@ -102,8 +102,13 @@ namespace sim::mehp {
   X(BICGSTAB_IDENTITY, "BiCGSTAB, IdentityPreconditioner")                     \
   X(BICGSTAB_INCOMPLETE_LU, "BiCGSTAB, IncompleteLUTPreconditioner")           \
   X(GRADIENT_DESCENT, "GradientDescent")                                       \
-  X(GRADIENT_DESCENT_BARZILAI_BORWEIN,                                         \
-    "GradientDescent (Barzilai-Borwein method)")
+  X(GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT,                                   \
+    "GradientDescent (Barzilai-Borwein method, short time-step)")              \
+  X(GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG,                                    \
+    "GradientDescent (Barzilai-Borwein method, long time-step)")               \
+  X(GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM,                                \
+    "GradientDescent (Barzilai-Borwein & heavy ball method, selective "        \
+    "time-step)")
 
   enum SLESolver
   {

@@ -776,7 +776,6 @@ MEHPForceBalance2::runForceRelaxation(
 
     switch (solverChoice) {
       // iterative solvers
-      case SLESolver::DEFAULT:
       case SLESolver::CONJUGATE_GRADIENT:
       case SLESolver::CONJUGATE_GRADIENT_DIAGONALIZED: {
         Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
@@ -849,15 +848,37 @@ MEHPForceBalance2::runForceRelaxation(
         iterationsDone += solverIterations;
         break;
       }
-      case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN: {
+      case SLESolver::DEFAULT:
+      case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT:
+      case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG: {
+        int solverIterations = 0;
+        finalCoordinates = Eigen::gradientDescentBarzilaiBorwein(
+          sysMatrix,
+          constants,
+          0.01,
+          residualReduction,
+          maxIterations,
+          solverIterations,
+          solverChoice == SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT
+
+        );
+        if (solverIterations >= maxIterations) {
+          this->exitReason = ExitReason::MAX_STEPS;
+        } else {
+          this->exitReason = ExitReason::X_TOLERANCE;
+        }
+        iterationsDone += solverIterations;
+        break;
+      }
+      case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM: {
         int solverIterations = 0;
         finalCoordinates =
-          Eigen::gradientDescentBarzilaiBorwein(sysMatrix,
-                                                constants,
-                                                0.01,
-                                                residualReduction,
-                                                maxIterations,
-                                                solverIterations);
+          Eigen::gradientDescentHeavyBallBarzilaiBorwein(sysMatrix,
+                                                         constants,
+                                                         0.01,
+                                                         residualReduction,
+                                                         maxIterations,
+                                                         solverIterations);
         if (solverIterations >= maxIterations) {
           this->exitReason = ExitReason::MAX_STEPS;
         } else {
