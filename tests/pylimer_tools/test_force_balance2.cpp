@@ -2146,7 +2146,7 @@ TEST_CASE("Selective MC Generated Structure Solves",
   fb2.runForceRelaxation(
     pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
     1e-5,
-    pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN); //);
+    pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG); //);
   CHECK(fb2.getPressure() < 1e-3);
 }
 
