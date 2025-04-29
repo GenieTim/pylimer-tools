@@ -426,7 +426,11 @@ public:
    */
   int getNrOfActiveNodes(const double tolerance = 1e-6) const
   {
-    return this->findActiveNodes(tolerance).count();
+    if (this->initialConfig.nrOfNodes == 0) {
+      return 0;
+    }
+    Eigen::ArrayXb activeNodes = this->findActiveNodes(tolerance);
+    return activeNodes.count();
   }
 
   /**
