@@ -204,12 +204,12 @@ namespace entities {
     return totalWeight;
   }
 
-  long int Molecule::getAtomIdByIdx(const int vertexId) const
+  long int Molecule::getAtomIdByIdx(const igraph_integer_t vertexId) const
   {
     return VAN(&this->graph, "id", vertexId);
   };
 
-  long int Molecule::getIdxByAtomId(const int atomId) const
+  igraph_integer_t Molecule::getIdxByAtomId(const int atomId) const
   {
     if (!pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx, atomId)) {
       throw std::invalid_argument("Molecule cannot return vertex idx of this "

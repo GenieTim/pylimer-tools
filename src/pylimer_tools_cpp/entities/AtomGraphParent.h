@@ -95,6 +95,18 @@ namespace entities {
                                       const long int vertexIdxTo) const;
 
     /**
+     * @brief Get the number of edges leading to/from one vertex
+     *
+     * @param vertexIdxFrom the vertex from which to start the path
+     * @param vertexIdxTo the vertex to which to end the path
+     * @param maxLength the maximum length of the path, -1 for no limit
+     * @return the number of edges in the path, 0 if no path exists
+     */
+    int getPathLength(const long int vertexIdxFrom,
+                      const long int vertexIdxTo,
+                      const int maxLength = -1) const;
+
+    /**
      * @brief Get the number Of Atoms
      *
      * @return int
@@ -206,7 +218,7 @@ namespace entities {
      * @param vertexId the index of the vertex
      * @return long int the atom's id
      */
-    virtual long int getAtomIdByIdx(const int vertexId) const = 0;
+    virtual long int getAtomIdByIdx(igraph_integer_t vertexId) const = 0;
 
     /**
      * @brief Get the vertex index by the Atom id
@@ -214,7 +226,7 @@ namespace entities {
      * @param atomId the id of the atom
      * @return long int the vertex index
      */
-    virtual long int getIdxByAtomId(const int atomId) const = 0;
+    virtual igraph_integer_t getIdxByAtomId(const int atomId) const = 0;
 
     /**
      * @brief Get an atom by its vertex id

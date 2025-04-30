@@ -1,65 +1,79 @@
 #pragma once
 
-#include <algorithm>
 #include <string>
 #include <vector>
 
-namespace pylimer_tools {
-namespace utils {
+
+namespace pylimer_tools::utils {
+#define LAMMPS_ATOM_STYLES                                                     \
+  X(NONE, "none")                                                              \
+  X(ANGLE, "angle")                                                            \
+  X(ATOMIC, "atomic")                                                          \
+  X(BODY, "body")                                                              \
+  X(BOND, "bond")                                                              \
+  X(CHARGE, "charge")                                                          \
+  X(DIELECTRIC, "dielectric")                                                  \
+  X(DIPOLE, "dipole")                                                          \
+  X(DPD, "dpd")                                                                \
+  X(EDPD, "edpd")                                                              \
+  X(ELECTRON, "electron")                                                      \
+  X(ELLIPSOID, "ellipsoid")                                                    \
+  X(FULL, "full")                                                              \
+  X(LINE, "line")                                                              \
+  X(MDPD, "mdpd")                                                              \
+  X(MOLECULAR, "molecular")                                                    \
+  X(PERI, "peri")                                                              \
+  X(SMD, "smd")                                                                \
+  X(SPH, "sph")                                                                \
+  X(SPHERE, "sphere")                                                          \
+  X(BPM_SPHERE, "bpm_sphere")                                                  \
+  X(SPIN, "spin")                                                              \
+  X(TDPD, "tdpd")                                                              \
+  X(TEMPLATE, "template")                                                      \
+  X(TRI, "tri")                                                                \
+  X(WAVEPACKET, "wavepacket")                                                  \
+  X(HYBRID, "hybrid")
+
   enum AtomStyle : int
   {
-    NONE,
-    ANGLE,
-    ATOMIC,
-    BODY,
-    BOND,
-    CHARGE,
-    DIELECTRIC,
-    DIPOLE,
-    DPD,
-    EDPD,
-    ELECTRON,
-    ELLIPSOID,
-    FULL,
-    LINE,
-    MDPD,
-    MOLECULAR,
-    PERI,
-    SMD,
-    SPH,
-    SPHERE,
-    BPM_SPHERE,
-    SPIN,
-    TDPD,
-    TEMPLATE,
-    TRI,
-    WAVEPACKET,
-    HYBRID
+#define X(e, s) e,
+    LAMMPS_ATOM_STYLES
+#undef X
   };
+
+  static inline std::string getAtomStyleString(AtomStyle type)
+  {
+    switch (type) {
+#define X(e, s)                                                                \
+  case e:                                                                      \
+    return s;
+      LAMMPS_ATOM_STYLES
+#undef X
+      default:
+        SHOULD_NOT_REACH_HERE("Atom style " + std::to_string(type) + " not recognized");
+    }
+  }
 
   static inline std::vector<std::string> getAtomStyleStrings()
   {
-    return { "none",       "angle",      "atomic", "body",     "bond",
-             "charge",     "dielectric", "dipole", "dpd",      "edpd",
-             "electron",   "ellipsoid",  "full",   "line",     "mdpd",
-             "molecular",  "peri",       "smd",    "sph",      "sphere",
-             "bpm_sphere", "spin",       "tdpd",   "template", "tri",
-             "wavepacket", "hybrid" };
-  }
-  static inline std::string getAtomStyleString(AtomStyle type)
-  {
-    return getAtomStyleStrings()[type];
+    return {
+#define X(e, s) s,
+      LAMMPS_ATOM_STYLES
+#undef X
+    };
   }
 
   static inline AtomStyle getAtomStyleFromString(const std::string& src)
   {
-    std::vector<std::string> AtomStyleString = getAtomStyleStrings();
-    auto it = std::find(AtomStyleString.begin(), AtomStyleString.end(), src);
-    if (it != AtomStyleString.end()) {
-      int index = it - AtomStyleString.begin();
-      return static_cast<AtomStyle>(index);
+    switch (src) {
+#define X(e, s)                                                                \
+  case s:                                                                      \
+    return e;
+      LAMMPS_ATOM_STYLES
+#undef X
+      default:
+        throw std::invalid_argument("Atom style " + src + " not recognized");
     }
-    return AtomStyle::NONE;
   }
 }
-}
+

@@ -1731,7 +1731,7 @@ namespace entities {
    * @param vertexId
    * @return long int
    */
-  long int Universe::getAtomIdByIdx(const int vertexId) const
+  long int Universe::getAtomIdByIdx(const igraph_integer_t vertexId) const
   {
     return igraphRealToInt<long int>(VAN(&this->graph, "id", vertexId));
   }
@@ -1742,7 +1742,7 @@ namespace entities {
    * @param atomId
    * @return long int
    */
-  long int Universe::getIdxByAtomId(const int atomId) const
+  igraph_integer_t Universe::getIdxByAtomId(const int atomId) const
   {
     // if (!pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx, atomId))
     // {

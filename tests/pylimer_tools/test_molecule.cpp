@@ -117,6 +117,10 @@ TEST_CASE("Molecules sum the bonds correctly", "[entity][Molecule]")
             << std::endl;
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
 
+  /**
+   * This Universe contains one single chain of 5 atoms,
+   *   1 - 2 - 3 - 4 - 5
+   */
   universe.addAtoms({ { 1, 2, 3, 4, 5 } },        // id
                     { { 2, 1, 1, 1, 2 } },        // type
                     { { 5., 7., 9., 11., 13. } }, // x
@@ -154,6 +158,12 @@ TEST_CASE("Molecules sum the bonds correctly", "[entity][Molecule]")
   CHECK(molecules[0].getNrOfBondsFromTo(2, 4, 2, false) == 2);
   CHECK(molecules[0].getNrOfBondsFromTo(4, 2, 2, false) == 2);
   CHECK(molecules[0].getNrOfBondsFromTo(1, 5) == molecules[0].getNrOfBonds());
+
+  CHECK(molecules[0].getPathLength(0, 1) == 1);
+  CHECK(molecules[0].getPathLength(1, 3, 1) == 0);
+  CHECK(molecules[0].getPathLength(1, 3) == 2);
+  CHECK(molecules[0].getPathLength(3, 1) == 2);
+  CHECK(molecules[0].getPathLength(0, 4) == molecules[0].getNrOfBonds());
 }
 
 TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
