@@ -21,8 +21,8 @@ namespace sim {
       virtual ~MEHPForceEvaluator() = default;
       void setNetwork(Network& net) { this->net = net; }
       Network getNetwork() const { return this->net; }
-      void setIs2D(bool is2D) { this->is2D = is2D; }
-      bool getIs2D() { return this->is2D; };
+      void setIs2D(const bool is2D) { this->is2D = is2D; }
+      bool getIs2D() const { return this->is2D; };
       double evaluateForceSetGradient(const size_t n,
                                       const double* x,
                                       double* grad,
@@ -62,7 +62,7 @@ namespace sim {
       using MEHPForceEvaluator::getNetwork;
       using MEHPForceEvaluator::setIs2D;
       using MEHPForceEvaluator::setNetwork;
-      SimpleSpringMEHPForceEvaluator(double kappa = 1.0)
+      SimpleSpringMEHPForceEvaluator(const double kappa = 1.0)
       {
         this->kappa = kappa;
       }
@@ -70,10 +70,11 @@ namespace sim {
       double evaluateForceSetGradient(const size_t n,
                                       const Eigen::VectorXd& springDistances,
                                       double* grad) const override;
-      double evaluateStressContribution(double springDistances[3],
-                                        size_t i,
-                                        size_t j,
-                                        size_t spring_index) const override
+      double evaluateStressContribution(
+        double springDistances[3],
+        const size_t i,
+        const size_t j,
+        const size_t spring_index) const override
       {
         return this->kappa * springDistances[i] * springDistances[j] /
                this->net.springsContourLength[spring_index];
@@ -95,9 +96,9 @@ namespace sim {
       using MEHPForceEvaluator::getNetwork;
       using MEHPForceEvaluator::setIs2D;
       using MEHPForceEvaluator::setNetwork;
-      NonGaussianSpringForceEvaluator(double kappa = 1.0,
+      NonGaussianSpringForceEvaluator(const double kappa = 1.0,
                                       double N = 1.0,
-                                      double l = 1.0)
+                                      const double l = 1.0)
       {
         this->kappa = kappa;
         this->springForceEvaluator = SimpleSpringMEHPForceEvaluator(kappa);
@@ -109,10 +110,11 @@ namespace sim {
       double evaluateForceSetGradient(const size_t n,
                                       const Eigen::VectorXd& springDistances,
                                       double* grad) const override;
-      double evaluateStressContribution(double springDistances[3],
-                                        size_t i,
-                                        size_t j,
-                                        size_t spring_index) const override
+      double evaluateStressContribution(
+        double springDistances[3],
+        const size_t i,
+        const size_t j,
+        const size_t spring_index) const override
       {
         return this->kappa * springDistances[i] * springDistances[j] /
                this->net.springsContourLength[spring_index];

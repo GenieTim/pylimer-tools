@@ -73,10 +73,10 @@ namespace sim {
 
     public:
       MEHPForceBalance(const pylimer_tools::entities::Universe& u,
-                       int crossLinkerType = 2,
-                       bool is2D = false,
-                       bool remove2functionalCrosslinkers = false,
-                       bool removeDanglingChains = false)
+                       const int crossLinkerType = 2,
+                       const bool is2D = false,
+                       const bool remove2functionalCrosslinkers = false,
+                       const bool removeDanglingChains = false)
         : universe(u)
       {
         this->crossLinkerType = crossLinkerType;
@@ -97,7 +97,7 @@ namespace sim {
 
       MEHPForceBalance(const ForceBalanceNetwork& net,
                        const Eigen::VectorXd& springPartitions,
-                       bool is2D = false)
+                       const bool is2D = false)
       {
         this->is2D = is2D;
         this->initialConfig = net;
@@ -416,9 +416,9 @@ namespace sim {
         const size_t minimumNrOfSliplinks = 0,
         const double sameStrandCutoff = 3,
         const std::string seed = "",
-        int crossLinkerType = 2,
-        bool is2D = false,
-        bool filterEntanglements = true)
+        const int crossLinkerType = 2,
+        const bool is2D = false,
+        const bool filterEntanglements = true)
       {
         // sample the "entanglements"
         pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
@@ -470,14 +470,14 @@ namespace sim {
        * @param ftol
        */
       void runForceRelaxation(
-        long int maxNrOfSteps = 50000, // default: 10000
-        double xtol = 1e-9,
+        const long int maxNrOfSteps = 50000, // default: 10000
+        const double xtol = 1e-9,
         const double initialResidualToUse = -1.0,
         const StructureSimplificationMode simplificationMode =
           StructureSimplificationMode::NO_SIMPLIFICATION,
         const double inactiveRemovalCutoff = 1e-3,
-        bool doInnerIterations = false,
-        LinkSwappingMode allowSlipLinksToPassEachOther =
+        const bool doInnerIterations = false,
+        const LinkSwappingMode allowSlipLinksToPassEachOther =
           LinkSwappingMode::NO_SWAPPING,
         const int swappingFrequency = 10,
         const double oneOverSpringPartitionUpperLimit = 1.0,
@@ -540,7 +540,7 @@ namespace sim {
         const size_t link_idx,
         const Eigen::VectorXd& displacements,
         Eigen::VectorXd& springPartitions,
-        double oneOverSpringPartitionUpperLimit = 1.0) const
+        const double oneOverSpringPartitionUpperLimit = 1.0) const
       {
         // TODO: revise, hard!
         assert(involvedPartitions.size() == 4);
@@ -832,13 +832,13 @@ namespace sim {
                  double,
                  double>
       inspectParametrisationOptimsationForLink(
-        size_t link_idx,
+        const size_t link_idx,
         Eigen::VectorXd& displacements,
         Eigen::VectorXd& springPartitions,
-        long int innerMaxNrOfSteps = 500,
-        double innerAlphaTol = 1e-9,
-        long int innerMinNrOfSteps = 1,
-        const double oneOverSpringPartitionUpperLimit = 1.0)
+        const long int innerMaxNrOfSteps = 500,
+        const double innerAlphaTol = 1e-9,
+        const long int innerMinNrOfSteps = 1,
+        const double oneOverSpringPartitionUpperLimit = 1.0) const
       {
         size_t innerIterationsDone = 0;
         double displacementDone = 0.0;
@@ -937,7 +937,7 @@ namespace sim {
         this->initialConfig.springsContourLength = springsContourLengths;
       }
 
-      void configAssumeBoxLargeEnough(bool assumption)
+      void configAssumeBoxLargeEnough(const bool assumption)
       {
         this->assumeBoxLargeEnough = assumption;
 
@@ -947,24 +947,28 @@ namespace sim {
           this->initialConfig, this->currentDisplacements);
       }
 
-      void configMeanBondLength(double meanBondLength)
+      void configMeanBondLength(const double meanBondLength)
       {
         this->defaultBondLength = meanBondLength;
       }
 
-      void configSpringConstant(double kappa = 1.0) { this->kappa = kappa; }
+      void configSpringConstant(const double kappa = 1.0)
+      {
+        this->kappa = kappa;
+      }
 
-      void configEntanglementType(int newEntanglementType = -1)
+      void configEntanglementType(const int newEntanglementType = -1)
       {
         this->entanglementType = newEntanglementType;
       }
 
-      void configSimplificationFrequency(int newRemovalFrequency = 10)
+      void configSimplificationFrequency(const int newRemovalFrequency = 10)
       {
         this->simplificationFrequency = newRemovalFrequency;
       }
 
-      void configSpringBreakingDistance(double newSpringBreakingForce = -1.)
+      void configSpringBreakingDistance(
+        const double newSpringBreakingForce = -1.)
       {
         this->springBreakingLength = newSpringBreakingForce;
       }
@@ -977,7 +981,7 @@ namespace sim {
        * considered inactive
        * @return int
        */
-      int getNrOfActiveNodes(double tolerance = 1e-3) const
+      int getNrOfActiveNodes(const double tolerance = 1e-3) const
       {
         return this->findActiveNodes(tolerance).count();
       }
@@ -988,7 +992,7 @@ namespace sim {
        * @param tolerance
        * @return double
        */
-      double getSolubleWeightFraction(double tolerance = 1e-3)
+      double getSolubleWeightFraction(const double tolerance = 1e-3)
       {
         return this->computeSolubleWeightFraction(
           &this->initialConfig,
@@ -1003,7 +1007,7 @@ namespace sim {
        * @param tolerance
        * @return double
        */
-      double getDanglingWeightFraction(double tolerance = 1e-3)
+      double getDanglingWeightFraction(const double tolerance = 1e-3)
       {
         return this->computeDanglingWeightFraction(
           &this->initialConfig,
@@ -1018,7 +1022,7 @@ namespace sim {
        * @param tolerance
        * @return double
        */
-      double getActiveWeightFraction(double tolerance = 1e-3)
+      double getActiveWeightFraction(const double tolerance = 1e-3)
       {
         return this->computeActiveWeightFraction(
           &this->initialConfig,
@@ -1034,7 +1038,7 @@ namespace sim {
        * @param tolerance
        * @return double
        */
-      double countActiveClusteredAtoms(double tolerance = 1e-3)
+      double countActiveClusteredAtoms(const double tolerance = 1e-3)
       {
         return this->countActiveClusteredAtoms(&this->initialConfig,
                                                this->currentDisplacements,
@@ -1368,12 +1372,13 @@ namespace sim {
        * inactive
        * @return int
        */
-      int getNrOfActiveSprings(double tolerance = 1e-3) const
+      int getNrOfActiveSprings(const double tolerance = 1e-3) const
       {
         return this->countNrOfActiveSprings(tolerance);
       }
 
-      int getNrOfActiveSpringsInDir(int dir, double tolerance = 1e-3) const
+      int getNrOfActiveSpringsInDir(const int dir,
+                                    const double tolerance = 1e-3) const
       {
         return this->countNrOfActiveSpringsInDir(dir, tolerance);
       }
@@ -1385,7 +1390,7 @@ namespace sim {
        * inactive
        * @return int
        */
-      int getNrOfActivePartialSprings(double tolerance = 1e-3) const
+      int getNrOfActivePartialSprings(const double tolerance = 1e-3) const
       {
         return this->countNrOfActivePartialSprings(tolerance);
       }
@@ -1485,7 +1490,7 @@ namespace sim {
                         const std::vector<double>& z,
                         const std::vector<double>& alpha1,
                         const std::vector<double>& alpha2,
-                        bool clampAlpha = false)
+                        const bool clampAlpha = false)
       {
         std::vector<std::vector<size_t>> loops;
         std::vector<std::vector<size_t>> loopsOfSliplinks;
@@ -1571,8 +1576,8 @@ namespace sim {
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const size_t springIdx,
-        bool is2d,
-        bool boxLargeEnough) const
+        const bool is2d,
+        const bool boxLargeEnough) const
       {
         assert(net.isUpToDate);
 
@@ -1619,8 +1624,8 @@ namespace sim {
        */
       double sumToTotalFraction(const ForceBalanceNetwork& net,
                                 Eigen::VectorXd springPartition,
-                                size_t springIdx,
-                                size_t targetLink) const
+                                const size_t springIdx,
+                                const size_t targetLink) const
       {
         double alpha = 0.;
         for (size_t i = 0; i < net.localToGlobalSpringIndex[springIdx].size();
@@ -1718,8 +1723,8 @@ namespace sim {
         const Eigen::VectorXd& u,
         const size_t springIdx,
         const size_t linkIdx,
-        bool is2d,
-        bool boxLargeEnough) const
+        const bool is2d,
+        const bool boxLargeEnough) const
       {
         assert(this->isPartOfSpring(net, linkIdx, springIdx));
 
@@ -1753,8 +1758,8 @@ namespace sim {
         const Eigen::VectorXd& u,
         const size_t springIdx,
         const size_t linkIdx,
-        bool is2d,
-        bool boxLargeEnough) const
+        const bool is2d,
+        const bool boxLargeEnough) const
       {
         return -1. * this->evaluatePartialSpringDistanceTo(
                        net, u, springIdx, linkIdx, is2d, boxLargeEnough);
@@ -1807,7 +1812,7 @@ namespace sim {
        * @return Eigen::VectorXd
        */
       Eigen::VectorXd getWeightedPartialSpringLengths(
-        double oneOverSpringPartitionUpperLimit = 1.)
+        const double oneOverSpringPartitionUpperLimit = 1.) const
       {
         Eigen::VectorXd weightedLengths =
           Eigen::VectorXd(this->initialConfig.nrOfPartialSprings);
@@ -1984,8 +1989,8 @@ namespace sim {
         const Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
         const size_t linkIdx,
-        double oneOverSpringPartitionUpperLimit = 1.0,
-        bool allowSlipLinksToPassEachOther = false) const
+        const double oneOverSpringPartitionUpperLimit = 1.0,
+        const bool allowSlipLinksToPassEachOther = false) const
       {
         Eigen::VectorXd oneOverSpringPartitions = Eigen::VectorXd::Zero(0);
         return this->updateSpringPartition(net,
@@ -2046,7 +2051,7 @@ namespace sim {
         const double oneOverSpringPartitionUpperLimit,
         const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
         const bool respectLoops = true,
-        const bool moveAttempt = false);
+        const bool moveAttempt = false) const;
 
       /**
        * @brief Loop all springs, swap slip-links on them if they are close
@@ -2058,7 +2063,7 @@ namespace sim {
                                    const Eigen::VectorXd& u,
                                    Eigen::VectorXd& springPartitions,
                                    double swappableCutoff,
-                                   const bool respectLoops = true);
+                                   const bool respectLoops = true) const;
 
       /**
        * @brief Loop all springs, swap slip-links on them if they are close
@@ -2643,7 +2648,7 @@ namespace sim {
         const size_t linkIdx,
         const pylimer_tools::entities::Atom& atom1,
         const pylimer_tools::entities::Atom& atom2,
-        int atomType)
+        const int atomType)
       {
         assert(linkIdx < net.nrOfLinks);
         assert(atom1.getType() != this->crossLinkerType &&
@@ -2675,7 +2680,7 @@ namespace sim {
       void setLinkPropertiesFromAtom(ForceBalanceNetwork& net,
                                      const size_t linkIdx,
                                      const pylimer_tools::entities::Atom& atom,
-                                     int atomType = -1)
+                                     int atomType = -1) const
       {
         if (atomType == -1) {
           atomType = atom.getType();
@@ -2702,10 +2707,11 @@ namespace sim {
        * @return true
        * @return false
        */
-      bool distanceIsWithinTolerance(const Eigen::Vector3d& dist,
-                                     double tolerance = 1e-3,
-                                     double contourLength = 1.,
-                                     double contourLengthFraction = 1.) const
+      bool distanceIsWithinTolerance(
+        const Eigen::Vector3d& dist,
+        const double tolerance = 1e-3,
+        const double contourLength = 1.,
+        const double contourLengthFraction = 1.) const
       {
         return dist.norm() <=
                (tolerance *
@@ -2728,7 +2734,7 @@ namespace sim {
         const size_t atom1Idx,
         const size_t atom2Idx,
         const size_t springIdx,
-        const size_t partialSpringIdx)
+        const size_t partialSpringIdx) const
       {
         assert(atom1Idx < atom2Idx);
         if (chain.getType() ==
@@ -2904,8 +2910,8 @@ namespace sim {
       }
 
       size_t getOtherEnd(const ForceBalanceNetwork& net,
-                         size_t partialSpringIdx,
-                         size_t linkIdx) const
+                         const size_t partialSpringIdx,
+                         const size_t linkIdx) const
       {
         assert(this->isPartOfSpring(net, linkIdx, partialSpringIdx));
         return net.springPartIndexA[partialSpringIdx] == linkIdx
@@ -2914,15 +2920,15 @@ namespace sim {
       }
 
       bool isPartOfSpring(const ForceBalanceNetwork& net,
-                          size_t linkIdx,
-                          size_t partialSpringIdx) const
+                          const size_t linkIdx,
+                          const size_t partialSpringIdx) const
       {
         return (net.springPartIndexA[partialSpringIdx] == linkIdx) ||
                (net.springPartIndexB[partialSpringIdx] == linkIdx);
       }
 
       bool isLoopingSpring(const ForceBalanceNetwork& net,
-                           size_t partialSpringIdx) const
+                           const size_t partialSpringIdx) const
       {
         return (net.springPartIndexA[partialSpringIdx] ==
                 net.springPartIndexB[partialSpringIdx]);
@@ -2940,8 +2946,8 @@ namespace sim {
        * @return false
        */
       bool springInvolvesEntanglementBead(const ForceBalanceNetwork& net,
-                                          size_t springIdx,
-                                          long int ignoring = -1) const
+                                          const size_t springIdx,
+                                          const long int ignoring = -1) const
       {
         INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                            "Spring index out of range.");
@@ -2959,9 +2965,10 @@ namespace sim {
                 net.springIndexB[springIdx] != ignoring);
       }
 
-      size_t getInvolvedEntanglementBeadIndex(const ForceBalanceNetwork& net,
-                                              const size_t springIdx,
-                                              long int ignoring = -1) const
+      size_t getInvolvedEntanglementBeadIndex(
+        const ForceBalanceNetwork& net,
+        const size_t springIdx,
+        const long int ignoring = -1) const
       {
         INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                            "Spring index out of range.");

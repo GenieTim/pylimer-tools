@@ -157,7 +157,7 @@ namespace calc {
     for (int k = 1; k < kmax; ++k) {
       for (int i = dmin; i < p; ++i) {
         if (ncorrelation(k, i) > 0) {
-          t[im] = i * pow((double)m, k);
+          t[im] = i * pow(static_cast<double>(m), k);
           f[im] = correlation(k, i) / ncorrelation(k, i) - aux;
           ++im;
         }

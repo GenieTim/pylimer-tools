@@ -83,8 +83,8 @@ namespace utils {
     {
       return this->getValuesForAt<double>(index, headerKey, column);
     };
-    size_t getLength();
-    bool hasKey(std::string headerKey);
+    size_t getLength() const;
+    bool hasKey(std::string headerKey) const;
     bool keyHasColumn(std::string headerKey, std::string column);
     bool keyHasDirectionalColumn(std::string headerKey,
                                  std::string dirPraefix,
@@ -103,7 +103,7 @@ namespace utils {
     void rewind();
 
     template<typename OUT>
-    inline std::vector<OUT> parseTypesInLine(std::string line)
+    inline std::vector<OUT> parseTypesInLine(const std::string line)
     {
       std::vector<OUT> resultnumbers;
       pylimer_tools::utils::CsvTokenizer tokenizer(line);

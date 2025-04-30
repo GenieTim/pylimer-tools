@@ -31,7 +31,7 @@ namespace calc {
     */
     std::map<std::string, position_vec_t> computeEndToEndVectors(
       pylimer_tools::entities::Universe network,
-      int crossLinkerType)
+      const int crossLinkerType)
     {
       std::map<std::string, position_vec_t> result;
       std::vector<pylimer_tools::entities::Molecule> molecules =
@@ -80,7 +80,7 @@ namespace calc {
     */
     std::map<std::string, position_vec_t> computeMeanEndToEndVectors(
       pylimer_tools::entities::UniverseSequence networks,
-      int crossLinkerType)
+      const int crossLinkerType)
     {
       std::map<std::string, position_vec_t> result;
 
@@ -126,7 +126,7 @@ namespace calc {
     */
     std::map<std::string, double> computeMeanEndToEndDistances(
       pylimer_tools::entities::UniverseSequence networks,
-      int crossLinkerType)
+      const int crossLinkerType)
     {
       std::map<std::string, position_vec_t> distanceVectors =
         computeMeanEndToEndVectors(networks, crossLinkerType);

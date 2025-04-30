@@ -12,14 +12,14 @@ extern "C"
 #include "./VectorUtils.h"
 
 static inline igraph_integer_t
-castToIgraphInt(igraph_real_t c)
+castToIgraphInt(const igraph_real_t c)
 {
   return std::lround(c);
 }
 
 template<typename INTT>
 static inline INTT
-igraphRealToInt(igraph_real_t c)
+igraphRealToInt(const igraph_real_t c)
 {
   return static_cast<INTT>(std::lround(c));
 }
@@ -28,7 +28,7 @@ namespace pylimer_tools {
 namespace utils {
   template<typename IN>
   static bool graphHasVertexWithProperty(igraph_t* graph,
-                                         std::string propertyName,
+                                         const std::string propertyName,
                                          IN propertyValue)
   {
     INVALIDARG_EXP_IFN(propertyValue != 0,

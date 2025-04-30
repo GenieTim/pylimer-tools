@@ -47,13 +47,13 @@ namespace sim {
      * FORCE RELAXATION
      */
     void MEHPForceBalance::runForceRelaxation(
-      long int maxNrOfSteps, // default: 10000
-      double xtol,
+      const long int maxNrOfSteps, // default: 10000
+      const double xtol,
       const double initialResidualToUse,
       const StructureSimplificationMode simplificationMode,
       const double inactiveRemovalCutoff,
-      bool doInnerIterations,
-      LinkSwappingMode allowSlipLinksToPassEachOther,
+      const bool doInnerIterations,
+      const LinkSwappingMode allowSlipLinksToPassEachOther,
       const int swappingFrequency,
       const double oneOverSpringPartitionUpperLimit,
       const int nrOfCrosslinkSwapsAllowedPerSliplink,
@@ -402,7 +402,7 @@ namespace sim {
      * @return double
      */
     double MEHPForceBalance::getDisplacementResidualNorm(
-      double oneOverSpringPartitionUpperLimit) const
+      const double oneOverSpringPartitionUpperLimit) const
     {
       Eigen::VectorXd oneOverSpringPartitions =
         this->assembleOneOverSpringPartition(this->initialConfig,
@@ -638,7 +638,7 @@ namespace sim {
     void MEHPForceBalance::removeDuplicateListedSpringsFromLink(
       ForceBalanceNetwork& net,
       size_t linkIdx,
-      bool allowOnEntanglement) const
+      const bool allowOnEntanglement) const
     {
       INVALIDARG_EXP_IFN(linkIdx < net.nrOfLinks,
                          "Cannot remove duplicate spring indices of index "
@@ -712,7 +712,7 @@ namespace sim {
       ForceBalanceNetwork& net,
       Eigen::VectorXd& displacements,
       Eigen::VectorXd& springPartitions,
-      double tolerance) const
+      const double tolerance) const
     {
       size_t numRemoved = 0;
       //        this->removePrimaryLoops(net, displacements, springPartitions);
@@ -1191,9 +1191,10 @@ namespace sim {
       // "
       //           << getCurrentRSS() << ", peak " << getPeakRSS() <<
       //           std::endl;
-      std::vector<std::vector<long int>> loopEdges;
-      std::vector<std::vector<long int>> loops = this->universe.findLoops(
-        this->crossLinkerType, maxLoopLength, false, &loopEdges);
+      std::vector<std::vector<igraph_integer_t>> loopEdges;
+      std::vector<std::vector<igraph_integer_t>> loops =
+        this->universe.findLoops(
+          this->crossLinkerType, maxLoopLength, false, &loopEdges);
       std::cout << "Detected " << loops.size() << " loops." << std::endl;
       // reduced loops = loops, but only the (new) spring indices
       std::vector<std::vector<size_t>> reducedLoops;
@@ -1205,7 +1206,7 @@ namespace sim {
       std::vector<std::array<double, 3>> loopMaxCoords;
       loopMaxCoords.reserve(loops.size());
       pylimer_tools::entities::Box box = this->box;
-      for (std::vector<long int> loop : loops) {
+      for (std::vector<igraph_integer_t> loop : loops) {
         // max & min coordinates
         // TODO: implement, such that the max & min work also with infinite
         // loops
@@ -1309,7 +1310,8 @@ namespace sim {
 
       // as of
       // https://stackoverflow.com/questions/919612/mapping-two-integers-to-one-in-a-unique-and-deterministic-way
-      auto hash_integer_pair = [](long int a, long int b) -> long int {
+      auto hash_integer_pair = [](const long int a,
+                                  const long int b) -> long int {
         return a >= b ? a * a + a + b : a + b * b; // where a, b >= 0
       };
       std::cout << "Searching for intersections..." << std::endl;
@@ -1410,7 +1412,7 @@ namespace sim {
         }
 
         // make space: cleanup the loop i
-        loops[i] = std::vector<long int>();
+        loops[i] = std::vector<igraph_integer_t>();
         // std::cout
         //   << "After checking intersections of loop " << i << " ("
         //   << relevantIntersections.size()
@@ -1972,7 +1974,7 @@ namespace sim {
       const size_t removedPartialSpringIdx,
       const size_t keptPartialSpringIdx,
       const size_t linkToReduce,
-      bool skipEigenResize) const
+      const bool skipEigenResize) const
     {
       INVALIDARG_EXP_IFN(net.linkIsSliplink[linkToReduce],
                          "The link to reduce must be a slip-link");
@@ -2640,7 +2642,7 @@ namespace sim {
       ForceBalanceNetwork& net,
       Eigen::VectorXd& displacements,
       Eigen::VectorXd& springPartitions,
-      double tolerance) const
+      const double tolerance) const
     {
       size_t numRemovedTotal = 0;
       size_t numRemovedInIteration = 0;
@@ -2998,7 +3000,7 @@ namespace sim {
       Eigen::VectorXd&
         oneOverSpringPartitions, /* gives the parametrization of N */
       const size_t linkIdx,
-      double oneOverSpringPartitionUpperLimit,
+      const double oneOverSpringPartitionUpperLimit,
       bool allowSlipLinksToPassEachOther) const
     {
       // std::cout << "Updating spring partition " << linkIdx << " of "
@@ -3276,11 +3278,11 @@ namespace sim {
       ForceBalanceNetwork& net,
       Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
-      size_t slipLinkIdx,
+      const size_t slipLinkIdx,
       const double oneOverSpringPartitionUpperLimit,
       const int nrOfCrosslinkSwapsAllowedPerSliplink,
       const bool respectLoops,
-      const bool moveAttempt)
+      const bool moveAttempt) const
     {
       INVALIDARG_EXP_IFN(net.linkIsSliplink[slipLinkIdx],
                          "Passed slip-link must be one.");
@@ -4028,8 +4030,8 @@ namespace sim {
       ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
-      double oneOverSpringPartitionUpperLimit,
-      bool respectLoops)
+      const double oneOverSpringPartitionUpperLimit,
+      const bool respectLoops) const
     {
 #ifndef NDEBUG
       this->validateNetwork(net, u, springPartitions);
@@ -4111,7 +4113,7 @@ namespace sim {
       ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
-      double oneOverSpringPartitionUpperLimit) const
+      const double oneOverSpringPartitionUpperLimit) const
     {
       for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
         if (net.linkIndicesOfSprings[springIdx].size() <= 3) {
@@ -4163,7 +4165,7 @@ namespace sim {
       const Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
       const size_t partialSpringIdx,
-      double oneOverSpringPartitionUpperLimit,
+      const double oneOverSpringPartitionUpperLimit,
       const bool respectLoops) const
     {
       INVALIDARG_EXP_IFN(net.springPartIndexA[partialSpringIdx] !=
@@ -4215,7 +4217,7 @@ namespace sim {
         // involved loops
         std::erase_if(
           possibleTargetSprings,
-          [&net, springIdx, involvedSlipLink](size_t springIdxToCheck) {
+          [&net, springIdx, involvedSlipLink](const size_t springIdxToCheck) {
             // we want to be able to distinguish all associated loops
             // into being (a) the ones the slip-link is slipping on, or
             // (b) the one the second, currently non-slipping part is
@@ -4450,7 +4452,7 @@ namespace sim {
       springPartWeightingFactor(net.springPartCoordinateIndexB) +=
         oneOverSpringPartitions * loopPartialSpringEliminator;
       springPartWeightingFactor = springPartWeightingFactor.unaryExpr(
-        [](double v) { return v > 0. ? v : 1.0; });
+        [](const double v) { return v > 0. ? v : 1.0; });
       Eigen::ArrayXd remainingDisplacement =
         (objectiveDisplacement / springPartWeightingFactor);
 #ifndef NDEBUG
@@ -4470,8 +4472,8 @@ namespace sim {
         loopPartialSpringEliminator;
       nSpringsPerLink(net.springPartCoordinateIndexB) +=
         loopPartialSpringEliminator;
-      nSpringsPerLink =
-        nSpringsPerLink.unaryExpr([](double v) { return v > 0. ? v : 1.0; });
+      nSpringsPerLink = nSpringsPerLink.unaryExpr(
+        [](const double v) { return v > 0. ? v : 1.0; });
       // make sure there are no infinite back-and-forth
       // and actually displace
       Eigen::ArrayXd backForthDisplacement =
@@ -4976,7 +4978,7 @@ namespace sim {
       const std::vector<double>& alpha2,
       std::vector<std::vector<size_t>> loops,
       std::vector<std::vector<size_t>> loopsOfSliplinks,
-      bool clampAlpha)
+      const bool clampAlpha)
     {
       size_t additionalLen = strandIdx1.size();
       if (additionalLen == 0) {
@@ -5603,7 +5605,8 @@ namespace sim {
      * @return std::unordered_map<long int, int>
      */
     std::unordered_map<long int, int>
-    MEHPForceBalance::getEffectiveFunctionalityOfAtoms(double tolerance) const
+    MEHPForceBalance::getEffectiveFunctionalityOfAtoms(
+      const double tolerance) const
     {
       std::unordered_map<long int, int> results;
       results.reserve(this->initialConfig.nrOfNodes);
@@ -5628,7 +5631,7 @@ namespace sim {
       const ForceBalanceNetwork* net,
       const Eigen::VectorXd& u,
       const Eigen::VectorXd& springPartitions,
-      double tolerance) const
+      const double tolerance) const
     {
       std::vector<long int> results;
       results.reserve(net->nrOfNodes);
@@ -5662,7 +5665,7 @@ namespace sim {
      * @return std::vector<long int> the atom ids
      */
     std::vector<long int> MEHPForceBalance::getIdsOfActiveNodes(
-      double tolerance) const
+      const double tolerance) const
     {
       std::vector<long int> results;
       // find all active springs
@@ -5689,7 +5692,7 @@ namespace sim {
      * @return Eigen::VectorXi
      */
     Eigen::VectorXi MEHPForceBalance::getNrOfActiveSpringsConnected(
-      double tolerance) const
+      const double tolerance) const
     {
       Eigen::VectorXi nrOfActiveSpringsConnected =
         Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
@@ -5713,7 +5716,7 @@ namespace sim {
      * @return Eigen::VectorXi
      */
     Eigen::VectorXi MEHPForceBalance::getNrOfActivePartialSpringsConnected(
-      double tolerance) const
+      const double tolerance) const
     {
       Eigen::VectorXi nrOfActivePartialSpringsConnected =
         Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
@@ -5754,7 +5757,7 @@ namespace sim {
      */
     double MEHPForceBalance::getGammaFactor(
       double b02,
-      int nrOfChains,
+      const int nrOfChains,
       double oneOverSpringPartitionUpperLimit) const
     {
       if (b02 < 0) {
@@ -5782,8 +5785,8 @@ namespace sim {
      * @return Eigen::VectorXd
      */
     Eigen::VectorXd MEHPForceBalance::getGammaFactors(
-      double b02,
-      double oneOverSpringPartitionUpperLimit) const
+      const double b02,
+      const double oneOverSpringPartitionUpperLimit) const
     {
       Eigen::VectorXd springVectors = this->evaluatePartialSpringVectors(
         this->initialConfig, this->currentDisplacements);
@@ -5825,9 +5828,9 @@ namespace sim {
      * @return Eigen::VectorXd
      */
     Eigen::VectorXd MEHPForceBalance::getGammaFactorsInDir(
-      double b02,
-      int dir,
-      double oneOverSpringPartitionUpperLimit) const
+      const double b02,
+      const int dir,
+      const double oneOverSpringPartitionUpperLimit) const
     {
       INVALIDARG_EXP_IFN(dir >= 0 && dir <= 2, "Invalid direction.");
       Eigen::VectorXd springVectors = this->evaluatePartialSpringVectors(
@@ -5870,8 +5873,8 @@ namespace sim {
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
       const Eigen::VectorXd& springPartitions,
-      size_t partialSpringIdx,
-      double oneOverSpringPartitionUpperLimit) const
+      const size_t partialSpringIdx,
+      const double oneOverSpringPartitionUpperLimit) const
     {
       double N =
         net

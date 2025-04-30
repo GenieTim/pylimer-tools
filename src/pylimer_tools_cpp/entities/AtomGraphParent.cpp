@@ -43,11 +43,12 @@ namespace entities {
    * the connected atoms
    * @return std::vector<long int>
    */
-  std::vector<long int> AtomGraphParent::getVertexIdxsConnectedTo(
-    const long int vertexIdx) const
+  std::vector<igraph_integer_t> AtomGraphParent::getVertexIdxsConnectedTo(
+    const igraph_integer_t vertexIdx) const
   {
-    std::vector<long int> incidentEdges = this->getIncidentEdgeIds(vertexIdx);
-    std::vector<long int> results;
+    std::vector<igraph_integer_t> incidentEdges =
+      this->getIncidentEdgeIds(vertexIdx);
+    std::vector<igraph_integer_t> results;
     results.reserve(incidentEdges.size());
     for (long int edgeId : incidentEdges) {
       igraph_integer_t vertex1OfEdge;
@@ -87,12 +88,13 @@ namespace entities {
     const long int vertexIdx) const
   {
     std::vector<Atom> results;
-    std::vector<long int> vertexIds = this->getVertexIdxsConnectedTo(vertexIdx);
+    std::vector<igraph_integer_t> vertexIds =
+      this->getVertexIdxsConnectedTo(vertexIdx);
     results.reserve(vertexIds.size());
     std::transform(vertexIds.begin(),
                    vertexIds.end(),
                    std::back_inserter(results),
-                   [this](long int vertexId) -> Atom {
+                   [this](const long int vertexId) -> Atom {
                      return this->getAtomByVertexIdx(vertexId);
                    });
     return results;
@@ -139,9 +141,9 @@ namespace entities {
                                      const long int vertexIdxTo,
                                      const int maxLength) const
   {
-    INVALIDARG_EXP_IFN(vertexIdxFrom >= 0 &&
-                         vertexIdxFrom < this->getNrOfVertices(),
-                       "Invalid vertex index.");
+    INVALIDINDEX_EXP_IFN(vertexIdxFrom >= 0 &&
+                           vertexIdxFrom < this->getNrOfVertices(),
+                         "Invalid vertex index.");
 
     if (maxLength == 0) {
       return 0;
@@ -149,17 +151,18 @@ namespace entities {
 
     int foundAtDepth = 0;
 
-    auto handler_lambda = [&foundAtDepth, vertexIdxTo, maxLength](
-                            igraph_integer_t vid, igraph_integer_t dist) {
-      if (dist > maxLength && maxLength > 0) {
-        return IGRAPH_STOP;
-      }
-      if (vid == vertexIdxTo) {
-        foundAtDepth = dist;
-        return IGRAPH_STOP;
-      }
-      return IGRAPH_SUCCESS;
-    };
+    auto handler_lambda =
+      [&foundAtDepth, vertexIdxTo, maxLength](const igraph_integer_t vid,
+                                              const igraph_integer_t dist) {
+        if (dist > maxLength && maxLength > 0) {
+          return IGRAPH_STOP;
+        }
+        if (vid == vertexIdxTo) {
+          foundAtDepth = dist;
+          return IGRAPH_STOP;
+        }
+        return IGRAPH_SUCCESS;
+      };
 
     igraph_bfs(
       &this->graph,
@@ -175,12 +178,14 @@ namespace entities {
       nullptr,
       nullptr,
       [](const igraph_t* graph,
-         igraph_integer_t vid,
+         const igraph_integer_t vid,
          igraph_integer_t pred,
          igraph_integer_t succ,
          igraph_integer_t rank,
-         igraph_integer_t dist,
-         void* f) { return (*(decltype(handler_lambda)*)f)(vid, dist); },
+         const igraph_integer_t dist,
+         void* f) {
+        return (*static_cast<decltype(handler_lambda)*>(f))(vid, dist);
+      },
       &handler_lambda);
 
     return foundAtDepth;
@@ -195,12 +200,13 @@ namespace entities {
    * @param vertexId2 id of the second vertex
    * @return std::vector<long int> the edge ids
    */
-  std::vector<long int> AtomGraphParent::getEdgeIdsFromTo(
-    const long int vertexId1,
-    const long int vertexId2) const
+  std::vector<igraph_integer_t> AtomGraphParent::getEdgeIdsFromTo(
+    const igraph_integer_t vertexId1,
+    const igraph_integer_t vertexId2) const
   {
-    std::vector<long int> incidentEdges = this->getIncidentEdgeIds(vertexId1);
-    std::vector<long int> results;
+    std::vector<igraph_integer_t> incidentEdges =
+      this->getIncidentEdgeIds(vertexId1);
+    std::vector<igraph_integer_t> results;
     results.reserve(incidentEdges.size());
 
     for (const long int edgeId : incidentEdges) {
@@ -217,17 +223,17 @@ namespace entities {
     return results;
   }
 
-  std::vector<long int> AtomGraphParent::getIncidentEdgeIds(
-    const long int vertexId) const
+  std::vector<igraph_integer_t> AtomGraphParent::getIncidentEdgeIds(
+    const igraph_integer_t vertexId) const
   {
     igraph_es_t edgeSelector;
     igraph_es_incident(&edgeSelector, vertexId, IGRAPH_ALL);
     igraph_eit_t iterator;
     igraph_eit_create(&this->graph, edgeSelector, &iterator);
-    std::vector<long int> results;
+    std::vector<igraph_integer_t> results;
     results.reserve(IGRAPH_EIT_SIZE(iterator));
     while (!IGRAPH_EIT_END(iterator)) {
-      long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(iterator));
+      igraph_integer_t edgeId = IGRAPH_EIT_GET(iterator);
       results.push_back(edgeId);
       IGRAPH_EIT_NEXT(iterator);
     }
@@ -242,7 +248,7 @@ namespace entities {
    *
    * @return int
    */
-  int AtomGraphParent::getNrOfVertices() const
+  igraph_integer_t AtomGraphParent::getNrOfVertices() const
   {
     return igraph_vcount(&this->graph);
   }
@@ -289,7 +295,8 @@ namespace entities {
    * @param vertexIdx the id of the vertex on the graph
    * @return Atom
    */
-  Atom AtomGraphParent::getAtomByVertexIdx(const long int vertexIdx) const
+  Atom AtomGraphParent::getAtomByVertexIdx(
+    const igraph_integer_t vertexIdx) const
   {
     if (this->atomsHaveCustomAttributes) {
       return this->getComplexAtomByVertexIdx(vertexIdx);
@@ -297,13 +304,12 @@ namespace entities {
     return this->getSimpleAtomByVertexIdx(vertexIdx);
   };
 
-  Atom AtomGraphParent::getSimpleAtomByVertexIdx(const long int vertexIdx) const
+  Atom AtomGraphParent::getSimpleAtomByVertexIdx(
+    const igraph_integer_t vertexIdx) const
   {
-    if (vertexIdx > this->getNrOfVertices()) {
-      throw std::invalid_argument("Atom with this vertex id (" +
-                                  std::to_string(vertexIdx) +
-                                  ") does not exist");
-    }
+    INVALIDINDEX_EXP_IFN(0 <= vertexIdx && vertexIdx < this->getNrOfVertices(),
+                         "Atom with this vertex id (" +
+                           std::to_string(vertexIdx) + ") does not exist");
 
     return Atom(
       static_cast<long int>(
@@ -376,15 +382,16 @@ namespace entities {
   }
 
   std::vector<Atom> AtomGraphParent::verticesToAtoms(
-    const std::vector<long int>& vertexIds) const
+    const std::vector<igraph_integer_t>& vertexIds) const
   {
     std::vector<Atom> results;
     results.reserve(vertexIds.size());
-    std::transform(
-      vertexIds.begin(),
-      vertexIds.end(),
-      std::back_inserter(results),
-      [&](long int vertexId) { return this->getAtomByVertexIdx(vertexId); });
+    std::transform(vertexIds.begin(),
+                   vertexIds.end(),
+                   std::back_inserter(results),
+                   [&](const long int vertexId) {
+                     return this->getAtomByVertexIdx(vertexId);
+                   });
     return results;
   };
 
@@ -472,7 +479,7 @@ namespace entities {
   }
 
   Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
-    igraph_vector_int_t& vertices,
+    const igraph_vector_int_t& vertices,
     const pylimer_tools::entities::Box& box) const
   {
     return this->getUnwrappedVertexCoordinates(igraph_vss_vector(&vertices),
@@ -480,7 +487,7 @@ namespace entities {
   }
 
   Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
-    std::vector<long int>& vertices,
+    const std::vector<igraph_integer_t>& vertices,
     const pylimer_tools::entities::Box& box) const
   {
     igraph_vector_int_t vertices_v;
@@ -628,7 +635,8 @@ namespace entities {
    * @param vertexId
    * @return int
    */
-  int AtomGraphParent::computeFunctionalityForVertex(const long int vertexId)
+  int AtomGraphParent::computeFunctionalityForVertex(
+    const long int vertexId) const
   {
     igraph_integer_t degree;
     if (igraph_degree_1(&this->graph, &degree, vertexId, IGRAPH_ALL, false)) {
@@ -647,7 +655,7 @@ namespace entities {
    *
    */
   long AtomGraphParent::hashAngleType(int typeFrom,
-                                      int typeVia,
+                                      const int typeVia,
                                       int typeTo) const
   {
     if (typeFrom < 0 || typeTo < 0 || typeVia < 0) {
@@ -853,10 +861,11 @@ namespace entities {
     const igraph_t* someGraph,
     std::vector<int> degrees) const
   {
-    return this->getVerticesWithDegree(someGraph, [degrees](int currentDegree) {
-      return std::find(degrees.begin(), degrees.end(), currentDegree) !=
-             degrees.end();
-    });
+    return this->getVerticesWithDegree(
+      someGraph, [degrees](const int currentDegree) {
+        return std::find(degrees.begin(), degrees.end(), currentDegree) !=
+               degrees.end();
+      });
   }
 
   std::vector<long int> AtomGraphParent::getVerticesWithDegree(
@@ -868,10 +877,11 @@ namespace entities {
   std::vector<long int> AtomGraphParent::getVerticesWithDegree(int degree) const
   {
     return this->getVerticesWithDegree(
-      [degree](int currentDegree) { return currentDegree == degree; });
+      [degree](const int currentDegree) { return currentDegree == degree; });
   }
 
-  igraph_vs_t AtomGraphParent::getVerticesWithDegreeSelector(int degree) const
+  igraph_vs_t AtomGraphParent::getVerticesWithDegreeSelector(
+    const int degree) const
   {
     // NOTE: this is to omit the assumption, that the returned degree is
     // sequential for vertex 0, ..., |V|

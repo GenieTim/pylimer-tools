@@ -736,7 +736,7 @@ public:
   Eigen::Vector3d evaluateSpringVector(const ForceBalance2Network& net,
                                        const Eigen::VectorXd& u,
                                        const size_t springIdx,
-                                       bool is2d) const
+                                       const bool is2d) const
   {
     Eigen::Vector3d dist =
       ((net.coordinates.segment(3 * net.springIndexB(springIdx), 3) +
@@ -887,7 +887,7 @@ public:
                                          const Eigen::VectorXd& u,
                                          const size_t springIdx,
                                          const size_t linkIdx,
-                                         bool is2d) const
+                                         const bool is2d) const
   {
     assert(this->isPartOfSpring(net, linkIdx, springIdx));
 
@@ -918,7 +918,7 @@ public:
                                            const Eigen::VectorXd& u,
                                            const size_t springIdx,
                                            const size_t linkIdx,
-                                           bool is2d) const
+                                           const bool is2d) const
   {
     return -1. * this->evaluateSpringVectorTo(net, u, springIdx, linkIdx, is2d);
   }
@@ -939,7 +939,7 @@ public:
    *
    * @return Eigen::VectorXd
    */
-  Eigen::VectorXd getWeightedSpringLengths()
+  Eigen::VectorXd getWeightedSpringLengths() const
   {
     Eigen::VectorXd weightedLengths =
       Eigen::VectorXd(this->initialConfig.nrOfSprings);

@@ -19,7 +19,7 @@ namespace entities {
 
   NeighbourList::NeighbourList(const std::vector<Atom>& atoms,
                                const Box& box,
-                               double cutoff)
+                               const double cutoff)
   {
     if (cutoff <= 1e-3) {
       throw std::invalid_argument("Cutoff must be larger than zero");
@@ -29,12 +29,15 @@ namespace entities {
     this->atoms = atoms;
     this->box = box;
 
-    this->nrOfBucketsX = std::max(
-      (size_t)1, static_cast<size_t>(std::floor(box.getLx() / cutoff)));
-    this->nrOfBucketsY = std::max(
-      (size_t)1, static_cast<size_t>(std::floor(box.getLy() / cutoff)));
-    this->nrOfBucketsZ = std::max(
-      (size_t)1, static_cast<size_t>(std::floor(box.getLz() / cutoff)));
+    this->nrOfBucketsX =
+      std::max(static_cast<size_t>(1),
+               static_cast<size_t>(std::floor(box.getLx() / cutoff)));
+    this->nrOfBucketsY =
+      std::max(static_cast<size_t>(1),
+               static_cast<size_t>(std::floor(box.getLy() / cutoff)));
+    this->nrOfBucketsZ =
+      std::max(static_cast<size_t>(1),
+               static_cast<size_t>(std::floor(box.getLz() / cutoff)));
 
     this->bucketWidthX = box.getLx() / static_cast<double>(this->nrOfBucketsX);
     this->bucketWidthY = box.getLy() / static_cast<double>(this->nrOfBucketsY);
@@ -71,9 +74,9 @@ namespace entities {
   std::vector<pylimer_tools::entities::Atom> NeighbourList::getAtomsCloseTo(
     const pylimer_tools::entities::Atom& atom,
     double upperCutoff,
-    double lowerCutoff,
-    bool unwrapped,
-    bool expectSelf)
+    const double lowerCutoff,
+    const bool unwrapped,
+    const bool expectSelf)
   {
     if (lowerCutoff > upperCutoff) {
       throw std::invalid_argument("Expected upper cutoff > lower cutoff, got " +
@@ -167,8 +170,8 @@ namespace entities {
   // protected
   /////////////////////////////////////////////////////////////
 
-  size_t NeighbourList::normalizeBucketIndex(long int bucketIndex,
-                                             size_t nrOfBuckets) const
+  size_t NeighbourList::normalizeBucketIndex(const long int bucketIndex,
+                                             const size_t nrOfBuckets) const
   {
     size_t result =
       bucketIndex - nrOfBuckets * std::floor(static_cast<double>(bucketIndex) /
@@ -212,7 +215,7 @@ namespace entities {
 
   std::vector<size_t> NeighbourList::getCombinedBucketIndicesForAtom(
     const pylimer_tools::entities::Atom& atom,
-    double newCutoff) const
+    const double newCutoff) const
   {
     std::vector<size_t> result = std::vector<size_t>();
     std::tuple<long int, long int, long int> indexBasis =

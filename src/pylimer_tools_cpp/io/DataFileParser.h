@@ -23,8 +23,8 @@ namespace utils {
               const AtomStyle atomStyle3 = AtomStyle::NONE);
 
     // access atom data
-    int getNrOfAtoms() { return this->nAtoms; }
-    int getNrOfAtomTypes() { return this->nAtomTypes; }
+    int getNrOfAtoms() const { return this->nAtoms; }
+    int getNrOfAtomTypes() const { return this->nAtomTypes; }
     std::vector<long int> getAtomIds() { return this->atomIds; }
     std::vector<int> getMoleculeIds() { return this->moleculeIds; }
     std::vector<int> getAtomTypes() { return this->atomTypes; }
@@ -37,23 +37,23 @@ namespace utils {
     std::map<int, double> getMasses() { return this->masses; }
 
     // access bond data
-    int getNrOfBonds() { return this->nBonds; }
-    int getNrOfBondTypes() { return this->nBondTypes; }
+    int getNrOfBonds() const { return this->nBonds; }
+    int getNrOfBondTypes() const { return this->nBondTypes; }
     std::vector<int> getBondTypes() { return this->bondTypes; }
     std::vector<long int> getBondFrom() { return this->bondFrom; }
     std::vector<long int> getBondTo() { return this->bondTo; }
 
     // access angle data
-    int getNrOfAngles() { return this->nAngles; }
-    int getNrOfAngleTypes() { return this->nAngleTypes; }
+    int getNrOfAngles() const { return this->nAngles; }
+    int getNrOfAngleTypes() const { return this->nAngleTypes; }
     std::vector<int> getAngleTypes() { return this->angleTypes; }
     std::vector<long int> getAngleFrom() { return this->angleFrom; }
     std::vector<long int> getAngleVia() { return this->angleVia; }
     std::vector<long int> getAngleTo() { return this->angleTo; }
 
     // access dihedral angle data
-    int getNrOfDihedralAngles() { return this->nDihedralAngles; }
-    int getNrOfDihedralAngleTypes() { return this->nDihedralAngleTypes; }
+    int getNrOfDihedralAngles() const { return this->nDihedralAngles; }
+    int getNrOfDihedralAngleTypes() const { return this->nDihedralAngleTypes; }
     std::vector<int> getDihedralAngleTypes()
     {
       return this->dihedralAngleTypes;
@@ -77,15 +77,15 @@ namespace utils {
     }
 
     // get box info
-    double getLowX() { return this->xLo; }
-    double getHighX() { return this->xHi; }
-    double getLx() { return this->xHi - this->xLo; }
-    double getLowY() { return this->yLo; }
-    double getHighY() { return this->yHi; }
-    double getLy() { return this->yHi - this->yLo; }
-    double getLowZ() { return this->zLo; }
-    double getHighZ() { return this->zHi; }
-    double getLz() { return this->zHi - this->zLo; }
+    double getLowX() const { return this->xLo; }
+    double getHighX() const { return this->xHi; }
+    double getLx() const { return this->xHi - this->xLo; }
+    double getLowY() const { return this->yLo; }
+    double getHighY() const { return this->yHi; }
+    double getLy() const { return this->yHi - this->yLo; }
+    double getLowZ() const { return this->zLo; }
+    double getHighZ() const { return this->zHi; }
+    double getLz() const { return this->zHi - this->zLo; }
 
   private:
     void readNs(const std::string& line);
@@ -119,7 +119,7 @@ namespace utils {
 
     template<typename OUT>
     inline std::vector<OUT> parseTypesInLine(const std::string& line,
-                                             int nToRead)
+                                             const int nToRead)
     {
       std::vector<OUT> resultnumbers;
       pylimer_tools::utils::CsvTokenizer tokenizer(line, nToRead);

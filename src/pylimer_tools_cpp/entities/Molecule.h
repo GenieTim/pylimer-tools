@@ -52,13 +52,14 @@ namespace entities {
     std::vector<Atom> getAtomsLinedUp(int crossLinkerType = 2,
                                       bool assumedCoordinates = false,
                                       bool closeLoop = false) const;
-    std::vector<long int> getVerticesLinedUp(int crossLinkerType = 2,
-                                             bool closeLoop = false) const;
+    std::vector<igraph_integer_t> getVerticesLinedUp(
+      int crossLinkerType = 2,
+      bool closeLoop = false) const;
     int getNrOfAtoms() const;
     int getNrOfBonds() const;
     const Box& getBox() const;
     std::string getKey() const;
-    std::vector<int> getAtomTypes()
+    std::vector<int> getAtomTypes() const
     {
       return this->getPropertyValues<int>("type");
     }
@@ -76,7 +77,7 @@ namespace entities {
     double computeRadiusOfGyration();
     double computeRadiusOfGyrationWithDerivedImageFlags() const;
     double computeTotalMass();
-    std::vector<double> computeBondLengths();
+    std::vector<double> computeBondLengths() const;
     double computeTotalLength();
 
     /**
@@ -120,7 +121,7 @@ namespace entities {
                               bool requireOrder = true) const;
 
     // operators
-    Atom operator[](size_t index) const
+    Atom operator[](const size_t index) const
     {
       return this->getAtomByVertexIdx(index);
     }
@@ -128,7 +129,7 @@ namespace entities {
   private:
     Box parent;
     MoleculeType typeOfThisMolecule;
-    int size;
+    int size = 0;
     std::string key;
     std::map<int, double> massPerType;
     std::unordered_map<long int, long int> atomIdToVertexIdx;

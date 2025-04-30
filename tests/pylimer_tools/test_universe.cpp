@@ -261,7 +261,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                       false,
                       false);
     REQUIRE(universe.getNrOfBonds() == 8);
-    const std::vector<long int> empty;
+    const std::vector<igraph_integer_t> empty;
     CHECK(universe.findLoopEntanglements(empty, empty, empty, empty).size() ==
           0);
     CHECK(
@@ -1033,7 +1033,8 @@ TEST_CASE("Coordinates work")
     for (const pe::Molecule& molecule : molecules) {
       CHECK(molecule.getLength() == 3);
       std::vector<pe::Atom> atoms = molecule.getAtomsLinedUp();
-      std::vector<long int> alignedVertices = molecule.getVerticesLinedUp(2);
+      std::vector<igraph_integer_t> alignedVertices =
+        molecule.getVerticesLinedUp(2);
       CHECK(alignedVertices.size() == molecule.getLength());
       CHECK(atoms.size() == molecule.getLength());
       for (size_t i = 0; i < 3; ++i) {
@@ -1054,7 +1055,8 @@ TEST_CASE("Coordinates work")
     CHECK(dist[0] == 5.);
     CHECK(dist[1] == -0.2);
 
-    std::vector<long int> alignedVertices = molecules[0].getVerticesLinedUp(2);
+    std::vector<igraph_integer_t> alignedVertices =
+      molecules[0].getVerticesLinedUp(2);
     Eigen::VectorXd alignedCoordinates =
       Eigen::VectorXd::Zero(3 * alignedVertices.size());
     pe::Box box = universe.getBox();
@@ -1097,7 +1099,7 @@ TEST_CASE("Coordinates work")
                       // ny
                       { { 0, 0, 0, 0, 1, 2, 2, 2 } } // nz
     );
-    std::vector<long int> indices = { { 1, 2, 3 } };
+    std::vector<igraph_integer_t> indices = { { 1, 2, 3 } };
     Eigen::VectorXd coordinates =
       universe.getUnwrappedVertexCoordinates(indices, box);
     CHECK(coordinates.size() == 9);

@@ -407,7 +407,7 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("vertex_idx"))
     .def(
       "get_atom_by_id",
-      [](const Molecule& molecule, size_t id) {
+      [](const Molecule& molecule, const size_t id) {
         return molecule.getAtomByVertexIdx(molecule.getIdxByAtomId(id));
       },
       R"pbdoc(
@@ -546,7 +546,7 @@ init_pylimer_bound_entities(py::module_& m)
     .def(pybind11::self == pybind11::self)
     .def(
       "__getitem__",
-      [](const Molecule& molecule, size_t index) {
+      [](const Molecule& molecule, const size_t index) {
         if (index > molecule.getLength()) {
           throw py::index_error();
         }
@@ -1200,7 +1200,7 @@ init_pylimer_bound_entities(py::module_& m)
     //     .def(pybind11::self == pybind11::self)
     .def(
       "__getitem__",
-      [](const Universe& u, size_t index) {
+      [](const Universe& u, const size_t index) {
         if (index > u.getNrOfAtoms()) {
           throw py::index_error();
         }
@@ -1390,7 +1390,7 @@ init_pylimer_bound_entities(py::module_& m)
     // operators
     .def(
       "__getitem__",
-      [](UniverseSequence& us, size_t index) {
+      [](UniverseSequence& us, const size_t index) {
         if (index > us.getLength()) {
           throw py::index_error();
         }

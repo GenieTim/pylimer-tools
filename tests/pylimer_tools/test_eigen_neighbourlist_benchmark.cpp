@@ -30,11 +30,11 @@ string_format(const std::string& format, Args... args)
 }
 
 void
-runBenchmarkWithConfig(double neighbourBinSize = 1.0,
-                       double cutoff = 1.0,
-                       double scalingFactor = 1.0,
-                       double density = 3.,
-                       double scatter = 5.)
+runBenchmarkWithConfig(const double neighbourBinSize = 1.0,
+                       const double cutoff = 1.0,
+                       const double scalingFactor = 1.0,
+                       const double density = 3.,
+                       const double scatter = 5.)
 {
   double boxLen = 12.5;
   pe::Box box = pe::Box(boxLen, boxLen, boxLen);

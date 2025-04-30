@@ -22,7 +22,7 @@ namespace pu = pylimer_tools::utils;
 namespace pcm = pylimer_tools::sim::mehp;
 
 double
-roundForOutput(double val, double precision = 5)
+roundForOutput(const double val, const double precision = 5)
 {
   return std::round(val * std::pow(10, precision)) / std::pow(10, precision);
 }

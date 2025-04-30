@@ -69,7 +69,7 @@ template<typename MatrixType>
 static inline Eigen::VectorXd
 gradientDescentBarzilaiBorwein(const MatrixType& A,
                                const Eigen::VectorXd& b,
-                               double learningRate,
+                               const double learningRate,
                                const double tolerance,
                                const int maxIterations,
                                int& iteration,
@@ -110,7 +110,7 @@ template<typename MatrixType>
 static inline Eigen::VectorXd
 gradientDescentHeavyBallBarzilaiBorwein(const MatrixType& A,
                                         const Eigen::VectorXd& b,
-                                        double learningRate,
+                                        const double learningRate,
                                         const double tolerance,
                                         const int maxIterations,
                                         int& iteration)

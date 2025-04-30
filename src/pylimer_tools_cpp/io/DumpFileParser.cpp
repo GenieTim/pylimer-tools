@@ -155,7 +155,7 @@ namespace utils {
    *
    * @return size_t
    */
-  size_t DumpFileParser::getLength()
+  size_t DumpFileParser::getLength() const
   {
     return this->nrOfGroups;
   }
@@ -166,7 +166,7 @@ namespace utils {
    * @param headerKey
    * @return bool
    */
-  bool DumpFileParser::hasKey(std::string headerKey)
+  bool DumpFileParser::hasKey(std::string headerKey) const
   {
     if (this->data.size() == 0) {
       throw std::invalid_argument("Cannot check for header '" + headerKey +

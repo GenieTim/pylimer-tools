@@ -188,10 +188,10 @@ namespace utils {
    * @return std::vector<double>
    */
   std::vector<double> AveFileReader::autocorrelateColumn(
-    int column,
+    const int column,
     const std::vector<size_t>& dts)
   {
-    INVALIDARG_EXP_IFN(column < this->getNrOfColumns(), "Invalid column");
+    INVALIDINDEX_EXP_IFN(column < this->getNrOfColumns(), "Invalid column");
 
     int nRows = this->getNrOfRows();
     // validate dts
@@ -230,12 +230,12 @@ namespace utils {
    * @return std::vector<double>
    */
   std::vector<double> AveFileReader::autocorrelateColumnDifference(
-    int column1,
-    int column2,
+    const int column1,
+    const int column2,
     const std::vector<size_t>& dts)
   {
-    INVALIDARG_EXP_IFN(column1 < this->getNrOfColumns(), "Invalid column");
-    INVALIDARG_EXP_IFN(column2 < this->getNrOfColumns(), "Invalid column");
+    INVALIDINDEX_EXP_IFN(column1 < this->getNrOfColumns(), "Invalid column");
+    INVALIDINDEX_EXP_IFN(column2 < this->getNrOfColumns(), "Invalid column");
 
     int nRows = this->getNrOfRows();
     // validate dts

@@ -12,6 +12,13 @@
 
 // raise exceptions under condition – similar to assert, but kept when compiling
 // for any optimisation
+#define INVALIDINDEX_EXP_IFN(condition, message)                               \
+  if (!(condition)) {                                                          \
+    std::cerr << "Argument error: " << message << std::endl;                   \
+    throw std::out_of_range(std::string(message) +                             \
+                            std::string("\nFailed condition: " #condition));   \
+  }
+
 #define INVALIDARG_EXP_IFN(condition, message)                                 \
   if (!(condition)) {                                                          \
     std::cerr << "Argument error: " << message << std::endl;                   \

@@ -65,7 +65,7 @@ namespace entities {
     std::vector<pylimer_tools::utils::AtomStyle> dataFileAtomStyle;
 
     void reset();
-    Universe readDataFile(const std::string& filePath);
+    Universe readDataFile(const std::string& filePath) const;
     Universe readDataFileAtIndex(const size_t index);
     Universe readDumpFileAtIndex(const size_t index);
 

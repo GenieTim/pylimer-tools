@@ -170,7 +170,7 @@ namespace sim {
     //   return ((3 * x - (x / 5.) * (6. * x2 + x4 + 2 * x6)) / (1. - x2));
     // }
 
-    double csch(double x)
+    double csch(const double x)
     {
       return 1. / sinh(x);
     };

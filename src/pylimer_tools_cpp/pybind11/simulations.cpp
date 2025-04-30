@@ -792,13 +792,13 @@ and finally springs will be any number of connected bonds between links.
     .def(
       "run_force_relaxation",
       [](mehp::MEHPForceBalance& sim,
-         long int maxNrOfSteps,
+         const long int maxNrOfSteps,
          // default: 10000
-         double xtol,
+         const double xtol,
          const double initialResidualToUse,
          const mehp::StructureSimplificationMode simplificationMode,
          const double inactiveRemovalCutoff,
-         bool doInnerIterations,
+         const bool doInnerIterations,
          const mehp::LinkSwappingMode allowSlipLinksToPassEachOther,
          const int swappingFrequency,
          const double oneOverSpringPartitionUpperLimit,
@@ -1843,7 +1843,10 @@ and finally springs will be any number of connected bonds between links.
     //          py::arg("with_MC") = false)
     .def(
       "run_simulation",
-      [](dpd::DPDSimulator& sim, int nSteps, double dt, bool withMC) {
+      [](dpd::DPDSimulator& sim,
+         const int nSteps,
+         const double dt,
+         const bool withMC) {
         sim.configTimeStep(dt);
         return sim.runSimulation(
           nSteps,
