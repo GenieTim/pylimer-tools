@@ -408,11 +408,13 @@ init_pylimer_bound_generators(py::module_& m)
     [](pe::Box& b,
        Eigen::Vector3d f,
        Eigen::Vector3d t,
-       int c,
-       double l,
-       double l2,
+       const int c,
+       const double l,
+       const double l2,
        std::string s,
-       int n) { return doRandomWalkChainFromToMC(b, f, t, c, l, l2, s, n); },
+       const int n) {
+      return doRandomWalkChainFromToMC(b, f, t, c, l, l2, s, n);
+    },
     R"pbdoc(
             Do a random walk from one point to another.
             Then, relax the points in between using a Metropolis-Monte Carlo simulation.
@@ -430,9 +432,9 @@ init_pylimer_bound_generators(py::module_& m)
     [](pe::Box& b,
        Eigen::Vector3d f,
        Eigen::Vector3d t,
-       int c,
-       double l,
-       double l2,
+       const int c,
+       const double l,
+       const double l2,
        std::string s) { return doRandomWalkChainFromTo(b, f, t, c, l, l2, s); },
     R"pbdoc(
             Do a random walk from one point to another.

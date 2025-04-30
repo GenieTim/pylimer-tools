@@ -243,7 +243,7 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
 
   SECTION("Coordinates are derived correctly")
   {
-    std::vector<long int> vertices;
+    std::vector<igraph_integer_t> vertices;
     for (int i = 0; i < molecules[1].getNrOfAtoms(); i++) {
       vertices.push_back(i);
     }

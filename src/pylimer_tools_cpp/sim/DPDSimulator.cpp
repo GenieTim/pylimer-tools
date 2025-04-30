@@ -1,5 +1,6 @@
 #include "./DPDSimulator.h"
 #include "../utils/PerformanceTimer.h"
+#include "../utils/StringUtils.h"
 
 #include <fstream>
 #include <iostream>
@@ -108,7 +109,7 @@ namespace sim {
             : std::accumulate(this->bondsOfIndex[i].begin(),
                               this->bondsOfIndex[i].end(),
                               0,
-                              [&](int val, size_t bondIdx) {
+                              [&](const int val, const size_t bondIdx) {
                                 return val + static_cast<int>(bondIdx <
                                                               this->numBonds);
                               });
@@ -142,7 +143,7 @@ namespace sim {
      */
     void DPDSimulator::runSimulation(
       const long int nSteps,
-      bool withMC,
+      const bool withMC,
       const std::function<bool()>& shouldInterrupt,
       const std::function<void()>& cleanupInterrupt)
     {
@@ -313,7 +314,7 @@ namespace sim {
       }
     }
 
-    void DPDSimulator::resetBondDuplicationPenalty(size_t atomIdx)
+    void DPDSimulator::resetBondDuplicationPenalty(const size_t atomIdx)
     {
       std::unordered_set<size_t> partners;
       partners.reserve(this->bondsOfIndex[atomIdx].size());
@@ -354,7 +355,7 @@ namespace sim {
                             this->coordinates(this->bondPartnerCoordinatesA));
     }
 
-    void DPDSimulator::resetBondOffset(int bondIdx)
+    void DPDSimulator::resetBondOffset(const int bondIdx)
     {
       this->bondBoxOffsets.segment(bondIdx * 3, 3) = this->box.getOffset(
         this->coordinates.segment(3 * this->bondPartnersB[bondIdx], 3) -
@@ -906,8 +907,10 @@ namespace sim {
       INVALIDARG_EXP_IFN(partnerA.size() == partnerB.size(),
                          "Require same size A & B");
       for (size_t i = 0; i < partnerA.size(); ++i) {
-        INVALIDARG_EXP_IFN(partnerA[i] < this->numAtoms, "Invalid partner id");
-        INVALIDARG_EXP_IFN(partnerB[i] < this->numAtoms, "Invalid partner id");
+        INVALIDINDEX_EXP_IFN(partnerA[i] < this->numAtoms,
+                             "Invalid partner id");
+        INVALIDINDEX_EXP_IFN(partnerB[i] < this->numAtoms,
+                             "Invalid partner id");
       }
       size_t sizeBefore = this->numBonds + this->numSlipSprings;
       this->bondPartnersA.conservativeResize(sizeBefore + partnerA.size());
@@ -1478,12 +1481,12 @@ namespace sim {
       if (partnerAfter == partnerBefore) {
         return;
       }
-      INVALIDARG_EXP_IFN(springIdx < this->bondPartnersA.size(),
-                         "Cannot replace on a non-existing spring.");
-      INVALIDARG_EXP_IFN(partnerBefore < this->numAtoms,
-                         "Cannot replace with a non-existing bead.");
-      INVALIDARG_EXP_IFN(partnerAfter < this->numAtoms,
-                         "Cannot replace with a non-existing bead.");
+      INVALIDINDEX_EXP_IFN(springIdx < this->bondPartnersA.size(),
+                           "Cannot replace on a non-existing spring.");
+      INVALIDINDEX_EXP_IFN(partnerBefore < this->numAtoms,
+                           "Cannot replace with a non-existing bead.");
+      INVALIDINDEX_EXP_IFN(partnerAfter < this->numAtoms,
+                           "Cannot replace with a non-existing bead.");
       INVALIDARG_EXP_IFN(this->bondPartnersA[springIdx] == partnerBefore ||
                            this->bondPartnersB[springIdx] == partnerBefore,
                          "This spring and its partners do not match.");
@@ -1536,7 +1539,7 @@ namespace sim {
      * @return pylimer_tools::entities::Universe
      */
     pylimer_tools::entities::Universe DPDSimulator::getUniverse(
-      bool withSlipsprings) const
+      const bool withSlipsprings) const
     {
       pylimer_tools::entities::Universe result =
         pylimer_tools::entities::Universe(this->box);
@@ -1583,7 +1586,7 @@ namespace sim {
       return result;
     }
 
-    void DPDSimulator::validateNeighbourlist(double cutoff)
+    void DPDSimulator::validateNeighbourlist(const double cutoff)
     {
       // this->neighbourlist.resetCoordinates(this->coordinates);
       RUNTIME_EXP_IFN(this->neighbourlist.getNumBinnedCoordinates() ==
@@ -1728,7 +1731,7 @@ namespace sim {
           this->bondsOfIndex[i].begin(),
           this->bondsOfIndex[i].end(),
           0,
-          [&](int val, size_t bondIdx) {
+          [&](const int val, const size_t bondIdx) {
             return val + static_cast<int>(bondIdx < this->numBonds);
           });
         if (this->numSlipSprings == 0) {

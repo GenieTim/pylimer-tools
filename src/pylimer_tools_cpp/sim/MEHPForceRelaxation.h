@@ -64,12 +64,12 @@ namespace sim {
 
     public:
       MEHPForceRelaxation(const pylimer_tools::entities::Universe& u,
-                          int crossLinkerType = 2,
-                          bool is2D = false,
+                          const int crossLinkerType = 2,
+                          const bool is2D = false,
                           MEHPForceEvaluator* newForceEvaluator = nullptr,
-                          double kappa = 1.0,
-                          bool remove2functionalCrosslinkers = false,
-                          bool removeDanglingChains = false)
+                          const double kappa = 1.0,
+                          const bool remove2functionalCrosslinkers = false,
+                          const bool removeDanglingChains = false)
         : universe(u)
       {
         if (newForceEvaluator == nullptr) {
@@ -97,9 +97,9 @@ namespace sim {
       };
 
       MEHPForceRelaxation(const Network& net,
-                          bool is2D = false,
+                          const bool is2D = false,
                           MEHPForceEvaluator* newForceEvaluator = nullptr,
-                          double kappa = 1.0)
+                          const double kappa = 1.0)
       {
         this->forceRelaxationNetwork = net;
         this->is2D = is2D;
@@ -175,7 +175,7 @@ namespace sim {
 
       Network getNetwork() const { return this->forceRelaxationNetwork; }
 
-      void configAssumeBoxLargeEnough(bool assumption = true)
+      void configAssumeBoxLargeEnough(const bool assumption = true)
       {
         this->forceRelaxationNetwork.assumeBoxLargeEnough = assumption;
       }
@@ -200,9 +200,9 @@ namespace sim {
        * considered inactive
        * @return int
        */
-      int getNrOfActiveNodes(double tolerance = 0.05,
-                             int minimumNrOfActiveConnections = 2,
-                             int maximumNrOfActiveConnections = -1) const
+      int getNrOfActiveNodes(const double tolerance = 0.05,
+                             const int minimumNrOfActiveConnections = 2,
+                             const int maximumNrOfActiveConnections = -1) const
       {
         return this
           ->getIdsOfActiveNodes(tolerance,
@@ -230,7 +230,7 @@ namespace sim {
        * @param tolerance
        * @return double
        */
-      double countActiveClusteredAtoms(double tolerance = 0.05)
+      double countActiveClusteredAtoms(const double tolerance = 0.05)
       {
         return this->countActiveClusteredAtoms(&this->forceRelaxationNetwork,
                                                tolerance);
@@ -244,7 +244,7 @@ namespace sim {
        * @return std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
        */
       std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
-        double tolerance = 0.05) const
+        const double tolerance = 0.05) const
       {
         return this->findClusteredToActive(&this->forceRelaxationNetwork,
                                            tolerance);
@@ -256,7 +256,7 @@ namespace sim {
        * @param tolerance
        * @return double
        */
-      double getDanglingWeightFraction(double tolerance = 0.05)
+      double getDanglingWeightFraction(const double tolerance = 0.05)
       {
         return this->computeDanglingWeightFraction(
           &this->forceRelaxationNetwork, tolerance);
@@ -269,7 +269,7 @@ namespace sim {
        * @return std::vector<pylimer_tools::entities::Molecule>
        */
       std::vector<pylimer_tools::entities::Molecule> getActiveChains(
-        double tolerance = 0.05) const
+        const double tolerance = 0.05) const
       {
         std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
           this->universe.getChainsWithCrosslinker(crossLinkerType);
@@ -335,7 +335,7 @@ namespace sim {
        * inactive
        * @return int
        */
-      int getNrOfActiveSprings(double tol = 0.1) const
+      int getNrOfActiveSprings(const double tol = 0.1) const
       {
         return this->countNrOfActiveSprings(&this->forceRelaxationNetwork, tol);
       }
@@ -470,7 +470,10 @@ namespace sim {
         return this->simulationSuggestsRerun || !this->simulationHasRun;
       }
 
-      void configRerunEps(double eps = 1e-3) { this->suggestRerunEps = eps; }
+      void configRerunEps(const double eps = 1e-3)
+      {
+        this->suggestRerunEps = eps;
+      }
 
       /**
        * @brief Get the Stress Tensor
@@ -493,7 +496,7 @@ namespace sim {
 
       double getTimestep() override { return this->dt; }
 
-      double getCurrentTime(double currentStep) override
+      double getCurrentTime(const double currentStep) override
       {
         return this->dt * currentStep;
       }
@@ -768,8 +771,8 @@ namespace sim {
        * @return double
        */
       double evaluateGammaFactor(const Eigen::VectorXd& springDistances,
-                                 double b02,
-                                 int nrOfChains) const
+                                 const double b02,
+                                 const int nrOfChains) const
       {
         return this->evaluateGammaFactors(springDistances, b02).sum() /
                static_cast<double>(nrOfChains);
@@ -1039,8 +1042,8 @@ namespace sim {
        * @return false
        */
       bool distanceIsWithinTolerance(const Eigen::Vector3d& dist,
-                                     double tolerance = 1e-3,
-                                     double contourLength = 1.) const
+                                     const double tolerance = 1e-3,
+                                     const double contourLength = 1.) const
       {
         return dist.norm() <= (tolerance * std::max(contourLength, 1.));
       }

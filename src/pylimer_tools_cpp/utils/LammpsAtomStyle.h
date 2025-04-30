@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 
-
 namespace pylimer_tools::utils {
 #define LAMMPS_ATOM_STYLES                                                     \
   X(NONE, "none")                                                              \
@@ -34,46 +33,48 @@ namespace pylimer_tools::utils {
   X(WAVEPACKET, "wavepacket")                                                  \
   X(HYBRID, "hybrid")
 
-  enum AtomStyle : int
-  {
+enum AtomStyle : int
+{
 #define X(e, s) e,
-    LAMMPS_ATOM_STYLES
+  LAMMPS_ATOM_STYLES
 #undef X
-  };
+};
 
-  static inline std::string getAtomStyleString(AtomStyle type)
-  {
-    switch (type) {
+static inline std::string
+getAtomStyleString(AtomStyle type)
+{
+  switch (type) {
 #define X(e, s)                                                                \
   case e:                                                                      \
     return s;
-      LAMMPS_ATOM_STYLES
+    LAMMPS_ATOM_STYLES
 #undef X
-      default:
-        SHOULD_NOT_REACH_HERE("Atom style " + std::to_string(type) + " not recognized");
-    }
-  }
-
-  static inline std::vector<std::string> getAtomStyleStrings()
-  {
-    return {
-#define X(e, s) s,
-      LAMMPS_ATOM_STYLES
-#undef X
-    };
-  }
-
-  static inline AtomStyle getAtomStyleFromString(const std::string& src)
-  {
-    switch (src) {
-#define X(e, s)                                                                \
-  case s:                                                                      \
-    return e;
-      LAMMPS_ATOM_STYLES
-#undef X
-      default:
-        throw std::invalid_argument("Atom style " + src + " not recognized");
-    }
+    default:
+      throw std::runtime_error("Atom style " + std::to_string(type) +
+                               " not recognized");
   }
 }
 
+static inline std::vector<std::string>
+getAtomStyleStrings()
+{
+  return {
+#define X(e, s) s,
+    LAMMPS_ATOM_STYLES
+#undef X
+  };
+}
+
+static inline AtomStyle
+getAtomStyleFromString(const std::string& src)
+{
+  // unfortunately, there's no support for switch(std::string) in C++, currently
+#define X(e, s)                                                                \
+  if (src == s) {                                                              \
+    return e;                                                                  \
+  }
+  LAMMPS_ATOM_STYLES
+#undef X
+  throw std::invalid_argument("Atom style " + src + " not recognized");
+}
+}

@@ -107,7 +107,10 @@ namespace entities {
     void setMasses(const std::map<int, double>& massPerType);
     void setMassForType(const int atomType, const double mass);
     void setBox(const Box& box, bool rescaleAtomCoordinates = false);
-    void setTimestep(long int newTimestep) { this->timestep = newTimestep; };
+    void setTimestep(const long int newTimestep)
+    {
+      this->timestep = newTimestep;
+    };
     void initializeFromGraph(const igraph_t* ingraph);
     void removeAllAngles();
     void removeAllDihedralAngles();
@@ -136,11 +139,11 @@ namespace entities {
     Universe getNetworkOfCrosslinker(const int crossLinkerType) const;
     Universe contractVerticesAlongBondType(const int bondType) const;
     // TODO: find & implement a better return type, e.g. std::vector<Molecule>
-    std::vector<std::vector<long int>> findLoops(
-      const int crossLinkerType,
-      const int maxLength = -1,
+    std::vector<std::vector<igraph_integer_t>> findLoops(
+      int crossLinkerType,
+      int maxLength = -1,
       bool skipSelfLoops = false,
-      std::vector<std::vector<long int>>* edges = nullptr) const;
+      std::vector<std::vector<igraph_integer_t>>* edges = nullptr) const;
     std::unordered_map<int, int> countLoopLengths(
       const int maxLength = -1) const;
     std::map<int, std::vector<std::vector<Atom>>> findLoopsOfAtoms(
@@ -159,8 +162,9 @@ namespace entities {
       return this->getPropertyValues<int>("type");
     }
     std::map<int, int> countAtomTypes() const;
-    std::vector<size_t> countAtomsInSkinDistance(std::vector<double> distances,
-                                                 bool unwrapped = false) const;
+    std::vector<size_t> countAtomsInSkinDistance(
+      const std::vector<double>& distances,
+      bool unwrapped = false) const;
     template<typename IN>
     long int findVertexIdForProperty(const char* propertyName,
                                      IN propertyValue) const;
@@ -171,12 +175,12 @@ namespace entities {
     size_t getNrOfAngles() const;
     size_t getNrOfDihedralAngles() const;
     std::map<int, double> getMasses();
-    long int getTimestep() { return this->timestep; };
+    long int getTimestep() const { return this->timestep; };
     long int getAtomIdByIdx(igraph_integer_t vertexId) const override;
     igraph_integer_t getIdxByAtomId(const int atomId) const override;
 
     // operators
-    Atom operator[](size_t index) const { return this->getAtom(index); }
+    Atom operator[](const size_t index) const { return this->getAtom(index); }
 
     // computations
     std::map<std::string, std::vector<long int>> detectAngles() const;
@@ -190,11 +194,11 @@ namespace entities {
       int crossLinkerType,
       double interpolationFactor) const;
     std::vector<double> computeDxs(const std::vector<long int>& bondFrom,
-                                   const std::vector<long int>& bondTo);
+                                   const std::vector<long int>& bondTo) const;
     std::vector<double> computeDys(const std::vector<long int>& bondFrom,
-                                   const std::vector<long int>& bondTo);
+                                   const std::vector<long int>& bondTo) const;
     std::vector<double> computeDzs(const std::vector<long int>& bondFrom,
-                                   const std::vector<long int>& bondTo);
+                                   const std::vector<long int>& bondTo) const;
     std::vector<double> computeBondLengths() const
     {
       return AtomGraphParent::computeBondLengths(this->box);
@@ -206,27 +210,28 @@ namespace entities {
     double computeTemperature(const int dimensions = 3,
                               const double kb = 1.) const;
     std::vector<LoopIntersectionInfo> findLoopEntanglements(
-      const std::vector<long int>& vertexIndicesLoop1,
-      const std::vector<long int>& vertexIndicesLoop2,
-      const std::vector<long int>& edgeIndicesLoop1,
-      const std::vector<long int>& edgeIndicesLoop2) const;
-    double getMeanStrandLength(int crossLinkerType);
-    std::vector<double> computeEndToEndDistances(int crossLinkerType,
-                                                 bool implyImageFlags = false);
+      const std::vector<igraph_integer_t>& vertexIndicesLoop1,
+      const std::vector<igraph_integer_t>& vertexIndicesLoop2,
+      const std::vector<igraph_integer_t>& edgeIndicesLoop1,
+      const std::vector<igraph_integer_t>& edgeIndicesLoop2) const;
+    double getMeanStrandLength(int crossLinkerType) const;
+    std::vector<double> computeEndToEndDistances(
+      int crossLinkerType,
+      bool implyImageFlags = false) const;
     double computeMeanEndToEndDistance(int crossLinkerType,
-                                       bool implyImageFlags = false);
+                                       bool implyImageFlags = false) const;
     double computeMeanSquareEndToEndDistance(
       int crossLinkerType,
       bool onlyThoseWithTwoCrosslinkers = false,
-      bool implyImageFlags = false);
-    double computeMeanBondLength();
+      bool implyImageFlags = false) const;
+    double computeMeanBondLength() const;
     double computeTotalMass() const;
     double computeTotalMassWithMasses(
       std::map<int, double> massPerTypeToUse) const;
     double computeWeightAverageMolecularWeight(int crossLinkerType) const;
     double computeNumberAverageMolecularWeight(int crossLinkerType) const;
     double computePolydispersityIndex(int crossLinkerType) const;
-    bool validate();
+    bool validate() const;
 
 #ifdef CEREALIZABLE
     template<class Archive>
@@ -286,8 +291,9 @@ namespace entities {
 
     // internal functions
     igraph_vs_t getVerticesOfType(const int type) const;
-    std::vector<long int> getIndicesOfType(const int type) const;
-    igraph_vs_t getVerticesByIndices(std::vector<long int> indices) const;
+    std::vector<igraph_integer_t> getIndicesOfType(const int type) const;
+    igraph_vs_t getVerticesByIndices(
+      std::vector<igraph_integer_t> indices) const;
     std::vector<double> computeDs(const std::vector<long int>& bondFrom,
                                   const std::vector<long int>& bondTo,
                                   const std::string& direction,

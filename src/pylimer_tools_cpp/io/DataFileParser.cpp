@@ -348,8 +348,8 @@ namespace utils {
   }
 
   void DataFileParser::readAtomHybrid(const std::string& line,
-                                      AtomStyle style1,
-                                      AtomStyle style2)
+                                      const AtomStyle style1,
+                                      const AtomStyle style2)
   {
     if (style1 != AtomStyle::BOND && style2 != AtomStyle::EDPD) {
       throw std::runtime_error(

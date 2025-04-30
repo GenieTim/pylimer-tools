@@ -155,7 +155,7 @@ namespace sim {
                          const std::function<bool()>& shouldInterrupt,
                          const std::function<void()>& cleanupInterrupt);
 
-      void runSimulation(const long int nSteps, bool withMC = false)
+      void runSimulation(const long int nSteps, const bool withMC = false)
       {
         runSimulation(nSteps, withMC, []() { return false; }, []() {});
       }
@@ -206,7 +206,7 @@ namespace sim {
        */
       double computeTemperature(const Eigen::VectorXd& velocities) const;
 
-      inline Eigen::Vector3d computeBondDistance(int bondIdx) const
+      inline Eigen::Vector3d computeBondDistance(const int bondIdx) const
       {
         Eigen::Vector3d bondDistances =
           this->coordinates(
@@ -226,7 +226,7 @@ namespace sim {
        * @param bondIdx
        * @return double
        */
-      double computeBondLength(int bondIdx) const
+      double computeBondLength(const int bondIdx) const
       {
         return this->computeBondDistance(bondIdx).norm();
       }
@@ -302,7 +302,7 @@ namespace sim {
               bool oneOfTheBeadsIsXlink = std::any_of(
                 this->bondsOfIndex[i].begin(),
                 this->bondsOfIndex[i].end(),
-                [&](size_t bondIdx) {
+                [&](const size_t bondIdx) {
                   assert(this->bondPartnersA[bondIdx] == i ||
                          this->bondPartnersB[bondIdx] == i);
                   return this->atomTypes[this->bondPartnersA[bondIdx]] ==
@@ -319,17 +319,24 @@ namespace sim {
 
       void startMeasuringMSDForAtoms(const std::vector<size_t>& atomIds);
 
-      void configNumStepsMC(long int steps = 500) { this->nStepsMC = steps; }
+      void configNumStepsMC(const long int steps = 500)
+      {
+        this->nStepsMC = steps;
+      }
 
       int getSlipSpringBondType() const { return this->slipspringBondType; }
 
-      long int getNumStepsMC() { return this->nStepsMC; }
+      long int getNumStepsMC() const { return this->nStepsMC; }
 
-      void configNumStepsDPD(long int steps = 500) { this->nStepsDPD = steps; }
+      void configNumStepsDPD(const long int steps = 500)
+      {
+        this->nStepsDPD = steps;
+      }
 
-      long int getNumStepsDPD() { return this->nStepsDPD; }
+      long int getNumStepsDPD() const { return this->nStepsDPD; }
 
-      void configShiftPossibilityEmpty(bool shiftPossibilityEmptyConfig = true)
+      void configShiftPossibilityEmpty(
+        const bool shiftPossibilityEmptyConfig = true)
       {
         this->shiftPossibilityEmpty = shiftPossibilityEmptyConfig;
       }
@@ -338,7 +345,7 @@ namespace sim {
         return this->shiftPossibilityEmpty;
       }
 
-      void configShiftOneAtATime(bool shiftOne = false)
+      void configShiftOneAtATime(const bool shiftOne = false)
       {
         this->shiftOneAtATime = shiftOne;
       }

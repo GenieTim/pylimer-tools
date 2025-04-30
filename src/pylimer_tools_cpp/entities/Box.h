@@ -27,7 +27,7 @@ namespace entities {
     int shearDirection = -1;
 
   protected:
-    [[nodiscard]] inline double minImageDistance(double dcoord,
+    [[nodiscard]] inline double minImageDistance(const double dcoord,
                                                  const int coord) const
     {
       return dcoord -
@@ -63,7 +63,9 @@ namespace entities {
       return coords;
     }
 
-    static double iterateForPlacementIn(double coord, double min, double max)
+    static double iterateForPlacementIn(double coord,
+                                        const double min,
+                                        const double max)
     {
       int min_iterations = 0;
       assert(!std::isinf(coord) && !std::isnan(coord));
@@ -162,7 +164,7 @@ namespace entities {
     }
 
     void applySimpleShear(const double shearMagnitude,
-                          int newShearDirection = 0)
+                          const int newShearDirection = 0)
     {
       this->simpleShearMagnitude = shearMagnitude;
       this->shearDirection = newShearDirection;
@@ -246,7 +248,7 @@ namespace entities {
     }
 
     [[nodiscard]] bool isValidOffset(const Eigen::VectorXd& offset,
-                                     double precision = 1e-5) const
+                                     const double precision = 1e-5) const
     {
       if (!(offset.size() % 3 == 0)) {
         return false;
@@ -381,7 +383,7 @@ namespace entities {
      * @param f interpolation factor
      * @return Box the new box
      */
-    [[nodiscard]] Box interpolate(const Box& other, double f) const
+    [[nodiscard]] Box interpolate(const Box& other, const double f) const
     {
       INVALIDARG_EXP_IFN(f >= 0. && f <= 1., "Cannot extrapolate box.");
       INVALIDARG_EXP_IFN(

@@ -32,7 +32,7 @@ median(const Eigen::DenseBase<Derived>& d)
 }
 
 static inline bool
-isSelfAdjoint(const SparseMatrix<double>& mat, double tol = 1e-9)
+isSelfAdjoint(const SparseMatrix<double>& mat, const double tol = 1e-9)
 {
   if (mat.rows() != mat.cols())
     return false; // Must be square

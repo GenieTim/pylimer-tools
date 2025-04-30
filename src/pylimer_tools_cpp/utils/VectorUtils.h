@@ -321,7 +321,7 @@ namespace utils {
                                 unsigned int nrOfRowsToRemove,                 \
                                 bool noResize = false)                         \
   {                                                                            \
-    INVALIDARG_EXP_IFN(                                                        \
+    INVALIDINDEX_EXP_IFN(                                                      \
       vec.size() >= rowToStartRemove + nrOfRowsToRemove,                       \
       "Cannot remove rows " + std::to_string(nrOfRowsToRemove) + " from " +    \
         std::to_string(rowToStartRemove) + " from vector with size " +         \
@@ -408,8 +408,8 @@ namespace utils {
   template<typename T>
   static inline void removeRows(std::vector<T>& vec,
                                 std::vector<size_t>& indicesToRemove,
-                                bool isSorted = false,
-                                bool isUnique = false)
+                                const bool isSorted = false,
+                                const bool isUnique = false)
   {
     if (indicesToRemove.empty())
       return;
@@ -752,7 +752,7 @@ namespace utils {
   static inline bool vector_approx_equal(const IN& v1,
                                          const IN& v2,
                                          const double absEps = 1e-12,
-                                         bool echo = false)
+                                         const bool echo = false)
   {
     assert(v1.size() == v2.size());
     for (size_t i = 0; i < v1.size(); ++i) {
@@ -771,7 +771,7 @@ namespace utils {
   static inline bool vector_approx_rel_equal(const IN& v1,
                                              const IN& v2,
                                              const double eps = 1e-12,
-                                             bool echo = false)
+                                             const bool echo = false)
   {
     assert(v1.size() == v2.size());
     for (size_t i = 0; i < v1.size(); ++i) {

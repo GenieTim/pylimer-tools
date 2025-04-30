@@ -126,7 +126,7 @@ MEHPForceBalance2::MEHPForceBalance2(
   igraph_inclist_init(&graph, &incidenceList, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
 
   size_t nVerticesWithRelevantDegree = (std::ranges::count_if(
-    vertexDegrees, [](int d) { return d > 0 && d != 2; }));
+    vertexDegrees, [](const int d) { return d > 0 && d != 2; }));
   size_t nLinksExpected = nVerticesWithRelevantDegree + pairsOfAtoms.size();
   size_t nStrandsExpected = nVerticesWithRelevantDegree / 2;
   size_t nSpringsExpected =
@@ -1912,7 +1912,7 @@ MEHPForceBalance2::displaceToMeanPosition(
   springPartWeightingFactor(net.springCoordinateIndexB) +=
     oneOverSpringPartitions * loopPartialSpringEliminator;
   springPartWeightingFactor = springPartWeightingFactor.unaryExpr(
-    [](double v) { return v > 0. ? v : 1.0; });
+    [](const double v) { return v > 0. ? v : 1.0; });
   Eigen::ArrayXd remainingDisplacement =
     (objectiveDisplacement / springPartWeightingFactor);
 #ifndef NDEBUG
@@ -1931,7 +1931,7 @@ MEHPForceBalance2::displaceToMeanPosition(
   nSpringsPerLink(net.springCoordinateIndexA) += loopPartialSpringEliminator;
   nSpringsPerLink(net.springCoordinateIndexB) += loopPartialSpringEliminator;
   nSpringsPerLink =
-    nSpringsPerLink.unaryExpr([](double v) { return v > 0. ? v : 1.0; });
+    nSpringsPerLink.unaryExpr([](const double v) { return v > 0. ? v : 1.0; });
   // make sure there are no infinite back-and-forth
   // and actually displace
   Eigen::ArrayXd backForthDisplacement =
@@ -2320,8 +2320,8 @@ MEHPForceBalance2::evaluateStrandVectors(const ForceBalance2Network& net,
 double
 MEHPForceBalance2::sumToTotalFraction(const ForceBalance2Network& net,
                                       Eigen::VectorXd springPartition,
-                                      size_t springIdx,
-                                      size_t targetLink) const
+                                      const size_t springIdx,
+                                      const size_t targetLink) const
 {
   double alpha = 0.;
   for (size_t i = 0; i < net.springIndicesOfStrand[springIdx].size(); ++i) {
@@ -2565,7 +2565,8 @@ MEHPForceBalance2::getStressTensorLinkBased(const bool crosslinksOnly) const
  * @return std::unordered_map<long int, int>
  */
 std::unordered_map<long int, int>
-MEHPForceBalance2::getEffectiveFunctionalityOfAtoms(double tolerance) const
+MEHPForceBalance2::getEffectiveFunctionalityOfAtoms(
+  const double tolerance) const
 {
   std::unordered_map<long int, int> results;
   results.reserve(this->initialConfig.nrOfNodes);
@@ -2778,7 +2779,7 @@ MEHPForceBalance2::computeSolubleWeightFraction(ForceBalance2Network& net,
 std::vector<long int>
 MEHPForceBalance2::getIndicesOfActiveNodes(const ForceBalance2Network& net,
                                            const Eigen::VectorXd& u,
-                                           double tolerance) const
+                                           const double tolerance) const
 {
   std::vector<long int> results;
   results.reserve(net.nrOfNodes);
@@ -2811,7 +2812,7 @@ MEHPForceBalance2::getIndicesOfActiveNodes(const ForceBalance2Network& net,
  * @return std::vector<long int> the atom ids
  */
 std::vector<long int>
-MEHPForceBalance2::getIdsOfActiveNodes(double tolerance) const
+MEHPForceBalance2::getIdsOfActiveNodes(const double tolerance) const
 {
   std::vector<long int> results;
   // find all active springs
@@ -2941,7 +2942,7 @@ MEHPForceBalance2::getNrOfActiveSpringsConnected(const double tolerance) const
  * @return double
  */
 double
-MEHPForceBalance2::getGammaFactor(double b02, int nrOfChains) const
+MEHPForceBalance2::getGammaFactor(double b02, const int nrOfChains) const
 {
   if (b02 < 0) {
     b02 = this->defaultBondLength * this->defaultBondLength;
@@ -2968,7 +2969,7 @@ MEHPForceBalance2::getGammaFactor(double b02, int nrOfChains) const
  * @return Eigen::VectorXd
  */
 Eigen::VectorXd
-MEHPForceBalance2::getGammaFactors(double b02) const
+MEHPForceBalance2::getGammaFactors(const double b02) const
 {
   Eigen::VectorXd springVectors = this->evaluateSpringVectors(
     this->initialConfig, this->currentDisplacements);
@@ -3000,7 +3001,7 @@ MEHPForceBalance2::getGammaFactors(double b02) const
  * @return Eigen::VectorXd
  */
 Eigen::VectorXd
-MEHPForceBalance2::getGammaFactorsInDir(double b02, int dir) const
+MEHPForceBalance2::getGammaFactorsInDir(const double b02, const int dir) const
 {
   INVALIDARG_EXP_IFN(dir >= 0 && dir <= 2, "Invalid direction.");
   Eigen::VectorXd springVectors = this->evaluateSpringVectors(
@@ -3032,7 +3033,7 @@ MEHPForceBalance2::getGammaFactorsInDir(double b02, int dir) const
 double
 MEHPForceBalance2::getWeightedSpringLength(const ForceBalance2Network& net,
                                            const Eigen::VectorXd& u,
-                                           size_t partialSpringIdx) const
+                                           const size_t partialSpringIdx) const
 {
   double oneOverContourLengthFraction =
     1. / net.springContourLength[partialSpringIdx];

@@ -24,9 +24,9 @@ namespace sim {
      */
     void MEHPForceRelaxation::runForceRelaxation(
       const char* algorithm,
-      long int maxNrOfSteps, // default: 10000
-      double xtol,
-      double ftol)
+      const long int maxNrOfSteps, // default: 10000
+      const double xtol,
+      const double ftol)
     {
       this->simulationHasRun = true;
       RUNTIME_EXP_IFN(this->forceEvaluator != nullptr,
@@ -52,8 +52,10 @@ namespace sim {
       /* force relaxation */
       nlopt::opt opt(algorithm, 3 * net.nrOfNodes);
 
-      nlopt::func objectiveF =
-        [](unsigned n, const double* x, double* grad, void* f_data) -> double {
+      nlopt::func objectiveF = [](const unsigned n,
+                                  const double* x,
+                                  double* grad,
+                                  void* f_data) -> double {
         MEHPForceEvaluator* fEvaluator =
           static_cast<MEHPForceEvaluator*>(f_data);
         return fEvaluator->evaluateForceSetGradient(n, x, grad, f_data);
@@ -351,7 +353,7 @@ namespace sim {
      */
     std::unordered_map<long int, int>
     MEHPForceRelaxation::getEffectiveFunctionalityOfAtoms(
-      double tolerance) const
+      const double tolerance) const
     {
       std::unordered_map<long int, int> results;
       results.reserve(this->forceRelaxationNetwork.nrOfNodes);
@@ -375,9 +377,9 @@ namespace sim {
      * @return std::vector<long int> the atom ids
      */
     std::vector<long int> MEHPForceRelaxation::getIdsOfActiveNodes(
-      double tolerance,
-      int minimumNrOfActiveConnections,
-      int maximumNrOfActiveConnections) const
+      const double tolerance,
+      const int minimumNrOfActiveConnections,
+      const int maximumNrOfActiveConnections) const
     {
       std::vector<long int> results;
       results.reserve(this->forceRelaxationNetwork.nrOfNodes);
@@ -403,7 +405,7 @@ namespace sim {
      * @return Eigen::VectorXi
      */
     Eigen::VectorXi MEHPForceRelaxation::getNrOfActiveSpringsConnected(
-      double tolerance) const
+      const double tolerance) const
     {
       Eigen::VectorXi nrOfActiveSpringsConnected =
         Eigen::VectorXi::Zero(this->forceRelaxationNetwork.nrOfNodes);

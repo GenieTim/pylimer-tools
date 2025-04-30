@@ -271,8 +271,8 @@ namespace topo {
       const size_t minimumNrOfSliplinks,
       const double sameStrandCutoff,
       const std::string& seed,
-      int crossLinkerType,
-      bool ignoreCrosslinks,
+      const int crossLinkerType,
+      const bool ignoreCrosslinks,
       bool filterDanglingAndSoluble)
     {
       INVALIDARG_EXP_IFN(minimumNrOfSliplinks < universe.getNrOfAtoms() / 2,

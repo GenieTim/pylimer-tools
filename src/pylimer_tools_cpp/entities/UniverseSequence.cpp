@@ -75,7 +75,7 @@ namespace entities {
     this->dataFileAtomStyle = newDataFileAtomStyle;
   }
 
-  Universe UniverseSequence::readDataFileAtIndex(size_t idx)
+  Universe UniverseSequence::readDataFileAtIndex(const size_t idx)
   {
     return this->readDataFile(this->dataFiles[idx]);
   }
@@ -263,7 +263,7 @@ namespace entities {
     return newUniverse;
   };
 
-  Universe UniverseSequence::readDataFile(const std::string& filePath)
+  Universe UniverseSequence::readDataFile(const std::string& filePath) const
   {
     pylimer_tools::utils::AtomStyle style1 =
       this->dataFileAtomStyle.size() > 0
@@ -329,7 +329,7 @@ namespace entities {
     return results;
   }
 
-  void UniverseSequence::forgetAtIndex(size_t idx)
+  void UniverseSequence::forgetAtIndex(const size_t idx)
   {
     if (!this->modeDataFiles) {
       this->dumpFileParser.forgetAt(idx);
@@ -635,8 +635,8 @@ namespace entities {
    */
   std::unordered_map<long int, double> UniverseSequence::computeMsdForAtoms(
     const std::vector<long int>& atomIds,
-    int nrOfOrigins,
-    bool reduceMemory)
+    const int nrOfOrigins,
+    const bool reduceMemory)
   {
     if (this->modeDataFiles) {
       return this->computeMsdForAtomsFromDataFiles(

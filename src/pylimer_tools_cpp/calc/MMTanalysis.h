@@ -33,8 +33,8 @@ namespace calc {
     */
     double computeStoichiometricInbalance(
       pylimer_tools::entities::Universe network,
-      int crossLinkerType,
-      int strandLength,
+      const int crossLinkerType,
+      const int strandLength,
       std::map<int, int> functionalityPerType)
     {
 
@@ -91,7 +91,8 @@ namespace calc {
         maxFormableBonds += functionalityPerType[type];
       }
 
-      return network.getNrOfBonds() * 2.0 / (double)maxFormableBonds;
+      return network.getNrOfBonds() * 2.0 /
+             static_cast<double>(maxFormableBonds);
     }
 
     double computeExtentOfReaction(pylimer_tools::entities::Universe network)
@@ -116,9 +117,10 @@ namespace calc {
     Returns:
       - p_gel: critical extent of reaction for gelation
     */
-    double predictGelationPoint(double r, int f, int g = 2)
+    double predictGelationPoint(const double r, const int f, const int g = 2)
     {
-      return 1 / (r * ((double)f - 1) * ((double)g - 1));
+      return 1 /
+             (r * (static_cast<double>(f) - 1) * (static_cast<double>(g) - 1));
     }
   } // namespace mmt
 } // namespace calc

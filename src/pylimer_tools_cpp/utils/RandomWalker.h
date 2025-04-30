@@ -18,11 +18,14 @@ namespace utils {
    *
    * @param from the atom to start the random walk from
    * @param chainLen the number of atoms to add in between from and to
+   * @param beadDistance
+   * @param meanSquaredBeadDistance
+   * @param rng
    */
   static Eigen::VectorXd doRandomWalkChain(const int chainLen,
                                            const double beadDistance,
                                            const double meanSquaredBeadDistance,
-                                           std::mt19937 rng)
+                                           std::mt19937& rng)
   {
     std::uniform_real_distribution<double> angleDistribution =
       std::uniform_real_distribution<double>(0, 2 * M_PI);
@@ -63,12 +66,13 @@ namespace utils {
     return coordinates;
   }
 
-  static Eigen::VectorXd doRandomWalkChain(const int chainLen,
-                                           const double beadDistance = 1.0,
-                                           const double meanSquaredBeadDistance = 1.0,
-                                           std::string seed = "")
+  static Eigen::VectorXd doRandomWalkChain(
+    const int chainLen,
+    const double beadDistance = 1.0,
+    const double meanSquaredBeadDistance = 1.0,
+    std::string seed = "")
   {
-    const std::mt19937 rng = [&]() {
+    std::mt19937 rng = [&]() {
       if (seed.empty()) {
         std::random_device rd;
         return std::mt19937(rd());
@@ -101,7 +105,7 @@ namespace utils {
     const int chainLen,
     const double beadDistance,
     const double meanSquaredBeadDistance,
-    const std::mt19937 &rng,
+    std::mt19937& rng,
     const bool includeEnds = false)
   {
     std::uniform_real_distribution<double> angleDistribution =
@@ -182,7 +186,7 @@ namespace utils {
     const int chainLen,
     const double beadDistance,
     const double meanSquaredBeadDistance,
-    const std::mt19937 &rng,
+    std::mt19937& rng,
     const int numIterations)
   {
     // first, do a random walk already for initial guesses

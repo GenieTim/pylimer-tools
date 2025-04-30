@@ -467,7 +467,7 @@ namespace sim {
       const OutputConfiguration& oc,
       const std::array<long int, NUM_COMPUTABLE_INT_VALUES>& intvalues,
       const std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES>& doublevalues,
-      int streamIdx = 0)
+      const int streamIdx = 0)
     {
       assert(streamIdx <= this->outputStreams.size());
       assert(doublevalues.size() == NUM_COMPUTABLE_DOUBLE_VALUES);
@@ -662,7 +662,8 @@ namespace sim {
       this->updateValuesRequiredEvery(vals);
     }
 
-    void configRestartOutput(const std::string outputFile, int outputEvery)
+    void configRestartOutput(const std::string outputFile,
+                             const int outputEvery)
     {
       this->outputRestartEvery = outputEvery;
       this->restartOutputFile = outputFile;

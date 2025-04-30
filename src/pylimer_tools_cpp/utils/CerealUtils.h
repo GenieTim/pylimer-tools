@@ -480,7 +480,7 @@ namespace utils {
   }
 
   template<typename T>
-  void serializeToFile(T obj, std::string file)
+  void serializeToFile(T obj, const std::string file)
   {
     std::ofstream os(file);
     if (file.ends_with("json")) {
@@ -496,7 +496,7 @@ namespace utils {
   }
 
   template<typename T>
-  void deserializeFromFile(T& obj, std::string file)
+  void deserializeFromFile(T& obj, const std::string file)
   {
     std::ifstream is(file);
     if (file.ends_with("json")) {
