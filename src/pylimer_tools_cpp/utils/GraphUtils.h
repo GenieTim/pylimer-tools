@@ -58,7 +58,7 @@ namespace utils {
     const igraph_integer_t targetVertex,
     const std::vector<std::string>& propertyNames)
   {
-    for (std::string propertyName : propertyNames) {
+    for (const std::string& propertyName : propertyNames) {
       igraph_cattribute_VAN_set(
         targetGraph,
         propertyName.c_str(),
@@ -73,7 +73,7 @@ namespace utils {
                                  const igraph_integer_t targetEdge,
                                  const std::vector<std::string>& propertyNames)
   {
-    for (std::string propertyName : propertyNames) {
+    for (const std::string& propertyName : propertyNames) {
       igraph_cattribute_EAN_set(
         targetGraph,
         propertyName.c_str(),

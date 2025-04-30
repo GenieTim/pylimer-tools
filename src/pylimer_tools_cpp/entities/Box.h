@@ -18,7 +18,7 @@ namespace entities {
   {
   private:
     Eigen::Array3d L = Eigen::Array3d::Zero();
-    double volume;
+    double volume = 0.;
     Eigen::Array3d boxHalfs = Eigen::Array3d::Zero();
     Eigen::Array3d oneOverL = Eigen::Array3d::Zero();
     Eigen::Array3d loCoords = Eigen::Array3d::Zero();
@@ -27,7 +27,8 @@ namespace entities {
     int shearDirection = -1;
 
   protected:
-    inline double minImageDistance(double dcoord, const int coord) const
+    [[nodiscard]] inline double minImageDistance(double dcoord,
+                                                 const int coord) const
     {
       return dcoord -
              (this->L[coord] * std::nearbyint(dcoord * this->oneOverL[coord]));
@@ -62,7 +63,7 @@ namespace entities {
       return coords;
     }
 
-    double iterateForPlacementIn(double coord, double min, double max) const
+    static double iterateForPlacementIn(double coord, double min, double max)
     {
       int min_iterations = 0;
       assert(!std::isinf(coord) && !std::isnan(coord));
@@ -106,7 +107,9 @@ namespace entities {
     }
 
   public:
-    Box(const double Lx = 1.0, const double Ly = 1.0, const double Lz = 1.0)
+    explicit Box(const double Lx = 1.0,
+                 const double Ly = 1.0,
+                 const double Lz = 1.0)
     {
       INVALIDARG_EXP_IFN(Lx > 0 && Ly > 0 && Lz > 0,
                          "The box must be instantiated with positive lengths.");
@@ -165,30 +168,39 @@ namespace entities {
       this->shearDirection = newShearDirection;
     }
 
-    double getVolume() const { return this->volume; }
+    [[nodiscard]] double getVolume() const { return this->volume; }
 
-    double getL(const int i) const { return this->L[i % 3]; }
-    Eigen::Array3d getL() const { return this->L; }
-    double getLowL(const int i) const { return this->loCoords[i % 3]; }
-    Eigen::Array3d getLowL() const { return this->loCoords; }
-    double getHighL(const int i) const { return this->hiCoords[i % 3]; }
-    Eigen::Array3d getHighL() const { return this->hiCoords; }
+    [[nodiscard]] double getL(const int i) const { return this->L[i % 3]; }
+    [[nodiscard]] Eigen::Array3d getL() const { return this->L; }
+    [[nodiscard]] double getLowL(const int i) const
+    {
+      return this->loCoords[i % 3];
+    }
+    [[nodiscard]] Eigen::Array3d getLowL() const { return this->loCoords; }
+    [[nodiscard]] double getHighL(const int i) const
+    {
+      return this->hiCoords[i % 3];
+    }
+    [[nodiscard]] Eigen::Array3d getHighL() const { return this->hiCoords; }
 
-    double getLx() const { return this->L[0]; }
-    double getLy() const { return this->L[1]; }
-    double getLz() const { return this->L[2]; }
+    [[nodiscard]] double getLx() const { return this->L[0]; }
+    [[nodiscard]] double getLy() const { return this->L[1]; }
+    [[nodiscard]] double getLz() const { return this->L[2]; }
 
-    double getLowX() const { return this->loCoords[0]; }
-    double getLowY() const { return this->loCoords[1]; }
-    double getLowZ() const { return this->loCoords[2]; }
+    [[nodiscard]] double getLowX() const { return this->loCoords[0]; }
+    [[nodiscard]] double getLowY() const { return this->loCoords[1]; }
+    [[nodiscard]] double getLowZ() const { return this->loCoords[2]; }
 
-    double getHighX() const { return this->hiCoords[0]; }
-    double getHighY() const { return this->hiCoords[1]; }
-    double getHighZ() const { return this->hiCoords[2]; }
+    [[nodiscard]] double getHighX() const { return this->hiCoords[0]; }
+    [[nodiscard]] double getHighY() const { return this->hiCoords[1]; }
+    [[nodiscard]] double getHighZ() const { return this->hiCoords[2]; }
 
-    double getShearMagnitude() const { return this->simpleShearMagnitude; }
-    int getShearDirection() const { return this->shearDirection; }
-    bool isSheared() const
+    [[nodiscard]] double getShearMagnitude() const
+    {
+      return this->simpleShearMagnitude;
+    }
+    [[nodiscard]] int getShearDirection() const { return this->shearDirection; }
+    [[nodiscard]] bool isSheared() const
     {
       return this->getShearMagnitude() != 0 &&
              (this->getShearDirection() >= 0 && this->getShearDirection() <= 2);
@@ -223,7 +235,8 @@ namespace entities {
      * @param distanceVec
      * @return Eigen::VectorXd
      */
-    Eigen::VectorXd getOffset(const Eigen::VectorXd& distanceVec) const
+    [[nodiscard]] Eigen::VectorXd getOffset(
+      const Eigen::VectorXd& distanceVec) const
     {
       return -(this->L.replicate(distanceVec.size() / 3, 1) *
                (distanceVec.array() *
@@ -232,8 +245,8 @@ namespace entities {
                 .matrix();
     }
 
-    bool isValidOffset(const Eigen::VectorXd& offset,
-                       double precision = 1e-5) const
+    [[nodiscard]] bool isValidOffset(const Eigen::VectorXd& offset,
+                                     double precision = 1e-5) const
     {
       if (!(offset.size() % 3 == 0)) {
         return false;
@@ -365,10 +378,10 @@ namespace entities {
      * symmetric.
      *
      * @param other
-     * @param interpolationFactor
+     * @param f interpolation factor
      * @return Box the new box
      */
-    Box interpolate(const Box& other, double f) const
+    [[nodiscard]] Box interpolate(const Box& other, double f) const
     {
       INVALIDARG_EXP_IFN(f >= 0. && f <= 1., "Cannot extrapolate box.");
       INVALIDARG_EXP_IFN(
@@ -396,7 +409,7 @@ namespace entities {
       return newBox;
     }
 
-    Box getBoundingBox() const
+    [[nodiscard]] Box getBoundingBox() const
     {
       if (this->isSheared()) {
         Eigen::Vector3d lowerCorner = this->getLowL();
@@ -405,14 +418,10 @@ namespace entities {
         upperCorner[this->getShearDirection()] *=
           (1. + this->getShearMagnitude());
 
-        return Box(lowerCorner[0],
-                   upperCorner[0],
-                   lowerCorner[1],
-                   upperCorner[1],
-                   lowerCorner[2],
-                   upperCorner[2]);
+        return { lowerCorner[0], upperCorner[0], lowerCorner[1],
+                 upperCorner[1], lowerCorner[2], upperCorner[2] };
       }
-      return Box(*this);
+      return { *this };
     }
 
 #ifdef CEREALIZABLE

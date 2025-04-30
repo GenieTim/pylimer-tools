@@ -172,8 +172,8 @@ namespace entities {
     size_t getNrOfDihedralAngles() const;
     std::map<int, double> getMasses();
     long int getTimestep() { return this->timestep; };
-    long int getAtomIdByIdx(const int vertexId) const override;
-    long int getIdxByAtomId(const int atomId) const override;
+    long int getAtomIdByIdx(igraph_integer_t vertexId) const override;
+    igraph_integer_t getIdxByAtomId(const int atomId) const override;
 
     // operators
     Atom operator[](size_t index) const { return this->getAtom(index); }

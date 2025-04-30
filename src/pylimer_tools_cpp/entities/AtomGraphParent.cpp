@@ -128,6 +128,65 @@ namespace entities {
   };
 
   /**
+   * @brief Get the number of edges leading to/from one vertex
+   *
+   * @param vertexIdxFrom the vertex from which to start the path
+   * @param vertexIdxTo the vertex to which to end the path
+   * @param maxLength the maximum length of the path, negative for no limit
+   * @return the number of edges in the path, 0 if no path exists
+   */
+  int AtomGraphParent::getPathLength(const long int vertexIdxFrom,
+                                     const long int vertexIdxTo,
+                                     const int maxLength) const
+  {
+    INVALIDARG_EXP_IFN(vertexIdxFrom >= 0 &&
+                         vertexIdxFrom < this->getNrOfVertices(),
+                       "Invalid vertex index.");
+
+    if (maxLength == 0) {
+      return 0;
+    }
+
+    int foundAtDepth = 0;
+
+    auto handler_lambda = [&foundAtDepth, vertexIdxTo, maxLength](
+                            igraph_integer_t vid, igraph_integer_t dist) {
+      if (dist > maxLength && maxLength > 0) {
+        return IGRAPH_STOP;
+      }
+      if (vid == vertexIdxTo) {
+        foundAtDepth = dist;
+        return IGRAPH_STOP;
+      }
+      return IGRAPH_SUCCESS;
+    };
+
+    igraph_bfs(
+      &this->graph,
+      vertexIdxFrom,
+      nullptr,
+      IGRAPH_ALL,
+      false,
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+      [](const igraph_t* graph,
+         igraph_integer_t vid,
+         igraph_integer_t pred,
+         igraph_integer_t succ,
+         igraph_integer_t rank,
+         igraph_integer_t dist,
+         void* f) { return (*(decltype(handler_lambda)*)f)(vid, dist); },
+      &handler_lambda);
+
+    return foundAtDepth;
+  };
+
+  /**
    * @brief Get the edge ids of the edges between two vertices
    *
    * Main useage: check whether two vertices are connected twice

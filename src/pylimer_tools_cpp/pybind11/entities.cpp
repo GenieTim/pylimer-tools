@@ -522,6 +522,26 @@ init_pylimer_bound_entities(py::module_& m)
      Computes the sum of the lengths of all bonds.
      In most cases, this is equal to the contour length.
     )pbdoc")
+    .def("get_edge_ids_from",
+         &Universe::getIncidentEdgeIds,
+         R"pbdoc()pbdoc",
+         py::arg("vertex_id"))
+    .def("get_edge_ids_from_to",
+         &Universe::getEdgeIdsFromTo,
+         R"pbdoc(
+      Get the edge ids of the edges between two specific vertices)pbdoc",
+         py::arg("vertex_id_from"),
+         py::arg("vertex_id_to"))
+    .def("get_nr_of_edges_from_to",
+         &Universe::getPathLength,
+         R"pbdoc(
+      Get the number of edges in the shortest path between two specific vertices.
+
+      If `max_length` is provided and positive, it will only consider paths up to that length.
+    )pbdoc",
+         py::arg("vertex_id_from"),
+         py::arg("vertex_id_to"),
+         py::arg("max_length") = -1)
     // operators
     .def(pybind11::self == pybind11::self)
     .def(
@@ -1011,6 +1031,16 @@ init_pylimer_bound_entities(py::module_& m)
       Get the edge ids of the edges between two specific vertices)pbdoc",
          py::arg("vertex_id_from"),
          py::arg("vertex_id_to"))
+    .def("get_nr_of_edges_from_to",
+         &Universe::getPathLength,
+         R"pbdoc(
+      Get the number of edges in the shortest path between two specific vertices.
+
+      If `max_length` is provided and positive, it will only consider paths up to that length.
+)pbdoc",
+         py::arg("vertex_id_from"),
+         py::arg("vertex_id_to"),
+         py::arg("max_length") = -1)
     // computations
     .def("compute_bond_lengths",
          &Universe::computeBondLengths,

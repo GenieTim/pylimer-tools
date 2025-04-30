@@ -3,14 +3,10 @@
 #include "../entities/Box.h"
 #include "../sim/MCSimulator.h"
 #include <Eigen/Dense>
-#include <algorithm>
 #include <cassert>
 #include <iostream>
-#include <numeric>
 #include <random>
 #include <string>
-#include <unordered_map>
-#include <vector>
 #ifndef M_PI
 #define M_PI 3.1415926535897932384626433
 #endif
@@ -23,9 +19,9 @@ namespace utils {
    * @param from the atom to start the random walk from
    * @param chainLen the number of atoms to add in between from and to
    */
-  static Eigen::VectorXd doRandomWalkChain(int chainLen,
-                                           double beadDistance,
-                                           double meanSquaredBeadDistance,
+  static Eigen::VectorXd doRandomWalkChain(const int chainLen,
+                                           const double beadDistance,
+                                           const double meanSquaredBeadDistance,
                                            std::mt19937 rng)
   {
     std::uniform_real_distribution<double> angleDistribution =
@@ -67,19 +63,20 @@ namespace utils {
     return coordinates;
   }
 
-  static Eigen::VectorXd doRandomWalkChain(int chainLen,
-                                           double beadDistance = 1.0,
-                                           double meanSquaredBeadDistance = 1.0,
+  static Eigen::VectorXd doRandomWalkChain(const int chainLen,
+                                           const double beadDistance = 1.0,
+                                           const double meanSquaredBeadDistance = 1.0,
                                            std::string seed = "")
   {
-    std::mt19937 rng;
-    if (seed == "") {
-      std::random_device rd;
-      rng = std::mt19937(rd());
-    } else {
-      std::seed_seq seed2(seed.begin(), seed.end());
-      rng = std::mt19937(seed2);
-    }
+    const std::mt19937 rng = [&]() {
+      if (seed.empty()) {
+        std::random_device rd;
+        return std::mt19937(rd());
+      } else {
+        std::seed_seq seed2(seed.begin(), seed.end());
+        return std::mt19937(seed2);
+      }
+    }();
 
     return doRandomWalkChain(
       chainLen, beadDistance, meanSquaredBeadDistance, rng);
@@ -92,16 +89,20 @@ namespace utils {
    * @param from the atom to start the random walk from
    * @param to the atom to end the random walk at
    * @param chainLen the number of atoms to add in between from and to
+   * @param beadDistance the distance between beads
+   * @param meanSquaredBeadDistance the mean squared distance between beads
+   * @param rng the random number generator
+   * @param includeEnds whether to include the first and the last positions
    */
   static Eigen::VectorXd doRandomWalkChainFromTo(
     const pylimer_tools::entities::Box& box,
-    Eigen::Vector3d from,
-    Eigen::Vector3d to,
-    int chainLen,
-    double beadDistance,
-    double meanSquaredBeadDistance,
-    std::mt19937 rng,
-    bool includeEnds = false)
+    const Eigen::Vector3d& from,
+    const Eigen::Vector3d& to,
+    const int chainLen,
+    const double beadDistance,
+    const double meanSquaredBeadDistance,
+    const std::mt19937 &rng,
+    const bool includeEnds = false)
   {
     std::uniform_real_distribution<double> angleDistribution =
       std::uniform_real_distribution<double>(0, 2 * M_PI);
@@ -141,21 +142,22 @@ namespace utils {
 
   static Eigen::VectorXd doRandomWalkChainFromTo(
     const pylimer_tools::entities::Box& box,
-    const Eigen::Vector3d from,
-    const Eigen::Vector3d to,
-    int chainLen,
-    double beadDistance = 1.0,
-    double meanSquaredBeadDistance = 1.0,
+    const Eigen::Vector3d& from,
+    const Eigen::Vector3d& to,
+    const int chainLen,
+    const double beadDistance = 1.0,
+    const double meanSquaredBeadDistance = 1.0,
     std::string seed = "")
   {
-    std::mt19937 rng;
-    if (seed == "") {
-      std::random_device rd;
-      rng = std::mt19937(rd());
-    } else {
-      std::seed_seq seed2(seed.begin(), seed.end());
-      rng = std::mt19937(seed2);
-    }
+    std::mt19937 rng = [&]() {
+      if (seed.empty()) {
+        std::random_device rd;
+        return std::mt19937(rd());
+      } else {
+        std::seed_seq seed2(seed.begin(), seed.end());
+        return std::mt19937(seed2);
+      }
+    }();
     return doRandomWalkChainFromTo(
       box, from, to, chainLen, beadDistance, meanSquaredBeadDistance, rng);
   }
@@ -164,19 +166,24 @@ namespace utils {
    * @brief Do a random walk of certain length to add a chain from one to
    * another atom, with some MC steps to equilibrate the bond lengths
    *
+   * @param box the box in which to perform the random walk
    * @param from the atom to start the random walk from
    * @param to the atom to end the random walk at
    * @param chainLen the number of atoms to add in between from and to
+   * @param beadDistance
+   * @param meanSquaredBeadDistance
+   * @param rng the random number generator
+   * @param numIterations
    */
   static Eigen::VectorXd doRandomWalkChainFromToMC(
     const pylimer_tools::entities::Box& box,
-    const Eigen::Vector3d from,
-    const Eigen::Vector3d to,
-    int chainLen,
-    double beadDistance,
-    double meanSquaredBeadDistance,
-    std::mt19937 rng,
-    int numIterations)
+    const Eigen::Vector3d& from,
+    const Eigen::Vector3d& to,
+    const int chainLen,
+    const double beadDistance,
+    const double meanSquaredBeadDistance,
+    const std::mt19937 &rng,
+    const int numIterations)
   {
     // first, do a random walk already for initial guesses
     Eigen::VectorXd coordinates =
@@ -199,22 +206,23 @@ namespace utils {
 
   static Eigen::VectorXd doRandomWalkChainFromToMC(
     const pylimer_tools::entities::Box& box,
-    const Eigen::Vector3d from,
-    const Eigen::Vector3d to,
-    int chainLen,
-    double beadDistance = 1.0,
-    double meanSquaredBeadDistance = 1.0,
+    const Eigen::Vector3d& from,
+    const Eigen::Vector3d& to,
+    const int chainLen,
+    const double beadDistance = 1.0,
+    const double meanSquaredBeadDistance = 1.0,
     std::string seed = "",
-    int numIterations = 1000)
+    const int numIterations = 1000)
   {
-    std::mt19937 rng;
-    if (seed == "") {
-      std::random_device rd;
-      rng = std::mt19937(rd());
-    } else {
-      std::seed_seq seed2(seed.begin(), seed.end());
-      rng = std::mt19937(seed2);
-    }
+    std::mt19937 rng = [&]() {
+      if (seed.empty()) {
+        std::random_device rd;
+        return std::mt19937(rd());
+      } else {
+        std::seed_seq seed2(seed.begin(), seed.end());
+        return std::mt19937(seed2);
+      }
+    }();
     return doRandomWalkChainFromToMC(box,
                                      from,
                                      to,
@@ -229,23 +237,25 @@ namespace utils {
    * @brief Do a random walk of certain length to add a chain from one to
    * another atom
    *
+   * @param box
    * @param from the atom to start the random walk from
    * @param to the atom to end the random walk at
    * @param chainLen the number of atoms to add in between from and to
+   * @param includeEnds
    */
   static Eigen::VectorXd doLinearWalkChainFromTo(
     const pylimer_tools::entities::Box& box,
-    const Eigen::Vector3d from,
-    const Eigen::Vector3d to,
-    int chainLen,
-    bool includeEnds = false)
+    const Eigen::Vector3d& from,
+    const Eigen::Vector3d& to,
+    const int chainLen,
+    const bool includeEnds = false)
   {
     Eigen::Vector3d dist = to - from;
     box.handlePBC(dist);
 
     Eigen::VectorXd results = Eigen::VectorXd::Zero(3 * (chainLen + 2));
 
-    for (size_t i = 0; i < chainLen + 2; ++i) {
+    for (Eigen::Index i = 0; i < chainLen + 2; ++i) {
       double denominator =
         static_cast<double>(i) / static_cast<double>(chainLen + 1);
       results.segment(3 * i, 3) = from + denominator * dist;
