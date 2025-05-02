@@ -1133,6 +1133,122 @@ TEST_CASE("Large universe can be used", "[Universe][entity]")
     CHECK(interpolatedEdges2.size() ==
           Catch::Approx(2. * edges["edge_from"].size()));
   }
+
+  SECTION("Dangling structures can be inferred")
+  {
+    std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
+
+    std::vector<pe::MoleculeType> moleculeTypes =
+      universe.identifyObviouslyDanglingAtoms();
+
+    for (pe::Molecule m : chains) {
+      for (long int atomId : m.getPropertyValues<long int>("id")) {
+        igraph_integer_t vertexId = universe.getIdxByAtomId(atomId);
+        if (m.getType() == pe::MoleculeType::DANGLING_CHAIN) {
+          CHECK(moleculeTypes[vertexId] == m.getType());
+        } else if (m.getType() == pe::MoleculeType::PRIMARY_LOOP) {
+          CHECK(moleculeTypes[vertexId] == pe::MoleculeType::UNDEFINED);
+        }
+      }
+    }
+  }
+}
+
+TEST_CASE("Free & Dangling Chains are identified", "[Universe][entity]")
+{
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  std::vector<double> coord =
+    pylimer_tools::utils::initializeWithValue(12, 0.0);
+  std::vector<long int> ids = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+  universe.addAtoms(ids,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 1),
+                    coord,
+                    coord,
+                    coord,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 1),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 1),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 1));
+  // make a four-end-star structure
+  // 0-2, 2-5, 6-2, 9-11
+  universe.addBonds(
+    {
+      0,
+      1,
+      2, // 2
+      3,
+      4,
+      6, // 5
+      7,
+      8,
+      2, // 8
+      9,
+      10,
+    },
+    {
+      1,
+      2,
+      3, // 2
+      4,
+      5,
+      7, // 5
+      8,
+      2,
+      9, // 8
+      10,
+      11,
+    });
+
+  SECTION("Free chains are identified")
+  {
+    std::vector<pe::MoleculeType> mTypes =
+      universe.identifyObviouslyDanglingAtoms(true);
+    for (pe::MoleculeType type : mTypes) {
+      CHECK(type == pe::MoleculeType::FREE_CHAIN);
+    }
+  }
+
+  SECTION("Free chains are secretly dangling chains")
+  {
+    std::vector<pe::MoleculeType> mTypes =
+      universe.identifyObviouslyDanglingAtoms(false);
+    for (pe::MoleculeType type : mTypes) {
+      CHECK(type == pe::MoleculeType::DANGLING_CHAIN);
+    }
+  }
+
+  SECTION("Dangling chains are identified")
+  {
+    // add a (primary) loop to turn the so-far free into a possibly catenated
+    // structure
+    universe.addBonds({ 2 }, { 2 });
+
+    std::vector<pe::MoleculeType> mTypes =
+      universe.identifyObviouslyDanglingAtoms(true);
+    for (size_t i = 0; i < mTypes.size(); ++i) {
+      if (i == 2) {
+        CHECK(mTypes[i] == pe::MoleculeType::UNDEFINED);
+      } else {
+        CHECK(mTypes[i] == pe::MoleculeType::DANGLING_CHAIN);
+      }
+    }
+  }
+
+  SECTION("Non-dangling chains are not identified")
+  {
+    // close two of the "arms"
+    universe.addBonds({ 0 }, { 5 });
+
+    std::vector<pe::MoleculeType> mTypes =
+      universe.identifyObviouslyDanglingAtoms(true);
+
+    for (size_t i = 0; i < mTypes.size(); ++i) {
+      if (i < 6) {
+        CHECK(mTypes[i] == pe::MoleculeType::UNDEFINED);
+      } else {
+        CHECK(mTypes[i] == pe::MoleculeType::DANGLING_CHAIN);
+      }
+    }
+  }
 }
 
 TEST_CASE("Vertex coordinates are assumed for tree-like structures",

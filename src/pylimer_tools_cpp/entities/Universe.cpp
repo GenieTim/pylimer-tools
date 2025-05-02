@@ -504,7 +504,7 @@ Universe::addBonds(const size_t NNewBonds,
       igraph_vector_int_set(&newEdges, innerIndex, vertexTo);
       innerIndex += 1;
       actualNrOfBondsAdded += 1;
-    } catch (std::out_of_range& ex) {
+    } catch ([[maybe_unused]] std::out_of_range& ex) {
       if (!ignoreNonExistentAtoms) {
         igraph_vector_int_destroy(&newEdges);
         throw std::invalid_argument(
@@ -603,7 +603,8 @@ Universe::removeAllAngles()
  * @brief Add additional angles to the universe
  *
  * @param from
- * @param via
+ * @param via1
+ * @param via2
  * @param to
  * @param types
  */
@@ -742,7 +743,7 @@ Universe::countAtomsInSkinDistance(const std::vector<double>& distances,
 /**
  * @brief Set the masses of the atoms in this universe
  *
- * @param massPerType the weight per type
+ * @param newMassPerType the weight per type
  */
 void
 Universe::setMasses(const std::map<int, double>& newMassPerType)
@@ -1200,6 +1201,197 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
   igraph_destroy(&graphWithoutJunctions);
 
   return molecules;
+};
+
+/**
+ * Identify vertices associated with dangling and free chains.
+ *
+ * Note: there are special cases that fail here, in particular,
+ * if you have a primary or secondary loops without internal beads,
+ * sandwiched between two dangling chains.
+ *
+ * @return a list of molecule types,
+ * for each vertex in the universe the anticipated type
+ * of the corresponding molecule, if the type is either dangling or free chain.
+ */
+std::vector<pylimer_tools::entities::MoleculeType>
+Universe::identifyObviouslyDanglingAtoms(const bool distinguishFree) const
+{
+  std::vector<pylimer_tools::entities::MoleculeType> result =
+    pylimer_tools::utils::initializeWithValue(
+      this->getNrOfAtoms(), pylimer_tools::entities::MoleculeType::UNDEFINED);
+
+  // it works like this:
+  // we find the definitive ends of dangling chains, namely f = 0 and 1 atoms.
+  // from these ends, we walk along the chain, marking each encountered atom
+  // as visited and dangling, iff it's not a junction.
+  // it it's a junction, we require all but one of the neighbours to be
+  // dangling, in order to mark the junction as dangling as well, and progress
+  // with the walk down the remaining chain.
+  std::vector<bool> vertexVisited =
+    pylimer_tools::utils::initializeWithValue(this->getNrOfAtoms(), false);
+  std::vector<bool> edgeVisited =
+    pylimer_tools::utils::initializeWithValue(this->getNrOfBonds(), false);
+  std::vector<int> vertexDegrees = this->getVertexDegrees();
+  igraph_lazy_adjlist_t adjlist;
+  igraph_lazy_adjlist_init(
+    &this->graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+  igraph_vector_int_t* neighbors = nullptr;
+  igraph_lazy_inclist_t inclist;
+  igraph_lazy_inclist_init(
+    &this->graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
+  igraph_vector_int_t* neighbourEdges = nullptr;
+
+  for (igraph_integer_t startingVertexIdx = 0;
+       startingVertexIdx < this->getNrOfAtoms();
+       ++startingVertexIdx) {
+    if (vertexDegrees[startingVertexIdx] > 1) {
+      continue;
+    }
+
+    // free bead; we don't mark it as visited, but could in principle
+    if (vertexDegrees[startingVertexIdx] == 0) {
+      result[startingVertexIdx] =
+        pylimer_tools::entities::MoleculeType::FREE_CHAIN;
+      continue;
+    }
+
+    // finally an f = 1 bead we can start walking from, down the chain
+    igraph_integer_t currentVertexIdx = startingVertexIdx;
+    // actually start walking down the chain
+    do {
+      assert(!vertexVisited[currentVertexIdx]);
+      vertexVisited[currentVertexIdx] = true;
+      neighbors = igraph_lazy_adjlist_get(&adjlist, currentVertexIdx);
+      neighbourEdges = igraph_lazy_inclist_get(&inclist, currentVertexIdx);
+      assert(vertexDegrees[currentVertexIdx] ==
+             igraph_vector_int_size(neighbors));
+      assert(vertexDegrees[currentVertexIdx] ==
+             igraph_vector_int_size(neighbourEdges));
+      size_t nVisitedNeighbours = 0;
+      size_t nVisitedNeighbourEdges = 0;
+      size_t nDanglingNeighbours = 0;
+      igraph_integer_t unvisitedNeighbour = -1;
+      igraph_integer_t unvisitedNeighbourEdge = -1;
+      // check the neighbours
+      for (igraph_integer_t neighbourIdx = 0;
+           neighbourIdx < igraph_vector_int_size(neighbors);
+           ++neighbourIdx) {
+        igraph_integer_t neighbourVertex =
+          igraph_vector_int_get(neighbors, neighbourIdx);
+        igraph_integer_t neighbourEdge =
+          igraph_vector_int_get(neighbourEdges, neighbourIdx);
+
+#ifndef NDEBUG
+        // validate that the inclist & adjlist are actually compliant
+        // by checking that such an edge exists in the graph
+        igraph_integer_t a = 0;
+        igraph_integer_t b = 0;
+        igraph_edge(&graph, neighbourEdge, &a, &b);
+        assert(a == currentVertexIdx || b == currentVertexIdx);
+        assert(a == neighbourVertex || b == neighbourVertex);
+#endif
+
+        nVisitedNeighbours += vertexVisited[neighbourVertex];
+        nVisitedNeighbourEdges += edgeVisited[neighbourEdge];
+        nDanglingNeighbours +=
+          (result[neighbourVertex] ==
+           pylimer_tools::entities::MoleculeType::DANGLING_CHAIN);
+        // we have to check both edges and vertices, since we could have,
+        // for example, a dangling chain connected to a primary loop,
+        // connected to a dangling chain, in which case we do not want to mark
+        // the primary loop as dangling
+        if (!vertexVisited[neighbourVertex] && !edgeVisited[neighbourEdge]) {
+          unvisitedNeighbour = neighbourVertex;
+          unvisitedNeighbourEdge = neighbourEdge;
+        }
+      }
+      // if we found mostly dangling neighbour, we mark this vertex as dangling
+      // as well
+      if (nDanglingNeighbours >= vertexDegrees[currentVertexIdx] - 1) {
+        result[currentVertexIdx] =
+          pylimer_tools::entities::MoleculeType::DANGLING_CHAIN;
+      }
+      // then, find where to continue the walk
+      if ((nVisitedNeighbourEdges == vertexDegrees[currentVertexIdx] - 1) &&
+          (nVisitedNeighbours == vertexDegrees[currentVertexIdx] - 1)) {
+        assert(unvisitedNeighbour != -1);
+        assert(unvisitedNeighbourEdge != -1);
+        currentVertexIdx = unvisitedNeighbour;
+        edgeVisited[unvisitedNeighbourEdge] = true;
+      } else {
+        // we can't walk further from this vertex,
+        // we need to go back to a start
+        // however, we may revisit this vertex later, if needed
+        vertexVisited[currentVertexIdx] = false;
+        break;
+      }
+    } while (true);
+  }
+
+  // then, when we have found all obviously dangling atoms,
+  // some of them might be free chains instead.
+  // We can find those by checking whether for a cluster of vertices
+  // all vertices are considered dangling.
+  if (distinguishFree) {
+    // reset visited flags
+    edgeVisited =
+      pylimer_tools::utils::initializeWithValue(this->getNrOfBonds(), false);
+    vertexVisited =
+      pylimer_tools::utils::initializeWithValue(this->getNrOfAtoms(), false);
+    std::vector<igraph_integer_t> verticesOfCluster;
+    verticesOfCluster.reserve(0.01 * this->getNrOfAtoms());
+
+    for (igraph_integer_t startingVertexIdx = 0;
+         startingVertexIdx < this->getNrOfAtoms();
+         ++startingVertexIdx) {
+      if (vertexVisited[startingVertexIdx]) {
+        continue;
+      }
+      if (vertexDegrees[startingVertexIdx] == 1) {
+        bool isFree = true;
+        // start searching all connected vertices
+        std::stack<igraph_integer_t> vertexSearchStack;
+        vertexSearchStack.push(startingVertexIdx);
+        do {
+          igraph_integer_t currentVertex = vertexSearchStack.top();
+          vertexSearchStack.pop();
+          vertexVisited[currentVertex] = true;
+          verticesOfCluster.push_back(currentVertex);
+          const igraph_vector_int_t* neighbours =
+            igraph_lazy_adjlist_get(&adjlist, currentVertex);
+          for (igraph_integer_t neighbourIdx = 0;
+               neighbourIdx < igraph_vector_int_size(neighbours);
+               ++neighbourIdx) {
+            igraph_integer_t neighbourVertex =
+              igraph_vector_int_get(neighbours, neighbourIdx);
+            if (!vertexVisited[neighbourVertex]) {
+              vertexSearchStack.push(neighbourVertex);
+            }
+            if (result[neighbourVertex] !=
+                pylimer_tools::entities::MoleculeType::DANGLING_CHAIN) {
+              isFree = false;
+              break;
+            }
+          }
+        } while (!vertexSearchStack.empty() && isFree);
+
+        // propagate this change from dangling to free chains for all connected
+        // vertices
+        if (isFree) {
+          for (const igraph_integer_t vertex : verticesOfCluster) {
+            result[vertex] = pylimer_tools::entities::MoleculeType::FREE_CHAIN;
+          }
+          verticesOfCluster.clear();
+        }
+      }
+    }
+  }
+
+  igraph_lazy_adjlist_destroy(&adjlist);
+  igraph_lazy_inclist_destroy(&inclist);
+
+  return result;
 }
 
 /**
@@ -1746,7 +1938,7 @@ Universe::getAtomIdByIdx(const igraph_integer_t vertexId) const
  * @return long int
  */
 igraph_integer_t
-Universe::getIdxByAtomId(const int atomId) const
+Universe::getIdxByAtomId(const long int atomId) const
 {
   // if (!pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx, atomId))
   // {

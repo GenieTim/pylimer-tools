@@ -1,19 +1,12 @@
 #pragma once
 
-extern "C"
-{
-#include <igraph/igraph.h>
-}
-#include "../utils/VectorUtils.h"
 #include "Atom.h"
 #include "Box.h"
 #include <Eigen/Dense>
-#include <map>
 #include <unordered_map>
 #include <vector>
 
 #include <algorithm>
-#include <stdexcept>
 
 namespace pylimer_tools {
 namespace entities {

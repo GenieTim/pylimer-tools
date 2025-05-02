@@ -37,21 +37,21 @@ namespace entities {
   class Universe : public AtomGraphParent
   {
   public:
-    Universe(const double Lx = 1., const double Ly = 1., const double Lz = 1.);
-    Universe(const Box& box);
+    explicit Universe(double Lx = 1., double Ly = 1., double Lz = 1.);
+    explicit Universe(const Box& box);
 
     // rule of three:
     // 1. destructor (to destroy the graph)
-    ~Universe();
+    ~Universe() override;
     // 2. copy constructor
     Universe(const Universe& src);
     // 3. copy assignment operator
     Universe& operator=(Universe src);
 
     // initilaization/setters (and removers)
-    void setBoxLengths(const double Lx,
-                       const double Ly,
-                       const double Lz,
+    void setBoxLengths(double Lx,
+                       double Ly,
+                       double Lz,
                        bool rescaleAtomCoordinates = false);
     // atoms
     void addAtoms(const std::vector<long int>& ids,
@@ -74,26 +74,26 @@ namespace entities {
                     additionalData);
     // void addAtoms(const std::vector<Atom>& atoms);
     void removeAtoms(const std::vector<long int>& ids);
-    void replaceAtom(const long int id, const Atom& replacement);
-    void replaceAtomType(const long int id, const int newType);
+    void replaceAtom(long int id, const Atom& replacement);
+    void replaceAtomType(long int id, int newType);
     // bonds
     void addBonds(const std::vector<long int>& from,
                   const std::vector<long int>& to);
     void addBonds(const std::vector<long int>& from,
                   const std::vector<long int>& to,
                   const std::vector<int>& types);
-    void addBonds(const size_t NNewBonds,
+    void addBonds(size_t NNewBonds,
                   const std::vector<long int>& from,
                   const std::vector<long int>& to);
-    void addBonds(const size_t NNewBonds,
+    void addBonds(size_t NNewBonds,
                   const std::vector<long int>& from,
                   const std::vector<long int>& to,
                   const std::vector<int>& bondTypes,
-                  const bool ignoreNonExistentAtoms = false,
-                  const bool simplify = false);
+                  bool ignoreNonExistentAtoms = false,
+                  bool simplify = false);
     void removeBonds(const std::vector<long int>& atomIdsFrom,
                      const std::vector<long int>& atomIdsTo);
-    void removeBondsOfType(const int bondType);
+    void removeBondsOfType(int bondType);
     // others
     void addAngles(const std::vector<long int>& from,
                    const std::vector<long int>& via,
@@ -105,7 +105,7 @@ namespace entities {
                            const std::vector<long int>& to,
                            const std::vector<int>& types);
     void setMasses(const std::map<int, double>& massPerType);
-    void setMassForType(const int atomType, const double mass);
+    void setMassForType(int atomType, double mass);
     void setBox(const Box& box, bool rescaleAtomCoordinates = false);
     void setTimestep(const long int newTimestep)
     {
@@ -124,111 +124,126 @@ namespace entities {
     void simplify();
 
     // getters
-    bool containsAtom(const Atom& atom) const;
-    bool containsAtomWithId(const int atomId) const;
-    Atom getAtom(const int atomId) const;
-    std::vector<Atom> getAtoms() const;
+    [[nodiscard]] bool containsAtom(const Atom& atom) const;
+    [[nodiscard]] bool containsAtomWithId(int atomId) const;
+    [[nodiscard]] Atom getAtom(int atomId) const;
+    [[nodiscard]] std::vector<Atom> getAtoms() const;
     // std::map<std::st¨ring, std::vector<long int>> getBonds() const;
-    std::map<std::string, std::vector<long int>> getAngles() const;
-    std::vector<double> computeAngles() const;
-    std::map<std::string, std::vector<long int>> getDihedralAngles() const;
-    std::vector<Universe> getClusters() const;
-    std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1) const;
-    std::vector<Molecule> getChainsWithCrosslinker(
-      const int crossLinkerType) const;
-    Universe getNetworkOfCrosslinker(const int crossLinkerType) const;
-    Universe contractVerticesAlongBondType(const int bondType) const;
+    [[nodiscard]] std::map<std::string, std::vector<long int>> getAngles()
+      const;
+    [[nodiscard]] std::vector<double> computeAngles() const;
+    [[nodiscard]] std::map<std::string, std::vector<long int>>
+    getDihedralAngles() const;
+    [[nodiscard]] std::vector<Universe> getClusters() const;
+    [[nodiscard]] std::vector<Molecule> getMolecules(
+      int atomTypeToOmit = -1) const;
+    [[nodiscard]] std::vector<Molecule> getChainsWithCrosslinker(
+      int crossLinkerType) const;
+    [[nodiscard]] std::vector<pylimer_tools::entities::MoleculeType>
+    identifyObviouslyDanglingAtoms(bool distinguishFree = false) const;
+    [[nodiscard]] Universe getNetworkOfCrosslinker(int crossLinkerType) const;
+    [[nodiscard]] Universe contractVerticesAlongBondType(int bondType) const;
     // TODO: find & implement a better return type, e.g. std::vector<Molecule>
-    std::vector<std::vector<igraph_integer_t>> findLoops(
+    [[nodiscard]] std::vector<std::vector<igraph_integer_t>> findLoops(
       int crossLinkerType,
       int maxLength = -1,
       bool skipSelfLoops = false,
       std::vector<std::vector<igraph_integer_t>>* edges = nullptr) const;
-    std::unordered_map<int, int> countLoopLengths(
-      const int maxLength = -1) const;
-    std::map<int, std::vector<std::vector<Atom>>> findLoopsOfAtoms(
-      const int crossLinkerType,
-      const int maxLength = -1,
+    [[nodiscard]] std::unordered_map<int, int> countLoopLengths(
+      int maxLength = -1) const;
+    [[nodiscard]] std::map<int, std::vector<std::vector<Atom>>>
+    findLoopsOfAtoms(int crossLinkerType,
+                     int maxLength = -1,
+                     bool skipSelfLoops = false) const;
+    [[nodiscard]] std::vector<Atom> findMinimalOrderLoopFrom(
+      long int loopStart,
+      long int loopStep1,
+      int maxLength = -1,
       bool skipSelfLoops = false) const;
-    std::vector<Atom> findMinimalOrderLoopFrom(
-      const long int loopStart,
-      const long int loopStep1,
-      const int maxLength = -1,
-      bool skipSelfLoops = false) const;
-    bool hasInfiniteStrand(const int crossLinkerType,
-                           const int maxLength = -1) const;
-    std::vector<int> getAtomTypes() const
+    [[nodiscard]] bool hasInfiniteStrand(int crossLinkerType,
+                                         int maxLength = -1) const;
+    [[nodiscard]] std::vector<int> getAtomTypes() const
     {
       return this->getPropertyValues<int>("type");
     }
-    std::map<int, int> countAtomTypes() const;
-    std::vector<size_t> countAtomsInSkinDistance(
+    [[nodiscard]] std::map<int, int> countAtomTypes() const;
+    [[nodiscard]] std::vector<size_t> countAtomsInSkinDistance(
       const std::vector<double>& distances,
       bool unwrapped = false) const;
     template<typename IN>
-    long int findVertexIdForProperty(const char* propertyName,
-                                     IN propertyValue) const;
-    Box getBox() const;
-    double getVolume() const;
-    size_t getNrOfAtoms() const;
-    size_t getNrOfBonds() const;
-    size_t getNrOfAngles() const;
-    size_t getNrOfDihedralAngles() const;
-    std::map<int, double> getMasses();
-    long int getTimestep() const { return this->timestep; };
-    long int getAtomIdByIdx(igraph_integer_t vertexId) const override;
-    igraph_integer_t getIdxByAtomId(const int atomId) const override;
+    [[nodiscard]] long int findVertexIdForProperty(const char* propertyName,
+                                                   IN propertyValue) const;
+    [[nodiscard]] Box getBox() const;
+    [[nodiscard]] double getVolume() const;
+    [[nodiscard]] size_t getNrOfAtoms() const;
+    [[nodiscard]] size_t getNrOfBonds() const;
+    [[nodiscard]] size_t getNrOfAngles() const;
+    [[nodiscard]] size_t getNrOfDihedralAngles() const;
+    [[nodiscard]] std::map<int, double> getMasses();
+    [[nodiscard]] long int getTimestep() const { return this->timestep; };
+    [[nodiscard]] long int getAtomIdByIdx(
+      igraph_integer_t vertexId) const override;
+    [[nodiscard]] igraph_integer_t getIdxByAtomId(
+      long int atomId) const override;
 
     // operators
     Atom operator[](const size_t index) const { return this->getAtom(index); }
 
     // computations
-    std::map<std::string, std::vector<long int>> detectAngles() const;
-    std::map<std::string, std::vector<long int>> detectDihedralAngles() const;
-    std::map<int, int> determineFunctionalityPerType() const;
-    std::map<int, double> determineEffectiveFunctionalityPerType() const;
-    std::map<int, double> computeWeightFractions() const;
-    double computeWeightFractionOfClustersAssociatedWith(
+    [[nodiscard]] std::map<std::string, std::vector<long int>> detectAngles()
+      const;
+    [[nodiscard]] std::map<std::string, std::vector<long int>>
+    detectDihedralAngles() const;
+    [[nodiscard]] std::map<int, int> determineFunctionalityPerType() const;
+    [[nodiscard]] std::map<int, double> determineEffectiveFunctionalityPerType()
+      const;
+    [[nodiscard]] std::map<int, double> computeWeightFractions() const;
+    [[nodiscard]] double computeWeightFractionOfClustersAssociatedWith(
       std::vector<long int> atomIds) const;
-    std::vector<std::pair<size_t, size_t>> interpolateEdges(
+    [[nodiscard]] std::vector<std::pair<size_t, size_t>> interpolateEdges(
       int crossLinkerType,
       double interpolationFactor) const;
-    std::vector<double> computeDxs(const std::vector<long int>& bondFrom,
-                                   const std::vector<long int>& bondTo) const;
-    std::vector<double> computeDys(const std::vector<long int>& bondFrom,
-                                   const std::vector<long int>& bondTo) const;
-    std::vector<double> computeDzs(const std::vector<long int>& bondFrom,
-                                   const std::vector<long int>& bondTo) const;
-    std::vector<double> computeBondLengths() const
+    [[nodiscard]] std::vector<double> computeDxs(
+      const std::vector<long int>& bondFrom,
+      const std::vector<long int>& bondTo) const;
+    [[nodiscard]] std::vector<double> computeDys(
+      const std::vector<long int>& bondFrom,
+      const std::vector<long int>& bondTo) const;
+    [[nodiscard]] std::vector<double> computeDzs(
+      const std::vector<long int>& bondFrom,
+      const std::vector<long int>& bondTo) const;
+    [[nodiscard]] std::vector<double> computeBondLengths() const
     {
       return AtomGraphParent::computeBondLengths(this->box);
     };
-    double computeMeanSquaredBondLength() const
+    [[nodiscard]] double computeMeanSquaredBondLength() const
     {
       return AtomGraphParent::computeMeanSquaredBondLength(this->box);
     };
-    double computeTemperature(const int dimensions = 3,
-                              const double kb = 1.) const;
+    [[nodiscard]] double computeTemperature(int dimensions = 3,
+                                            double kb = 1.) const;
     std::vector<LoopIntersectionInfo> findLoopEntanglements(
       const std::vector<igraph_integer_t>& vertexIndicesLoop1,
       const std::vector<igraph_integer_t>& vertexIndicesLoop2,
       const std::vector<igraph_integer_t>& edgeIndicesLoop1,
       const std::vector<igraph_integer_t>& edgeIndicesLoop2) const;
-    double getMeanStrandLength(int crossLinkerType) const;
-    std::vector<double> computeEndToEndDistances(
+    [[nodiscard]] double getMeanStrandLength(int crossLinkerType) const;
+    [[nodiscard]] std::vector<double> computeEndToEndDistances(
       int crossLinkerType,
       bool implyImageFlags = false) const;
-    double computeMeanEndToEndDistance(int crossLinkerType,
-                                       bool implyImageFlags = false) const;
-    double computeMeanSquareEndToEndDistance(
+    [[nodiscard]] double computeMeanEndToEndDistance(
+      int crossLinkerType,
+      bool implyImageFlags = false) const;
+    [[nodiscard]] double computeMeanSquareEndToEndDistance(
       int crossLinkerType,
       bool onlyThoseWithTwoCrosslinkers = false,
       bool implyImageFlags = false) const;
-    double computeMeanBondLength() const;
-    double computeTotalMass() const;
-    double computeTotalMassWithMasses(
+    [[nodiscard]] double computeMeanBondLength() const;
+    [[nodiscard]] double computeTotalMass() const;
+    [[nodiscard]] double computeTotalMassWithMasses(
       std::map<int, double> massPerTypeToUse) const;
-    double computeWeightAverageMolecularWeight(int crossLinkerType) const;
+    [[nodiscard]] double computeWeightAverageMolecularWeight(
+      int crossLinkerType) const;
     double computeNumberAverageMolecularWeight(int crossLinkerType) const;
     double computePolydispersityIndex(int crossLinkerType) const;
     bool validate() const;
@@ -269,7 +284,7 @@ namespace entities {
     Box box;
     // connectivity
     // igraph_t graph;
-    std::unordered_map<int, igraph_integer_t> atomIdToVertexIdx;
+    std::unordered_map<long int, igraph_integer_t> atomIdToVertexIdx;
     // extra info
     // TODO: might want to move the angle business to the parent?!?
     // angles (NOTE: only atom-ids, not vertex-idxs are used!)
@@ -290,14 +305,14 @@ namespace entities {
     // of this atom type.
 
     // internal functions
-    igraph_vs_t getVerticesOfType(const int type) const;
-    std::vector<igraph_integer_t> getIndicesOfType(const int type) const;
+    igraph_vs_t getVerticesOfType(int type) const;
+    std::vector<igraph_integer_t> getIndicesOfType(int type) const;
     igraph_vs_t getVerticesByIndices(
       std::vector<igraph_integer_t> indices) const;
     std::vector<double> computeDs(const std::vector<long int>& bondFrom,
                                   const std::vector<long int>& bondTo,
                                   const std::string& direction,
-                                  const double boxLimit) const;
+                                  double boxLimit) const;
     void resetAtomIdMapping();
   };
 } // namespace entities
