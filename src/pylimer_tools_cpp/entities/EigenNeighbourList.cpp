@@ -57,18 +57,51 @@ namespace entities {
     // std::cout << "Preparing " << this->totalNrOfBuckets << " bins"
     //           << std::endl;
 
-    // prepare the buckets
+    // prepare the default buckets
+    long int nB1x2 = (this->nrOfBuckets[0] * this->nrOfBuckets[1]);
+    int currentX = this->nrOfBuckets[0] - 1;
+    int currentY = nB1x2 - 1;
+    int currentZ = this->totalNrOfBuckets - 1;
     for (bucket_idx_t bucketIndex = 0; bucketIndex < this->totalNrOfBuckets;
          ++bucketIndex) {
+      currentX += 1;
+      if (bucketIndex % this->nrOfBuckets[0] == 0) {
+        currentY += 1;
+      }
+      if (bucketIndex % nB1x2 == 0) {
+        currentZ += 1;
+      }
+
+      assert(currentX >= 0 && currentY >= 0 && currentZ >= 0);
       std::vector<bucket_idx_t> vectorToPlace = std::vector<bucket_idx_t>();
       // reserve a sensible capacity as estimated
       vectorToPlace.reserve((coordinates.size() / 3) / this->totalNrOfBuckets);
       this->neighbourBuckets.push_back(vectorToPlace);
-      Eigen::Vector3d centralCoordinates =
-        this->getCentralCoordinatesOfBucket(bucketIndex);
+      // assemble the neighbouring buckets with the default cut-off
+      std::vector<bucket_idx_t> neighbouringBuckets;
+      int lowerLim = scalingFactor * -1;
+      int upperLim = scalingFactor * 1;
+      neighbouringBuckets.reserve(
+        (upperLim - lowerLim) * (upperLim - lowerLim) * (upperLim - lowerLim));
+      for (int dx = lowerLim; dx <= upperLim; ++dx) {
+        for (int dy = lowerLim; dy <= upperLim; ++dy) {
+          for (int dz = lowerLim; dz <= upperLim; ++dz) {
+            neighbouringBuckets.push_back(
+              (currentX + dx) % this->nrOfBuckets[0] +
+              ((currentY + dy) * this->nrOfBuckets[0]) % nB1x2 +
+              ((currentZ + dz) * nB1x2) % this->totalNrOfBuckets);
+          }
+        }
+      }
       this->neighbourBucketNeighboursDefaultCutoff.push_back(
-        this->getCombinedBucketIndicesForCoordinates(
-          centralCoordinates, this->cutoff, true));
+        neighbouringBuckets);
+
+      // /
+      // Eigen::Vector3d centralCoordinates =
+      //   this->getCentralCoordinatesOfBucket(bucketIndex);
+      // this->neighbourBucketNeighboursDefaultCutoff.push_back(
+      //   this->getCombinedBucketIndicesForCoordinates(
+      //     centralCoordinates, this->cutoff, true));
     }
 
     assert(this->neighbourBucketNeighboursDefaultCutoff.size() ==

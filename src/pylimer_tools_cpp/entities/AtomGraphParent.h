@@ -7,6 +7,7 @@ extern "C"
 }
 
 #include "../utils/CerealUtils.h"
+#include "../utils/VectorUtils.h"
 #include "Atom.h"
 #include <Eigen/Dense>
 #include <climits>
@@ -224,7 +225,7 @@ public:
    * @param atomId the id of the atom
    * @return long int the vertex index
    */
-  virtual igraph_integer_t getIdxByAtomId(const int atomId) const = 0;
+  virtual igraph_integer_t getIdxByAtomId(long int atomId) const = 0;
 
   /**
    * @brief Get an atom by its vertex id

@@ -33,22 +33,26 @@ namespace topo {
      * entanglements
      *
      * @param universe the universe with all the atoms etc.
-     * @param nrOfSliplinksToSample the nr of entanglements to find
-     * @param cutoff the cut-off distance within which two atoms are considered
-     * close enough
-     * @param minimumNrOfSliplinks the minimum number of entanglements to find
+     * @param nrOfEntanglementsToSample the nr of entanglements to find
+     * @param upperCutoff the cut-off distance within which two atoms are
+     * considered close enough
+     * @param lowerCutoff
+     * @param minimumNrOfEntanglements the minimum number of entanglements to
+     * find
      * @param sameStrandCutoff the number of beads required between two atoms of
      * the same strand
      * @param seed the random seed
      * @param crossLinkerType the type of the cross-link atoms
+     * @param ignoreCrosslinks
+     * @param filterDanglingAndSoluble
      * @return AtomPairEntanglements
      */
     AtomPairEntanglements randomlyFindEntanglements(
       const pylimer_tools::entities::Universe& universe,
-      const size_t nrOfSliplinksToSample,
+      const size_t nrOfEntanglementsToSample,
       const double upperCutoff,
       const double lowerCutoff = 0.,
-      const size_t minimumNrOfSliplinks = 0,
+      const size_t minimumNrOfEntanglements = 0,
       const double sameStrandCutoff = 3,
       const std::string& seed = "",
       int crossLinkerType = 2,
@@ -60,26 +64,31 @@ namespace topo {
      * entanglements
      *
      * @param universe the universe with all the atoms etc.
-     * @param nrOfSliplinksToSample the nr of entanglements to find
-     * @param cutoff the cut-off distance within which two atoms are considered
-     * close enough
-     * @param minimumNrOfSliplinks the minimum number of entanglements to find
+     * @param nrOfEntanglementsToSample the nr of entanglements to find
+     * @param upperCutoff the cut-off distance within which two atoms are
+     * considered close enough
+     * @param lowerCutoff
+     * @param minimumNrOfEntanglements the minimum number of entanglements to
+     * find
      * @param sameStrandCutoff the number of beads required between two atoms of
      * the same strand
      * @param seed the random seed
      * @param crossLinkerType the type of the cross-link atoms
+     * @param ignoreCrosslinks
+     * @param filterDanglingAndSoluble
      * @return AtomPairEntanglements
      */
-    AtomPairEntanglements randomlyFindUnfilteredEntanglements(
+    AtomPairEntanglements randomlyFindEntanglementsV2(
       const pylimer_tools::entities::Universe& universe,
-      const size_t nrOfSliplinksToSample,
+      const size_t nrOfEntanglementsToSample,
       const double upperCutoff,
       const double lowerCutoff = 0.,
-      const size_t minimumNrOfSliplinks = 0,
+      const size_t minimumNrOfEntanglements = 0,
       const double sameStrandCutoff = 3,
       const std::string& seed = "",
       int crossLinkerType = 2,
-      bool ignoreCrosslinks = true);
+      bool ignoreCrosslinks = true,
+      bool filterDanglingAndSoluble = true);
 
   }
 

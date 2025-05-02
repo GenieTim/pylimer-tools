@@ -216,7 +216,7 @@ Molecule::getAtomIdByIdx(const igraph_integer_t vertexId) const
 };
 
 igraph_integer_t
-Molecule::getIdxByAtomId(const int atomId) const
+Molecule::getIdxByAtomId(const long int atomId) const
 {
   if (!pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx, atomId)) {
     throw std::invalid_argument("Molecule cannot return vertex idx of this "

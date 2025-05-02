@@ -34,12 +34,12 @@ namespace entities {
     EigenNeighbourList(const Eigen::VectorXd& coordinates,
                        const Box& box,
                        double cutoff,
-                       double scalingFactor = 2.);
+                       double scalingFactor = 1.);
 
     void initialize(const Eigen::VectorXd& coordinates,
                     const Box& box,
                     double cutoff,
-                    double scalingFactor = 2.);
+                    double scalingFactor = 1.);
 
     /**
      * @brief Re-bin with a new set of coordinates

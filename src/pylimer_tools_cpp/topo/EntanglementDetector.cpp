@@ -18,10 +18,11 @@ namespace topo {
      * entanglements
      *
      * @param universe the universe with all the atoms etc.
-     * @param nrOfSliplinksToSample the nr of entanglements to find
+     * @param nrOfEntanglementsToSample the nr of entanglements to find
      * @param cutoff the cut-off distance within which two atoms are considered
      * close enough
-     * @param minimumNrOfSliplinks the minimum number of entanglements to find
+     * @param minimumNrOfEntanglements the minimum number of entanglements to
+     * find
      * @param sameStrandCutoff the number of beads required between two atoms of
      * the same strand
      * @param seed the random seed
@@ -34,26 +35,27 @@ namespace topo {
      */
     AtomPairEntanglements randomlyFindEntanglements(
       const pylimer_tools::entities::Universe& universe,
-      const size_t nrOfSliplinksToSample,
+      const size_t nrOfEntanglementsToSample,
       const double upperCutoff,
       const double lowerCutoff,
-      const size_t minimumNrOfSliplinks,
+      const size_t minimumNrOfEntanglements,
       const double sameStrandCutoff,
       const std::string& seed,
       int crossLinkerType,
       bool ignoreCrosslinks,
       bool filterDanglingAndSoluble)
     {
-      INVALIDARG_EXP_IFN(minimumNrOfSliplinks < universe.getNrOfAtoms() / 2,
+      INVALIDARG_EXP_IFN(minimumNrOfEntanglements < universe.getNrOfAtoms() / 2,
                          "Minimum number of slip-links must be less than the "
                          "possible number of slip-links to place.");
-      INVALIDARG_EXP_IFN(nrOfSliplinksToSample < universe.getNrOfAtoms() / 2,
+      INVALIDARG_EXP_IFN(nrOfEntanglementsToSample <
+                           universe.getNrOfAtoms() / 2,
                          "Number of slip-links to place must be less than "
                          "the possible number of slip-links to place.");
-      INVALIDARG_EXP_IFN(nrOfSliplinksToSample >= minimumNrOfSliplinks,
+      INVALIDARG_EXP_IFN(nrOfEntanglementsToSample >= minimumNrOfEntanglements,
                          "Maximum nr. should be larger than minimum, got " +
-                           std::to_string(nrOfSliplinksToSample) + " and " +
-                           std::to_string(minimumNrOfSliplinks) + ".");
+                           std::to_string(nrOfEntanglementsToSample) + " and " +
+                           std::to_string(minimumNrOfEntanglements) + ".");
       INVALIDARG_EXP_IFN(upperCutoff > 0.0,
                          "Expected a cutoff > 0.0, got " +
                            std::to_string(upperCutoff) + ".");
@@ -63,18 +65,18 @@ namespace topo {
           std::to_string(lowerCutoff) + " ≥ " + std::to_string(upperCutoff) +
           ".");
 
-      // std::cout << "Randomly finding " << nrOfSliplinksToSample
+      // std::cout << "Randomly finding " << nrOfEntanglementsToSample
       //           << " entanglements within cutoff " << cutoff
       //           << " and same strand cutoff " << sameStrandCutoff << "."
       //           << std::endl;
 
       // initialise some stuff
       std::vector<std::pair<size_t, size_t>> pairsOfAtoms;
-      pairsOfAtoms.reserve(nrOfSliplinksToSample);
+      pairsOfAtoms.reserve(nrOfEntanglementsToSample);
       std::vector<long int> pairOfAtom =
         std::vector<long int>(universe.getNrOfAtoms(), -1);
 
-      if (nrOfSliplinksToSample == 0) {
+      if (nrOfEntanglementsToSample == 0) {
         return AtomPairEntanglements(pairsOfAtoms, pairOfAtom);
       }
 
@@ -222,14 +224,14 @@ namespace topo {
           //                                      atomIdxInStrand[a1.getId()]))
           //             << std::endl;
           // }
-          if (numEntanglementsSampled >= nrOfSliplinksToSample) {
+          if (numEntanglementsSampled >= nrOfEntanglementsToSample) {
             break;
           }
         }
-        if (numEntanglementsSampled >= nrOfSliplinksToSample) {
+        if (numEntanglementsSampled >= nrOfEntanglementsToSample) {
           break;
         }
-      } while (numEntanglementsSampled < minimumNrOfSliplinks &&
+      } while (numEntanglementsSampled < minimumNrOfEntanglements &&
                numLinksFoundInIteration > 0);
 
       // reset internal thing
@@ -250,10 +252,12 @@ namespace topo {
      * entanglements
      *
      * @param universe the universe with all the atoms etc.
-     * @param nrOfSliplinksToSample the nr of entanglements to find
-     * @param cutoff the cut-off distance within which two atoms are considered
-     * close enough
-     * @param minimumNrOfSliplinks the minimum number of entanglements to find
+     * @param nrOfEntanglementsToSample the nr of entanglements to find
+     * @param upperCutoff the cut-off distance within which two atoms are
+     * considered close enough
+     * @param lowerCutoff
+     * @param minimumNrOfEntanglements the minimum number of entanglements to
+     * find
      * @param sameStrandCutoff the number of beads required between two atoms of
      * the same strand
      * @param seed the random seed
@@ -261,30 +265,32 @@ namespace topo {
      * @param ignoreCrosslinks whether to ignore cross-link atoms when sampling.
      * Careful: if you don't ignore them, the same-strand policy might not work
      * correctly.
+     * @param filterDanglingAndSoluble
      * @return AtomPairEntanglements
      */
-    AtomPairEntanglements randomlyFindUnfilteredEntanglements(
+    AtomPairEntanglements randomlyFindEntanglementsV2(
       const pylimer_tools::entities::Universe& universe,
-      const size_t nrOfSliplinksToSample,
+      const size_t nrOfEntanglementsToSample,
       const double upperCutoff,
       const double lowerCutoff,
-      const size_t minimumNrOfSliplinks,
+      const size_t minimumNrOfEntanglements,
       const double sameStrandCutoff,
       const std::string& seed,
       const int crossLinkerType,
       const bool ignoreCrosslinks,
       bool filterDanglingAndSoluble)
     {
-      INVALIDARG_EXP_IFN(minimumNrOfSliplinks < universe.getNrOfAtoms() / 2,
+      INVALIDARG_EXP_IFN(minimumNrOfEntanglements < universe.getNrOfAtoms() / 2,
                          "Minimum number of slip-links must be less than the "
                          "possible number of slip-links to place.");
-      INVALIDARG_EXP_IFN(nrOfSliplinksToSample < universe.getNrOfAtoms() / 2,
+      INVALIDARG_EXP_IFN(nrOfEntanglementsToSample <
+                           universe.getNrOfAtoms() / 2,
                          "Number of slip-links to place must be less than "
                          "the possible number of slip-links to place.");
-      INVALIDARG_EXP_IFN(nrOfSliplinksToSample >= minimumNrOfSliplinks,
+      INVALIDARG_EXP_IFN(nrOfEntanglementsToSample >= minimumNrOfEntanglements,
                          "Maximum nr. should be larger than minimum, got " +
-                           std::to_string(nrOfSliplinksToSample) + " and " +
-                           std::to_string(minimumNrOfSliplinks) + ".");
+                           std::to_string(nrOfEntanglementsToSample) + " and " +
+                           std::to_string(minimumNrOfEntanglements) + ".");
       INVALIDARG_EXP_IFN(upperCutoff > 0.0,
                          "Expected a cutoff > 0.0, got " +
                            std::to_string(upperCutoff) + ".");
@@ -294,18 +300,18 @@ namespace topo {
           std::to_string(lowerCutoff) + " ≥ " + std::to_string(upperCutoff) +
           ".");
 
-      // std::cout << "Randomly finding " << nrOfSliplinksToSample
+      // std::cout << "Randomly finding " << nrOfEntanglementsToSample
       //           << " entanglements within cutoff " << cutoff
       //           << " and same strand cutoff " << sameStrandCutoff << "."
       //           << std::endl;
 
       // initialise some stuff
       std::vector<std::pair<size_t, size_t>> pairsOfAtoms;
-      pairsOfAtoms.reserve(nrOfSliplinksToSample);
+      pairsOfAtoms.reserve(nrOfEntanglementsToSample);
       std::vector<long int> pairOfAtom =
         std::vector<long int>(universe.getNrOfAtoms(), -1);
 
-      if (nrOfSliplinksToSample == 0) {
+      if (nrOfEntanglementsToSample == 0) {
         return AtomPairEntanglements(pairsOfAtoms, pairOfAtom);
       }
 
@@ -321,20 +327,37 @@ namespace topo {
       // std::cout << "Initial sampling rng seed: " << rng << std::endl;
       Eigen::VectorXd coordinates =
         universe.getUnwrappedVertexCoordinates(universe.getBox());
-      pylimer_tools::entities::EigenNeighbourList neighbourList =
+      const pylimer_tools::entities::EigenNeighbourList neighbourList =
         pylimer_tools::entities::EigenNeighbourList(
           coordinates, universe.getBox(), upperCutoff);
       std::vector<bool> vertexIsEligible(universe.getNrOfAtoms(), true);
-      std::vector<int> vertexTypes = universe.getPropertyValues<int>("type");
-      std::vector<int> vertexDegrees = universe.getVertexDegrees();
+      const std::vector<int> vertexTypes =
+        universe.getPropertyValues<int>("type");
+      const std::vector<int> vertexDegrees = universe.getVertexDegrees();
 
       std::vector<long int> vertexIdsToSample;
       vertexIdsToSample.reserve(universe.getNrOfAtoms());
+
+      const std::vector<pylimer_tools::entities::MoleculeType>
+        moleculeTypePerVertex =
+          filterDanglingAndSoluble
+            ? universe.identifyObviouslyDanglingAtoms()
+            : std::vector({ pylimer_tools::entities::MoleculeType::UNDEFINED });
+
+      // filter out cross-link atoms and soluble atoms
+
       for (size_t i = 0; i < universe.getNrOfAtoms(); ++i) {
         if (ignoreCrosslinks && vertexTypes[i] == crossLinkerType) {
           vertexIsEligible[i] = false;
         }
         if (ignoreCrosslinks && vertexDegrees[i] > 2) {
+          vertexIsEligible[i] = false;
+        }
+        if (filterDanglingAndSoluble &&
+            (moleculeTypePerVertex[i] ==
+               pylimer_tools::entities::MoleculeType::FREE_CHAIN ||
+             moleculeTypePerVertex[i] ==
+               pylimer_tools::entities::MoleculeType::DANGLING_CHAIN)) {
           vertexIsEligible[i] = false;
         }
         if (vertexIsEligible[i]) {
@@ -349,14 +372,15 @@ namespace topo {
       size_t numEntanglementsSampled = 0;
       do {
         numLinksFoundInIteration = 0;
-        std::shuffle(vertexIdsToSample.begin(), vertexIdsToSample.end(), rng);
-        for (long int atomVertexIdx1 : vertexIdsToSample) {
+        std::ranges::shuffle(vertexIdsToSample, rng);
+        for (const long int atomVertexIdx1 : vertexIdsToSample) {
           // make sure this atom does not yet have a pair
           if (pairOfAtom[atomVertexIdx1] != -1) {
             continue;
           }
+          vertexIsEligible[atomVertexIdx1] = false;
           // then, find neighbouring atoms
-          size_t nNeighbours = neighbourList.getIndicesCloseToCoordinates(
+          const size_t nNeighbours = neighbourList.getIndicesCloseToCoordinates(
             neighbourIndices,
             coordinates.segment(3 * atomVertexIdx1, 3),
             upperCutoff,
@@ -418,14 +442,14 @@ namespace topo {
           numEntanglementsSampled += 1;
           numLinksFoundInIteration += 1;
 
-          if (numEntanglementsSampled >= nrOfSliplinksToSample) {
+          if (numEntanglementsSampled >= nrOfEntanglementsToSample) {
             break;
           }
         }
-        if (numEntanglementsSampled >= nrOfSliplinksToSample) {
+        if (numEntanglementsSampled >= nrOfEntanglementsToSample) {
           break;
         }
-      } while (numEntanglementsSampled < minimumNrOfSliplinks &&
+      } while (numEntanglementsSampled < minimumNrOfEntanglements &&
                numLinksFoundInIteration > 0);
 
       // reset internal thing
