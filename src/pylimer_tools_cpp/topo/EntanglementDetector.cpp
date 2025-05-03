@@ -4,6 +4,7 @@
 #include "../entities/Molecule.h"
 #include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
+#include "../utils/LazyDistanceMatrix.h"
 #include "../utils/StringUtils.h"
 #include <iostream>
 #include <random>
@@ -315,6 +316,11 @@ namespace topo {
         return AtomPairEntanglements(pairsOfAtoms, pairOfAtom);
       }
 
+      igraph_lazy_distance_matrix_state_t distance_matrix_computer;
+      igraph_t graph = universe.getCopyOfGraph();
+      igraph_lazy_distance_matrix_state_init(
+        &distance_matrix_computer, &graph, IGRAPH_ALL, sameStrandCutoff);
+
       // some randomness for placement
       std::mt19937 rng;
       if (seed == "") {
@@ -325,11 +331,12 @@ namespace topo {
         rng = std::mt19937(seed2);
       }
       // std::cout << "Initial sampling rng seed: " << rng << std::endl;
+      pylimer_tools::entities::Box box = universe.getBox();
       Eigen::VectorXd coordinates =
-        universe.getUnwrappedVertexCoordinates(universe.getBox());
+        universe.getUnwrappedVertexCoordinates(box);
       const pylimer_tools::entities::EigenNeighbourList neighbourList =
         pylimer_tools::entities::EigenNeighbourList(
-          coordinates, universe.getBox(), upperCutoff);
+          coordinates, box, upperCutoff);
       std::vector<bool> vertexIsEligible(universe.getNrOfAtoms(), true);
       const std::vector<int> vertexTypes =
         universe.getPropertyValues<int>("type");
@@ -351,13 +358,6 @@ namespace topo {
           vertexIsEligible[i] = false;
         }
         if (ignoreCrosslinks && vertexDegrees[i] > 2) {
-          vertexIsEligible[i] = false;
-        }
-        if (filterDanglingAndSoluble &&
-            (moleculeTypePerVertex[i] ==
-               pylimer_tools::entities::MoleculeType::FREE_CHAIN ||
-             moleculeTypePerVertex[i] ==
-               pylimer_tools::entities::MoleculeType::DANGLING_CHAIN)) {
           vertexIsEligible[i] = false;
         }
         if (vertexIsEligible[i]) {
@@ -401,17 +401,19 @@ namespace topo {
             Eigen::Vector3d distance =
               coordinates.segment(3 * neighbourIndices[idxInNeighbours], 3) -
               coordinates.segment(3 * atomVertexIdx1, 3);
-            universe.getBox().handlePBC(distance);
+            box.handlePBC(distance);
 
             if (distance.norm() < lowerCutoff ||
                 distance.norm() > upperCutoff) {
               continue;
             }
 
-            if (sameStrandCutoff <= 0 ||
-                universe.getPathLength(atomVertexIdx1,
-                                       neighbourIndices[idxInNeighbours]) >
-                  sameStrandCutoff) {
+            igraph_integer_t pathLength =
+              igraph_lazy_distance_matrix_path_length(
+                &distance_matrix_computer,
+                atomVertexIdx1,
+                neighbourIndices[idxInNeighbours]);
+            if (sameStrandCutoff <= 0 || pathLength < sameStrandCutoff) {
               // found the second part of the pair
               atomVertexIdx2 = neighbourIndices[idxInNeighbours];
               break;
@@ -433,10 +435,24 @@ namespace topo {
               ". This time sampled with vertex " +
               std::to_string(atomVertexIdx1) + ".");
 
-          pairOfAtom[atomVertexIdx2] = pairsOfAtoms.size();
-          pairOfAtom[atomVertexIdx1] = pairsOfAtoms.size();
-          pairsOfAtoms.emplace_back(universe.getAtomIdByIdx(atomVertexIdx1),
-                                    universe.getAtomIdByIdx(atomVertexIdx2));
+          if (!filterDanglingAndSoluble ||
+              !((moleculeTypePerVertex[atomVertexIdx1] ==
+                   pylimer_tools::entities::MoleculeType::FREE_CHAIN ||
+                 moleculeTypePerVertex[atomVertexIdx1] ==
+                   pylimer_tools::entities::MoleculeType::DANGLING_CHAIN) ||
+                (moleculeTypePerVertex[atomVertexIdx2] ==
+                   pylimer_tools::entities::MoleculeType::FREE_CHAIN ||
+                 moleculeTypePerVertex[atomVertexIdx2] ==
+                   pylimer_tools::entities::MoleculeType::DANGLING_CHAIN))) {
+            pairOfAtom[atomVertexIdx2] = pairsOfAtoms.size();
+            pairOfAtom[atomVertexIdx1] = pairsOfAtoms.size();
+            pairsOfAtoms.emplace_back(universe.getAtomIdByIdx(atomVertexIdx1),
+                                      universe.getAtomIdByIdx(atomVertexIdx2));
+          } else {
+            // dangling atoms, entangled but we don't store it
+            pairOfAtom[atomVertexIdx2] = -2;
+            pairOfAtom[atomVertexIdx1] = -2;
+          }
           vertexIsEligible[atomVertexIdx2] = false;
 
           numEntanglementsSampled += 1;
@@ -458,6 +474,8 @@ namespace topo {
           i = -1;
         }
       }
+      igraph_lazy_distance_matrix_state_destroy(&distance_matrix_computer);
+      igraph_destroy(&graph);
 
       AtomPairEntanglements result;
       result.pairsOfAtoms = pairsOfAtoms;
