@@ -66,6 +66,7 @@ Universe
       ~Universe.get_nr_of_bonds_of_atom
       ~Universe.get_nr_of_bonds_of_vertex
       ~Universe.get_nr_of_dihedral_angles
+      ~Universe.get_nr_of_edges_from_to
       ~Universe.get_timestep
       ~Universe.get_vertex_degrees
       ~Universe.get_vertex_idx_by_atom_id
@@ -148,6 +149,7 @@ Universe
    .. automethod:: get_nr_of_bonds_of_atom
    .. automethod:: get_nr_of_bonds_of_vertex
    .. automethod:: get_nr_of_dihedral_angles
+   .. automethod:: get_nr_of_edges_from_to
    .. automethod:: get_timestep
    .. automethod:: get_vertex_degrees
    .. automethod:: get_vertex_idx_by_atom_id

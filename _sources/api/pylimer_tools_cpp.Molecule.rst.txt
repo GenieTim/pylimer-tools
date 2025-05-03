@@ -32,10 +32,13 @@ Molecule
       ~Molecule.get_atoms_connected_to_vertex
       ~Molecule.get_atoms_lined_up
       ~Molecule.get_bonds
+      ~Molecule.get_edge_ids_from
+      ~Molecule.get_edge_ids_from_to
       ~Molecule.get_edges
       ~Molecule.get_key
       ~Molecule.get_nr_of_atoms
       ~Molecule.get_nr_of_bonds
+      ~Molecule.get_nr_of_edges_from_to
       ~Molecule.get_strand_ends
       ~Molecule.get_strand_type
       ~Molecule.get_vertex_idx_by_atom_id
@@ -64,10 +67,13 @@ Molecule
    .. automethod:: get_atoms_connected_to_vertex
    .. automethod:: get_atoms_lined_up
    .. automethod:: get_bonds
+   .. automethod:: get_edge_ids_from
+   .. automethod:: get_edge_ids_from_to
    .. automethod:: get_edges
    .. automethod:: get_key
    .. automethod:: get_nr_of_atoms
    .. automethod:: get_nr_of_bonds
+   .. automethod:: get_nr_of_edges_from_to
    .. automethod:: get_strand_ends
    .. automethod:: get_strand_type
    .. automethod:: get_vertex_idx_by_atom_id

@@ -392,6 +392,12 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_bonds" title="pylimer_tools_cpp.Molecule.get_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bonds</span></code></a>(self)</p></td>
 <td><p>Get all bonds.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_edge_ids_from" title="pylimer_tools_cpp.Molecule.get_edge_ids_from"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_edge_ids_from</span></code></a>(self, vertex_id)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_edge_ids_from_to" title="pylimer_tools_cpp.Molecule.get_edge_ids_from_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_edge_ids_from_to</span></code></a>(self, vertex_id_from, ...)</p></td>
+<td><p>Get the edge ids of the edges between two specific vertices</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_edges" title="pylimer_tools_cpp.Molecule.get_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_edges</span></code></a>(self)</p></td>
 <td><p>Get all bonds.</p></td>
 </tr>
@@ -404,13 +410,16 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_nr_of_bonds" title="pylimer_tools_cpp.Molecule.get_nr_of_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_bonds</span></code></a>(self)</p></td>
 <td><p>Counts and returns the number of bonds associated with this molecule.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_strand_ends" title="pylimer_tools_cpp.Molecule.get_strand_ends"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_strand_ends</span></code></a>(self[, crosslinker_type, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_nr_of_edges_from_to" title="pylimer_tools_cpp.Molecule.get_nr_of_edges_from_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_edges_from_to</span></code></a>(self, ...[, max_length])</p></td>
+<td><p>Get the number of edges in the shortest path between two specific vertices.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_strand_ends" title="pylimer_tools_cpp.Molecule.get_strand_ends"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_strand_ends</span></code></a>(self[, crosslinker_type, ...])</p></td>
 <td><p>Get the ends of the given strand (= molecule).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_strand_type" title="pylimer_tools_cpp.Molecule.get_strand_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_strand_type</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_strand_type" title="pylimer_tools_cpp.Molecule.get_strand_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_strand_type</span></code></a>(self)</p></td>
 <td><p>Get the type of this molecule (see <a class="reference internal" href="pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType" title="pylimer_tools_cpp.MoleculeType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoleculeType</span></code></a> enum).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_vertex_idx_by_atom_id" title="pylimer_tools_cpp.Molecule.get_vertex_idx_by_atom_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_vertex_idx_by_atom_id</span></code></a>(self, atom_id)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_vertex_idx_by_atom_id" title="pylimer_tools_cpp.Molecule.get_vertex_idx_by_atom_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_vertex_idx_by_atom_id</span></code></a>(self, atom_id)</p></td>
 <td><p>Get the vertex index of the underlying graph for an atom with a specified id.</p></td>
 </tr>
 </tbody>
@@ -595,6 +604,17 @@ to start with the cross-link.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_edge_ids_from">
+<span class="sig-name descname"><span class="pre">get_edge_ids_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_edge_ids_from" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_edge_ids_from_to">
+<span class="sig-name descname"><span class="pre">get_edge_ids_from_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_id_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_id_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_edge_ids_from_to" title="Link to this definition">¶</a></dt>
+<dd><p>Get the edge ids of the edges between two specific vertices</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_edges">
 <span class="sig-name descname"><span class="pre">get_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_edges" title="Link to this definition">¶</a></dt>
 <dd><p>Get all bonds. Returns a dict with three properties: ‘edge_from’, ‘edge_to’ and ‘edge_type’.
@@ -623,6 +643,13 @@ Use <code class="xref py py-func docutils literal notranslate"><span class="pre"
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_nr_of_bonds">
 <span class="sig-name descname"><span class="pre">get_nr_of_bonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_nr_of_bonds" title="Link to this definition">¶</a></dt>
 <dd><p>Counts and returns the number of bonds associated with this molecule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_nr_of_edges_from_to">
+<span class="sig-name descname"><span class="pre">get_nr_of_edges_from_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_id_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_id_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_nr_of_edges_from_to" title="Link to this definition">¶</a></dt>
+<dd><p>Get the number of edges in the shortest path between two specific vertices.</p>
+<p>If <cite>max_length</cite> is provided and positive, it will only consider paths up to that length.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -733,10 +760,13 @@ Use the argument <cite>close_loop</cite> to decide, whether this should be retur
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_connected_to_vertex"><code class="docutils literal notranslate"><span class="pre">Molecule.get_atoms_connected_to_vertex()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_lined_up"><code class="docutils literal notranslate"><span class="pre">Molecule.get_atoms_lined_up()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_bonds"><code class="docutils literal notranslate"><span class="pre">Molecule.get_bonds()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_edge_ids_from"><code class="docutils literal notranslate"><span class="pre">Molecule.get_edge_ids_from()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_edge_ids_from_to"><code class="docutils literal notranslate"><span class="pre">Molecule.get_edge_ids_from_to()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_edges"><code class="docutils literal notranslate"><span class="pre">Molecule.get_edges()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_key"><code class="docutils literal notranslate"><span class="pre">Molecule.get_key()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_nr_of_atoms"><code class="docutils literal notranslate"><span class="pre">Molecule.get_nr_of_atoms()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_nr_of_bonds"><code class="docutils literal notranslate"><span class="pre">Molecule.get_nr_of_bonds()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_nr_of_edges_from_to"><code class="docutils literal notranslate"><span class="pre">Molecule.get_nr_of_edges_from_to()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_strand_ends"><code class="docutils literal notranslate"><span class="pre">Molecule.get_strand_ends()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_strand_type"><code class="docutils literal notranslate"><span class="pre">Molecule.get_strand_type()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_vertex_idx_by_atom_id"><code class="docutils literal notranslate"><span class="pre">Molecule.get_vertex_idx_by_atom_id()</span></code></a></li>
