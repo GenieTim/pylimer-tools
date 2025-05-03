@@ -91,8 +91,7 @@ namespace entities {
     std::vector<igraph_integer_t> vertexIds =
       this->getVertexIdxsConnectedTo(vertexIdx);
     results.reserve(vertexIds.size());
-    std::transform(vertexIds.begin(),
-                   vertexIds.end(),
+    std::ranges::transform(vertexIds,
                    std::back_inserter(results),
                    [this](const long int vertexId) -> Atom {
                      return this->getAtomByVertexIdx(vertexId);
@@ -143,7 +142,10 @@ namespace entities {
   {
     INVALIDINDEX_EXP_IFN(vertexIdxFrom >= 0 &&
                            vertexIdxFrom < this->getNrOfVertices(),
-                         "Invalid vertex index.");
+                           "Invalid vertex index from.");
+    INVALIDINDEX_EXP_IFN(vertexIdxTo >= 0 &&
+                           vertexIdxTo < this->getNrOfVertices(),
+                         "Invalid vertex index target.");
 
     if (maxLength == 0) {
       return 0;
