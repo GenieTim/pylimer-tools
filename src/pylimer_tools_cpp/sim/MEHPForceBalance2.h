@@ -1521,20 +1521,44 @@ protected:
    * @return for each node whether the node is connected to at least one active
    * spring
    */
-  Eigen::ArrayXb findActiveNodes(const double tolerance = 1e-6) const
+  Eigen::ArrayXb findActiveLinks(const double tolerance = 1e-6) const
   {
-    Eigen::ArrayXb activeSprings = this->findActiveStrands(tolerance);
-    assert(activeSprings.size() == this->initialConfig.nrOfStrands);
+    Eigen::ArrayXb activeStrands = this->findActiveStrands(tolerance);
+    assert(activeStrands.size() == this->initialConfig.nrOfStrands);
 
-    Eigen::ArrayXb activeNodes =
-      Eigen::ArrayXb::Constant(this->initialConfig.nrOfNodes, false);
-    for (size_t i = 0; i < activeSprings.size(); ++i) {
-      if (activeSprings[i]) {
-        activeNodes[this->initialConfig.linkIndicesOfStrand[i][0]] = true;
-        activeNodes[pylimer_tools::utils::last(
+    Eigen::ArrayXb activeLinks =
+      Eigen::ArrayXb::Constant(this->initialConfig.nrOfLinks, false);
+    for (size_t i = 0; i < activeStrands.size(); ++i) {
+      if (activeStrands[i]) {
+        activeLinks[this->initialConfig.linkIndicesOfStrand[i][0]] = true;
+        activeLinks[pylimer_tools::utils::last(
           this->initialConfig.linkIndicesOfStrand[i])] = true;
       }
     }
+
+    return activeLinks;
+  }
+
+  /**
+   *
+   * @param tolerance the tolerance to decide whether a spring is considered
+   * active
+   * @return for each node whether the node is connected to at least one active
+   * spring
+   */
+  Eigen::ArrayXb findActiveNodes(const double tolerance = 1e-6) const
+  {
+    Eigen::ArrayXb activeLinks = this->findActiveLinks(tolerance);
+    Eigen::ArrayXb activeNodes =
+      Eigen::ArrayXb::Constant(this->initialConfig.nrOfNodes, false);
+    size_t nodeIdx = 0;
+    for (size_t i = 0; i < this->initialConfig.nrOfLinks; ++i) {
+      if (!this->initialConfig.linkIsEntanglement[i]) {
+        activeNodes[nodeIdx] = activeLinks[i];
+        ++nodeIdx;
+      }
+    }
+
     return activeNodes;
   }
 

@@ -332,8 +332,7 @@ namespace topo {
       }
       // std::cout << "Initial sampling rng seed: " << rng << std::endl;
       pylimer_tools::entities::Box box = universe.getBox();
-      Eigen::VectorXd coordinates =
-        universe.getUnwrappedVertexCoordinates(box);
+      Eigen::VectorXd coordinates = universe.getUnwrappedVertexCoordinates(box);
       const pylimer_tools::entities::EigenNeighbourList neighbourList =
         pylimer_tools::entities::EigenNeighbourList(
           coordinates, box, upperCutoff);
@@ -409,16 +408,19 @@ namespace topo {
             }
 
             igraph_integer_t pathLength =
-              igraph_lazy_distance_matrix_path_length(
-                &distance_matrix_computer,
-                atomVertexIdx1,
-                neighbourIndices[idxInNeighbours]);
+              sameStrandCutoff <= 0 ? IGRAPH_INFINITY
+                                    : igraph_lazy_distance_matrix_path_length(
+                                        &distance_matrix_computer,
+                                        atomVertexIdx1,
+                                        neighbourIndices[idxInNeighbours]);
             if (sameStrandCutoff <= 0 || pathLength < sameStrandCutoff) {
               // found the second part of the pair
               atomVertexIdx2 = neighbourIndices[idxInNeighbours];
               break;
             }
           }
+          igraph_lazy_distance_matrix_forget_source(&distance_matrix_computer,
+                                                    atomVertexIdx1);
 
           if (atomVertexIdx2 < 0) {
             // did not find eligible neighbour, continue to next starting atom

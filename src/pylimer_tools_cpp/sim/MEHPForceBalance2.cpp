@@ -3004,10 +3004,16 @@ Eigen::VectorXd
 MEHPForceBalance2::getGammaFactorsInDir(const double b02, const int dir) const
 {
   INVALIDARG_EXP_IFN(dir >= 0 && dir <= 2, "Invalid direction.");
+
+  if (this->initialConfig.nrOfSprings == 0) {
+    return Eigen::VectorXd::Zero(0);
+  }
+
   Eigen::VectorXd springVectors = this->evaluateSpringVectors(
     this->initialConfig, this->currentDisplacements);
 
-  Eigen::VectorXd gammaFactors(springVectors.size() / 3);
+  Eigen::VectorXd gammaFactors =
+    Eigen::VectorXd::Zero(springVectors.size() / 3);
   const double commonDenominator = 1. / b02;
   for (size_t i = 0; i < springVectors.size() / 3; ++i) {
     double oneOverContourLengthFraction =

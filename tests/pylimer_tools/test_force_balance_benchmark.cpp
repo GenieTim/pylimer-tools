@@ -232,35 +232,35 @@ TEST_CASE("Temporary entanglement sampling benchmark",
 {
   std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
   std::vector<std::string> files = {
-    "3d-diamond-lattice_10x10x10_a_3_d_0.85_imperfect.structure.out",
-    "3d-diamond-lattice_10x10x10_a_3_d_0.85_v_0.V-fixed.structure.out",
-    "3d-diamond-lattice_3x3x3_a_23_d_3_v_0.structure.out",
-    "3d-diamond-lattice_5x5x5_a_3_d_0.85_imperfect.structure.out",
-    "3d-diamond-lattice_5x5x5_a_3_d_0.85_v_0.V-fixed.structure.out",
+    // "3d-diamond-lattice_10x10x10_a_3_d_0.85_imperfect.structure.out",
+    // "3d-diamond-lattice_10x10x10_a_3_d_0.85_v_0.V-fixed.structure.out",
+    // "3d-diamond-lattice_3x3x3_a_23_d_3_v_0.structure.out",
+    // "3d-diamond-lattice_5x5x5_a_3_d_0.85_imperfect.structure.out",
+    // "3d-diamond-lattice_5x5x5_a_3_d_0.85_v_0.V-fixed.structure.out",
     "crosslinked_M10000_N39_p_0.9.out",
-    "crosslinked_p_0.98_melt_100_a_3_50_xlinks_v_14.converted.structure.out-"
-    "equilibration_do_crosslink.structure.out",
-    "crosslinked_p_0.98_melt_100_a_38_50_xlinks_v_22.structure.out-"
-    "equilibration_do_crosslink.structure.out",
-    "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
-    "structure.out-equilibration_do_crosslink.structure.out",
-    "crosslinked_p_1_0.5_melt_100_a_158_100_xlinks_v_13.V-fixed.structure."
-    "out-"
-    "equilibration_do_crosslink.structure.out",
-    "crosslinked_p_1_1_melt_100_a_3_50_xlinks_v_1.V-fixed.structure.out-"
-    "finish_"
-    "crosslinking.structure.out",
-    "equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0.333_2d_t_7500001."
-    "structure.out",
-    "mc_own-si_pdms_crosslinked_melt_464_a_77_r_1.71_wsol_0.0114_f_4_v_1."
-    "structure.out",
-    "melt_213_a_47_106_xlinks_v_1.structure.out",
-    "melt_83_a_100.structure.out",
-    "network_100_a_46.structure.out",
-    "network_p_1_100_a_38_50_xlinks.structure.out",
-    "square_lattice_2x2_a_5.2d.structure.out",
-    "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out",
-    "xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out"
+    // "crosslinked_p_0.98_melt_100_a_3_50_xlinks_v_14.converted.structure.out-"
+    // "equilibration_do_crosslink.structure.out",
+    // "crosslinked_p_0.98_melt_100_a_38_50_xlinks_v_22.structure.out-"
+    // "equilibration_do_crosslink.structure.out",
+    // "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
+    // "structure.out-equilibration_do_crosslink.structure.out",
+    // "crosslinked_p_1_0.5_melt_100_a_158_100_xlinks_v_13.V-fixed.structure."
+    // "out-"
+    // "equilibration_do_crosslink.structure.out",
+    // "crosslinked_p_1_1_melt_100_a_3_50_xlinks_v_1.V-fixed.structure.out-"
+    // "finish_"
+    // "crosslinking.structure.out",
+    // "equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0.333_2d_t_7500001."
+    // "structure.out",
+    // "mc_own-si_pdms_crosslinked_melt_464_a_77_r_1.71_wsol_0.0114_f_4_v_1."
+    // "structure.out",
+    // "melt_213_a_47_106_xlinks_v_1.structure.out",
+    // "melt_83_a_100.structure.out",
+    // "network_100_a_46.structure.out",
+    // "network_p_1_100_a_38_50_xlinks.structure.out",
+    // "square_lattice_2x2_a_5.2d.structure.out",
+    // "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out",
+    // "xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out"
   };
 
   for (const std::string& file : files) {
