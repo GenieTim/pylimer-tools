@@ -36,6 +36,17 @@ typedef struct igraph_lazy_distance_matrix_state_t
   igraph_dqueue_int_t depth_queue;
 } igraph_lazy_distance_matrix_state_t;
 
+static void
+igraph_lazy_distance_matrix_forget_source(
+  const igraph_lazy_distance_matrix_state_t* state,
+  const igraph_integer_t source)
+{
+  igraph_vector_int_t* path_lengths =
+    igraph_vector_int_list_get_ptr(&state->path_lengths, source);
+  igraph_vector_int_resize(path_lengths, 0);
+  igraph_vector_int_resize_min(path_lengths);
+}
+
 static igraph_integer_t
 igraph_lazy_distance_matrix_path_length(
   igraph_lazy_distance_matrix_state_t* state,
@@ -70,7 +81,8 @@ igraph_lazy_distance_matrix_path_length(
     // fetch the next vertex and its depth
     const igraph_integer_t current_vertex =
       igraph_dqueue_int_pop(&state->to_visit_queue);
-    const igraph_integer_t current_depth = igraph_dqueue_int_pop(&state->depth_queue);
+    const igraph_integer_t current_depth =
+      igraph_dqueue_int_pop(&state->depth_queue);
 
     // iterate the neighbors to either walk deeper, or find target vertex
     const igraph_vector_int_t* neighbors =
