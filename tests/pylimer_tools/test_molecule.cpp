@@ -21,11 +21,11 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
   std::cout << "Running test \"Molecules work as intended\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   universeSeq.initializeFromDataSequence(
-    { { suspectedPath + "lammps_data_file_small.out" } });
+    { { suspectedPath + "/lammps_data_file_small.out" } });
   REQUIRE(universeSeq.getLength() == 1);
   REQUIRE(universeSeq.atIndex(0).getNrOfAtoms() == 12);
   REQUIRE(universeSeq.atIndex(0).getNrOfBonds() == 5);

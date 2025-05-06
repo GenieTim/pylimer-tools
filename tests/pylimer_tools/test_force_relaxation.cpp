@@ -10,7 +10,6 @@
 #include <cmath>
 #include <filesystem>
 #include <iostream>
-#include <map>
 #include <vector>
 
 namespace pe = pylimer_tools::entities;

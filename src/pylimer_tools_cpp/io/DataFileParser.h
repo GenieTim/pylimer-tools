@@ -3,187 +3,179 @@
 
 #include "../utils/LammpsAtomStyle.h"
 #include "../utils/StringUtils.h"
-#include <algorithm>
 #include <filesystem>
-#include <iostream>
 #include <map>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-namespace pylimer_tools {
-namespace utils {
+namespace pylimer_tools::utils {
 
-  class DataFileParser
+class DataFileParser
+{
+public:
+  void read(const std::string& filePath,
+            AtomStyle atomStyle = AtomStyle::ANGLE,
+            const AtomStyle atomStyle2 = AtomStyle::NONE,
+            const AtomStyle atomStyle3 = AtomStyle::NONE);
+
+  // access atom data
+  int getNrOfAtoms() const { return this->nAtoms; }
+  int getNrOfAtomTypes() const { return this->nAtomTypes; }
+  std::vector<long int> getAtomIds() { return this->atomIds; }
+  std::vector<int> getMoleculeIds() { return this->moleculeIds; }
+  std::vector<int> getAtomTypes() { return this->atomTypes; }
+  std::vector<double> getAtomX() { return this->atomX; }
+  std::vector<double> getAtomY() { return this->atomY; }
+  std::vector<double> getAtomZ() { return this->atomZ; }
+  std::vector<int> getAtomNx() { return this->atomNx; }
+  std::vector<int> getAtomNy() { return this->atomNy; }
+  std::vector<int> getAtomNz() { return this->atomNz; }
+  std::map<int, double> getMasses() { return this->masses; }
+
+  // access bond data
+  int getNrOfBonds() const { return this->nBonds; }
+  int getNrOfBondTypes() const { return this->nBondTypes; }
+  std::vector<int> getBondTypes() { return this->bondTypes; }
+  std::vector<long int> getBondFrom() { return this->bondFrom; }
+  std::vector<long int> getBondTo() { return this->bondTo; }
+
+  // access angle data
+  int getNrOfAngles() const { return this->nAngles; }
+  int getNrOfAngleTypes() const { return this->nAngleTypes; }
+  std::vector<int> getAngleTypes() { return this->angleTypes; }
+  std::vector<long int> getAngleFrom() { return this->angleFrom; }
+  std::vector<long int> getAngleVia() { return this->angleVia; }
+  std::vector<long int> getAngleTo() { return this->angleTo; }
+
+  // access dihedral angle data
+  int getNrOfDihedralAngles() const { return this->nDihedralAngles; }
+  int getNrOfDihedralAngleTypes() const { return this->nDihedralAngleTypes; }
+  std::vector<int> getDihedralAngleTypes() { return this->dihedralAngleTypes; }
+  std::vector<long int> getDihedralAngleFrom()
   {
-  public:
-    void read(const std::string filePath,
-              AtomStyle atomStyle = AtomStyle::ANGLE,
-              const AtomStyle atomStyle2 = AtomStyle::NONE,
-              const AtomStyle atomStyle3 = AtomStyle::NONE);
+    return this->dihedralAngleFrom;
+  }
+  std::vector<long int> getDihedralAngleVia1()
+  {
+    return this->dihedralAngleVia1;
+  }
+  std::vector<long int> getDihedralAngleVia2()
+  {
+    return this->dihedralAngleVia2;
+  }
+  std::vector<long int> getDihedralAngleTo() { return this->dihedralAngleTo; }
+  std::unordered_map<std::string, std::vector<double>> getAdditionalAtomData()
+  {
+    return this->additionalAtomData;
+  }
 
-    // access atom data
-    int getNrOfAtoms() const { return this->nAtoms; }
-    int getNrOfAtomTypes() const { return this->nAtomTypes; }
-    std::vector<long int> getAtomIds() { return this->atomIds; }
-    std::vector<int> getMoleculeIds() { return this->moleculeIds; }
-    std::vector<int> getAtomTypes() { return this->atomTypes; }
-    std::vector<double> getAtomX() { return this->atomX; }
-    std::vector<double> getAtomY() { return this->atomY; }
-    std::vector<double> getAtomZ() { return this->atomZ; }
-    std::vector<int> getAtomNx() { return this->atomNx; }
-    std::vector<int> getAtomNy() { return this->atomNy; }
-    std::vector<int> getAtomNz() { return this->atomNz; }
-    std::map<int, double> getMasses() { return this->masses; }
+  // get box info
+  double getLowX() const { return this->xLo; }
+  double getHighX() const { return this->xHi; }
+  double getLx() const { return this->xHi - this->xLo; }
+  double getLowY() const { return this->yLo; }
+  double getHighY() const { return this->yHi; }
+  double getLy() const { return this->yHi - this->yLo; }
+  double getLowZ() const { return this->zLo; }
+  double getHighZ() const { return this->zHi; }
+  double getLz() const { return this->zHi - this->zLo; }
 
-    // access bond data
-    int getNrOfBonds() const { return this->nBonds; }
-    int getNrOfBondTypes() const { return this->nBondTypes; }
-    std::vector<int> getBondTypes() { return this->bondTypes; }
-    std::vector<long int> getBondFrom() { return this->bondFrom; }
-    std::vector<long int> getBondTo() { return this->bondTo; }
+private:
+  void readNs(const std::string& line);
+  void readMass(const std::string& line);
+  // different atom styles
+  void readAtom(const std::string& line);
+  void readAtomFull(const std::string& line);
+  void readAtomCharge(const std::string& line);
+  void readAtomHybrid(const std::string& line,
+                      AtomStyle style1,
+                      AtomStyle style2);
+  // bonds, angles, etc.
+  void readBonds(std::ifstream& file, std::string& line);
+  void readBond(const std::string& line);
+  void readAngles(std::ifstream& file, std::string& line);
+  void readAngle(const std::string& line);
+  void readDihedralAngles(std::ifstream& file, std::string& line);
+  void readDihedralAngle(const std::string& line);
+  // additional atom data
+  void readVelocities(std::ifstream& file, std::string& line);
 
-    // access angle data
-    int getNrOfAngles() const { return this->nAngles; }
-    int getNrOfAngleTypes() const { return this->nAngleTypes; }
-    std::vector<int> getAngleTypes() { return this->angleTypes; }
-    std::vector<long int> getAngleFrom() { return this->angleFrom; }
-    std::vector<long int> getAngleVia() { return this->angleVia; }
-    std::vector<long int> getAngleTo() { return this->angleTo; }
+  // utilities
+  static void skipEmptyLines(std::string& line, std::ifstream& file);
+  static void skipLinesToContains(std::string& line,
+                                  std::ifstream& file,
+                                  const std::string& upTo);
+  static void skipLinesToContains(std::string& line,
+                                  std::ifstream& file,
+                                  const std::vector<std::string>& upToEitherOr);
 
-    // access dihedral angle data
-    int getNrOfDihedralAngles() const { return this->nDihedralAngles; }
-    int getNrOfDihedralAngleTypes() const { return this->nDihedralAngleTypes; }
-    std::vector<int> getDihedralAngleTypes()
-    {
-      return this->dihedralAngleTypes;
+  template<typename OUT>
+  inline std::vector<OUT> parseTypesInLine(const std::string& line,
+                                           const int nToRead)
+  {
+    std::vector<OUT> resultnumbers;
+    pylimer_tools::utils::CsvTokenizer tokenizer(line, nToRead);
+    resultnumbers.reserve(tokenizer.getLength());
+    for (size_t i = 0; i < tokenizer.getLength(); ++i) {
+      resultnumbers.push_back(tokenizer.get<OUT>(i));
     }
-    std::vector<long int> getDihedralAngleFrom()
-    {
-      return this->dihedralAngleFrom;
-    }
-    std::vector<long int> getDihedralAngleVia1()
-    {
-      return this->dihedralAngleVia1;
-    }
-    std::vector<long int> getDihedralAngleVia2()
-    {
-      return this->dihedralAngleVia2;
-    }
-    std::vector<long int> getDihedralAngleTo() { return this->dihedralAngleTo; }
-    std::unordered_map<std::string, std::vector<double>> getAdditionalAtomData()
-    {
-      return this->additionalAtomData;
-    }
+    return resultnumbers;
+  }
 
-    // get box info
-    double getLowX() const { return this->xLo; }
-    double getHighX() const { return this->xHi; }
-    double getLx() const { return this->xHi - this->xLo; }
-    double getLowY() const { return this->yLo; }
-    double getHighY() const { return this->yHi; }
-    double getLy() const { return this->yHi - this->yLo; }
-    double getLowZ() const { return this->zLo; }
-    double getHighZ() const { return this->zHi; }
-    double getLz() const { return this->zHi - this->zLo; }
+  //// data
+  // nr of data points to read
+  int nAtoms = 0; // number of atoms
+  int nBonds = 0;
+  int nAngles = 0;
+  int nAtomTypes = 0;
+  int nBondTypes = 0;
+  int nAngleTypes = 0;
+  int nDihedralAngles = 0;
+  int nDihedralAngleTypes = 0;
 
-  private:
-    void readNs(const std::string& line);
-    void readMass(const std::string& line);
-    // different atom styles
-    void readAtom(const std::string& line);
-    void readAtomFull(const std::string& line);
-    void readAtomCharge(const std::string& line);
-    void readAtomHybrid(const std::string& line,
-                        AtomStyle style1,
-                        AtomStyle style2);
-    // bonds, angles, etc.
-    void readBonds(std::ifstream& file, std::string& line);
-    void readBond(const std::string& line);
-    void readAngles(std::ifstream& file, std::string& line);
-    void readAngle(const std::string& line);
-    void readDihedralAngles(std::ifstream& file, std::string& line);
-    void readDihedralAngle(const std::string& line);
-    // additional atom data
-    void readVelocities(std::ifstream& file, std::string& line);
+  // box sizes
+  double xLo = 0;
+  double xHi = 0;
+  double yLo = 0;
+  double yHi = 0;
+  double zLo = 0;
+  double zHi = 0;
 
-    // utilities
-    static void skipEmptyLines(std::string& line, std::ifstream& file);
-    static void skipLinesToContains(std::string& line,
-                                    std::ifstream& file,
-                                    std::string upTo);
-    static void skipLinesToContains(
-      std::string& line,
-      std::ifstream& file,
-      const std::vector<std::string>& upToEitherOr);
+  // actual dimensional values
+  std::map<int, double> masses;
+  std::unordered_map<std::string, std::vector<double>> additionalAtomData;
+  std::vector<long int> atomIds;
+  std::vector<int> moleculeIds;
+  std::vector<int> atomTypes;
+  std::vector<double> atomX;
+  std::vector<double> atomY;
+  std::vector<double> atomZ;
+  std::vector<int> atomNx;
+  std::vector<int> atomNy;
+  std::vector<int> atomNz;
 
-    template<typename OUT>
-    inline std::vector<OUT> parseTypesInLine(const std::string& line,
-                                             const int nToRead)
-    {
-      std::vector<OUT> resultnumbers;
-      pylimer_tools::utils::CsvTokenizer tokenizer(line, nToRead);
-      resultnumbers.reserve(tokenizer.getLength());
-      for (size_t i = 0; i < tokenizer.getLength(); ++i) {
-        resultnumbers.push_back(tokenizer.get<OUT>(i));
-      }
-      return resultnumbers;
-    }
+  // bonds
+  std::vector<long int> bondIds;
+  std::vector<int> bondTypes;
+  std::vector<long int> bondFrom;
+  std::vector<long int> bondTo;
 
-    //// data
-    // nr of data points to read
-    int nAtoms; // number of atoms
-    int nBonds;
-    int nAngles;
-    int nAtomTypes;
-    int nBondTypes;
-    int nAngleTypes;
-    int nDihedralAngles;
-    int nDihedralAngleTypes;
+  // angles
+  std::vector<long int> angleIds;
+  std::vector<int> angleTypes;
+  std::vector<long int> angleFrom;
+  std::vector<long int> angleVia;
+  std::vector<long int> angleTo;
 
-    // box sizes
-    double xLo;
-    double xHi;
-    double yLo;
-    double yHi;
-    double zLo;
-    double zHi;
-
-    // actual dimensional values
-    std::map<int, double> masses;
-    std::unordered_map<std::string, std::vector<double>> additionalAtomData;
-    std::vector<long int> atomIds;
-    std::vector<int> moleculeIds;
-    std::vector<int> atomTypes;
-    std::vector<double> atomX;
-    std::vector<double> atomY;
-    std::vector<double> atomZ;
-    std::vector<int> atomNx;
-    std::vector<int> atomNy;
-    std::vector<int> atomNz;
-
-    // bonds
-    std::vector<long int> bondIds;
-    std::vector<int> bondTypes;
-    std::vector<long int> bondFrom;
-    std::vector<long int> bondTo;
-
-    // angles
-    std::vector<long int> angleIds;
-    std::vector<int> angleTypes;
-    std::vector<long int> angleFrom;
-    std::vector<long int> angleVia;
-    std::vector<long int> angleTo;
-
-    // dihedrals
-    std::vector<long int> dihedralAngleIds;
-    std::vector<int> dihedralAngleTypes;
-    std::vector<long int> dihedralAngleFrom;
-    std::vector<long int> dihedralAngleVia1;
-    std::vector<long int> dihedralAngleVia2;
-    std::vector<long int> dihedralAngleTo;
-  };
-} // namespace utils
-} // namespace pylimer_tools
+  // dihedrals
+  std::vector<long int> dihedralAngleIds;
+  std::vector<int> dihedralAngleTypes;
+  std::vector<long int> dihedralAngleFrom;
+  std::vector<long int> dihedralAngleVia1;
+  std::vector<long int> dihedralAngleVia2;
+  std::vector<long int> dihedralAngleTo;
+};
+}
 
 #endif

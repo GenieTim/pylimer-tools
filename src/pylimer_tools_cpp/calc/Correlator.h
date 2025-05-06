@@ -23,107 +23,104 @@ SOFTWARE.
 #define CORRELATOR_H
 
 #include <Eigen/Dense>
-#include <stdio.h>
 
-namespace pylimer_tools {
-namespace calc {
-  typedef Eigen::Matrix<unsigned long int, Eigen::Dynamic, Eigen::Dynamic>
-    MatrixXuli;
-  typedef Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> VectorXui;
+namespace pylimer_tools::calc {
+typedef Eigen::Matrix<unsigned long int, Eigen::Dynamic, Eigen::Dynamic>
+  MatrixXuli;
+typedef Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> VectorXui;
 
-  ////////////////////////////////////////////////////
-  /// Standard Scalar Correlator f(tau)=<A(t)A(t+tau)>
-  class Correlator
-  {
+////////////////////////////////////////////////////
+/// Standard Scalar Correlator f(tau)=<A(t)A(t+tau)>
+class Correlator
+{
 
-  protected:
-    /** Where the coming values are stored */
-    Eigen::MatrixXd shift;
-    /** Array containing the actual calculated correlation function */
-    Eigen::MatrixXd correlation;
-    /** Number of values accumulated in cor */
-    MatrixXuli ncorrelation;
+protected:
+  /** Where the coming values are stored */
+  Eigen::MatrixXd shift;
+  /** Array containing the actual calculated correlation function */
+  Eigen::MatrixXd correlation;
+  /** Number of values accumulated in cor */
+  MatrixXuli ncorrelation;
 
-    /** Accumulator in each correlator */
-    Eigen::VectorXd accumulator;
-    /** Index that controls accumulation in each correlator */
-    VectorXui naccumulator;
-    /** Index pointing at the position at which the current value is inserted */
-    VectorXui insertindex;
+  /** Accumulator in each correlator */
+  Eigen::VectorXd accumulator;
+  /** Index that controls accumulation in each correlator */
+  VectorXui naccumulator;
+  /** Index pointing at the position at which the current value is inserted */
+  VectorXui insertindex;
 
-    /** Number of Correlators */
-    unsigned int numcorrelators;
+  /** Number of Correlators */
+  unsigned int numcorrelators;
 
-    /** Minimum distance between points for correlators k>0; dmin = p/m */
-    unsigned int dmin;
+  /** Minimum distance between points for correlators k>0; dmin = p/m */
+  unsigned int dmin;
 
-    /*  SCHEMATIC VIEW OF EACH CORRELATOR
-                                                    p=N
-            <----------------------------------------------->
-            _________________________________________________
-            |0|1|2|3|.|.|.| | | | | | | | | | | | | | | |N-1|
-            -------------------------------------------------
-            */
+  /*  SCHEMATIC VIEW OF EACH CORRELATOR
+                                                  p=N
+          <----------------------------------------------->
+          _________________________________________________
+          |0|1|2|3|.|.|.| | | | | | | | | | | | | | | |N-1|
+          -------------------------------------------------
+          */
 
-    /** Length of result arrays */
-    unsigned int length;
-    /** Maximum correlator attained during simulation */
-    unsigned int kmax;
+  /** Length of result arrays */
+  unsigned int length;
+  /** Maximum correlator attained during simulation */
+  unsigned int kmax;
 
-  public:
-    /** Points per correlator */
-    unsigned int p;
-    /** Number of points over which to average; RECOMMENDED: p mod m = 0 */
-    unsigned int m;
-    Eigen::VectorXd t, f;
-    unsigned int npcorr;
+public:
+  /** Points per correlator */
+  unsigned int p;
+  /** Number of points over which to average; RECOMMENDED: p mod m = 0 */
+  unsigned int m;
+  Eigen::VectorXd t, f;
+  unsigned int npcorr;
 
-    /** Accumulated result of incoming values **/
-    double accval;
+  /** Accumulated result of incoming values **/
+  double accval;
 
-    /** Constructor */
-    // Correlator() { numcorrelators = 0; };
-    Correlator(const unsigned int numcorrin = 32,
+  /** Constructor */
+  // Correlator() { numcorrelators = 0; };
+  Correlator(const unsigned int numcorrin = 32,
+             const unsigned int pin = 16,
+             const unsigned int min = 2);
+
+  /** Set size of correlator */
+  void setsize(const unsigned int numcorrin = 32,
                const unsigned int pin = 16,
                const unsigned int min = 2);
 
-    /** Set size of correlator */
-    void setsize(const unsigned int numcorrin = 32,
-                 const unsigned int pin = 16,
-                 const unsigned int min = 2);
+  /** Add a scalar to the correlator number k */
+  void add(const double w, const unsigned int k = 0);
 
-    /** Add a scalar to the correlator number k */
-    void add(const double w, const unsigned int k = 0);
+  /** Evaluate the current state of the correlator */
+  void evaluate(const bool norm = false);
 
-    /** Evaluate the current state of the correlator */
-    void evaluate(const bool norm = false);
+  /** serialize this object */
+  template<class Archive>
+  void serialize(Archive& ar)
+  {
+    ar(
+      // private...
+      shift,
+      correlation,
+      ncorrelation,
+      accumulator,
+      naccumulator,
+      insertindex,
+      numcorrelators,
+      dmin,
+      length,
+      kmax,
+      // ...and public members
+      p,
+      m,
+      t,
+      f,
+      npcorr,
+      accval);
+  }
+};
 
-    /** serialize this object */
-    template<class Archive>
-    void serialize(Archive& ar)
-    {
-      ar(
-        // private...
-        shift,
-        correlation,
-        ncorrelation,
-        accumulator,
-        naccumulator,
-        insertindex,
-        numcorrelators,
-        dmin,
-        length,
-        kmax,
-        // ...and public members
-        p,
-        m,
-        t,
-        f,
-        npcorr,
-        accval);
-    }
-  };
-
-}
 }
 #endif

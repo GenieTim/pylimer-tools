@@ -78,12 +78,11 @@ setupAllOutputs(pcd::DPDSimulator& simulator,
 TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator][long]")
 {
   std::cout << "Running test \"DPD Simulator Works\"" << std::endl;
-  const std::string suspectedPath =
-    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
+  const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
-    suspectedPath + "structure/melt_83_a_100.structure.out";
+    suspectedPath + "/structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     std::vector<pu::AtomStyle> atomStyles = { pu::AtomStyle::HYBRID,
@@ -215,12 +214,11 @@ TEST_CASE("DPD Simulator Restart Files Work", "[analysis][DPDSimulator]")
 {
   std::cout << "Running test \"DPD Simulator Restart Files Work\"" << std::endl;
 
-  const std::string suspectedPath =
-    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
+  const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
-    suspectedPath + "structure/melt_83_a_100.structure.out";
+    suspectedPath + "/structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     std::vector<pu::AtomStyle> atomStyles = { pu::AtomStyle::HYBRID,
@@ -277,12 +275,11 @@ TEST_CASE("DPD Simulator Restart Files Work", "[analysis][DPDSimulator]")
 TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator][long]")
 {
   std::cout << "Running test \"DPD Simulator Can Cross-link\"" << std::endl;
-  const std::string suspectedPath =
-    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
+  const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
-    suspectedPath + "structure/melt_213_a_47_106_xlinks_v_1.structure.out";
+    suspectedPath + "/structure/melt_213_a_47_106_xlinks_v_1.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
@@ -359,12 +356,11 @@ TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
   std::cout << "Running test \"DPD Simulator Computes Correct Forces\""
             << std::endl;
   // note that the random force might lead to deviations compared to LAMMPS
-  const std::string suspectedPath =
-    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
+  const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
-    suspectedPath + "structure/melt_83_a_100.structure.out";
+    suspectedPath + "/structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
@@ -446,12 +442,11 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
 {
   std::cout << "Running test \"DPD Simulator Converts Correctly\"" << std::endl;
   // note that the random force might lead to deviations compared to LAMMPS
-  const std::string suspectedPath =
-    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
+  const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
-    suspectedPath + "structure/melt_83_a_100.structure.out";
+    suspectedPath + "/structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
@@ -483,12 +478,11 @@ TEST_CASE("DPD can deform box", "[analysis][DPDSimulator][long]")
 {
   std::cout << "Running test \"DPD can deform box\"" << std::endl;
 
-  const std::string suspectedPath =
-    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
+  const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
-    suspectedPath + "structure/"
+    suspectedPath + "/structure/"
                     "crosslinked_p_0.98_melt_100_a_38_50_xlinks_v_22.structure."
                     "out-equilibration_do_crosslink.structure.out";
   if (std::filesystem::exists(inputFile)) {
@@ -559,12 +553,11 @@ TEST_CASE("DPD can deform box", "[analysis][DPDSimulator][long]")
 TEST_CASE("New PBC computation is correct", "[analysis][DPDSimulator][1proc]")
 {
   std::cout << "Running test \"New PBC computation is correct\"" << std::endl;
-  const std::string suspectedPath =
-    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
+  const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
-    suspectedPath + "structure/"
+    suspectedPath + "/structure/"
                     "crosslinked_p_0.98_melt_100_a_3_50_xlinks_v_14.converted."
                     "structure.out-equilibration_do_crosslink.structure.out";
   if (std::filesystem::exists(inputFile)) {
@@ -612,12 +605,11 @@ TEST_CASE("For large systems the PBC method does not matter",
   std::cout
     << "Running test \"For large systems the PBC method does not matter\""
     << std::endl;
-  const std::string suspectedPath =
-    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
+  const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile = suspectedPath +
-                          "structure/"
+                          "/structure/"
                           "3d-diamond-lattice_3x3x3_a_23_d_3_v_0.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
@@ -692,12 +684,11 @@ TEST_CASE("DPD Simulator's restart files are accurate",
           "[analysis][DPDSimulator][1proc][long]")
 {
   // note that the random force might lead to deviations compared to LAMMPS
-  const std::string suspectedPath =
-    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/";
+  const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
-    suspectedPath + "structure/melt_83_a_100.structure.out";
+    suspectedPath + "/structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);

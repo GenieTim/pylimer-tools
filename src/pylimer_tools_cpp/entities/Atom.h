@@ -2,166 +2,157 @@
 
 #include "Box.h"
 #include <Eigen/Dense>
-#include <algorithm>
-#include <cassert>
 #include <cmath>
-#include <cstdlib>
 #include <unordered_map>
 // #include <iostream>
-#include <iterator>
-#include <vector>
 
-namespace pylimer_tools {
-namespace entities {
+namespace pylimer_tools::entities {
 
-  class Atom
+class Atom
+{
+public:
+  Atom(const long int idNow,
+       const int typeNow,
+       const double xNow,
+       const double yNow,
+       const double zNow,
+       const int nxNow = 0,
+       const int nyNow = 0,
+       const int nzNow = 0)
+    : id(idNow)
+    , type(typeNow)
+    , x(xNow)
+    , y(yNow)
+    , z(zNow)
+    , nx(nxNow)
+    , ny(nyNow)
+    , nz(nzNow) {};
+
+  explicit Atom(std::unordered_map<std::string, double>& properties)
+    : Atom(static_cast<long int>(std::lround(properties["id"])),
+           static_cast<int>(std::rint(properties["type"])),
+           properties["x"],
+           properties["y"],
+           properties["z"],
+           static_cast<int>(std::rint(properties["nx"])),
+           static_cast<int>(std::rint(properties["ny"])),
+           static_cast<int>(std::rint(properties["nz"])))
   {
-  public:
-    Atom(const long int idNow,
-         const int typeNow,
-         const double xNow,
-         const double yNow,
-         const double zNow,
-         const int nxNow = 0,
-         const int nyNow = 0,
-         const int nzNow = 0)
-      : id(idNow)
-      , type(typeNow)
-      , x(xNow)
-      , y(yNow)
-      , z(zNow)
-      , nx(nxNow)
-      , ny(nyNow)
-      , nz(nzNow) {};
-
-    explicit Atom(std::unordered_map<std::string, double>& properties)
-      : Atom(static_cast<long int>(std::lround(properties["id"])),
-             static_cast<int>(std::rint(properties["type"])),
-             properties["x"],
-             properties["y"],
-             properties["z"],
-             static_cast<int>(std::rint(properties["nx"])),
-             static_cast<int>(std::rint(properties["ny"])),
-             static_cast<int>(std::rint(properties["nz"])))
-    {
-      this->extraData = properties;
-    };
-
-    bool operator==(const Atom& ref) const
-    {
-      return this->id == ref.id && this->type == ref.type && this->x == ref.x &&
-             this->y == ref.y && this->z == ref.z && this->nx == ref.nx &&
-             this->ny == ref.ny && this->nz == ref.nz;
-    }
-
-    Eigen::Vector3d vectorTo(const Atom& b, const Box& box) const
-    {
-      Eigen::Vector3d dist = b.getCoordinates() - this->getCoordinates();
-      box.handlePBC(dist);
-      return dist;
-    }
-
-    Eigen::Vector3d vectorToUnwrapped(const Atom& b, const Box& box) const
-    {
-      return b.getUnwrappedCoordinates(box) -
-             this->getUnwrappedCoordinates(box);
-    }
-
-    Eigen::Vector3d meanPositionWith(const Atom& b, const Box& box) const
-    {
-      Eigen::Vector3d result =
-        this->getCoordinates() + 0.5 * this->vectorTo(b, box);
-      box.handlePBC(result); // move into box
-      return result;
-    }
-
-    Eigen::Vector3d meanPositionWithUnwrapped(const Atom& b,
-                                              const Box& box) const
-    {
-      Eigen::Vector3d result =
-        this->getCoordinates() + 0.5 * this->vectorToUnwrapped(b, box);
-      box.handlePBC(result); // move into box
-      return result;
-    }
-
-    double distanceTo(const Atom& b, const Box& box) const
-    {
-      return this->vectorTo(b, box).norm();
-    }
-
-    double distanceToUnwrapped(const Atom& b, const Box& box) const
-    {
-      return this->vectorToUnwrapped(b, box).norm();
-    }
-
-    long int getId() const { return this->id; }
-    int getType() const { return this->type; }
-    double getX() const { return this->x; }
-    double getY() const { return this->y; }
-    double getZ() const { return this->z; }
-    double getUnwrappedX(const Box& box) const
-    {
-      return this->x + (this->nx * box.getLx());
-    }
-    double getUnwrappedY(const Box& box) const
-    {
-      return this->y + (this->ny * box.getLy());
-    }
-    double getUnwrappedZ(const Box& box) const
-    {
-      return this->z + (this->nz * box.getLz());
-    }
-    int getNX() const { return this->nx; }
-    int getNY() const { return this->ny; }
-    int getNZ() const { return this->nz; }
-
-    template<typename VectorType>
-    void getCoordinates(VectorType& vec) const
-    {
-      INVALIDARG_EXP_IFN(vec.size() == 3,
-                         "Expect coordinates to be in order x, y, z, i.e., a "
-                         "vector or array of size 3.");
-      vec[0] = this->getX();
-      vec[1] = this->getY();
-      vec[2] = this->getZ();
-    }
-    Eigen::Vector3d getCoordinates() const
-    {
-      return Eigen::Vector3d(this->x, this->y, this->z);
-    }
-    template<typename VectorType>
-    void getUnwrappedCoordinates(VectorType& vec, const Box& box) const
-    {
-      INVALIDARG_EXP_IFN(vec.size() == 3,
-                         "Expect coordinates to be in order x, y, z, i.e., a "
-                         "vector or array of size 3.");
-      vec[0] = this->getUnwrappedX(box);
-      vec[1] = this->getUnwrappedY(box);
-      vec[2] = this->getUnwrappedZ(box);
-    }
-    Eigen::Vector3d getUnwrappedCoordinates(const Box& box) const
-    {
-      Eigen::Vector3d coords = Eigen::Vector3d::Zero();
-      this->getUnwrappedCoordinates<Eigen::Vector3d>(coords, box);
-      return coords;
-    }
-
-    std::unordered_map<std::string, double> getExtraData() const
-    {
-      return this->extraData;
-    }
-
-    double getProperty(const std::string property) const
-    {
-      return this->extraData.at(property);
-    }
-
-  private:
-    long int id;
-    int type;
-    double x, y, z;
-    int nx, ny, nz;
-    std::unordered_map<std::string, double> extraData;
+    this->extraData = properties;
   };
-} // namespace entities
-} // namespace pylimer_tools
+
+  bool operator==(const Atom& ref) const
+  {
+    return this->id == ref.id && this->type == ref.type && this->x == ref.x &&
+           this->y == ref.y && this->z == ref.z && this->nx == ref.nx &&
+           this->ny == ref.ny && this->nz == ref.nz;
+  }
+
+  Eigen::Vector3d vectorTo(const Atom& b, const Box& box) const
+  {
+    Eigen::Vector3d dist = b.getCoordinates() - this->getCoordinates();
+    box.handlePBC(dist);
+    return dist;
+  }
+
+  Eigen::Vector3d vectorToUnwrapped(const Atom& b, const Box& box) const
+  {
+    return b.getUnwrappedCoordinates(box) - this->getUnwrappedCoordinates(box);
+  }
+
+  Eigen::Vector3d meanPositionWith(const Atom& b, const Box& box) const
+  {
+    Eigen::Vector3d result =
+      this->getCoordinates() + 0.5 * this->vectorTo(b, box);
+    box.handlePBC(result); // move into box
+    return result;
+  }
+
+  Eigen::Vector3d meanPositionWithUnwrapped(const Atom& b, const Box& box) const
+  {
+    Eigen::Vector3d result =
+      this->getCoordinates() + 0.5 * this->vectorToUnwrapped(b, box);
+    box.handlePBC(result); // move into box
+    return result;
+  }
+
+  double distanceTo(const Atom& b, const Box& box) const
+  {
+    return this->vectorTo(b, box).norm();
+  }
+
+  double distanceToUnwrapped(const Atom& b, const Box& box) const
+  {
+    return this->vectorToUnwrapped(b, box).norm();
+  }
+
+  long int getId() const { return this->id; }
+  int getType() const { return this->type; }
+  double getX() const { return this->x; }
+  double getY() const { return this->y; }
+  double getZ() const { return this->z; }
+  double getUnwrappedX(const Box& box) const
+  {
+    return this->x + (this->nx * box.getLx());
+  }
+  double getUnwrappedY(const Box& box) const
+  {
+    return this->y + (this->ny * box.getLy());
+  }
+  double getUnwrappedZ(const Box& box) const
+  {
+    return this->z + (this->nz * box.getLz());
+  }
+  int getNX() const { return this->nx; }
+  int getNY() const { return this->ny; }
+  int getNZ() const { return this->nz; }
+
+  template<typename VectorType>
+  void getCoordinates(VectorType& vec) const
+  {
+    INVALIDARG_EXP_IFN(vec.size() == 3,
+                       "Expect coordinates to be in order x, y, z, i.e., a "
+                       "vector or array of size 3.");
+    vec[0] = this->getX();
+    vec[1] = this->getY();
+    vec[2] = this->getZ();
+  }
+  Eigen::Vector3d getCoordinates() const
+  {
+    return Eigen::Vector3d(this->x, this->y, this->z);
+  }
+  template<typename VectorType>
+  void getUnwrappedCoordinates(VectorType& vec, const Box& box) const
+  {
+    INVALIDARG_EXP_IFN(vec.size() == 3,
+                       "Expect coordinates to be in order x, y, z, i.e., a "
+                       "vector or array of size 3.");
+    vec[0] = this->getUnwrappedX(box);
+    vec[1] = this->getUnwrappedY(box);
+    vec[2] = this->getUnwrappedZ(box);
+  }
+  Eigen::Vector3d getUnwrappedCoordinates(const Box& box) const
+  {
+    Eigen::Vector3d coords = Eigen::Vector3d::Zero();
+    this->getUnwrappedCoordinates<Eigen::Vector3d>(coords, box);
+    return coords;
+  }
+
+  std::unordered_map<std::string, double> getExtraData() const
+  {
+    return this->extraData;
+  }
+
+  double getProperty(const std::string property) const
+  {
+    return this->extraData.at(property);
+  }
+
+private:
+  long int id;
+  int type;
+  double x, y, z;
+  int nx, ny, nz;
+  std::unordered_map<std::string, double> extraData;
+};
+}

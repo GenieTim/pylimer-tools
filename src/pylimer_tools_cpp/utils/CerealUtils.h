@@ -2,13 +2,11 @@
 #ifdef CEREALIZABLE
 
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <random>
 #include <string>
 #include <type_traits>
 
-#include "./ExtraEigenTypes.h"
 #include "./VectorUtils.h"
 #include <Eigen/Dense>
 #include <cereal/archives/binary.hpp>
@@ -21,6 +19,7 @@
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
+
 extern "C"
 {
 #include <igraph/igraph.h>
@@ -457,58 +456,60 @@ CEREAL_CLASS_VERSION(igraph_t, 1);
 
 //////////////////////////////////////////////////////////////////////////////////
 // MARK: actual utils to serialize fast
-namespace pylimer_tools {
-namespace utils {
+namespace pylimer_tools::utils {
 
-  template<typename T>
-  std::string serializeToString(T obj)
+template<typename T>
+std::string
+serializeToString(T obj)
+{
+  std::stringstream os;
   {
-    std::stringstream os;
-    {
-      cereal::BinaryOutputArchive oarchive(os);
-      oarchive(obj);
-    }
-    return os.str();
+    cereal::BinaryOutputArchive oarchive(os);
+    oarchive(obj);
   }
+  return os.str();
+}
 
-  template<typename T>
-  void deserializeFromString(T& obj, std::string& in)
-  {
-    std::stringstream is(in);
+template<typename T>
+void
+deserializeFromString(T& obj, std::string& in)
+{
+  std::stringstream is(in);
+  cereal::BinaryInputArchive iarchive(is);
+  iarchive(obj);
+}
+
+template<typename T>
+void
+serializeToFile(T obj, const std::string file)
+{
+  std::ofstream os(file);
+  if (file.ends_with("json")) {
+    cereal::JSONOutputArchive oarchive(os);
+    oarchive(obj);
+  } else if (file.ends_with("xml")) {
+    cereal::XMLOutputArchive oarchive(os);
+    oarchive(obj);
+  } else {
+    cereal::BinaryOutputArchive oarchive(os);
+    oarchive(obj);
+  }
+}
+
+template<typename T>
+void
+deserializeFromFile(T& obj, const std::string file)
+{
+  std::ifstream is(file);
+  if (file.ends_with("json")) {
+    cereal::JSONInputArchive iarchive(is);
+    iarchive(obj);
+  } else if (file.ends_with("xml")) {
+    cereal::XMLInputArchive iarchive(is);
+    iarchive(obj);
+  } else {
     cereal::BinaryInputArchive iarchive(is);
     iarchive(obj);
-  }
-
-  template<typename T>
-  void serializeToFile(T obj, const std::string file)
-  {
-    std::ofstream os(file);
-    if (file.ends_with("json")) {
-      cereal::JSONOutputArchive oarchive(os);
-      oarchive(obj);
-    } else if (file.ends_with("xml")) {
-      cereal::XMLOutputArchive oarchive(os);
-      oarchive(obj);
-    } else {
-      cereal::BinaryOutputArchive oarchive(os);
-      oarchive(obj);
-    }
-  }
-
-  template<typename T>
-  void deserializeFromFile(T& obj, const std::string file)
-  {
-    std::ifstream is(file);
-    if (file.ends_with("json")) {
-      cereal::JSONInputArchive iarchive(is);
-      iarchive(obj);
-    } else if (file.ends_with("xml")) {
-      cereal::XMLInputArchive iarchive(is);
-      iarchive(obj);
-    } else {
-      cereal::BinaryInputArchive iarchive(is);
-      iarchive(obj);
-    }
   }
 }
 }

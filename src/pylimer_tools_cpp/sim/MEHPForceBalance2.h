@@ -2,7 +2,6 @@
 
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
-#include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
 #include "../sim/MEHPUtilityStructures.h"
 #include "../sim/OutputSupportingSimulation.h"
@@ -733,10 +732,10 @@ public:
    * @param boxLargeEnough
    * @return Eigen::Vector3d
    */
-  Eigen::Vector3d evaluateSpringVector(const ForceBalance2Network& net,
-                                       const Eigen::VectorXd& u,
-                                       const size_t springIdx,
-                                       const bool is2d) const
+  static Eigen::Vector3d evaluateSpringVector(const ForceBalance2Network& net,
+                                              const Eigen::VectorXd& u,
+                                              const size_t springIdx,
+                                              const bool is2d)
   {
     Eigen::Vector3d dist =
       ((net.coordinates.segment(3 * net.springIndexB(springIdx), 3) +
@@ -759,9 +758,9 @@ public:
    * @param is2D
    * @return the vectors of the springs
    */
-  Eigen::VectorXd evaluateSpringVectors(const ForceBalance2Network& net,
-                                        const Eigen::VectorXd& u,
-                                        const bool is2D) const;
+  static Eigen::VectorXd evaluateSpringVectors(const ForceBalance2Network& net,
+                                               const Eigen::VectorXd& u,
+                                               const bool is2D);
 
   Eigen::VectorXd evaluateSpringVectors(const ForceBalance2Network& net,
                                         const Eigen::VectorXd& u) const
@@ -805,10 +804,10 @@ public:
    * @param targetLink
    * @return double
    */
-  double sumToTotalFraction(const ForceBalance2Network& net,
-                            Eigen::VectorXd springPartition,
-                            size_t springIdx,
-                            size_t targetLink) const;
+  static double sumToTotalFraction(const ForceBalance2Network& net,
+                                   Eigen::VectorXd springPartition,
+                                   size_t springIdx,
+                                   size_t targetLink);
 
   /**
    * @brief Query the link index of the other end of a spring
@@ -1088,8 +1087,8 @@ public:
 0
    * @return Eigen::VectorXd
    */
-  Eigen::VectorXd assembleOneOverSpringPartition(
-    const ForceBalance2Network& net) const;
+  static Eigen::VectorXd assembleOneOverSpringPartition(
+    const ForceBalance2Network& net);
 
   double getDisplacementResidualNorm() const;
 
@@ -1114,8 +1113,9 @@ public:
    * @param linkIdx
    * @return std::vector<size_t>
    */
-  std::vector<size_t> getNeighbourLinkIndices(const ForceBalance2Network& net,
-                                              const size_t linkIdx) const;
+  static std::vector<size_t> getNeighbourLinkIndices(
+    const ForceBalance2Network& net,
+    const size_t linkIdx);
 
 #ifdef CEREALIZABLE
   void writeRestartFile(std::string& file) override
@@ -1604,31 +1604,31 @@ protected:
    * @return true
    * @return false
    */
-  bool distanceIsWithinTolerance(const Eigen::Vector3d& dist,
-                                 const double tolerance = 1e-6,
-                                 const double contourLength = 1.,
-                                 const double contourLengthFraction = 1.) const
+  static bool distanceIsWithinTolerance(const Eigen::Vector3d& dist,
+                                        const double tolerance = 1e-6,
+                                        const double contourLength = 1.,
+                                        const double contourLengthFraction = 1.)
   {
     return dist.norm() <=
            (tolerance * std::max(contourLengthFraction * contourLength, 1.));
   }
 
-  bool isPartOfSpring(const ForceBalance2Network& net,
-                      const size_t linkIdx,
-                      const size_t springIdx) const
+  static bool isPartOfSpring(const ForceBalance2Network& net,
+                             const size_t linkIdx,
+                             const size_t springIdx)
   {
     return (net.springIndexA[springIdx] == linkIdx) ||
            (net.springIndexB[springIdx] == linkIdx);
   }
 
-  bool isLoopingSpring(const ForceBalance2Network& net,
-                       const size_t springIdx) const
+  static bool isLoopingSpring(const ForceBalance2Network& net,
+                              const size_t springIdx)
   {
     return (net.springIndexA[springIdx] == net.springIndexB[springIdx]);
   }
 
-  bool isLoopingStrand(const ForceBalance2Network& net,
-                       const size_t strandIdx) const
+  static bool isLoopingStrand(const ForceBalance2Network& net,
+                              const size_t strandIdx)
   {
     if (net.linkIndicesOfStrand[strandIdx].size() == 0) {
       return false;
@@ -1638,7 +1638,7 @@ protected:
             net.linkIndicesOfStrand[strandIdx].back());
   }
 
-  double getDenominatorOfPartialSpring(const ForceBalance2Network& net,
-                                       const size_t partialSpringIdx) const;
+  static double getDenominatorOfPartialSpring(const ForceBalance2Network& net,
+                                              const size_t partialSpringIdx);
 };
 } // namespace

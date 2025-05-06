@@ -803,6 +803,84 @@ Universe::getClusters() const
   return clusters;
 }
 
+StrandAffiliationInfo
+Universe::getStrandAffiliation(const int crosslinkerType) const
+{
+  // reserve results
+  StrandAffiliationInfo result;
+  result.strandIdOfVertex = pylimer_tools::utils::initializeWithValue<long int>(
+    this->getNrOfAtoms(), -1);
+  result.indexOfVertexInStrand =
+    pylimer_tools::utils::initializeWithValue<long int>(this->getNrOfAtoms(),
+                                                        -1);
+
+  // find possible starting points for the depth-first search
+  std::vector<int> vertexAtomTypes = this->getPropertyValues<int>("type");
+  std::vector<int> vertexDegree = this->getVertexDegrees();
+  assert(vertexAtomTypes.size() == vertexDegree.size());
+  assert(vertexAtomTypes.size() == this->getNrOfAtoms());
+  std::vector<bool> vertexIsStartingPoint =
+    pylimer_tools::utils::initializeWithValue<bool>(this->getNrOfAtoms(),
+                                                    false);
+  // assemble the starting points
+  std::vector<igraph_integer_t> startingPoints;
+  for (size_t i = 0; i < this->getNrOfAtoms(); ++i) {
+    if (vertexAtomTypes[i] == crosslinkerType || vertexDegree[i] != 1) {
+      vertexIsStartingPoint[i] = true;
+      startingPoints.push_back(i);
+    }
+  }
+  // variables to count
+  long int currentStrandId = 0;
+  long int currentIndexOfVertexInStrand = 0;
+
+  // do the depth-first search
+  igraph_adjlist_t adjlist;
+  igraph_adjlist_init(
+    &this->graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+  std::vector<bool> visited = pylimer_tools::utils::initializeWithValue<bool>(
+    this->getNrOfAtoms(), false);
+  std::stack<long int> verticesToVisit;
+  for (size_t idxInStartingPoints = 0;
+       idxInStartingPoints < startingPoints.size();
+       ++idxInStartingPoints) {
+    verticesToVisit.push(startingPoints[idxInStartingPoints]);
+  }
+  while (!verticesToVisit.empty()) {
+    const long int currentVertex = verticesToVisit.top();
+    visited[currentVertex] = true;
+    if (vertexIsStartingPoint[currentVertex]) {
+      currentStrandId += 1;
+      currentIndexOfVertexInStrand = 0;
+    }
+    // by using these starting points,
+    // we can guarantee that the search will always be along a strand
+    if (vertexDegree[currentVertex] <= 2 &&
+        vertexAtomTypes[currentVertex] != crosslinkerType) {
+      result.strandIdOfVertex[currentVertex] = currentStrandId;
+      result.indexOfVertexInStrand[currentVertex] =
+        currentIndexOfVertexInStrand;
+    }
+    // add unvisited neighbours to stack to visit
+    size_t nUnvisitedNeighbours = 0;
+    const igraph_vector_int_t* neighbors =
+      igraph_adjlist_get(&adjlist, currentVertex);
+    for (long int j = 0; j < igraph_vector_int_size(neighbors); ++j) {
+      if (!visited[igraph_vector_int_get(neighbors, j)]) {
+        verticesToVisit.push(igraph_vector_int_get(neighbors, j));
+        nUnvisitedNeighbours += 1;
+      }
+    }
+    if (nUnvisitedNeighbours == 0) {
+      verticesToVisit.pop();
+    }
+  }
+
+  igraph_adjlist_destroy(&adjlist);
+
+  return result;
+}
+
 /**
  * @brief Decompose this universe into chains/molecules by splitting them into
  * clusters
