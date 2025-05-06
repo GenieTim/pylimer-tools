@@ -323,6 +323,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       igraph_integer_t degree;
       igraph_degree_1(&graph, &degree, 0, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
       CHECK(degree == 2);
+      igraph_destroy(&graph);
     }
 
     SECTION("Atoms can be replaced")

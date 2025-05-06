@@ -976,11 +976,11 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc()pbdoc",
          py::arg("network"),
          py::arg("link_idx"))
-    .def("get_neighbour_link_indices",
-         &mehp::MEHPForceBalance::getNeighbourLinkIndices,
-         R"pbdoc()pbdoc",
-         py::arg("network"),
-         py::arg("link_idx"))
+    .def_static("get_neighbour_link_indices",
+                &mehp::MEHPForceBalance::getNeighbourLinkIndices,
+                R"pbdoc()pbdoc",
+                py::arg("network"),
+                py::arg("link_idx"))
     .def(
       "evaluate_partial_spring_distance",
       [](const mehp::MEHPForceBalance& sim,
@@ -1524,11 +1524,11 @@ and finally springs will be any number of connected bonds between links.
            Helper method to debug and/or understand what happens to certain links when being displaced.
           )pbdoc",
          py::arg("link_idx"))
-    .def("get_neighbour_link_indices",
-         &mehp::MEHPForceBalance2::getNeighbourLinkIndices,
-         R"pbdoc()pbdoc",
-         py::arg("network"),
-         py::arg("link_idx"))
+    .def_static("get_neighbour_link_indices",
+                &mehp::MEHPForceBalance2::getNeighbourLinkIndices,
+                R"pbdoc()pbdoc",
+                py::arg("network"),
+                py::arg("link_idx"))
     .def(
       "evaluate_partial_spring_distance",
       [](const mehp::MEHPForceBalance2& sim,

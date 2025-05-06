@@ -539,7 +539,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
   std::cout << "Running test \"MEHP Force Balance runs\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   SECTION("MEHP Force Balance 3D case")
   {
@@ -792,10 +792,10 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   std::string inputFile =
-    suspectedPath + "structure/network_100_a_46.structure.out";
+    suspectedPath + "/structure/network_100_a_46.structure.out";
   if (std::filesystem::exists(inputFile)) {
     CHECK(std::filesystem::exists(suspectedPath));
     std::cout << "Reading file " << inputFile << std::endl;
@@ -847,10 +847,10 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
     << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   std::string inputFile =
-    suspectedPath + "structure/network_100_a_46.structure.out";
+    suspectedPath + "/structure/network_100_a_46.structure.out";
   if (std::filesystem::exists(inputFile)) {
     CHECK(std::filesystem::exists(suspectedPath));
     std::cout << "Reading file " << inputFile << std::endl;
@@ -942,10 +942,10 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   std::string inputFile =
-    suspectedPath + "structure/network_100_a_46.structure.out";
+    suspectedPath + "/structure/network_100_a_46.structure.out";
   if (std::filesystem::exists(inputFile)) {
     CHECK(std::filesystem::exists(suspectedPath));
     std::cout << "Reading file " << inputFile << std::endl;
@@ -1020,10 +1020,10 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   std::string inputFile =
-    suspectedPath + "structure/network_100_a_46.structure.out";
+    suspectedPath + "/structure/network_100_a_46.structure.out";
   if (std::filesystem::exists(inputFile)) {
     CHECK(std::filesystem::exists(suspectedPath));
     std::cout << "Reading file " << inputFile << std::endl;
@@ -1286,13 +1286,13 @@ TEST_CASE("MEHP Force Balance runs with non-network",
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
 
   SECTION("MEHP Force Balance 3D case")
   {
     std::string largeInputFile =
       suspectedPath +
-      "structure/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
+      "/structure/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);

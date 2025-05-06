@@ -27,145 +27,146 @@ SOFTWARE.
 #include <limits.h>
 #include <math.h>
 
-namespace pylimer_tools {
-namespace calc {
-  /////////////////////////////////////////
-  // Correlator class
-  /////////////////////////////////////////
-  Correlator::Correlator(const unsigned int numcorrin,
-                         const unsigned int pin,
-                         const unsigned int min)
-  {
-    setsize(numcorrin, pin, min);
+namespace pylimer_tools::calc {
+/////////////////////////////////////////
+// Correlator class
+/////////////////////////////////////////
+Correlator::Correlator(const unsigned int numcorrin,
+                       const unsigned int pin,
+                       const unsigned int min)
+{
+  setsize(numcorrin, pin, min);
+}
+
+void
+Correlator::setsize(const unsigned int numcorrin,
+                    const unsigned int pin,
+                    const unsigned int min)
+{
+  INVALIDARG_EXP_IFN(numcorrin < INT_MAX && pin < INT_MAX && min < INT_MAX,
+                     "Arguments must be able to cast to integers.");
+  numcorrelators = numcorrin;
+  p = pin;
+  m = min;
+  dmin = p / m;
+
+  length = numcorrelators * p;
+
+  // initialize all values, set to 0
+  shift = Eigen::MatrixXd::Constant(numcorrelators, p, -2e10);
+  correlation = Eigen::MatrixXd::Zero(numcorrelators, p);
+  ncorrelation = MatrixXuli::Zero(numcorrelators, p);
+  accumulator = Eigen::VectorXd::Zero(numcorrelators);
+  naccumulator = VectorXui::Zero(numcorrelators);
+  insertindex = VectorXui::Zero(numcorrelators);
+
+  t = Eigen::VectorXd::Zero(length);
+  f = Eigen::VectorXd::Zero(length);
+
+  npcorr = 0;
+  kmax = 0;
+  accval = 0;
+}
+
+void
+Correlator::add(const double w, const unsigned int k)
+{
+
+  /// If we exceed the correlator side, the value is discarded
+  if (k >= numcorrelators) {
+    return;
+  }
+  if (k > kmax) {
+    kmax = k;
   }
 
-  void Correlator::setsize(const unsigned int numcorrin,
-                           const unsigned int pin,
-                           const unsigned int min)
-  {
-    INVALIDARG_EXP_IFN(numcorrin < INT_MAX && pin < INT_MAX && min < INT_MAX,
-                       "Arguments must be able to cast to integers.");
-    numcorrelators = numcorrin;
-    p = pin;
-    m = min;
-    dmin = p / m;
+  /// Insert new value in shift array
+  shift(k, insertindex[k]) = w;
 
-    length = numcorrelators * p;
-
-    // initialize all values, set to 0
-    shift = Eigen::MatrixXd::Constant(numcorrelators, p, -2e10);
-    correlation = Eigen::MatrixXd::Zero(numcorrelators, p);
-    ncorrelation = MatrixXuli::Zero(numcorrelators, p);
-    accumulator = Eigen::VectorXd::Zero(numcorrelators);
-    naccumulator = VectorXui::Zero(numcorrelators);
-    insertindex = VectorXui::Zero(numcorrelators);
-
-    t = Eigen::VectorXd::Zero(length);
-    f = Eigen::VectorXd::Zero(length);
-
-    npcorr = 0;
-    kmax = 0;
-    accval = 0;
+  /// Add to average value
+  if (k == 0) {
+    accval += w;
   }
 
-  void Correlator::add(const double w, const unsigned int k)
-  {
+  /// Add to accumulator and, if needed, add to next correlator
+  accumulator[k] += w;
+  ++naccumulator[k];
+  if (naccumulator[k] == m) {
+    add(accumulator[k] / m, k + 1);
+    accumulator[k] = 0;
+    naccumulator[k] = 0;
+  }
 
-    /// If we exceed the correlator side, the value is discarded
-    if (k >= numcorrelators) {
-      return;
-    }
-    if (k > kmax) {
-      kmax = k;
-    }
-
-    /// Insert new value in shift array
-    shift(k, insertindex[k]) = w;
-
-    /// Add to average value
-    if (k == 0) {
-      accval += w;
-    }
-
-    /// Add to accumulator and, if needed, add to next correlator
-    accumulator[k] += w;
-    ++naccumulator[k];
-    if (naccumulator[k] == m) {
-      add(accumulator[k] / m, k + 1);
-      accumulator[k] = 0;
-      naccumulator[k] = 0;
-    }
-
-    /// Calculate correlation function
-    const unsigned int ind1 = insertindex[k];
-    // TODO: change to asserts or remove once we don't get any crashes here
-    // anymore
-    RUNTIME_EXP_IFN(k < numcorrelators,
-                    "Cannot evaluate correlator outside its bounds.");
-    RUNTIME_EXP_IFN(ind1 < p, "Cannot evaluate correlator outside its bounds.");
-    if (k == 0) { /// First correlator is different
-      int ind2 = static_cast<int>(ind1);
-      for (unsigned int j = 0; j < p; ++j) {
-        if (shift(k, ind2) > -1e10) {
-          correlation(k, j) += shift(k, ind1) * shift(k, ind2);
-          ncorrelation(k, j) += 1;
-        }
-        --ind2;
-        if (ind2 < 0) {
-          ind2 += p;
-        }
+  /// Calculate correlation function
+  const unsigned int ind1 = insertindex[k];
+  // TODO: change to asserts or remove once we don't get any crashes here
+  // anymore
+  RUNTIME_EXP_IFN(k < numcorrelators,
+                  "Cannot evaluate correlator outside its bounds.");
+  RUNTIME_EXP_IFN(ind1 < p, "Cannot evaluate correlator outside its bounds.");
+  if (k == 0) { /// First correlator is different
+    int ind2 = static_cast<int>(ind1);
+    for (unsigned int j = 0; j < p; ++j) {
+      if (shift(k, ind2) > -1e10) {
+        correlation(k, j) += shift(k, ind1) * shift(k, ind2);
+        ncorrelation(k, j) += 1;
       }
-    } else {
-      int ind2 = static_cast<int>(ind1) - static_cast<int>(dmin);
-      for (unsigned int j = dmin; j < p; ++j) {
-        if (ind2 < 0) {
-          ind2 += p;
-        }
-        if (shift(k, ind2) > -1e10) {
-          correlation(k, j) += shift(k, ind1) * shift(k, ind2);
-          ncorrelation(k, j) += 1;
-        }
-        --ind2;
+      --ind2;
+      if (ind2 < 0) {
+        ind2 += p;
       }
     }
-
-    ++insertindex[k];
-    if (insertindex[k] == p) {
-      insertindex[k] = 0;
+  } else {
+    int ind2 = static_cast<int>(ind1) - static_cast<int>(dmin);
+    for (unsigned int j = dmin; j < p; ++j) {
+      if (ind2 < 0) {
+        ind2 += p;
+      }
+      if (shift(k, ind2) > -1e10) {
+        correlation(k, j) += shift(k, ind1) * shift(k, ind2);
+        ncorrelation(k, j) += 1;
+      }
+      --ind2;
     }
   }
 
-  void Correlator::evaluate(const bool norm)
-  {
-    unsigned int im = 0;
+  ++insertindex[k];
+  if (insertindex[k] == p) {
+    insertindex[k] = 0;
+  }
+}
 
-    double aux = 0.;
-    if (norm) {
-      aux = (accval / ncorrelation(0, 0)) * (accval / ncorrelation(0, 0));
+void
+Correlator::evaluate(const bool norm)
+{
+  unsigned int im = 0;
+
+  double aux = 0.;
+  if (norm) {
+    aux = (accval / ncorrelation(0, 0)) * (accval / ncorrelation(0, 0));
+  }
+
+  // First correlator
+  for (unsigned int i = 0; i < p; ++i) {
+    if (ncorrelation(0, i) > 0) {
+      t[im] = i;
+      f[im] = correlation(0, i) / ncorrelation(0, i) - aux;
+      ++im;
     }
+  }
 
-    // First correlator
-    for (unsigned int i = 0; i < p; ++i) {
-      if (ncorrelation(0, i) > 0) {
-        t[im] = i;
-        f[im] = correlation(0, i) / ncorrelation(0, i) - aux;
+  // Subsequent correlators
+  for (int k = 1; k < kmax; ++k) {
+    for (int i = dmin; i < p; ++i) {
+      if (ncorrelation(k, i) > 0) {
+        t[im] = i * pow(static_cast<double>(m), k);
+        f[im] = correlation(k, i) / ncorrelation(k, i) - aux;
         ++im;
       }
     }
-
-    // Subsequent correlators
-    for (int k = 1; k < kmax; ++k) {
-      for (int i = dmin; i < p; ++i) {
-        if (ncorrelation(k, i) > 0) {
-          t[im] = i * pow(static_cast<double>(m), k);
-          f[im] = correlation(k, i) / ncorrelation(k, i) - aux;
-          ++im;
-        }
-      }
-    }
-
-    npcorr = im;
   }
 
+  npcorr = im;
 }
+
 }

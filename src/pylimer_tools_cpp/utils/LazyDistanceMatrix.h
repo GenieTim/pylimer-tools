@@ -47,11 +47,26 @@ igraph_lazy_distance_matrix_forget_source(
   igraph_vector_int_resize_min(path_lengths);
 }
 
+/**
+ * @brief Retrieves the path length between two vertices in a graph
+ *
+ * This function calculates the shortest path length between source and target
+ * vertices using breadth-first search. It can optionally store all computed
+ * path lengths.
+ *
+ * @param state The lazy distance matrix state containing graph information
+ * @param source The source vertex ID
+ * @param target The target vertex ID
+ * @param store_path Whether to store all path lengths (default: false)
+ * @return The length of the shortest path between source and target,
+ * or IGRAPH_INFINITY if no path exists
+ */
 static igraph_integer_t
 igraph_lazy_distance_matrix_path_length(
   igraph_lazy_distance_matrix_state_t* state,
   const igraph_integer_t source,
-  const igraph_integer_t target)
+  const igraph_integer_t target,
+  const igraph_bool_t store_path = false)
 {
   // we only need one direction in the case of undirected graphs
   // make sure we query always the same matrix element
@@ -61,12 +76,14 @@ igraph_lazy_distance_matrix_path_length(
   // check whether we have already computed the path length
   igraph_vector_int_t* path_lengths =
     igraph_vector_int_list_get_ptr(&state->path_lengths, source);
-  if (igraph_vector_int_size(path_lengths) != state->N) {
-    igraph_vector_int_resize(path_lengths, state->N);
-    igraph_vector_int_null(path_lengths);
-  }
-  if (igraph_vector_int_get(path_lengths, target) > 0) {
-    return igraph_vector_int_get(path_lengths, target);
+  if (store_path) {
+    if (igraph_vector_int_size(path_lengths) != state->N) {
+      igraph_vector_int_resize(path_lengths, state->N);
+      igraph_vector_int_null(path_lengths);
+    }
+    if (igraph_vector_int_get(path_lengths, target) > 0) {
+      return igraph_vector_int_get(path_lengths, target);
+    }
   }
   // otherwise, compute it by bfs
   igraph_dqueue_int_push(&state->to_visit_queue, source);
@@ -94,10 +111,12 @@ igraph_lazy_distance_matrix_path_length(
       const igraph_integer_t neighbour_vertex =
         igraph_vector_int_get(neighbors, neighbour_idx);
       // store the path length in any case, since we have already computed it
-      const igraph_integer_t dist =
-        igraph_vector_int_get(path_lengths, neighbour_vertex);
-      assert(dist == 0 || dist == next_depth);
-      igraph_vector_int_set(path_lengths, neighbour_vertex, next_depth);
+      if (store_path) {
+        const igraph_integer_t dist =
+          igraph_vector_int_get(path_lengths, neighbour_vertex);
+        assert(dist == 0 || dist == next_depth);
+        igraph_vector_int_set(path_lengths, neighbour_vertex, next_depth);
+      }
       if (neighbour_vertex == target) {
         result = next_depth;
         break;

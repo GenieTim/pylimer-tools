@@ -3,7 +3,6 @@
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance2.h"
-#include "../../src/pylimer_tools_cpp/sim/MEHPForceEvaluator.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceRelaxation.h"
 #include "../../src/pylimer_tools_cpp/utils/MCUniverseGenerator.h"
 #include "../../src/pylimer_tools_cpp/utils/StringUtils.h"

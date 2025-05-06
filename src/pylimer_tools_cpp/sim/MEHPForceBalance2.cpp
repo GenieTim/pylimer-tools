@@ -17,7 +17,6 @@
 #include <cassert>
 #include <future>
 #include <iostream>
-#include <set>
 #include <string>
 #include <unistd.h>
 #include <unordered_map>
@@ -106,7 +105,7 @@ MEHPForceBalance2::MEHPForceBalance2(
     }
   }
 
-  // the basic coordinates to use afterwards
+  // the basic coordinates to use afterward
   Eigen::VectorXd vertexCoordinates =
     u.getUnwrappedVertexCoordinates(this->box);
   assert(vertexCoordinates.size() == u.getNrOfAtoms() * 3);
@@ -1141,7 +1140,7 @@ MEHPForceBalance2::getDisplacementResidualNormFor(
 
 std::vector<size_t>
 MEHPForceBalance2::getNeighbourLinkIndices(const ForceBalance2Network& net,
-                                           const size_t linkIdx) const
+                                           const size_t linkIdx)
 {
   std::vector<size_t> results;
   results.reserve(4);
@@ -1166,7 +1165,7 @@ MEHPForceBalance2::getNeighbourLinkIndices(const ForceBalance2Network& net,
  */
 Eigen::VectorXd
 MEHPForceBalance2::assembleOneOverSpringPartition(
-  const ForceBalance2Network& net) const
+  const ForceBalance2Network& net)
 {
   Eigen::VectorXd oneOverSpringPartitions =
     Eigen::VectorXd(3 * net.nrOfSprings);
@@ -2174,7 +2173,7 @@ MEHPForceBalance2::getNumIntraChainSlipLinks() const
 Eigen::VectorXd
 MEHPForceBalance2::evaluateSpringVectors(const ForceBalance2Network& net,
                                          const Eigen::VectorXd& u,
-                                         const bool is2D) const
+                                         const bool is2D)
 {
   // first, the distances
   assert(u.size() == net.coordinates.size());
@@ -2321,7 +2320,7 @@ double
 MEHPForceBalance2::sumToTotalFraction(const ForceBalance2Network& net,
                                       Eigen::VectorXd springPartition,
                                       const size_t springIdx,
-                                      const size_t targetLink) const
+                                      const size_t targetLink)
 {
   double alpha = 0.;
   for (size_t i = 0; i < net.springIndicesOfStrand[springIdx].size(); ++i) {
@@ -2347,7 +2346,7 @@ MEHPForceBalance2::sumToTotalFraction(const ForceBalance2Network& net,
 double
 MEHPForceBalance2::getDenominatorOfPartialSpring(
   const ForceBalance2Network& net,
-  const size_t partialSpringIdx) const
+  const size_t partialSpringIdx)
 {
   double denominator = 1. / net.springContourLength[partialSpringIdx];
 

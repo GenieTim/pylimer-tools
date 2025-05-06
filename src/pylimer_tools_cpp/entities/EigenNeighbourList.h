@@ -1,20 +1,11 @@
 #pragma once
 
 extern "C"
-{
-#include <igraph/igraph.h>
-}
+{}
 #include "../utils/ExtraEigenTypes.h"
 #include "Box.h"
 #include <Eigen/Dense>
-#include <iostream>
-#include <map>
-#include <set>
-#include <stdexcept>
-#include <unordered_map>
 #include <vector>
-
-#include <algorithm>
 
 namespace pylimer_tools {
 namespace entities {

@@ -4,7 +4,6 @@
 #include "../calc/MEHPanalysis.h"
 #include "../calc/MMTanalysis.h"
 #include "../calc/NormalModeAnalyzer.h"
-#include "../entities/Universe.h"
 
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>

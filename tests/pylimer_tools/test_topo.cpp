@@ -103,7 +103,7 @@ TEST_CASE("Entanglement Detector respects distance cut-off",
     pe::Universe universe = universeSeq.atIndex(0);
 
     for (const bool filtered : { true, false }) {
-      std::cout << "Filtering: " << (filtered? "true" : "false") << std::endl;
+      std::cout << "Filtering: " << (filtered ? "true" : "false") << std::endl;
       for (const double lowerCutoff : {
              0.,
              1.,
@@ -121,15 +121,15 @@ TEST_CASE("Entanglement Detector respects distance cut-off",
             pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
               entanglements = pylimer_tools::topo::entanglement_detection::
                 randomlyFindEntanglementsV2(universe,
-                                          0.1 * universe.getNrOfAtoms(),
-                                          upperCutoff,
-                                          lowerCutoff,
-                                          0,
-                                          sameStrandCutoff,
-                                          "",
-                                          2,
-                                          true,
-                                          filtered);
+                                            0.1 * universe.getNrOfAtoms(),
+                                            upperCutoff,
+                                            lowerCutoff,
+                                            0,
+                                            sameStrandCutoff,
+                                            "",
+                                            2,
+                                            true,
+                                            filtered);
 
             auto end_ref = std::chrono::high_resolution_clock::now();
             auto duration_ref =

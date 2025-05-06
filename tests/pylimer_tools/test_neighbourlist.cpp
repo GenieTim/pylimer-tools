@@ -22,12 +22,12 @@ TEST_CASE("NeighbourList works as intended", "[entity][NeighbourList]")
   std::cout << "Running test \"NeighbourList works as intended\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
-  CHECK(std::filesystem::exists(suspectedPath));
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+  REQUIRE(std::filesystem::exists(suspectedPath));
 
   universeSeq.initializeFromDataSequence(
-    { { suspectedPath + "lammps_data_file_small.out" } });
-  CHECK(universeSeq.getLength() == 1);
+    { { suspectedPath + "/lammps_data_file_small.out" } });
+  REQUIRE(universeSeq.getLength() == 1);
   CHECK(universeSeq.atIndex(0).getNrOfAtoms() == 12);
   CHECK(universeSeq.atIndex(0).getNrOfBonds() == 5);
 

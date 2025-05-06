@@ -1,7 +1,6 @@
 #include "DataFileParser.h"
 #include "../utils/StringUtils.h"
 #include "../utils/utilityMacros.h"
-#include <algorithm>
 #include <filesystem>
 #include <fstream> // std::ifstream
 #include <iostream>
@@ -9,562 +8,574 @@
 #include <string>
 #include <vector>
 
-namespace pylimer_tools {
-namespace utils {
+namespace pylimer_tools::utils {
 
-  void DataFileParser::read(const std::string filePath,
-                            AtomStyle atomStyle,
-                            const AtomStyle atomStyle2,
-                            const AtomStyle atomStyle3)
-  {
-    if (!std::filesystem::exists(filePath)) {
-      throw std::invalid_argument("Data file to read (" + filePath +
-                                  ") does not exist.");
-    }
-
-    std::string line;
-    std::ifstream file;
-    file.open(filePath);
-
-    if (!file.is_open()) {
-      throw std::invalid_argument("File to read (" + filePath +
-                                  "): failed to open.");
-    }
-
-    // read everything until "Masses"
-    while (getline(file, line)) {
-      line = pylimer_tools::utils::trimLineOmitComment(line);
-      // skip empty lines
-      if (line.empty()) {
-        continue;
-      }
-      // read up until the masses
-      if (line.find("Masses") != std::string::npos) {
-        break;
-      }
-      // read the nr of data points to read afterwards
-      this->readNs(line);
-    }
-
-    // reserve space
-    // for atom data
-    this->atomIds.reserve(this->nAtoms);
-    this->atomTypes.reserve(this->nAtoms);
-    this->moleculeIds.reserve(this->nAtoms);
-    this->atomX.reserve(this->nAtoms);
-    this->atomY.reserve(this->nAtoms);
-    this->atomZ.reserve(this->nAtoms);
-    this->atomNx.reserve(this->nAtoms);
-    this->atomNy.reserve(this->nAtoms);
-    this->atomNz.reserve(this->nAtoms);
-    // and bond data
-    this->bondIds.reserve(this->nBonds);
-    this->bondTypes.reserve(this->nBonds);
-    this->bondFrom.reserve(this->nBonds);
-    this->bondTo.reserve(this->nBonds);
-
-    // skip empty lines plus the line with "Masses"
-    while (getline(file, line)) {
-      line = pylimer_tools::utils::trimLineOmitComment(line);
-
-      // skip empty lines
-      if (!line.empty()) {
-        break;
-      }
-    }
-
-    // Then, read masses, up until the next section ("atoms")
-    do {
-      line = pylimer_tools::utils::trimLineOmitComment(line);
-
-      // skip empty lines
-      if (line.empty()) {
-        continue;
-      }
-      // read masses until e.g. atoms section
-      if (line.find("Atoms") != std::string::npos ||
-          line.find("Coeffs") != std::string::npos) {
-        break;
-      }
-      // read the mass...
-      this->readMass(line);
-    } while (getline(file, line));
-
-    this->skipLinesToContains(line, file, "Atoms");
-    // detect atom style
-    if (pylimer_tools::utils::contains(line, "#")) {
-      std::string atomStyleString = pylimer_tools::utils::trim(
-        pylimer_tools::utils::removeAllRegex(line, "Atoms[ ]+#", true));
-      if (atomStyleString.size() > 2) {
-        atomStyle =
-          pylimer_tools::utils::getAtomStyleFromString(atomStyleString);
-      }
-    }
-
-    // skip this line too
-    if (!getline(file, line)) {
-      throw std::runtime_error(
-        "Data file ended too early. Not able to read any atoms.");
-    }
-    // then, skip empty lines
-    this->skipEmptyLines(line, file);
-
-    // Then, read atoms, up until the next section ("bonds")
-    for (int i = 0; i < this->nAtoms; ++i) {
-      switch (atomStyle) {
-        case AtomStyle::ANGLE:
-        case AtomStyle::BOND:
-        case AtomStyle::MOLECULAR:
-          this->readAtom(line);
-          break;
-        case AtomStyle::CHARGE:
-          this->readAtomCharge(line);
-          break;
-        case AtomStyle::FULL:
-          this->readAtomFull(line);
-          break;
-        case AtomStyle::HYBRID:
-          this->readAtomHybrid(line, atomStyle2, atomStyle3);
-          break;
-        default:
-          throw std::invalid_argument(
-            "This atom style (" +
-            pylimer_tools::utils::getAtomStyleString(atomStyle) +
-            ") is not supported yet.");
-          break;
-      }
-
-      if (!getline(file, line) && i < this->nAtoms - 1) {
-        throw std::runtime_error(
-          "Data file ended too early. Not enough atoms read. Read " +
-          std::to_string(i) + " of " + std::to_string(this->nAtoms) + ".");
-      }
-    }
-
-    // read the rest of the file
-    while (file.peek() != EOF) {
-      this->skipLinesToContains(
-        line, file, { "Bonds", "Angles", "Dihedrals", "Velocities" });
-
-      if (file.peek() == EOF) {
-        break;
-      }
-
-      if (contains(line, "Bonds")) {
-        this->readBonds(file, line);
-      } else if (contains(line, "Angles")) {
-        this->readAngles(file, line);
-      } else if (contains(line, "Dihedrals")) {
-        this->readDihedralAngles(file, line);
-      } else if (contains(line, "Velocities")) {
-        this->readVelocities(file, line);
-      }
-    }
-
-    // we ignore dihedrals etc. for now.
-    file.close();
+void
+DataFileParser::read(const std::string& filePath,
+                     AtomStyle atomStyle,
+                     const AtomStyle atomStyle2,
+                     const AtomStyle atomStyle3)
+{
+  if (!std::filesystem::exists(filePath)) {
+    throw std::invalid_argument("Data file to read (" + filePath +
+                                ") does not exist.");
   }
 
-  void DataFileParser::skipLinesToContains(std::string& line,
-                                           std::ifstream& file,
-                                           std::string upTo)
-  {
-    do {
+  std::string line;
+  std::ifstream file;
+  file.open(filePath);
+
+  if (!file.is_open()) {
+    throw std::invalid_argument("File to read (" + filePath +
+                                "): failed to open.");
+  }
+
+  // read everything until "Masses"
+  while (getline(file, line)) {
+    line = pylimer_tools::utils::trimLineOmitComment(line);
+    // skip empty lines
+    if (line.empty()) {
+      continue;
+    }
+    // read up until the masses
+    if (line.find("Masses") != std::string::npos) {
+      break;
+    }
+    // read the nr of data points to read afterward
+    this->readNs(line);
+  }
+
+  // reserve space
+  // for atom data
+  this->atomIds.reserve(this->nAtoms);
+  this->atomTypes.reserve(this->nAtoms);
+  this->moleculeIds.reserve(this->nAtoms);
+  this->atomX.reserve(this->nAtoms);
+  this->atomY.reserve(this->nAtoms);
+  this->atomZ.reserve(this->nAtoms);
+  this->atomNx.reserve(this->nAtoms);
+  this->atomNy.reserve(this->nAtoms);
+  this->atomNz.reserve(this->nAtoms);
+  // and bond data
+  this->bondIds.reserve(this->nBonds);
+  this->bondTypes.reserve(this->nBonds);
+  this->bondFrom.reserve(this->nBonds);
+  this->bondTo.reserve(this->nBonds);
+
+  // skip empty lines plus the line with "Masses"
+  while (getline(file, line)) {
+    line = pylimer_tools::utils::trimLineOmitComment(line);
+
+    // skip empty lines
+    if (!line.empty()) {
+      break;
+    }
+  }
+
+  // Then, read masses, up until the next section ("atoms")
+  do {
+    line = pylimer_tools::utils::trimLineOmitComment(line);
+
+    // skip empty lines
+    if (line.empty()) {
+      continue;
+    }
+    // read masses until e.g. atoms section
+    if (line.find("Atoms") != std::string::npos ||
+        line.find("Coeffs") != std::string::npos) {
+      break;
+    }
+    // read the mass...
+    this->readMass(line);
+  } while (getline(file, line));
+
+  this->skipLinesToContains(line, file, "Atoms");
+  // detect atom style
+  if (pylimer_tools::utils::contains(line, "#")) {
+    std::string atomStyleString = pylimer_tools::utils::trim(
+      pylimer_tools::utils::removeAllRegex(line, "Atoms[ ]+#", true));
+    if (atomStyleString.size() > 2) {
+      atomStyle = pylimer_tools::utils::getAtomStyleFromString(atomStyleString);
+    }
+  }
+
+  // skip this line too
+  if (!getline(file, line)) {
+    throw std::runtime_error(
+      "Data file ended too early. Not able to read any atoms.");
+  }
+  // then, skip empty lines
+  this->skipEmptyLines(line, file);
+
+  // Then, read atoms, up until the next section ("bonds")
+  for (int i = 0; i < this->nAtoms; ++i) {
+    switch (atomStyle) {
+      case AtomStyle::ANGLE:
+      case AtomStyle::BOND:
+      case AtomStyle::MOLECULAR:
+        this->readAtom(line);
+        break;
+      case AtomStyle::CHARGE:
+        this->readAtomCharge(line);
+        break;
+      case AtomStyle::FULL:
+        this->readAtomFull(line);
+        break;
+      case AtomStyle::HYBRID:
+        this->readAtomHybrid(line, atomStyle2, atomStyle3);
+        break;
+      default:
+        throw std::invalid_argument(
+          "This atom style (" +
+          pylimer_tools::utils::getAtomStyleString(atomStyle) +
+          ") is not supported yet.");
+    }
+
+    if (!getline(file, line) && i < this->nAtoms - 1) {
+      throw std::runtime_error(
+        "Data file ended too early. Not enough atoms read. Read " +
+        std::to_string(i) + " of " + std::to_string(this->nAtoms) + ".");
+    }
+  }
+
+  // read the rest of the file
+  while (file.peek() != EOF) {
+    this->skipLinesToContains(
+      line, file, { "Bonds", "Angles", "Dihedrals", "Velocities" });
+
+    if (file.peek() == EOF) {
+      break;
+    }
+
+    if (contains(line, "Bonds")) {
+      this->readBonds(file, line);
+    } else if (contains(line, "Angles")) {
+      this->readAngles(file, line);
+    } else if (contains(line, "Dihedrals")) {
+      this->readDihedralAngles(file, line);
+    } else if (contains(line, "Velocities")) {
+      this->readVelocities(file, line);
+    }
+  }
+
+  // we ignore dihedrals etc. for now.
+  file.close();
+}
+
+void
+DataFileParser::skipLinesToContains(std::string& line,
+                                    std::ifstream& file,
+                                    const std::string& upTo)
+{
+  do {
+    if (contains(line, upTo)) {
+      break;
+    }
+  } while (getline(file, line));
+}
+
+void
+DataFileParser::skipLinesToContains(
+  std::string& line,
+  std::ifstream& file,
+  const std::vector<std::string>& upToEitherOr)
+{
+  do {
+    for (const std::string& upTo : upToEitherOr) {
       if (contains(line, upTo)) {
-        break;
+        return;
       }
-    } while (getline(file, line));
-  }
-
-  void DataFileParser::skipLinesToContains(
-    std::string& line,
-    std::ifstream& file,
-    const std::vector<std::string>& upToEitherOr)
-  {
-    do {
-      for (const std::string& upTo : upToEitherOr) {
-        if (contains(line, upTo)) {
-          return;
-        }
-      }
-    } while (getline(file, line));
-  };
-
-  void DataFileParser::skipEmptyLines(std::string& line, std::ifstream& file)
-  {
-    do {
-      line = pylimer_tools::utils::trimLineOmitComment(line);
-
-      // skip until empty lines
-      if (!line.empty()) {
-        break;
-      }
-    } while (getline(file, line));
-  }
-
-  void DataFileParser::readNs(const std::string& line)
-  {
-    if (contains(line, "atoms")) {
-      this->nAtoms = (this->parseTypesInLine<int>(line, 1))[0];
-    } else if (contains(line, "bonds")) {
-      this->nBonds = (this->parseTypesInLine<int>(line, 1))[0];
-    } else if (contains(line, "angles")) {
-      this->nAngles = (this->parseTypesInLine<int>(line, 1))[0];
-    } else if (contains(line, "dihedrals")) {
-      this->nDihedralAngles = (this->parseTypesInLine<int>(line, 1))[0];
-    } else if (contains(line, "atom types")) {
-      this->nAtomTypes = (this->parseTypesInLine<int>(line, 1))[0];
-    } else if (contains(line, "bond types")) {
-      this->nBondTypes = (this->parseTypesInLine<int>(line, 1))[0];
-    } else if (contains(line, "angle types")) {
-      this->nAngleTypes = (this->parseTypesInLine<int>(line, 1))[0];
-    } else if (contains(line, "dihedral types")) {
-      this->nDihedralAngleTypes = (this->parseTypesInLine<int>(line, 1))[0];
-    } else if (contains(line, "xlo xhi")) {
-      std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
-      this->xHi = parsedL[1];
-      this->xLo = parsedL[0];
-    } else if (contains(line, "ylo yhi")) {
-      std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
-      this->yHi = parsedL[1];
-      this->yLo = parsedL[0];
-    } else if (contains(line, "zlo zhi")) {
-      std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
-      this->zHi = parsedL[1];
-      this->zLo = parsedL[0];
     }
+  } while (getline(file, line));
+};
+
+void
+DataFileParser::skipEmptyLines(std::string& line, std::ifstream& file)
+{
+  do {
+    line = pylimer_tools::utils::trimLineOmitComment(line);
+
+    // skip until empty lines
+    if (!line.empty()) {
+      break;
+    }
+  } while (getline(file, line));
+}
+
+void
+DataFileParser::readNs(const std::string& line)
+{
+  if (contains(line, "atoms")) {
+    this->nAtoms = (this->parseTypesInLine<int>(line, 1))[0];
+  } else if (contains(line, "bonds")) {
+    this->nBonds = (this->parseTypesInLine<int>(line, 1))[0];
+  } else if (contains(line, "angles")) {
+    this->nAngles = (this->parseTypesInLine<int>(line, 1))[0];
+  } else if (contains(line, "dihedrals")) {
+    this->nDihedralAngles = (this->parseTypesInLine<int>(line, 1))[0];
+  } else if (contains(line, "atom types")) {
+    this->nAtomTypes = (this->parseTypesInLine<int>(line, 1))[0];
+  } else if (contains(line, "bond types")) {
+    this->nBondTypes = (this->parseTypesInLine<int>(line, 1))[0];
+  } else if (contains(line, "angle types")) {
+    this->nAngleTypes = (this->parseTypesInLine<int>(line, 1))[0];
+  } else if (contains(line, "dihedral types")) {
+    this->nDihedralAngleTypes = (this->parseTypesInLine<int>(line, 1))[0];
+  } else if (contains(line, "xlo xhi")) {
+    std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
+    this->xHi = parsedL[1];
+    this->xLo = parsedL[0];
+  } else if (contains(line, "ylo yhi")) {
+    std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
+    this->yHi = parsedL[1];
+    this->yLo = parsedL[0];
+  } else if (contains(line, "zlo zhi")) {
+    std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
+    this->zHi = parsedL[1];
+    this->zLo = parsedL[0];
+  }
+}
+
+void
+DataFileParser::readMass(const std::string& line)
+{
+  int key = 0;
+  pylimer_tools::utils::CsvTokenizer tokenizer(line);
+  if (tokenizer.getLength() != 2) {
+    throw std::runtime_error(
+      "Incorrect nr of fields tokenized when reading masses");
   }
 
-  void DataFileParser::readMass(const std::string& line)
-  {
-    int key = 0;
-    pylimer_tools::utils::CsvTokenizer tokenizer(line);
-    if (tokenizer.getLength() != 2) {
+  key = tokenizer.get<int>(0);
+  // for now, we just override duplicate keys
+  this->masses[key] = tokenizer.get<double>(1);
+}
+
+void
+DataFileParser::readAtomFull(const std::string& line)
+{
+  size_t atomId, nx, ny, nz;
+  int atomType, moleculeId;
+  double charge;
+  double x, y, z;
+  int resFound = sscanf(line.c_str(),
+                        "%zd %d %d %le %le %le %le %zd %zd %zd",
+                        &atomId,
+                        &moleculeId,
+                        &atomType,
+                        &charge,
+                        &x,
+                        &y,
+                        &z,
+                        &nx,
+                        &ny,
+                        &nz);
+
+  this->atomIds.push_back(atomId);
+  this->moleculeIds.push_back(moleculeId);
+  this->atomTypes.push_back(atomType);
+  this->atomX.push_back(x);
+  this->atomY.push_back(y);
+  this->atomZ.push_back(z);
+  this->additionalAtomData["charge"].push_back(charge);
+
+  if (resFound > 6) {
+    this->atomNx.push_back(nx);
+    this->atomNy.push_back(ny);
+    this->atomNz.push_back(nz);
+  }
+}
+
+void
+DataFileParser::readAtomCharge(const std::string& line)
+{
+  size_t atomId, nx, ny, nz;
+  int atomType;
+  double charge;
+  double x, y, z;
+  int resFound = sscanf(line.c_str(),
+                        "%zd %d %le %le %le %le %zd %zd %zd",
+                        &atomId,
+                        &atomType,
+                        &charge,
+                        &x,
+                        &y,
+                        &z,
+                        &nx,
+                        &ny,
+                        &nz);
+
+  this->atomIds.push_back(atomId);
+  this->moleculeIds.push_back(0);
+  this->atomTypes.push_back(atomType);
+  this->atomX.push_back(x);
+  this->atomY.push_back(y);
+  this->atomZ.push_back(z);
+  this->additionalAtomData["charge"].push_back(charge);
+
+  if (resFound > 6) {
+    this->atomNx.push_back(nx);
+    this->atomNy.push_back(ny);
+    this->atomNz.push_back(nz);
+  }
+}
+
+void
+DataFileParser::readAtom(const std::string& line)
+{
+  size_t atomId, nx, ny, nz;
+  int atomType, moleculeId;
+  double x, y, z;
+  int resFound = sscanf(line.c_str(),
+                        "%lu %d %d %le %le %le %lu %lu %lu",
+                        &atomId,
+                        &moleculeId,
+                        &atomType,
+                        &x,
+                        &y,
+                        &z,
+                        &nx,
+                        &ny,
+                        &nz);
+
+  this->atomIds.push_back(atomId);
+  this->moleculeIds.push_back(moleculeId);
+  this->atomTypes.push_back(atomType);
+  this->atomX.push_back(x);
+  this->atomY.push_back(y);
+  this->atomZ.push_back(z);
+
+  if (resFound > 6) {
+    this->atomNx.push_back(nx);
+    this->atomNy.push_back(ny);
+    this->atomNz.push_back(nz);
+  }
+}
+
+void
+DataFileParser::readAtomHybrid(const std::string& line,
+                               const AtomStyle style1,
+                               const AtomStyle style2)
+{
+  if (style1 != AtomStyle::BOND && style2 != AtomStyle::EDPD) {
+    throw std::runtime_error(
+      "This combination is not implemented for hybrid atom style");
+  }
+  size_t atomId, nx, ny, nz;
+  int atomType, moleculeId;
+  double x, y, z;
+  double edpdTemp, edpd;
+  int resFound = sscanf(line.c_str(),
+                        "%zd %d %le %le %le %d %le %le %zd %zd %zd",
+                        &atomId,
+                        &atomType,
+                        &x,
+                        &y,
+                        &z,
+                        &moleculeId,
+                        &edpdTemp,
+                        &edpd,
+                        &nx,
+                        &ny,
+                        &nz);
+
+  RUNTIME_EXP_IFN(resFound >= 8,
+                  "Did not find enough data in line '" + line + "': only " +
+                    std::to_string(resFound) + ".");
+
+  this->atomIds.push_back(atomId);
+  this->moleculeIds.push_back(moleculeId);
+  this->atomTypes.push_back(atomType);
+  this->atomX.push_back(x);
+  this->atomY.push_back(y);
+  this->atomZ.push_back(z);
+  this->additionalAtomData["edpd_temp"].push_back(edpdTemp);
+  this->additionalAtomData["edpd"].push_back(edpd);
+
+  if (resFound > 8) {
+    this->atomNx.push_back(nx);
+    this->atomNy.push_back(ny);
+    this->atomNz.push_back(nz);
+  }
+}
+
+void
+DataFileParser::readBonds(std::ifstream& file, std::string& line)
+{
+  // skip this line too
+  if (!getline(file, line)) {
+    throw std::runtime_error(
+      "Data file ended too early. Not able to read any bonds.");
+  }
+  // then, skip empty lines
+  this->skipEmptyLines(line, file);
+
+  for (int i = 0; i < this->nBonds; i++) {
+    this->readBond(line);
+
+    if (!getline(file, line) && i + 1 < this->nBonds) {
       throw std::runtime_error(
-        "Incorrect nr of fields tokenized when reading masses");
-    }
-
-    key = tokenizer.get<int>(0);
-    // for now, we just override duplicate keys
-    this->masses[key] = tokenizer.get<double>(1);
-  }
-
-  void DataFileParser::readAtomFull(const std::string& line)
-  {
-    size_t atomId, nx, ny, nz;
-    int atomType, moleculeId;
-    double charge;
-    double x, y, z;
-    int resFound = sscanf(line.c_str(),
-                          "%zd %d %d %le %le %le %le %zd %zd %zd",
-                          &atomId,
-                          &moleculeId,
-                          &atomType,
-                          &charge,
-                          &x,
-                          &y,
-                          &z,
-                          &nx,
-                          &ny,
-                          &nz);
-
-    this->atomIds.push_back(atomId);
-    this->moleculeIds.push_back(moleculeId);
-    this->atomTypes.push_back(atomType);
-    this->atomX.push_back(x);
-    this->atomY.push_back(y);
-    this->atomZ.push_back(z);
-    this->additionalAtomData["charge"].push_back(charge);
-
-    if (resFound > 6) {
-      this->atomNx.push_back(nx);
-      this->atomNy.push_back(ny);
-      this->atomNz.push_back(nz);
+        "Data file ended too early. Not enough bonds read. Read " +
+        std::to_string(i + 1) + " of " + std::to_string(this->nBonds) +
+        " expected bonds.");
     }
   }
+}
 
-  void DataFileParser::readAtomCharge(const std::string& line)
-  {
-    size_t atomId, nx, ny, nz;
-    int atomType;
-    double charge;
-    double x, y, z;
-    int resFound = sscanf(line.c_str(),
-                          "%zd %d %le %le %le %le %zd %zd %zd",
-                          &atomId,
-                          &atomType,
-                          &charge,
-                          &x,
-                          &y,
-                          &z,
-                          &nx,
-                          &ny,
-                          &nz);
+void
+DataFileParser::readBond(const std::string& line)
+{
+  size_t bondId, bondType, newBondFrom, newBondTo;
+  sscanf(line.c_str(),
+         "%zu %zu %zu %zu",
+         &bondId,
+         &bondType,
+         &newBondFrom,
+         &newBondTo);
+  this->bondIds.push_back(bondId);
+  this->bondTypes.push_back(bondType);
+  this->bondFrom.push_back(newBondFrom);
+  this->bondTo.push_back(newBondTo);
+}
 
-    this->atomIds.push_back(atomId);
-    this->moleculeIds.push_back(0);
-    this->atomTypes.push_back(atomType);
-    this->atomX.push_back(x);
-    this->atomY.push_back(y);
-    this->atomZ.push_back(z);
-    this->additionalAtomData["charge"].push_back(charge);
-
-    if (resFound > 6) {
-      this->atomNx.push_back(nx);
-      this->atomNy.push_back(ny);
-      this->atomNz.push_back(nz);
-    }
+void
+DataFileParser::readAngles(std::ifstream& file, std::string& line)
+{
+  // skip this line too
+  if (!getline(file, line)) {
+    throw std::runtime_error(
+      "Data file ended too early. Not able to read any angles.");
   }
+  // then, skip empty lines
+  this->skipEmptyLines(line, file);
 
-  void DataFileParser::readAtom(const std::string& line)
-  {
-    size_t atomId, nx, ny, nz;
-    int atomType, moleculeId;
-    double x, y, z;
-    int resFound = sscanf(line.c_str(),
-                          "%lu %d %d %le %le %le %lu %lu %lu",
-                          &atomId,
-                          &moleculeId,
-                          &atomType,
-                          &x,
-                          &y,
-                          &z,
-                          &nx,
-                          &ny,
-                          &nz);
+  for (int i = 0; i < this->nAngles; i++) {
+    this->readAngle(line);
 
-    this->atomIds.push_back(atomId);
-    this->moleculeIds.push_back(moleculeId);
-    this->atomTypes.push_back(atomType);
-    this->atomX.push_back(x);
-    this->atomY.push_back(y);
-    this->atomZ.push_back(z);
-
-    if (resFound > 6) {
-      this->atomNx.push_back(nx);
-      this->atomNy.push_back(ny);
-      this->atomNz.push_back(nz);
-    }
-  }
-
-  void DataFileParser::readAtomHybrid(const std::string& line,
-                                      const AtomStyle style1,
-                                      const AtomStyle style2)
-  {
-    if (style1 != AtomStyle::BOND && style2 != AtomStyle::EDPD) {
+    if (!getline(file, line) && i + 1 < this->nAngles) {
       throw std::runtime_error(
-        "This combination is not implemented for hybrid atom style");
-    }
-    size_t atomId, nx, ny, nz;
-    int atomType, moleculeId;
-    double x, y, z;
-    double edpdTemp, edpd;
-    int resFound = sscanf(line.c_str(),
-                          "%zd %d %le %le %le %d %le %le %zd %zd %zd",
-                          &atomId,
-                          &atomType,
-                          &x,
-                          &y,
-                          &z,
-                          &moleculeId,
-                          &edpdTemp,
-                          &edpd,
-                          &nx,
-                          &ny,
-                          &nz);
-
-    RUNTIME_EXP_IFN(resFound >= 8,
-                    "Did not find enough data in line '" + line + "': only " +
-                      std::to_string(resFound) + ".");
-
-    this->atomIds.push_back(atomId);
-    this->moleculeIds.push_back(moleculeId);
-    this->atomTypes.push_back(atomType);
-    this->atomX.push_back(x);
-    this->atomY.push_back(y);
-    this->atomZ.push_back(z);
-    this->additionalAtomData["edpd_temp"].push_back(edpdTemp);
-    this->additionalAtomData["edpd"].push_back(edpd);
-
-    if (resFound > 8) {
-      this->atomNx.push_back(nx);
-      this->atomNy.push_back(ny);
-      this->atomNz.push_back(nz);
+        "Data file ended too early. Not enough angles read. Read " +
+        std::to_string(i + 1) + " of " + std::to_string(this->nAngles) +
+        " expected angles.");
     }
   }
+}
 
-  void DataFileParser::readBonds(std::ifstream& file, std::string& line)
-  {
-    // skip this line too
-    if (!getline(file, line)) {
-      throw std::runtime_error(
-        "Data file ended too early. Not able to read any bonds.");
-    }
-    // then, skip empty lines
-    this->skipEmptyLines(line, file);
+void
+DataFileParser::readAngle(const std::string& line)
+{
+  size_t newAngleId, newAngleType, newAngleFrom, newAngleVia, newAngleTo;
+  sscanf(line.c_str(),
+         "%zu %zu %zu %zu %zu",
+         &newAngleId,
+         &newAngleType,
+         &newAngleFrom,
+         &newAngleVia,
+         &newAngleTo);
 
-    for (int i = 0; i < this->nBonds; i++) {
-      this->readBond(line);
+  this->angleIds.push_back(newAngleId);
+  this->angleTypes.push_back(newAngleType);
+  this->angleFrom.push_back(newAngleFrom);
+  this->angleVia.push_back(newAngleVia);
+  this->angleTo.push_back(newAngleTo);
+}
 
-      if (!getline(file, line) && i + 1 < this->nBonds) {
-        throw std::runtime_error(
-          "Data file ended too early. Not enough bonds read. Read " +
-          std::to_string(i + 1) + " of " + std::to_string(this->nBonds) +
-          " expected bonds.");
-      }
+void
+DataFileParser::readDihedralAngles(std::ifstream& file, std::string& line)
+{
+  // skip this line too
+  if (!getline(file, line)) {
+    throw std::runtime_error(
+      "Data file ended too early. Not able to read any dihedral angles.");
+  }
+  // then, skip empty lines
+  this->skipEmptyLines(line, file);
+
+  for (int i = 0; i < this->nDihedralAngles; i++) {
+    this->readDihedralAngle(line);
+
+    if (!getline(file, line) && i + 1 < this->nDihedralAngles) {
+      throw std::runtime_error("Data file ended too early. Not enough "
+                               "dihedral angles read. Read " +
+                               std::to_string(i + 1) + " of " +
+                               std::to_string(this->nDihedralAngles) +
+                               " expected angles.");
     }
   }
+}
 
-  void DataFileParser::readBond(const std::string& line)
-  {
-    size_t bondId, bondType, newBondFrom, newBondTo;
-    sscanf(line.c_str(),
-           "%zu %zu %zu %zu",
-           &bondId,
-           &bondType,
-           &newBondFrom,
-           &newBondTo);
-    this->bondIds.push_back(bondId);
-    this->bondTypes.push_back(bondType);
-    this->bondFrom.push_back(newBondFrom);
-    this->bondTo.push_back(newBondTo);
+void
+DataFileParser::readDihedralAngle(const std::string& line)
+{
+  size_t newAngleId, newAngleType, newAngleFrom, newAngleVia1, newAngleVia2,
+    newAngleTo;
+  sscanf(line.c_str(),
+         "%zu %zu %zu %zu %zu %zu",
+         &newAngleId,
+         &newAngleType,
+         &newAngleFrom,
+         &newAngleVia1,
+         &newAngleVia2,
+         &newAngleTo);
+
+  this->dihedralAngleIds.push_back(newAngleId);
+  this->dihedralAngleTypes.push_back(newAngleType);
+  this->dihedralAngleFrom.push_back(newAngleFrom);
+  this->dihedralAngleVia1.push_back(newAngleVia1);
+  this->dihedralAngleVia2.push_back(newAngleVia2);
+  this->dihedralAngleTo.push_back(newAngleTo);
+}
+
+void
+DataFileParser::readVelocities(std::ifstream& file, std::string& line)
+{
+  // skip this line too
+  if (!getline(file, line)) {
+    throw std::runtime_error("Data file ended too early. Not able to read "
+                             "any advertised velocities.");
   }
+  // then, skip empty lines
+  this->skipEmptyLines(line, file);
+  std::unordered_map<size_t, size_t> atomIdToIdx;
+  std::vector<double> unorderedVx, unorderedVy, unorderedVz;
+  unorderedVx.reserve(this->nAtoms);
+  unorderedVy.reserve(this->nAtoms);
+  unorderedVz.reserve(this->nAtoms);
+  // start reading, assuming as many as atoms
+  for (size_t i = 0; i < this->nAtoms; ++i) {
+    size_t atomId;
+    double vx, vy, vz;
+    sscanf(line.c_str(), "%zu %le %le %le", &atomId, &vx, &vy, &vz);
+    unorderedVx.push_back(vx);
+    unorderedVy.push_back(vy);
+    unorderedVz.push_back(vz);
+    atomIdToIdx[atomId] = i;
 
-  void DataFileParser::readAngles(std::ifstream& file, std::string& line)
-  {
-    // skip this line too
-    if (!getline(file, line)) {
-      throw std::runtime_error(
-        "Data file ended too early. Not able to read any angles.");
-    }
-    // then, skip empty lines
-    this->skipEmptyLines(line, file);
-
-    for (int i = 0; i < this->nAngles; i++) {
-      this->readAngle(line);
-
-      if (!getline(file, line) && i + 1 < this->nAngles) {
-        throw std::runtime_error(
-          "Data file ended too early. Not enough angles read. Read " +
-          std::to_string(i + 1) + " of " + std::to_string(this->nAngles) +
-          " expected angles.");
-      }
-    }
-  }
-
-  void DataFileParser::readAngle(const std::string& line)
-  {
-    size_t newAngleId, newAngleType, newAngleFrom, newAngleVia, newAngleTo;
-    sscanf(line.c_str(),
-           "%zu %zu %zu %zu %zu",
-           &newAngleId,
-           &newAngleType,
-           &newAngleFrom,
-           &newAngleVia,
-           &newAngleTo);
-
-    this->angleIds.push_back(newAngleId);
-    this->angleTypes.push_back(newAngleType);
-    this->angleFrom.push_back(newAngleFrom);
-    this->angleVia.push_back(newAngleVia);
-    this->angleTo.push_back(newAngleTo);
-  }
-
-  void DataFileParser::readDihedralAngles(std::ifstream& file,
-                                          std::string& line)
-  {
-    // skip this line too
-    if (!getline(file, line)) {
-      throw std::runtime_error(
-        "Data file ended too early. Not able to read any dihedral angles.");
-    }
-    // then, skip empty lines
-    this->skipEmptyLines(line, file);
-
-    for (int i = 0; i < this->nDihedralAngles; i++) {
-      this->readDihedralAngle(line);
-
-      if (!getline(file, line) && i + 1 < this->nDihedralAngles) {
-        throw std::runtime_error("Data file ended too early. Not enough "
-                                 "dihedral angles read. Read " +
-                                 std::to_string(i + 1) + " of " +
-                                 std::to_string(this->nDihedralAngles) +
-                                 " expected angles.");
-      }
+    if (!getline(file, line) && i + 1 < this->nAtoms) {
+      throw std::runtime_error("Data file ended too early. Not enough "
+                               "velocities read. Read " +
+                               std::to_string(i + 1) + " of " +
+                               std::to_string(this->nAtoms) +
+                               " expected velocities.");
     }
   }
+  assert(unorderedVx.size() == this->nAtoms);
 
-  void DataFileParser::readDihedralAngle(const std::string& line)
-  {
-    size_t newAngleId, newAngleType, newAngleFrom, newAngleVia1, newAngleVia2,
-      newAngleTo;
-    sscanf(line.c_str(),
-           "%zu %zu %zu %zu %zu %zu",
-           &newAngleId,
-           &newAngleType,
-           &newAngleFrom,
-           &newAngleVia1,
-           &newAngleVia2,
-           &newAngleTo);
+  // re-order for the other stuff
+  std::vector<double> orderedVx, orderedVy, orderedVz;
+  orderedVx.reserve(this->nAtoms);
+  orderedVy.reserve(this->nAtoms);
+  orderedVz.reserve(this->nAtoms);
 
-    this->dihedralAngleIds.push_back(newAngleId);
-    this->dihedralAngleTypes.push_back(newAngleType);
-    this->dihedralAngleFrom.push_back(newAngleFrom);
-    this->dihedralAngleVia1.push_back(newAngleVia1);
-    this->dihedralAngleVia2.push_back(newAngleVia2);
-    this->dihedralAngleTo.push_back(newAngleTo);
+  for (size_t i = 0; i < this->nAtoms; ++i) {
+    size_t realIdx = atomIdToIdx.at(this->atomIds[i]);
+    orderedVx.push_back(unorderedVx[realIdx]);
+    orderedVy.push_back(unorderedVy[realIdx]);
+    orderedVz.push_back(unorderedVz[realIdx]);
   }
 
-  void DataFileParser::readVelocities(std::ifstream& file, std::string& line)
-  {
-    // skip this line too
-    if (!getline(file, line)) {
-      throw std::runtime_error("Data file ended too early. Not able to read "
-                               "any advertised velocities.");
-    }
-    // then, skip empty lines
-    this->skipEmptyLines(line, file);
-    std::unordered_map<size_t, size_t> atomIdToIdx;
-    std::vector<double> unorderedVx, unorderedVy, unorderedVz;
-    unorderedVx.reserve(this->nAtoms);
-    unorderedVy.reserve(this->nAtoms);
-    unorderedVz.reserve(this->nAtoms);
-    // start reading, assuming as many as atoms
-    for (size_t i = 0; i < this->nAtoms; ++i) {
-      size_t atomId;
-      double vx, vy, vz;
-      sscanf(line.c_str(), "%zu %le %le %le", &atomId, &vx, &vy, &vz);
-      unorderedVx.push_back(vx);
-      unorderedVy.push_back(vy);
-      unorderedVz.push_back(vz);
-      atomIdToIdx[atomId] = i;
-
-      if (!getline(file, line) && i + 1 < this->nAtoms) {
-        throw std::runtime_error("Data file ended too early. Not enough "
-                                 "velocities read. Read " +
-                                 std::to_string(i + 1) + " of " +
-                                 std::to_string(this->nAtoms) +
-                                 " expected velocities.");
-      }
-    }
-    assert(unorderedVx.size() == this->nAtoms);
-
-    // re-order for the other stuff
-    std::vector<double> orderedVx, orderedVy, orderedVz;
-    orderedVx.reserve(this->nAtoms);
-    orderedVy.reserve(this->nAtoms);
-    orderedVz.reserve(this->nAtoms);
-
-    for (size_t i = 0; i < this->nAtoms; ++i) {
-      size_t realIdx = atomIdToIdx.at(this->atomIds[i]);
-      orderedVx.push_back(unorderedVx[realIdx]);
-      orderedVy.push_back(unorderedVy[realIdx]);
-      orderedVz.push_back(unorderedVz[realIdx]);
-    }
-
-    this->additionalAtomData["vx"] = orderedVx;
-    this->additionalAtomData["vy"] = orderedVy;
-    this->additionalAtomData["vz"] = orderedVz;
-  }
-} // namespace utils
-} // namespace pylimer_tools
+  this->additionalAtomData["vx"] = orderedVx;
+  this->additionalAtomData["vy"] = orderedVy;
+  this->additionalAtomData["vz"] = orderedVz;
+}
+}

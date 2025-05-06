@@ -8,7 +8,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include <cstdio>
 #include <filesystem>
-#include <fstream>
 #include <iostream>
 #include <string>
 extern "C"
@@ -22,13 +21,13 @@ namespace pe = pylimer_tools::entities;
 TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
 {
   std::cout << "Running test \"FileParsers can be used\"" << std::endl;
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
   CHECK(std::filesystem::exists(suspectedPath));
 
   SECTION("Reading from dump file works")
   {
     pu::DumpFileParser parser =
-      pu::DumpFileParser(suspectedPath + "lammps_dump_small.lammpstrj");
+      pu::DumpFileParser(suspectedPath + "/lammps_dump_small.lammpstrj");
     CHECK_THROWS(parser.hasKey("BOX BOUNDS"));
     CHECK(parser.getLength() == 1);
     CHECK_NOTHROW(parser.read());
@@ -42,7 +41,7 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
 
     // test other reading capabilities
     pu::DumpFileParser parser3 =
-      pu::DumpFileParser(suspectedPath + "lammps_dump_small.lammpstrj");
+      pu::DumpFileParser(suspectedPath + "/lammps_dump_small.lammpstrj");
     CHECK(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
     CHECK_THROWS(parser.getValuesForAt<double>(0, "NOT EXISTING", 9));
 
@@ -51,7 +50,7 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
 
     // test without atoms
     pu::DumpFileParser parser4 = pu::DumpFileParser(
-      suspectedPath + "lammps_dump_small_no_atoms.lammpstrj");
+      suspectedPath + "/lammps_dump_small_no_atoms.lammpstrj");
     CHECK(parser4.getLength() == 1);
     CHECK(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
     CHECK(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1)[0] ==
@@ -61,7 +60,7 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
   SECTION("Reading from data files works")
   {
     pu::DataFileParser parser = pu::DataFileParser();
-    parser.read(suspectedPath + "lammps_data_file.out");
+    parser.read(suspectedPath + "/lammps_data_file.out");
     CHECK(parser.getNrOfAtoms() == 3000);
 
     // call copy constructor
@@ -73,20 +72,20 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
 
     // test angles reading
     pu::DataFileParser parser3 = pu::DataFileParser();
-    parser3.read(suspectedPath + "lammps_data_file_small_wangles.out");
+    parser3.read(suspectedPath + "/lammps_data_file_small_wangles.out");
     CHECK(parser3.getNrOfAngles() == 1);
 
     // BENCHMARK("DataFileParserOld")
     // {
     //   pu::DataFileParser parser4 = pu::DataFileParser();
-    //   parser4.read(suspectedPath + "big_dump_file_data.out");
+    //   parser4.read(suspectedPath + "/big_dump_file_data.out");
     //   return parser4.getNrOfAngles();
     // };
 
     // BENCHMARK("DataFileParserNew")
     // {
     //   pu::DataFileParser2 parser5 = pu::DataFileParser2();
-    //   parser5.read(suspectedPath + "big_dump_file_data.out");
+    //   parser5.read(suspectedPath + "/big_dump_file_data.out");
     //   return parser5.getNrOfAngles();
     // };
   }
@@ -94,27 +93,27 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
   SECTION("Reading large files is sensibly fast")
   {
     pu::DumpFileParser parser =
-      pu::DumpFileParser(suspectedPath + "big_dump_file.lammpstrj");
+      pu::DumpFileParser(suspectedPath + "/big_dump_file.lammpstrj");
     // pre-read multiple
     CHECK_NOTHROW(parser.readNGroups(9, 12));
     CHECK(parser.hasKey("BOX BOUNDS") == true);
     CHECK(parser.hasKey("NO EXISTING") == false);
 
     // pu::DumpFileParser2 parser5 =
-    //   pu::DumpFileParser2(suspectedPath + "big_dump_file.lammpstrj");
+    //   pu::DumpFileParser2(suspectedPath + "/big_dump_file.lammpstrj");
     // CHECK(parser5.getLength() == parser.getLength());
 
     // BENCHMARK("DumpFileParserOld")
     // {
     //   pu::DumpFileParser parser4 =
-    //     pu::DumpFileParser(suspectedPath + "big_dump_file.lammpstrj");
+    //     pu::DumpFileParser(suspectedPath + "/big_dump_file.lammpstrj");
     //   return parser4.getLength();
     // };
 
     // BENCHMARK("DumpFileParserNew")
     // {
     //   pu::DumpFileParser2 parser5 =
-    //     pu::DumpFileParser2(suspectedPath + "big_dump_file.lammpstrj");
+    //     pu::DumpFileParser2(suspectedPath + "/big_dump_file.lammpstrj");
     //   return parser5.getLength();
     // };
   }
@@ -123,7 +122,7 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
 TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
 {
   std::cout << "Running test \"Writers can be used\"" << std::endl;
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
   CHECK(std::filesystem::exists(suspectedPath));
 
   SECTION("Files are read and written")
@@ -131,7 +130,7 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     // TODO: implement
     pe::UniverseSequence universeSeq = pe::UniverseSequence();
     std::string largeInputFile =
-      suspectedPath + "structure/network_100_a_46.structure.out";
+      suspectedPath + "/structure/network_100_a_46.structure.out";
     universeSeq.initializeFromDataSequence({ { largeInputFile } });
     pe::Universe universe = universeSeq.atIndex(0);
 
@@ -171,7 +170,7 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     writer.configMoleculeIdxForSwap(false);
     writer.configMoveIntoBox(true);
     writer.configAttemptImageReset(true);
-    std::string fileToWrite = suspectedPath + "tmp_data_file.structure.out";
+    std::string fileToWrite = suspectedPath + "/tmp_data_file.structure.out";
     writer.setCustomAtomFormat(
       "$atomId\t$atomType\t$charge\t$x\t$y\t$z\t$nx\t$ny\t$nz");
     writer.writeToFile(fileToWrite);
@@ -213,10 +212,10 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
 TEST_CASE("AveFileReader works", "[AveFileReader][io][utils]")
 {
   std::cout << "Running test \"AveFileReader works\"" << std::endl;
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
   CHECK(std::filesystem::exists(suspectedPath));
   pu::AveFileReader reader =
-    pu::AveFileReader(suspectedPath + "example_avg_file.out.avg.txt");
+    pu::AveFileReader(suspectedPath + "/example_avg_file.out.avg.txt");
 
   CHECK(reader.getNrOfRows() == 5);
   CHECK(reader.getNrOfColumns() == 3);
