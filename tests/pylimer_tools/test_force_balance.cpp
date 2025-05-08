@@ -424,6 +424,74 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
   }
 }
 
+TEST_CASE("MEHPForceBalance phantom with and without removal is the same",
+          "[analysis][MEHPForceBalance]")
+{
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  CHECK(universeSeq.getLength() == 0);
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+
+  // a structure with lots of dangling things that can and will be entangled,
+  // yet the entanglements removed
+  std::string inputFile =
+    suspectedPath +
+    "/structure/mc_own-si_pdms_crosslinked_melt_464_a_77_r_1.71_wsol_0."
+    "0114_f_4_v_1.structure.out";
+
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  auto masses = universe.getMasses();
+  std::cout << "Read file " << inputFile << std::endl;
+
+  pcm::MEHPForceBalance forceBalancerPhantom =
+    pcm::MEHPForceBalance(universe, 2, false);
+  forceBalancerPhantom.configAssumeBoxLargeEnough(false);
+  pcm::MEHPForceBalance forceBalancerPhantomRem =
+    pcm::MEHPForceBalance(universe, 2, false);
+  forceBalancerPhantomRem.configAssumeBoxLargeEnough(false);
+
+  CHECK(forceBalancerPhantom.getNrOfSprings() ==
+        forceBalancerPhantomRem.getNrOfSprings());
+  CHECK_THAT(
+    forceBalancerPhantom.getResidual(),
+    Catch::Matchers::WithinRel(forceBalancerPhantomRem.getResidual(), 0.001));
+  CHECK_THAT(forceBalancerPhantom.getSolubleWeightFraction(),
+             Catch::Matchers::WithinRel(
+               forceBalancerPhantomRem.getSolubleWeightFraction(), 0.001));
+  CHECK_THAT(
+    forceBalancerPhantom.getGamma(),
+    Catch::Matchers::WithinRel(forceBalancerPhantomRem.getGamma(), 0.001));
+  CHECK_THAT(forceBalancerPhantom.getDanglingWeightFraction(),
+             Catch::Matchers::WithinRel(
+               forceBalancerPhantomRem.getDanglingWeightFraction(), 0.001));
+
+  // run with and without simplification
+  forceBalancerPhantom.runForceRelaxation(
+    5000, 1e-12, -1, pcm::StructureSimplificationMode::NO_SIMPLIFICATION);
+  forceBalancerPhantomRem.runForceRelaxation(
+    5000, 1e-12, -1, pcm::StructureSimplificationMode::ALL_TIM, 1e-6);
+
+  // compare results
+  CHECK(forceBalancerPhantom.getNrOfSprings() >
+        forceBalancerPhantomRem.getNrOfSprings());
+  CHECK_THAT(
+    forceBalancerPhantom.getResidual(),
+    Catch::Matchers::WithinAbs(forceBalancerPhantomRem.getResidual(), 1e-6));
+  CHECK_THAT(forceBalancerPhantom.getSolubleWeightFraction(),
+             Catch::Matchers::WithinAbs(
+               forceBalancerPhantomRem.getSolubleWeightFraction(), 5e-3));
+  CHECK_THAT(forceBalancerPhantom.getActiveWeightFraction(),
+             Catch::Matchers::WithinAbs(
+               forceBalancerPhantomRem.getActiveWeightFraction(), 5e-3));
+  CHECK_THAT(forceBalancerPhantom.getDanglingWeightFraction(),
+             Catch::Matchers::WithinAbs(
+               forceBalancerPhantomRem.getDanglingWeightFraction(), 5e-3));
+  CHECK_THAT(forceBalancerPhantom.getGammaFactors(1., 1).sum(),
+             Catch::Matchers::WithinRel(
+               forceBalancerPhantomRem.getGammaFactors(1., 1).sum(), 1e-4));
+}
+
 TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
           "[analysis][MEHPForceBalance]")
 {

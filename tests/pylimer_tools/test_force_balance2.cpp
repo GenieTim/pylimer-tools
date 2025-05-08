@@ -1279,9 +1279,13 @@ TEST_CASE("MEHPForceBalance2 phantom with and without removal is the same",
 
   // run with and without simplification
   forceBalancerPhantom.runForceRelaxation(
-    pcm::StructureSimplificationMode::NO_SIMPLIFICATION);
+    pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+    1e-9,
+    pcm::SLESolver::CONJUGATE_GRADIENT);
   forceBalancerPhantomRem.runForceRelaxation(
-    pcm::StructureSimplificationMode::ALL_TIM);
+    pcm::StructureSimplificationMode::ALL_TIM,
+    1e-9,
+    pcm::SLESolver::CONJUGATE_GRADIENT);
 
   // compare results
   CHECK(forceBalancerPhantom.getNrOfSprings() >
@@ -1291,13 +1295,16 @@ TEST_CASE("MEHPForceBalance2 phantom with and without removal is the same",
     Catch::Matchers::WithinAbs(forceBalancerPhantomRem.getResidual(), 1e-6));
   CHECK_THAT(forceBalancerPhantom.getSolubleWeightFraction(),
              Catch::Matchers::WithinRel(
-               forceBalancerPhantomRem.getSolubleWeightFraction(), 0.001));
-  CHECK_THAT(forceBalancerPhantom.getGammaFactors(1.).sum(),
+               forceBalancerPhantomRem.getSolubleWeightFraction(), 1e-3));
+  CHECK_THAT(forceBalancerPhantom.getActiveWeightFraction(),
              Catch::Matchers::WithinRel(
-               forceBalancerPhantomRem.getGammaFactors(1.).sum(), 0.001));
+               forceBalancerPhantomRem.getActiveWeightFraction(), 1e-3));
   CHECK_THAT(forceBalancerPhantom.getDanglingWeightFraction(),
              Catch::Matchers::WithinRel(
-               forceBalancerPhantomRem.getDanglingWeightFraction(), 0.001));
+               forceBalancerPhantomRem.getDanglingWeightFraction(), 1e-3));
+  CHECK_THAT(forceBalancerPhantom.getGammaFactors(1.).sum(),
+             Catch::Matchers::WithinRel(
+               forceBalancerPhantomRem.getGammaFactors(1.).sum(), 1e-4));
 }
 
 TEST_CASE("Temporary force balance 2 test case",
