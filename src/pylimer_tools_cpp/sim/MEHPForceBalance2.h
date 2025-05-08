@@ -223,9 +223,9 @@ public:
    */
   void runForceRelaxation(const StructureSimplificationMode simplificationMode =
                             StructureSimplificationMode::NO_SIMPLIFICATION,
-                          const double inactiveRemovalCutoff = 1e-3,
+                          const double inactiveRemovalCutoff = 1e-6,
                           const SLESolver solver = SLESolver::DEFAULT,
-                          const double residualReduction = 1e-13,
+                          const double residualReduction = 1e-15,
                           const int maxIterations = 10000)
   {
     this->runForceRelaxation(

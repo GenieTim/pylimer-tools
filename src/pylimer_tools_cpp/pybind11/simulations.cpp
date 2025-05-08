@@ -1455,9 +1455,9 @@ and finally springs will be any number of connected bonds between links.
            )pbdoc",
       py::arg("simplification_mode") =
         mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
-      py::arg("inactive_removal_cutoff") = 1e-3,
+      py::arg("inactive_removal_cutoff") = 1e-6,
       py::arg("sle_solver") = mehp::SLESolver::DEFAULT,
-      py::arg("tolerance") = 1e-12,
+      py::arg("tolerance") = 1e-15,
       py::arg("max_iterations") = 10000)
     .def("deform_to",
          &mehp::MEHPForceBalance2::deformTo,
