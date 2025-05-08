@@ -1773,7 +1773,7 @@ and finally springs will be any number of connected bonds between links.
       )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_average_spring_length",
-         &mehp::MEHPForceBalance2::getAverageSpringLength,
+         &mehp::MEHPForceBalance2::getAverageStrandLength,
          R"pbdoc(
             Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()`,
             this value is normalized by the number of springs rather than the number of chains.

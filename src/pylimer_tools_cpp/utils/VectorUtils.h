@@ -252,7 +252,8 @@ segmentwise_norm_mean(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
   double denominator = 1. / static_cast<double>(vecs.size() / segmentSize);
 
   for (size_t i = 0; i < vecs.size() / segmentSize; i++) {
-    result += (vecs.segment(segmentSize * i, segmentSize).norm() * denominator);
+    const double norm = vecs.segment(segmentSize * i, segmentSize).norm();
+    result += (norm * denominator);
   }
   return result;
 }

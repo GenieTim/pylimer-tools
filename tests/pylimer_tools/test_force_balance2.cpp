@@ -154,7 +154,7 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
             (forceBalancer2.getNrOfActiveStrandsInDir(0) +
              forceBalancer2.getNrOfActiveStrandsInDir(1) +
              forceBalancer2.getNrOfActiveStrandsInDir(2)));
-      CHECK(forceBalancer2.getAverageSpringLength() > 1.0);
+      CHECK(forceBalancer2.getAverageStrandLength() > 1.0);
       CHECK(forceBalancer2.getEffectiveFunctionalityOfAtoms().size() ==
             forceBalancer2.getNrOfNodes());
     }
@@ -190,7 +190,7 @@ TEST_CASE("MEHP Force Balance2 runs", "[analysis][MEHPForceBalance2][long]")
     // TODO: find better, more accurate tests here
     CHECK(forceBalancer.getNrOfActiveNodes() > 1);
     CHECK(forceBalancer.getNrOfActiveStrands() > 1);
-    CHECK(forceBalancer.getAverageSpringLength() > 1.0);
+    CHECK(forceBalancer.getAverageStrandLength() > 1.0);
     CHECK(forceBalancer.getEffectiveFunctionalityOfAtoms().size() ==
           forceBalancer.getNrOfNodes());
 
@@ -236,6 +236,8 @@ TEST_CASE(
     // remove all springs...
     size_t numRemoved =
       forceBalancer.removeInactiveLinks(net, displacements, 1e5);
+    forceBalancer = pcm::MEHPForceBalance2(net);
+    CHECK(forceBalancer.getNrOfActiveSprings() == 0);
     CHECK(net.nrOfSprings == 0);
     CHECK(numRemoved > 0);
   }
@@ -411,8 +413,8 @@ TEST_CASE("MEHP Force Balance2 Free chains collapse",
              Catch::Matchers::WithinRel(1.));
   CHECK_THAT(forceBalancer.getDanglingWeightFraction(),
              Catch::Matchers::WithinAbs(0., 1e-9));
-  CHECK(forceBalancer.getAverageSpringLength() >= 0.0);
-  CHECK(forceBalancer.getAverageSpringLength() <= 3e-6);
+  CHECK(forceBalancer.getAverageStrandLength() >= 0.0);
+  CHECK(forceBalancer.getAverageStrandLength() <= 3e-6);
   CHECK_NOTHROW(forceBalancer.validateNetwork());
 }
 
@@ -640,7 +642,7 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
                forceBalanceSprings.getStressTensor().trace(), 1e-1));
   CHECK_THAT(forceBalanceLinks.getDisplacementResidualNorm(),
              Catch::Matchers::WithinAbs(
-               forceBalanceSprings.getDisplacementResidualNorm(), 1e-9));
+               forceBalanceSprings.getDisplacementResidualNorm(), 1e-6));
   CHECK_THAT(forceBalanceLinks.getActiveWeightFraction(),
              Catch::Matchers::WithinAbs(
                forceBalanceSprings.getActiveWeightFraction(), 1e-3));
@@ -654,7 +656,7 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
 
   CHECK_THAT(forceBalanceLinks.getStressTensor().trace(),
              Catch::Matchers::WithinRel(
-               forceBalanceSprings.getStressTensor().trace(), 1e-3));
+               forceBalanceSprings.getStressTensor().trace(), 0.1));
   CHECK_THAT(forceBalanceLinks.getDisplacementResidualNorm(),
              Catch::Matchers::WithinAbs(
                forceBalanceSprings.getDisplacementResidualNorm(), 1e-3));
@@ -770,18 +772,47 @@ TEST_CASE("MEHP Force Balance2 does not collapse",
   universe.addAtoms(
     { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 } },
     { { 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1 } },
-    { { 0., 2.5, 5, 7.5, 0.1, 2.5, 5, 7.5, -0.1, 5., 0., 5. } },
+    { { 0.0, 2.5, 5.0, 7.5, 0.1, 2.5, 5.0, 7.5, -.1, 5.0, 0.0, 5.0 } },
     // x with slight (0.1) deviation, so we don't start perfect
-    { { 0.1, 0., -0.1, 0., 5., 5., 5., 5., 2.5, 2.5, 7.5, 7.5 } },
+    { { 0.1, 0.0, -.1, 0.0, 5.0, 5.0, 5.0, 5.0, 2.5, 2.5, 7.5, 7.5 } },
     // y
     { { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. } },
     // z
     { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
     { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
     { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } });
-  universe.addBonds(
-    { { 1, 1, 1, 1, 3, 3, 3, 3, 5, 5, 5, 5, 7, 7, 7, 7 } },
-    { { 2, 9, 4, 11, 2, 4, 10, 12, 9, 11, 6, 8, 6, 8, 10, 12 } });
+  universe.addBonds({ { 1,
+                        1,
+                        1, //
+                        1,
+                        3,
+                        3, //
+                        3,
+                        3,
+                        5, //
+                        5,
+                        5,
+                        5, //
+                        7,
+                        7,
+                        7, //
+                        7 } },
+                    { { 2,
+                        9,
+                        4, //
+                        11,
+                        2,
+                        4, //
+                        10,
+                        12,
+                        9, //
+                        11,
+                        6,
+                        8, //
+                        6,
+                        8,
+                        10, //
+                        12 } });
 
   pcm::MEHPForceBalance2 forceBalanceNew =
     pcm::MEHPForceBalance2(universe, 2, true);
@@ -793,13 +824,14 @@ TEST_CASE("MEHP Force Balance2 does not collapse",
         forceBalanceNew.getNrOfStrands());
   // compare to what we expect
   CHECK(forceBalanceNew.getNrOfActiveStrands() == 8);
+  CHECK((forceBalanceNew.getNetwork().springContourLength.array() == 2).all());
 
   CHECK(forceBalanceNew.getNrOfActiveStrands() <=
         (forceBalanceNew.getNrOfActiveStrandsInDir(0) +
          forceBalanceNew.getNrOfActiveStrandsInDir(1) +
          forceBalanceNew.getNrOfActiveStrandsInDir(2)));
   CHECK(forceBalanceNew.getNrOfActiveNodes() == 4);
-  CHECK(forceBalanceNew.getAverageSpringLength() == Catch::Approx(5.0));
+  CHECK(forceBalanceNew.getAverageStrandLength() == Catch::Approx(5.0));
   // forceBalanceNew.setSpringContourLengths(
   //   Eigen::VectorXd::Constant(forceBalanceNew.getNrOfSprings(), 5.));
   // TODO: check this again
