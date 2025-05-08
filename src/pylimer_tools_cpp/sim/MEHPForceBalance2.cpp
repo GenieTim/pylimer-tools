@@ -2261,7 +2261,7 @@ MEHPForceBalance2::getCrosslinkerVerse() const
  * @return double
  */
 double
-MEHPForceBalance2::getAverageSpringLength() const
+MEHPForceBalance2::getAverageStrandLength() const
 {
   Eigen::VectorXd partialSpringVectors = this->evaluateSpringVectors(
     this->initialConfig, this->currentDisplacements);
@@ -2269,11 +2269,14 @@ MEHPForceBalance2::getAverageSpringLength() const
   Eigen::VectorXd springVectors =
     Eigen::VectorXd::Zero(3 * this->initialConfig.nrOfStrands);
   for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
-    springVectors.segment(this->initialConfig.strandIndexOfSpring[i], 3) +=
+    springVectors.segment(3 * this->initialConfig.strandIndexOfSpring[i], 3) +=
       partialSpringVectors.segment(3 * i, 3);
   }
 
-  return pylimer_tools::utils::segmentwise_norm_mean(springVectors, 3);
+  const double result =
+    pylimer_tools::utils::segmentwise_norm_mean(springVectors, 3);
+  assert(result >= 0.0);
+  return result;
 }
 
 Eigen::VectorXd
@@ -2662,9 +2665,13 @@ MEHPForceBalance2::computeActiveWeightFraction(ForceBalance2Network& net,
     (activeLinks * net.linkIsEntanglement).count();
   const double nEntanglementSprings = net.springIsEntanglement.count();
   // normalize by the number of atoms
-  return (nActiveAtomsFromSprings + 2 * nActiveEntanglementLinks +
-          nActiveCrossLinks - nEntanglementSprings) /
-         (static_cast<double>(this->universe.getNrOfAtoms()));
+  const double result =
+    (nActiveAtomsFromSprings +
+     (nEntanglementSprings > 0 ? 1. : 2.) * nActiveEntanglementLinks +
+     nActiveCrossLinks) /
+    (static_cast<double>(this->universe.getNrOfAtoms()));
+  assert(APPROX_WITHIN(result, 0., 1., 1e-6));
+  return result;
 }
 
 std::pair<Eigen::ArrayXb, Eigen::ArrayXb>

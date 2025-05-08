@@ -649,7 +649,7 @@ public:
    *
    * @return double
    */
-  double getAverageSpringLength() const;
+  double getAverageStrandLength() const;
 
   Eigen::Matrix3d getStressTensor() override;
 
