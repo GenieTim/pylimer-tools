@@ -4,6 +4,7 @@ cd "$(dirname "$0")/.." || exit 10
 ROOT_DIR=$(pwd)
 
 cd "$ROOT_DIR/tests" || exit 2
+rm ./**/*.gcda # remove old coverage files
 
 PATH="/usr/local/opt/llvm/bin:$PATH"
 
