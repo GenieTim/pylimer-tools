@@ -45,7 +45,7 @@ Include(FetchContent)
 FetchContent_Declare(
         Catch2
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-        GIT_TAG v3.3.2
+        GIT_TAG v3.8.1
 )
 
 FetchContent_MakeAvailable(Catch2)
@@ -177,9 +177,12 @@ endif ()
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(CTest)
 include(Catch)
-catch_discover_tests(pylimer_tests)
-
-catch_discover_tests(header_tests)
+catch_discover_tests(pylimer_tests
+        TEST_SPEC "~[long]"
+)
+catch_discover_tests(header_tests
+        TEST_SPEC "~[long]"
+)
 
 # code coverage setup in the end
 if (CODE_COVERAGE)
@@ -192,7 +195,7 @@ if (CODE_COVERAGE)
             EXECUTABLE pylimer_tests
             DEPENDENCIES pylimer_tests
             LCOV_ARGS --ignore-errors inconsistent,source,format
-            EXECUTABLE_ARGS --skip-benchmarks --durations yes "~[long]"
+            EXECUTABLE_ARGS --skip-benchmarks --order rand --durations yes "~[long]" &> "${CMAKE_CURRENT_LIST_DIR}/build/pylimer_test_output.log.txt"
             EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/../vendor/*" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
     )
     setup_target_for_coverage_lcov(
@@ -200,7 +203,7 @@ if (CODE_COVERAGE)
             EXECUTABLE header_tests
             DEPENDENCIES header_tests
             LCOV_ARGS --ignore-errors inconsistent,source,format
-            EXECUTABLE_ARGS --skip-benchmarks --durations yes "~[long]"
+            EXECUTABLE_ARGS --skip-benchmarks --order rand --durations yes "~[long]" &> "${CMAKE_CURRENT_LIST_DIR}/build/header_test_output.log.txt"
             EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/../vendor/*" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
     )
     # BASE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/.."

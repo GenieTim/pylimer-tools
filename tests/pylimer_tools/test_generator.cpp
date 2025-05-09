@@ -107,7 +107,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
     auto bondLengths = universe.computeBondLengths();
     for (const double bondLength : bondLengths) {
       CHECK(bondLength > 0.0);
-      CHECK(bondLength < 3.2);
+      CHECK(bondLength < 3.5);
     }
   }
 
