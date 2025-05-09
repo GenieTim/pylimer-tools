@@ -9,8 +9,8 @@
 
 namespace pylimer_tools {
 namespace utils {
-  std::vector<std::string> splitCSV(const std::string filePath,
-                                    const std::string delimiter)
+  inline std::vector<std::string> splitCSV(const std::string& filePath,
+                                    const std::string& delimiter)
   {
     if (!std::filesystem::exists(filePath)) {
       throw std::invalid_argument("File to read (" + filePath +
@@ -59,7 +59,7 @@ namespace utils {
     return results;
   }
 
-  std::string mergeCSVFiles(const std::vector<std::string> files)
+  inline std::string mergeCSVFiles(const std::vector<std::string>& files)
   {
     std::set<std::string> columns;
     for (std::string file : files) {
