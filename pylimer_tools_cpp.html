@@ -395,7 +395,7 @@
 <td><p>Members:</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ComputedIntValues.html#pylimer_tools_cpp.ComputedIntValues" title="pylimer_tools_cpp.ComputedIntValues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComputedIntValues</span></code></a>(self, value)</p></td>
-<td><p>Members:</p></td>
+<td><p>Integer output quantities</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DPDSimulator</span></code></a>(self, universe[, ...])</p></td>
 <td><p>A quick-and-dirty implementation of the DPD simulation with slip-springs as presented by Langeloth et al.</p></td>
@@ -410,7 +410,7 @@
 <td><p>A reader for LAMMPS's <cite>dump</cite> files.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ExitReason.html#pylimer_tools_cpp.ExitReason" title="pylimer_tools_cpp.ExitReason"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExitReason</span></code></a>(self, value)</p></td>
-<td><p>Members:</p></td>
+<td><p>An enum representing the reason for exiting the simulation or optimization procedure.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html#pylimer_tools_cpp.LazyUniverseSequenceIterator" title="pylimer_tools_cpp.LazyUniverseSequenceIterator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LazyUniverseSequenceIterator</span></code></a></p></td>
 <td><p>An iterator to iterate throught the universes in <a class="reference internal" href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniverseSequence</span></code></a>.</p></td>
@@ -443,7 +443,7 @@
 <td><p>An (ideally) connected series of atoms/beads.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.MoleculeIterator.html#pylimer_tools_cpp.MoleculeIterator" title="pylimer_tools_cpp.MoleculeIterator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoleculeIterator</span></code></a></p></td>
-<td><p>An iterator to iterate throught the atoms in <a class="reference internal" href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</p></td>
+<td><p>An iterator to iterate through the atoms in <a class="reference internal" href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType" title="pylimer_tools_cpp.MoleculeType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoleculeType</span></code></a>(self, value)</p></td>
 <td><p>Members:</p></td>
@@ -461,7 +461,7 @@
 <td><p>Initialize NormalModeAnalyzer</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.OutputConfiguration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OutputConfiguration</span></code></a>(self)</p></td>
-<td><p>Get an instance of this struct</p></td>
+<td><p>A configuration object to configure the output, as supported by most &quot;simulation-like&quot; classes in this package.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SLESolver.html#pylimer_tools_cpp.SLESolver" title="pylimer_tools_cpp.SLESolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SLESolver</span></code></a>(self, value)</p></td>
 <td><p>Solver for sparse linear equation systems</p></td>
@@ -470,13 +470,13 @@
 <td><p>This is equal to a spring evaluator for Gaussian chains.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html#pylimer_tools_cpp.SimplifiedBalance2Network" title="pylimer_tools_cpp.SimplifiedBalance2Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedBalance2Network</span></code></a></p></td>
-<td><p>A more efficient structure of the network for use in MEHP force balance 2.</p></td>
+<td><p>A more efficient structure of the network for use in <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceBalance2</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork" title="pylimer_tools_cpp.SimplifiedBalanceNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork</span></code></a></p></td>
-<td><p>A more efficient structure of the network for use in MEHP force balance.</p></td>
+<td><p>A more efficient structure of the network for use in MEHP force balance, namely <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceBalance</span></code></a>, though also passable to namely <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceBalance2</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedNetwork.html#pylimer_tools_cpp.SimplifiedNetwork" title="pylimer_tools_cpp.SimplifiedNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedNetwork</span></code></a></p></td>
-<td><p>A more efficient structure of the network for use in MEHP.</p></td>
+<td><p>A more efficient structure of the network for use in MEHP, namely <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceRelaxation</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.StructureSimplificationMode.html#pylimer_tools_cpp.StructureSimplificationMode" title="pylimer_tools_cpp.StructureSimplificationMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StructureSimplificationMode</span></code></a>(self, value)</p></td>
 <td><p>How the structure shall be simplified during the optimization in order to remove non-trapped entanglement links.</p></td>

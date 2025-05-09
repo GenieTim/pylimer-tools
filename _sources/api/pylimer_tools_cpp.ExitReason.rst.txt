@@ -12,7 +12,9 @@ ExitReason
 
       ~ExitReason.FAILURE
       ~ExitReason.F_TOLERANCE
+      ~ExitReason.INTERRUPT
       ~ExitReason.MAX_STEPS
+      ~ExitReason.NO_STEPS_POSSIBLE
       ~ExitReason.OTHER
       ~ExitReason.UNSET
       ~ExitReason.X_TOLERANCE
@@ -23,7 +25,9 @@ ExitReason
 
    .. autoattribute:: FAILURE
    .. autoattribute:: F_TOLERANCE
+   .. autoattribute:: INTERRUPT
    .. autoattribute:: MAX_STEPS
+   .. autoattribute:: NO_STEPS_POSSIBLE
    .. autoattribute:: OTHER
    .. autoattribute:: UNSET
    .. autoattribute:: X_TOLERANCE

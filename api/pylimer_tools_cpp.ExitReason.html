@@ -321,13 +321,19 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ExitReason">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">ExitReason</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ExitReason" title="pylimer_tools_cpp.ExitReason"><span class="pre">pylimer_tools_cpp.ExitReason</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.ExitReason" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>An enum representing the reason for exiting
+the simulation or optimization procedure.</p>
 <p>Members:</p>
-<p>UNSET</p>
-<p>MAX_STEPS</p>
-<p>F_TOLERANCE</p>
-<p>X_TOLERANCE</p>
-<p>FAILURE</p>
-<p>OTHER</p>
+<blockquote>
+<div><p>UNSET : Exit reason: “Unset”.</p>
+<p>F_TOLERANCE : Exit reason: “F (force) tolerance reached”.</p>
+<p>X_TOLERANCE : Exit reason: “X (displacement) tolerance reached”.</p>
+<p>MAX_STEPS : Exit reason: “Maximum number of steps reached”.</p>
+<p>NO_STEPS_POSSIBLE : Exit reason: “No (more) steps possible”.</p>
+<p>FAILURE : Exit reason: “Failure”.</p>
+<p>INTERRUPT : Exit reason: “Interrupt”.</p>
+<p>OTHER : Exit reason: “Other”.</p>
+</div></blockquote>
 <p class="rubric">Attributes Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -338,7 +344,13 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.F_TOLERANCE" title="pylimer_tools_cpp.ExitReason.F_TOLERANCE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">F_TOLERANCE</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.MAX_STEPS" title="pylimer_tools_cpp.ExitReason.MAX_STEPS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MAX_STEPS</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.INTERRUPT" title="pylimer_tools_cpp.ExitReason.INTERRUPT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">INTERRUPT</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.MAX_STEPS" title="pylimer_tools_cpp.ExitReason.MAX_STEPS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MAX_STEPS</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.NO_STEPS_POSSIBLE" title="pylimer_tools_cpp.ExitReason.NO_STEPS_POSSIBLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NO_STEPS_POSSIBLE</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.OTHER" title="pylimer_tools_cpp.ExitReason.OTHER"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OTHER</span></code></a></p></td>
@@ -371,8 +383,18 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.ExitReason.INTERRUPT">
+<span class="sig-name descname"><span class="pre">INTERRUPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ExitReason.INTERRUPT:</span> <span class="pre">6&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ExitReason.INTERRUPT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.ExitReason.MAX_STEPS">
 <span class="sig-name descname"><span class="pre">MAX_STEPS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ExitReason.MAX_STEPS:</span> <span class="pre">3&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ExitReason.MAX_STEPS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.ExitReason.NO_STEPS_POSSIBLE">
+<span class="sig-name descname"><span class="pre">NO_STEPS_POSSIBLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ExitReason.NO_STEPS_POSSIBLE:</span> <span class="pre">4&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ExitReason.NO_STEPS_POSSIBLE" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -462,7 +484,9 @@
 <li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason"><code class="docutils literal notranslate"><span class="pre">ExitReason</span></code></a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.FAILURE"><code class="docutils literal notranslate"><span class="pre">ExitReason.FAILURE</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.F_TOLERANCE"><code class="docutils literal notranslate"><span class="pre">ExitReason.F_TOLERANCE</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.INTERRUPT"><code class="docutils literal notranslate"><span class="pre">ExitReason.INTERRUPT</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.MAX_STEPS"><code class="docutils literal notranslate"><span class="pre">ExitReason.MAX_STEPS</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.NO_STEPS_POSSIBLE"><code class="docutils literal notranslate"><span class="pre">ExitReason.NO_STEPS_POSSIBLE</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.OTHER"><code class="docutils literal notranslate"><span class="pre">ExitReason.OTHER</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.UNSET"><code class="docutils literal notranslate"><span class="pre">ExitReason.UNSET</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.X_TOLERANCE"><code class="docutils literal notranslate"><span class="pre">ExitReason.X_TOLERANCE</span></code></a></li>
