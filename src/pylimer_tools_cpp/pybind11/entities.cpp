@@ -280,7 +280,7 @@ init_pylimer_bound_entities(py::module_& m)
   py::class_<MoleculeIterator>(m,
                                "MoleculeIterator",
                                R"pbdoc(
-       An iterator to iterate throught the atoms in :obj:`~pylimer_tools_cpp.Molecule`.
+       An iterator to iterate through the atoms in :obj:`~pylimer_tools_cpp.Molecule`.
   )pbdoc",
                                py::module_local())
     .def("__iter__",

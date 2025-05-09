@@ -25,71 +25,68 @@
 
 namespace pylimer_tools::sim {
 
+#define COMPUTED_INT_VALUES                                                    \
+  X(STEP, "Step")                                                              \
+  X(NUM_SHIFT, "numShift")                                                     \
+  X(NUM_RELOC, "numReloc")                                                     \
+  X(NUM_ATOMS, "numAtoms")                                                     \
+  X(NUM_EXTRA_ATOMS, "numExtraAtoms")                                          \
+  X(NUM_BONDS, "numBonds")                                                     \
+  X(NUM_EXTRA_BONDS, "numExtraBonds")                                          \
+  X(NUM_BONDS_TO_FORM, "numBondsToForm")
+
 #define NUM_COMPUTABLE_INT_VALUES 8
 
 enum ComputedIntValues
 {
-  STEP = 0,
-  NUM_SHIFT = 1,
-  NUM_RELOC = 2,
-  NUM_ATOMS = 3,
-  NUM_EXTRA_ATOMS = 4,
-  NUM_BONDS = 5,
-  NUM_EXTRA_BONDS = 6,
-  NUM_BONDS_TO_FORM = 7,
+#define X(name, str) name,
+  COMPUTED_INT_VALUES
+#undef X
 };
 
 const std::array<std::string, NUM_COMPUTABLE_INT_VALUES>
   ComputedIntValuesNames = {
-    "Step",          "numShift", "numReloc",      "numAtoms",
-    "numExtraAtoms", "numBonds", "numExtraBonds", "numBondsToForm",
+#define X(name, str) str,
+    COMPUTED_INT_VALUES
+#undef X
   };
+
+#define COMPUTED_DOUBLE_VALUES                                                 \
+  X(TIMESTEP, "TimeStep")                                                      \
+  X(TIME, "Time")                                                              \
+  X(VOLUME, "Volume")                                                          \
+  X(PRESSURE, "Pressure")                                                      \
+  X(TEMPERATURE, "Temperature")                                                \
+  X(STRESS_XX, "Stress[0,0]")                                                  \
+  X(STRESS_YY, "Stress[1,1]")                                                  \
+  X(STRESS_ZZ, "Stress[2,2]")                                                  \
+  X(STRESS_XY, "Stress[0,1]")                                                  \
+  X(STRESS_YZ, "Stress[1,2]")                                                  \
+  X(STRESS_XZ, "Stress[0,2]")                                                  \
+  X(STRESS_NXY, "Stress[0,0]-Stress[1,1]")                                     \
+  X(STRESS_NYZ, "Stress[1,1]-Stress[2,2]")                                     \
+  X(STRESS_NXZ, "Stress[0,0]-Stress[2,2]")                                     \
+  X(GAMMA, "Gamma")                                                            \
+  X(RESIDUAL, "Residual")                                                      \
+  X(MEAN_B, "<b>")                                                             \
+  X(MAX_B, "max(b)")                                                           \
+  X(MSD, "MSD")
 
 #define NUM_COMPUTABLE_DOUBLE_VALUES 19
 
 enum ComputedDoubleValues
 {
-  TIMESTEP = 0,
-  TIME = 1,
-  VOLUME = 2,
-  PRESSURE = 3,
-  TEMPERATURE = 4,
-  STRESS_XX = 5,
-  STRESS_YY = 6,
-  STRESS_ZZ = 7,
-  STRESS_XY = 8,
-  STRESS_YZ = 9,
-  STRESS_XZ = 10,
-  STRESS_NXY = 11,
-  STRESS_NYZ = 12,
-  STRESS_NXZ = 13,
-  GAMMA = 14,
-  RESIDUAL = 15,
-  MEAN_B = 16,
-  MAX_B = 17,
-  MSD = 18
+#define X(name, str) name,
+  COMPUTED_DOUBLE_VALUES
+#undef X
 };
 
 const std::array<std::string, NUM_COMPUTABLE_DOUBLE_VALUES>
-  ComputedDoubleValuesNames = { "TimeStep",
-                                "Time",
-                                "Volume",
-                                "Pressure",
-                                "Temperature",
-                                "Stress[0,0]",
-                                "Stress[1,1]",
-                                "Stress[2,2]",
-                                "Stress[0,1]",
-                                "Stress[1,2]",
-                                "Stress[0,2]",
-                                "Stress[0,0]-Stress[1,1]",
-                                "Stress[1,1]-Stress[2,2]",
-                                "Stress[0,0]-Stress[2,2]",
-                                "Gamma",
-                                "Residual",
-                                "<b>",
-                                "max(b)",
-                                "MSD" };
+  ComputedDoubleValuesNames = {
+#define X(name, str) str,
+    COMPUTED_DOUBLE_VALUES
+#undef X
+  };
 
 struct OutputConfiguration
 {
@@ -223,7 +220,7 @@ protected:
   /**
    * @brief Iterate all possible output configurations, handle them
    *
-   * @param current_step
+   * @param currentStep
    */
   void handleOutput(const long int currentStep)
   {
@@ -449,34 +446,32 @@ protected:
    * @brief Output the passed valus
    *
    * @param oc
-   * @param intvalues
-   * @param doublevalues
-   * @param outputBuffer
-   * @param coordinates
+   * @param intValues
+   * @param doubleValues
    * @param streamIdx
    */
   inline void doOutputValues(
     const OutputConfiguration& oc,
-    const std::array<long int, NUM_COMPUTABLE_INT_VALUES>& intvalues,
-    const std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES>& doublevalues,
+    const std::array<long int, NUM_COMPUTABLE_INT_VALUES>& intValues,
+    const std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES>& doubleValues,
     const int streamIdx = 0)
   {
     assert(streamIdx <= this->outputStreams.size());
-    assert(doublevalues.size() == NUM_COMPUTABLE_DOUBLE_VALUES);
+    assert(doubleValues.size() == NUM_COMPUTABLE_DOUBLE_VALUES);
     for (ComputedIntValues val : oc.intValues) {
-      RUNTIME_EXP_IFN(std::isfinite(static_cast<double>(intvalues[val])),
+      RUNTIME_EXP_IFN(std::isfinite(static_cast<double>(intValues[val])),
                       "Expect output quantities to be finite, found " +
-                        std::to_string(intvalues[val]) + " for property " +
+                        std::to_string(intValues[val]) + " for property " +
                         ComputedIntValuesNames[val] + ".");
       switch (val) {
         default:
-          outputBuffer += std::to_string(intvalues[val]) + "\t";
+          outputBuffer += std::to_string(intValues[val]) + "\t";
       }
     }
     for (ComputedDoubleValues val : oc.doubleValues) {
-      RUNTIME_EXP_IFN(std::isfinite(doublevalues[val]),
+      RUNTIME_EXP_IFN(std::isfinite(doubleValues[val]),
                       "Expect output quantities to be finite, found " +
-                        std::to_string(doublevalues[val]) + " for property " +
+                        std::to_string(doubleValues[val]) + " for property " +
                         ComputedDoubleValuesNames[val] + ".");
       switch (val) {
         case ComputedDoubleValues::MSD:
@@ -503,7 +498,7 @@ protected:
           break;
         default:
           outputBuffer += "(" + std::to_string(val) + ")" +
-                          std::to_string(doublevalues[val]) + "\t";
+                          std::to_string(doubleValues[val]) + "\t";
       }
     }
     if (!outputBuffer.empty()) {
@@ -594,7 +589,7 @@ public:
     }
   }
 
-  void configAutoCorrelatorOutput(std::vector<OutputConfiguration>& vals,
+  void configAutoCorrelatorOutput(const std::vector<OutputConfiguration>& vals,
                                   const unsigned int numcorrin = 32,
                                   const unsigned int pin = 16,
                                   const unsigned int min = 2)
@@ -652,7 +647,7 @@ public:
     this->updateValuesRequiredEvery(vals);
   }
 
-  void configRestartOutput(const std::string outputFile, const int outputEvery)
+  void configRestartOutput(const std::string& outputFile, const int outputEvery)
   {
     this->outputRestartEvery = outputEvery;
     this->restartOutputFile = outputFile;

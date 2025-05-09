@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Iterable
+from typing import Sequence, Union
 
 import numpy as np
 
-from pylimer_tools.calc.structure_analysis import \
-    compute_mean_end_to_end_distances
+from pylimer_tools.calc.structure_analysis import compute_mean_end_to_end_distances
 from pylimer_tools_cpp import MoleculeType, Universe
 
 """
@@ -19,8 +18,13 @@ to these methods should be minimized first.
 """
 
 
-def predict_shear_modulus(networks: Iterable[Universe], temperature: float = 1, k_boltzmann: float = 1,
-                          crosslinker_type: int = 2, total_mass=1) -> float:
+def predict_shear_modulus(
+    networks: Sequence[Universe],
+    temperature: float = 1,
+    k_boltzmann: float = 1,
+    crosslinker_type: int = 2,
+    total_mass=1,
+) -> float:
     """
     Predict the shear modulus using ANT Analysis.
 
@@ -37,17 +41,25 @@ def predict_shear_modulus(networks: Iterable[Universe], temperature: float = 1, 
     Returns:
       - shear modulus (float): the estimated shear modulus. Unit: [pressure]
     """
-    gamma = compute_topological_factor(
-        networks, crosslinker_type, total_mass)
+    gamma = compute_topological_factor(networks, crosslinker_type, total_mass)
     nu = 0
     for network in networks:
-        nu += len(network.get_molecules(crosslinker_type)) / \
-            (network.get_volume()) / len(networks)
+        nu += (
+            len(network.get_molecules(crosslinker_type))
+            / (network.get_volume())
+            / len(networks)
+        )
     return gamma * nu * k_boltzmann * temperature
 
 
-def compute_cycle_rank(networks: Iterable[Universe] = None, nu: int = None, mu: int = None,
-                       abs_tol: float = 1, rel_tol: float = 1, crosslinker_type: int = 2) -> float:
+def compute_cycle_rank(
+    networks: Union[Sequence[Universe], None] = None,
+    nu: Union[float, None] = None,
+    mu: Union[float, None] = None,
+    abs_tol: float = 1,
+    rel_tol: float = 1,
+    crosslinker_type: int = 2,
+) -> float:
     """
     Compute the cycle rank (:math:`\\chi`).
     Assumes the precursor-chains to be bifunctional.
@@ -69,24 +81,32 @@ def compute_cycle_rank(networks: Iterable[Universe] = None, nu: int = None, mu: 
     Returns:
       - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$). Unit: [1/Volume]
     """
-    if (nu is None):
-        if (crosslinker_type is None or networks is None):
+    if nu is None:
+        if crosslinker_type is None or networks is None:
             raise ValueError(
-                "Argument missing: When not specifying nu, network and crosslinker_type need to be specified")
+                "Argument missing: When not specifying nu, network and crosslinker_type need to be specified"
+            )
         nu = compute_effective_nr_density_of_network(
-            networks, abs_tol, rel_tol, crosslinker_type)
-    if (mu is None):
-        if (crosslinker_type is None or networks is None):
+            networks, abs_tol, rel_tol, crosslinker_type
+        )
+    if mu is None:
+        if crosslinker_type is None or networks is None:
             raise ValueError(
-                "Argument missing: When not specifying mu, network and crosslinker_type need to be specified")
+                "Argument missing: When not specifying mu, network and crosslinker_type need to be specified"
+            )
         mu = compute_effective_nr_density_of_junctions(
-            networks, abs_tol, rel_tol, crosslinker_type)
+            networks, abs_tol, rel_tol, crosslinker_type
+        )
 
     return nu - mu
 
 
-def compute_effective_nr_density_of_network(networks: Iterable[Universe], abs_tol: float = 1, rel_tol: float = 1,
-                                            crosslinker_type: int = 2) -> float:
+def compute_effective_nr_density_of_network(
+    networks: Sequence[Universe],
+    abs_tol: float = 1,
+    rel_tol: float = 1,
+    crosslinker_type: int = 2,
+) -> float:
     """
     Compute the effective number density :math:`\\nu_{eff}` of a network.
     Assumes the precursor-chains to be bifunctional.
@@ -109,30 +129,32 @@ def compute_effective_nr_density_of_network(networks: Iterable[Universe], abs_to
     Returns:
       - :math:`\\nu_{eff}` (float): the effective number density of network strands. Unit: [1/Volume]
     """
-    if (len(networks) == 0):
-        return None
+    if len(networks) == 0:
+        return 0
 
     # get the mean end to end distances
     r_taus = compute_mean_end_to_end_distances(networks, crosslinker_type)
-    if (len(r_taus) < 1):
+    if len(r_taus) < 1:
         return 0.0
     r_taus = np.array(list(r_taus.values()))
     r_tau_max = np.max(r_taus)
 
     # process additional input parameters
-    if (abs_tol is None):
+    if abs_tol is None:
         abs_tol = r_tau_max
 
     # count how many effective strands there are
-    num_effective = np.array([r_tau > abs_tol or r_tau > rel_tol * r_tau_max
-                             for r_tau in r_taus]).sum()
+    num_effective = np.array(
+        [r_tau > abs_tol or r_tau > rel_tol * r_tau_max for r_tau in r_taus]
+    ).sum()
     mean_volume = compute_mean_universe_volume(networks)
 
     return num_effective / mean_volume
 
 
 def compute_mean_universe_volume(
-        networks: Iterable[Universe], accept_different_sizes: bool = False) -> float:
+    networks: Sequence[Universe], accept_different_sizes: bool = False
+) -> float:
     """
     Compute the mean volume of a list of universes.
 
@@ -143,25 +165,31 @@ def compute_mean_universe_volume(
     Returns:
       - mean_volume (float): the mean volume of the universes
     """
-    if (len(networks) < 1):
-        raise ValueError('Must have at least one network')
+    if len(networks) < 1:
+        raise ValueError("Must have at least one network")
     # compute the mean volume of the universes
     mean_volume = 0
     divisor = 1 / len(networks)
     network_size = networks[0].get_nr_of_atoms()
     for network in networks:
-        if (not accept_different_sizes and network.get_nr_of_atoms() != network_size):
+        if not accept_different_sizes and network.get_nr_of_atoms() != network_size:
             raise NotImplementedError(
                 "Currently, only sequences of networks with the same size are supported"
                 + " (got one with {} instead of {})".format(
                     network.get_nr_of_atoms(), network_size
-                ))
+                )
+            )
         mean_volume += network.get_volume() * divisor
     return mean_volume
 
 
-def compute_effective_nr_density_of_junctions(networks: Iterable[Universe], abs_tol: float = 0, rel_tol: float = 1,
-                                              crosslinker_type: int = 2, min_num_effective_strands=2) -> float:
+def compute_effective_nr_density_of_junctions(
+    networks: Sequence[Universe],
+    abs_tol: float = 0,
+    rel_tol: float = 1,
+    crosslinker_type: int = 2,
+    min_num_effective_strands=2,
+) -> float:
     """
     Compute the number density of the elastically effective crosslinks,
     defined as the ones that connect at least `min_num_effective_strands` elastically effective strands.
@@ -182,25 +210,25 @@ def compute_effective_nr_density_of_junctions(networks: Iterable[Universe], abs_
     Returns:
       - :math:`\\mu_{eff}` (float): the effective number density of junctions. Unit: [1/Volume]
     """
-    if (len(networks) < 1):
-        return None
-    if (crosslinker_type is None):
+    if len(networks) < 1:
+        return 0.0
+    if crosslinker_type is None:
         return 0.0
 
     mean_volume = compute_mean_universe_volume(networks)
 
-    if (min_num_effective_strands == 0):
+    if min_num_effective_strands == 0:
         return len(networks[0].get_atoms_by_type(
             crosslinker_type)) / mean_volume
 
     # get the mean end to end distances
     r_taus = compute_mean_end_to_end_distances(networks, crosslinker_type)
-    if (len(r_taus) < 1):
+    if len(r_taus) < 1:
         return 0.0
     r_tau_max = max(r_taus.values())
 
     # process additional input parameters
-    if (abs_tol is None):
+    if abs_tol is None:
         abs_tol = r_tau_max
 
     key_to_molecule = {}
@@ -212,24 +240,32 @@ def compute_effective_nr_density_of_junctions(networks: Iterable[Universe], abs_
     junction_activity = {}
     for key in r_taus:
         crosslinkers = key_to_molecule[key].get_atoms_by_type(crosslinker_type)
-        assert (len(crosslinkers) == 2)
+        assert len(crosslinkers) == 2
         is_active = r_taus[key] > abs_tol or r_taus[key] > rel_tol * r_tau_max
-        if (not (is_active)):
+        if not (is_active):
             continue
         relevant_names = [crosslinkers[0].get_id(), crosslinkers[1].get_id()]
         for crosslinker_name in relevant_names:
-            if (crosslinker_name not in junction_activity):
+            if crosslinker_name not in junction_activity:
                 junction_activity[crosslinker_name] = 0
             junction_activity[crosslinker_name] += 1
 
     effective_junctions = np.array(
-        [junction_activity[key] >= min_num_effective_strands for key in junction_activity])
+        [
+            junction_activity[key] >= min_num_effective_strands
+            for key in junction_activity
+        ]
+    )
     num_effective_junctions = effective_junctions.sum()
     return num_effective_junctions / mean_volume
 
 
-def compute_topological_factor(networks: Iterable[Universe], crosslinker_type: int = 2,
-                               total_mass: float = 1, b: float | None = None) -> float:
+def compute_topological_factor(
+    networks: Sequence[Universe],
+    crosslinker_type: int = 2,
+    total_mass: float = 1,
+    b: float | None = None,
+) -> float:
     """
     Compute the topological factor of a polymer network.
 
@@ -259,20 +295,23 @@ def compute_topological_factor(networks: Iterable[Universe], crosslinker_type: i
     chains_to_process = network.get_chains_with_crosslinker(crosslinker_type)
     for molecule in chains_to_process:
         crosslinkers = molecule.get_atoms_by_type(crosslinker_type)
-        if (len(crosslinkers) != 2 or
-            molecule.get_strand_type() == MoleculeType.PRIMARY_LOOP or
-                molecule.get_strand_type() == MoleculeType.DANGLING_CHAIN):
+        if (
+            len(crosslinkers) != 2
+            or molecule.get_strand_type() == MoleculeType.PRIMARY_LOOP
+            or molecule.get_strand_type() == MoleculeType.DANGLING_CHAIN
+        ):
             # dangling, free chains and loops are irrelevant for our purposes
             continue
-        if (b is None):
-            b = np.mean(molecule.compute_bond_lengths())
+        if b is None:
+            b = float(np.mean(molecule.compute_bond_lengths()))
         crosslinkers = [crosslinkers[0], crosslinkers[1]]
         # sort crosslinkers by name as a way to keep the vector directions
         # consistent between timesteps
         crosslinkers.sort(key=lambda a: a.get_id())
         key = molecule.get_key()
-        gamma_sum += r_taus[key] * r_taus[key] / \
-            ((molecule.get_nr_of_atoms() - 2) * b *
-             b)  # -2: remove crosslinkers again (assumption 3)
+        gamma_sum += (
+            r_taus[key] * r_taus[key] /
+            ((molecule.get_nr_of_atoms() - 2) * b * b)
+        )  # -2: remove crosslinkers again (assumption 3)
 
     return gamma_sum / total_mass

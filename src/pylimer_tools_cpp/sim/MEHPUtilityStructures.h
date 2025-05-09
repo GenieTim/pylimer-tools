@@ -54,10 +54,10 @@ static std::string LinkSwappingModeNames[] = {
 
 #define EXIT_REASONS                                                           \
   X(UNSET, "Unset")                                                            \
-  X(F_TOLERANCE, "F Tolerance")                                                \
-  X(X_TOLERANCE, "X Tolerance")                                                \
-  X(MAX_STEPS, "Max Steps")                                                    \
-  X(NO_STEPS_POSSIBLE, "No Steps Possible")                                    \
+  X(F_TOLERANCE, "F (force) tolerance reached")                                \
+  X(X_TOLERANCE, "X (displacement) tolerance reached")                         \
+  X(MAX_STEPS, "Maximum number of steps reached")                              \
+  X(NO_STEPS_POSSIBLE, "No (more) steps possible")                             \
   X(FAILURE, "Failure")                                                        \
   X(INTERRUPT, "Interrupt")                                                    \
   X(OTHER, "Other")

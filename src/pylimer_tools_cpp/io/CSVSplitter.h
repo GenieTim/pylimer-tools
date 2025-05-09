@@ -10,7 +10,7 @@
 namespace pylimer_tools {
 namespace utils {
   inline std::vector<std::string> splitCSV(const std::string& filePath,
-                                    const std::string& delimiter)
+                                           const std::string& delimiter)
   {
     if (!std::filesystem::exists(filePath)) {
       throw std::invalid_argument("File to read (" + filePath +
