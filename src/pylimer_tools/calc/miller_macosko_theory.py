@@ -1,6 +1,6 @@
 import math
 import warnings
-from typing import Callable, List, Union
+from typing import Callable, List, Tuple, Union
 
 import numpy as np
 import pint
@@ -26,7 +26,7 @@ Caution:
 """
 
 
-def predict_shear_modulus(**kwargs):
+def predict_shear_modulus(**kwargs) -> pint.Quantity:
     """
     Predict the shear modulus using MMT Analysis.
 
@@ -76,6 +76,12 @@ def predict_number_density_of_junction_points(
         param["weight_fractions"],
         param["p_f_a_out"],
     )
+    assert (
+        isinstance(functionality_per_type, dict)
+        and isinstance(weight_fractions, dict)
+        and isinstance(alpha, float)
+    )
+
     if functionality_per_type[crosslinker_type] == 3:
         return weight_fractions[crosslinker_type] * (1 - alpha) ** 3
     elif functionality_per_type[crosslinker_type] == 4:
@@ -125,29 +131,19 @@ def predict_number_density_of_network_strands(
         param["p"],
         param["crosslinker_type"],
     )
+    assert (
+        isinstance(functionality_per_type, dict)
+        and isinstance(weight_fractions, dict)
+        and isinstance(r, (int, float))
+        and isinstance(p, (int, float))
+        and isinstance(crosslinker_type, int)
+    )
 
     if crosslinker_type not in weight_fractions:
         weight_fractions[crosslinker_type] = 0.0
     alpha, _ = compute_miller_macosko_probabilities(
-        r=(
-            r
-            if r is not None
-            else compute_stoichiometric_imbalance(
-                network=network,
-                crosslinker_type=crosslinker_type,
-                functionality_per_type=functionality_per_type,
-            )
-        ),
-        p=(
-            p
-            if p is not None
-            else compute_crosslinker_conversion(
-                network=network,
-                crosslinker_type=crosslinker_type,
-                f=functionality_per_type[crosslinker_type],
-                functionality_per_type=functionality_per_type,
-            )
-        ),
+        r=r,
+        p=p,
         f=functionality_per_type[crosslinker_type],
     )
 
@@ -206,6 +202,12 @@ def compute_weight_fraction_of_dangling_chains(
         param["weight_fractions"],
         param["p_f_a_out"],
         param["p_f_b_out"],
+    )
+    assert (
+        isinstance(functionality_per_type, dict)
+        and isinstance(weight_fractions, dict)
+        and isinstance(alpha, float)
+        and isinstance(beta, float)
     )
 
     w_dangling = 0.0
@@ -283,6 +285,9 @@ def compute_weight_fraction_of_backbone(
         param["p_f_a_out"],
         param["p_f_b_out"],
     )
+    assert isinstance(functionality_per_type, dict) and isinstance(
+        weight_fractions, dict
+    )
 
     w_elastic = 0.0
     for atom_type, weight_fraction in weight_fractions.items():
@@ -351,6 +356,12 @@ def compute_weight_fraction_of_soluble_material(
         param["weight_fractions"],
         param["p_f_a_out"],
         param["p_f_b_out"],
+    )
+    assert (
+        isinstance(functionality_per_type, dict)
+        and isinstance(weight_fractions, dict)
+        and isinstance(alpha, float)
+        and isinstance(beta, float)
     )
 
     w_sol = 0
@@ -484,18 +495,18 @@ def compute_miller_macosko_probabilities(
 
 def compute_modulus_decomposition(
     network: Union[Universe, None] = None,
-    ureg: pint.UnitRegistry = None,
+    ureg: Union[pint.UnitRegistry, None] = None,
     unit_style: Union[None, UnitStyle] = None,
-    crosslinker_type: int = None,
+    crosslinker_type: Union[int, None] = None,
     r: Union[float, None] = None,
     p: Union[float, None] = None,
-    f: int = None,
+    f: Union[int, None] = None,
     nu: Union[float, None] = None,
-    temperature: pint.Quantity = None,
+    temperature: Union[pint.Quantity, None] = None,
     functionality_per_type: Union[dict, None] = None,
     g_e_1: Union[float, None] = None,
     b2: float = 1.0,
-):
+) -> Tuple[pint.Quantity, pint.Quantity, pint.Quantity, pint.Quantity]:
     """
     Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
 
@@ -542,9 +553,18 @@ def compute_modulus_decomposition(
         param["p"],
         param["r"],
     )
+    assert (
+        isinstance(f, int)
+        and isinstance(nu, float)
+        and isinstance(alpha, float)
+        and isinstance(beta, float)
+        and isinstance(p, float)
+        and isinstance(r, float)
+    )
 
     if temperature is None:
         temperature = (273.15 + 25) * ureg.kelvin  # Temperature in Kelvin
+    assert isinstance(temperature, ureg.Quantity)
     if g_e_1 is None:
         g_e_1 = (
             8.3145  # gas constant, J/(mol*K)
@@ -553,6 +573,7 @@ def compute_modulus_decomposition(
             * 94.79281
         ) * ureg("MPa")
         # -> MPa, melt entanglement modulus of PDMS
+    assert isinstance(g_e_1, ureg.Quantity)
 
     # Boltzmann constant
     kb = 1.380649e-23 * ureg.joule / ureg.kelvin
@@ -581,9 +602,9 @@ def compute_extracted_modulus(
     g_e_1: pint.Quantity,
     w_sol: float,
     xlink_concentration_0: pint.Quantity,
+    ureg: pint.UnitRegistry,
     alpha: Union[float, None] = None,
-    temperature: pint.Quantity = None,
-    ureg: pint.UnitRegistry = None,
+    temperature: Union[pint.Quantity, None] = None,
 ):
     """
     Compute MMT's modulus, assuming the solvent is removed
@@ -621,8 +642,6 @@ def compute_extracted_modulus(
         r=r,
         f=f,
         g_e_1=g_e_1,
-        alpha=alpha,
-        ureg=ureg,
         temperature=temperature,
     )
     return junction_part + entanglement_part
@@ -666,9 +685,9 @@ def compute_junction_modulus(
     r: float,
     xlink_concentration_0: pint.Quantity,
     ureg: pint.UnitRegistry,
-    f: Union[int, None] = None,
+    f: int,
     alpha: Union[float, None] = None,
-    temperature: pint.Quantity = None,
+    temperature: Union[pint.Quantity, None] = None,
 ):
     """
     Compute MMT's junction modulus, given by
@@ -683,9 +702,12 @@ def compute_junction_modulus(
         - temperature: the temperatures; defaults to room temperature (25 °C)
     """
     if temperature is None:
+        assert ureg is not None, "Unit registry must be initialized."
         temperature = (273.15 + 25) * ureg.kelvin
     if alpha is None:
+        assert isinstance(f, int) and f > 0, "f must be a positive integer."
         alpha, _ = compute_miller_macosko_probabilities(r, p, f)
+    assert alpha is not None
     gamma_mmt_sum = 0.0
     for m in range(3, f + 1):
         gamma_mmt_sum += (
@@ -834,7 +856,7 @@ def predict_gelation_point(r: float, f: int, b2: float = 1) -> float:
     return math.sqrt(1 / (r * (f - 1) * b2))
 
 
-def predict_maximum_p(r: float, f: int, b2: float = 1) -> float:
+def predict_maximum_p(r: float, f: int, b2: float = 1) -> Union[float, None]:
     """
     Compute the maximum cross-linker conversion possible given a stoichiometric inbalance.
 
@@ -913,7 +935,7 @@ def _validate_r_and_p(r: float, p: float, f: int):
         )
     # assume:
     p_max = predict_maximum_p(r=r, f=f)
-    if p > p_max:
+    if p_max is None or p > p_max:
         raise ValueError(
             "For a system with r = {} and f = {}, p (in terms of crosslinkers) must be < {}, {} given.".format(
                 r, f, p_max, p

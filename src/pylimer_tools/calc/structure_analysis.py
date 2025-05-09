@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import warnings
 from collections import Counter
-from typing import Iterable, Tuple
+from typing import Sequence, Tuple, Union
 
 import numpy as np
 
@@ -18,8 +18,8 @@ This module provides functions to compute various quantities related to polymer 
 def compute_stoichiometric_imbalance(
     network: Universe,
     crosslinker_type: int = 2,
-    functionality_per_type: dict = None,
-    ignore_types: list = None,
+    functionality_per_type: Union[dict, None] = None,
+    ignore_types: Union[list, None] = None,
     effective: bool = False,
 ) -> float:
     """
@@ -99,7 +99,9 @@ def compute_stoichiometric_imbalance(
 
 
 def compute_extent_of_reaction(
-    network: Universe, crosslinker_type: int = 2, functionality_per_type: dict = None
+    network: Universe,
+    crosslinker_type: int = 2,
+    functionality_per_type: Union[dict, None] = None,
 ) -> float:
     """
     Compute the extent of polymerization reaction
@@ -164,8 +166,10 @@ def compute_extent_of_reaction(
 
 
 def compute_fraction_of_bifunctional_reactive_sites(
-    network: Universe, crosslinker_type: int = 2, functionality_per_type: dict = None
-) -> dict:
+    network: Universe,
+    crosslinker_type: int = 2,
+    functionality_per_type: Union[dict, None] = None,
+) -> float:
     """
     Compute the mole fraction of reactive sites in B2
     among all reactive sites in a mixture of B1 and B2.
@@ -237,7 +241,7 @@ def compute_fraction_of_bifunctional_reactive_sites(
 
 
 def compute_mean_end_to_end_distances(
-    networks: Iterable[Universe], crosslinker_type: int = 2
+    networks: Sequence[Universe], crosslinker_type: int = 2
 ) -> dict:
     """
     Compute the mean end to end distance between each pair of (indirectly) connected crosslinker
@@ -261,7 +265,7 @@ def compute_mean_end_to_end_distances(
 
 
 def compute_mean_end_to_end_vectors(
-    networks: Iterable[Universe], crosslinker_type: int = 2
+    networks: Sequence[Universe], crosslinker_type: int = 2
 ) -> dict:
     """
     Compute the mean end to end vectors between each pair of (indirectly) connected crosslinker
@@ -354,8 +358,8 @@ def compute_end_to_end_vectors(
 def compute_crosslinker_conversion(
     network: Universe,
     crosslinker_type: int = 2,
-    f: int = None,
-    functionality_per_type: dict = None,
+    f: Union[int, None] = None,
+    functionality_per_type: Union[dict, None] = None,
 ) -> float:
     """
     Compute the extent of reaction of the crosslinkers
@@ -376,8 +380,9 @@ def compute_crosslinker_conversion(
             return 0.0
         f = functionality_per_type[crosslinker_type]
 
-    if f == 0.0:
-        warnings.warn("Crosslinker functionality = 0 is problematic.")
+    if f == 0.0 or not isinstance(f, (int, float)):
+        warnings.warn(
+            "Crosslinker functionality = {} is problematic.".format(f))
         return 0.0
 
     return compute_effective_crosslinker_functionality(
@@ -400,7 +405,8 @@ def compute_effective_crosslinker_functionality(
     junction_degrees = compute_effective_crosslinker_functionalities(
         network, crosslinker_type
     )
-    return np.mean(junction_degrees) if len(junction_degrees) > 0 else 0.0
+    return float(np.mean(junction_degrees)) if len(
+        junction_degrees) > 0 else 0.0
 
 
 def compute_effective_crosslinker_functionalities(
@@ -519,7 +525,7 @@ def measure_weight_fraction_of_dangling_chains(
 
 
 def measure_weight_fraction_of_soluble_material(
-    network: Universe, rel_tol: float = 0.5, abs_tol: float = None
+    network: Universe, rel_tol: float = 0.5, abs_tol: Union[float, None] = None
 ) -> float:
     """
     Compute the weight fraction of soluble material by counting.
@@ -560,7 +566,7 @@ def measure_lower_bound_weight_fraction_of_soluble_material(
     network: Universe,
     crosslinker_type: int = 2,
     rel_tol: float = 0.75,
-    abs_tol: float = None,
+    abs_tol: Union[float, None] = None,
 ) -> float:
     """
     Compute a lower bound on the weight fraction of soluble material by counting.

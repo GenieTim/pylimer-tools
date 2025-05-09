@@ -90,45 +90,37 @@ init_pylimer_bound_sim(py::module_& m)
   ////////////////////////////////////////////////////////////////
   // MARK: Output Quantities
 
+  py::enum_<ComputedIntValues>(
+    m, "ComputedIntValues", "Integer output quantities")
+#define X(e, n)                                                                \
+  .value(#e, ComputedIntValues::e, "Results in the output column " #n ".")
+    COMPUTED_INT_VALUES
+#undef X
+    ;
+
   py::enum_<ComputedDoubleValues>(m, "ComputedDoubleValues")
-    .value("TIMESTEP", ComputedDoubleValues::TIMESTEP)
-    .value("TIME", ComputedDoubleValues::TIME)
-    .value("VOLUME", ComputedDoubleValues::VOLUME)
-    .value("PRESSURE", ComputedDoubleValues::PRESSURE)
-    .value("TEMPERATURE", ComputedDoubleValues::TEMPERATURE)
-    .value("STRESS_XX", ComputedDoubleValues::STRESS_XX)
-    .value("STRESS_YY", ComputedDoubleValues::STRESS_YY)
-    .value("STRESS_ZZ", ComputedDoubleValues::STRESS_ZZ)
-    .value("STRESS_XY", ComputedDoubleValues::STRESS_XY)
-    .value("STRESS_XZ", ComputedDoubleValues::STRESS_XZ)
-    .value("STRESS_YZ", ComputedDoubleValues::STRESS_YZ)
-    .value("STRESS_NXY", ComputedDoubleValues::STRESS_NXY)
-    .value("STRESS_NXZ", ComputedDoubleValues::STRESS_NXZ)
-    .value("STRESS_NYZ", ComputedDoubleValues::STRESS_NYZ)
-    .value("GAMMA", ComputedDoubleValues::GAMMA)
-    .value("RESIDUAL", ComputedDoubleValues::RESIDUAL)
-    .value("MEAN_B", ComputedDoubleValues::MEAN_B)
-    .value("MAX_B", ComputedDoubleValues::MAX_B)
-    .value("MSD", ComputedDoubleValues::MSD);
+#define X(e, n)                                                                \
+  .value(#e, ComputedDoubleValues::e, "Results in the output column " #n ".")
+    COMPUTED_DOUBLE_VALUES
+#undef X
+    ;
 
-  py::enum_<ComputedIntValues>(m, "ComputedIntValues")
-    .value("STEP", ComputedIntValues::STEP)
-    .value("NUM_SHIFT", ComputedIntValues::NUM_SHIFT)
-    .value("NUM_RELOC", ComputedIntValues::NUM_RELOC)
-    .value("NUM_ATOMS", ComputedIntValues::NUM_ATOMS)
-    .value("NUM_EXTRA_ATOMS", ComputedIntValues::NUM_EXTRA_ATOMS)
-    .value("NUM_BONDS", ComputedIntValues::NUM_BONDS)
-    .value("NUM_EXTRA_BONDS", ComputedIntValues::NUM_EXTRA_BONDS)
-    .value("NUM_BONDS_TO_FORM", ComputedIntValues::NUM_BONDS_TO_FORM);
-
-  py::class_<OutputConfiguration>(m, "OutputConfiguration", py::module_local())
+  py::class_<OutputConfiguration>(
+    m,
+    "OutputConfiguration",
+    py::module_local(),
+    R"pbdoc(A configuration object to configure the output,
+    as supported by most "simulation-like" classes in this package.)pbdoc")
     .def(py::init<>(), "Get an instance of this struct")
     .def_readwrite("int_values", &OutputConfiguration::intValues)
     .def_readwrite("double_values", &OutputConfiguration::doubleValues)
     .def_readwrite("use_every",
                    &OutputConfiguration::useEvery,
                    R"pbdoc(
-     For autocorrelation/averaging, how often to include values
+     For autocorrelation and averaging, how often to include values.
+
+     Use a value of 1 to take average of or autocorrelate, respectively,
+    all values encountered during the simulation or optimization procedure.
      )pbdoc")
     .def_readwrite("append",
                    &OutputConfiguration::append,
@@ -138,7 +130,8 @@ init_pylimer_bound_sim(py::module_& m)
     .def_readwrite("filename",
                    &OutputConfiguration::filename,
                    R"pbdoc(
-     The file to write to. Empty means standard output (console).
+      The path and name of the file to write to.
+      An empty string ("") means standard output (console).
      )pbdoc")
     .def_readwrite("output_every",
                    &OutputConfiguration::outputEvery,
@@ -153,13 +146,15 @@ init_pylimer_bound_sim(py::module_& m)
    * ////////////////////////////////////////////////////////////////
    */
 
-  py::enum_<mehp::ExitReason>(m, "ExitReason")
-    .value("UNSET", mehp::ExitReason::UNSET)
-    .value("MAX_STEPS", mehp::ExitReason::MAX_STEPS)
-    .value("F_TOLERANCE", mehp::ExitReason::F_TOLERANCE)
-    .value("X_TOLERANCE", mehp::ExitReason::X_TOLERANCE)
-    .value("FAILURE", mehp::ExitReason::FAILURE)
-    .value("OTHER", mehp::ExitReason::OTHER);
+  py::enum_<mehp::ExitReason>(m,
+                              "ExitReason",
+                              R"pbdoc(
+An enum representing the reason for exiting
+the simulation or optimization procedure.)pbdoc")
+#define X(e, n) .value(#e, mehp::ExitReason::e, "Exit reason: " #n ".")
+    EXIT_REASONS
+#undef X
+    ;
 
   m.def("inverse_langevin",
         &mehp::langevin_inv,
@@ -175,7 +170,8 @@ init_pylimer_bound_sim(py::module_& m)
   py::class_<mehp::Network>(m,
                             "SimplifiedNetwork",
                             R"pbdoc(
-     A more efficient structure of the network for use in MEHP.
+     A more efficient structure of the network for use in MEHP,
+     namely :obj:`~pylimer_tools_cpp.MEHPForceRelaxation`.
      Consists usually only of the crosslinkers.
  )pbdoc")
     .def_readonly("box_lengths", &mehp::Network::L)
@@ -198,7 +194,9 @@ init_pylimer_bound_sim(py::module_& m)
   py::class_<mehp::ForceBalanceNetwork>(m,
                                         "SimplifiedBalanceNetwork",
                                         R"pbdoc(
-     A more efficient structure of the network for use in MEHP force balance.
+     A more efficient structure of the network for use in MEHP force balance,
+     namely :obj:`~pylimer_tools_cpp.MEHPForceBalance`, though also passable to
+     namely :obj:`~pylimer_tools_cpp.MEHPForceBalance2`.
      Consists usually only of the cross- and slip-links.
 
      Assumed terminology: a spring is approximately a strand/chain,
@@ -250,7 +248,8 @@ init_pylimer_bound_sim(py::module_& m)
   py::class_<mehp::ForceBalance2Network>(m,
                                          "SimplifiedBalance2Network",
                                          R"pbdoc(
-A more efficient structure of the network for use in MEHP force balance 2.
+A more efficient structure of the network for use in
+:obj:`~pylimer_tools_cpp.MEHPForceBalance2`.
 Consists usually only of the cross- and entanglement-links.
 
 The terminology is a bit more consistent here:
