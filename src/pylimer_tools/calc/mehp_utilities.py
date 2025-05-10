@@ -31,15 +31,19 @@ def predict_shear_modulus(
     Source:
       - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
-    Arguments:
-      - network: the polymer system to predict the shear modulus for
-      - T: the temperature in your unit system
-      - k_b: Boltzmann's constant in your unit system
-      - crosslinker_type: the type of atoms to ignore (junctions, cross-linkers)
-      - totalMass: the :math:`M` in the respective formula
+    :param networks: The polymer systems to predict the shear modulus for
+    :type networks: Sequence[Universe]
+    :param temperature: The temperature in your unit system
+    :type temperature: float
+    :param k_boltzmann: Boltzmann's constant in your unit system
+    :type k_boltzmann: float
+    :param crosslinker_type: The type of atoms to ignore (junctions, cross-linkers)
+    :type crosslinker_type: int
+    :param total_mass: The :math:`M` in the respective formula
+    :type total_mass: float
 
-    Returns:
-      - shear modulus (float): the estimated shear modulus. Unit: [pressure]
+    :return: The estimated shear modulus in pressure units
+    :rtype: float
     """
     gamma = compute_topological_factor(networks, crosslinker_type, total_mass)
     nu = 0
@@ -64,22 +68,27 @@ def compute_cycle_rank(
     Compute the cycle rank (:math:`\\chi`).
     Assumes the precursor-chains to be bifunctional.
 
-    Arguments:
-      - network: the network to calculate the cycle rank for
-      - nu: number of elastically effective (active) strands per unit volume
-      - mu: number density of the elastically effective crosslink
-      - abs_tol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance)
-            (None to use only rel_tol)
-      - rel_tol (float): the relative tolerance to categorize a chain as active
-            (0: all, 1: none (use only abs_tol))
-      - crosslinker_type: the atom type of the crosslinkers/junctions
-
     No need to provide all the parameters — either/or:
-    - nu & mu
-    - network, abs_tol, rel_tol, crosslinker_type
 
-    Returns:
-      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$). Unit: [1/Volume]
+    * nu & mu
+    * network, abs_tol, rel_tol, crosslinker_type
+
+    :param networks: The networks to calculate the cycle rank for
+    :type networks: Union[Sequence[Universe], None]
+    :param nu: Number of elastically effective (active) strands per unit volume
+    :type nu: Union[float, None]
+    :param mu: Number density of the elastically effective crosslinks
+    :type mu: Union[float, None]
+    :param abs_tol: The absolute tolerance to categorize a chain as active (min. end-to-end distance).
+                    Set to None to use only rel_tol
+    :type abs_tol: float
+    :param rel_tol: The relative tolerance to categorize a chain as active (0: all, 1: none)
+    :type rel_tol: float
+    :param crosslinker_type: The atom type of the crosslinkers/junctions
+    :type crosslinker_type: int
+
+    :return: The cycle rank (:math:`\\xi = \\nu_{eff} - \\mu_{eff}`) in units of 1/Volume
+    :rtype: float
     """
     if nu is None:
         if crosslinker_type is None or networks is None:
@@ -113,21 +122,23 @@ def compute_effective_nr_density_of_network(
 
     :math:`\\nu_{eff}` is the number of elastically effective (active) strands per unit volume,
     which are defined as the ones that can store elastic energy
-    upon network deformation, resp. the effective number density of network strands
+    upon network deformation, resp. the effective number density of network strands.
 
     Source:
       - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
-    Arguments:
-      - network (pylimer_tools.entities.Universe): the network to compute :math:`\\nu_{eff}` for
-      - abs_tol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance)
-            (None to use only rel_tol)
-      - rel_tol (float): the relative tolerance to categorize a chain as active
-            (0: all, 1: none (use only abs_tol))
-      - crosslinker_type: the atom type of the cross-linkers/junctions
+    :param networks: The networks to compute :math:`\\nu_{eff}` for
+    :type networks: Sequence[Universe]
+    :param abs_tol: The absolute tolerance to categorize a chain as active (min. end-to-end distance).
+                    Set to None to use only rel_tol
+    :type abs_tol: float
+    :param rel_tol: The relative tolerance to categorize a chain as active (0: all, 1: none)
+    :type rel_tol: float
+    :param crosslinker_type: The atom type of the cross-linkers/junctions
+    :type crosslinker_type: int
 
-    Returns:
-      - :math:`\\nu_{eff}` (float): the effective number density of network strands. Unit: [1/Volume]
+    :return: The effective number density of network strands in units of 1/Volume
+    :rtype: float
     """
     if len(networks) == 0:
         return 0
@@ -158,12 +169,16 @@ def compute_mean_universe_volume(
     """
     Compute the mean volume of a list of universes.
 
-    Arguments:
-      - networks: a list of universes
-      - accept_different_sizes: toggle whether to throw an error when the Universe have different nr. of atoms
+    :param networks: A list of universes
+    :type networks: Sequence[Universe]
+    :param accept_different_sizes: Toggle whether to throw an error when the Universes have different numbers of atoms
+    :type accept_different_sizes: bool
 
-    Returns:
-      - mean_volume (float): the mean volume of the universes
+    :return: The mean volume of the universes
+    :rtype: float
+
+    :raises ValueError: If the input list is empty
+    :raises NotImplementedError: If universes have different sizes and accept_different_sizes is False
     """
     if len(networks) < 1:
         raise ValueError("Must have at least one network")
@@ -198,17 +213,20 @@ def compute_effective_nr_density_of_junctions(
     Source:
       - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
-    Arguments:
-      - network (pylimer_tools.entities.Universe): the network to compute :math:`\\nu_{eff}` for
-      - abs_tol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance)
-          (None to use only rel_tol)
-      - rel_tol (float): the relative tolerance to categorize a chain as active
-          (0: all, 1: none (use only abs_tol))
-      - crosslinker_type: the atom type of the crosslinkers/junctions
-      - min_num_effective_strands (int): the number of elastically effective strands to qualify a junction as such
+    :param networks: The networks to compute :math:`\\mu_{eff}` for
+    :type networks: Sequence[Universe]
+    :param abs_tol: The absolute tolerance to categorize a chain as active (min. end-to-end distance).
+                    Set to None to use only rel_tol
+    :type abs_tol: float
+    :param rel_tol: The relative tolerance to categorize a chain as active (0: all, 1: none)
+    :type rel_tol: float
+    :param crosslinker_type: The atom type of the crosslinkers/junctions
+    :type crosslinker_type: int
+    :param min_num_effective_strands: The number of elastically effective strands to qualify a junction as such
+    :type min_num_effective_strands: int
 
-    Returns:
-      - :math:`\\mu_{eff}` (float): the effective number density of junctions. Unit: [1/Volume]
+    :return: The effective number density of junctions in units of 1/Volume
+    :rtype: float
     """
     if len(networks) < 1:
         return 0.0
@@ -277,15 +295,17 @@ def compute_topological_factor(
     Source:
       - eq. 16 in https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
-    Arguments:
-      - network: the network to compute the topological factor for
-      - crosslinker_type: the type of atoms to ignore
-      - total_mass: the :math:`M` in the respective formula
-      - b: the mean bond length.
-          If `None`, it will be computed for each molecule in the first Universe (Network).
+    :param networks: The networks to compute the topological factor for
+    :type networks: Sequence[Universe]
+    :param crosslinker_type: The type of atoms to ignore (junctions, cross-linkers)
+    :type crosslinker_type: int
+    :param total_mass: The :math:`M` in the respective formula
+    :type total_mass: float
+    :param b: The mean bond length. If None, it will be computed for each molecule in the first Universe
+    :type b: float or None
 
-    Returns:
-      - the topological factor :math:`\\Gamma`
+    :return: The topological factor :math:`\\Gamma`
+    :rtype: float
     """
     r_taus = compute_mean_end_to_end_distances(networks, crosslinker_type)
 

@@ -259,12 +259,12 @@ MEHPForceBalance2::MEHPForceBalance2(
 
           // each entanglement link has two original bead positions,
           // which may differ by multiple boxes.
-          // should be distance: the distance that is "correct" by following the
+          // should be distance: The distance that is "correct" by following the
           // strand
           Eigen::Vector3d shouldBeDistance =
             currentPosition -
             effectiveCoordinates.segment<3>(3 * springFromVertexIdx.back(), 3);
-          // is distance: the distance that would be calculated using the
+          // is distance: The distance that would be calculated using the
           // coordinates of the beads
           Eigen::Vector3d isDistance =
             (addNewLink
@@ -381,12 +381,12 @@ MEHPForceBalance2::MEHPForceBalance2(
           this->box.handlePBC(lastStepToTarget);
           Eigen::Vector3d actualTargetPos = currentPosition - lastStepToTarget;
 
-          // should be distance: the distance that is "correct" by following the
+          // should be distance: The distance that is "correct" by following the
           // strand
           Eigen::Vector3d shouldBeDistance =
             actualTargetPos -
             effectiveCoordinates.segment<3>(3 * springFromVertexIdx.back(), 3);
-          // is distance: the distance that would be calculated using the
+          // is distance: The distance that would be calculated using the
           // coordinates of the beads
           Eigen::Vector3d isDistance =
             newLinkPositions[oldVertexIdToNewLinkId[neighbor]] -

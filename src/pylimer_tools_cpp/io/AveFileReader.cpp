@@ -201,7 +201,7 @@ AveFileReader::autocorrelateColumn(const int column,
   // validate dts
   for (size_t i = 1; i < dts.size(); ++i) {
     INVALIDARG_EXP_IFN(dts[i - 1] < dts[i],
-                       "Invalid dts: they need to be sequential.");
+                       "Invalid dts: They need to be sequential.");
     INVALIDARG_EXP_IFN(dts[i] < nRows - 1,
                        "Invalid dts: got requested " + std::to_string(dts[i]) +
                          ", but only got " + std::to_string(nRows) + " rows.");
@@ -244,7 +244,7 @@ AveFileReader::autocorrelateColumnDifference(const int column1,
   // validate dts
   for (size_t i = 1; i < dts.size(); ++i) {
     INVALIDARG_EXP_IFN(dts[i - 1] < dts[i],
-                       "Invalid dts: they need to be sequential.");
+                       "Invalid dts: They need to be sequential.");
     INVALIDARG_EXP_IFN(dts[i] < nRows - 1,
                        "Invalid dts: got requested " + std::to_string(dts[i]) +
                          ", but only got " + std::to_string(nRows) + " rows.");

@@ -98,7 +98,7 @@ DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe& u,
   this->isRelocationTarget = Eigen::ArrayXb::Constant(this->numAtoms, false);
   for (size_t i = 0; i < this->numAtoms; ++i) {
     // if we already have slip-springs, the functionality must account for
-    // that: the idxFunctionalities should not include the slip-springs
+    // that: The idxFunctionalities should not include the slip-springs
     this->idxFunctionalities[i] =
       this->numSlipSprings == 0
         ? this->bondsOfIndex[i].size()

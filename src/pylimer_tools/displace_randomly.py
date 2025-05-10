@@ -17,8 +17,8 @@ def cli(file, max_displacement):
     Basic CLI application iterating all atoms in a file, displacing them by a bit.
 
     Arguments:
-      - file: the file to read (and write, with prefix "random-displaced-")
-      - max_displacement: the maximum displacement
+      - file: The file to read (and write, with prefix "random-displaced-")
+      - max_displacement: The maximum displacement
     """
     universe = read_data_file(file)
 

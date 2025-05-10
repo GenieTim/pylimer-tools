@@ -15,12 +15,12 @@ def do_cache(obj, file: str, suffix: str, tmp_dir: str = None):
     Store the object in the cache
 
     Arguments:
-        - obj: the thing to cache
+        - obj: The thing to cache
         - file: a part of what's use for the cache's name.
             Ideally the file that is read, such that the filemtime of `file` can be used
             to check whether cache must be generated anew
-        - suffix: the file name's suffix
-        - tmp_dir: the directory to store the cache in
+        - suffix: The file name's suffix
+        - tmp_dir: The directory to store the cache in
     """
     cache_file_name = get_cache_file_name(file, suffix, tmp_dir)
     with open(cache_file_name, 'wb') as cache_file:
@@ -35,9 +35,9 @@ def load_cache(file: Union[str, List[str], None], suffix: str, disable_warnings:
     Arguments:
         - file: a part of what's use for the cache's name. Ideally the file that is read,
             such that the filemtime of `file` can be used to check whether cache must be generated anew
-        - suffix: the file name's suffix
+        - suffix: The file name's suffix
         - disable_warnings: whether to disable warnings about missing possibilities to check for filemtime
-        - tmp_dir: the directory to load the cache from
+        - tmp_dir: The directory to load the cache from
         - anyway: whether to ignore the cache's modification time, and return the cached data anyway,
             as if it were current
 
@@ -90,11 +90,11 @@ def get_cache_file_name(file: Union[str, List[str], None],
         - file: a part of what's use for the cache's name.
             Ideally the file that is read, such that the filemtime of `file` can be used
             to check whether cache must be generated anew
-        - suffix: the file name's suffix
-        - tmp_dir: the temporary directory
+        - suffix: The file name's suffix
+        - tmp_dir: The temporary directory
 
     Returns:
-        - cache_file_name: the path to the cache file
+        - cache_file_name: The path to the cache file
     """
     if (isinstance(file, list)):
         file = "".join(sorted(file) if not old else file)

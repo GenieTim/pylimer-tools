@@ -1442,7 +1442,7 @@ TEST_CASE(
 
   // some other network validations
   REQUIRE(net.oldAtomIds.size() == 2);
-  // NOTE: the following checks are a bit too much checking the implementation
+  // NOTE: The following checks are a bit too much checking the implementation
   // rather than just the functionality.
   CHECK(net.oldAtomIds[0] == 0);
   CHECK(net.oldAtomIds[1] == 2);

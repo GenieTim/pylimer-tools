@@ -28,24 +28,21 @@ def compute_stoichiometric_imbalance(
 
     r > 1 means an excess of crosslinkers, whereas r = 0 implies that there are not crosslinkers in the network.
 
-    NOTE:
-      if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
-      this will not be rounded/respected in any way.
+    .. note::
+        - if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
+          this will not be rounded/respected in any way.
+        - Currently, only g = 2 chains are respected yet, and only one type of crosslinker is supported.
+        - If you have e.g. solvent chains in the network, use `ignore_types` to not count them.
 
-      Currently, only g = 2 chains are respected yet, and only one type of crosslinker is supported.
-      If you have e.g. solvent chains in the network,
-      use `ignore_types` to not count them.
-
-    Arguments:
-      - network: the polymer network to do the computation for
-      - crosslinker_type: the type of the junctions/crosslinkers to select them in the network
-      - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
-          If `None`: will use max functionality per type.
-      - ignore_types: a list of integers, the types to ignore for the imbalance (e.g. solvent atom types)
-      - effective: whether to use the effective functionality (if functionality_per_type is not passed) or the maximum
-
-    Returns:
-      - r (float): the stoichiometric imbalance. If the network is empty, or no crosslinkers are present 0. is returned.
+    :param network: The polymer network to do the computation for
+    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network
+    :param functionality_per_type: A dictionary with key: type, and value: functionality of this atom type.
+        If `None`: will use max functionality per type.
+    :param ignore_types: A list of integers, the types to ignore for the imbalance (e.g. solvent atom types)
+    :param effective: Whether to use the effective functionality (if functionality_per_type is not passed)
+        or the maximum functionality of the cross-linkers.
+    :return: The stoichiometric imbalance. If the network is empty, or no crosslinkers are present 0. is returned.
+    :rtype: float
     """
     if network.get_nr_of_atoms() == 0:
         return 0.0
@@ -106,21 +103,20 @@ def compute_extent_of_reaction(
     """
     Compute the extent of polymerization reaction
     (nr. of formed bonds in reaction / max. nr. of bonds formable)
-    NOTE:
+
+    .. note::
         - if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
-            this will not be rounded/respected in any way
+          this will not be rounded/respected in any way
         - if the system contains solvent or other molecules that should not be binding to
-            cross-linkers, make sure to remove them before calling this function
+          cross-linkers, make sure to remove them before calling this function
         - if you have multiple cross-linker types, be sure to replace them by one type only
 
-    Arguments:
-      - network: the polymer network to do the computation for
-      - crosslinker_type: the atom type of crosslinker beads
-      - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
-          If None: will use max functionality per type.
-
-    Returns:
-      - p (float): the extent of reaction
+    :param network: The polymer network to do the computation for
+    :param crosslinker_type: The atom type of crosslinker beads
+    :param functionality_per_type: A dictionary with key: type, and value: functionality of this atom type.
+        If None: will use max functionality per type.
+    :return: The extent of reaction
+    :rtype: float
     """
     if network.get_nr_of_atoms() == 0:
         return 1
@@ -176,13 +172,11 @@ def compute_fraction_of_bifunctional_reactive_sites(
     Uses the network to detect what might be monofunctional chains,
     and then counts them and the bifunctional ones.
 
-    Arguments:
-    - network: the polymer network to do the computation for
-    - crosslinker_type: the atom type of crosslinker beads
-    - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
-
-    Returns:
-    - b2, the mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2.
+    :param network: The polymer network to do the computation for
+    :param crosslinker_type: The atom type of crosslinker beads
+    :param functionality_per_type: A dictionary with key: type, and value: functionality of this atom type
+    :return: The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2
+    :rtype: float
     """
     if functionality_per_type is None:
         functionality_per_type = network.determine_functionality_per_type()
@@ -246,13 +240,13 @@ def compute_mean_end_to_end_distances(
     """
     Compute the mean end to end distance between each pair of (indirectly) connected crosslinker
 
-    Arguments:
-      - networks: the different configurations of the polymer network to do the computation for
-      - crosslinker_type: the atom type to compute the in-between vectors for
+    :param networks: The different configurations of the polymer network to do the computation for
+    :type networks: Sequence[Universe]
+    :param crosslinker_type: The atom type to compute the in-between vectors for
+    :type crosslinker_type: int
 
-    Returns:
-      - endToEndDistances (dict): a dictionary with key: "{atom1.name}+{atom2.name}"
-          and value: the norm of the mean difference vector
+    :return: a dictionary with key: "{atom1.name}+{atom2.name}" and value: The norm of the mean difference vector
+    :rtype: dict
     """
     r_tau_vectors = compute_mean_end_to_end_vectors(networks, crosslinker_type)
     if len(r_tau_vectors) < 1:
@@ -270,13 +264,13 @@ def compute_mean_end_to_end_vectors(
     """
     Compute the mean end to end vectors between each pair of (indirectly) connected crosslinker
 
-    Arguments:
-      - networks: the different configurations of the polymer network to do the computation for
-      - crosslinker_type: the atom type to compute the in-between vectors for
+    :param networks: The different configurations of the polymer network to do the computation for
+    :type networks: Sequence[Universe]
+    :param crosslinker_type: The atom type to compute the in-between vectors for
+    :type crosslinker_type: int
 
-    Returns:
-      - end_to_end_vectors (dict): a dictionary with key: "{atom1.name}+{atom2.name}"
-          and value: their mean distance difference vector
+    :return: a dictionary with key: "{atom1.name}+{atom2.name}" and value: Their mean distance difference vector
+    :rtype: dict
     """
     if len(networks) == 0:
         return {}
@@ -321,13 +315,13 @@ def compute_end_to_end_vectors(
     """
     Compute the end to end vectors between each pair of (indirectly) connected crosslinker
 
-    Arguments:
-      - network: the polymer network to do the computation for
-      - crosslinker_type: the atom type to compute the in-between vectors for
+    :param network: The polymer network to do the computation for
+    :type network: Universe
+    :param crosslinker_type: The atom type to compute the in-between vectors for
+    :type crosslinker_type: int
 
-    Returns:
-      - end_to_end_vectors (dict): a dictionary with key: "{atom1.name}+{atom2.name}"
-          and value: their difference vector
+    :return: a dictionary with key: "{atom1.name}+{atom2.name}" and value: Their difference vector
+    :rtype: dict
     """
     # while we could do the decomposition again with explicit removal of irrelevant strand atoms,
     # this should not be any more expensive
@@ -365,13 +359,12 @@ def compute_crosslinker_conversion(
     Compute the extent of reaction of the crosslinkers
     (actual functionality divided by target functionality)
 
-    Arguments:
-      - network: the polymer network to do the computation for
-      - crosslinker_type: the type of the junctions/crosslinkers to select them in the network
-      - f: the functionality of the crosslinkers
-
-    Returns:
-      - r (float): the (mean) crosslinker conversion
+    :param network: The polymer network to do the computation for
+    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network
+    :param f: The functionality of the crosslinkers
+    :param functionality_per_type: A dictionary with key: type, and value: functionality of this atom type
+    :return: The (mean) crosslinker conversion
+    :rtype: float
     """
     if f is None:
         if functionality_per_type is None:
@@ -395,12 +388,10 @@ def compute_effective_crosslinker_functionality(
     """
     Compute the mean crosslinker functionality
 
-    Arguments:
-      - network: the polymer network to do the computation for
-      - crosslinker_type: the type of the junctions/crosslinkers to select them in the network
-
-    Returns:
-      - f (float): the (mean) effective crosslinker functionality
+    :param network: The polymer network to do the computation for
+    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network
+    :return: The (mean) effective crosslinker functionality
+    :rtype: float
     """
     junction_degrees = compute_effective_crosslinker_functionalities(
         network, crosslinker_type
@@ -415,12 +406,10 @@ def compute_effective_crosslinker_functionalities(
     """
     Compute the functionality of every crosslinker in the network
 
-    Arguments:
-      - network: the polymer network to do the computation for
-      - crosslinker_type: the type of the junctions/crosslinkers to select them in the network
-
-    Returns:
-      - junctionDegrees (list[int]): the functionality of every crosslinker
+    :param network: The polymer network to do the computation for
+    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network
+    :return: The functionality of every crosslinker
+    :rtype: list[int]
     """
     if network.get_nr_of_atoms() == 0:
         return []
@@ -437,12 +426,9 @@ def compute_weight_fractions(network: Universe) -> dict:
     Kept for compatibility reasons; just call
     :func:`pylimer_tools_cpp.Universe.compute_weight_fractions()` instead.
 
-    Arguments:
-      - network: the polymer network to do the computation for
-
-    Returns:
-      - :math:`\\vec{W_i}` (dict): using the type i as a key,
-            this dict contains the weight fractions (:math:`\\frac{W_i}{W_{tot}}`)
+    :param network: The polymer network to do the computation for
+    :return: Using the type i as a key, this dict contains the weight fractions (:math:`\\frac{W_i}{W_{tot}}`)
+    :rtype: dict
     """
     return network.compute_weight_fractions()
 
@@ -452,12 +438,10 @@ def measure_weight_fraction_of_backbone(
     """
     Compute the weight fraction of network backbone in infinite network
 
-    Arguments:
-      - network: the network to compute the weight fraction for
-      - crosslinker_type: the atom type to use to split the molecules
-
-    Returns:
-      - weightFraction (float): 1 - weightDangling/weightTotal - weightSoluble/weightTotal,
+    :param network: The network to compute the weight fraction for
+    :param crosslinker_type: The atom type to use to split the molecules
+    :return: 1 - weightDangling/weightTotal - weightSoluble/weightTotal
+    :rtype: float
 
     See also:
       - :func:`pylimer_tools.structure_analysis.measure_weight_fraction_of_dangling_chains()`
@@ -482,17 +466,14 @@ def measure_weight_fraction_of_dangling_chains(
     """
     Compute the weight fraction of dangling strands in infinite network
 
-    NOTE:
+    .. note::
         Currently, only primary dangling chains are taken into account.
         There are other methods that incorporate more.
 
-    Arguments:
-      - network: the network to compute the weight fraction for
-      - crosslinker_type: the atom type to use to split the molecules
-
-    Returns:
-      - weightFraction: weightDangling/weightTotal,
-      - numFraction: numDangling/numTotal
+    :param network: The network to compute the weight fraction for
+    :param crosslinker_type: The atom type to use to split the molecules
+    :return: A tuple containing (weightDangling/weightTotal, numDangling/numTotal)
+    :rtype: Tuple[float, float]
     """
     if network.get_nr_of_atoms() < 1:
         return 0.0, 0.0
@@ -532,14 +513,11 @@ def measure_weight_fraction_of_soluble_material(
     Effectively, this method counts the weight of clusters
     that have a weight less than a certain fraction of the total weight.
 
-    Arguments:
-      - network: the polymer network to do the computation for
-      - rel_tol: the fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified
-      - abs_tol: the weight from which on a component is not soluble anymore
-
-    Returns:
-      - :math:`W_{sol}` (float): the weight fraction of soluble material as counted.
-            0. for an empty network
+    :param network: The polymer network to do the computation for
+    :param rel_tol: The fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified
+    :param abs_tol: The weight from which on a component is not soluble anymore
+    :return: The weight fraction of soluble material as counted. 0 for an empty network
+    :rtype: float
     """
     if network.get_nr_of_atoms() == 0:
         return 0.0
@@ -574,15 +552,12 @@ def measure_lower_bound_weight_fraction_of_soluble_material(
         - only clusters, which do not contain loops and are smaller than the rel_tol of the biggest,
             are counted as soluble
 
-    Arguments:
-      - network: the polymer network to do the computation for
-      - crosslinker_type: the type of the junctions/crosslinkers to select them in the network
-      - rel_tol: the fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified
-      - abs_tol: the weight from which on a component is not soluble anymore
-
-    Returns:
-      - :math:`W_{sol}` (float): the weight fraction of soluble material as counted.
-            0. for an empty network
+    :param network: The polymer network to do the computation for
+    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network
+    :param rel_tol: The fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified
+    :param abs_tol: The weight from which on a component is not soluble anymore
+    :return: The weight fraction of soluble material as counted. 0 for an empty network
+    :rtype: float
     """
     if network.get_nr_of_atoms() == 0:
         return 0.0

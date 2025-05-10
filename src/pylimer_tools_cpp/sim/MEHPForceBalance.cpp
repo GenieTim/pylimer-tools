@@ -238,7 +238,7 @@ MEHPForceBalance::runForceRelaxation(
                                               oneOverSpringPartitions.array()));
       RUNTIME_EXP_IFN(
         std::isfinite(maxDistanceMoved),
-        "Something went wrong: the last distance moved is not finite but " +
+        "Something went wrong: The last distance moved is not finite but " +
           std::to_string(maxDistanceMoved) + " in iteration " +
           std::to_string(iterationsDone + 1) + ".");
     }
@@ -2954,7 +2954,7 @@ MEHPForceBalance::updateSpringPartition(
         // found position of this link in this spring
         // want to find the ideal value for
         // net.springPartitions[springIndex][partner_idx-1]
-        // NOTE: the following is slightly problematic for primary loops!
+        // NOTE: The following is slightly problematic for primary loops!
         Eigen::Vector3d vecBack = this->evaluatePartialSpringDistanceFrom(
           net, u, currentSpringGlobalIdx, linkIdx);
         double distanceBack = (vecBack.squaredNorm());

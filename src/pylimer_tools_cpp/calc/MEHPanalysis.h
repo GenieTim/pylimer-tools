@@ -19,12 +19,12 @@ Compute the end to end vectors between each pair of (indirectly) connected
 crossLinker
 
 Arguments:
-  - network: the polymer network to do the computation for
-  - crossLinkerType: the atom type to compute the in-between vectors for
+  - network: The polymer network to do the computation for
+  - crossLinkerType: The atom type to compute the in-between vectors for
 
 Returns:
   - endToEndVectors (map): a map with key: "{molecule.key}"
-          and value: their difference vector
+          and value: Their difference vector
 */
 std::map<std::string, position_vec_t>
 computeEndToEndVectors(pylimer_tools::entities::Universe network,
@@ -67,13 +67,13 @@ Compute the mean end to end vectors between each pair of (indirectly)
 connected crossLinker
 
 Arguments:
-  - networks: the different configurations of the polymer network to do the
+  - networks: The different configurations of the polymer network to do the
 computation for
-  - crossLinkerType: the atom type to compute the in-between vectors for
+  - crossLinkerType: The atom type to compute the in-between vectors for
 
 Returns:
   - endToEndVectors (map): a dictionary with key: "{chain.key}"
-          and value: their mean distance difference vector
+          and value: Their mean distance difference vector
 */
 std::map<std::string, position_vec_t>
 computeMeanEndToEndVectors(pylimer_tools::entities::UniverseSequence networks,
@@ -112,13 +112,13 @@ Compute the mean end to end distance between each pair of (indirectly)
 connected crossLinker
 
 Arguments:
-- networks: the different configurations of the polymer network to do the
+- networks: The different configurations of the polymer network to do the
 computation for
-- crossLinkerType: the atom type to compute the in-between vectors for
+- crossLinkerType: The atom type to compute the in-between vectors for
 
 Returns:
 - endToEndDistances (dict): a dictionary with key:
-"{atom1.name}+{atom2.name}" and value: the norm of the mean difference
+"{atom1.name}+{atom2.name}" and value: The norm of the mean difference
 vector
 */
 std::map<std::string, double>

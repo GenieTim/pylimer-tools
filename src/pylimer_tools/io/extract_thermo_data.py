@@ -16,6 +16,14 @@ from pylimer_tools_cpp import split_csv
 
 
 def _is_numeric_string(test: str) -> bool:
+    """
+    Check if a string represents a numeric value.
+
+    :param test: String to check
+    :type test: str
+    :return: True if the string represents a numeric value, False otherwise
+    :rtype: bool
+    """
     return bool(
         np.all(
             [
@@ -39,12 +47,16 @@ def detect_headers(
 
     Some assumptions are made regarding the columns, e.g., that 75% of them start with a character.
 
-    Arguments:
-        - file: The file to search for header lines
-        - max_nr_of_lines_to_read: The number of lines to read in search for header lines.
-            Use a negative number to read the whole file.
-        - use_cache: Whether to read the result from cache or not.
-            The cache is not read if the file changed meanwhile.
+    :param file: The file to search for header lines
+    :type file: str
+    :param max_nr_of_lines_to_read: The number of lines to read in search for header lines.
+                                   Use a negative number to read the whole file.
+    :type max_nr_of_lines_to_read: int
+    :param use_cache: Whether to read the result from cache or not.
+                     The cache is not read if the file changed meanwhile.
+    :type use_cache: bool
+    :return: List of detected header lines
+    :rtype: List[str]
     """
     suffix = str(max_nr_of_lines_to_read)
     cache_content = load_cache(file, suffix)
@@ -97,21 +109,29 @@ def read_one_group(
     fp, header, min_line_len=4, additional_lines_skip=0, lines_to_read_till_header=1e3
 ) -> str:
     """
-    Read one group of csv lines from the file
+    Read one group of csv lines from the file.
 
-    Arguments:
-        - fp: the file pointer to the file to read from
-        - header: the header of the CSV (where to start reading at)
-        - min_line_len: the minimal length of a line to be accepted as data
-        - additional_lines_skip: number of lines to skip after reading the header
-
-
-    Returns:
-       The filename of a temporary CSV file
+    :param fp: The file pointer to the file to read from
+    :type fp: file object
+    :param header: The header of the CSV (where to start reading at)
+    :type header: str or list
+    :param min_line_len: The minimal length of a line to be accepted as data
+    :type min_line_len: int
+    :param additional_lines_skip: Number of lines to skip after reading the header
+    :type additional_lines_skip: int
+    :param lines_to_read_till_header: Maximum number of lines to read until finding the header
+    :type lines_to_read_till_header: float
+    :return: The filename of a temporary CSV file, or empty string if no data was read
+    :rtype: str
     """
     if len(header) == 0:
         raise ValueError("header must have more than zero characters")
-    assert isinstance(header, str) or (isinstance(header, list) and len(header) > 0)
+    assert isinstance(
+        header,
+        str) or (
+        isinstance(
+            header,
+            list) and len(header) > 0)
     csv_file_to_write = "{}/{}_{}".format(
         tempfile.gettempdir(),
         hashlib.md5(
@@ -127,7 +147,8 @@ def read_one_group(
         if isinstance(header, str):
             min_line_len = max(min_line_len, len(header.split()))
         else:
-            min_line_len = max(min_line_len, min([len(h.split()) for h in header]))
+            min_line_len = max(min_line_len,
+                               min([len(h.split()) for h in header]))
 
         def check_skip_line(line, header):
             return line and not line.startswith(header)
@@ -141,7 +162,8 @@ def read_one_group(
             return True
 
         skip_line_fun = (
-            check_skip_line_header_list if isinstance(header, list) else check_skip_line
+            check_skip_line_header_list if isinstance(
+                header, list) else check_skip_line
         )
         # skip lines up until header (or file ending)
         n_lines_skipped = 0
@@ -196,17 +218,22 @@ def read_one_group(
 
 
 def get_thermo_cache_name_suffix(
-    header: Union[str, List[str], None] = "Step Temp E_pair E_mol TotEng Press",
+    header: Union[str, List[str],
+                  None] = "Step Temp E_pair E_mol TotEng Press",
     texts_to_read: float = 50,
     min_line_len: float = 5,
 ) -> str:
     """
-    Compose a cache file suffix in such a way, that it distinguishes different thermo reader parameters
+    Compose a cache file suffix in such a way, that it distinguishes different thermo reader parameters.
 
-    Arguments:
-        - header: the header of the CSV (where to start reading at)
-        - texts_to_read: the number of times to expect the header
-        - min_line_len: the minimal length of a line to be accepted as data
+    :param header: The header of the CSV (where to start reading at)
+    :type header: Union[str, List[str], None]
+    :param texts_to_read: The number of times to expect the header
+    :type texts_to_read: float
+    :param min_line_len: The minimal length of a line to be accepted as data
+    :type min_line_len: float
+    :return: A string to be used as cache file suffix
+    :rtype: str
     """
     if isinstance(header, Iterable):
         header = "{}{}".format("".join("".join(header).split()), len(header))
@@ -222,7 +249,8 @@ def get_thermo_cache_name_suffix(
 
 def extract_thermo_params(
     file,
-    header: Union[str, List[str], None] = "Step Temp E_pair E_mol TotEng Press",
+    header: Union[str, List[str],
+                  None] = "Step Temp E_pair E_mol TotEng Press",
     texts_to_read: int = 50,
     min_line_len: int = 5,
     use_cache: bool = True,
@@ -237,24 +265,30 @@ def extract_thermo_params(
     handle sections with different columns,
     and handles skipping over warnings as well as broken lines.
 
-    Note: the header parameter can be an array — make sure to pay attention
-    when reading a file with different header sections in them
+    Note: The header parameter can be an array — make sure to pay attention
+    when reading a file with different header sections in them.
 
-    Arguments:
-        - file: the file path to the file to read from
-        - header: the header of the CSV (where to start reading at).
-            Can be a string, a list of strings, or None if you want to try the detection.
-        - texts_to_read: the number of times to expect the header
-        - min_line_len: the minimal length of a line to be accepted as data
-        - use_cache: whether to use cache or not (though it will be written anyway)
-            The cache is not read if the file changed meanwhile.
-        - lines_to_read_till_header: the number of lines that are acceptable to skip
-            until a header should have been found.
-            This is useful for (a) finding the header, and (b) exit early if you are unsure about the header(s)
-
-    Returns:
-        - data (pd.DataFrame): the thermodynamic parameters
-
+    :param file: The file path to the file to read from
+    :type file: str
+    :param header: The header of the CSV (where to start reading at).
+                  Can be a string, a list of strings, or None if you want to try the detection.
+    :type header: Union[str, List[str], None]
+    :param texts_to_read: The number of times to expect the header
+    :type texts_to_read: int
+    :param min_line_len: The minimal length of a line to be accepted as data
+    :type min_line_len: int
+    :param use_cache: Whether to use cache or not (though it will be written anyway).
+                     The cache is not read if the file changed meanwhile.
+    :type use_cache: bool
+    :param lines_to_read_to_detect_header: The number of lines to read when trying to detect headers
+    :type lines_to_read_to_detect_header: int
+    :param lines_to_read_till_header: The number of lines that are acceptable to skip
+                                     until a header should have been found.
+                                     This is useful for (a) finding the header, and
+                                     (b) exit early if you are unsure about the header(s)
+    :type lines_to_read_till_header: float
+    :return: The thermodynamic parameters
+    :rtype: pd.DataFrame
     """
     df = None
 
@@ -289,12 +323,15 @@ def extract_thermo_params(
             try:
                 os.remove(filepath)
             except Exception as e:
-                warnings.warn("Could not remove file {}: {}".format(filepath, e))
+                warnings.warn(
+                    "Could not remove file {}: {}".format(
+                        filepath, e))
                 pass
             return tmp_df
         except Exception as e:
             warnings.warn(
-                "Error reading temporary CSV thermo file '{}': {}".format(filepath, e),
+                "Error reading temporary CSV thermo file '{}': {}".format(
+                    filepath, e),
                 source=e,
             )
             return pd.DataFrame()
@@ -354,16 +391,27 @@ def read_multi_section_separated_value_file(
     skip_err: bool = False,
 ) -> pd.DataFrame:
     """
-    Reads a tsv-like file (could also be e.g. space separated, or csv if you use separator = ",")
-    which contains multiple headers throughout the file.
+    Reads a file with multiple sections that have different headers throughout the file.
 
-    Particularly useful to read e.g. a file of output from the DPDSimulator.
+    This function handles files with multiple data sections that may have different column structures.
+    It automatically detects the separator if not specified and combines all sections into a single DataFrame.
 
-    Parameters:
-        - file: the path to the file to read
-        - separator: the separator if not one of the defaults used/recognized by pandas' read_csv
-        - use_cache: use to disable reading from cached results
-        - comment: a character such as "#" to indicate the separator for where a comment starts
+    :param file: Path to the file to read
+    :type file: str
+    :param separator: Character used to separate values in the file (auto-detected if None)
+    :type separator: Union[str, None]
+    :param use_cache: Whether to use cached results if available
+    :type use_cache: bool
+    :param comment: Character indicating the start of comments (e.g., "#")
+    :type comment: Union[str, None]
+    :param skip_err: Whether to skip errors when processing sections
+    :type skip_err: bool
+    :return: Combined DataFrame containing all data from the file
+    :rtype: pd.DataFrame
+
+    .. note::
+       Particularly useful for reading output files from the DPDSimulator or other
+       multi-section files where the structure may change between sections.
     """
     suffix = (
         (
@@ -427,7 +475,8 @@ def read_multi_section_separated_value_file(
         if got_err:
             continue
         headers = re.split("{}+".format(separator), header_line.strip())
-        if np.sum([_is_numeric_string(h) for h in headers]) > 0.5 * len(headers):
+        if np.sum([_is_numeric_string(h)
+                  for h in headers]) > 0.5 * len(headers):
             warnings.warn(
                 "CSV file {} has header line {}, which does not seem to be a header.".format(
                     csv_file, header_line
@@ -435,14 +484,16 @@ def read_multi_section_separated_value_file(
             )
         for i, h in enumerate(headers):
             if h not in all_headers:
-                first_line_split = re.split("{}+".format(separator), first_line.strip())
+                first_line_split = re.split(
+                    "{}+".format(separator), first_line.strip())
                 if len(first_line_split) != len(headers):
                     raise ValueError(
                         "Headers and first line do not match in nr of values",
                         first_line,
                         header_line,
                     )
-                if np.all([c.isdigit() or c == "-" for c in first_line_split[i]]):
+                if np.all(
+                        [c.isdigit() or c == "-" for c in first_line_split[i]]):
                     detected_dtypes[h] = np.int64
                 elif np.all(
                     [
@@ -473,12 +524,15 @@ def read_multi_section_separated_value_file(
                 try:
                     os.remove(csv_file)
                 except OSError as e:
-                    warnings.warn("Could not remove file {}: {}".format(csv_file, e))
+                    warnings.warn(
+                        "Could not remove file {}: {}".format(
+                            csv_file, e))
                     pass
                 continue
             with open(csv_file, "r") as fp:
                 header_line = next(fp)
-                split_header = re.split("{}+".format(separator), header_line.strip())
+                split_header = re.split(
+                    "{}+".format(separator), header_line.strip())
                 map_to_col = []
                 n_found = 0
                 for i, col in enumerate(all_headers):
@@ -491,7 +545,8 @@ def read_multi_section_separated_value_file(
                 for line in fp:
                     if line == header_line or line.startswith("Step"):
                         continue
-                    split_line = re.split("{}+".format(separator), line.strip())
+                    split_line = re.split(
+                        "{}+".format(separator), line.strip())
                     str_to_write = separator.join(
                         [split_line[i] if i != -1 else "NaN" for i in map_to_col]
                     )
@@ -499,7 +554,9 @@ def read_multi_section_separated_value_file(
             try:
                 os.remove(csv_file)
             except OSError as e:
-                warnings.warn("Could not remove file {}: {}".format(csv_file, e))
+                warnings.warn(
+                    "Could not remove file {}: {}".format(
+                        csv_file, e))
                 pass
             print("File {} handled".format(csv_file))
     # read the csv files again
@@ -519,7 +576,9 @@ def read_multi_section_separated_value_file(
     try:
         os.remove(csv_file_to_write)
     except OSError as e:
-        warnings.warn("Could not remove file {}: {}".format(csv_file_to_write, e))
+        warnings.warn(
+            "Could not remove file {}: {}".format(
+                csv_file_to_write, e))
         pass
     # doCache(reduce_mem_usage(df), file, suffix)
     # print("Read {} rows for file {}".format(len(df), file))

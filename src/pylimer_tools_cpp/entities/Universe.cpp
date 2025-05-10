@@ -1284,7 +1284,7 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
 /**
  * Identify vertices associated with dangling and free chains.
  *
- * Note: there are special cases that fail here, in particular,
+ * Note: There are special cases that fail here, in particular,
  * if you have a primary or secondary loops without internal beads,
  * sandwiched between two dangling chains.
  *
@@ -1488,7 +1488,7 @@ Universe::findLoops(const int crossLinkerType,
                     bool skipSelfLoops,
                     std::vector<std::vector<igraph_integer_t>>* edges) const
 {
-  // NOTE: there are exponentially many paths between two vertices of a graph,
+  // NOTE: There are exponentially many paths between two vertices of a graph,
   // and you may run out of memory when using this function, if your graph is
   // lattice-like.
 
@@ -1550,7 +1550,7 @@ Universe::findLoops(const int crossLinkerType,
 std::unordered_map<int, int>
 Universe::countLoopLengths(const int maxLength) const
 {
-  // NOTE: there are exponentially many paths between two vertices of a graph,
+  // NOTE: There are exponentially many paths between two vertices of a graph,
   // and you may run out of memory when using this function, if your graph is
   // lattice-like.
 
@@ -1566,7 +1566,7 @@ Universe::countLoopLengths(const int maxLength) const
 /**
  * @brief Find the loops in the network
  *
- * NOTE: there are exponentially many paths between two vertices of a graph,
+ * NOTE: There are exponentially many paths between two vertices of a graph,
  * and you may run out of memory when using this function, if your graph is
  * lattice-like.
  *
@@ -1579,7 +1579,7 @@ Universe::findLoopsOfAtoms(const int crossLinkerType,
                            const int maxLength,
                            const bool skipSelfLoops) const
 {
-  // NOTE: there are exponentially many paths between two vertices of a graph,
+  // NOTE: There are exponentially many paths between two vertices of a graph,
   // and you may run out of memory when using this function, if your graph is
   // lattice-like.
   std::map<int, std::vector<std::vector<Atom>>> results;
@@ -1608,7 +1608,7 @@ Universe::findLoopsOfAtoms(const int crossLinkerType,
 /**
  * @brief Find the loops in the network starting with one connection
  *
- * NOTE: there are exponentially many paths between two vertices of a graph,
+ * NOTE: There are exponentially many paths between two vertices of a graph,
  * and you may run out of memory when using this function, if your graph is
  * lattice-like.
  *
@@ -1651,7 +1651,7 @@ Universe::findMinimalOrderLoopFrom(const long int loopStart,
     return minimalPath;
   }
 
-  // NOTE: there are exponentially many paths between two vertices of a graph,
+  // NOTE: There are exponentially many paths between two vertices of a graph,
   // and you may run out of memory when using this function, if your graph is
   // lattice-like.
   // note: this algorithm is not particularly efficient
@@ -1728,7 +1728,7 @@ Universe::findMinimalOrderLoopFrom(const long int loopStart,
  * @brief Check whether the universe contains a loop that crosses the periodic
  * boundaries an odd times
  *
- * NOTE: there are exponentially many paths between two vertices of a graph,
+ * NOTE: There are exponentially many paths between two vertices of a graph,
  * and you may run out of memory when using this function, if your graph is
  * lattice-like.
  *
@@ -1741,7 +1741,7 @@ bool
 Universe::hasInfiniteStrand(const int crossLinkerType,
                             const int maxLength) const
 {
-  // NOTE: there are exponentially many paths between two vertices of a graph,
+  // NOTE: There are exponentially many paths between two vertices of a graph,
   // and you may run out of memory when using this function, if your graph is
   // lattice-like.
   std::vector<igraph_integer_t> startingCrosslinkers =
@@ -2519,7 +2519,7 @@ Universe::getNrOfAngles() const
                                     this->angleTo.size(),
                                     this->angleVia.size(),
                                     this->angleType.size()),
-                  "Invalid internal state: the angle info is not consistent");
+                  "Invalid internal state: The angle info is not consistent");
   return this->angleFrom.size();
 }
 
@@ -2538,7 +2538,7 @@ Universe::getNrOfDihedralAngles() const
                       this->dihedralAngleVia1.size(),
                       this->dihedralAngleVia2.size(),
                       this->dihedralAngleType.size()),
-    "Invalid internal state: the dihedral info is not consistent");
+    "Invalid internal state: The dihedral info is not consistent");
   return this->dihedralAngleFrom.size();
 }
 

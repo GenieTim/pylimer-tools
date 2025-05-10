@@ -10,8 +10,7 @@ from scipy import optimize
 from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
     compute_fraction_of_bifunctional_reactive_sites,
-    compute_stoichiometric_imbalance,
-)
+    compute_stoichiometric_imbalance)
 from pylimer_tools.io.unit_styles import UnitStyle
 from pylimer_tools_cpp import Universe
 
@@ -34,12 +33,13 @@ def predict_shear_modulus(**kwargs) -> pint.Quantity:
       - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
     :param kwargs: See :func:`~pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition`
-    :return: G: the predicted shear modulus, or `None` if the universe is empty.
+    :return: G: The predicted shear modulus, or `None` if the universe is empty.
 
     ToDo:
       - Support more than one crosslinker type (as is supported by original formula)
     """
-    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(**kwargs)
+    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(
+        **kwargs)
     return g_mmt_phantom + g_mmt_entanglement
 
 
@@ -54,8 +54,8 @@ def predict_number_density_of_junction_points(
     Source:
       - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737 (see supporting information for formulae)
 
-    :param network: the network to compute the weight fraction for
-    :param crosslinker_type: the atom type to use to split the molecules
+    :param network: The network to compute the weight fraction for
+    :param crosslinker_type: The atom type to use to split the molecules
     :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
     :return: mu: The predicted number density of junction points
     """
@@ -102,11 +102,11 @@ def predict_number_density_of_network_strands(
     Source:
       - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737 (see supporting information for formulae)
 
-    :param network: the network to compute the weight fraction for
-    :param crosslinker_type: the atom type to use to split the molecules
+    :param network: The network to compute the weight fraction for
+    :param crosslinker_type: The atom type to use to split the molecules
     :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
-    :param r: the stoichiometric imbalance
-    :param p: the extent of reaction in terms of the crosslinkers
+    :param r: The stoichiometric imbalance
+    :param p: The extent of reaction in terms of the crosslinkers
     :return: nu: The predicted number density of network strands
     """
     param = _compute_validate_parameters(
@@ -166,13 +166,13 @@ def compute_weight_fraction_of_dangling_chains(
     Source:
       - Eq. 6.4 in https://doi.org/10.1002/pen.760190409
 
-    :param network: the network to compute the weight fraction for
-    :param crosslinker_type: the atom type to use to split the molecules
+    :param network: The network to compute the weight fraction for
+    :param crosslinker_type: The atom type to use to split the molecules
     :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
     :param weight_fractions: a dictionary with the weight fraction of each type of atom
-    :param r: the stoichiometric imbalance
-    :param p: the extent of reaction in terms of the crosslinkers
-    :param b2: the mole fraction of reactive sites in B2 among all reactive sites
+    :param r: The stoichiometric imbalance
+    :param p: The extent of reaction in terms of the crosslinkers
+    :param b2: The mole fraction of reactive sites in B2 among all reactive sites
         in a mixture of B1 and B2
     :return: weightFraction :math:`$\\Phi_d = w_p$`: weightDangling/weightTotal
     """
@@ -245,13 +245,13 @@ def compute_weight_fraction_of_backbone(
     """
     Compute the weight fraction of the backbone (elastically effective) strands in an infinite network
 
-    :param network: the polymer network to do the computation for
-    :param crosslinker_type: the type of the junctions/cross-linkers to select them in the network
+    :param network: The polymer network to do the computation for
+    :param crosslinker_type: The type of the junctions/cross-linkers to select them in the network
     :param functionality_per_type: a dictionary with key: atom type, and value: functionality atoms with this type.
     :param weight_fractions: a dictionary with the weight fraction of each type of atom
-    :param r: the stoichiometric imbalance
-    :param p: the extent of reaction in terms of the crosslinkers
-    :param b2: the mole fraction of reactive sites in B2 among all reactive sites
+    :param r: The stoichiometric imbalance
+    :param p: The extent of reaction in terms of the crosslinkers
+    :param b2: The mole fraction of reactive sites in B2 among all reactive sites
         in a mixture of B1 and B2
     :return: :math:`\\Phi_{el} = w_e`: weight fraction of network backbone
     """
@@ -309,17 +309,17 @@ def compute_weight_fraction_of_soluble_material(
       - https://pubs.acs.org/doi/10.1021/ma00046a021
       - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737
 
-    :param network: the polymer network to do the computation for
-    :param crosslinker_type: the type of the junctions/cross-linkers to select them in the network
+    :param network: The polymer network to do the computation for
+    :param crosslinker_type: The type of the junctions/cross-linkers to select them in the network
     :param weight_fractions: a dictionary with key: type, and value: weight fraction of type.
             Pass if you want to omit the network.
     :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
           See: :func:`~pylimer_tools_cpp.Universe.determine_functionality_per_type`.
-    :param r: the stoichiometric imbalance
-    :param p: the extent of reaction in terms of the crosslinkers
-    :param b2: the mole fraction of reactive sites in B2 among all reactive sites
+    :param r: The stoichiometric imbalance
+    :param p: The extent of reaction in terms of the crosslinkers
+    :param b2: The mole fraction of reactive sites in B2 among all reactive sites
         in a mixture of B1 and B2
-    :return: :math:`W_{sol}` (float): the weight fraction of soluble material according to MMT.
+    :return: :math:`W_{sol}` (float): The weight fraction of soluble material according to MMT.
     :return: weight_fractions (dict): a dictionary with key: type, and value: weight fraction of type
     :return: :math:`\\alpha` (float): Macosko & Miller's :math:`P(F_A)`
     :return: :math:`\\beta` (float): Macosko & Miller's :math:`P(F_B)`
@@ -367,18 +367,20 @@ def compute_weight_fraction_of_soluble_material_from_weight_fractions(
 
     :math:`W_{sol} = w_A_f P(F_A^{out})^f + w_B_g [rpP(F_A^{out})^{f-1}+1-rp]^g`
 
-    :param r: the stoichiometric imbalance
-    :param p: the extent of reaction in terms of the crosslinkers
-    :param f: the functionality of the the crosslinker
-    :param w_f: the weight fraction of the crosslinkers
-    :param w_g: the weight fraction of ordinary chains
-    :param g: the functionality of the ordinary chains
+    :param r: The stoichiometric imbalance
+    :param p: The extent of reaction in terms of the crosslinkers
+    :param f: The functionality of the the crosslinker
+    :param w_f: The weight fraction of the crosslinkers
+    :param w_g: The weight fraction of ordinary chains
+    :param g: The functionality of the ordinary chains
     """
     alpha, _ = compute_miller_macosko_probabilities(r, p, f)
-    return w_f * (alpha**f) + w_g * ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
+    return w_f * (alpha**f) + w_g * \
+        ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
 
 
-def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float = 1.0):
+def compute_miller_macosko_probabilities(
+        r: float, p: float, f: int, b2: float = 1.0):
     """
     Compute Macosko and Miller's probabilities :math:`P(F_A)` and :math:`P(F_B)`
     i.e., the probability that a randomly chosen A (cross-link) or B (strand-end),
@@ -392,11 +394,13 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float =
 
     .. note::
         Currently, only systems with B_2, B_1 and A_f are supported.
+        If you have a system with other functionality distributions,
+        you would need to implement these formulas yourselves.
 
-    :param r: the stoichiometric imbalance
-    :param p: the extent of reaction in terms of the crosslinkers
-    :param f: the functionality of the the crosslinker
-    :param b2: the fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.
+    :param r: The stoichiometric imbalance
+    :param p: The extent of reaction in terms of the crosslinkers
+    :param f: The functionality of the the crosslinker
+    :param b2: The fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.
             Can be computed e.g. as :math:`b_2 = \frac{2 \\cdot [B_2]}{[B_1] + 2 \\cdot [B_2]}`
     :return: alpha: :math:`P(F_A)`
     :return: beta: :math:`P(F_B)`
@@ -422,7 +426,8 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float =
     if f == 3:
         alpha = (1 - r * p * p * b2) / (r * p * p * b2)
     elif f == 4:
-        alpha = ((1.0 / (r * p * p * b2)) - 3.0 / 4.0) ** (1.0 / 2.0) - (1.0 / 2.0)
+        alpha = ((1.0 / (r * p * p * b2)) - 3.0 /
+                 4.0) ** (1.0 / 2.0) - (1.0 / 2.0)
     else:
         if not (f > 4):
             raise NotImplementedError(
@@ -430,7 +435,8 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float =
             )
 
         def fun_to_root_for_alpha(alpha):
-            return r * b2 * p**2 * alpha ** (f - 1) - alpha - r * b2 * (p**2) + 1
+            return r * b2 * p**2 * \
+                alpha ** (f - 1) - alpha - r * b2 * (p**2) + 1
 
         def fun_to_root_for_alpha_prime(alpha):
             return -1 + alpha ** (f - 2) * (-1 + f) * (p**2) * r * b2
@@ -483,27 +489,27 @@ def compute_modulus_decomposition(
     """
     Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
 
-    :param network: the polymer network to do the computation for
-    :param ureg: the unit registry to use
-    :param unit_style: the unit style to use to have the results in appropriate units
-    :param crosslinker_type: the type of the junctions/cross-linkers to select them in the network
-    :param r: the stoichiometric imbalance. Optional if network is specified
-    :param p: the extent of reaction. Optional if network is specified
-    :param f: the functionality of the the crosslinker. Optional if network is specified
-    :param nu: the strand number density (nr of strands per volume) (ideally with units).
+    :param network: The polymer network to do the computation for
+    :param ureg: The unit registry to use
+    :param unit_style: The unit style to use to have the results in appropriate units
+    :param crosslinker_type: The type of the junctions/cross-linkers to select them in the network
+    :param r: The stoichiometric imbalance. Optional if network is specified
+    :param p: The extent of reaction. Optional if network is specified
+    :param f: The functionality of the the crosslinker. Optional if network is specified
+    :param nu: The strand number density (nr of strands per volume) (ideally with units).
         Optional if network is specified
-    :param temperature: the temperature to compute the modulus at. Default: 298.15 K
+    :param temperature: The temperature to compute the modulus at. Default: 298.15 K
         Optional, can be passed to improve performance
     :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
         Optional, can be passed to improve performance
-    :param g_e_1: the melt entanglement modulus
-    :param b2: the mole fraction of reactive sites in B2 among all reactive sites
+    :param g_e_1: The melt entanglement modulus
+    :param b2: The mole fraction of reactive sites in B2 among all reactive sites
         in a mixture of B1 and B2
-    :return: G_MMT_phantom: the phantom contribution to the MMT modulus;
+    :return: G_MMT_phantom: The phantom contribution to the MMT modulus;
         see also :func:`pylimer_tools.calc.miller_macosko_theory.computeJunctionModulus`
-    :return: G_MMT_entanglement: the entanglement contribution to the MMT modulus
-    :return: g_anm: the ANM estimate of the modulus
-    :return: g_pnm: the PNM estimate of the modulus
+    :return: G_MMT_entanglement: The entanglement contribution to the MMT modulus
+    :return: g_anm: The ANM estimate of the modulus
+    :return: g_pnm: The PNM estimate of the modulus
     """
     if ureg is None:
         if unit_style is None:
@@ -581,15 +587,15 @@ def compute_extracted_modulus(
     """
     Compute MMT's modulus, assuming the solvent is removed
 
-    :param p: the cross-linker conversion
-    :param r: the stoichiometric imbalance
-    :param f: the functionality of the crosslinkers
-    :param g_e_1: the melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
+    :param p: The cross-linker conversion
+    :param r: The stoichiometric imbalance
+    :param f: The functionality of the crosslinkers
+    :param g_e_1: The melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
     :param xlink_concentration_0: [A_f]_0, in 1/volume units
-    :param ureg: the unit registry to use
+    :param ureg: The unit registry to use
     :param alpha: :math:`P(F_a^{out})`, optional
-    :param temperature: the temperatures; defaults to room temperature
-    :param w_sol: the soluble fraction (to be removed)
+    :param temperature: The temperatures; defaults to room temperature
+    :param w_sol: The soluble fraction (to be removed)
     """
     if temperature is None:
         if ureg is None:
@@ -634,13 +640,13 @@ def compute_entanglement_modulus(
     Compute MMT's entanglement contribution to the equilibrium shear modulus, given by
     :math:`k_B T \\epsilon_e T_e`.
 
-    :param g_e_1: the melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
-    :param temperature: the temperatures; defaults to room temperature (25 °C)
-    :param network: the polymer network to do the computation for
-    :param crosslinker_type: the type of the junctions/cross-linkers to select them in the network
-    :param p: the cross-linker conversion
-    :param r: the stoichiometric imbalance
-    :param f: the functionality of the crosslinkers
+    :param g_e_1: The melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
+    :param temperature: The temperatures; defaults to room temperature (25 °C)
+    :param network: The polymer network to do the computation for
+    :param crosslinker_type: The type of the junctions/cross-linkers to select them in the network
+    :param p: The cross-linker conversion
+    :param r: The stoichiometric imbalance
+    :param f: The functionality of the crosslinkers
     :param beta: :math:`P(F_b^{out})`, optional
     :returns: :math:`T_e \\cdot G_e(1)`
     """
@@ -663,16 +669,16 @@ def compute_junction_modulus(
 ):
     """
     Compute MMT's junction modulus, given by
-    :math:`G_{junctions} = k_B T [A_f]_0 \\sum_{m=3}^{f} \frac{m-2}{2} P(X_{m,f})`.
+    :math:`G_{junctions} = k_B T [A_f]_0 \\sum_{m=3}^{f} \\frac{m-2}{2} P(X_{m,f})`.
 
-    :param p: the cross-linker conversion
-    :param r: the stoichiometric imbalance
+    :param p: The cross-linker conversion
+    :param r: The stoichiometric imbalance
     :param xlink_concentration_0: [A_f]_0, in 1/volume units
-    :param ureg: the unit registry to use
-    :param f: the functionality of the crosslinkers
+    :param ureg: The unit registry to use
+    :param f: The functionality of the crosslinkers
     :param alpha: :math:`P(F_a^{out})`, optional
-    :param temperature: the temperatures; defaults to room temperature (25 °C)
-    :return: the junction modulus contribution
+    :param temperature: The temperatures; defaults to room temperature (25 °C)
+    :return: The junction modulus contribution
     """
     if temperature is None:
         assert ureg is not None, "Unit registry must be initialized."
@@ -698,7 +704,7 @@ def compute_trapping_factor(beta: float) -> float:
     Literature: https://doi.org/10.1021/ma60004a015
 
     :param beta: :math:`P(F_b^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`
-    :return: the Langley trapping factor
+    :return: The Langley trapping factor
     """
     # for long B2s reacting with small A_fs
     return (1 - beta) ** 4
@@ -720,22 +726,24 @@ def compute_probability_that_crosslink_is_effective(
     :param functionality_of_monomer: f
     :param expected_degree_of_effect: m
     :param p_f_a_out: :math:`P(F_A^{out})`
-    :return: the probability that a crosslink is effective
+    :return: The probability that a crosslink is effective
     """
     assert 0 <= p_f_a_out <= 1, "p_f_a_out must be between 0 and 1"
     f = functionality_of_monomer
     m = expected_degree_of_effect
     alpha = p_f_a_out
-    return scipy.special.binom(f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
+    return scipy.special.binom(
+        f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
 
 
-def compute_probability_that_bifunctional_monomer_is_effective(p_f_b_out: float):
+def compute_probability_that_bifunctional_monomer_is_effective(
+        p_f_b_out: float):
     """
     Consider a copolymerization of A_f with B_2.
     This function computes the probability that a random B_2 unit will be effective.
 
     :param p_f_b_out: :math:`P(F_B^{out})`
-    :return: the probability that a bifunctional monomer is effective
+    :return: The probability that a bifunctional monomer is effective
     """
     assert 0 <= p_f_b_out <= 1, "p_f_b_out must be between 0 and 1"
     return (1 - p_f_b_out) ** 2
@@ -754,7 +762,7 @@ def compute_probability_that_crosslink_with_degree_is_dangling(
     :param functionality_of_monomer: f
     :param degree_of_ineffectiveness: i
     :param p_f_a_out: :math:`P(F_A^{out})`
-    :return: the probability that a crosslink with degree is dangling
+    :return: The probability that a crosslink with degree is dangling
     """
     assert 0 <= p_f_a_out <= 1, "p_f_a_out must be between 0 and 1"
     f = functionality_of_monomer
@@ -763,7 +771,8 @@ def compute_probability_that_crosslink_with_degree_is_dangling(
     alpha = p_f_a_out
     # NOTE: verify that the last exponent is f - m, rather than f - 1 as in
     # the paper
-    return scipy.special.binom(f, i) * (alpha ** (i)) * ((1.0 - alpha) ** (f - i))
+    return scipy.special.binom(f, i) * (alpha ** (i)) * \
+        ((1.0 - alpha) ** (f - i))
 
 
 def compute_probability_that_crosslink_is_dangling(
@@ -779,7 +788,7 @@ def compute_probability_that_crosslink_is_dangling(
 
     :param functionality_of_monomer: f
     :param p_f_a_out: :math:`P(F_A^{out})`
-    :return: the probability that a crosslink is dangling
+    :return: The probability that a crosslink is dangling
     """
     assert 0 <= p_f_a_out <= 1, "p_f_a_out must be between 0 and 1"
     f = functionality_of_monomer
@@ -787,7 +796,8 @@ def compute_probability_that_crosslink_is_dangling(
     return scipy.special.binom(f, 1) * (alpha ** (f - 1)) * (1.0 - alpha)
 
 
-def compute_probability_that_bifunctional_monomer_is_dangling(p_f_b_out: float):
+def compute_probability_that_bifunctional_monomer_is_dangling(
+        p_f_b_out: float):
     """
     Consider a copolymerization of A_f with B_2.
     This function computes the probability that a random B_2 unit will be dangling.
@@ -796,7 +806,7 @@ def compute_probability_that_bifunctional_monomer_is_dangling(p_f_b_out: float):
         - Eq. 6.1 in https://doi.org/10.1002/pen.760190409
 
     :param p_f_b_out: :math:`P(F_B^{out})`
-    :return: the probability that a bifunctional monomer is dangling
+    :return: The probability that a bifunctional monomer is dangling
     """
     assert 0 <= p_f_b_out <= 1, "p_f_b_out must be between 0 and 1"
     return scipy.special.binom(2, 1) * (p_f_b_out) * ((1.0 - p_f_b_out))
@@ -810,9 +820,9 @@ def predict_gelation_point(r: float, f: int, b2: float = 1) -> float:
     Source:
       - https://www.sciencedirect.com/science/article/pii/003238618990253X
 
-    :param r: the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
+    :param r: The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
     :param f: functionality of the crosslinkers
-    :param b2: the mole fraction of reactive sites in B2 among all reactive sites
+    :param b2: The mole fraction of reactive sites in B2 among all reactive sites
         in a mixture of B1 and B2
     :return: p_gel: critical extent of reaction for gelation
     """
@@ -825,12 +835,12 @@ def predict_maximum_p(r: float, f: int, b2: float = 1) -> Union[float, None]:
     """
     Compute the maximum cross-linker conversion possible given a stoichiometric inbalance.
 
-    :param r: the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
+    :param r: The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
     :param f: functionality of the crosslinkers
-    :param b2: the mole fraction of reactive sites in B2 among all reactive sites
+    :param b2: The mole fraction of reactive sites in B2 among all reactive sites
         in a mixture of B1 and B2. Since `r` already includes the number of active sites, this argument
         is not necessary.
-    :return: p_max: the maximum cross-linker conversion possible
+    :return: p_max: The maximum cross-linker conversion possible
     """
     n_xlinks = r * 2 / f
     if n_xlinks == 0:
@@ -852,15 +862,15 @@ def predict_p_from_w_sol(
     """
     Compute the extent of reaction based on the weight fraction of soluble material.
 
-    :param w_sol: the weight fraction of soluble material
-    :param network: the polymer network to do the computation for
-    :param crosslinker_type: the type of the junctions/cross-linkers to select them in the network
+    :param w_sol: The weight fraction of soluble material
+    :param network: The polymer network to do the computation for
+    :param crosslinker_type: The type of the junctions/cross-linkers to select them in the network
     :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type
     :param weight_fractions: a dictionary with the weight fraction of each type of atom
-    :param r: the stoichiometric imbalance
-    :param b2: the mole fraction of reactive sites in B2 among all reactive sites
+    :param r: The stoichiometric imbalance
+    :param b2: The mole fraction of reactive sites in B2 among all reactive sites
         in a mixture of B1 and B2
-    :return: the extent of reaction p
+    :return: The extent of reaction p
     """
 
     def compute_wsol(p):
@@ -899,11 +909,13 @@ def _validate_r_and_p(r: float, p: float, f: int):
     """
     if p < 0:
         raise ValueError(
-            "The cross-linker conversion `p` must be positive, got {}".format(p)
+            "The cross-linker conversion `p` must be positive, got {}".format(
+                p)
         )
     if r < 0:
         raise ValueError(
-            "The stoichiometric imbalance `r` must be positive, got {}".format(r)
+            "The stoichiometric imbalance `r` must be positive, got {}".format(
+                r)
         )
     if f < 2:
         raise ValueError(
@@ -938,7 +950,7 @@ class _ParamValidatorAssembler:
 
 
 """
-A list of parameter validators and assemblers used to compute and validate 
+A list of parameter validators and assemblers used to compute and validate
 parameters for Miller-Macosko theory calculations.
 
 Each validator assembler contains:
@@ -947,8 +959,8 @@ Each validator assembler contains:
 - param_validator: A function that validates the parameter value
 - dependencies: A list of parameter names that the parameter depends on
 
-This list is used by the _compute_validate_parameters function to automatically 
-compute missing parameters and validate existing ones 
+This list is used by the _compute_validate_parameters function to automatically
+compute missing parameters and validate existing ones
 when performing Miller-Macosko theory calculations.
 """
 _validators_assembler = [
@@ -966,7 +978,9 @@ _validators_assembler = [
     ),
     _ParamValidatorAssembler(
         "crosslinker_type",
-        lambda p: max(p["functionality_per_type"], key=p["functionality_per_type"].get),
+        lambda p: max(
+            p["functionality_per_type"],
+            key=p["functionality_per_type"].get),
         lambda x: isinstance(x, int) and x >= 0,
         ["functionality_per_type"],
     ),
@@ -1060,7 +1074,8 @@ def _compute_validate_parameters(
         return all(_param_is_ready(dep) for dep in param.dependencies)
 
     def _validate(param_name: str):
-        if not _validator_per_name[param_name].param_validator(given_parameters[p]):
+        if not _validator_per_name[param_name].param_validator(
+                given_parameters[p]):
             raise ValueError(
                 "Invalid value for parameter '{}' (got {}).".format(
                     param_name, given_parameters[param_name]
@@ -1073,7 +1088,8 @@ def _compute_validate_parameters(
         _validate(p)
 
     # first, determine all parameters to compute
-    to_compute = set([d for d in required_parameters if not _param_is_ready(d)])
+    to_compute = set(
+        [d for d in required_parameters if not _param_is_ready(d)])
     # add dependencies
     found_last_iteration = True
     while found_last_iteration:

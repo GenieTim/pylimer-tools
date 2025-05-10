@@ -364,7 +364,7 @@ public:
    * @brief Find a ("linear" in terms of volume) intermediate between two
    * different boxes
    *
-   * NOTE: the implementation entails that the deformation might not be
+   * NOTE: The implementation entails that the deformation might not be
    * symmetric.
    *
    * @param other

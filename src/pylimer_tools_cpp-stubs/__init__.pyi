@@ -24,9 +24,6 @@ class Atom:
       
     """
     __hash__: typing.ClassVar[None] = None
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __eq__(self, arg0: Atom) -> bool:
         ...
     def __getstate__(self) -> tuple:
@@ -92,9 +89,6 @@ class Atom:
         Compute the vector to another atom respecting the periodic image flags.
         """
 class AtomPairEntanglements:
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self) -> None:
         """
         Get an instance of this struct
@@ -201,9 +195,6 @@ class AtomStyle:
     TRI: typing.ClassVar[AtomStyle]  # value = <AtomStyle.TRI: 24>
     WAVEPACKET: typing.ClassVar[AtomStyle]  # value = <AtomStyle.WAVEPACKET: 25>
     __members__: typing.ClassVar[dict[str, AtomStyle]]  # value = {'NONE': <AtomStyle.NONE: 0>, 'ANGLE': <AtomStyle.ANGLE: 1>, 'ATOMIC': <AtomStyle.ATOMIC: 2>, 'BODY': <AtomStyle.BODY: 3>, 'BOND': <AtomStyle.BOND: 4>, 'CHARGE': <AtomStyle.CHARGE: 5>, 'DIELECTRIC': <AtomStyle.DIELECTRIC: 6>, 'DIPOLE': <AtomStyle.DIPOLE: 7>, 'DPD': <AtomStyle.DPD: 8>, 'EDPD': <AtomStyle.EDPD: 9>, 'ELECTRON': <AtomStyle.ELECTRON: 10>, 'ELLIPSOID': <AtomStyle.ELLIPSOID: 11>, 'FULL': <AtomStyle.FULL: 12>, 'LINE': <AtomStyle.LINE: 13>, 'MDPD': <AtomStyle.MDPD: 14>, 'MOLECULAR': <AtomStyle.MOLECULAR: 15>, 'PERI': <AtomStyle.PERI: 16>, 'SMD': <AtomStyle.SMD: 17>, 'SPH': <AtomStyle.SPH: 18>, 'SPHERE': <AtomStyle.SPHERE: 19>, 'BPM_SPHERE': <AtomStyle.BPM_SPHERE: 20>, 'SPIN': <AtomStyle.SPIN: 21>, 'TDPD': <AtomStyle.TDPD: 22>, 'TEMPLATE': <AtomStyle.TEMPLATE: 23>, 'TRI': <AtomStyle.TRI: 24>, 'WAVEPACKET': <AtomStyle.WAVEPACKET: 25>, 'HYBRID': <AtomStyle.HYBRID: 26>}
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __eq__(self, other: typing.Any) -> bool:
         ...
     def __getstate__(self) -> int:
@@ -241,26 +232,23 @@ class AveFileReader:
               For moderately sized and small files, we recommend to use the Python interface instead.
          
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self, file_path: str) -> None:
         ...
-    def autocorrelate_column(self, column_index: typing.SupportsInt, delta_indices: ..., std: ...) -> ...:
+    def autocorrelate_column(self, column_index: typing.SupportsInt, delta_indices: collections.abc.Sequence[typing.SupportsInt]) -> list[float]:
         """
                   Do autocorrelation on one particular column for a specified set of delta indices.
         
                   Assumes the data is equally spaced.
         """
-    def autocorrelate_column_difference(self, column_index1: typing.SupportsInt, column_index2: typing.SupportsInt, delta_indices: ..., std: ...) -> ...:
+    def autocorrelate_column_difference(self, column_index1: typing.SupportsInt, column_index2: typing.SupportsInt, delta_indices: collections.abc.Sequence[typing.SupportsInt]) -> list[float]:
         """
                   Do autocorrelation on the difference between two particular columns for a specified set of delta indices.
         
                   Assumes the data is equally spaced.
         """
-    def get_column_names(self) -> ...:
+    def get_column_names(self) -> list[str]:
         ...
-    def get_data(self) -> ...:
+    def get_data(self) -> list[list[float]]:
         ...
     def get_nr_of_columns(self) -> int:
         ...
@@ -275,9 +263,6 @@ class Box:
               currently, only rectangular boxes are supported.
             
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __getstate__(self) -> tuple:
         ...
     @typing.overload
@@ -361,43 +346,43 @@ class ComputedDoubleValues:
     """
     Members:
     
-      TIMESTEP
+      TIMESTEP : Results in the output column "TimeStep".
     
-      TIME
+      TIME : Results in the output column "Time".
     
-      VOLUME
+      VOLUME : Results in the output column "Volume".
     
-      PRESSURE
+      PRESSURE : Results in the output column "Pressure".
     
-      TEMPERATURE
+      TEMPERATURE : Results in the output column "Temperature".
     
-      STRESS_XX
+      STRESS_XX : Results in the output column "Stress[0,0]".
     
-      STRESS_YY
+      STRESS_YY : Results in the output column "Stress[1,1]".
     
-      STRESS_ZZ
+      STRESS_ZZ : Results in the output column "Stress[2,2]".
     
-      STRESS_XY
+      STRESS_XY : Results in the output column "Stress[0,1]".
     
-      STRESS_XZ
+      STRESS_YZ : Results in the output column "Stress[1,2]".
     
-      STRESS_YZ
+      STRESS_XZ : Results in the output column "Stress[0,2]".
     
-      STRESS_NXY
+      STRESS_NXY : Results in the output column "Stress[0,0]-Stress[1,1]".
     
-      STRESS_NXZ
+      STRESS_NYZ : Results in the output column "Stress[1,1]-Stress[2,2]".
     
-      STRESS_NYZ
+      STRESS_NXZ : Results in the output column "Stress[0,0]-Stress[2,2]".
     
-      GAMMA
+      GAMMA : Results in the output column "Gamma".
     
-      RESIDUAL
+      RESIDUAL : Results in the output column "Residual".
     
-      MEAN_B
+      MEAN_B : Results in the output column "<b>".
     
-      MAX_B
+      MAX_B : Results in the output column "max(b)".
     
-      MSD
+      MSD : Results in the output column "MSD".
     """
     GAMMA: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.GAMMA: 14>
     MAX_B: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.MAX_B: 17>
@@ -418,10 +403,7 @@ class ComputedDoubleValues:
     TIME: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.TIME: 1>
     TIMESTEP: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.TIMESTEP: 0>
     VOLUME: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.VOLUME: 2>
-    __members__: typing.ClassVar[dict[str, ComputedDoubleValues]]  # value = {'TIMESTEP': <ComputedDoubleValues.TIMESTEP: 0>, 'TIME': <ComputedDoubleValues.TIME: 1>, 'VOLUME': <ComputedDoubleValues.VOLUME: 2>, 'PRESSURE': <ComputedDoubleValues.PRESSURE: 3>, 'TEMPERATURE': <ComputedDoubleValues.TEMPERATURE: 4>, 'STRESS_XX': <ComputedDoubleValues.STRESS_XX: 5>, 'STRESS_YY': <ComputedDoubleValues.STRESS_YY: 6>, 'STRESS_ZZ': <ComputedDoubleValues.STRESS_ZZ: 7>, 'STRESS_XY': <ComputedDoubleValues.STRESS_XY: 8>, 'STRESS_XZ': <ComputedDoubleValues.STRESS_XZ: 10>, 'STRESS_YZ': <ComputedDoubleValues.STRESS_YZ: 9>, 'STRESS_NXY': <ComputedDoubleValues.STRESS_NXY: 11>, 'STRESS_NXZ': <ComputedDoubleValues.STRESS_NXZ: 13>, 'STRESS_NYZ': <ComputedDoubleValues.STRESS_NYZ: 12>, 'GAMMA': <ComputedDoubleValues.GAMMA: 14>, 'RESIDUAL': <ComputedDoubleValues.RESIDUAL: 15>, 'MEAN_B': <ComputedDoubleValues.MEAN_B: 16>, 'MAX_B': <ComputedDoubleValues.MAX_B: 17>, 'MSD': <ComputedDoubleValues.MSD: 18>}
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
+    __members__: typing.ClassVar[dict[str, ComputedDoubleValues]]  # value = {'TIMESTEP': <ComputedDoubleValues.TIMESTEP: 0>, 'TIME': <ComputedDoubleValues.TIME: 1>, 'VOLUME': <ComputedDoubleValues.VOLUME: 2>, 'PRESSURE': <ComputedDoubleValues.PRESSURE: 3>, 'TEMPERATURE': <ComputedDoubleValues.TEMPERATURE: 4>, 'STRESS_XX': <ComputedDoubleValues.STRESS_XX: 5>, 'STRESS_YY': <ComputedDoubleValues.STRESS_YY: 6>, 'STRESS_ZZ': <ComputedDoubleValues.STRESS_ZZ: 7>, 'STRESS_XY': <ComputedDoubleValues.STRESS_XY: 8>, 'STRESS_YZ': <ComputedDoubleValues.STRESS_YZ: 9>, 'STRESS_XZ': <ComputedDoubleValues.STRESS_XZ: 10>, 'STRESS_NXY': <ComputedDoubleValues.STRESS_NXY: 11>, 'STRESS_NYZ': <ComputedDoubleValues.STRESS_NYZ: 12>, 'STRESS_NXZ': <ComputedDoubleValues.STRESS_NXZ: 13>, 'GAMMA': <ComputedDoubleValues.GAMMA: 14>, 'RESIDUAL': <ComputedDoubleValues.RESIDUAL: 15>, 'MEAN_B': <ComputedDoubleValues.MEAN_B: 16>, 'MAX_B': <ComputedDoubleValues.MAX_B: 17>, 'MSD': <ComputedDoubleValues.MSD: 18>}
     def __eq__(self, other: typing.Any) -> bool:
         ...
     def __getstate__(self) -> int:
@@ -450,23 +432,25 @@ class ComputedDoubleValues:
         ...
 class ComputedIntValues:
     """
+    Integer output quantities
+    
     Members:
     
-      STEP
+      STEP : Results in the output column "Step".
     
-      NUM_SHIFT
+      NUM_SHIFT : Results in the output column "numShift".
     
-      NUM_RELOC
+      NUM_RELOC : Results in the output column "numReloc".
     
-      NUM_ATOMS
+      NUM_ATOMS : Results in the output column "numAtoms".
     
-      NUM_EXTRA_ATOMS
+      NUM_EXTRA_ATOMS : Results in the output column "numExtraAtoms".
     
-      NUM_BONDS
+      NUM_BONDS : Results in the output column "numBonds".
     
-      NUM_EXTRA_BONDS
+      NUM_EXTRA_BONDS : Results in the output column "numExtraBonds".
     
-      NUM_BONDS_TO_FORM
+      NUM_BONDS_TO_FORM : Results in the output column "numBondsToForm".
     """
     NUM_ATOMS: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.NUM_ATOMS: 3>
     NUM_BONDS: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.NUM_BONDS: 5>
@@ -477,9 +461,6 @@ class ComputedIntValues:
     NUM_SHIFT: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.NUM_SHIFT: 1>
     STEP: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.STEP: 0>
     __members__: typing.ClassVar[dict[str, ComputedIntValues]]  # value = {'STEP': <ComputedIntValues.STEP: 0>, 'NUM_SHIFT': <ComputedIntValues.NUM_SHIFT: 1>, 'NUM_RELOC': <ComputedIntValues.NUM_RELOC: 2>, 'NUM_ATOMS': <ComputedIntValues.NUM_ATOMS: 3>, 'NUM_EXTRA_ATOMS': <ComputedIntValues.NUM_EXTRA_ATOMS: 4>, 'NUM_BONDS': <ComputedIntValues.NUM_BONDS: 5>, 'NUM_EXTRA_BONDS': <ComputedIntValues.NUM_EXTRA_BONDS: 6>, 'NUM_BONDS_TO_FORM': <ComputedIntValues.NUM_BONDS_TO_FORM: 7>}
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __eq__(self, other: typing.Any) -> bool:
         ...
     def __getstate__(self) -> int:
@@ -513,9 +494,6 @@ class DPDSimulator:
               with slip-springs as presented by Langeloth et al.
          
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     @staticmethod
     def read_restart_file(file: str) -> DPDSimulator:
         """
@@ -566,12 +544,12 @@ class DPDSimulator:
                   Configure how to do bond formation during the run.
         
                   Arguments:
-                  - num_bonds_to_form (int): the nr of bonds to form in total. Use 0 to stop bond formation.
-                  - num_bonds_per_atom_type (dict): the nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)
-                  - bond_formation_dist (float): the maximum distance allowed to form bonds
+                  - num_bonds_to_form (int): The nr of bonds to form in total. Use 0 to stop bond formation.
+                  - num_bonds_per_atom_type (dict): The nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)
+                  - bond_formation_dist (float): The maximum distance allowed to form bonds
                   - attempt_bond_formation_every (int): attempt to form bonds every this many steps during the simulation run
-                  - atom_type_form_from (int): the atom type to start forming bonds from.
-                  - atom_type_form_to (int): the atom type to start forming bonds to.
+                  - atom_type_form_from (int): The atom type to start forming bonds from.
+                  - atom_type_form_to (int): The atom type to start forming bonds to.
         """
     def config_box_deformation(self, target_box: Box) -> None:
         """
@@ -602,7 +580,7 @@ class DPDSimulator:
                        Use the same version of pylimer-tools if you want to be sure that things work.
         
                   Arguments:
-                       - file: the file path to the restart file to write
+                       - file: The file path to the restart file to write
                        - outputEvery: how often to write the restart file
         """
     def config_shift_one_at_a_time(self, arg0: bool) -> None:
@@ -703,7 +681,7 @@ class DPDSimulator:
                   Explicitly force the writing of a restart file, now!
         
                   Arguments:
-                  - file (str): the file path and name of the restart file to be written.
+                  - file (str): The file path and name of the restart file to be written.
                        Can end in xml, json or anything else (-> binary).
         """
 class DataFileReader:
@@ -712,32 +690,29 @@ class DataFileReader:
            A reader for LAMMPS's `write_data` files.
       
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self) -> None:
         ...
-    def get_atom_ids(self) -> ...:
+    def get_atom_ids(self) -> list[int]:
         ...
-    def get_atom_nx(self) -> ...:
+    def get_atom_nx(self) -> list[int]:
         ...
-    def get_atom_ny(self) -> ...:
+    def get_atom_ny(self) -> list[int]:
         ...
-    def get_atom_nz(self) -> ...:
+    def get_atom_nz(self) -> list[int]:
         ...
-    def get_atom_types(self) -> ...:
+    def get_atom_types(self) -> list[int]:
         ...
-    def get_atom_x(self) -> ...:
+    def get_atom_x(self) -> list[float]:
         ...
-    def get_atom_y(self) -> ...:
+    def get_atom_y(self) -> list[float]:
         ...
-    def get_atom_z(self) -> ...:
+    def get_atom_z(self) -> list[float]:
         ...
-    def get_bond_from(self) -> ...:
+    def get_bond_from(self) -> list[int]:
         ...
-    def get_bond_to(self) -> ...:
+    def get_bond_to(self) -> list[int]:
         ...
-    def get_bond_types(self) -> ...:
+    def get_bond_types(self) -> list[int]:
         ...
     def get_high_x(self) -> float:
         ...
@@ -757,9 +732,9 @@ class DataFileReader:
         ...
     def get_lz(self) -> float:
         ...
-    def get_masses(self) -> ...:
+    def get_masses(self) -> dict[int, float]:
         ...
-    def get_molecule_ids(self) -> ...:
+    def get_molecule_ids(self) -> list[int]:
         ...
     def get_nr_of_atom_types(self) -> int:
         ...
@@ -780,9 +755,6 @@ class DataFileReader:
                   - `atom_style3`: The format of the "Atoms" section if the second to last parameter is equal to AtomStyle::HYBRID
         """
 class DataFileWriter:
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self, universe: Universe) -> None:
         """
                    Initialize the writer with the universe to write.
@@ -875,7 +847,7 @@ class DataFileWriter:
                   Actually do the writing to the disk.
         
                   Arguments:
-                       - file (str): the path and file name to write to
+                       - file (str): The path and file name to write to
         """
 class DumpFileReader:
     """
@@ -883,20 +855,17 @@ class DumpFileReader:
            A reader for LAMMPS's `dump` files.
       
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self, path_of_file_to_read: str) -> None:
         ...
     def get_length(self) -> int:
         """
         Get the number of sections (time-steps) in the file
         """
-    def get_numeric_values_for_at(self, arg0: typing.SupportsInt, arg1: str, arg2: str) -> ...:
+    def get_numeric_values_for_at(self, arg0: typing.SupportsInt, arg1: str, arg2: str) -> list[float]:
         """
         Get the values for the section `index`, the main header `headerKey` and the column (in the header) `column`.
         """
-    def get_string_values_for_at(self, rowIndex: typing.SupportsInt, headerKey: str, columnIndex: str) -> ...:
+    def get_string_values_for_at(self, rowIndex: typing.SupportsInt, headerKey: str, columnIndex: str) -> list[str]:
         """
         Get the values for the section `index`, the main header `headerKey` and the column (in the header) `column`.
         """
@@ -918,30 +887,37 @@ class DumpFileReader:
         """
 class ExitReason:
     """
+    
+    An enum representing the reason for exiting
+    the simulation or optimization procedure.
+    
     Members:
     
-      UNSET
+      UNSET : Exit reason: "Unset".
     
-      MAX_STEPS
+      F_TOLERANCE : Exit reason: "F (force) tolerance reached".
     
-      F_TOLERANCE
+      X_TOLERANCE : Exit reason: "X (displacement) tolerance reached".
     
-      X_TOLERANCE
+      MAX_STEPS : Exit reason: "Maximum number of steps reached".
     
-      FAILURE
+      NO_STEPS_POSSIBLE : Exit reason: "No (more) steps possible".
     
-      OTHER
+      FAILURE : Exit reason: "Failure".
+    
+      INTERRUPT : Exit reason: "Interrupt".
+    
+      OTHER : Exit reason: "Other".
     """
     FAILURE: typing.ClassVar[ExitReason]  # value = <ExitReason.FAILURE: 5>
     F_TOLERANCE: typing.ClassVar[ExitReason]  # value = <ExitReason.F_TOLERANCE: 1>
+    INTERRUPT: typing.ClassVar[ExitReason]  # value = <ExitReason.INTERRUPT: 6>
     MAX_STEPS: typing.ClassVar[ExitReason]  # value = <ExitReason.MAX_STEPS: 3>
+    NO_STEPS_POSSIBLE: typing.ClassVar[ExitReason]  # value = <ExitReason.NO_STEPS_POSSIBLE: 4>
     OTHER: typing.ClassVar[ExitReason]  # value = <ExitReason.OTHER: 7>
     UNSET: typing.ClassVar[ExitReason]  # value = <ExitReason.UNSET: 0>
     X_TOLERANCE: typing.ClassVar[ExitReason]  # value = <ExitReason.X_TOLERANCE: 2>
-    __members__: typing.ClassVar[dict[str, ExitReason]]  # value = {'UNSET': <ExitReason.UNSET: 0>, 'MAX_STEPS': <ExitReason.MAX_STEPS: 3>, 'F_TOLERANCE': <ExitReason.F_TOLERANCE: 1>, 'X_TOLERANCE': <ExitReason.X_TOLERANCE: 2>, 'FAILURE': <ExitReason.FAILURE: 5>, 'OTHER': <ExitReason.OTHER: 7>}
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
+    __members__: typing.ClassVar[dict[str, ExitReason]]  # value = {'UNSET': <ExitReason.UNSET: 0>, 'F_TOLERANCE': <ExitReason.F_TOLERANCE: 1>, 'X_TOLERANCE': <ExitReason.X_TOLERANCE: 2>, 'MAX_STEPS': <ExitReason.MAX_STEPS: 3>, 'NO_STEPS_POSSIBLE': <ExitReason.NO_STEPS_POSSIBLE: 4>, 'FAILURE': <ExitReason.FAILURE: 5>, 'INTERRUPT': <ExitReason.INTERRUPT: 6>, 'OTHER': <ExitReason.OTHER: 7>}
     def __eq__(self, other: typing.Any) -> bool:
         ...
     def __getstate__(self) -> int:
@@ -974,9 +950,6 @@ class LazyUniverseSequenceIterator:
            An iterator to iterate throught the universes in :obj:`~pylimer_tools_cpp.UniverseSequence`.
       
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __iter__(self) -> LazyUniverseSequenceIterator:
         ...
     def __next__(self) -> Universe:
@@ -989,9 +962,6 @@ class LinearMaxDistanceProvider(MaxDistanceProvider):
         Useful only for performance improvements in large systems.
         
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self, max_distance_multiplier: typing.SupportsFloat) -> None:
         ...
     def get_max_distance(self, N: typing.SupportsFloat) -> float:
@@ -1027,9 +997,6 @@ class LinkSwappingMode:
     NO_SWAPPING: typing.ClassVar[LinkSwappingMode]  # value = <LinkSwappingMode.NO_SWAPPING: 0>
     SLIPLINKS_ONLY: typing.ClassVar[LinkSwappingMode]  # value = <LinkSwappingMode.SLIPLINKS_ONLY: 1>
     __members__: typing.ClassVar[dict[str, LinkSwappingMode]]  # value = {'NO_SWAPPING': <LinkSwappingMode.NO_SWAPPING: 0>, 'SLIPLINKS_ONLY': <LinkSwappingMode.SLIPLINKS_ONLY: 1>, 'ALL': <LinkSwappingMode.ALL: 2>, 'ALL_CYCLE': <LinkSwappingMode.ALL_CYCLE: 3>, 'ALL_MC': <LinkSwappingMode.ALL_MC: 4>, 'ALL_MC_CYCLE': <LinkSwappingMode.ALL_MC_CYCLE: 5>, 'ALL_MC_TRY': <LinkSwappingMode.ALL_MC_TRY: 6>, 'ALL_MC_TRY_CYCLE': <LinkSwappingMode.ALL_MC_TRY_CYCLE: 7>}
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __eq__(self, other: typing.Any) -> bool:
         ...
     def __getstate__(self) -> int:
@@ -1062,9 +1029,6 @@ class MCUniverseGenerator:
            A :obj:`pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
       
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self, lx: typing.SupportsFloat, ly: typing.SupportsFloat, lz: typing.SupportsFloat) -> None:
         ...
     def add_crosslinkers(self, nr_of_crosslinkers: typing.SupportsInt, crosslinker_functionality: typing.SupportsInt = 4, crosslinker_type: typing.SupportsInt = 2, white_noise: bool = True) -> None:
@@ -1301,9 +1265,6 @@ class MEHPForceBalance:
          
     """
     @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
-    @staticmethod
     def construct_with_random_sliplinks(universe: Universe, nr_of_sliplinks_to_sample: typing.SupportsInt, upper_sampling_cutoff: typing.SupportsFloat = 1.2, lower_sampling_cutoff: typing.SupportsFloat = 0.0, minimum_nr_of_sliplinks: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 3, seed: str = '', crosslinker_type: typing.SupportsInt = 2, is_2d: bool = False, skip_dangling_soluble_entanglements: bool = True) -> MEHPForceBalance:
         """
                   Instantiate this simulator with randomly chosen slip-links.
@@ -1319,10 +1280,10 @@ class MEHPForceBalance:
         """
                   Instantiate the simulator for a certain universe.
         
-                  :param universe: the universe to simulate with
+                  :param universe: The universe to simulate with
                   :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
                   :param is2D: Whether to ignore the z direction.
-                  :param kappa: the spring constant
+                  :param kappa: The spring constant
                   :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
                   :param remove_dangling_chains: whether to keep or remove obviously dangling chains when setting up the network
         """
@@ -1464,8 +1425,8 @@ class MEHPForceBalance:
                   :math:`T` the temperature and
                   :math:`k_B` Boltzmann's constant.
         
-                  :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
-                  :param nr_of_chains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs.
+                  :param b02: The melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
+                  :param nr_of_chains: The value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs.
         """
     def get_gamma_factors(self, b02: typing.SupportsFloat, one_over_spring_partition_upper_limit: typing.SupportsFloat = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
@@ -1475,8 +1436,8 @@ class MEHPForceBalance:
         """
                        Evaluates the gamma factor for each strand in the specified direction (i.e., the squared distance divided by the contour length multiplied by b02)
         
-                       :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
-                       :param direction: the direction in which to compute the gamma factors (0: x, 1: y, 2: z)
+                       :param b02: The melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
+                       :param direction: The direction in which to compute the gamma factors (0: x, 1: y, 2: z)
         """
     def get_ids_of_active_nodes(self, tolerance: typing.SupportsFloat = 0.001) -> list[int]:
         """
@@ -1508,7 +1469,7 @@ class MEHPForceBalance:
         """
                         Get the number of active springs remaining after running the simulation.
         
-                       :param direction: the direction in which to compute the active springs (0: x, 1: y, 2: z)
+                       :param direction: The direction in which to compute the active springs (0: x, 1: y, 2: z)
                        :param tolerance: springs under this length are considered inactive
         """
     def get_nr_of_atoms(self) -> int:
@@ -1654,9 +1615,6 @@ class MEHPForceBalance2:
           
     """
     @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
-    @staticmethod
     def get_neighbour_link_indices(network: SimplifiedBalance2Network, link_idx: typing.SupportsInt) -> list[int]:
         ...
     def __copy__(self) -> MEHPForceBalance2:
@@ -1668,10 +1626,10 @@ class MEHPForceBalance2:
         """
                    Instantiate the simulator for a certain universe.
         
-                   :param universe: the universe giving the basic connectivity to compute with
+                   :param universe: The universe giving the basic connectivity to compute with
                    :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
                    :param is_2d: Whether to ignore the z direction.
-                   :param kappa: the spring constant
+                   :param kappa: The spring constant
                    :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
                    :param remove_dangling_chains: whether to keep or remove obviously dangling chains when setting up the network
         """
@@ -1680,8 +1638,8 @@ class MEHPForceBalance2:
         """
                    Instantiate the simulator for a certain universe with the given entanglements.
         
-                   :param universe: the universe giving the basic connectivity to compute with
-                   :param entanglements: the entanglements to use in the computation
+                   :param universe: The universe giving the basic connectivity to compute with
+                   :param entanglements: The entanglements to use in the computation
                    :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
                    :param is_2d: Whether to ignore the z direction.
                    :param entanglements_as_springs: whether to use the entanglements as springs instead of links
@@ -1691,13 +1649,13 @@ class MEHPForceBalance2:
         """
              Instantiate this simulator with randomly chosen slip-links.
         
-             :param universe: the universe containing the basic atoms and connectivity
-             :param nr_of_entanglements_to_sample: the number of entanglements to sample
+             :param universe: The universe containing the basic atoms and connectivity
+             :param nr_of_entanglements_to_sample: The number of entanglements to sample
              :param upper_cutoff: maximum distance from one sampled bead to its partner
              :param lower_cutoff: minimum distance from one sampled bead to its partner
-             :param minimum_nr_of_entanglements: the minimum number of entanglements that should be sampled
+             :param minimum_nr_of_entanglements: The minimum number of entanglements that should be sampled
              :param same_strand_cutoff: distance from one sampled bead to its pair within the same strand
-             :param seed: the seed for the random number generator
+             :param seed: The seed for the random number generator
              :param cross_linker_type:
              :param is_2d:
              :param filter_entanglements:
@@ -1804,8 +1762,8 @@ class MEHPForceBalance2:
                    :math:`T` the temperature and
                    :math:`k_B` Boltzmann's constant.
         
-                   :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
-                   :param nr_of_chains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs.
+                   :param b02: The melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
+                   :param nr_of_chains: The value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs.
         """
     def get_gamma_factors(self, b02: typing.SupportsFloat) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
@@ -1815,8 +1773,8 @@ class MEHPForceBalance2:
         """
                         Evaluates the gamma factor for each strand in the specified direction (i.e., the squared distance divided by the contour length multiplied by b02)
         
-                        :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
-                        :param direction: the direction in which to compute the gamma factors (0: x, 1: y, 2: z)
+                        :param b02: The melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
+                        :param direction: The direction in which to compute the gamma factors (0: x, 1: y, 2: z)
         """
     def get_ids_of_active_nodes(self, tolerance: typing.SupportsFloat = 0.001) -> list[int]:
         """
@@ -1848,7 +1806,7 @@ class MEHPForceBalance2:
         """
                          Get the number of active springs remaining after running the simulation.
         
-                        :param direction: the direction in which to compute the active springs (0: x, 1: y, 2: z)
+                        :param direction: The direction in which to compute the active springs (0: x, 1: y, 2: z)
                         :param tolerance: springs under this length are considered inactive
         """
     def get_nr_of_atoms(self) -> int:
@@ -1914,7 +1872,7 @@ class MEHPForceBalance2:
         """
                    Helper method to debug and/or understand what happens to certain links when being displaced.
         """
-    def run_force_relaxation(self, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: typing.SupportsFloat = 0.001, sle_solver: SLESolver = ..., tolerance: typing.SupportsFloat = 1e-12, max_iterations: typing.SupportsInt = 10000) -> None:
+    def run_force_relaxation(self, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: typing.SupportsFloat = 1e-06, sle_solver: SLESolver = ..., tolerance: typing.SupportsFloat = 1e-15, max_iterations: typing.SupportsInt = 10000) -> None:
         """
                    Run the simulation.
         
@@ -1951,18 +1909,15 @@ class MEHPForceEvaluator:
         
     """
     is_2d: bool
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self) -> None:
         ...
     def evaluate_stress_contribution(self, spring_distances: typing.SupportsFloat, i: typing.SupportsInt, j: typing.SupportsInt, spring_index: typing.SupportsInt) -> float:
         """
                   An evaluation of the stress-contribution.
         
-                  :param springDistances: the three coordinate differences for one spring.
-                  :param i: the row index of the stress tensor
-                  :param j: the column index of the stress tensor
+                  :param springDistances: The three coordinate differences for one spring.
+                  :param i: The row index of the stress tensor
+                  :param j: The column index of the stress tensor
         """
     @property
     def network(self) -> SimplifiedNetwork:
@@ -1977,16 +1932,13 @@ class MEHPForceRelaxation:
         Consequently, it offers a variety of configurable non-linear solvers using NLoptLib.
          
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __getstate__(self) -> tuple:
         ...
     def __init__(self, universe: Universe, crosslinker_type: typing.SupportsInt = 2, is_2d: bool = False, force_evaluator: MEHPForceEvaluator = None, kappa: typing.SupportsFloat = 1.0, remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -> None:
         """
                   Instantiate the simulator for a certain universe.
         
-                  :param universe: the universe to simulate with
+                  :param universe: The universe to simulate with
                   :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
                   :param is2d: Whether to ignore the z direction.
                   :param force_evaluator: The force evaluator to use
@@ -2080,7 +2032,7 @@ class MEHPForceRelaxation:
                        If :math:`-1.0` (default), the network is used for determination (which is not accurate), the system is assumed to be phantom.
                        For real systems, the value could be determined by :func:`~pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance()`
                        on the melt system, with subsequent division by the nr of bonds in the chain.
-                  :param nr_of_chains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains.
+                  :param nr_of_chains: The value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains.
         """
     def get_gamma_factors(self, b0_squared: typing.SupportsFloat = -1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
@@ -2206,9 +2158,6 @@ class MaxDistanceProvider:
          
          
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self) -> None:
         ...
     def get_max_distance(self, N: typing.SupportsFloat) -> float:
@@ -2222,9 +2171,6 @@ class Molecule:
       
     """
     __hash__: typing.ClassVar[None] = None
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __contains__(self, arg0: Atom) -> bool:
         """
                   Check whether a particular atom is contained in this molecule.
@@ -2439,12 +2385,9 @@ class Molecule:
 class MoleculeIterator:
     """
     
-           An iterator to iterate throught the atoms in :obj:`~pylimer_tools_cpp.Molecule`.
+           An iterator to iterate through the atoms in :obj:`~pylimer_tools_cpp.Molecule`.
       
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __iter__(self) -> MoleculeIterator:
         ...
     def __next__(self) -> Atom:
@@ -2477,9 +2420,6 @@ class MoleculeType:
     PRIMARY_LOOP: typing.ClassVar[MoleculeType]  # value = <MoleculeType.PRIMARY_LOOP: 2>
     UNDEFINED: typing.ClassVar[MoleculeType]  # value = <MoleculeType.UNDEFINED: 0>
     __members__: typing.ClassVar[dict[str, MoleculeType]]  # value = {'UNDEFINED': <MoleculeType.UNDEFINED: 0>, 'NETWORK_STRAND': <MoleculeType.NETWORK_STRAND: 1>, 'PRIMARY_LOOP': <MoleculeType.PRIMARY_LOOP: 2>, 'DANGLING_CHAIN': <MoleculeType.DANGLING_CHAIN: 3>, 'FREE_CHAIN': <MoleculeType.FREE_CHAIN: 4>}
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __eq__(self, other: typing.Any) -> bool:
         ...
     def __getstate__(self) -> int:
@@ -2510,9 +2450,6 @@ class NeighbourList:
     """
     Gives access to somewhat fast queries on the neighbourhood of atoms
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self, atoms: collections.abc.Sequence[Atom], box: Box, cutoff: typing.SupportsFloat) -> None:
         """
         Instantiates a new neighbour list
@@ -2541,9 +2478,6 @@ class NoMaxDistanceProvider(MaxDistanceProvider):
         For MC generation, to disable the neighbour list useage.
         
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self) -> None:
         ...
     def get_max_distance(self, N: typing.SupportsFloat) -> float:
@@ -2562,22 +2496,16 @@ class NonGaussianSpringForceEvaluator(MEHPForceEvaluator):
     
          Recommended optimization algorithm: "LD_MMA"
     
-         :param kappa: the spring constant :math:`\\kappa`
+         :param kappa: The spring constant :math:`\\kappa`
          :param N: The number of links in a spring
          :param l: The  the length of a spring in the chain
         
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self, kappa: typing.SupportsFloat = 1.0, N: typing.SupportsFloat = 1.0, l: typing.SupportsFloat = 1.0) -> None:
         """
         Initialize this ForceEvaluator
         """
 class NormalModeAnalyzer:
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __getstate__(self) -> tuple:
         ...
     def __init__(self, spring_from: collections.abc.Sequence[typing.SupportsInt], spring_to: collections.abc.Sequence[typing.SupportsInt]) -> None:
@@ -2635,9 +2563,10 @@ class NormalModeAnalyzer:
         Set eigenvectors, e.g. if you use an external solver
         """
 class OutputConfiguration:
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
+    """
+    A configuration object to configure the output,
+        as supported by most "simulation-like" classes in this package.
+    """
     def __init__(self) -> None:
         """
         Get an instance of this struct
@@ -2659,7 +2588,8 @@ class OutputConfiguration:
     @property
     def filename(self) -> str:
         """
-             The file to write to. Empty means standard output (console).
+              The path and name of the file to write to.
+              An empty string ("") means standard output (console).
         """
     @filename.setter
     def filename(self, arg0: str) -> None:
@@ -2682,7 +2612,10 @@ class OutputConfiguration:
     @property
     def use_every(self) -> int:
         """
-             For autocorrelation/averaging, how often to include values
+             For autocorrelation and averaging, how often to include values.
+        
+             Use a value of 1 to take average of or autocorrelate, respectively,
+            all values encountered during the simulation or optimization procedure.
         """
     @use_every.setter
     def use_every(self, arg0: typing.SupportsInt) -> None:
@@ -2754,9 +2687,6 @@ class SLESolver:
     SPARSE_LU: typing.ClassVar[SLESolver]  # value = <SLESolver.SPARSE_LU: 3>
     SPARSE_QR: typing.ClassVar[SLESolver]  # value = <SLESolver.SPARSE_QR: 4>
     __members__: typing.ClassVar[dict[str, SLESolver]]  # value = {'DEFAULT': <SLESolver.DEFAULT: 0>, 'SIMPLICIAL_LLT': <SLESolver.SIMPLICIAL_LLT: 1>, 'SIMPLICIAL_LDLT': <SLESolver.SIMPLICIAL_LDLT: 2>, 'SPARSE_LU': <SLESolver.SPARSE_LU: 3>, 'SPARSE_QR': <SLESolver.SPARSE_QR: 4>, 'CONJUGATE_GRADIENT': <SLESolver.CONJUGATE_GRADIENT: 5>, 'CONJUGATE_GRADIENT_DIAGONALIZED': <SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED: 6>, 'CONJUGATE_GRADIENT_IDENTITY': <SLESolver.CONJUGATE_GRADIENT_IDENTITY: 7>, 'CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY': <SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY: 8>, 'LEAST_SQUARES_CONJUGATE_GRADIENT': <SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT: 9>, 'LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED': <SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED: 10>, 'LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY': <SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY: 11>, 'BICGSTAB': <SLESolver.BICGSTAB: 12>, 'BICGSTAB_DIAGONALIZED': <SLESolver.BICGSTAB_DIAGONALIZED: 13>, 'BICGSTAB_IDENTITY': <SLESolver.BICGSTAB_IDENTITY: 14>, 'BICGSTAB_INCOMPLETE_LU': <SLESolver.BICGSTAB_INCOMPLETE_LU: 15>, 'GRADIENT_DESCENT': <SLESolver.GRADIENT_DESCENT: 16>, 'GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT': <SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT: 17>, 'GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG': <SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG: 18>, 'GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM': <SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM: 19>}
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __eq__(self, other: typing.Any) -> bool:
         ...
     def __getstate__(self) -> int:
@@ -2794,18 +2724,16 @@ class SimpleSpringMEHPForceEvaluator(MEHPForceEvaluator):
     
          Recommended optimization algorithm: "LD_LBFGS"
     
-         :param kappa: the spring constant :math:`\\kappa`
+         :param kappa: The spring constant :math:`\\kappa`
         
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self, kappa: typing.SupportsFloat = 1.0) -> None:
         ...
 class SimplifiedBalance2Network:
     """
     
-    A more efficient structure of the network for use in MEHP force balance 2.
+    A more efficient structure of the network for use in
+    :obj:`~pylimer_tools_cpp.MEHPForceBalance2`.
     Consists usually only of the cross- and entanglement-links.
     
     The terminology is a bit more consistent here:
@@ -2813,9 +2741,6 @@ class SimplifiedBalance2Network:
     links will be both these nodes as well as entanglement-links, 
     and finally springs will be any number of connected bonds between links.
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     @property
     def box_lengths(self) -> float:
         ...
@@ -2876,16 +2801,15 @@ class SimplifiedBalance2Network:
 class SimplifiedBalanceNetwork:
     """
     
-         A more efficient structure of the network for use in MEHP force balance.
+         A more efficient structure of the network for use in MEHP force balance,
+         namely :obj:`~pylimer_tools_cpp.MEHPForceBalance`, though also passable to
+         namely :obj:`~pylimer_tools_cpp.MEHPForceBalance2`.
          Consists usually only of the cross- and slip-links.
     
          Assumed terminology: a spring is approximately a strand/chain,
          whereas a partial spring is the spring between a cross-link and an entanglement-link (slip-link).
      
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     @property
     def box_lengths(self) -> float:
         ...
@@ -2961,13 +2885,11 @@ class SimplifiedBalanceNetwork:
 class SimplifiedNetwork:
     """
     
-         A more efficient structure of the network for use in MEHP.
+         A more efficient structure of the network for use in MEHP,
+         namely :obj:`~pylimer_tools_cpp.MEHPForceRelaxation`.
          Consists usually only of the crosslinkers.
      
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     @property
     def box_lengths(self) -> float:
         ...
@@ -3023,9 +2945,6 @@ class StructureSimplificationMode:
     NO_SIMPLIFICATION: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.NO_SIMPLIFICATION: 0>
     X2F_ONLY: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.X2F_ONLY: 1>
     __members__: typing.ClassVar[dict[str, StructureSimplificationMode]]  # value = {'NO_SIMPLIFICATION': <StructureSimplificationMode.NO_SIMPLIFICATION: 0>, 'X2F_ONLY': <StructureSimplificationMode.X2F_ONLY: 1>, 'INACTIVE_ONLY': <StructureSimplificationMode.INACTIVE_ONLY: 2>, 'ALL_TIM': <StructureSimplificationMode.ALL_TIM: 3>, 'ALL_ANDREI': <StructureSimplificationMode.ALL_ANDREI: 4>}
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __eq__(self, other: typing.Any) -> bool:
         ...
     def __getstate__(self) -> int:
@@ -3056,9 +2975,6 @@ class Universe:
     """
     Represents a full Polymer Network structure, a collection of molecules.
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __contains__(self, arg0: Atom) -> bool:
         """
                   Check whether a particular atom is contained in this universe.
@@ -3213,7 +3129,7 @@ class Universe:
                   It loops the 
         
                   Parameters:
-                       - distances: the edges of the bins
+                       - distances: The edges of the bins
                        - unwrapped: whether to measure the distance in unwrapped coordinates or as PBC-corrected distance
         """
     def count_loop_lengths(self, max_length: typing.SupportsInt = -1) -> dict[int, int]:
@@ -3517,9 +3433,6 @@ class UniverseSequence:
          to have the UniverseSequence forget about already read universes.
          
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __getitem__(self, arg0: typing.SupportsInt) -> Universe:
         """
         Get a universe by its index.
@@ -3638,9 +3551,6 @@ class ZScoreMaxDistanceProvider(MaxDistanceProvider):
          - in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
         
     """
-    @staticmethod
-    def _pybind11_conduit_v1_(*args, **kwargs):
-        ...
     def __init__(self, std_multiplier: typing.SupportsFloat, in_sqrt_multiplier: typing.SupportsFloat) -> None:
         ...
     def get_max_distance(self, N: typing.SupportsFloat) -> float:
@@ -3704,7 +3614,7 @@ def randomly_sample_entanglements(universe: Universe, nr_of_samples: typing.Supp
         :param filter_dangling_and_soluble: Whether to filter out dangling chains and soluble crosslinks when finding entanglements.
           This means, entanglements involving an obviously (1st order) dangling or soluble chain are 
     """
-def split_csv(arg0: str, arg1: str) -> ...:
+def split_csv(arg0: str, arg1: str) -> list[str]:
     """
     Read a file containing a number of CSVs. Returns them split up.
     """
