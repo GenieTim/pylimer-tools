@@ -26,6 +26,14 @@ class UnitStyle(object):
     """
 
     def __init__(self, unit_configuration: dict, ureg: UnitRegistry):
+        """
+        Initialize a UnitStyle object.
+
+        :param unit_configuration: Dictionary containing unit definitions
+        :type unit_configuration: dict
+        :param ureg: Pint unit registry to use for unit conversions
+        :type ureg: UnitRegistry
+        """
         self.unit_configuration = unit_configuration
         self.underlying_unit_registry = ureg
         # add some auxiliary constants
@@ -34,11 +42,22 @@ class UnitStyle(object):
             self.unit_configuration["volume"] = self.unit_configuration["distance"] ** 3
 
     def get_underlying_unit_registry(self):
+        """
+        Get the underlying Pint unit registry.
+
+        :return: The unit registry used by this UnitStyle
+        :rtype: UnitRegistry
+        """
         return self.underlying_unit_registry
 
     def get_base_unit_of(self, property: str):
         """
         Returns the conversion factor from the unit style to SI units.
+
+        :param property: The property name to get the unit for (e.g., "mass", "distance")
+        :type property: str
+        :return: The unit object for the requested property
+        :rtype: pint.Quantity
 
         Example usage:
 
@@ -60,6 +79,11 @@ class UnitStyle(object):
         """
         Shorthand access for :func:`~pylimer_tools.io.unitStyles.UnitStyle.get_base_unit_of`.
 
+        :param property: The property name to get the unit for
+        :type property: str
+        :return: The unit object for the requested property
+        :rtype: pint.Quantity
+
         Example usage:
 
         .. code:: python
@@ -79,14 +103,26 @@ class UnitStyleFactory(object):
     """
 
     def __init__(self):
+        """
+        Initialize the UnitStyleFactory with a new UnitRegistry.
+        """
         self.ureg = UnitRegistry()
 
     def get_unit_registry(self):
+        """
+        Get the underlying unit registry.
+
+        :return: The unit registry used by this factory
+        :rtype: UnitRegistry
+        """
         return self.ureg
 
     def get_everares_et_al_data(self) -> pd.DataFrame:
         """
         Load the Everaers et al. (2020) unit properties data.
+
+        :return: DataFrame containing polymer properties from Everaers et al.
+        :rtype: pd.DataFrame
         """
         return pd.read_excel(
             os.path.join(
@@ -99,6 +135,9 @@ class UnitStyleFactory(object):
     def get_available_polymers(self) -> list:
         """
         List all available polymers for which we have lj unit conversions.
+
+        :return: List of polymer names
+        :rtype: list
         """
         return list(self.get_everares_et_al_data()["name"].unique())
 
@@ -107,17 +146,25 @@ class UnitStyleFactory(object):
         """
         Get a UnitStyle instance corresponding to the unit system requested.
 
+        :param unit_type: The unit type, e.g. "lj", "nano", "real", "si", etc.
+        :type unit_type: str
+        :param dimension: The dimension of the box
+        :type dimension: int
+        :param kwargs: Additional arguments required for certain unit styles
+        :type kwargs: dict
+        :return: A UnitStyle object for the requested unit system
+        :rtype: UnitStyle
+        :raises ValueError: If required parameters are missing
+        :raises NotImplementedError: If the requested unit type is not implemented
+
+        For LJ units, you must specify the polymer using the `polymer` parameter.
+
         See also:
           - https://docs.lammps.org/units.html
 
-        Caution:
-          - Please check the source code of this function to see
+        .. warning::
+            Please check the source code of this function to see
             whether the units you need are correctly implemented
-
-        Arguments:
-          - unit_type (str): The unit type, e.g. "lj", "nano", "real", "si", ...
-          - dimension (int): The dimension of the box
-          - kwargs: additional arguments required force certain unit styles (e.g. style "lj" requiring "polymer")
         """
         ureg = self.ureg
         elementary_charge: Final = (1.602176634e-19) * ureg.coulomb
@@ -154,13 +201,15 @@ class UnitStyleFactory(object):
                 )
             # follow derivation for more accurate results
             # sigma_conversion = polymer_data.sigma
-            sigma_conversion = 0.1 * float(polymer_data.l_K) / \
+            sigma_conversion = (
+                0.1 * float(polymer_data.l_K) /
                 (0.965 * float(polymer_data.Cb))
+            )
             ureg.define("sigma = {} * nanometer".format(sigma_conversion))
             ureg.define("eps = {}e-21 joule".format(polymer_data.kB_Tref))
             # time is most difficult in lj — let's keep tau
             ureg.define("tau = 1 * tau")
-            # NOTE: the formula in the LAMMPS documentation contains \epsilon_0.
+            # NOTE: The formula in the LAMMPS documentation contains \epsilon_0.
             # BUT: it does not add up in terms of units, so... the implementation here
             # *might* be wrong
             # epsZero = (8.8541878128e-12*ureg.farad/ureg.meter)
@@ -184,7 +233,7 @@ class UnitStyleFactory(object):
                         else ureg.eps / (ureg.sigma ** (3))
                     ),
                     "viscosity": ureg.eps * ureg.tau / (ureg.sigma ** (3)),
-                    # TODO: the use of elementary charge might not be correct, see
+                    # TODO: The use of elementary charge might not be correct, see
                     # above
                     "charge": elementary_charge,
                     "dipole": elementary_charge * ureg.sigma,

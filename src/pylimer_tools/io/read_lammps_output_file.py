@@ -10,14 +10,13 @@ from pylimer_tools.utils.cache_utility import do_cache, load_cache
 from pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
 
 """
-This module provides a few functions to read LAMMPS' output files, including
+This module provides a few functions to read LAMMPS' output files, including:
 
 - log files (thermo output)
 - dump files (focusing on the coordinates of atoms)
 - data files (the LAMMPS structure)
 - averaged data (from :code:`fix ave/time...` or :code:`fix ave/hist...`)
 - correlation data (from :code:`fix ave/correlate/...`)
-
 """
 
 
@@ -25,6 +24,13 @@ def read_log_file(
         filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:
     """
     Read a LAMMPS' log (thermo output) file.
+
+    :param filepath: Path to the LAMMPS log file
+    :type filepath: str
+    :param lines_to_read_to_detect_header: Maximum number of lines to read when detecting the header
+    :type lines_to_read_to_detect_header: int
+    :return: DataFrame containing the parsed thermo data
+    :rtype: pd.DataFrame
     """
     return extract_thermo_params(
         filepath,
@@ -39,6 +45,15 @@ def read_dump_file(
 ) -> UniverseSequence:
     """
     Read a file with LAMMPS' dump of snapshots of structures into a Universe.
+
+    :param data_file: Path to the LAMMPS data file containing structure information
+    :type data_file: str
+    :param dump_file: Path to the LAMMPS dump file containing trajectory information
+    :type dump_file: str
+    :param atom_style: The atom style(s) used in the data file
+    :type atom_style: Union[List[AtomStyle], None]
+    :return: Sequence of Universe objects representing the trajectory
+    :rtype: UniverseSequence
     """
     u_s = UniverseSequence()
     if atom_style is not None:
@@ -53,12 +68,13 @@ def read_data_file(
     """
     Read a file with LAMMPS' data type of structure into a Universe.
 
-    Arguments:
-        - structure_file: the path to the structure file
-        - atom_style: the atom style in the structure file. Defaults to AtomStyle.Molecule
-
-    Returns:
-        - universe (Universe): the Universe in the given structure file
+    :param structure_file: Path to the structure file
+    :type structure_file: str
+    :param atom_style: The atom style(s) in the structure file (defaults to AtomStyle.Molecule if None)
+    :type atom_style: Union[List[AtomStyle], None]
+    :return: Universe object representing the molecular structure
+    :rtype: Universe
+    :raises FileNotFoundError: If the structure file does not exist
     """
     if not (os.path.isfile(structure_file)):
         raise FileNotFoundError(
@@ -79,16 +95,21 @@ def read_averages_file(filepath, use_cache: bool = True,
 
     Uses pandas' read_csv after detecting the columns.
 
-    Important assumption: the first 2 or 3 lines in the file are:
+    Important assumption: The first 2 or 3 lines in the file are:
     - comment,
     - then one header indicating the columns,
     - and then either data or potentially a second header,
       if it is a sectioned file (e.g., from a `fix ave/time ... vector`)
 
-    Arguments:
-        - filepath: the path to the averages file
-        - use_cache: whether to use the cache to speed up the reading & writing
-        - sep: if, for some reason, the file uses a different delimiter than " "
+    :param filepath: Path to the averages file
+    :type filepath: str
+    :param use_cache: Whether to use the cache to speed up reading & writing
+    :type use_cache: bool
+    :param sep: Delimiter used in the file (default is space)
+    :type sep: str
+    :return: DataFrame containing the parsed average data
+    :rtype: pd.DataFrame
+    :raises FileNotFoundError: If the averages file does not exist
     """
     if not (os.path.isfile(filepath)):
         raise FileNotFoundError(f"Averages-file '{filepath}' not found.")
@@ -119,14 +140,19 @@ def read_averages_file(filepath, use_cache: bool = True,
 def read_sectioned_averages_file(
         filepath, use_cache: bool = True) -> pd.DataFrame:
     """
-    Read a file written by a `fix ave/time` command.
+    Read a file written by a `fix ave/time` command with multiple sections.
 
     Use the section delimiter columns together with pandas' groupby()
     to restore the original sections.
 
-    Arguments:
-        - filepath: the path to the averages file
-        - use_cache: whether to use the cache to speed up the reading & writing
+    :param filepath: Path to the sectioned averages file
+    :type filepath: str
+    :param use_cache: Whether to use the cache to speed up reading & writing
+    :type use_cache: bool
+    :return: DataFrame containing the parsed sectioned data
+    :rtype: pd.DataFrame
+    :raises FileNotFoundError: If the file does not exist
+    :raises ValueError: If the file format is not recognized as a proper sectioned averages file
     """
     if not (os.path.isfile(filepath)):
         raise FileNotFoundError(f"Averages-file '{filepath}' not found.")
@@ -205,8 +231,16 @@ def read_histogram_file(filepath, use_cache: bool = True) -> pd.DataFrame:
     """
     Read a file written by `fix ave/hist` or similar.
 
-    See also:
-        - :func:`~pylimer_tools.io.read_lammps_output_file.readSectionedAveragesFile`
+    This is a wrapper around read_sectioned_averages_file for histogram data.
+
+    :param filepath: Path to the histogram file
+    :type filepath: str
+    :param use_cache: Whether to use the cache to speed up reading & writing
+    :type use_cache: bool
+    :return: DataFrame containing the parsed histogram data
+    :rtype: pd.DataFrame
+
+    :see: :func:`~pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_file`
     """
     return read_sectioned_averages_file(filepath, use_cache)
 
@@ -217,13 +251,16 @@ def read_correlation_file(
     """
     Read a file written by a `fix ave/correlate{/long}` command.
 
-    Parameters:
-        - filepath: the path to the file to read
-        - group_key: the key that denotes a new section
-
-    Returns:
-        - correlatedData: a DataFrame containing all the data of the file.
-            Use the group_key with the DataFrame's groupby() to restore the original sections.
+    :param filepath: Path to the correlation file
+    :type filepath: str
+    :param group_key: The key that denotes a new section
+    :type group_key: str
+    :param use_cache: Whether to use the cache to speed up reading & writing
+    :type use_cache: bool
+    :return: DataFrame containing the correlation data. Use the group_key with
+             the DataFrame's groupby() to restore the original sections.
+    :rtype: pd.DataFrame
+    :raises FileNotFoundError: If the correlation file does not exist
     """
     if not (os.path.isfile(filepath)):
         raise FileNotFoundError(f"Correlation-file '{filepath}' not found.")

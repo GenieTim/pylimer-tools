@@ -4,20 +4,26 @@ from pylimer_tools.utils.cache_utility import do_cache, load_cache
 
 """
 This module provides a few functions to read output from pylimer_tools_cpp's simulators.
-
 """
 
 
-def read_avg_file(filename: str):
+def read_avg_file(filename: str) -> pd.DataFrame:
     """
-    Read an averages-output file from one of the simulators shipped with pylimer_tools
+    Read an averages-output file from one of the simulators shipped with pylimer_tools.
 
-    Args:
-        - filename: The path to the file to read
+    This function parses the output file format used by pylimer_tools_cpp simulators,
+    handling multiple data sections and converting them to a pandas DataFrame.
+    The function also caches results to improve performance on subsequent reads.
 
-    Returns:
-        - results (pd.DataFrame): the content of the averages file
+    :param filename: Path to the averages file to read
+    :type filename: str
+    :return: DataFrame containing the parsed averages data, grouped by OutputStep
+    :rtype: pd.DataFrame
 
+    :note: The function automatically filters out lines containing "-nan" values,
+           null characters, or fewer than 3 columns.
+    :note: The returned DataFrame is grouped by OutputStep, keeping only the last
+           entry for each step.
     """
     cache = load_cache(filename, "my-avg")
     if cache is not None:

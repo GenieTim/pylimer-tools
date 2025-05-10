@@ -89,7 +89,7 @@ SimpleSpringMEHPForceEvaluator::evaluateForceSetGradient(
 //   double p, r, t;
 //   if (std::fabs(x) > 0.99999) {
 //     // TODO: do better.
-//     // we have two problems: the value must be larger than whatever the
+//     // we have two problems: The value must be larger than whatever the
 //     // langevin should return, and second, the value should be small
 //     enough
 //     // to prevent overflow when summing them up.

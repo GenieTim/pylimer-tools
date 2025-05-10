@@ -15,10 +15,10 @@ NOTE:
 unbonded), this will not be rounded/respected in any way.
 
 Arguments:
-  - network: the poylmer network to do the computation for
-  - crossLinkerType: the type of the junctions/crossLinkers to select them
+  - network: The poylmer network to do the computation for
+  - crossLinkerType: The type of the junctions/crossLinkers to select them
 in the network
-  - strandLength: the length of the network strands (in nr. of beads).
+  - strandLength: The length of the network strands (in nr. of beads).
           Used to infer the number of precursor strands.
           If `None`: will use average length of each connected system when
 ignoring the crossLinkers.
@@ -27,7 +27,7 @@ functionality of this atom type. If `None`: will use max functionality per
 type.
 
 Returns:
-  - r (float): the stoichiometric inbalance
+  - r (float): The stoichiometric inbalance
 */
 double
 computeStoichiometricInbalance(pylimer_tools::entities::Universe network,
@@ -65,13 +65,13 @@ NOTE: if your system has a non-integer number of possible bonds (e.g. one
 site unbonded), this will not be rounded/respected in any way.
 
 Arguments:
-  - network: the poylmer network to do the computation for
+  - network: The poylmer network to do the computation for
   - functionalityPerType: a dictionary with key: type, and value:
 functionality of this atom type. If None: will use max functionality per
 type.
 
 Returns:
-  - p (float): the extent of reaction
+  - p (float): The extent of reaction
 */
 double
 computeExtentOfReaction(pylimer_tools::entities::Universe network,
@@ -108,7 +108,7 @@ Source:
   - https://www.sciencedirect.com/science/article/pii/003238618990253X
 
 Arguments:
-  - r (double): the stoichiometric inbalance of reactants (see:
+  - r (double): The stoichiometric inbalance of reactants (see:
 #computeStoichiometricInbalance)
   - f (int): functionality of the crossLinkers
   - g (int): functionality of the precursor polymer

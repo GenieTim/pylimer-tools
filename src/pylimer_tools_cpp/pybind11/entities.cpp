@@ -892,7 +892,7 @@ init_pylimer_bound_entities(py::module_& m)
           It loops the 
 
           Parameters:
-               - distances: the edges of the bins
+               - distances: The edges of the bins
                - unwrapped: whether to measure the distance in unwrapped coordinates or as PBC-corrected distance
      )pbdoc",
          py::arg("distances"),

@@ -330,7 +330,7 @@ namespace entities {
    * This function must be O(1), otherwise, this whole neighbor list will be
    * useless
    *
-   * NOTE: the resulting list will not be reduced, i.e., it will contain
+   * NOTE: The resulting list will not be reduced, i.e., it will contain
    * indices that have a distance > upperCutoff. Additionally,
    * the requested coordinates will also be included!
    *
@@ -443,7 +443,7 @@ namespace entities {
   }
 
   /**
-   * @brief For debugging/test purposes: the actual buckets
+   * @brief For debugging/test purposes: The actual buckets
    *
    * @return std::vector<std::vector<coordinate_idx_t>>
    */

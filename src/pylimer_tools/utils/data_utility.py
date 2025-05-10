@@ -1,4 +1,5 @@
 import warnings
+
 import pandas as pd
 
 
@@ -7,10 +8,10 @@ def get_tail(data, percentage=0.2, min_n=25, max_percentage=0.5):
     Extract the last few entries of a list
 
     Arguments:
-        - data (list|pd.DataFrame|pd.Series): the list to extract the last few entries from
-        - percentage: the percentage of entries to extract
-        - min_n: the minimum number of entries to extract
-        - max_percentage: the maximum percentage of entries to extract
+        - data (list|pd.DataFrame|pd.Series): The list to extract the last few entries from
+        - percentage: The percentage of entries to extract
+        - min_n: The minimum number of entries to extract
+        - max_percentage: The maximum percentage of entries to extract
 
     Returns:
         A (list|pd.DataFrame|pd.Series) with at maximum maxPercentage,
@@ -36,8 +37,8 @@ def unify_data_stepsizes(data: pd.DataFrame, key: str, step_size: int = None,
     - ideal step-size is max step difference. Breaks e.g. if there is one big gap
 
     Arguments:
-        - data: the DataFrame to unify the step-size for
-        - key: the column name indicating the column containing the step-nr.
+        - data: The DataFrame to unify the step-size for
+        - key: The column name indicating the column containing the step-nr.
         - max_expected_step_size: use to get a warning if the computed step-size is larger
 
     Returns:

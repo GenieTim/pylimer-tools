@@ -561,7 +561,7 @@ TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
   CHECK(springPartitions[0] == Catch::Approx(0.367729));
   CHECK(springPartitions[4] == Catch::Approx(1. - 0.367729));
   CHECK(springPartitions[1] == Catch::Approx(0.13793103448275862));
-  // TODO: the Mathematica example `exemplaric-sliplink-3` proposes a different
+  // TODO: The Mathematica example `exemplaric-sliplink-3` proposes a different
   // solution here – check! CHECK(springPartitions[3] == Catch::Approx(0.655172
   // - 0.306578));
   forceBalancer.displaceToMeanPosition(
@@ -762,7 +762,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         CHECK_THAT(forceBalancer2.getPressure(),
                    Catch::Matchers::WithinRel(0.0061105865, 1e-3));
         // add entanglements
-        // TODO: these are random values, as are the results... :P
+        // TODO: These are random values, as are the results... :P
         size_t nrOfSprings = forceRelaxer.getNetwork().nrOfSprings;
         forceBalancer2.addSlipLinks(
           { 10, 100, 50, 12, 76, 80, nrOfSprings - 1 },
@@ -2550,7 +2550,7 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
     // check to make sure the slip-links are actually placed identically
     CHECK(forceBalancerOldSamplingLarge.getNetwork().springPartIndexA.isApprox(
       forceBalancerOldSamplingSmall.getNetwork().springPartIndexA));
-    // cannot compare this: the indices are different depending on sampling
+    // cannot compare this: The indices are different depending on sampling
     // or addition method
     // CHECK(forceBalancer2.getNetwork().springPartIndexB.isApprox(
     //   forceBalancer4.getNetwork().springPartIndexB));

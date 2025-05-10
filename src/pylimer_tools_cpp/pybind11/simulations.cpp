@@ -311,9 +311,9 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
           An evaluation of the stress-contribution.
 
-          :param springDistances: the three coordinate differences for one spring.
-          :param i: the row index of the stress tensor
-          :param j: the column index of the stress tensor
+          :param springDistances: The three coordinate differences for one spring.
+          :param i: The row index of the stress tensor
+          :param j: The column index of the stress tensor
     )pbdoc",
          py::arg("spring_distances"),
          py::arg("i"),
@@ -332,9 +332,9 @@ and finally springs will be any number of connected bonds between links.
   //      One of the two functions to override, the other being
   //      :func:`~pylimer_tools_cpp.MEHPForceEvaluator.evaluateStressContribution`.
 
-  //      :param n: the dimensionality of the problem (the nr. of spring
-  //      coordinates) :param springDistances: the sequential (x, y, z) spring
-  //      distances :param displacements: the displacements from the original
+  //      :param n: The dimensionality of the problem (the nr. of spring
+  //      coordinates) :param springDistances: The sequential (x, y, z) spring
+  //      distances :param displacements: The displacements from the original
   //      coordinates
   //           (accessible by
   //           :func:`~pylimer_tools_cpp.CustomMEHPForceEvaluator.getNetwork().coordinates`)
@@ -342,8 +342,8 @@ and finally springs will be any number of connected bonds between links.
   //      returned
 
   //      Returns:
-  //           - force: the result of the force computation.
-  //           - gradient: the result of the gradient computation.
+  //           - force: The result of the force computation.
+  //           - gradient: The result of the gradient computation.
   //                Only needed if the parameter `gradientNeeded` is true,
   //                otherwise an empty list is sufficient.
   //     )pbdoc",
@@ -364,7 +364,7 @@ and finally springs will be any number of connected bonds between links.
 
      Recommended optimization algorithm: "LD_LBFGS"
 
-     :param kappa: the spring constant :math:`\kappa`
+     :param kappa: The spring constant :math:`\kappa`
     )pbdoc")
     .def(py::init<double>(), py::arg("kappa") = 1.0);
 
@@ -383,7 +383,7 @@ and finally springs will be any number of connected bonds between links.
 
      Recommended optimization algorithm: "LD_MMA"
 
-     :param kappa: the spring constant :math:`\kappa`
+     :param kappa: The spring constant :math:`\kappa`
      :param N: The number of links in a spring
      :param l: The  the length of a spring in the chain
     )pbdoc")
@@ -414,7 +414,7 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
           Instantiate the simulator for a certain universe.
 
-          :param universe: the universe to simulate with
+          :param universe: The universe to simulate with
           :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
           :param is2d: Whether to ignore the z direction.
           :param force_evaluator: The force evaluator to use
@@ -548,7 +548,7 @@ and finally springs will be any number of connected bonds between links.
                If :math:`-1.0` (default), the network is used for determination (which is not accurate), the system is assumed to be phantom.
                For real systems, the value could be determined by :func:`~pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance()`
                on the melt system, with subsequent division by the nr of bonds in the chain.
-          :param nr_of_chains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains.
+          :param nr_of_chains: The value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains.
      )pbdoc",
          py::arg("b0_squared") = -1.0,
          py::arg("nr_of_chains") = -1)
@@ -745,10 +745,10 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
           Instantiate the simulator for a certain universe.
 
-          :param universe: the universe to simulate with
+          :param universe: The universe to simulate with
           :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
           :param is2D: Whether to ignore the z direction.
-          :param kappa: the spring constant
+          :param kappa: The spring constant
           :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
           :param remove_dangling_chains: whether to keep or remove obviously dangling chains when setting up the network
           )pbdoc",
@@ -1143,8 +1143,8 @@ and finally springs will be any number of connected bonds between links.
           :math:`T` the temperature and
           :math:`k_B` Boltzmann's constant.
 
-          :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
-          :param nr_of_chains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs.
+          :param b02: The melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
+          :param nr_of_chains: The value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs.
      )pbdoc",
          py::arg("b02") = -1.0,
          py::arg("nr_of_chains") = -1,
@@ -1161,8 +1161,8 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
                Evaluates the gamma factor for each strand in the specified direction (i.e., the squared distance divided by the contour length multiplied by b02)
 
-               :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
-               :param direction: the direction in which to compute the gamma factors (0: x, 1: y, 2: z)
+               :param b02: The melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
+               :param direction: The direction in which to compute the gamma factors (0: x, 1: y, 2: z)
           )pbdoc",
          py::arg("b02"),
          py::arg("direction"),
@@ -1247,7 +1247,7 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
                 Get the number of active springs remaining after running the simulation.
 
-               :param direction: the direction in which to compute the active springs (0: x, 1: y, 2: z)
+               :param direction: The direction in which to compute the active springs (0: x, 1: y, 2: z)
                :param tolerance: springs under this length are considered inactive
           )pbdoc",
          py::arg("direction"),
@@ -1341,10 +1341,10 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
            Instantiate the simulator for a certain universe.
 
-           :param universe: the universe giving the basic connectivity to compute with
+           :param universe: The universe giving the basic connectivity to compute with
            :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
            :param is_2d: Whether to ignore the z direction.
-           :param kappa: the spring constant
+           :param kappa: The spring constant
            :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
            :param remove_dangling_chains: whether to keep or remove obviously dangling chains when setting up the network
            )pbdoc",
@@ -1360,8 +1360,8 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
            Instantiate the simulator for a certain universe with the given entanglements.
 
-           :param universe: the universe giving the basic connectivity to compute with
-           :param entanglements: the entanglements to use in the computation
+           :param universe: The universe giving the basic connectivity to compute with
+           :param entanglements: The entanglements to use in the computation
            :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
            :param is_2d: Whether to ignore the z direction.
            :param entanglements_as_springs: whether to use the entanglements as springs instead of links
@@ -1386,13 +1386,13 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
      Instantiate this simulator with randomly chosen slip-links.
 
-     :param universe: the universe containing the basic atoms and connectivity
-     :param nr_of_entanglements_to_sample: the number of entanglements to sample
+     :param universe: The universe containing the basic atoms and connectivity
+     :param nr_of_entanglements_to_sample: The number of entanglements to sample
      :param upper_cutoff: maximum distance from one sampled bead to its partner
      :param lower_cutoff: minimum distance from one sampled bead to its partner
-     :param minimum_nr_of_entanglements: the minimum number of entanglements that should be sampled
+     :param minimum_nr_of_entanglements: The minimum number of entanglements that should be sampled
      :param same_strand_cutoff: distance from one sampled bead to its pair within the same strand
-     :param seed: the seed for the random number generator
+     :param seed: The seed for the random number generator
      :param cross_linker_type:
      :param is_2d:
      :param filter_entanglements:
@@ -1646,8 +1646,8 @@ and finally springs will be any number of connected bonds between links.
            :math:`T` the temperature and
            :math:`k_B` Boltzmann's constant.
 
-           :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
-           :param nr_of_chains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs.
+           :param b02: The melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
+           :param nr_of_chains: The value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs.
       )pbdoc",
          py::arg("b02") = -1.0,
          py::arg("nr_of_chains") = -1)
@@ -1662,8 +1662,8 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
                 Evaluates the gamma factor for each strand in the specified direction (i.e., the squared distance divided by the contour length multiplied by b02)
 
-                :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
-                :param direction: the direction in which to compute the gamma factors (0: x, 1: y, 2: z)
+                :param b02: The melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
+                :param direction: The direction in which to compute the gamma factors (0: x, 1: y, 2: z)
            )pbdoc",
          py::arg("b02"),
          py::arg("direction"))
@@ -1735,7 +1735,7 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
                  Get the number of active springs remaining after running the simulation.
 
-                :param direction: the direction in which to compute the active springs (0: x, 1: y, 2: z)
+                :param direction: The direction in which to compute the active springs (0: x, 1: y, 2: z)
                 :param tolerance: springs under this length are considered inactive
            )pbdoc",
          py::arg("direction"),
@@ -1934,7 +1934,7 @@ and finally springs will be any number of connected bonds between links.
                Use the same version of pylimer-tools if you want to be sure that things work.
 
           Arguments:
-               - file: the file path to the restart file to write
+               - file: The file path to the restart file to write
                - outputEvery: how often to write the restart file
      )pbdoc",
          py::arg("file"),
@@ -1992,12 +1992,12 @@ and finally springs will be any number of connected bonds between links.
           Configure how to do bond formation during the run.
 
           Arguments:
-          - num_bonds_to_form (int): the nr of bonds to form in total. Use 0 to stop bond formation.
-          - num_bonds_per_atom_type (dict): the nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)
-          - bond_formation_dist (float): the maximum distance allowed to form bonds
+          - num_bonds_to_form (int): The nr of bonds to form in total. Use 0 to stop bond formation.
+          - num_bonds_per_atom_type (dict): The nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)
+          - bond_formation_dist (float): The maximum distance allowed to form bonds
           - attempt_bond_formation_every (int): attempt to form bonds every this many steps during the simulation run
-          - atom_type_form_from (int): the atom type to start forming bonds from.
-          - atom_type_form_to (int): the atom type to start forming bonds to.
+          - atom_type_form_from (int): The atom type to start forming bonds from.
+          - atom_type_form_to (int): The atom type to start forming bonds to.
          )pbdoc",
          py::arg("num_bonds_to_form"),
          py::arg("max_bonds_per_atom_type"),
@@ -2068,7 +2068,7 @@ and finally springs will be any number of connected bonds between links.
           Explicitly force the writing of a restart file, now!
 
           Arguments:
-          - file (str): the file path and name of the restart file to be written.
+          - file (str): The file path and name of the restart file to be written.
                Can end in xml, json or anything else (-> binary).
      )pbdoc",
          py::arg("file"))

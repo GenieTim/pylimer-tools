@@ -127,7 +127,7 @@ init_pylimer_bound_writers(py::module_& m)
           Actually do the writing to the disk.
 
           Arguments:
-               - file (str): the path and file name to write to
+               - file (str): The path and file name to write to
     )pbdoc",
          py::arg("file"));
 }
