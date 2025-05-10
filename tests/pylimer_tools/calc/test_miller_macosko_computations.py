@@ -385,7 +385,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         )
 
         alpha, beta = compute_miller_macosko_probabilities(
-            r=1.0, p=0.95, f=4.0)
+            r=1.0, p=0.95, f=4)
         self.assertAlmostEqual(alpha, 0.0983588, places=5)
 
         self.assertAlmostEqual(g_anm.to("MPa").magnitude, 0.1930520, places=5)

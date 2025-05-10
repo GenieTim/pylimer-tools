@@ -69,7 +69,7 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
             [self.testUniverse, self.testUniverseSmall]))
 
     def test_effective_nr_density_of_junction_calculation(self):
-        self.assertIsNone(compute_effective_nr_density_of_junctions([]))
+        self.assertEqual(0., compute_effective_nr_density_of_junctions([]))
         # Border cases
         self.assertEqual(
             0.0, compute_effective_nr_density_of_junctions([self.testUniverse], 0, 0, crosslinker_type=None))
@@ -94,7 +94,7 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
                                                       crosslinker_type=2, min_num_effective_strands=2))
 
     def test_effective_nr_density_of_network_calculation(self):
-        self.assertIsNone(compute_effective_nr_density_of_network([]))
+        self.assertEqual(0., compute_effective_nr_density_of_network([]))
         self.assertEqual(3, len(self.testUniverse.get_molecules(2)))
         # Border cases
         self.assertEqual(0.0, compute_effective_nr_density_of_network(
