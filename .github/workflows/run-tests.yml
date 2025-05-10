@@ -60,7 +60,7 @@ jobs:
       - name: Coverage Badge
         run: genbadge coverage -i coverage.xml -o ".github/coverage.svg"
 
-      - name: Upload to CodeCov
+      - name: Upload test coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
