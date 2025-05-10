@@ -68,6 +68,14 @@ jobs:
           verbose: true # optional (default = false)
           # gcov: true
 
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true # optional (default = false)
+          directory: ./test-reports/
+
       # Commit Coverage Badge if applicable
       - name: Verify Changed files
         uses: tj-actions/verify-changed-files@v20

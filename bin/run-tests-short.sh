@@ -54,8 +54,8 @@ python -m pip install --verbose -e . || exit 3
 
 cd "$ROOT_DIR" || exit 4
 
-# then, run Python tests
-python -m coverage run -m unittest discover -v || exit 7
+# then, run Python tests with XML output
+python -m coverage run -m xmlrunner discover -v -o ./test-reports || exit 7
 
 # generate coverage report
 python -m coverage report
