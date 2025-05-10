@@ -154,8 +154,8 @@ class UnitStyleFactory(object):
                 )
             # follow derivation for more accurate results
             # sigma_conversion = polymer_data.sigma
-            sigma_conversion = 0.1 * polymer_data.l_K / \
-                (0.965 * polymer_data.Cb)
+            sigma_conversion = 0.1 * float(polymer_data.l_K) / \
+                (0.965 * float(polymer_data.Cb))
             ureg.define("sigma = {} * nanometer".format(sigma_conversion))
             ureg.define("eps = {}e-21 joule".format(polymer_data.kB_Tref))
             # time is most difficult in lj — let's keep tau
