@@ -327,32 +327,28 @@
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.mehp_utilities.</span></span><span class="sig-name descname"><span class="pre">compute_cycle_rank</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">networks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.mehp_utilities.compute_cycle_rank" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the cycle rank (<span class="math notranslate nohighlight">\(\chi\)</span>).
 Assumes the precursor-chains to be bifunctional.</p>
+<p>No need to provide all the parameters — either/or:</p>
+<ul class="simple">
+<li><p>nu &amp; mu</p></li>
+<li><p>network, abs_tol, rel_tol, crosslinker_type</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the network to calculate the cycle rank for</p></li>
-<li><p><strong>nu</strong> (<em>-</em>) – number of elastically effective (active) strands per unit volume</p></li>
-<li><p><strong>mu</strong> (<em>-</em>) – number density of the elastically effective crosslink</p></li>
-<li><p><strong>abs_tol</strong> (<em>-</em>) – the absolute tolerance to categorize a chain as active (min. end-to-end distance)
-(None to use only rel_tol)</p></li>
-<li><p><strong>rel_tol</strong> (<em>-</em>) – the relative tolerance to categorize a chain as active
-(0: all, 1: none (use only abs_tol))</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type of the crosslinkers/junctions</p></li>
+<li><p><strong>networks</strong> (<em>Union</em><em>[</em><em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em><em>, </em><em>None</em><em>]</em>) – The networks to calculate the cycle rank for</p></li>
+<li><p><strong>nu</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>None</em><em>]</em>) – Number of elastically effective (active) strands per unit volume</p></li>
+<li><p><strong>mu</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>None</em><em>]</em>) – Number density of the elastically effective crosslinks</p></li>
+<li><p><strong>abs_tol</strong> (<em>float</em>) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
+Set to None to use only rel_tol</p></li>
+<li><p><strong>rel_tol</strong> (<em>float</em>) – The relative tolerance to categorize a chain as active (0: all, 1: none)</p></li>
+<li><p><strong>crosslinker_type</strong> (<em>int</em>) – The atom type of the crosslinkers/junctions</p></li>
 </ul>
 </dd>
-</dl>
-<p>No need to provide all the parameters — either/or:
-- nu &amp; mu
-- network, abs_tol, rel_tol, crosslinker_type</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the cycle rank ($xi = nu_{eff} - mu_{eff}$). Unit: [1/Volume]</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The cycle rank (<span class="math notranslate nohighlight">\(\xi = \nu_{eff} - \mu_{eff}\)</span>) in units of 1/Volume</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p>cycleRank</p></li>
-</ul>
-</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -372,23 +368,19 @@ Assumes the precursor-chains to be bifunctional.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the network to compute <span class="math notranslate nohighlight">\(\nu_{eff}\)</span> for</p></li>
-<li><p><strong>abs_tol</strong> (<em>-</em>) – the absolute tolerance to categorize a chain as active (min. end-to-end distance)
-(None to use only rel_tol)</p></li>
-<li><p><strong>rel_tol</strong> (<em>-</em>) – the relative tolerance to categorize a chain as active
-(0: all, 1: none (use only abs_tol))</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type of the crosslinkers/junctions</p></li>
-<li><p><strong>min_num_effective_strands</strong> (<em>-</em>) – the number of elastically effective strands to qualify a junction as such</p></li>
+<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The networks to compute <span class="math notranslate nohighlight">\(\mu_{eff}\)</span> for</p></li>
+<li><p><strong>abs_tol</strong> (<em>float</em>) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
+Set to None to use only rel_tol</p></li>
+<li><p><strong>rel_tol</strong> (<em>float</em>) – The relative tolerance to categorize a chain as active (0: all, 1: none)</p></li>
+<li><p><strong>crosslinker_type</strong> (<em>int</em>) – The atom type of the crosslinkers/junctions</p></li>
+<li><p><strong>min_num_effective_strands</strong> (<em>int</em>) – The number of elastically effective strands to qualify a junction as such</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the effective number density of junctions. Unit: [1/Volume]</p>
+<dd class="field-even"><p>The effective number density of junctions in units of 1/Volume</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\mu_{eff}\)</span> (float)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -400,7 +392,7 @@ Assumes the precursor-chains to be bifunctional.</p>
 Assumes the precursor-chains to be bifunctional.</p>
 <p><span class="math notranslate nohighlight">\(\nu_{eff}\)</span> is the number of elastically effective (active) strands per unit volume,
 which are defined as the ones that can store elastic energy
-upon network deformation, resp. the effective number density of network strands</p>
+upon network deformation, resp. the effective number density of network strands.</p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
 <li><p><a class="reference external" href="https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262">https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</a></p></li>
@@ -410,22 +402,18 @@ upon network deformation, resp. the effective number density of network strands<
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the network to compute <span class="math notranslate nohighlight">\(\nu_{eff}\)</span> for</p></li>
-<li><p><strong>abs_tol</strong> (<em>-</em>) – the absolute tolerance to categorize a chain as active (min. end-to-end distance)
-(None to use only rel_tol)</p></li>
-<li><p><strong>rel_tol</strong> (<em>-</em>) – the relative tolerance to categorize a chain as active
-(0: all, 1: none (use only abs_tol))</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type of the cross-linkers/junctions</p></li>
+<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The networks to compute <span class="math notranslate nohighlight">\(\nu_{eff}\)</span> for</p></li>
+<li><p><strong>abs_tol</strong> (<em>float</em>) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
+Set to None to use only rel_tol</p></li>
+<li><p><strong>rel_tol</strong> (<em>float</em>) – The relative tolerance to categorize a chain as active (0: all, 1: none)</p></li>
+<li><p><strong>crosslinker_type</strong> (<em>int</em>) – The atom type of the cross-linkers/junctions</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the effective number density of network strands. Unit: [1/Volume]</p>
+<dd class="field-even"><p>The effective number density of network strands in units of 1/Volume</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\nu_{eff}\)</span> (float)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -437,18 +425,21 @@ upon network deformation, resp. the effective number density of network strands<
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>networks</strong> (<em>-</em>) – a list of universes</p></li>
-<li><p><strong>accept_different_sizes</strong> (<em>-</em>) – toggle whether to throw an error when the Universe have different nr. of atoms</p></li>
+<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – A list of universes</p></li>
+<li><p><strong>accept_different_sizes</strong> (<em>bool</em>) – Toggle whether to throw an error when the Universes have different numbers of atoms</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the mean volume of the universes</p>
+<dd class="field-even"><p>The mean volume of the universes</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>mean_volume (float)</p></li>
+<dd class="field-odd"><p>float</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the input list is empty</p></li>
+<li><p><strong>NotImplementedError</strong> – If universes have different sizes and accept_different_sizes is False</p></li>
 </ul>
-</p>
 </dd>
 </dl>
 </dd></dl>
@@ -472,18 +463,17 @@ upon network deformation, resp. the effective number density of network strands<
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the network to compute the topological factor for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the type of atoms to ignore</p></li>
-<li><p><strong>total_mass</strong> (<em>-</em>) – the <span class="math notranslate nohighlight">\(M\)</span> in the respective formula</p></li>
-<li><p><strong>b</strong> (<em>-</em>) – the mean bond length.
-If <cite>None</cite>, it will be computed for each molecule in the first Universe (Network).</p></li>
+<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The networks to compute the topological factor for</p></li>
+<li><p><strong>crosslinker_type</strong> (<em>int</em>) – The type of atoms to ignore (junctions, cross-linkers)</p></li>
+<li><p><strong>total_mass</strong> (<em>float</em>) – The <span class="math notranslate nohighlight">\(M\)</span> in the respective formula</p></li>
+<li><p><strong>b</strong> (<em>float</em><em> or </em><em>None</em>) – The mean bond length. If None, it will be computed for each molecule in the first Universe</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p>the topological factor <span class="math notranslate nohighlight">\(\Gamma\)</span></p></li>
-</ul>
-</p>
+<dd class="field-even"><p>The topological factor <span class="math notranslate nohighlight">\(\Gamma\)</span></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -501,21 +491,18 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the polymer system to predict the shear modulus for</p></li>
-<li><p><strong>T</strong> (<em>-</em>) – the temperature in your unit system</p></li>
-<li><p><strong>k_b</strong> (<em>-</em>) – Boltzmann’s constant in your unit system</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the type of atoms to ignore (junctions, cross-linkers)</p></li>
-<li><p><strong>totalMass</strong> (<em>-</em>) – the <span class="math notranslate nohighlight">\(M\)</span> in the respective formula</p></li>
+<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The polymer systems to predict the shear modulus for</p></li>
+<li><p><strong>temperature</strong> (<em>float</em>) – The temperature in your unit system</p></li>
+<li><p><strong>k_boltzmann</strong> (<em>float</em>) – Boltzmann’s constant in your unit system</p></li>
+<li><p><strong>crosslinker_type</strong> (<em>int</em>) – The type of atoms to ignore (junctions, cross-linkers)</p></li>
+<li><p><strong>total_mass</strong> (<em>float</em>) – The <span class="math notranslate nohighlight">\(M\)</span> in the respective formula</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the estimated shear modulus. Unit: [pressure]</p>
+<dd class="field-even"><p>The estimated shear modulus in pressure units</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>shear modulus (float)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -531,13 +518,13 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>g_e_1</strong> – the melt entanglement modulus <span class="math notranslate nohighlight">\(G_e(1) = k_B T \epsilon_e\)</span></p></li>
-<li><p><strong>temperature</strong> – the temperatures; defaults to room temperature (25 °C)</p></li>
-<li><p><strong>network</strong> – the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – the type of the junctions/cross-linkers to select them in the network</p></li>
-<li><p><strong>p</strong> – the cross-linker conversion</p></li>
-<li><p><strong>r</strong> – the stoichiometric imbalance</p></li>
-<li><p><strong>f</strong> – the functionality of the crosslinkers</p></li>
+<li><p><strong>g_e_1</strong> – The melt entanglement modulus <span class="math notranslate nohighlight">\(G_e(1) = k_B T \epsilon_e\)</span></p></li>
+<li><p><strong>temperature</strong> – The temperatures; defaults to room temperature (25 °C)</p></li>
+<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> – The type of the junctions/cross-linkers to select them in the network</p></li>
+<li><p><strong>p</strong> – The cross-linker conversion</p></li>
+<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
+<li><p><strong>f</strong> – The functionality of the crosslinkers</p></li>
 <li><p><strong>beta</strong> – <span class="math notranslate nohighlight">\(P(F_b^{out})\)</span>, optional</p></li>
 </ul>
 </dd>
@@ -554,15 +541,15 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>p</strong> – the cross-linker conversion</p></li>
-<li><p><strong>r</strong> – the stoichiometric imbalance</p></li>
-<li><p><strong>f</strong> – the functionality of the crosslinkers</p></li>
-<li><p><strong>g_e_1</strong> – the melt entanglement modulus <span class="math notranslate nohighlight">\(G_e(1) = k_B T \epsilon_e\)</span></p></li>
+<li><p><strong>p</strong> – The cross-linker conversion</p></li>
+<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
+<li><p><strong>f</strong> – The functionality of the crosslinkers</p></li>
+<li><p><strong>g_e_1</strong> – The melt entanglement modulus <span class="math notranslate nohighlight">\(G_e(1) = k_B T \epsilon_e\)</span></p></li>
 <li><p><strong>xlink_concentration_0</strong> – [A_f]_0, in 1/volume units</p></li>
-<li><p><strong>ureg</strong> – the unit registry to use</p></li>
+<li><p><strong>ureg</strong> – The unit registry to use</p></li>
 <li><p><strong>alpha</strong> – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, optional</p></li>
-<li><p><strong>temperature</strong> – the temperatures; defaults to room temperature</p></li>
-<li><p><strong>w_sol</strong> – the soluble fraction (to be removed)</p></li>
+<li><p><strong>temperature</strong> – The temperatures; defaults to room temperature</p></li>
+<li><p><strong>w_sol</strong> – The soluble fraction (to be removed)</p></li>
 </ul>
 </dd>
 </dl>
@@ -571,39 +558,24 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_junction_modulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlink_concentration_0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ureg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">UnitRegistry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus" title="Link to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>Compute MMT’s junction modulus, given by
-:math:<a href="#id1"><span class="problematic" id="id2">`</span></a>G_{junctions} = k_B T [A_f]_0 sum_{m=3}^{f}</p>
-</div></blockquote>
-<p>rac{m-2}{2} P(X_{m,f})`.</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param p<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the cross-linker conversion</p>
+<dd><p>Compute MMT’s junction modulus, given by
+<span class="math notranslate nohighlight">\(G_{junctions} = k_B T [A_f]_0 \sum_{m=3}^{f} \frac{m-2}{2} P(X_{m,f})\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> – The cross-linker conversion</p></li>
+<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
+<li><p><strong>xlink_concentration_0</strong> – [A_f]_0, in 1/volume units</p></li>
+<li><p><strong>ureg</strong> – The unit registry to use</p></li>
+<li><p><strong>f</strong> – The functionality of the crosslinkers</p></li>
+<li><p><strong>alpha</strong> – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, optional</p></li>
+<li><p><strong>temperature</strong> – The temperatures; defaults to room temperature (25 °C)</p></li>
+</ul>
 </dd>
-<dt class="field-even">param r<span class="colon">:</span></dt>
-<dd class="field-even"><p>the stoichiometric imbalance</p>
-</dd>
-<dt class="field-odd">param xlink_concentration_0<span class="colon">:</span></dt>
-<dd class="field-odd"><p>[A_f]_0, in 1/volume units</p>
-</dd>
-<dt class="field-even">param ureg<span class="colon">:</span></dt>
-<dd class="field-even"><p>the unit registry to use</p>
-</dd>
-<dt class="field-odd">param f<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the functionality of the crosslinkers</p>
-</dd>
-<dt class="field-even">param alpha<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, optional</p>
-</dd>
-<dt class="field-odd">param temperature<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the temperatures; defaults to room temperature (25 °C)</p>
-</dd>
-<dt class="field-even">return<span class="colon">:</span></dt>
-<dd class="field-even"><p>the junction modulus contribution</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The junction modulus contribution</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py function">
@@ -624,21 +596,23 @@ respectively, is the start of a finite chain.</p>
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Currently, only systems with B_2, B_1 and A_f are supported.</p>
+<p>Currently, only systems with B_2, B_1 and A_f are supported.
+If you have a system with other functionality distributions,
+you would need to implement these formulas yourselves.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">param r<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the stoichiometric imbalance</p>
+<dd class="field-odd"><p>The stoichiometric imbalance</p>
 </dd>
 <dt class="field-even">param p<span class="colon">:</span></dt>
-<dd class="field-even"><p>the extent of reaction in terms of the crosslinkers</p>
+<dd class="field-even"><p>The extent of reaction in terms of the crosslinkers</p>
 </dd>
 <dt class="field-odd">param f<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the functionality of the the crosslinker</p>
+<dd class="field-odd"><p>The functionality of the the crosslinker</p>
 </dd>
 <dt class="field-even">param b2<span class="colon">:</span></dt>
-<dd class="field-even"><p>the fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.
-Can be computed e.g. as :math:<a href="#id3"><span class="problematic" id="id4">`</span></a>b_2 =</p>
+<dd class="field-even"><p>The fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.
+Can be computed e.g. as :math:<a href="#id1"><span class="problematic" id="id2">`</span></a>b_2 =</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -662,36 +636,36 @@ Can be computed e.g. as :math:<a href="#id3"><span class="problematic" id="id4">
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – the polymer network to do the computation for</p></li>
-<li><p><strong>ureg</strong> – the unit registry to use</p></li>
-<li><p><strong>unit_style</strong> – the unit style to use to have the results in appropriate units</p></li>
-<li><p><strong>crosslinker_type</strong> – the type of the junctions/cross-linkers to select them in the network</p></li>
-<li><p><strong>r</strong> – the stoichiometric imbalance. Optional if network is specified</p></li>
-<li><p><strong>p</strong> – the extent of reaction. Optional if network is specified</p></li>
-<li><p><strong>f</strong> – the functionality of the the crosslinker. Optional if network is specified</p></li>
-<li><p><strong>nu</strong> – the strand number density (nr of strands per volume) (ideally with units).
+<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
+<li><p><strong>ureg</strong> – The unit registry to use</p></li>
+<li><p><strong>unit_style</strong> – The unit style to use to have the results in appropriate units</p></li>
+<li><p><strong>crosslinker_type</strong> – The type of the junctions/cross-linkers to select them in the network</p></li>
+<li><p><strong>r</strong> – The stoichiometric imbalance. Optional if network is specified</p></li>
+<li><p><strong>p</strong> – The extent of reaction. Optional if network is specified</p></li>
+<li><p><strong>f</strong> – The functionality of the the crosslinker. Optional if network is specified</p></li>
+<li><p><strong>nu</strong> – The strand number density (nr of strands per volume) (ideally with units).
 Optional if network is specified</p></li>
-<li><p><strong>temperature</strong> – the temperature to compute the modulus at. Default: 298.15 K
+<li><p><strong>temperature</strong> – The temperature to compute the modulus at. Default: 298.15 K
 Optional, can be passed to improve performance</p></li>
 <li><p><strong>functionality_per_type</strong> – a dictionary with key: type, and value: functionality of this atom type.
 Optional, can be passed to improve performance</p></li>
-<li><p><strong>g_e_1</strong> – the melt entanglement modulus</p></li>
-<li><p><strong>b2</strong> – the mole fraction of reactive sites in B2 among all reactive sites
+<li><p><strong>g_e_1</strong> – The melt entanglement modulus</p></li>
+<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>G_MMT_phantom: the phantom contribution to the MMT modulus;
+<dd class="field-even"><p>G_MMT_phantom: The phantom contribution to the MMT modulus;
 see also <code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools.calc.miller_macosko_theory.computeJunctionModulus()</span></code></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>G_MMT_entanglement: the entanglement contribution to the MMT modulus</p>
+<dd class="field-odd"><p>G_MMT_entanglement: The entanglement contribution to the MMT modulus</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>g_anm: the ANM estimate of the modulus</p>
+<dd class="field-even"><p>g_anm: The ANM estimate of the modulus</p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>g_pnm: the PNM estimate of the modulus</p>
+<dd class="field-odd"><p>g_pnm: The PNM estimate of the modulus</p>
 </dd>
 </dl>
 </dd></dl>
@@ -712,7 +686,7 @@ This function computes the probability that a random B_2 unit will be dangling.<
 <dd class="field-odd"><p><strong>p_f_b_out</strong> – <span class="math notranslate nohighlight">\(P(F_B^{out})\)</span></p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the probability that a bifunctional monomer is dangling</p>
+<dd class="field-even"><p>The probability that a bifunctional monomer is dangling</p>
 </dd>
 </dl>
 </dd></dl>
@@ -727,7 +701,7 @@ This function computes the probability that a random B_2 unit will be effective.
 <dd class="field-odd"><p><strong>p_f_b_out</strong> – <span class="math notranslate nohighlight">\(P(F_B^{out})\)</span></p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the probability that a bifunctional monomer is effective</p>
+<dd class="field-even"><p>The probability that a bifunctional monomer is effective</p>
 </dd>
 </dl>
 </dd></dl>
@@ -752,7 +726,7 @@ This is equal to the probability that only one of the arms is attached to the ge
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the probability that a crosslink is dangling</p>
+<dd class="field-even"><p>The probability that a crosslink is dangling</p>
 </dd>
 </dl>
 </dd></dl>
@@ -777,7 +751,7 @@ This is equal to the probability that only one of the arms is attached to the ge
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the probability that a crosslink is effective</p>
+<dd class="field-even"><p>The probability that a crosslink is effective</p>
 </dd>
 </dl>
 </dd></dl>
@@ -802,7 +776,7 @@ This function computes the probability that a random A_f unit will have i pendan
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the probability that a crosslink with degree is dangling</p>
+<dd class="field-even"><p>The probability that a crosslink with degree is dangling</p>
 </dd>
 </dl>
 </dd></dl>
@@ -817,7 +791,7 @@ This function computes the probability that a random A_f unit will have i pendan
 <dd class="field-odd"><p><strong>beta</strong> – <span class="math notranslate nohighlight">\(P(F_b^{out})\)</span>, see <code class="xref py py-func docutils literal notranslate"><span class="pre">compute_mms_probabilities()</span></code></p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the Langley trapping factor</p>
+<dd class="field-even"><p>The Langley trapping factor</p>
 </dd>
 </dl>
 </dd></dl>
@@ -829,13 +803,13 @@ This function computes the probability that a random A_f unit will have i pendan
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – the type of the junctions/cross-linkers to select them in the network</p></li>
+<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> – The type of the junctions/cross-linkers to select them in the network</p></li>
 <li><p><strong>functionality_per_type</strong> – a dictionary with key: atom type, and value: functionality atoms with this type.</p></li>
 <li><p><strong>weight_fractions</strong> – a dictionary with the weight fraction of each type of atom</p></li>
-<li><p><strong>r</strong> – the stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> – the extent of reaction in terms of the crosslinkers</p></li>
-<li><p><strong>b2</strong> – the mole fraction of reactive sites in B2 among all reactive sites
+<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
+<li><p><strong>p</strong> – The extent of reaction in terms of the crosslinkers</p></li>
+<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
@@ -858,13 +832,13 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – the network to compute the weight fraction for</p></li>
-<li><p><strong>crosslinker_type</strong> – the atom type to use to split the molecules</p></li>
+<li><p><strong>network</strong> – The network to compute the weight fraction for</p></li>
+<li><p><strong>crosslinker_type</strong> – The atom type to use to split the molecules</p></li>
 <li><p><strong>functionality_per_type</strong> – a dictionary with key: type, and value: functionality of this atom type.</p></li>
 <li><p><strong>weight_fractions</strong> – a dictionary with the weight fraction of each type of atom</p></li>
-<li><p><strong>r</strong> – the stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> – the extent of reaction in terms of the crosslinkers</p></li>
-<li><p><strong>b2</strong> – the mole fraction of reactive sites in B2 among all reactive sites
+<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
+<li><p><strong>p</strong> – The extent of reaction in terms of the crosslinkers</p></li>
+<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
@@ -888,20 +862,20 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – the type of the junctions/cross-linkers to select them in the network</p></li>
+<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> – The type of the junctions/cross-linkers to select them in the network</p></li>
 <li><p><strong>weight_fractions</strong> – a dictionary with key: type, and value: weight fraction of type.
 Pass if you want to omit the network.</p></li>
 <li><p><strong>functionality_per_type</strong> – a dictionary with key: type, and value: functionality of this atom type.
 See: <a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.determine_functionality_per_type" title="pylimer_tools_cpp.Universe.determine_functionality_per_type"><code class="xref py py-func docutils literal notranslate"><span class="pre">determine_functionality_per_type()</span></code></a>.</p></li>
-<li><p><strong>r</strong> – the stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> – the extent of reaction in terms of the crosslinkers</p></li>
-<li><p><strong>b2</strong> – the mole fraction of reactive sites in B2 among all reactive sites
+<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
+<li><p><strong>p</strong> – The extent of reaction in terms of the crosslinkers</p></li>
+<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="math notranslate nohighlight">\(W_{sol}\)</span> (float): the weight fraction of soluble material according to MMT.</p>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(W_{sol}\)</span> (float): The weight fraction of soluble material according to MMT.</p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>weight_fractions (dict): a dictionary with key: type, and value: weight fraction of type</p>
@@ -923,12 +897,12 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> – the stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> – the extent of reaction in terms of the crosslinkers</p></li>
-<li><p><strong>f</strong> – the functionality of the the crosslinker</p></li>
-<li><p><strong>w_f</strong> – the weight fraction of the crosslinkers</p></li>
-<li><p><strong>w_g</strong> – the weight fraction of ordinary chains</p></li>
-<li><p><strong>g</strong> – the functionality of the ordinary chains</p></li>
+<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
+<li><p><strong>p</strong> – The extent of reaction in terms of the crosslinkers</p></li>
+<li><p><strong>f</strong> – The functionality of the the crosslinker</p></li>
+<li><p><strong>w_f</strong> – The weight fraction of the crosslinkers</p></li>
+<li><p><strong>w_g</strong> – The weight fraction of ordinary chains</p></li>
+<li><p><strong>g</strong> – The functionality of the ordinary chains</p></li>
 </ul>
 </dd>
 </dl>
@@ -948,9 +922,9 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> – the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</p></li>
+<li><p><strong>r</strong> – The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</p></li>
 <li><p><strong>f</strong> – functionality of the crosslinkers</p></li>
-<li><p><strong>b2</strong> – the mole fraction of reactive sites in B2 among all reactive sites
+<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
@@ -967,15 +941,15 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> – the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</p></li>
+<li><p><strong>r</strong> – The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</p></li>
 <li><p><strong>f</strong> – functionality of the crosslinkers</p></li>
-<li><p><strong>b2</strong> – the mole fraction of reactive sites in B2 among all reactive sites
+<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2. Since <cite>r</cite> already includes the number of active sites, this argument
 is not necessary.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>p_max: the maximum cross-linker conversion possible</p>
+<dd class="field-even"><p>p_max: The maximum cross-linker conversion possible</p>
 </dd>
 </dl>
 </dd></dl>
@@ -993,8 +967,8 @@ is not necessary.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – the network to compute the weight fraction for</p></li>
-<li><p><strong>crosslinker_type</strong> – the atom type to use to split the molecules</p></li>
+<li><p><strong>network</strong> – The network to compute the weight fraction for</p></li>
+<li><p><strong>crosslinker_type</strong> – The atom type to use to split the molecules</p></li>
 <li><p><strong>functionality_per_type</strong> – a dictionary with key: type, and value: functionality of this atom type.</p></li>
 </ul>
 </dd>
@@ -1017,11 +991,11 @@ is not necessary.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – the network to compute the weight fraction for</p></li>
-<li><p><strong>crosslinker_type</strong> – the atom type to use to split the molecules</p></li>
+<li><p><strong>network</strong> – The network to compute the weight fraction for</p></li>
+<li><p><strong>crosslinker_type</strong> – The atom type to use to split the molecules</p></li>
 <li><p><strong>functionality_per_type</strong> – a dictionary with key: type, and value: functionality of this atom type.</p></li>
-<li><p><strong>r</strong> – the stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> – the extent of reaction in terms of the crosslinkers</p></li>
+<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
+<li><p><strong>p</strong> – The extent of reaction in terms of the crosslinkers</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1037,18 +1011,18 @@ is not necessary.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>w_sol</strong> – the weight fraction of soluble material</p></li>
-<li><p><strong>network</strong> – the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – the type of the junctions/cross-linkers to select them in the network</p></li>
+<li><p><strong>w_sol</strong> – The weight fraction of soluble material</p></li>
+<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> – The type of the junctions/cross-linkers to select them in the network</p></li>
 <li><p><strong>functionality_per_type</strong> – a dictionary with key: type, and value: functionality of this atom type</p></li>
 <li><p><strong>weight_fractions</strong> – a dictionary with the weight fraction of each type of atom</p></li>
-<li><p><strong>r</strong> – the stoichiometric imbalance</p></li>
-<li><p><strong>b2</strong> – the mole fraction of reactive sites in B2 among all reactive sites
+<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
+<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the extent of reaction p</p>
+<dd class="field-even"><p>The extent of reaction p</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1068,7 +1042,7 @@ in a mixture of B1 and B2</p></li>
 <dd class="field-odd"><p><strong>kwargs</strong> – See <a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition" title="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_modulus_decomposition()</span></code></a></p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>G: the predicted shear modulus, or <cite>None</cite> if the universe is empty.</p>
+<dd class="field-even"><p>G: The predicted shear modulus, or <cite>None</cite> if the universe is empty.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1084,19 +1058,17 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the type of the junctions/crosslinkers to select them in the network</p></li>
-<li><p><strong>f</strong> (<em>-</em>) – the functionality of the crosslinkers</p></li>
+<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><strong>f</strong> – The functionality of the crosslinkers</p></li>
+<li><p><strong>functionality_per_type</strong> – A dictionary with key: type, and value: functionality of this atom type</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the (mean) crosslinker conversion</p>
+<dd class="field-even"><p>The (mean) crosslinker conversion</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>r (float)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1108,18 +1080,15 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the functionality of every crosslinker</p>
+<dd class="field-even"><p>The functionality of every crosslinker</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>junctionDegrees (list[int])</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>list[int]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1131,18 +1100,15 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the (mean) effective crosslinker functionality</p>
+<dd class="field-even"><p>The (mean) effective crosslinker functionality</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>f (float)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1154,22 +1120,15 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type to compute the in-between vectors for</p></li>
+<li><p><strong>network</strong> (<a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a>) – The polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> (<em>int</em>) – The atom type to compute the in-between vectors for</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>a dictionary with key: “{atom1.name}+{atom2.name}”</dt><dd><p>and value: their difference vector</p>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>a dictionary with key: “{atom1.name}+{atom2.name}” and value: Their difference vector</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>end_to_end_vectors (dict)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1178,32 +1137,31 @@ in a mixture of B1 and B2</p></li>
 <dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.compute_extent_of_reaction">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">compute_extent_of_reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionality_per_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.compute_extent_of_reaction" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the extent of polymerization reaction
-(nr. of formed bonds in reaction / max. nr. of bonds formable)
-.. note:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="k">if</span> <span class="n">your</span> <span class="n">system</span> <span class="n">has</span> <span class="n">a</span> <span class="n">non</span><span class="o">-</span><span class="n">integer</span> <span class="n">number</span> <span class="n">of</span> <span class="n">possible</span> <span class="n">bonds</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">one</span> <span class="n">site</span> <span class="n">non</span><span class="o">-</span><span class="n">bonded</span><span class="p">),</span>
-    <span class="n">this</span> <span class="n">will</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">rounded</span><span class="o">/</span><span class="n">respected</span> <span class="ow">in</span> <span class="nb">any</span> <span class="n">way</span>
-<span class="o">-</span> <span class="k">if</span> <span class="n">the</span> <span class="n">system</span> <span class="n">contains</span> <span class="n">solvent</span> <span class="ow">or</span> <span class="n">other</span> <span class="n">molecules</span> <span class="n">that</span> <span class="n">should</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">binding</span> <span class="n">to</span>
-    <span class="n">cross</span><span class="o">-</span><span class="n">linkers</span><span class="p">,</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">to</span> <span class="n">remove</span> <span class="n">them</span> <span class="n">before</span> <span class="n">calling</span> <span class="n">this</span> <span class="n">function</span>
-<span class="o">-</span> <span class="k">if</span> <span class="n">you</span> <span class="n">have</span> <span class="n">multiple</span> <span class="n">cross</span><span class="o">-</span><span class="n">linker</span> <span class="n">types</span><span class="p">,</span> <span class="n">be</span> <span class="n">sure</span> <span class="n">to</span> <span class="n">replace</span> <span class="n">them</span> <span class="n">by</span> <span class="n">one</span> <span class="nb">type</span> <span class="n">only</span>
-</pre></div>
+(nr. of formed bonds in reaction / max. nr. of bonds formable)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
+this will not be rounded/respected in any way</p></li>
+<li><p>if the system contains solvent or other molecules that should not be binding to
+cross-linkers, make sure to remove them before calling this function</p></li>
+<li><p>if you have multiple cross-linker types, be sure to replace them by one type only</p></li>
+</ul>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type of crosslinker beads</p></li>
-<li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.
+<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> – The atom type of crosslinker beads</p></li>
+<li><p><strong>functionality_per_type</strong> – A dictionary with key: type, and value: functionality of this atom type.
 If None: will use max functionality per type.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the extent of reaction</p>
+<dd class="field-even"><p>The extent of reaction</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>p (float)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1215,12 +1173,21 @@ If None: will use max functionality per type.</p></li>
 among all reactive sites in a mixture of B1 and B2.
 Uses the network to detect what might be monofunctional chains,
 and then counts them and the bifunctional ones.</p>
-<p>Arguments:
-- network: the polymer network to do the computation for
-- crosslinker_type: the atom type of crosslinker beads
-- functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.</p>
-<p>Returns:
-- b2, the mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> – The atom type of crosslinker beads</p></li>
+<li><p><strong>functionality_per_type</strong> – A dictionary with key: type, and value: functionality of this atom type</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1230,22 +1197,15 @@ and then counts them and the bifunctional ones.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>networks</strong> (<em>-</em>) – the different configurations of the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type to compute the in-between vectors for</p></li>
+<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The different configurations of the polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> (<em>int</em>) – The atom type to compute the in-between vectors for</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>a dictionary with key: “{atom1.name}+{atom2.name}”</dt><dd><p>and value: the norm of the mean difference vector</p>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>a dictionary with key: “{atom1.name}+{atom2.name}” and value: The norm of the mean difference vector</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>endToEndDistances (dict)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1257,22 +1217,15 @@ and then counts them and the bifunctional ones.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>networks</strong> (<em>-</em>) – the different configurations of the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type to compute the in-between vectors for</p></li>
+<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The different configurations of the polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> (<em>int</em>) – The atom type to compute the in-between vectors for</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>a dictionary with key: “{atom1.name}+{atom2.name}”</dt><dd><p>and value: their mean distance difference vector</p>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>a dictionary with key: “{atom1.name}+{atom2.name}” and value: Their mean distance difference vector</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>end_to_end_vectors (dict)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1285,31 +1238,30 @@ and then counts them and the bifunctional ones.</p>
 <p>r &gt; 1 means an excess of crosslinkers, whereas r = 0 implies that there are not crosslinkers in the network.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
-this will not be rounded/respected in any way.</p>
-<p>Currently, only g = 2 chains are respected yet, and only one type of crosslinker is supported.
-If you have e.g. solvent chains in the network,
-use <cite>ignore_types</cite> to not count them.</p>
+<ul class="simple">
+<li><p>if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
+this will not be rounded/respected in any way.</p></li>
+<li><p>Currently, only g = 2 chains are respected yet, and only one type of crosslinker is supported.</p></li>
+<li><p>If you have e.g. solvent chains in the network, use <cite>ignore_types</cite> to not count them.</p></li>
+</ul>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the type of the junctions/crosslinkers to select them in the network</p></li>
-<li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.
+<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><strong>functionality_per_type</strong> – A dictionary with key: type, and value: functionality of this atom type.
 If <cite>None</cite>: will use max functionality per type.</p></li>
-<li><p><strong>ignore_types</strong> (<em>-</em>) – a list of integers, the types to ignore for the imbalance (e.g. solvent atom types)</p></li>
-<li><p><strong>effective</strong> (<em>-</em>) – whether to use the effective functionality (if functionality_per_type is not passed) or the maximum</p></li>
+<li><p><strong>ignore_types</strong> – A list of integers, the types to ignore for the imbalance (e.g. solvent atom types)</p></li>
+<li><p><strong>effective</strong> – Whether to use the effective functionality (if functionality_per_type is not passed)
+or the maximum functionality of the cross-linkers.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the stoichiometric imbalance. If the network is empty, or no crosslinkers are present 0. is returned.</p>
+<dd class="field-even"><p>The stoichiometric imbalance. If the network is empty, or no crosslinkers are present 0. is returned.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>r (float)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1322,20 +1274,13 @@ Kept for compatibility reasons; just call
 <a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_weight_fractions" title="pylimer_tools_cpp.Universe.compute_weight_fractions"><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools_cpp.Universe.compute_weight_fractions()</span></code></a> instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>network</strong> (<em>-</em>) – the polymer network to do the computation for</p>
+<dd class="field-odd"><p><strong>network</strong> – The polymer network to do the computation for</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>using the type i as a key,</dt><dd><p>this dict contains the weight fractions (<span class="math notranslate nohighlight">\(\frac{W_i}{W_{tot}}\)</span>)</p>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>Using the type i as a key, this dict contains the weight fractions (<span class="math notranslate nohighlight">\(\frac{W_i}{W_{tot}}\)</span>)</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\vec{W_i}\)</span> (dict)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1357,26 +1302,17 @@ This works as:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the type of the junctions/crosslinkers to select them in the network</p></li>
-<li><p><strong>rel_tol</strong> (<em>-</em>) – the fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified</p></li>
-<li><p><strong>abs_tol</strong> (<em>-</em>) – the weight from which on a component is not soluble anymore</p></li>
+<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><strong>rel_tol</strong> – The fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified</p></li>
+<li><p><strong>abs_tol</strong> – The weight from which on a component is not soluble anymore</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>the weight fraction of soluble material as counted.</dt><dd><ol class="arabic simple" start="0">
-<li><p>for an empty network</p></li>
-</ol>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>The weight fraction of soluble material as counted. 0 for an empty network</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(W_{sol}\)</span> (float)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1388,18 +1324,15 @@ This works as:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
+<li><p><strong>network</strong> – The network to compute the weight fraction for</p></li>
+<li><p><strong>crosslinker_type</strong> – The atom type to use to split the molecules</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>1 - weightDangling/weightTotal - weightSoluble/weightTotal,</p>
+<dd class="field-even"><p>1 - weightDangling/weightTotal - weightSoluble/weightTotal</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>weightFraction (float)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -1423,19 +1356,15 @@ There are other methods that incorporate more.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
+<li><p><strong>network</strong> – The network to compute the weight fraction for</p></li>
+<li><p><strong>crosslinker_type</strong> – The atom type to use to split the molecules</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>weightDangling/weightTotal,
-- numFraction: numDangling/numTotal</p>
+<dd class="field-even"><p>A tuple containing (weightDangling/weightTotal, numDangling/numTotal)</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>weightFraction</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>Tuple[float, float]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1449,25 +1378,16 @@ that have a weight less than a certain fraction of the total weight.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the polymer network to do the computation for</p></li>
-<li><p><strong>rel_tol</strong> (<em>-</em>) – the fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified</p></li>
-<li><p><strong>abs_tol</strong> (<em>-</em>) – the weight from which on a component is not soluble anymore</p></li>
+<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
+<li><p><strong>rel_tol</strong> – The fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified</p></li>
+<li><p><strong>abs_tol</strong> – The weight from which on a component is not soluble anymore</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>the weight fraction of soluble material as counted.</dt><dd><ol class="arabic simple" start="0">
-<li><p>for an empty network</p></li>
-</ol>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>The weight fraction of soluble material as counted. 0 for an empty network</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(W_{sol}\)</span> (float)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>

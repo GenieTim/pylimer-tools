@@ -524,12 +524,12 @@ If you use this, you should cite <a class="reference external" href="https://pub
 <span class="sig-name descname"><span class="pre">config_bond_formation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bonds_to_form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bonds_per_atom_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">collections.abc.Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">SupportsInt</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">SupportsInt</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bond_formation_dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attempt_bond_formation_every</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_type_form_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_type_form_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.config_bond_formation" title="Link to this definition">¶</a></dt>
 <dd><p>Configure how to do bond formation during the run.</p>
 <p>Arguments:
-- num_bonds_to_form (int): the nr of bonds to form in total. Use 0 to stop bond formation.
-- num_bonds_per_atom_type (dict): the nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)
-- bond_formation_dist (float): the maximum distance allowed to form bonds
+- num_bonds_to_form (int): The nr of bonds to form in total. Use 0 to stop bond formation.
+- num_bonds_per_atom_type (dict): The nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)
+- bond_formation_dist (float): The maximum distance allowed to form bonds
 - attempt_bond_formation_every (int): attempt to form bonds every this many steps during the simulation run
-- atom_type_form_from (int): the atom type to start forming bonds from.
-- atom_type_form_to (int): the atom type to start forming bonds to.</p>
+- atom_type_form_from (int): The atom type to start forming bonds from.
+- atom_type_form_to (int): The atom type to start forming bonds to.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -573,7 +573,7 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> (<em>-</em>) – the file path to the restart file to write</p></li>
+<li><p><strong>file</strong> (<em>-</em>) – The file path to the restart file to write</p></li>
 <li><p><strong>outputEvery</strong> (<em>-</em>) – how often to write the restart file</p></li>
 </ul>
 </dd>
@@ -777,7 +777,7 @@ this method should be called to update the current stress tensor etc.</p>
 <span class="sig-name descname"><span class="pre">write_restart_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.write_restart_file" title="Link to this definition">¶</a></dt>
 <dd><p>Explicitly force the writing of a restart file, now!</p>
 <p>Arguments:
-- file (str): the file path and name of the restart file to be written.</p>
+- file (str): The file path and name of the restart file to be written.</p>
 <blockquote>
 <div><p>Can end in xml, json or anything else (-&gt; binary).</p>
 </div></blockquote>

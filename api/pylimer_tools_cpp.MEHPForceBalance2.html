@@ -334,7 +334,7 @@ although without slipping along the chain.</p>
 <div><p>Instantiate the simulator for a certain universe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">param universe<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the universe giving the basic connectivity to compute with</p>
+<dd class="field-odd"><p>The universe giving the basic connectivity to compute with</p>
 </dd>
 <dt class="field-even">param crosslinker_type<span class="colon">:</span></dt>
 <dd class="field-even"><p>The atom type of the cross-linkers. Needed to reduce the network.</p>
@@ -343,7 +343,7 @@ although without slipping along the chain.</p>
 <dd class="field-odd"><p>Whether to ignore the z direction.</p>
 </dd>
 <dt class="field-even">param kappa<span class="colon">:</span></dt>
-<dd class="field-even"><p>the spring constant</p>
+<dd class="field-even"><p>The spring constant</p>
 </dd>
 <dt class="field-odd">param remove_2functionalCrosslinkers<span class="colon">:</span></dt>
 <dd class="field-odd"><p>whether to keep or remove the 2-functional crosslinkers when setting up the network</p>
@@ -359,10 +359,10 @@ although without slipping along the chain.</p>
 <div><p>Instantiate the simulator for a certain universe with the given entanglements.</p>
 <dl class="field-list simple">
 <dt class="field-odd">param universe<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the universe giving the basic connectivity to compute with</p>
+<dd class="field-odd"><p>The universe giving the basic connectivity to compute with</p>
 </dd>
 <dt class="field-even">param entanglements<span class="colon">:</span></dt>
-<dd class="field-even"><p>the entanglements to use in the computation</p>
+<dd class="field-even"><p>The entanglements to use in the computation</p>
 </dd>
 <dt class="field-odd">param crosslinker_type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The atom type of the cross-linkers. Needed to reduce the network.</p>
@@ -381,10 +381,10 @@ although without slipping along the chain.</p>
 <div><p>Instantiate this simulator with randomly chosen slip-links.</p>
 <dl class="field-list simple">
 <dt class="field-odd">param universe<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the universe containing the basic atoms and connectivity</p>
+<dd class="field-odd"><p>The universe containing the basic atoms and connectivity</p>
 </dd>
 <dt class="field-even">param nr_of_entanglements_to_sample<span class="colon">:</span></dt>
-<dd class="field-even"><p>the number of entanglements to sample</p>
+<dd class="field-even"><p>The number of entanglements to sample</p>
 </dd>
 <dt class="field-odd">param upper_cutoff<span class="colon">:</span></dt>
 <dd class="field-odd"><p>maximum distance from one sampled bead to its partner</p>
@@ -393,13 +393,13 @@ although without slipping along the chain.</p>
 <dd class="field-even"><p>minimum distance from one sampled bead to its partner</p>
 </dd>
 <dt class="field-odd">param minimum_nr_of_entanglements<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the minimum number of entanglements that should be sampled</p>
+<dd class="field-odd"><p>The minimum number of entanglements that should be sampled</p>
 </dd>
 <dt class="field-even">param same_strand_cutoff<span class="colon">:</span></dt>
 <dd class="field-even"><p>distance from one sampled bead to its pair within the same strand</p>
 </dd>
 <dt class="field-odd">param seed<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the seed for the random number generator</p>
+<dd class="field-odd"><p>The seed for the random number generator</p>
 </dd>
 <dt class="field-even">param cross_linker_type<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
@@ -734,8 +734,8 @@ where <span class="math notranslate nohighlight">\(\eta\)</span> is the index of
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>b02</strong> – the melt <span class="math notranslate nohighlight">\(&lt;b&gt;_0^2\)</span>: mean bond length squared; vgl. the required &lt;R_0^2&gt;, computed as phantom = N&lt;b&gt;^2; otherwise, it’s the slope in a &lt;R_0^2&gt; vs. N plot, also sometimes labelled <span class="math notranslate nohighlight">\(C_\infinity b^2\)</span>.</p></li>
-<li><p><strong>nr_of_chains</strong> – the value to normalize the sum of square distances by. Usually (and default if <span class="math notranslate nohighlight">\(&lt; 0\)</span>) the nr of springs.</p></li>
+<li><p><strong>b02</strong> – The melt <span class="math notranslate nohighlight">\(&lt;b&gt;_0^2\)</span>: mean bond length squared; vgl. the required &lt;R_0^2&gt;, computed as phantom = N&lt;b&gt;^2; otherwise, it’s the slope in a &lt;R_0^2&gt; vs. N plot, also sometimes labelled <span class="math notranslate nohighlight">\(C_\infinity b^2\)</span>.</p></li>
+<li><p><strong>nr_of_chains</strong> – The value to normalize the sum of square distances by. Usually (and default if <span class="math notranslate nohighlight">\(&lt; 0\)</span>) the nr of springs.</p></li>
 </ul>
 </dd>
 </dl>
@@ -754,8 +754,8 @@ where <span class="math notranslate nohighlight">\(\eta\)</span> is the index of
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>b02</strong> – the melt <span class="math notranslate nohighlight">\(&lt;b&gt;_0^2\)</span>: mean bond length squared; vgl. the required &lt;R_0^2&gt;, computed as phantom = N&lt;b&gt;^2; otherwise, it’s the slope in a &lt;R_0^2&gt; vs. N plot, also sometimes labelled <span class="math notranslate nohighlight">\(C_\infinity b^2\)</span>.</p></li>
-<li><p><strong>direction</strong> – the direction in which to compute the gamma factors (0: x, 1: y, 2: z)</p></li>
+<li><p><strong>b02</strong> – The melt <span class="math notranslate nohighlight">\(&lt;b&gt;_0^2\)</span>: mean bond length squared; vgl. the required &lt;R_0^2&gt;, computed as phantom = N&lt;b&gt;^2; otherwise, it’s the slope in a &lt;R_0^2&gt; vs. N plot, also sometimes labelled <span class="math notranslate nohighlight">\(C_\infinity b^2\)</span>.</p></li>
+<li><p><strong>direction</strong> – The direction in which to compute the gamma factors (0: x, 1: y, 2: z)</p></li>
 </ul>
 </dd>
 </dl>
@@ -825,7 +825,7 @@ excl. entanglement links [the slip-links created internally when e.g. constructi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>direction</strong> – the direction in which to compute the active springs (0: x, 1: y, 2: z)</p></li>
+<li><p><strong>direction</strong> – The direction in which to compute the active springs (0: x, 1: y, 2: z)</p></li>
 <li><p><strong>tolerance</strong> – springs under this length are considered inactive</p></li>
 </ul>
 </dd>

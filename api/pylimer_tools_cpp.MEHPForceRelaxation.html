@@ -329,7 +329,7 @@ Consequently, it offers a variety of configurable non-linear solvers using NLopt
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>universe</strong> – the universe to simulate with</p></li>
+<li><p><strong>universe</strong> – The universe to simulate with</p></li>
 <li><p><strong>crosslinker_type</strong> – The atom type of the cross-linkers. Needed to reduce the network.</p></li>
 <li><p><strong>is2d</strong> – Whether to ignore the z direction.</p></li>
 <li><p><strong>force_evaluator</strong> – The force evaluator to use</p></li>
@@ -555,7 +555,7 @@ where <span class="math notranslate nohighlight">\(\eta\)</span> is the index of
 If <span class="math notranslate nohighlight">\(-1.0\)</span> (default), the network is used for determination (which is not accurate), the system is assumed to be phantom.
 For real systems, the value could be determined by <a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance" title="pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_mean_squared_end_to_end_distance()</span></code></a>
 on the melt system, with subsequent division by the nr of bonds in the chain.</p></li>
-<li><p><strong>nr_of_chains</strong> – the value to normalize the sum of square distances by. Usually (and default if <span class="math notranslate nohighlight">\(&lt; 0\)</span>) the nr of chains.</p></li>
+<li><p><strong>nr_of_chains</strong> – The value to normalize the sum of square distances by. Usually (and default if <span class="math notranslate nohighlight">\(&lt; 0\)</span>) the nr of chains.</p></li>
 </ul>
 </dd>
 </dl>
