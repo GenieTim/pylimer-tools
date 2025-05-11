@@ -1,6 +1,0 @@
-PRIMARY_LOOP
-============
-
-.. currentmodule:: pylimer_tools_cpp
-
-.. autodata:: PRIMARY_LOOP

@@ -1,6 +1,0 @@
-UNDEFINED
-=========
-
-.. currentmodule:: pylimer_tools_cpp
-
-.. autodata:: UNDEFINED

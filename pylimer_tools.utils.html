@@ -266,11 +266,6 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DANGLING_CHAIN.html">DANGLING_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.FREE_CHAIN.html">FREE_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NETWORK_STRAND.html">NETWORK_STRAND</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.PRIMARY_LOOP.html">PRIMARY_LOOP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.UNDEFINED.html">UNDEFINED</a></li>
 </ul>
 </li>
 </ul>
@@ -471,22 +466,27 @@ NOTE: this function is rather unstable, as it has a few dirty assumptions, such 
 </section>
 <section id="module-pylimer_tools.utils.optimize_dataframe">
 <span id="pylimer-tools-utils-optimize-dataframe-module"></span><h2>pylimer_tools.utils.optimize_dataframe module<a class="headerlink" href="#module-pylimer_tools.utils.optimize_dataframe" title="Link to this heading">¶</a></h2>
+<p>Utility functions to reduce the memory usage of a pandas DataFrame.
+Particularly useful when dealing with large datasets, e.g. output from long LAMMPS simulation runs.</p>
+<p>Heavily inspired by the following sources:
+- <a class="reference external" href="https://medium.com/bigdatarepublic/advanced-pandas-optimize-speed-and-memory-a654b53be6c2">https://medium.com/bigdatarepublic/advanced-pandas-optimize-speed-and-memory-a654b53be6c2</a>
+- <a class="reference external" href="https://stackoverflow.com/questions/57531388/how-can-i-reduce-the-memory-of-a-pandas-dataframe">https://stackoverflow.com/questions/57531388/how-can-i-reduce-the-memory-of-a-pandas-dataframe</a></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.utils.optimize_dataframe.optimize">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimize_dataframe.</span></span><span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetime_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.optimize_dataframe.optimize" title="Link to this definition">¶</a></dt>
-<dd><p>Optimize all types of all columns in a dataframe</p>
+<dd><p>Optimize all types of all columns in a dataframe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>df</strong> (<em>-</em>) – dataframe to reduce</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – dataframe to reduce</p></li>
+<li><p><strong>datetime_features</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – list of column names that contain datetime data</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>dataset with the column dtypes adjusted</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>df (pd.DataFrame)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -494,7 +494,7 @@ NOTE: this function is rather unstable, as it has a few dirty assumptions, such 
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.utils.optimize_dataframe.optimize_floats">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimize_dataframe.</span></span><span class="sig-name descname"><span class="pre">optimize_floats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pylimer_tools.utils.optimize_dataframe.optimize_floats" title="Link to this definition">¶</a></dt>
-<dd><p>Optimize the floating point type entries</p>
+<dd><p>Optimize the floating point type entries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>df</strong> (<em>pd.DataFrame</em>) – dataframe to reduce</p>
@@ -503,7 +503,7 @@ NOTE: this function is rather unstable, as it has a few dirty assumptions, such 
 <dd class="field-even"><p>dataset with the column dtypes adjusted</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>df (pd.DataFrame)</p>
+<dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -511,7 +511,7 @@ NOTE: this function is rather unstable, as it has a few dirty assumptions, such 
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.utils.optimize_dataframe.optimize_ints">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimize_dataframe.</span></span><span class="sig-name descname"><span class="pre">optimize_ints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pylimer_tools.utils.optimize_dataframe.optimize_ints" title="Link to this definition">¶</a></dt>
-<dd><p>Optimize the integer point type entries</p>
+<dd><p>Optimize the integer point type entries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>df</strong> (<em>pd.DataFrame</em>) – dataframe to reduce</p>
@@ -520,7 +520,7 @@ NOTE: this function is rather unstable, as it has a few dirty assumptions, such 
 <dd class="field-even"><p>dataset with the column dtypes adjusted</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>df (pd.DataFrame)</p>
+<dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -528,19 +528,19 @@ NOTE: this function is rather unstable, as it has a few dirty assumptions, such 
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.utils.optimize_dataframe.optimize_objects">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimize_dataframe.</span></span><span class="sig-name descname"><span class="pre">optimize_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetime_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pylimer_tools.utils.optimize_dataframe.optimize_objects" title="Link to this definition">¶</a></dt>
-<dd><p>Optimize object type entries</p>
+<dd><p>Optimize object type entries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>df</strong> (<em>-</em>) – dataframe to reduce</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – dataframe to reduce</p></li>
+<li><p><strong>datetime_features</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – list of column names that contain datetime data</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>dataset with the column dtypes adjusted</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>df (pd.DataFrame)</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -553,15 +553,17 @@ NOTE: this function is rather unstable, as it has a few dirty assumptions, such 
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>pd.DataFrame</em>) – dataframe to reduce</p></li>
-<li><p><strong>obj_to_category</strong> (<em>boolean</em>) – convert non-datetime related objects to category dtype</p></li>
-<li><p><strong>subset</strong> (<em>List</em>) – subset of columns to analyse</p></li>
+<li><p><strong>obj_to_category</strong> (<em>bool</em>) – convert non-datetime related objects to category dtype</p></li>
+<li><p><strong>subset</strong> (<em>List</em><em>[</em><em>str</em><em>] or </em><em>None</em>) – subset of columns to analyse</p></li>
+<li><p><strong>inplace</strong> (<em>bool</em>) – whether to modify the dataframe in place</p></li>
+<li><p><strong>print_stats</strong> (<em>bool</em>) – whether to print memory usage statistics</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>dataset with the column dtypes adjusted</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>df (pd.DataFrame)</p>
+<dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>

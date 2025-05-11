@@ -266,11 +266,6 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DANGLING_CHAIN.html">DANGLING_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.FREE_CHAIN.html">FREE_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NETWORK_STRAND.html">NETWORK_STRAND</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.PRIMARY_LOOP.html">PRIMARY_LOOP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.UNDEFINED.html">UNDEFINED</a></li>
 </ul>
 </li>
 </ul>
@@ -322,6 +317,10 @@
 </section>
 <section id="module-pylimer_tools.calc.mehp_utilities">
 <span id="pylimer-tools-calc-mehp-utilities-module"></span><h2>pylimer_tools.calc.mehp_utilities module<a class="headerlink" href="#module-pylimer_tools.calc.mehp_utilities" title="Link to this heading">¶</a></h2>
+<p>This module is deprecated.
+Use <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools_cpp.MEHPForceBalance()</span></code></a> or <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation()</span></code></a> instead.</p>
+<p>In principle, it offers comparable functionality, but without the force minimization - the networks you pass
+to these methods should be minimized first.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.mehp_utilities.compute_cycle_rank">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.mehp_utilities.</span></span><span class="sig-name descname"><span class="pre">compute_cycle_rank</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">networks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.mehp_utilities.compute_cycle_rank" title="Link to this definition">¶</a></dt>
@@ -510,6 +509,18 @@ Set to None to use only rel_tol</p></li>
 </section>
 <section id="module-pylimer_tools.calc.miller_macosko_theory">
 <span id="pylimer-tools-calc-miller-macosko-theory-module"></span><h2>pylimer_tools.calc.miller_macosko_theory module<a class="headerlink" href="#module-pylimer_tools.calc.miller_macosko_theory" title="Link to this heading">¶</a></h2>
+<p>This module provides access to various computations introduced in the Miller-Macosko theory.</p>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>not all systems are supported yet.</dt><dd><p>In particular, for most methods, only A_f and B_2 is supported.
+Also, the systems are mostly assumed to be end-linked and monodisperse.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_entanglement_modulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_e_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus" title="Link to this definition">¶</a></dt>
@@ -581,8 +592,7 @@ Set to None to use only rel_tol</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_miller_macosko_probabilities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities" title="Link to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>Compute Macosko and Miller’s probabilities <span class="math notranslate nohighlight">\(P(F_A)\)</span> and <span class="math notranslate nohighlight">\(P(F_B)\)</span>
+<dd><p>Compute Macosko and Miller’s probabilities <span class="math notranslate nohighlight">\(P(F_A)\)</span> and <span class="math notranslate nohighlight">\(P(F_B)\)</span>
 i.e., the probability that a randomly chosen A (cross-link) or B (strand-end),
 respectively, is the start of a finite chain.</p>
 <dl class="simple">
@@ -601,30 +611,20 @@ If you have a system with other functionality distributions,
 you would need to implement these formulas yourselves.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">param r<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The stoichiometric imbalance</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
+<li><p><strong>p</strong> – The extent of reaction in terms of the crosslinkers</p></li>
+<li><p><strong>f</strong> – The functionality of the the crosslinker</p></li>
+<li><p><strong>b2</strong> – The fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.
+Can be computed e.g. as <span class="math notranslate nohighlight">\(b_2 = \frac{2 \cdot [B_2]}{[B_1] + 2 \cdot [B_2]}\)</span></p></li>
+</ul>
 </dd>
-<dt class="field-even">param p<span class="colon">:</span></dt>
-<dd class="field-even"><p>The extent of reaction in terms of the crosslinkers</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>alpha: <span class="math notranslate nohighlight">\(P(F_A)\)</span></p>
 </dd>
-<dt class="field-odd">param f<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The functionality of the the crosslinker</p>
-</dd>
-<dt class="field-even">param b2<span class="colon">:</span></dt>
-<dd class="field-even"><p>The fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.
-Can be computed e.g. as :math:<a href="#id1"><span class="problematic" id="id2">`</span></a>b_2 =</p>
-</dd>
-</dl>
-</div></blockquote>
-<dl class="simple">
-<dt>rac{2 cdot [B_2]}{[B_1] + 2 cdot [B_2]}`</dt><dd><dl class="field-list simple">
-<dt class="field-odd">return<span class="colon">:</span></dt>
-<dd class="field-odd"><p>alpha: <span class="math notranslate nohighlight">\(P(F_A)\)</span></p>
-</dd>
-<dt class="field-even">return<span class="colon">:</span></dt>
-<dd class="field-even"><p>beta: <span class="math notranslate nohighlight">\(P(F_B)\)</span></p>
-</dd>
-</dl>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>beta: <span class="math notranslate nohighlight">\(P(F_B)\)</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -893,7 +893,10 @@ in a mixture of B1 and B2</p></li>
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_weight_fraction_of_soluble_material_from_weight_fractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions" title="Link to this definition">¶</a></dt>
 <dd><p>Use MMT to compute the weight fraction of soluble material using</p>
-<p><span class="math notranslate nohighlight">\(W_{sol} = w_A_f P(F_A^{out})^f + w_B_g [rpP(F_A^{out})^{f-1}+1-rp]^g\)</span></p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[`W_{sol} = w_A_f P(F_A^{out})^f + w_B_g [rpP(F_A^{out})^{f-1}+1-rp]^g`\]</div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1042,7 +1045,7 @@ in a mixture of B1 and B2</p></li>
 <dd class="field-odd"><p><strong>kwargs</strong> – See <a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition" title="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_modulus_decomposition()</span></code></a></p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>G: The predicted shear modulus, or <cite>None</cite> if the universe is empty.</p>
+<dd class="field-even"><p>G: The predicted shear modulus</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1050,6 +1053,7 @@ in a mixture of B1 and B2</p></li>
 </section>
 <section id="module-pylimer_tools.calc.structure_analysis">
 <span id="pylimer-tools-calc-structure-analysis-module"></span><h2>pylimer_tools.calc.structure_analysis module<a class="headerlink" href="#module-pylimer_tools.calc.structure_analysis" title="Link to this heading">¶</a></h2>
+<p>This module provides functions to compute various quantities related to polymer networks from their structure.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">compute_crosslinker_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionality_per_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion" title="Link to this definition">¶</a></dt>
@@ -1338,8 +1342,8 @@ This works as:</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools.structure_analysis.measure_weight_fraction_of_dangling_chains()</span></code></p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools.structure_analysis.measure_weight_fraction_of_soluble_material()</span></code></p></li>
+<li><p><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains" title="pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains"><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material" title="pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material"><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material()</span></code></a></p></li>
 </ul>
 </div>
 </dd></dl>

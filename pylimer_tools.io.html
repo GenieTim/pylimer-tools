@@ -266,11 +266,6 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DANGLING_CHAIN.html">DANGLING_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.FREE_CHAIN.html">FREE_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NETWORK_STRAND.html">NETWORK_STRAND</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.PRIMARY_LOOP.html">PRIMARY_LOOP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.UNDEFINED.html">UNDEFINED</a></li>
 </ul>
 </li>
 </ul>
@@ -459,6 +454,7 @@ multi-section files where the structure may change between sections.</p>
 </section>
 <section id="module-pylimer_tools.io.read_pylimer_tools_output_file">
 <span id="pylimer-tools-io-read-pylimer-tools-output-file-module"></span><h2>pylimer_tools.io.read_pylimer_tools_output_file module<a class="headerlink" href="#module-pylimer_tools.io.read_pylimer_tools_output_file" title="Link to this heading">¶</a></h2>
+<p>This module provides a few functions to read output from pylimer_tools_cpp’s simulators.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.read_pylimer_tools_output_file.</span></span><span class="sig-name descname"><span class="pre">read_avg_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file" title="Link to this definition">¶</a></dt>
@@ -490,18 +486,28 @@ entry for each step.</p>
 </section>
 <section id="module-pylimer_tools.io.read_lammps_output_file">
 <span id="pylimer-tools-io-read-lammps-output-file-module"></span><h2>pylimer_tools.io.read_lammps_output_file module<a class="headerlink" href="#module-pylimer_tools.io.read_lammps_output_file" title="Link to this heading">¶</a></h2>
+<p>This module provides a few functions to read LAMMPS’ output files, including:</p>
+<ul class="simple">
+<li><p>log files (thermo output)</p></li>
+<li><p>dump files (focusing on the coordinates of atoms)</p></li>
+<li><p>data files (the LAMMPS structure)</p></li>
+<li><p>averaged data (from <code class="code docutils literal notranslate"><span class="pre">fix</span> <span class="pre">ave/time...</span></code> or <code class="code docutils literal notranslate"><span class="pre">fix</span> <span class="pre">ave/hist...</span></code>)</p></li>
+<li><p>correlation data (from <code class="code docutils literal notranslate"><span class="pre">fix</span> <span class="pre">ave/correlate/...</span></code>)</p></li>
+</ul>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.io.read_lammps_output_file.read_averages_file">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.read_lammps_output_file.</span></span><span class="sig-name descname"><span class="pre">read_averages_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pylimer_tools.io.read_lammps_output_file.read_averages_file" title="Link to this definition">¶</a></dt>
 <dd><p>Read a file written by a <cite>fix ave/time</cite> command.</p>
 <p>Uses pandas’ read_csv after detecting the columns.</p>
-<p>Important assumption: The first 2 or 3 lines in the file are:
-- comment,
-- then one header indicating the columns,
-- and then either data or potentially a second header,</p>
-<blockquote>
-<div><p>if it is a sectioned file (e.g., from a <cite>fix ave/time … vector</cite>)</p>
-</div></blockquote>
+<dl>
+<dt>Important assumption: The first 2 or 3 lines in the file are:</dt><dd><ul class="simple">
+<li><p>comment,</p></li>
+<li><p>then one header indicating the columns,</p></li>
+<li><p>and then either data or potentially a second header, if it is a sectioned file</p></li>
+</ul>
+<p>(e.g., from a <cite>fix ave/time … vector</cite>)</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -709,7 +715,7 @@ but in SI units
 </dl>
 <p>Example usage:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">units</span> <span class="o">=</span> <span class="n">get_unit_style</span><span class="p">(</span><span class="s2">&quot;lj&quot;</span><span class="p">)</span>
-<span class="n">si_mass</span> <span class="o">=</span> <span class="n">lj_mass</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">get_base_unit_of</span><span class="p">(</span><span class="s2">&quot;mass&quot;</span><span class="p">)</span>
+<span class="n">mass_in_si</span> <span class="o">=</span> <span class="n">mass_in_lj</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">get_base_unit_of</span><span class="p">(</span><span class="s2">&quot;mass&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -808,9 +814,7 @@ using the same UnitRegistry, such that they are compatible.</p>
 <p>For LJ units, you must specify the polymer using the <cite>polymer</cite> parameter.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://docs.lammps.org/units.html">https://docs.lammps.org/units.html</a></p></li>
-</ul>
+<p><a class="reference external" href="https://docs.lammps.org/units.html">https://docs.lammps.org/units.html</a></p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -824,6 +828,8 @@ whether the units you need are correctly implemented</p>
 </section>
 <section id="module-pylimer_tools.io">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pylimer_tools.io" title="Link to this heading">¶</a></h2>
+<p>This module contains various utility functions for working with
+LAMMPS and pylimer_tools in- and output files.</p>
 </section>
 </section>
 

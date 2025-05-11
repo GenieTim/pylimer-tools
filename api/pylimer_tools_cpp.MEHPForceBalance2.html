@@ -266,11 +266,6 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DANGLING_CHAIN.html">DANGLING_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.FREE_CHAIN.html">FREE_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NETWORK_STRAND.html">NETWORK_STRAND</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.PRIMARY_LOOP.html">PRIMARY_LOOP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.UNDEFINED.html">UNDEFINED</a></li>
 </ul>
 </li>
 </ul>
@@ -723,7 +718,7 @@ this value is normalized by the number of springs rather than the number of chai
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.get_gamma_factor">
 <span class="sig-name descname"><span class="pre">get_gamma_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b02</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_of_chains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.get_gamma_factor" title="Link to this definition">¶</a></dt>
 <dd><p>Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:</p>
-<p><span class="math notranslate nohighlight">\(\Gamma = \langle\gamma_{\eta}\rangle\)</span>, with <span class="math notranslate nohighlight">\(\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}\)</span>,
+<p><span class="math notranslate nohighlight">\(\Gamma = \langle\gamma_{\eta}\rangle\)</span>, with <span class="math notranslate nohighlight">\(\gamma_{\eta} = \\frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}\)</span>,
 which you can use as <span class="math notranslate nohighlight">\(G_{\mathrm{ANT}} = \Gamma \nu k_B T\)</span>,
 where <span class="math notranslate nohighlight">\(\eta\)</span> is the index of a particular strand,
 <span class="math notranslate nohighlight">\(R_{0}^2\)</span> is the melt mean square end to end distance, in phantom systems <span class="math notranslate nohighlight">\($= N_{\eta}*b^2$\)</span>

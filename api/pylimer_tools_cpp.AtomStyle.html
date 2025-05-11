@@ -266,11 +266,6 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DANGLING_CHAIN.html">DANGLING_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.FREE_CHAIN.html">FREE_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NETWORK_STRAND.html">NETWORK_STRAND</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.PRIMARY_LOOP.html">PRIMARY_LOOP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.UNDEFINED.html">UNDEFINED</a></li>
 </ul>
 </li>
 </ul>
@@ -321,34 +316,37 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.AtomStyle">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">AtomStyle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.AtomStyle" title="pylimer_tools_cpp.AtomStyle"><span class="pre">pylimer_tools_cpp.AtomStyle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.AtomStyle" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>An enumeration of the LAMMPS atom styles.</p>
 <p>Members:</p>
-<p>NONE</p>
-<p>ANGLE</p>
-<p>ATOMIC</p>
-<p>BODY</p>
-<p>BOND</p>
-<p>CHARGE</p>
-<p>DIELECTRIC</p>
-<p>DIPOLE</p>
-<p>DPD</p>
-<p>EDPD</p>
-<p>ELECTRON</p>
-<p>ELLIPSOID</p>
-<p>FULL</p>
-<p>LINE</p>
-<p>MDPD</p>
-<p>MOLECULAR</p>
-<p>PERI</p>
-<p>SMD</p>
-<p>SPH</p>
-<p>SPHERE</p>
-<p>BPM_SPHERE</p>
-<p>SPIN</p>
-<p>TDPD</p>
-<p>TEMPLATE</p>
-<p>TRI</p>
-<p>WAVEPACKET</p>
-<p>HYBRID</p>
+<blockquote>
+<div><p>NONE : LAMMPS atom style ‘none’</p>
+<p>ANGLE : LAMMPS atom style ‘angle’</p>
+<p>ATOMIC : LAMMPS atom style ‘atomic’</p>
+<p>BODY : LAMMPS atom style ‘body’</p>
+<p>BOND : LAMMPS atom style ‘bond’</p>
+<p>CHARGE : LAMMPS atom style ‘charge’</p>
+<p>DIELECTRIC : LAMMPS atom style ‘dielectric’</p>
+<p>DIPOLE : LAMMPS atom style ‘dipole’</p>
+<p>DPD : LAMMPS atom style ‘dpd’</p>
+<p>EDPD : LAMMPS atom style ‘edpd’</p>
+<p>ELECTRON : LAMMPS atom style ‘electron’</p>
+<p>ELLIPSOID : LAMMPS atom style ‘ellipsoid’</p>
+<p>FULL : LAMMPS atom style ‘full’</p>
+<p>LINE : LAMMPS atom style ‘line’</p>
+<p>MDPD : LAMMPS atom style ‘mdpd’</p>
+<p>MOLECULAR : LAMMPS atom style ‘molecular’</p>
+<p>PERI : LAMMPS atom style ‘peri’</p>
+<p>SMD : LAMMPS atom style ‘smd’</p>
+<p>SPH : LAMMPS atom style ‘sph’</p>
+<p>SPHERE : LAMMPS atom style ‘sphere’</p>
+<p>BPM_SPHERE : LAMMPS atom style ‘bpm_sphere’</p>
+<p>SPIN : LAMMPS atom style ‘spin’</p>
+<p>TDPD : LAMMPS atom style ‘tdpd’</p>
+<p>TEMPLATE : LAMMPS atom style ‘template’</p>
+<p>TRI : LAMMPS atom style ‘tri’</p>
+<p>WAVEPACKET : LAMMPS atom style ‘wavepacket’</p>
+<p>HYBRID : LAMMPS atom style ‘hybrid’</p>
+</div></blockquote>
 <p class="rubric">Attributes Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">

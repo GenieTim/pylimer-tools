@@ -266,11 +266,6 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DANGLING_CHAIN.html">DANGLING_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.FREE_CHAIN.html">FREE_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NETWORK_STRAND.html">NETWORK_STRAND</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.PRIMARY_LOOP.html">PRIMARY_LOOP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.UNDEFINED.html">UNDEFINED</a></li>
 </ul>
 </li>
 </ul>
@@ -486,7 +481,7 @@ Requires bonds to be shorter than half the box length.</p>
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.compute_radius_of_gyration">
 <span class="sig-name descname"><span class="pre">compute_radius_of_gyration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.compute_radius_of_gyration" title="Link to this definition">¶</a></dt>
 <dd><p>Computes the radius of gyration, <span class="math notranslate nohighlight">\(R_g^2\)</span> of this molecule.</p>
-<p><span class="math notranslate nohighlight">\({R_g}^2 = \frac{1}{M} \sum_i m_i (r_i - r_{cm})^2\)</span>,
+<p><span class="math notranslate nohighlight">\({R_g}^2 = \\frac{1}{M} \sum_i m_i (r_i - r_{cm})^2\)</span>,
 where <span class="math notranslate nohighlight">\(M\)</span> is the total mass of the molecule, <span class="math notranslate nohighlight">\(r_{cm}\)</span>
 are the coordinates of the center of mass of the molecule and the
 sum is over all contained atoms.</p>

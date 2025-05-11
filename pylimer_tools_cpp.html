@@ -266,11 +266,6 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DANGLING_CHAIN.html">DANGLING_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.FREE_CHAIN.html">FREE_CHAIN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NETWORK_STRAND.html">NETWORK_STRAND</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.PRIMARY_LOOP.html">PRIMARY_LOOP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.UNDEFINED.html">UNDEFINED</a></li>
 </ul>
 </li>
 </ul>
@@ -380,10 +375,10 @@
 <td><p>A single bead or atom</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.AtomPairEntanglements.html#pylimer_tools_cpp.AtomPairEntanglements" title="pylimer_tools_cpp.AtomPairEntanglements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AtomPairEntanglements</span></code></a>(self)</p></td>
-<td><p>Get an instance of this struct</p></td>
+<td><p>A struct to store pairs of atoms that are close together and could be entanglements.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle" title="pylimer_tools_cpp.AtomStyle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AtomStyle</span></code></a>(self, value)</p></td>
-<td><p>Members:</p></td>
+<td><p>An enumeration of the LAMMPS atom styles.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.AveFileReader.html#pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.AveFileReader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AveFileReader</span></code></a>(self, file_path)</p></td>
 <td><p>Alternative implementation of the data file reader implemented in <code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools.read_lammps_output_file.read_averages_file()</span></code>.</p></td>
@@ -392,7 +387,7 @@
 <td><p>The box that the simulation is run in.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues" title="pylimer_tools_cpp.ComputedDoubleValues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComputedDoubleValues</span></code></a>(self, value)</p></td>
-<td><p>Members:</p></td>
+<td><p>Floating point output quantities</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ComputedIntValues.html#pylimer_tools_cpp.ComputedIntValues" title="pylimer_tools_cpp.ComputedIntValues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComputedIntValues</span></code></a>(self, value)</p></td>
 <td><p>Integer output quantities</p></td>
@@ -437,7 +432,7 @@
 <td><p>A small simulation tool for quickly minimizing the force between the cross-linker beads.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.MaxDistanceProvider.html#pylimer_tools_cpp.MaxDistanceProvider" title="pylimer_tools_cpp.MaxDistanceProvider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxDistanceProvider</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>A generic implementation of a class, that shall provide a maximum distance for the MC sampling.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Molecule</span></code></a>(self, arg0, arg1, arg2, arg3)</p></td>
 <td><p>An (ideally) connected series of atoms/beads.</p></td>
@@ -446,7 +441,7 @@
 <td><p>An iterator to iterate through the atoms in <a class="reference internal" href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType" title="pylimer_tools_cpp.MoleculeType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoleculeType</span></code></a>(self, value)</p></td>
-<td><p>Members:</p></td>
+<td><p>An enum representing the type of molecule/chain/strand.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NeighbourList.html#pylimer_tools_cpp.NeighbourList" title="pylimer_tools_cpp.NeighbourList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NeighbourList</span></code></a>(self, atoms, box, cutoff)</p></td>
 <td><p>Gives access to somewhat fast queries on the neighbourhood of atoms</p></td>
@@ -458,7 +453,7 @@
 <td><p>This is equal to a spring evaluator for Langevin chains.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NormalModeAnalyzer</span></code></a>(self, spring_from, spring_to)</p></td>
-<td><p>Initialize NormalModeAnalyzer</p></td>
+<td><p>Compute the normal modes and loss/storage moduli.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.OutputConfiguration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OutputConfiguration</span></code></a>(self)</p></td>
 <td><p>A configuration object to configure the output, as supported by most &quot;simulation-like&quot; classes in this package.</p></td>
@@ -489,30 +484,6 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html#pylimer_tools_cpp.ZScoreMaxDistanceProvider" title="pylimer_tools_cpp.ZScoreMaxDistanceProvider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZScoreMaxDistanceProvider</span></code></a>(self, ...)</p></td>
 <td><p>For MC generation, converts the <span class="math notranslate nohighlight">\(N\)</span> to a maximum distance within which to sample. The distance will be calculated as <span class="math notranslate nohighlight">\(\text{std_multiplier} \times \sqrt{N \times \text{in_sqrt_multiplier}}\)</span>. Useful only for performance improvements in large systems.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="variables">
-<h3>Variables<a class="headerlink" href="#variables" title="Link to this heading">¶</a></h3>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.DANGLING_CHAIN.html#pylimer_tools_cpp.DANGLING_CHAIN" title="pylimer_tools_cpp.DANGLING_CHAIN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DANGLING_CHAIN</span></code></a></p></td>
-<td><p>Members:</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.FREE_CHAIN.html#pylimer_tools_cpp.FREE_CHAIN" title="pylimer_tools_cpp.FREE_CHAIN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FREE_CHAIN</span></code></a></p></td>
-<td><p>Members:</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NETWORK_STRAND.html#pylimer_tools_cpp.NETWORK_STRAND" title="pylimer_tools_cpp.NETWORK_STRAND"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NETWORK_STRAND</span></code></a></p></td>
-<td><p>Members:</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.PRIMARY_LOOP.html#pylimer_tools_cpp.PRIMARY_LOOP" title="pylimer_tools_cpp.PRIMARY_LOOP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRIMARY_LOOP</span></code></a></p></td>
-<td><p>Members:</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.UNDEFINED.html#pylimer_tools_cpp.UNDEFINED" title="pylimer_tools_cpp.UNDEFINED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a></p></td>
-<td><p>Members:</p></td>
 </tr>
 </tbody>
 </table>
@@ -581,7 +552,6 @@
 <li><a class="reference internal" href="#pylimertools-cpp">PylimerTools Cpp</a></li>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
-<li><a class="reference internal" href="#variables">Variables</a></li>
 </ul>
 </li>
 </ul>
