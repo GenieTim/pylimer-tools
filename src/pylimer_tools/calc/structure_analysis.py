@@ -1,3 +1,7 @@
+"""
+This module provides functions to compute various quantities related to polymer networks from their structure.
+"""
+
 from __future__ import annotations
 
 import math
@@ -8,11 +12,6 @@ from typing import Sequence, Tuple, Union
 import numpy as np
 
 from pylimer_tools_cpp import MoleculeType, Universe
-
-"""
-This module provides functions to compute various quantities related to polymer networks from their structure.
-
-"""
 
 
 def compute_stoichiometric_imbalance(
@@ -444,8 +443,8 @@ def measure_weight_fraction_of_backbone(
     :rtype: float
 
     See also:
-      - :func:`pylimer_tools.structure_analysis.measure_weight_fraction_of_dangling_chains()`
-      - :func:`pylimer_tools.structure_analysis.measure_weight_fraction_of_soluble_material()`
+      - :func:`pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains()`
+      - :func:`pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material()`
     """
     if network.get_nr_of_atoms() < 1:
         return 0.0

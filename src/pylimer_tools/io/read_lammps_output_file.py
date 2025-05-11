@@ -1,3 +1,13 @@
+"""
+This module provides a few functions to read LAMMPS' output files, including:
+
+- log files (thermo output)
+- dump files (focusing on the coordinates of atoms)
+- data files (the LAMMPS structure)
+- averaged data (from :code:`fix ave/time...` or :code:`fix ave/hist...`)
+- correlation data (from :code:`fix ave/correlate/...`)
+"""
+
 import os
 import re
 import warnings
@@ -8,16 +18,6 @@ import pandas as pd
 from pylimer_tools.io.extract_thermo_data import extract_thermo_params
 from pylimer_tools.utils.cache_utility import do_cache, load_cache
 from pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
-
-"""
-This module provides a few functions to read LAMMPS' output files, including:
-
-- log files (thermo output)
-- dump files (focusing on the coordinates of atoms)
-- data files (the LAMMPS structure)
-- averaged data (from :code:`fix ave/time...` or :code:`fix ave/hist...`)
-- correlation data (from :code:`fix ave/correlate/...`)
-"""
 
 
 def read_log_file(
@@ -96,10 +96,10 @@ def read_averages_file(filepath, use_cache: bool = True,
     Uses pandas' read_csv after detecting the columns.
 
     Important assumption: The first 2 or 3 lines in the file are:
-    - comment,
-    - then one header indicating the columns,
-    - and then either data or potentially a second header,
-      if it is a sectioned file (e.g., from a `fix ave/time ... vector`)
+        - comment,
+        - then one header indicating the columns,
+        - and then either data or potentially a second header, if it is a sectioned file
+        (e.g., from a `fix ave/time ... vector`)
 
     :param filepath: Path to the averages file
     :type filepath: str

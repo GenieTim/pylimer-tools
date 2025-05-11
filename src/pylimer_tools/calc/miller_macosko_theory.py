@@ -1,3 +1,13 @@
+"""
+This module provides access to various computations introduced in the Miller-Macosko theory.
+
+Caution:
+    - not all systems are supported yet.
+        In particular, for most methods, only A_f and B_2 is supported.
+        Also, the systems are mostly assumed to be end-linked and monodisperse.
+
+"""
+
 import math
 import warnings
 from typing import Callable, List, Tuple, Union
@@ -10,19 +20,10 @@ from scipy import optimize
 from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
     compute_fraction_of_bifunctional_reactive_sites,
-    compute_stoichiometric_imbalance)
+    compute_stoichiometric_imbalance,
+)
 from pylimer_tools.io.unit_styles import UnitStyle
 from pylimer_tools_cpp import Universe
-
-"""
-This module provides access to various computations introduced in the Miller-Macosko theory.
-
-Caution:
-    - not all systems are supported yet.
-        In particular, for most methods, only A_f and B_2 is supported.
-        Also, the systems are mostly assumed to be end-linked and monodisperse.
-
-"""
 
 
 def predict_shear_modulus(**kwargs) -> pint.Quantity:
@@ -33,14 +34,14 @@ def predict_shear_modulus(**kwargs) -> pint.Quantity:
       - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
     :param kwargs: See :func:`~pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition`
-    :return: G: The predicted shear modulus, or `None` if the universe is empty.
+    :return: G: The predicted shear modulus
 
     ToDo:
       - Support more than one crosslinker type (as is supported by original formula)
     """
     g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(
         **kwargs)
-    return g_mmt_phantom + g_mmt_entanglement
+    return g_mmt_phantom + g_mmt_entanglement  # type: ignore
 
 
 def predict_number_density_of_junction_points(
@@ -365,7 +366,8 @@ def compute_weight_fraction_of_soluble_material_from_weight_fractions(
     """
     Use MMT to compute the weight fraction of soluble material using
 
-    :math:`W_{sol} = w_A_f P(F_A^{out})^f + w_B_g [rpP(F_A^{out})^{f-1}+1-rp]^g`
+    .. math::
+        `W_{sol} = w_A_f P(F_A^{out})^f + w_B_g [rpP(F_A^{out})^{f-1}+1-rp]^g`
 
     :param r: The stoichiometric imbalance
     :param p: The extent of reaction in terms of the crosslinkers
@@ -387,10 +389,10 @@ def compute_miller_macosko_probabilities(
     respectively, is the start of a finite chain.
 
     Sources:
-      - https://doi.org/10.1021/ma60050a003
-      - https://doi.org/10.1021/ma60050a004
-      - https://doi.org/10.1021/ma00046a021 (with monofunctional chains, f = 4)
-      - https://doi.org/10.1021/cm0343507 (with monofunctional chains, f = 3)
+        - https://doi.org/10.1021/ma60050a003
+        - https://doi.org/10.1021/ma60050a004
+        - https://doi.org/10.1021/ma00046a021 (with monofunctional chains, f = 4)
+        - https://doi.org/10.1021/cm0343507 (with monofunctional chains, f = 3)
 
     .. note::
         Currently, only systems with B_2, B_1 and A_f are supported.
@@ -401,7 +403,7 @@ def compute_miller_macosko_probabilities(
     :param p: The extent of reaction in terms of the crosslinkers
     :param f: The functionality of the the crosslinker
     :param b2: The fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.
-            Can be computed e.g. as :math:`b_2 = \frac{2 \\cdot [B_2]}{[B_1] + 2 \\cdot [B_2]}`
+            Can be computed e.g. as :math:`b_2 = \\frac{2 \\cdot [B_2]}{[B_1] + 2 \\cdot [B_2]}`
     :return: alpha: :math:`P(F_A)`
     :return: beta: :math:`P(F_B)`
     """

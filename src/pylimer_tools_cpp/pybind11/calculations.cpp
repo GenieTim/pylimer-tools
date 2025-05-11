@@ -26,7 +26,11 @@ init_pylimer_bound_calc(py::module_& m)
         &mmt::computeStoichiometricInbalance,
         "Compute stoichiometric imbalance");
 
-  py::class_<NormalModeAnalyzer>(m, "NormalModeAnalyzer", py::module_local())
+  py::class_<NormalModeAnalyzer>(
+    m,
+    "NormalModeAnalyzer",
+    py::module_local(),
+    "Compute the normal modes and loss/storage moduli.")
     .def(py::init<const std::vector<size_t>, const std::vector<size_t>>(),
          "Initialize NormalModeAnalyzer",
          py::arg("spring_from"),

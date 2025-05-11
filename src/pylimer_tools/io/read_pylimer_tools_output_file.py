@@ -1,10 +1,10 @@
-import pandas as pd
-
-from pylimer_tools.utils.cache_utility import do_cache, load_cache
-
 """
 This module provides a few functions to read output from pylimer_tools_cpp's simulators.
 """
+
+import pandas as pd
+
+from pylimer_tools.utils.cache_utility import do_cache, load_cache
 
 
 def read_avg_file(filename: str) -> pd.DataFrame:

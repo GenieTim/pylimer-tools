@@ -16,7 +16,7 @@ import numpy
 import numpy.typing
 import scipy.sparse
 import typing
-__all__ = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DANGLING_CHAIN', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'FREE_CHAIN', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NETWORK_STRAND', 'NeighbourList', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'OutputConfiguration', 'PRIMARY_LOOP', 'SLESolver', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'UNDEFINED', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'compute_stoichiometric_imbalance', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'predict_gelation_point', 'randomly_sample_entanglements', 'split_csv', 'version_information']
+__all__ = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NeighbourList', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'OutputConfiguration', 'SLESolver', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'compute_stoichiometric_imbalance', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'predict_gelation_point', 'randomly_sample_entanglements', 'split_csv', 'version_information']
 class Atom:
     """
     
@@ -89,6 +89,11 @@ class Atom:
         Compute the vector to another atom respecting the periodic image flags.
         """
 class AtomPairEntanglements:
+    """
+    
+          A struct to store pairs of atoms that are close together and could be entanglements.
+        
+    """
     def __init__(self) -> None:
         """
         Get an instance of this struct
@@ -111,61 +116,63 @@ class AtomPairEntanglements:
         ...
 class AtomStyle:
     """
+    An enumeration of the LAMMPS atom styles.
+    
     Members:
     
-      NONE
+      NONE : LAMMPS atom style 'none'
     
-      ANGLE
+      ANGLE : LAMMPS atom style 'angle'
     
-      ATOMIC
+      ATOMIC : LAMMPS atom style 'atomic'
     
-      BODY
+      BODY : LAMMPS atom style 'body'
     
-      BOND
+      BOND : LAMMPS atom style 'bond'
     
-      CHARGE
+      CHARGE : LAMMPS atom style 'charge'
     
-      DIELECTRIC
+      DIELECTRIC : LAMMPS atom style 'dielectric'
     
-      DIPOLE
+      DIPOLE : LAMMPS atom style 'dipole'
     
-      DPD
+      DPD : LAMMPS atom style 'dpd'
     
-      EDPD
+      EDPD : LAMMPS atom style 'edpd'
     
-      ELECTRON
+      ELECTRON : LAMMPS atom style 'electron'
     
-      ELLIPSOID
+      ELLIPSOID : LAMMPS atom style 'ellipsoid'
     
-      FULL
+      FULL : LAMMPS atom style 'full'
     
-      LINE
+      LINE : LAMMPS atom style 'line'
     
-      MDPD
+      MDPD : LAMMPS atom style 'mdpd'
     
-      MOLECULAR
+      MOLECULAR : LAMMPS atom style 'molecular'
     
-      PERI
+      PERI : LAMMPS atom style 'peri'
     
-      SMD
+      SMD : LAMMPS atom style 'smd'
     
-      SPH
+      SPH : LAMMPS atom style 'sph'
     
-      SPHERE
+      SPHERE : LAMMPS atom style 'sphere'
     
-      BPM_SPHERE
+      BPM_SPHERE : LAMMPS atom style 'bpm_sphere'
     
-      SPIN
+      SPIN : LAMMPS atom style 'spin'
     
-      TDPD
+      TDPD : LAMMPS atom style 'tdpd'
     
-      TEMPLATE
+      TEMPLATE : LAMMPS atom style 'template'
     
-      TRI
+      TRI : LAMMPS atom style 'tri'
     
-      WAVEPACKET
+      WAVEPACKET : LAMMPS atom style 'wavepacket'
     
-      HYBRID
+      HYBRID : LAMMPS atom style 'hybrid'
     """
     ANGLE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.ANGLE: 1>
     ATOMIC: typing.ClassVar[AtomStyle]  # value = <AtomStyle.ATOMIC: 2>
@@ -344,6 +351,8 @@ class Box:
         """
 class ComputedDoubleValues:
     """
+    Floating point output quantities
+    
     Members:
     
       TIMESTEP : Results in the output column "TimeStep".
@@ -1416,7 +1425,7 @@ class MEHPForceBalance:
         """
                   Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
         
-                  :math:`\\Gamma = \\langle\\gamma_{\\eta}\\rangle`, with :math:`\\gamma_{\\eta} = \\frac{\\bar{r_{\\eta}}^2}{R_{0,\\eta}^2}`,
+                  :math:`\\Gamma = \\langle\\gamma_{\\eta}\\rangle`, with :math:`\\gamma_{\\eta} = \\\\frac{\\bar{r_{\\eta}}^2}{R_{0,\\eta}^2}`,
                   which you can use as :math:`G_{\\mathrm{ANT}} = \\Gamma \\nu k_B T`,
                   where :math:`\\eta` is the index of a particular strand,
                   :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\\eta}*b^2$`
@@ -1753,7 +1762,7 @@ class MEHPForceBalance2:
         """
                    Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
         
-                   :math:`\\Gamma = \\langle\\gamma_{\\eta}\\rangle`, with :math:`\\gamma_{\\eta} = \\frac{\\bar{r_{\\eta}}^2}{R_{0,\\eta}^2}`,
+                   :math:`\\Gamma = \\langle\\gamma_{\\eta}\\rangle`, with :math:`\\gamma_{\\eta} = \\\\frac{\\bar{r_{\\eta}}^2}{R_{0,\\eta}^2}`,
                    which you can use as :math:`G_{\\mathrm{ANT}} = \\Gamma \\nu k_B T`,
                    where :math:`\\eta` is the index of a particular strand,
                    :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\\eta}*b^2$`
@@ -2018,7 +2027,7 @@ class MEHPForceRelaxation:
         """
                   Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
         
-                  :math:`\\Gamma = \\langle\\gamma_{\\eta}\\rangle`, with :math:`\\gamma_{\\eta} = \\frac{\\bar{r_{\\eta}}^2}{R_{0,\\eta}^2}`,
+                  :math:`\\Gamma = \\langle\\gamma_{\\eta}\\rangle`, with :math:`\\gamma_{\\eta} = \\\\frac{\\bar{r_{\\eta}}^2}{R_{0,\\eta}^2}`,
                   which you can use as :math:`G_{\\mathrm{ANT}} = \\Gamma \\nu k_B T`,
                   where :math:`\\eta` is the index of a particular strand,
                   :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`= N_{\\eta} b^2$`,
@@ -2038,7 +2047,7 @@ class MEHPForceRelaxation:
         """
                   Computes the gamma factor for each spring as part of the ANT/MEHP formulism.
         
-                  :math:`\\gamma_{\\eta} = \\frac{\\bar{r_{\\eta}}^2}{R_{0,\\eta}^2}`, with (here)
+                  :math:`\\gamma_{\\eta} = \\\\frac{\\bar{r_{\\eta}}^2}{R_{0,\\eta}^2}`, with (here)
                   :math:`R_{0,\\eta}^2 = N_\\eta \\cdot ` the parameter `b0_squared`.
                   You can obtain this parameter e.g. by doing melt simulations at different lengths,
                   it's the slope you obtain.
@@ -2155,7 +2164,7 @@ class MEHPForceRelaxation:
 class MaxDistanceProvider:
     """
     
-         
+         A generic implementation of a class, that shall provide a maximum distance for the MC sampling.
          
     """
     def __init__(self) -> None:
@@ -2240,7 +2249,7 @@ class Molecule:
         """
                     Computes the radius of gyration, :math:`R_g^2` of this molecule.
                     
-                    :math:`{R_g}^2 = \\frac{1}{M} \\sum_i m_i (r_i - r_{cm})^2`,
+                    :math:`{R_g}^2 = \\\\frac{1}{M} \\sum_i m_i (r_i - r_{cm})^2`,
                     where :math:`M` is the total mass of the molecule, :math:`r_{cm}`
                     are the coordinates of the center of mass of the molecule and the
                     sum is over all contained atoms.
@@ -2394,6 +2403,8 @@ class MoleculeIterator:
         ...
 class MoleculeType:
     """
+    An enum representing the type of molecule/chain/strand.
+    
     Members:
     
       UNDEFINED : This value indicates that either the property was not set or not discovered.
@@ -2488,7 +2499,7 @@ class NonGaussianSpringForceEvaluator(MEHPForceEvaluator):
          This is equal to a spring evaluator for Langevin chains.
     
          The force for a certain spring is given by:
-         :math:`f = 0.5 \\cdot \\frac{1}{l} \\scriptL^{-1}(\\frac{r}{N\\cdot l})`,
+         :math:`f = 0.5 \\cdot \\\\frac{1}{l} \\scriptL^{-1}(\\frac{r}{N\\cdot l})`,
          where :math:`r` is the spring [between cross-linkers] length
          and :math:`\\scriptL^{-1}` the inverse langevin function.
     
@@ -2506,6 +2517,9 @@ class NonGaussianSpringForceEvaluator(MEHPForceEvaluator):
         Initialize this ForceEvaluator
         """
 class NormalModeAnalyzer:
+    """
+    Compute the normal modes and loss/storage moduli.
+    """
     def __getstate__(self) -> tuple:
         ...
     def __init__(self, spring_from: collections.abc.Sequence[typing.SupportsInt], spring_to: collections.abc.Sequence[typing.SupportsInt]) -> None:
@@ -3622,8 +3636,3 @@ def version_information() -> str:
     """
         Returns  a string of the the current version, incl. git hash and date of compilation.
     """
-DANGLING_CHAIN: MoleculeType  # value = <MoleculeType.DANGLING_CHAIN: 3>
-FREE_CHAIN: MoleculeType  # value = <MoleculeType.FREE_CHAIN: 4>
-NETWORK_STRAND: MoleculeType  # value = <MoleculeType.NETWORK_STRAND: 1>
-PRIMARY_LOOP: MoleculeType  # value = <MoleculeType.PRIMARY_LOOP: 2>
-UNDEFINED: MoleculeType  # value = <MoleculeType.UNDEFINED: 0>

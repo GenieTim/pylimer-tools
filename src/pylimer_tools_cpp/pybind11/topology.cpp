@@ -16,7 +16,9 @@ void
 init_pylimer_bound_topo(py::module_& m)
 {
   py::class_<AtomPairEntanglements>(
-    m, "AtomPairEntanglements", py::module_local())
+    m, "AtomPairEntanglements", py::module_local(), R"pbdoc(
+      A struct to store pairs of atoms that are close together and could be entanglements.
+    )pbdoc")
     .def(py::init<>(), "Get an instance of this struct")
     .def_readwrite(
       "pairs_of_atoms", &AtomPairEntanglements::pairsOfAtoms, R"pbdoc(

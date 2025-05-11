@@ -14,5 +14,12 @@
         }
         }
         .class { margin-top: 1em; }
+        {# Remove equation start and end #}
+        .mjx-mrow > .mjx-mtext:first-child[style="color: red;"] {
+            display: none;
+        }
+        .mjx-mrow > .mjx-mtext:last-child[style="color: red;"] {
+            display: none;
+        }
     {% endblock %}
 </style>

@@ -1,3 +1,11 @@
+"""
+This module is deprecated.
+Use :func:`pylimer_tools_cpp.MEHPForceBalance` or :func:`pylimer_tools_cpp.MEHPForceRelaxation` instead.
+
+In principle, it offers comparable functionality, but without the force minimization - the networks you pass
+to these methods should be minimized first.
+"""
+
 # source: https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
 from __future__ import annotations
@@ -8,14 +16,6 @@ import numpy as np
 
 from pylimer_tools.calc.structure_analysis import compute_mean_end_to_end_distances
 from pylimer_tools_cpp import MoleculeType, Universe
-
-"""
-This module is deprecated.
-Use :func:`pylimer_tools_cpp.MEHPForceBalance` or :func:`pylimer_tools_cpp.MEHPForceRelaxation` instead.
-
-In principle, it offers comparable functionality, but without the force minimization - the networks you pass
-to these methods should be minimized first.
-"""
 
 
 def predict_shear_modulus(

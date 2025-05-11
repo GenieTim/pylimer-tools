@@ -64,7 +64,7 @@ class UnitStyle(object):
         .. code:: python
 
           units = get_unit_style("lj")
-          si_mass = lj_mass * units.get_base_unit_of("mass")
+          mass_in_si = mass_in_lj * units.get_base_unit_of("mass")
         """
         translator = {
             "dynamic viscosity": "viscosity",
@@ -89,7 +89,7 @@ class UnitStyle(object):
         .. code:: python
 
           units = get_unit_style("lj")
-          si_mass = lj_mass * units.mass
+          mass_with_units = mass_in_lj * units.mass
         """
         if property.lower() in self.unit_configuration.keys():
             return self.unit_configuration[property.lower()]
@@ -160,7 +160,7 @@ class UnitStyleFactory(object):
         For LJ units, you must specify the polymer using the `polymer` parameter.
 
         See also:
-          - https://docs.lammps.org/units.html
+            https://docs.lammps.org/units.html
 
         .. warning::
             Please check the source code of this function to see
