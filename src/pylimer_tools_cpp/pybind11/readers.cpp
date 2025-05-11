@@ -35,6 +35,13 @@ void
 init_pylimer_bound_readers(py::module_& m)
 {
 
+  py::enum_<AtomStyle>(
+    m, "AtomStyle", "An enumeration of the LAMMPS atom styles.")
+#define X(e, n) .value(#e, AtomStyle::e, "LAMMPS atom style '" n "'")
+    LAMMPS_ATOM_STYLES
+#undef X
+    ;
+
   py::class_<AveFileReader>(m, "AveFileReader", R"pbdoc(
           Alternative implementation of the data file reader implemented in 
           :func:`pylimer_tools.read_lammps_output_file.read_averages_file`.
@@ -67,35 +74,6 @@ init_pylimer_bound_readers(py::module_& m)
          py::arg("column_index1"),
          py::arg("column_index2"),
          py::arg("delta_indices"));
-
-  py::enum_<AtomStyle>(m, "AtomStyle")
-    .value("NONE", AtomStyle::NONE)
-    .value("ANGLE", AtomStyle::ANGLE)
-    .value("ATOMIC", AtomStyle::ATOMIC)
-    .value("BODY", AtomStyle::BODY)
-    .value("BOND", AtomStyle::BOND)
-    .value("CHARGE", AtomStyle::CHARGE)
-    .value("DIELECTRIC", AtomStyle::DIELECTRIC)
-    .value("DIPOLE", AtomStyle::DIPOLE)
-    .value("DPD", AtomStyle::DPD)
-    .value("EDPD", AtomStyle::EDPD)
-    .value("ELECTRON", AtomStyle::ELECTRON)
-    .value("ELLIPSOID", AtomStyle::ELLIPSOID)
-    .value("FULL", AtomStyle::FULL)
-    .value("LINE", AtomStyle::LINE)
-    .value("MDPD", AtomStyle::MDPD)
-    .value("MOLECULAR", AtomStyle::MOLECULAR)
-    .value("PERI", AtomStyle::PERI)
-    .value("SMD", AtomStyle::SMD)
-    .value("SPH", AtomStyle::SPH)
-    .value("SPHERE", AtomStyle::SPHERE)
-    .value("BPM_SPHERE", AtomStyle::BPM_SPHERE)
-    .value("SPIN", AtomStyle::SPIN)
-    .value("TDPD", AtomStyle::TDPD)
-    .value("TEMPLATE", AtomStyle::TEMPLATE)
-    .value("TRI", AtomStyle::TRI)
-    .value("WAVEPACKET", AtomStyle::WAVEPACKET)
-    .value("HYBRID", AtomStyle::HYBRID);
 
   py::class_<DumpFileParser>(m, "DumpFileReader", R"pbdoc(
        A reader for LAMMPS's `dump` files.

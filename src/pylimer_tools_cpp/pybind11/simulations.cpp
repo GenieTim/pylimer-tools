@@ -98,7 +98,8 @@ init_pylimer_bound_sim(py::module_& m)
 #undef X
     ;
 
-  py::enum_<ComputedDoubleValues>(m, "ComputedDoubleValues")
+  py::enum_<ComputedDoubleValues>(
+    m, "ComputedDoubleValues", "Floating point output quantities")
 #define X(e, n)                                                                \
   .value(#e, ComputedDoubleValues::e, "Results in the output column " #n ".")
     COMPUTED_DOUBLE_VALUES
@@ -375,7 +376,7 @@ and finally springs will be any number of connected bonds between links.
      This is equal to a spring evaluator for Langevin chains.
 
      The force for a certain spring is given by:
-     :math:`f = 0.5 \cdot \frac{1}{l} \scriptL^{-1}(\frac{r}{N\cdot l})`,
+     :math:`f = 0.5 \cdot \\frac{1}{l} \scriptL^{-1}(\frac{r}{N\cdot l})`,
      where :math:`r` is the spring [between cross-linkers] length
      and :math:`\scriptL^{-1}` the inverse langevin function.
 
@@ -516,7 +517,7 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
           Computes the gamma factor for each spring as part of the ANT/MEHP formulism.
 
-          :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`, with (here)
+          :math:`\gamma_{\eta} = \\frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`, with (here)
           :math:`R_{0,\eta}^2 = N_\eta \cdot ` the parameter `b0_squared`.
           You can obtain this parameter e.g. by doing melt simulations at different lengths,
           it's the slope you obtain.
@@ -534,7 +535,7 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
           Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
 
-          :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
+          :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \\frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
           which you can use as :math:`G_{\mathrm{ANT}} = \Gamma \nu k_B T`,
           where :math:`\eta` is the index of a particular strand,
           :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`= N_{\eta} b^2$`,
@@ -1134,7 +1135,7 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
           Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
 
-          :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
+          :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \\frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
           which you can use as :math:`G_{\mathrm{ANT}} = \Gamma \nu k_B T`,
           where :math:`\eta` is the index of a particular strand,
           :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\eta}*b^2$`
@@ -1637,7 +1638,7 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
            Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
 
-           :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
+           :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \\frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
            which you can use as :math:`G_{\mathrm{ANT}} = \Gamma \nu k_B T`,
            where :math:`\eta` is the index of a particular strand,
            :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\eta}*b^2$`

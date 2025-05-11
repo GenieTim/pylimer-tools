@@ -287,7 +287,10 @@ init_pylimer_bound_entities(py::module_& m)
          [](MoleculeIterator& it) -> MoleculeIterator& { return it; })
     .def("__next__", &MoleculeIterator::next);
 
-  py::enum_<MoleculeType>(m, "MoleculeType")
+  py::enum_<MoleculeType>(
+    m,
+    "MoleculeType",
+    "An enum representing the type of molecule/chain/strand.")
     .value("UNDEFINED",
            MoleculeType::UNDEFINED,
            "This value indicates that either the property was not set or not "
@@ -303,8 +306,7 @@ init_pylimer_bound_entities(py::module_& m)
       )pbdoc")
     .value("FREE_CHAIN", MoleculeType::FREE_CHAIN, R"pbdoc(
            A free chain is a strand not connected to any cross-linker.
-      )pbdoc")
-    .export_values();
+      )pbdoc");
 
   py::class_<Molecule>(m,
                        "Molecule",
@@ -441,7 +443,7 @@ init_pylimer_bound_entities(py::module_& m)
          R"pbdoc(
             Computes the radius of gyration, :math:`R_g^2` of this molecule.
             
-            :math:`{R_g}^2 = \frac{1}{M} \sum_i m_i (r_i - r_{cm})^2`,
+            :math:`{R_g}^2 = \\frac{1}{M} \sum_i m_i (r_i - r_{cm})^2`,
             where :math:`M` is the total mass of the molecule, :math:`r_{cm}`
             are the coordinates of the center of mass of the molecule and the
             sum is over all contained atoms.

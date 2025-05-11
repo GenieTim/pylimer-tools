@@ -38,7 +38,7 @@ init_pylimer_bound_generators(py::module_& m)
 
   py::class_<MaxDistanceProvider, PyMaxDistanceProvider>(
     m, "MaxDistanceProvider", R"pbdoc(
-     
+     A generic implementation of a class, that shall provide a maximum distance for the MC sampling.
      )pbdoc")
     .def(py::init<>())
     .def("get_max_distance",
@@ -75,6 +75,7 @@ init_pylimer_bound_generators(py::module_& m)
          &ZScoreMaxDistanceProvider::getMaxDistance,
          "",
          py::arg("N"));
+
   py::class_<NoMaxDistanceProvider, MaxDistanceProvider>(
     m, "NoMaxDistanceProvider", R"pbdoc(
     For MC generation, to disable the neighbour list useage.
