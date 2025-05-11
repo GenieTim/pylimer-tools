@@ -3,6 +3,8 @@
 cd "$(dirname "$0")/.." || exit 10
 ROOT_DIR=$(pwd)
 
+mkdir -p "$ROOT_DIR/test-reports"
+
 cd "$ROOT_DIR/tests" || exit 2
 rm ./**/*.gcda # remove old coverage files
 
