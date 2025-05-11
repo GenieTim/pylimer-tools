@@ -80,6 +80,11 @@ add_library(test_sources
         pylimer_tools/test_topo.cpp
         pylimer_tools/test_universe.cpp
         pylimer_tools/test_universesequence.cpp
+        # headers
+        pylimer_tools/test_string_utils.cpp
+        pylimer_tools/test_calc.cpp
+        pylimer_tools/test_vector_utils.cpp
+        pylimer_tools/test_box.cpp
 )
 
 IF (WIN32)
@@ -129,34 +134,6 @@ target_link_libraries(pylimer_tests
         ${nlopt_LIBRARIES}
 )
 
-add_library(header_test_sources
-        OBJECT
-        pylimer_tools/test_calc.cpp
-        pylimer_tools/test_vector_utils.cpp
-)
-add_dependencies(header_test_sources igraph::igraph)
-add_dependencies(header_test_sources cerealLib)
-#add_dependencies(header_test_sources pylimer_tools)
-target_link_libraries(header_test_sources PUBLIC
-        Catch2::Catch2
-        ${igraph_LIBRARIES}
-)
-
-target_link_libraries(header_test_sources PUBLIC Eigen3::Eigen)
-
-# separate the header tests out, for the coverage generation
-add_executable(header_tests pylimer_tools/test_headers.cpp)
-
-add_dependencies(header_tests igraph::igraph)
-add_dependencies(header_tests header_test_sources)
-
-target_link_libraries(header_tests
-        PRIVATE
-        Catch2::Catch2WithMain
-        header_test_sources
-        ${igraph_LIBRARIES}
-)
-
 if (LEAK_ANALYSIS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
     set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
@@ -168,19 +145,12 @@ if (LEAK_ANALYSIS)
             PRIVATE
             -fsanitize=address
     )
-    target_link_libraries(header_tests
-            PRIVATE
-            -fsanitize=address
-    )
 endif ()
 
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(CTest)
 include(Catch)
 catch_discover_tests(pylimer_tests
-        TEST_SPEC "~[long]"
-)
-catch_discover_tests(header_tests
         TEST_SPEC "~[long]"
 )
 
@@ -196,14 +166,6 @@ if (CODE_COVERAGE)
             DEPENDENCIES pylimer_tests
             LCOV_ARGS --ignore-errors inconsistent,source,format
             EXECUTABLE_ARGS --skip-benchmarks --order rand --durations yes "~[long]" --reporter JUnit::out=${CMAKE_CURRENT_LIST_DIR}/../test-reports/pylimer-tests-result-junit.xml --reporter console &> "${CMAKE_CURRENT_LIST_DIR}/build/pylimer_test_output.log.txt"
-            EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/../vendor/*" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
-    )
-    setup_target_for_coverage_lcov(
-            NAME header_tests-gcov
-            EXECUTABLE header_tests
-            DEPENDENCIES header_tests
-            LCOV_ARGS --ignore-errors inconsistent,source,format
-            EXECUTABLE_ARGS --skip-benchmarks --order rand --durations yes "~[long]" --reporter JUnit::out=${CMAKE_CURRENT_LIST_DIR}/../test-reports/header-tests-result-junit.xml --reporter console &> "${CMAKE_CURRENT_LIST_DIR}/build/header_test_output.log.txt"
             EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/../vendor/*" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
     )
     # BASE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/.."

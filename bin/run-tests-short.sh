@@ -23,7 +23,6 @@ fi
 ls ./*
 echo "======== Starting gcov ========"
 find . -name "*Universe.cpp.gcov" -exec cat {} \;
-MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp time "$GENERATOR_BIN" header_tests-gcov
 MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp time "$GENERATOR_BIN" pylimer_tests-gcov
 find . -name "*Universe.cpp.gcov" -exec cat {} \;
 echo "========== /ran gcov =========="
