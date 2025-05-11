@@ -66,25 +66,26 @@ endif ()
 
 add_library(test_sources
         OBJECT
-        pylimer_tools/test_dpd_simulator.cpp
-        pylimer_tools/test_eigen_neighbourlist_benchmark.cpp
-        pylimer_tools/test_force_balance.cpp
-        pylimer_tools/test_force_balance2.cpp
-        pylimer_tools/test_force_balance_benchmark.cpp
-        pylimer_tools/test_force_relaxation.cpp
-        pylimer_tools/test_generator.cpp
-        pylimer_tools/test_molecule.cpp
-        pylimer_tools/test_neighbourlist.cpp
-        pylimer_tools/test_normal_mode_analysis.cpp
-        pylimer_tools/test_readers_writers.cpp
-        pylimer_tools/test_topo.cpp
-        pylimer_tools/test_universe.cpp
-        pylimer_tools/test_universesequence.cpp
+        pylimer_tools_cpp/test_dpd_simulator.cpp
+        pylimer_tools_cpp/test_eigen_neighbourlist_benchmark.cpp
+        pylimer_tools_cpp/test_force_balance.cpp
+        pylimer_tools_cpp/test_force_balance2.cpp
+        pylimer_tools_cpp/test_force_balance_benchmark.cpp
+        pylimer_tools_cpp/test_force_relaxation.cpp
+        pylimer_tools_cpp/test_generator.cpp
+        pylimer_tools_cpp/test_molecule.cpp
+        pylimer_tools_cpp/test_neighbourlist.cpp
+        pylimer_tools_cpp/test_normal_mode_analysis.cpp
+        pylimer_tools_cpp/test_readers_writers.cpp
+        pylimer_tools_cpp/test_topo.cpp
+        pylimer_tools_cpp/test_universe.cpp
+        pylimer_tools_cpp/test_universesequence.cpp
         # headers
-        pylimer_tools/test_string_utils.cpp
-        pylimer_tools/test_calc.cpp
-        pylimer_tools/test_vector_utils.cpp
-        pylimer_tools/test_box.cpp
+        pylimer_tools_cpp/test_atom.cpp
+        pylimer_tools_cpp/test_box.cpp
+        pylimer_tools_cpp/test_calc.cpp
+        pylimer_tools_cpp/test_string_utils.cpp
+        pylimer_tools_cpp/test_vector_utils.cpp
 )
 
 IF (WIN32)
@@ -120,7 +121,7 @@ target_link_libraries(test_sources
         ${nlopt_LIBRARIES}
 )
 
-add_executable(pylimer_tests pylimer_tools/test.cpp)
+add_executable(pylimer_tests pylimer_tools_cpp/test.cpp)
 
 add_dependencies(pylimer_tests pylimer_tools)
 add_dependencies(pylimer_tests test_sources)

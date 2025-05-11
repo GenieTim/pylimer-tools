@@ -6,7 +6,7 @@
 namespace pylimer_tools {
 namespace topo {
 
-  Eigen::Vector3d sampleIntersectionPoint(const Eigen::Vector3d origin1,
+  static inline Eigen::Vector3d sampleIntersectionPoint(const Eigen::Vector3d origin1,
                                           const double radius1,
                                           const Eigen::Vector3d origin2,
                                           const double radius2,
@@ -43,7 +43,7 @@ namespace topo {
                                  intersectionBinormal * std::sin(theta));
   }
 
-  bool segmentIntersectsTriangle(
+  static inline bool segmentIntersectsTriangle(
     const Eigen::Vector3d rayOrigin,
     const Eigen::Vector3d rayTarget,
     const Eigen::Vector3d vertex0,
@@ -103,7 +103,7 @@ namespace topo {
     return false;
   };
 
-  bool segmentIntersectsTriangle(const Eigen::Vector3d rayOrigin,
+  static inline bool segmentIntersectsTriangle(const Eigen::Vector3d rayOrigin,
                                  const Eigen::Vector3d rayTarget,
                                  const Eigen::Vector3d vertex0,
                                  const Eigen::Vector3d vertex1,

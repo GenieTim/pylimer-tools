@@ -21,6 +21,8 @@ namespace pcd = pylimer_tools::sim::dpd;
  * @brief Auxiliary helper function: sets different output types
  *
  * @param simulator
+ * @param averageFile
+ * @param autocorrFile
  */
 void
 setupAllOutputs(pcd::DPDSimulator& simulator,
