@@ -1288,3 +1288,89 @@ TEST_CASE("Vertex coordinates are assumed for tree-like structures",
     CHECK(bondVector.norm() < 5.);
   }
 }
+
+TEST_CASE("Parts can be removed and added to the universe",
+          "[Universe][entity]")
+{
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  REQUIRE_NOTHROW(universe.simplify());
+  std::vector<double> coords = { 0.0, 1.0, 2.0, 3.0, 4.0,
+                                 5.0, 6.0, 7.0, 8.0, 9.0 };
+  std::vector<long int> ids = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  universe.addAtoms(ids,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 1),
+                    coords,
+                    coords,
+                    coords,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0));
+  universe.addBonds({ 0, 1, 2 }, { 1, 2, 3 }, { 1, 1, 1 });
+
+  CHECK(universe.getNrOfAtoms() == ids.size());
+  CHECK(universe.getNrOfBonds() == 3);
+
+  SECTION("Atoms")
+  {
+    CHECK(universe.getAtomsOfType(2).size() == 0);
+    universe.replaceAtomType(0, 2);
+    CHECK(universe.getAtom(0).getType() == 2);
+    CHECK(universe.getAtomsOfType(2).size() == 1);
+    CHECK(universe.getNrOfBonds() == 3);
+
+    CHECK_NOTHROW(universe.removeAtoms({ 0 }));
+    CHECK(universe.getAtomsOfType(2).size() == 0);
+    CHECK(universe.getNrOfBonds() == 2);
+
+    CHECK(universe.getMasses().size() == 0);
+    universe.setMassForType(1, 1.0);
+    universe.setMassForType(2, 2.0);
+    CHECK(universe.getMasses().size() == 2);
+
+    CHECK(universe.computeWeightFractionOfClustersAssociatedWith({0}) == 0.);
+    CHECK(universe.computeWeightFractionOfClustersAssociatedWith({1}) == 3. / 9.);
+  }
+
+  SECTION("Bonds")
+  {
+    CHECK(universe.getNrOfBonds() == 3);
+    CHECK_NOTHROW(universe.removeBondsOfType(1));
+    CHECK(universe.getNrOfBonds() == 0);
+
+    universe.addBonds({ 1, 2 }, { 2, 3 }, { 1, 1 });
+    CHECK(universe.getNrOfBonds() == 2);
+    universe.removeBonds({ 2, 3 }, { 1, 2 });
+    CHECK(universe.getNrOfBonds() == 0);
+  }
+
+  SECTION("Angles")
+  {
+    CHECK(universe.getNrOfAngles() == 0);
+    auto angles = universe.detectAngles();
+    REQUIRE(angles["angle_from"].size() == 2);
+    std::vector<int> angleTypes = { 1, 1 };
+    universe.addAngles(angles["angle_from"],
+                       angles["angle_to"],
+                       angles["angle_via"],
+                       angleTypes);
+    CHECK(universe.getNrOfAngles() == 2);
+    CHECK_NOTHROW(universe.removeAllAngles());
+    CHECK(universe.getNrOfAngles() == 0);
+  }
+
+  SECTION("Dihedrals")
+  {
+    CHECK(universe.getNrOfDihedralAngles() == 0);
+    auto dihedrals = universe.detectDihedralAngles();
+    REQUIRE(dihedrals["dihedral_angle_from"].size() == 1);
+    std::vector<int> dihedralAngleTypes = { 1 };
+    universe.addDihedralAngles(dihedrals["dihedral_angle_from"],
+                               dihedrals["dihedral_angle_via1"],
+                               dihedrals["dihedral_angle_via2"],
+                               dihedrals["dihedral_angle_to"],
+                               dihedralAngleTypes);
+    CHECK(universe.getNrOfDihedralAngles() == 1);
+    CHECK_NOTHROW(universe.removeAllDihedralAngles());
+    CHECK(universe.getNrOfDihedralAngles() == 0);
+  }
+}

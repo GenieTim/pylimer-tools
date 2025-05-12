@@ -279,18 +279,11 @@ std::vector<Atom>
 AtomGraphParent::getAtomsOfType(const int atomType) const
 {
   std::vector<Atom> results;
-  const std::vector<int> types = this->getPropertyValues<int>("type");
-  size_t nrOfTypes = types.size();
-  // results.reserve(this->getNrOfAtoms()); // TODO: check whether this is
-  // worth it or not
+  std::vector<igraph_integer_t> indices =
+    this->getIndicesWithAttribute<int>("type", atomType);
 
-  // #pragma omp declare reduction (merge : std::vector<Atom> :
-  // omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end())) #pragma
-  // omp parallel for reduction(merge: results)
-  for (size_t i = 0; i < nrOfTypes; ++i) {
-    if (types[i] == atomType) {
-      results.push_back(this->getAtomByVertexIdx(i));
-    }
+  for (igraph_integer_t i : indices) {
+    results.push_back(this->getAtomByVertexIdx(i));
   }
 
   return results;
