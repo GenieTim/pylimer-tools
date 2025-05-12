@@ -155,7 +155,6 @@ target_sources(pylimer_tools
         ${CMAKE_CURRENT_LIST_DIR}/utils/VectorUtils.h
 
         ${CMAKE_CURRENT_LIST_DIR}/calc/Correlator.h
-        ${CMAKE_CURRENT_LIST_DIR}/calc/MEHPanalysis.h
         ${CMAKE_CURRENT_LIST_DIR}/calc/MMTanalysis.h
         ${CMAKE_CURRENT_LIST_DIR}/calc/NormalModeAnalyzer.h
 

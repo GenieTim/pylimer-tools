@@ -437,8 +437,19 @@ TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
   REQUIRE_NOTHROW(simulator.validateState());
 
   // short run because we can
+
+  std::string averageFile =
+    suspectedPath + "melt_83_a_100.structure.avg-out.txt";
+  std::string autocorrFile =
+    suspectedPath + "melt_83_a_100.structure.autocorr-out.txt";
+  setupAllOutputs(simulator, averageFile, autocorrFile);
   REQUIRE_NOTHROW(simulator.runSimulation(10, false));
   REQUIRE_NOTHROW(simulator.runSimulation(10, true));
+
+  CHECK(std::filesystem::exists(averageFile));
+  std::remove(averageFile.c_str());
+  CHECK(std::filesystem::exists(autocorrFile));
+  std::remove(autocorrFile.c_str());
 }
 
 TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")

@@ -1,7 +1,6 @@
 #ifndef PYBIND_CALC_H
 #define PYBIND_CALC_H
 
-#include "../calc/MEHPanalysis.h"
 #include "../calc/MMTanalysis.h"
 #include "../calc/NormalModeAnalyzer.h"
 
