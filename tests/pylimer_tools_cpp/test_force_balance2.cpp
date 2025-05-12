@@ -2072,6 +2072,40 @@ TEST_CASE(
   }
 }
 
+TEST_CASE("MEHPFB2 Basic deformation test", "[analysis][MEHPForceBalance2][Box]")
+{
+  std::cout << "Running test \"MEHPFB2 Basic deformation test\"" << std::endl;
+
+  const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
+  REQUIRE(std::filesystem::exists(suspectedPath))
+
+  SECTION("Non-empty universe")
+  {
+    std::string inputFile =
+      suspectedPath +
+      "/structure/3d-diamond-lattice_3x3x3_a_23_d_3_v_0.structure.out";
+    REQUIRE(std::filesystem::exists(inputFile));
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
+
+    pcm::MEHPForceBalance2 fb2 = pcm::MEHPForceBalance2(universe, 2);
+    double residualBeforeDeformation = fb2.getResidual();
+    pe::Box prevBox = universe.getBox();
+    pe::Box newBox = pe::Box(prevBox.getLowX() * 0.9,
+                             prevBox.getHighX() * 1.1,
+                             prevBox.getLowY(),
+                             prevBox.getHighY(),
+                             prevBox.getLowZ(),
+                             prevBox.getHighZ());
+    fb2.deformTo(newBox);
+    double residualAfterDeformation = fb2.getResidual();
+    CHECK_THAT(residualBeforeDeformation < residualAfterDeformation);
+  }
+}
+
 TEST_CASE("MEHPFB2 Basic conversion test with entanglements",
           "[analysis][MEHPForceBalance2][StructureConversion]")
 {

@@ -23,6 +23,57 @@ namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 namespace pc = pylimer_tools::calc;
 
+/**
+ * Utility functions to validate the resulting distributions
+ */
+
+double
+normalCDF(double x) // Phi(-∞, x) aka N(x)
+{
+  return std::erfc(-x / std::sqrt(2)) / 2;
+}
+
+bool
+andersonDarlingNormalDistributionTest(Eigen::VectorXd observations,
+                                      const double expectedMean,
+                                      const double expectedVariance)
+{
+  std::ranges::sort(observations);
+  const double sampleMean = observations.mean();
+  const double sampleVariance =
+    (observations.array() - sampleMean).square().sum() /
+    (observations.size() - 1);
+  const double n = observations.size();
+
+  if (std::abs(sampleMean) < 1e-4 || std::abs(expectedMean) < 1e-4) {
+    CHECK_THAT(sampleMean, Catch::Matchers::WithinAbs(expectedMean, 10. / n));
+  } else {
+    CHECK_THAT(sampleMean, Catch::Matchers::WithinRel(expectedMean, 0.1));
+  }
+  CHECK_THAT(sampleVariance, Catch::Matchers::WithinRel(expectedVariance, 0.1));
+  // Eigen::VectorXd normalizedObservations =
+  //   (observations.array() - sampleMean).matrix() / std::sqrt(sampleVariance);
+  Eigen::VectorXd normalizedObservations =
+    (observations.array() - expectedMean).matrix() /
+    std::sqrt(expectedVariance);
+
+  double A2 = -n;
+  for (double i = 0; i < n; ++i) {
+    A2 -= ((2. * (i + 1) - 1.) / n) *
+          (std::log(
+             normalCDF(normalizedObservations(static_cast<Eigen::Index>(i)))) +
+           std::log(1. - normalCDF(normalizedObservations(
+                           static_cast<Eigen::Index>(n - (i + 1))))));
+  }
+
+  // Case 0, 10 % significance level,
+  // according to Marsaglia & Marsaglia
+  return A2 > 1.933;
+}
+
+/**
+ * Actual test cases
+ */
 TEST_CASE("Certain configurations do not lead to memory corruption",
           "[generator][MCUniverseGenerator]")
 {
@@ -952,4 +1003,150 @@ TEST_CASE("Universe generator uses correct w_sol even for strange structures",
 
   CHECK_THAT(forceBalance.getSolubleWeightFraction(),
              Catch::Matchers::WithinAbs(0.31, 0.05));
+}
+
+TEST_CASE("Linear walk chain can be generated", "[topo][RandomWalker]")
+{
+  std::cout << "Running test \"Linear walk chain can be generated\""
+            << std::endl;
+  pe::Box box = pe::Box(10., 10., 10.);
+
+  SECTION("With ends")
+  {
+    Eigen::VectorXd coordinates = pu::doLinearWalkChainFromTo(
+      box, Eigen::Vector3d(0., 0., 0.), Eigen::Vector3d(5., 5., 5.), 10, true);
+    CHECK(coordinates.size() == (10 + 2) * 3);
+    CHECK(coordinates.segment(0, 3) == Eigen::Vector3d(0., 0., 0.));
+    CHECK(coordinates.segment(3 * (10 + 1), 3) == Eigen::Vector3d(5., 5., 5.));
+    Eigen::Vector3d prevDistance =
+      coordinates.segment(0, 3) - coordinates.segment(3, 3);
+    for (size_t i = 3; i < coordinates.size(); i += 3) {
+      Eigen::Vector3d currentDistance =
+        coordinates.segment(i, 3) - coordinates.segment(i - 3, 3);
+      CHECK(currentDistance.norm() == Catch::Approx(prevDistance.norm()));
+    }
+  }
+
+  SECTION("Without ends")
+  {
+    Eigen::VectorXd coordinates = pu::doLinearWalkChainFromTo(
+      box, Eigen::Vector3d(0., 0., 0.), Eigen::Vector3d(5., 5., 5.), 10, false);
+    CHECK(coordinates.size() == (10) * 3);
+    Eigen::Vector3d prevDistance =
+      coordinates.segment(0, 3) - coordinates.segment(3, 3);
+    for (size_t i = 3; i < coordinates.size(); i += 3) {
+      Eigen::Vector3d currentDistance =
+        coordinates.segment(i, 3) - coordinates.segment(i - 3, 3);
+      CHECK(currentDistance.norm() == Catch::Approx(prevDistance.norm()));
+    }
+  }
+}
+
+TEST_CASE("doRandomWalkChainFromToMC generates valid chains",
+          "[topo][RandomWalker][mc]")
+{
+  // Create a box
+  pylimer_tools::entities::Box box(10.0, 10.0, 10.0);
+
+  // Define start and end points
+  Eigen::Vector3d from(1.0, 1.0, 1.0);
+  Eigen::Vector3d to(8.0, 8.0, 8.0);
+
+  // Parameters for the random walk
+  int chainLen = 15;
+  double beadDistance = 1.0;
+  double meanSquaredBeadDistance = 1.2;
+  std::string seed = "test_seed";
+  int numIterations = 500;
+
+  // Generate the chain
+  Eigen::VectorXd coordinates =
+    pylimer_tools::utils::doRandomWalkChainFromToMC(box,
+                                                    from,
+                                                    to,
+                                                    chainLen,
+                                                    beadDistance,
+                                                    meanSquaredBeadDistance,
+                                                    seed,
+                                                    numIterations);
+
+  // Check the size of the returned vector (should be 3 * chainLen)
+  REQUIRE(coordinates.size() == 3 * chainLen);
+
+  // Reshape the coordinates into a matrix for easier access
+  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor>>
+    posMatrix(coordinates.data(), chainLen, 3);
+
+  // Check that the first and last positions are close to the specified
+  // endpoints (Note: the function omits the actual endpoints, so we're checking
+  // the first and last positions in the returned chain are reasonably close to
+  // the endpoints)
+  Eigen::Vector3d firstPos = posMatrix.row(0);
+  Eigen::Vector3d lastPos = posMatrix.row(chainLen - 1);
+
+  // Calculate distances, accounting for PBC
+  Eigen::Vector3d distToStart = firstPos - from;
+  Eigen::Vector3d distToEnd = lastPos - to;
+  box.handlePBC(distToStart);
+  box.handlePBC(distToEnd);
+
+  // The first position should be close to 'from' (within ~beadDistance)
+  REQUIRE(distToStart.norm() == Catch::Approx(beadDistance).margin(0.5));
+
+  // The last position should be close to 'to' (within ~beadDistance)
+  REQUIRE(distToEnd.norm() == Catch::Approx(beadDistance).margin(0.5));
+
+  // Check that bond lengths are reasonable
+  Eigen::VectorXd bondLengths =
+    coordinates.tail((chainLen - 1) * 3) - coordinates.head((chainLen - 1) * 3);
+  CHECK(andersonDarlingNormalDistributionTest(bondLengths, 0., M_PI / 8.));
+
+  // Check that the chain follows a roughly direct path from start to end
+  // by verifying that the total path length is reasonable
+  Eigen::Vector3d totalPath = Eigen::Vector3d::Zero();
+  for (int i = 1; i < chainLen; ++i) {
+    Eigen::Vector3d bond = posMatrix.row(i) - posMatrix.row(i - 1);
+    box.handlePBC(bond);
+    totalPath += bond;
+  }
+
+  // The total path length should be greater than the direct distance but not
+  // excessively so
+  Eigen::Vector3d directDist = to - from;
+  box.handlePBC(directDist);
+
+  REQUIRE(totalPath.norm() >= directDist.norm());
+  // The path shouldn't be more than 2x the direct distance (this is a
+  // heuristic)
+  REQUIRE(totalPath.norm() <= 2.0 * directDist.norm());
+}
+
+TEST_CASE("doRandomWalkChain generates very long chains",
+          "[topo][RandomWalker][mc]")
+{
+  // Create a box
+  pylimer_tools::entities::Box box(100.0, 100.0, 100.0);
+
+  // Define start and end points
+  Eigen::Vector3d from(1.0, 1.0, 1.0);
+
+  // Parameters for the random walk
+  int chainLen = 500;
+  double beadDistance = 1.0;
+  double meanSquaredBeadDistance = 1.2;
+  std::string seed = "test_seed";
+  int numIterations = 500;
+
+  // Generate the chain
+  Eigen::VectorXd coordinates = pylimer_tools::utils::doRandomWalkChain(
+    chainLen, beadDistance, meanSquaredBeadDistance, seed);
+
+  // Check the size of the returned vector (should be 3 * chainLen)
+  REQUIRE(coordinates.size() == 3 * chainLen);
+
+  // Check that bond lengths are reasonable
+  const Eigen::VectorXd bondLengths =
+    coordinates.tail((chainLen - 1) * 3) - coordinates.head((chainLen - 1) * 3);
+  CHECK(andersonDarlingNormalDistributionTest(bondLengths, 0., M_PI / 8.));
+
 }
