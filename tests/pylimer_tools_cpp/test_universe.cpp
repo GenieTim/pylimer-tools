@@ -1327,8 +1327,9 @@ TEST_CASE("Parts can be removed and added to the universe",
     universe.setMassForType(2, 2.0);
     CHECK(universe.getMasses().size() == 2);
 
-    CHECK(universe.computeWeightFractionOfClustersAssociatedWith({0}) == 0.);
-    CHECK(universe.computeWeightFractionOfClustersAssociatedWith({1}) == 3. / 9.);
+    CHECK(universe.computeWeightFractionOfClustersAssociatedWith({ 0 }) == 0.);
+    CHECK(universe.computeWeightFractionOfClustersAssociatedWith({ 1 }) ==
+          3. / 9.);
   }
 
   SECTION("Bonds")
@@ -1373,4 +1374,30 @@ TEST_CASE("Parts can be removed and added to the universe",
     CHECK_NOTHROW(universe.removeAllDihedralAngles());
     CHECK(universe.getNrOfDihedralAngles() == 0);
   }
+}
+
+TEST_CASE("Querying the universe", "[Universe][entity]")
+{
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  std::vector<double> coords = { 0.0, 1.0, 2.0, 3.0, 4.0,
+                                 5.0, 6.0, 7.0, 8.0, 9.0 };
+  std::vector<long int> ids = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  universe.addAtoms(ids,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 1),
+                    coords,
+                    coords,
+                    coords,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0));
+  universe.addBonds({ 0, 1, 2 }, { 1, 2, 3 }, { 1, 1, 1 });
+  CHECK_NOTHROW(universe.simplify());
+  CHECK(universe.getAtomIdByIdx(0) == 0);
+  CHECK(universe.containsAtomWithId(0));
+  CHECK_FALSE(universe.containsAtomWithId(10));
+  pe::Atom atom = universe.getAtom(0);
+  CHECK(universe.containsAtom(atom));
+  pe::Atom wrongAtom = pe::Atom(0, 1, 0., 0., 0., 1, 1, 1);
+  CHECK_FALSE(universe.containsAtom(wrongAtom));
+  CHECK_THAT(universe.getVolume(), Catch::Matchers::WithinRel(10. * 10. * 10.));
 }
