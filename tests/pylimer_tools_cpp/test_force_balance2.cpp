@@ -2077,7 +2077,7 @@ TEST_CASE("MEHPFB2 Basic deformation test", "[analysis][MEHPForceBalance2][Box]"
   std::cout << "Running test \"MEHPFB2 Basic deformation test\"" << std::endl;
 
   const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
-  REQUIRE(std::filesystem::exists(suspectedPath))
+  REQUIRE(std::filesystem::exists(suspectedPath));
 
   SECTION("Non-empty universe")
   {
@@ -2102,7 +2102,7 @@ TEST_CASE("MEHPFB2 Basic deformation test", "[analysis][MEHPForceBalance2][Box]"
                              prevBox.getHighZ());
     fb2.deformTo(newBox);
     double residualAfterDeformation = fb2.getResidual();
-    CHECK_THAT(residualBeforeDeformation < residualAfterDeformation);
+    CHECK(residualBeforeDeformation < residualAfterDeformation);
   }
 }
 
