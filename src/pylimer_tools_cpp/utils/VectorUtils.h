@@ -765,7 +765,9 @@ vector_approx_equal(const IN& v1,
                     const double absEps = 1e-12,
                     const bool echo = false)
 {
-  assert(v1.size() == v2.size());
+  if (v1.size() != v2.size()) {
+    return false;
+  }
   for (size_t i = 0; i < v1.size(); ++i) {
     if (!APPROX_EQUAL(v1[i], v2[i], absEps)) {
       if (echo) {
@@ -785,7 +787,9 @@ vector_approx_rel_equal(const IN& v1,
                         const double eps = 1e-12,
                         const bool echo = false)
 {
-  assert(v1.size() == v2.size());
+  if (v1.size() != v2.size()) {
+    return false;
+  }
   for (size_t i = 0; i < v1.size(); ++i) {
     if (!APPROX_REL_EQUAL(v1[i], v2[i], eps)) {
       if (echo) {
