@@ -460,6 +460,19 @@ TEST_CASE("Segment-wise norm is calculated", "[VectorUtils]")
   CHECK_THROWS(pu::segmentwise_norm(vec1, 5));
 }
 
+TEST_CASE("Segment-wise norm maximum is calculated", "[VectorUtils]")
+{
+  std::cout << "Running test \"Segment-wise norm is calculated\"" << std::endl;
+  Eigen::VectorXd vec1 = Eigen::VectorXd::LinSpaced(6, 1, 6);
+
+  CHECK(pu::segmentwise_norm_max(vec1, 1) == 6);
+  const double res6 = pu::segmentwise_norm_max(vec1, 6);
+  CHECK(res6 == std::sqrt(vec1.array().square().sum()));
+
+  CHECK_THROWS(pu::segmentwise_norm(vec1, 0));
+  CHECK_THROWS(pu::segmentwise_norm(vec1, 5));
+}
+
 TEST_CASE("Finite component check is performed", "[VectorUtils]")
 {
   std::cout << "Running test \"Finite component check is performed\""
@@ -477,4 +490,34 @@ TEST_CASE("Finite component check is performed", "[VectorUtils]")
   Eigen::VectorXd vec4 =
     vec1.array() * std::numeric_limits<double>::signaling_NaN();
   CHECK_FALSE(pu::all_components_finite(vec4));
+}
+
+TEST_CASE("Vector equality is checked", "[VectorUtils]")
+{
+  std::cout << "Running test \"Vector equality is checked\"" << std::endl;
+  std::vector<size_t> vec1 = { 1, 2, 3, 4, 5 };
+  std::vector<size_t> vec2 = { 1, 2, 3, 4, 5 };
+  std::vector<size_t> vec3 = { 1, 2, 3, 4, 6 };
+  CHECK(pu::equal(vec1, vec2));
+  CHECK_FALSE(pu::equal(vec1, vec3));
+  CHECK(pu::vector_approx_equal(vec1, vec2));
+  CHECK_FALSE(pu::vector_approx_equal(vec1, vec3));
+  CHECK(pu::vector_approx_rel_equal(vec1, vec2));
+  CHECK_FALSE(pu::vector_approx_rel_equal(vec1, vec3));
+  vec2.push_back(6);
+  CHECK_FALSE(pu::equal(vec1, vec2));
+  CHECK_FALSE(pu::equal(vec2, vec3));
+  CHECK_FALSE(pu::vector_approx_equal(vec1, vec2));
+  CHECK_FALSE(pu::vector_approx_equal(vec2, vec3));
+  CHECK_FALSE(pu::vector_approx_rel_equal(vec1, vec2));
+  CHECK_FALSE(pu::vector_approx_rel_equal(vec2, vec3));
+
+  // similarly for a different type of vector
+  Eigen::VectorXd vec4 = Eigen::VectorXd::LinSpaced(6, 1, 6);
+  Eigen::VectorXd vec5 = Eigen::VectorXd::LinSpaced(6, 1, 6);
+  Eigen::VectorXd vec6 = Eigen::VectorXd::LinSpaced(7, 1, 7);
+  CHECK(pu::vector_approx_equal(vec4, vec5));
+  CHECK_FALSE(pu::vector_approx_equal(vec4, vec6));
+  CHECK(pu::vector_approx_rel_equal(vec4, vec5));
+  CHECK_FALSE(pu::vector_approx_rel_equal(vec4, vec6));
 }

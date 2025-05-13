@@ -1142,6 +1142,10 @@ std::vector<size_t>
 MEHPForceBalance2::getNeighbourLinkIndices(const ForceBalance2Network& net,
                                            const size_t linkIdx)
 {
+  INVALIDINDEX_EXP_IFN(linkIdx < net.nrOfLinks,
+                       "Link index " + std::to_string(linkIdx) +
+                         " out of range, only " +
+                         std::to_string(net.nrOfLinks) + " links are present.");
   std::vector<size_t> results;
   results.reserve(4);
   for (size_t springIdx : net.strandIndicesOfLink[linkIdx]) {

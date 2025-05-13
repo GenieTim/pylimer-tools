@@ -1316,11 +1316,6 @@ protected:
       bool isActiveN =
         activeSprings[net.springIndicesOfStrand[strandIdx].back()];
 
-      if (isActive0 && isActiveN) {
-        result[strandIdx] = true;
-        continue;
-      }
-
       const bool isAnyActive =
         std::ranges::any_of(net.springIndicesOfStrand[strandIdx],
                             [&activeSprings](const long int springIdx) {

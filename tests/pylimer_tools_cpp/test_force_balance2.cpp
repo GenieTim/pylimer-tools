@@ -1408,6 +1408,7 @@ TEST_CASE(
   CHECK(net.nrOfStrands == 5);
   CHECK(net.nrOfNodes == 2);
   CHECK_FALSE(net.springBoxOffset.isZero());
+  CHECK_THROWS(fb2.getNeighbourLinkIndices(net, 100));
 
   CHECK(fb1.getNrOfSprings() == 5);
 
@@ -1929,6 +1930,10 @@ TEST_CASE(
     CHECK(net2.nrOfLinks == 4);
     CHECK(net1.nrOfNodes == 4);
     CHECK(net2.nrOfNodes == 4);
+    CHECK(fb2_phantom.getNeighbourLinkIndices(net2, 0).size() == 4);
+    CHECK(fb2_phantom.getNeighbourLinkIndices(net2, 1).size() == 4);
+    CHECK(fb2_phantom.getNeighbourLinkIndices(net2, 2).size() == 4);
+    CHECK(fb2_phantom.getNeighbourLinkIndices(net2, 3).size() == 4);
     CHECK_FALSE(net1.springPartBoxOffset.isZero());
     CHECK_FALSE(net2.springBoxOffset.isZero());
     CHECK(net2.nrOfStrands == 8);
@@ -1940,6 +1945,14 @@ TEST_CASE(
     CHECK(fb2_phantom.getNrOfActiveStrands() == net2.nrOfStrands);
     CHECK(fb2_phantom.getNrOfActiveNodes() == net2.nrOfNodes);
     CHECK(net2.springContourLength.isApproxToConstant(5.));
+
+    fb2_phantom.configSpringBreakingDistance(100.);
+    Eigen::VectorXd displacements = fb2_phantom.getCurrentDisplacements();
+    CHECK(fb2_phantom.breakTooLongStrands(net2, displacements) == 0);
+    fb2_phantom.configSpringBreakingDistance(1e-9);
+    CHECK(fb2_phantom.breakTooLongStrands(net2, displacements) == 8);
+    CHECK(net2.nrOfSprings == 0);
+    CHECK_NOTHROW(fb2_phantom.validateNetwork(net2, displacements));
   }
 
   SECTION("Entangled")
@@ -1967,6 +1980,9 @@ TEST_CASE(
     CHECK(fb1.getCurrentDisplacements().isZero());
     CHECK(net1.nrOfNodes == 4);
     CHECK(net2.nrOfNodes == 4);
+    CHECK(fb2.getNumParticles() == fb2.getNumAtoms());
+    CHECK(fb2.getNumAtoms() == 4);
+    CHECK(fb2.getNumParticles() == net1.nrOfNodes);
     CHECK(fb2.getNrOfActiveSprings() == net2.nrOfSprings);
     CHECK(fb1.getNrOfActiveSprings() == net1.nrOfSprings);
     CHECK(fb1.getNrOfActivePartialSprings() == net1.nrOfPartialSprings);
@@ -2044,6 +2060,11 @@ TEST_CASE(
 
     // the relevant checks, not testing details but correctness of the
     // implementation
+    CHECK(fb2.getForceOn(0).isApprox(fb1.getForceOn(0)));
+    CHECK(fb2.getStressOn(0).isApprox(fb1.getStressOn(0)));
+    CHECK(
+      fb2.getStressTensorLinkBased().isApprox(fb1.getStressTensorLinkBased()));
+    CHECK(fb2.getStressTensor().isApprox(fb1.getStressTensor()));
     CHECK_THAT(
       fb1.getGammaFactors(1.0, -1.).mean(),
       Catch::Matchers::WithinRel(fb2.getGammaFactors(1.0).mean(), 1e-3));
