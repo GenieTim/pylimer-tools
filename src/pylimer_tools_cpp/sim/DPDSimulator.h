@@ -176,6 +176,7 @@ namespace dpd {
      *
      * @param fromIdx
      * @param toIdx
+     * @param bondType
      */
     void addBond(const long int fromIdx,
                  const long int toIdx,
@@ -294,10 +295,8 @@ namespace dpd {
           if (this->idxFunctionalities[i] == 2) {
             // this "any of" here might be a bit overkill, given that we know
             // that there are only two cases
-            bool oneOfTheBeadsIsXlink = std::any_of(
-              this->bondsOfIndex[i].begin(),
-              this->bondsOfIndex[i].end(),
-              [&](const size_t bondIdx) {
+            bool oneOfTheBeadsIsXlink = std::ranges::any_of(
+              this->bondsOfIndex[i], [&](const size_t bondIdx) {
                 assert(this->bondPartnersA[bondIdx] == i ||
                        this->bondPartnersB[bondIdx] == i);
                 return this->atomTypes[this->bondPartnersA[bondIdx]] ==
@@ -452,37 +451,11 @@ namespace dpd {
     double getGamma() override { return -1.; }
     double getResidual() override { return -1.; }
 
-    Eigen::VectorXd getBondLengths() override
-    {
-      Eigen::VectorXd bondDistances =
-        this->coordinates(this->bondPartnerCoordinatesB) -
-        this->coordinates(this->bondPartnerCoordinatesA) + this->bondBoxOffsets;
-      if (this->assumeBoxLargeEnough) {
-        // this should not do anything anymore, here,
-        // assuming the assumption holds.
-        this->box.handlePBC(bondDistances);
-      }
+    Eigen::VectorXd getBondLengths() override;
 
-      Eigen::VectorXd bondLengths =
-        Eigen::VectorXd::Zero(this->numBonds + this->numSlipSprings);
-#pragma omp parallel for
-      for (size_t i = 0; i < (this->numBonds + this->numSlipSprings); ++i) {
-        double b = bondDistances.segment(3 * i, 3).norm();
-        bondLengths[i] = b;
-      }
-      return bondLengths;
-    }
+    Eigen::VectorXd getCoordinates() override;
 
-    Eigen::VectorXd getCoordinates() override
-    {
-      assert(this->coordinates.size() == 3 * this->numAtoms);
-      return this->coordinates;
-    }
-
-    double getTemperature() override
-    {
-      return this->computeTemperature(this->currentVelocities);
-    }
+    double getTemperature() override;
 
     ////////////////////////////////////////////////////////////////
     // validation

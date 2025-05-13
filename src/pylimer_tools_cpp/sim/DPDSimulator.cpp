@@ -133,9 +133,9 @@ DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe& u,
  * @brief
  *
  * @param nSteps
- * @param dt
- * @param lambda
  * @param withMC
+ * @param shouldInterrupt
+ * @param cleanupInterrupt
  */
 void
 DPDSimulator::runSimulation(const long int nSteps,
@@ -158,7 +158,7 @@ DPDSimulator::runSimulation(const long int nSteps,
 
   pylimer_tools::entities::Box originalBox = this->box;
 
-  // start iterating over the steps to do
+  // start iterating over the steps to take
   long int step = 0;
   for (; step < nSteps; ++step) {
     if (withMC && ((step % this->nStepsDPD) == 0)) {
@@ -414,8 +414,7 @@ DPDSimulator::attemptBondFormation()
 
     // yay, we can form a bond
     // NOTE: currently, we build only 1
-    std::shuffle(
-      possibleCandidates.begin(), possibleCandidates.end(), this->e2);
+    std::ranges::shuffle(possibleCandidates, this->e2);
     this->addBond(
       atom_idx,
       possibleCandidates[0],
@@ -586,9 +585,9 @@ double
 DPDSimulator::computeTemperature(const Eigen::VectorXd& velocities)
 {
   // configuration
-  const double dim = 3;
-  const double kb = 1.0;
-  const double m = 1.0;
+  constexpr double dim = 3;
+  constexpr double kb = 1.0;
+  constexpr double m = 1.0;
 
   double KE = 0.5 * m * velocities.squaredNorm();
 
@@ -599,13 +598,12 @@ DPDSimulator::computeTemperature(const Eigen::VectorXd& velocities)
  * @brief Compute the force vector, and return the pressure
  *
  * @param forces
- * @param coordinates
+ * @param stressTensor
+ * @param coords
  * @param velocities
+ * @param timer
  * @param dt
  * @param cutoff
- * @param A
- * @param sigma
- * @param k
  * @return double
  */
 double
@@ -790,7 +788,7 @@ DPDSimulator::computeForces(
 /**
  * @brief Register a set of atoms and time for being measured for msd
  *
- * @param atomIds
+ * @param atomIdsToMeasure
  */
 void
 DPDSimulator::startMeasuringMSDForAtoms(
@@ -818,8 +816,7 @@ DPDSimulator::startMeasuringMSDForAtoms(
  * @brief Randomly add new slip-springs
  *
  * @param num
- * @param loCutoff
- * @param hiCutoff
+ * @param bondType
  * @return int
  */
 int
@@ -853,7 +850,7 @@ DPDSimulator::createSlipSprings(const int num, int bondType)
   Eigen::ArrayXi neighbours = Eigen::ArrayXi(16);
   while (createdLastIteration > 0 && totalCreated < num) {
     createdLastIteration = 0;
-    std::shuffle(sourceIds.begin(), sourceIds.end(), this->e2);
+    std::ranges::shuffle(sourceIds, this->e2);
     for (size_t i : sourceIds) {
       int numCandidates = 0;
       // for each atom, search for possible partners
@@ -958,7 +955,6 @@ DPDSimulator::addSlipSprings(std::vector<size_t>& partnerA,
  * @brief Move slip-springs that are at ends to new ends
  *
  * @param kbT
- * @param k
  * @return int
  */
 int
@@ -1065,7 +1061,6 @@ DPDSimulator::relocateSlipSprings(const double kbT)
  * @brief The first MC procedure:
  *
  * @param kbT
- * @param k
  * @return int
  */
 int
@@ -1219,7 +1214,7 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx, const double kbT)
                     : this->bondPartnersA[selectedRailBondB];
   }
 
-  // if cross-link, we don't allow shifting
+  // if it's a cross-link, we don't allow shifting
   if (this->idxFunctionalities[newPartnerA] > 2 ||
       this->idxFunctionalities[newPartnerB] > 2) {
     return false;
@@ -1380,7 +1375,7 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx,
   const size_t replacementForA = shiftEndIsFirstOnRailBond
                                    ? this->bondPartnersB[selectedRailBond]
                                    : this->bondPartnersA[selectedRailBond];
-  // if cross-link, we don't allow shifting
+  // if it's a cross-link, we don't allow shifting
   if (this->idxFunctionalities[replacementForA] > 2) {
     return false;
   }
@@ -1651,18 +1646,15 @@ DPDSimulator::validateNeighbourlist(const double cutoff)
       //                   std::to_string(i) + ".");
     }
 
-    std::sort(relevantPairs.begin(), relevantPairs.end());
-    std::sort(relevantNeighbors.begin(), relevantNeighbors.end());
+    std::ranges::sort(relevantPairs);
+    std::ranges::sort(relevantNeighbors);
     if (relevantPairs.size() > relevantNeighbors.size()) {
       std::cout << "Debugging neighbourlist. " << numNeighbors << std::endl;
       // debug why
       // find the difference
       std::vector<size_t> diff;
-      std::set_difference(relevantPairs.begin(),
-                          relevantPairs.end(),
-                          relevantNeighbors.begin(),
-                          relevantNeighbors.end(),
-                          std::back_inserter(diff));
+      std::ranges::set_difference(
+        relevantPairs, relevantNeighbors, std::back_inserter(diff));
       assert(diff.size() >= (relevantPairs.size() - relevantNeighbors.size()));
       // figure out why not included
       for (size_t diff_j : diff) {
@@ -1699,6 +1691,44 @@ DPDSimulator::validateNeighbourlist(const double cutoff)
 void
 DPDSimulator::validateDebugState()
 {
+}
+
+Eigen::VectorXd
+DPDSimulator::getBondLengths()
+{
+  Eigen::VectorXd bondDistances =
+    this->coordinates(this->bondPartnerCoordinatesB) -
+    this->coordinates(this->bondPartnerCoordinatesA) + this->bondBoxOffsets;
+  if (this->assumeBoxLargeEnough) {
+    // this should not do anything anymore, here,
+    // assuming the assumption holds.
+    this->box.handlePBC(bondDistances);
+  }
+
+  Eigen::VectorXd bondLengths =
+    Eigen::VectorXd::Zero(this->numBonds + this->numSlipSprings);
+#pragma omp parallel for
+  for (size_t i = 0; i < (this->numBonds + this->numSlipSprings); ++i) {
+    double b = bondDistances.segment(3 * i, 3).norm();
+    bondLengths[i] = b;
+  }
+  return bondLengths;
+}
+
+Eigen::VectorXd
+DPDSimulator::getCoordinates()
+{
+  assert(this->coordinates.size() == 3 * this->numAtoms);
+  // std::cout << "DPDSim returning " << this->coordinates.size() << "
+  // coordinates..."
+  //           << std::endl;
+  return this->coordinates;
+}
+
+double
+DPDSimulator::getTemperature()
+{
+  return this->computeTemperature(this->currentVelocities);
 }
 
 /**

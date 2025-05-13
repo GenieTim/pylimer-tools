@@ -27,7 +27,7 @@
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
         //"[MEHPForceBalance2]"
-        "All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and Simplification"
+        "DPD Simulator Computes Correct Forces"
       ],
       "env": {
         "MallocNanoZone": "0",
