@@ -735,21 +735,7 @@ public:
   static Eigen::Vector3d evaluateSpringVector(const ForceBalance2Network& net,
                                               const Eigen::VectorXd& u,
                                               const size_t springIdx,
-                                              const bool is2d)
-  {
-    Eigen::Vector3d dist =
-      ((net.coordinates.segment(3 * net.springIndexB(springIdx), 3) +
-        u.segment(3 * net.springIndexB(springIdx), 3)) -
-       (net.coordinates.segment(3 * net.springIndexA(springIdx), 3) +
-        u.segment(3 * net.springIndexA(springIdx), 3))) +
-      net.springBoxOffset.segment(3 * springIdx, 3);
-
-    if (is2d) {
-      dist[2] = 0.0;
-    }
-
-    return dist;
-  }
+                                              const bool is2d);
 
   /**
    *
@@ -960,24 +946,7 @@ public:
    */
   std::vector<size_t> getPartialSpringIndicesOfLink(
     const ForceBalance2Network& net,
-    const size_t linkIdx) const
-  {
-    INVALIDARG_EXP_IFN(linkIdx < net.nrOfLinks,
-                       "The requested link does not exist");
-    std::vector<size_t> partialSpringIndices;
-
-    std::vector<size_t> strandIndices = net.strandIndicesOfLink[linkIdx];
-
-    for (size_t strandIdx : strandIndices) {
-      std::vector<size_t> springs = net.springIndicesOfStrand[strandIdx];
-      for (size_t springIdx : springs) {
-        if (this->isPartOfSpring(net, linkIdx, springIdx)) {
-          partialSpringIndices.push_back(springIdx);
-        }
-      }
-    }
-    return partialSpringIndices;
-  }
+    const size_t linkIdx) const;
 
   Eigen::VectorXd getForceMagnitudeVector() const
   {
@@ -1137,62 +1106,15 @@ public:
   int getNumShifts() override { return 0; }
   int getNumRelocations() override { return 0; }
 
-  Eigen::VectorXd getBondLengths() override
-  {
-    return this->evaluateSpringVectors(this->initialConfig,
-                                       this->currentDisplacements);
-  }
+  Eigen::VectorXd getBondLengths() override;
 
-  Eigen::VectorXd getCoordinates() override
-  {
-    return this->initialConfig.coordinates + this->currentDisplacements;
-  }
+  Eigen::VectorXd getCoordinates() override;
 
-  double getTemperature() override
-  {
-    std::cerr << "Warning: Temperature is not a reasonable metric for this "
-                 "type of computation."
-              << std::endl;
-    return 0;
-  }
+  double getTemperature() override;
 
-  size_t getNumParticles() override { return this->initialConfig.nrOfNodes; }
+  size_t getNumParticles() override;
 
-  void debugAtomVicinity(const size_t atomId) const
-  {
-    long int atomIdx = -1;
-    for (size_t i = 0; i < this->initialConfig.oldAtomIds.size(); ++i) {
-      if (this->initialConfig.oldAtomIds[i] == atomId) {
-        atomIdx = i;
-        break;
-      }
-    }
-    RUNTIME_EXP_IFN(atomIdx >= 0, "Atom not found.");
-    std::cout << "Atom " << atomIdx << " (" << atomId << ")"
-              << " connectivity:" << std::endl;
-    for (long int parentSpringIdx :
-         this->initialConfig.strandIndicesOfLink[atomIdx]) {
-      std::vector<size_t> allSpringIndices =
-        this->initialConfig.springIndicesOfStrand[parentSpringIdx];
-      std::string prefix = "";
-      for (size_t springIdx : allSpringIndices) {
-        prefix += "\t";
-        std::cout << prefix << "Spring " << springIdx << " (";
-        std::cout << this->initialConfig.springIndexA[springIdx] << " ⟷ "
-                  << this->initialConfig.springIndexB[springIdx];
-        std::cout << prefix << "\t";
-
-        for (long int linkIdx :
-             this->initialConfig.linkIndicesOfStrand[springIdx]) {
-          std::cout << linkIdx << " ";
-          if (linkIdx < this->initialConfig.nrOfNodes) {
-            std::cout << "(" << this->initialConfig.oldAtomIds[linkIdx] << ") ";
-          }
-        }
-        std::cout << std::endl;
-      }
-    }
-  }
+  void debugAtomVicinity(const size_t atomId) const;
 
   bool validateNetwork() const
   {
