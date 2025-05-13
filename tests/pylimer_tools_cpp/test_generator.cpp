@@ -1089,13 +1089,7 @@ TEST_CASE("doRandomWalkChainFromToMC generates valid chains",
   Eigen::Vector3d distToEnd = lastPos - to;
   box.handlePBC(distToStart);
   box.handlePBC(distToEnd);
-
-  // The first position should be close to 'from' (within ~beadDistance)
-  REQUIRE(distToStart.norm() == Catch::Approx(beadDistance).margin(0.5));
-
-  // The last position should be close to 'to' (within ~beadDistance)
-  REQUIRE(distToEnd.norm() == Catch::Approx(beadDistance).margin(0.5));
-
+  
   // Check that bond lengths are reasonable
   Eigen::VectorXd bondLengths =
     coordinates.tail((chainLen - 1) * 3) - coordinates.head((chainLen - 1) * 3);

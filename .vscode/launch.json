@@ -27,7 +27,7 @@
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
         //"[MEHPForceBalance2]"
-        "DPD Simulator Computes Correct Forces"
+        "MEHP Force Balance2 can randomly add entanglements ignoring crosslinkers"
       ],
       "env": {
         "MallocNanoZone": "0",

@@ -102,7 +102,7 @@ TEST_CASE("Eigen Median computation", "[Eigen]")
   {
     Eigen::VectorXd testVec(11);
     testVec = Eigen::VectorXd::LinSpaced(11, 0, 10);
-    CHECK(Eigen::median(testVec) == 5.5);
+    CHECK(Eigen::median(testVec) == 5.0);
 
     Eigen::VectorXd testVec2(10);
     testVec2 << 3, 4, 1, 1, 1, 3.5, 4, 1, 1, 1;

@@ -214,33 +214,32 @@ TEST_CASE(
 
   std::string inputFile =
     suspectedPath + "/structure/network_100_a_46.structure.out";
-  if (std::filesystem::exists(inputFile)) {
-    CHECK(std::filesystem::exists(suspectedPath));
-    std::cout << "Reading file " << inputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    CHECK(universeSeq.getLength() == 1);
-    pe::Universe universe = universeSeq.atIndex(0);
-    std::cout << "Read file. " << std::endl;
-    pcm::MEHPForceBalance2 forceBalancer =
-      pcm::MEHPForceBalance2(universe, 250, 2.0, 0.0, 100);
-    size_t nrOfAddedLinks =
-      forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
-    CHECK(nrOfAddedLinks >= 50);
-    CHECK_NOTHROW(forceBalancer.validateNetwork());
-    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+  REQUIRE(std::filesystem::exists(inputFile));
+  CHECK(std::filesystem::exists(suspectedPath));
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  CHECK(universeSeq.getLength() == 1);
+  pe::Universe universe = universeSeq.atIndex(0);
+  std::cout << "Read file. " << std::endl;
+  pcm::MEHPForceBalance2 forceBalancer =
+    pcm::MEHPForceBalance2(universe, 250, 2.0, 0.0, 100);
+  size_t nrOfAddedLinks =
+    forceBalancer.getNrOfLinks() - forceBalancer.getNrOfNodes();
+  CHECK(nrOfAddedLinks >= 50);
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
+  std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
-    pcm::ForceBalance2Network net = forceBalancer.getNetwork();
-    Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
-    CHECK(net.nrOfSprings > 0);
-    CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
-    // remove all springs...
-    size_t numRemoved =
-      forceBalancer.removeInactiveLinks(net, displacements, 1e5);
-    forceBalancer = pcm::MEHPForceBalance2(net);
-    CHECK(forceBalancer.getNrOfActiveSprings() == 0);
-    CHECK(net.nrOfSprings == 0);
-    CHECK(numRemoved > 0);
-  }
+  pcm::ForceBalance2Network net = forceBalancer.getNetwork();
+  Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
+  CHECK(net.nrOfSprings > 0);
+  CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
+  // remove all springs...
+  size_t numRemoved =
+    forceBalancer.removeInactiveLinks(net, displacements, 1e5);
+  forceBalancer = pcm::MEHPForceBalance2(net);
+  CHECK(forceBalancer.getNrOfActiveSprings() == 0);
+  CHECK(net.nrOfSprings == 0);
+  CHECK(numRemoved > 0);
 }
 
 TEST_CASE("MEHP Force Balance2 can randomly add and remove entanglements",
@@ -2072,7 +2071,8 @@ TEST_CASE(
   }
 }
 
-TEST_CASE("MEHPFB2 Basic deformation test", "[analysis][MEHPForceBalance2][Box]")
+TEST_CASE("MEHPFB2 Basic deformation test",
+          "[analysis][MEHPForceBalance2][Box]")
 {
   std::cout << "Running test \"MEHPFB2 Basic deformation test\"" << std::endl;
 

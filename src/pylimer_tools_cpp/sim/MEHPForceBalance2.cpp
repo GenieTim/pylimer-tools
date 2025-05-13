@@ -1272,6 +1272,7 @@ MEHPForceBalance2::removeInactiveLinks(ForceBalance2Network& net,
       springIndicesToDelete.push_back(i - 1);
     }
   }
+  assert(springIndicesToDelete.size() == toDeleteCount);
   // std::ranges::sort(springIndicesToDelete, std::greater<>());
   this->removeSprings(net, displacements, springIndicesToDelete);
   this->unlinkBifunctionalLinks(net, displacements);

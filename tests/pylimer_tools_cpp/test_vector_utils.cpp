@@ -361,11 +361,12 @@ TEST_CASE("Index of element is found", "[VectorUtils]")
   CHECK_THROWS(pylimer_tools::utils::index_of<size_t>(vec, 99));
 
   // same for a different type of vector
-  std::vector<double> vecD = { 1.1, 2.2, 3.3, 4.4, 5.5 };
+  std::vector<double> vecD = { 1.1, 2.2, 3.3, 4.4, 5.5, 6.6 };
   index = pylimer_tools::utils::index_of<double>(vecD, 4.4);
   CHECK(index == 3);
   index = pylimer_tools::utils::index_of<double>(vecD, 6.6);
   CHECK(index == 5);
+  CHECK_THROWS(pylimer_tools::utils::index_of<double>(vecD, 7.7));
 }
 
 TEST_CASE("Vector equality is checked", "[VectorUtils]")
