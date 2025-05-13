@@ -2315,10 +2315,10 @@ namespace utils {
               : from;
           assert(xlinkIdxOnStrand1 <
                  this->simplifiedUniverse.xlinkChainId.size());
-          while (this->simplifiedUniverse.xlinkChainId[xlinkIdxOnStrand1] ==
-                   strand1 &&
-                 xlinkIdxOnStrand1 <
-                   this->simplifiedUniverse.xlinkChainId.size()) {
+          while (xlinkIdxOnStrand1 <
+                   this->simplifiedUniverse.xlinkChainId.size() &&
+                 this->simplifiedUniverse.xlinkChainId[xlinkIdxOnStrand1] ==
+                   strand1) {
             for (size_t partnersSubStrand :
                  this->simplifiedUniverse.strandsOfXlink[xlinkIdxOnStrand1]) {
               assert(this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
