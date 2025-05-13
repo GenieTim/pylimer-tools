@@ -630,6 +630,9 @@ protected:
     const std::string& attributeName,
     ValueT value) const
   {
+    if (this->getNrOfVertices() == 0) {
+      return std::vector<igraph_integer_t>();
+    }
     RUNTIME_EXP_IFN(
       igraph_cattribute_has_attr(
         &this->graph, IGRAPH_ATTRIBUTE_VERTEX, attributeName.c_str()),
