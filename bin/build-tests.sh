@@ -6,7 +6,9 @@ ROOT_DIR=$(pwd)
 mkdir -p "$ROOT_DIR/test-reports"
 
 cd "$ROOT_DIR/tests" || exit 2
-rm ./**/*.gcda # remove old coverage files
+# remove old coverage files
+rm ./**/*.gcda 
+rm ./**/*.gcno
 
 PATH="/usr/local/opt/llvm/bin:$PATH"
 
@@ -14,7 +16,7 @@ PATH="/usr/local/opt/llvm/bin:$PATH"
 # rm -rf build; rm -rf vendor/igraph;
 mkdir -p build
 cd build || exit 5
-# rm ./**/*.gcda
+
 GENERATOR_BIN="make"
 # force use of g++ if available for coverage
 # or clang on MacOS, as g++ leak analysis is not supported there
