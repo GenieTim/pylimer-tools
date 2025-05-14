@@ -1137,6 +1137,25 @@ MEHPForceBalance2::getDisplacementResidualNormFor(
 
   return overallForces.squaredNorm();
 }
+std::vector<size_t>
+MEHPForceBalance2::getEntanglementSpringsAtStrand(
+  const ForceBalance2Network& net,
+  const size_t strandIdx) const
+{
+  std::vector<size_t> result;
+  for (size_t linkI = 1; linkI < net.linkIndicesOfStrand[strandIdx].size() - 1;
+       ++linkI) {
+    const size_t linkIdx = net.linkIndicesOfStrand[strandIdx][linkI];
+    const std::vector<size_t> springs =
+      this->getPartialSpringIndicesOfLink(net, linkIdx);
+    for (const size_t springIdx : springs) {
+      if (net.springIsEntanglement[springIdx]) {
+        result.push_back(springIdx);
+      }
+    }
+  }
+  return result;
+}
 
 std::vector<size_t>
 MEHPForceBalance2::getNeighbourLinkIndices(const ForceBalance2Network& net,
@@ -1198,7 +1217,7 @@ MEHPForceBalance2::assembleOneOverSpringPartition(
  *
  * @param net
  * @param displacements
- * @return size_t the number of springs broken
+ * @return size_t the number of strands broken
  */
 size_t
 MEHPForceBalance2::breakTooLongStrands(ForceBalance2Network& net,
@@ -1210,47 +1229,34 @@ MEHPForceBalance2::breakTooLongStrands(ForceBalance2Network& net,
 
   size_t numBroken = 0;
 
+  std::vector<size_t> springIndicesToDelete;
+
   // iterate the springs, determine their distance, and determine if it
   // exceeds the breaking force
-  for (long int partialSpringIdx = net.nrOfSprings; partialSpringIdx >= 0;
-       --partialSpringIdx) {
-    if (partialSpringIdx >= net.nrOfSprings) {
-      partialSpringIdx = net.nrOfSprings - 1;
-    }
-    double len = this->getWeightedSpringLength(net,
-                                               displacements,
+  for (size_t strandIdx = 0; strandIdx < net.nrOfStrands; ++strandIdx) {
+    for (size_t springIdx : net.springIndicesOfStrand[strandIdx]) {
+      double len = this->getWeightedSpringLength(net, displacements, springIdx);
 
-                                               partialSpringIdx);
-    if (len > this->springBreakingLength) {
-      // break this spring
-      numBroken += 1;
-      this->breakSpring(net,
-                        displacements,
+      if (len > this->springBreakingLength) {
+        // break this strand
+        numBroken += 1;
+        for (size_t i : net.springIndicesOfStrand[strandIdx]) {
+          springIndicesToDelete.push_back(i);
+        }
+        pylimer_tools::utils::append(
+          springIndicesToDelete,
+          this->getEntanglementSpringsAtStrand(net, strandIdx));
 
-                        partialSpringIdx);
+        break;
+      }
     }
   }
 
+  std::ranges::sort(springIndicesToDelete, std::greater<>());
+  this->removeSprings(net, displacements, springIndicesToDelete);
+
   return numBroken;
 }
-
-/**
- * @brief break a spring, given its partial spring index
- *
- * @param net
- * @param displacements
- * @param partialSpringIdx
- */
-void
-MEHPForceBalance2::breakSpring(ForceBalance2Network& net,
-                               Eigen::VectorXd& displacements,
-                               const size_t partialSpringIdx) const
-{
-  this->removeSprings(
-    net,
-    displacements,
-    net.springIndicesOfStrand[net.strandIndexOfSpring[partialSpringIdx]]);
-};
 
 /**
  * @brief Decide for each spring if it should be removed,
@@ -1311,17 +1317,10 @@ MEHPForceBalance2::markInactiveSpringsToDelete(
       }
       // also remove entanglement springs associated with any of the links on
       // the strand
-      for (size_t linkI = 1;
-           linkI < net.linkIndicesOfStrand[strandIdx].size() - 1;
-           ++linkI) {
-        const size_t linkIdx = net.linkIndicesOfStrand[strandIdx][linkI];
-        const std::vector<size_t> springs =
-          this->getPartialSpringIndicesOfLink(net, linkIdx);
-        for (const size_t springIdx : springs) {
-          if (net.springIsEntanglement[springIdx]) {
-            result[springIdx] = true;
-          }
-        }
+      std::vector<size_t> entanglementSprings =
+        this->getEntanglementSpringsAtStrand(net, strandIdx);
+      for (const size_t springIdx : entanglementSprings) {
+        result[springIdx] = true;
       }
     }
   }

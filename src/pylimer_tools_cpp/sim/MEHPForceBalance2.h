@@ -269,18 +269,6 @@ public:
                              Eigen::VectorXd& displacements) const;
 
   /**
-   * @brief break a spring, given its partial spring index
-   *
-   * @param net
-   * @param displacements
-
-   * @param partialSpringIdx
-   */
-  void breakSpring(ForceBalance2Network& net,
-                   Eigen::VectorXd& displacements,
-                   const size_t partialSpringIdx) const;
-
-  /**
    * @brief Decide for each spring if it should be removed,
    * remove them, then remove orphaned links
    *
@@ -1074,6 +1062,17 @@ public:
     const ForceBalance2Network& net,
     const Eigen::VectorXd& u,
     const Eigen::VectorXd& oneOverSpringPartitions) const;
+
+  /**
+   *
+   * @param net the network for which the entanglement springs are to be listed
+   * @param strandIdx the strand for which the entanglement springs are to be
+   * listed
+   * @return the indices of the entanglement springs associated with a strand
+   */
+  std::vector<size_t> getEntanglementSpringsAtStrand(
+    const ForceBalance2Network& net,
+    size_t strandIdx) const;
 
   /**
    * @brief Get the Link Indices of all neighbours of a specified link
