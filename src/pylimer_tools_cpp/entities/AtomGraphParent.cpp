@@ -891,24 +891,6 @@ AtomGraphParent::getVerticesWithDegree(int degree) const
     [degree](const int currentDegree) { return currentDegree == degree; });
 }
 
-igraph_vs_t
-AtomGraphParent::getVerticesWithDegreeSelector(const int degree) const
-{
-  // NOTE: this is to omit the assumption, that the returned degree is
-  // sequential for vertex 0, ..., |V|
-  std::vector<long int> toSelect = this->getVerticesWithDegree(degree);
-
-  igraph_vs_t result;
-  igraph_vector_int_t toSelectVec;
-  igraph_vector_int_init(&toSelectVec, toSelect.size());
-  pylimer_tools::utils::StdVectorToIgraphVectorT(toSelect, &toSelectVec);
-  igraph_vs_vector(&result, &toSelectVec);
-
-  // igraph_vector_int_destroy(&toSelectVec);
-
-  return result;
-}
-
 bool
 AtomGraphParent::checkIfAtomsHaveCustomAttributes() const
 {

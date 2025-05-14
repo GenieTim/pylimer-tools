@@ -421,70 +421,62 @@ DumpFileParser::readDumpFileSections(ReadableDumpFileSections sectionsToRead)
           pylimer_tools::utils::split(splitFormat, atomFormat, " ");
           std::stringstream ss(line);
           for (const std::string& formatPart : splitFormat) {
+#define CASE(idStr, targetVar)                                                 \
+  case str2int(idStr):                                                         \
+    ss >> targetVar;                                                           \
+    /** always write to the extra data, for all properties */                  \
+    if (sectionsToRead & ReadableDumpFileSections::EXTRA_ATOM) {               \
+      localExtraAtomData[formatPart].push_back(                                \
+        static_cast<double>(targetVar));                                       \
+    }
+
             switch (str2int(formatPart)) {
-              case str2int("id"):
-                ss >> id;
-                break;
-              case str2int("type"):
-                ss >> type;
-                break;
-              case str2int("x"):
-                ss >> x;
-                break;
-              case str2int("xu"):
-                ss >> x;
-                isUnwrappedX = true;
-                break;
-              case str2int("xs"):
-                ss >> x;
-                isScaledX = true;
-                break;
-              case str2int("xsu"):
-                ss >> x;
-                isUnwrappedX = true;
-                isScaledX = true;
-                break;
-              case str2int("y"):
-                ss >> y;
-                break;
-              case str2int("yu"):
-                ss >> y;
-                isUnwrappedY = true;
-                break;
-              case str2int("ys"):
-                ss >> y;
-                isScaledY = true;
-                break;
-              case str2int("ysu"):
-                ss >> y;
-                isUnwrappedY = true;
-                isScaledY = true;
-                break;
-              case str2int("z"):
-                ss >> z;
-                break;
-              case str2int("zu"):
-                ss >> z;
-                isUnwrappedZ = true;
-                break;
-              case str2int("zs"):
-                ss >> z;
-                isScaledZ = true;
-                break;
-              case str2int("zsu"):
-                ss >> z;
-                isUnwrappedZ = true;
-                isScaledZ = true;
-                break;
-              case str2int("ix"):
-                ss >> nx;
-                break;
-              case str2int("iy"):
-                ss >> ny;
-                break;
-              case str2int("iz"):
-                ss >> nz;
-                break;
+              CASE("id", id)
+              break;
+              CASE("type", type)
+              break;
+              CASE("x", x)
+              break;
+              CASE("xu", x)
+              isUnwrappedX = true;
+              break;
+              CASE("xs", x)
+              isScaledX = true;
+              break;
+              CASE("xsu", x)
+              isUnwrappedX = true;
+              isScaledX = true;
+              break;
+              CASE("y", y)
+              break;
+              CASE("yu", y)
+              isUnwrappedY = true;
+              break;
+              CASE("ys", y)
+              isScaledY = true;
+              break;
+              CASE("ysu", y)
+              isUnwrappedY = true;
+              isScaledY = true;
+              break;
+              CASE("z", z)
+              break;
+              CASE("zu", z)
+              isUnwrappedZ = true;
+              break;
+              CASE("zs", z)
+              isScaledZ = true;
+              break;
+              CASE("zsu", z)
+              isUnwrappedZ = true;
+              isScaledZ = true;
+              break;
+              CASE("ix", nx)
+              break;
+              CASE("iy", ny)
+              break;
+              CASE("iz", nz)
+              break;
               default:
                 if (sectionsToRead & ReadableDumpFileSections::EXTRA_ATOM) {
                   double d;
@@ -494,6 +486,8 @@ DumpFileParser::readDumpFileSections(ReadableDumpFileSections sectionsToRead)
                 // throw std::runtime_error("Not implemented format part: '" +
                 //                          formatPart + "'");
             }
+
+#undef CASE
           }
         }
         localResults.push_back(pylimer_tools::entities::Atom(

@@ -611,8 +611,6 @@ protected:
   igraph_t graph;
   bool atomsHaveCustomAttributes = false;
 
-  igraph_vs_t getVerticesWithDegreeSelector(int degree) const;
-
   std::vector<long int> getVerticesWithDegree(int degree) const;
 
   std::vector<long int> getVerticesWithDegree(

@@ -145,6 +145,67 @@ Universe::operator=(Universe src)
   return *this;
 };
 
+// equality operator
+bool
+Universe::operator==(const Universe& other) const
+{
+  // Compare basic properties
+  if (this->timestep != other.timestep || this->NAtoms != other.NAtoms ||
+      this->NBonds != other.NBonds || this->box != other.box ||
+      this->atomIdToVertexIdx != other.atomIdToVertexIdx ||
+      this->atomsHaveCustomAttributes != other.atomsHaveCustomAttributes ||
+      this->massPerType != other.massPerType) {
+    return false;
+  }
+
+  // Compare angles
+  if (this->angleFrom != other.angleFrom || this->angleVia != other.angleVia ||
+      this->angleTo != other.angleTo || this->angleType != other.angleType) {
+    return false;
+  }
+
+  // Compare dihedral angles
+  if (this->dihedralAngleFrom != other.dihedralAngleFrom ||
+      this->dihedralAngleVia1 != other.dihedralAngleVia1 ||
+      this->dihedralAngleVia2 != other.dihedralAngleVia2 ||
+      this->dihedralAngleTo != other.dihedralAngleTo ||
+      this->dihedralAngleType != other.dihedralAngleType) {
+    return false;
+  }
+
+  // Compare graph structure
+  // For a complete equality check, we need to compare all vertex and edge
+  // attributes
+
+  // start with comparing the connectivity
+  igraph_t difference;
+  igraph_difference(&difference, &this->graph, &other.graph);
+  const igraph_integer_t diff_count = igraph_ecount(&difference);
+  igraph_destroy(&difference);
+  if (diff_count != 0) {
+    return false;
+  }
+
+  // Compare vertex attributes
+  std::vector<Atom> atoms = this->getAtoms();
+  std::vector<Atom> otherAtoms = other.getAtoms();
+  for (size_t i = 0; i < atoms.size(); i++) {
+    if (atoms[i] != otherAtoms[i]) {
+      return false;
+    }
+  }
+
+  // TODO: Compare edge attributes / check whether igraph_difference
+  // should take care of it
+  return true;
+}
+
+bool
+Universe::operator!=(const Universe& other) const
+{
+  return !(*this == other);
+}
+
 void
 Universe::initializeFromGraph(const igraph_t* ingraph)
 {

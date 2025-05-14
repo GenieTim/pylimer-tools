@@ -264,14 +264,22 @@ TEST_CASE("Universe sequence can compute things", "[UniverseSequence][entity]")
     CHECK(msdRes.at(1) == 0.);
     CHECK(msdRes.at(2) == 0.);
 
-    // auto msdRes2 = universeSeq.computeMsdForAtomProperties(
-    //   { 90000 }, "xsu", "ysu", "zsu", 1, true);
-    // CHECK(msdRes2.size() == 2);
-    // CHECK(msdRes2.at(1) == 0.);
-    // CHECK(msdRes2.at(2) == 0.);
+    auto msdRes2 = universeSeq.computeMsdForAtomProperties(
+      { 90000 }, "xsu", "ysu", "zsu", 1, true);
+    CHECK(msdRes2.size() == 2);
+    CHECK(msdRes2.at(1) == 0.);
+    CHECK(msdRes2.at(2) == 0.);
 
     std::vector<Eigen::Vector3d> fromTo =
       universeSeq.computeVectorFromToAtoms({ 90000 }, { 80000 });
     CHECK(fromTo.size() == 3);
+
+    std::vector<double> fromToDistance =
+      universeSeq.computeDistanceFromToAtoms({ 90000 }, { 80000 });
+    CHECK(fromToDistance.size() == 3);
+    CHECK_THAT(fromToDistance[0],
+               Catch::Matchers::WithinAbs(fromTo[0].norm(), 1e-7));
+    CHECK_THAT(fromToDistance[1],
+               Catch::Matchers::WithinAbs(fromTo[1].norm(), 1e-7));
   }
 }

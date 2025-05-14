@@ -11,6 +11,9 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#ifdef CEREALIZABLE
+#include "../../src/pylimer_tools_cpp/utils/CerealUtils.h"
+#endif
 
 extern "C"
 {
@@ -1100,6 +1103,7 @@ TEST_CASE("Coordinates work")
                       // ny
                       { { 0, 0, 0, 0, 1, 2, 2, 2 } } // nz
     );
+    CHECK(universe.getConnectedAtoms(universe.getAtom(1)).size() == 0);
     std::vector<igraph_integer_t> indices = { { 1, 2, 3 } };
     Eigen::VectorXd coordinates =
       universe.getUnwrappedVertexCoordinates(indices, box);
@@ -1109,6 +1113,15 @@ TEST_CASE("Coordinates work")
         CHECK(coordinates[i * 3 + dir] == i + 2);
       }
     }
+    CHECK(universe.getPathLength(0, 3, 0) == 0);
+    CHECK(universe.getPathLength(0, 3, 12) == 0);
+    CHECK(universe.getUnwrappedPositionVectorForVertex(0, universe.getBox())
+            .isApprox(universe.getPositionVectorForVertex(0)));
+    CHECK_FALSE(universe.getPositionVectorForVertex(1).isApprox(
+      universe.getPositionVectorForVertex(0)));
+    CHECK_FALSE(
+      universe.getUnwrappedPositionVectorForVertex(5, universe.getBox())
+        .isApprox(universe.getPositionVectorForVertex(5)));
   }
 }
 
@@ -1248,6 +1261,16 @@ TEST_CASE("Free & Dangling Chains are identified", "[Universe][entity]")
       } else {
         CHECK(mTypes[i] == pe::MoleculeType::DANGLING_CHAIN);
       }
+    }
+  }
+
+  SECTION("Functionality and number of connected atoms are consistent")
+  {
+    std::vector<int> degrees = universe.getVertexDegrees();
+    CHECK(degrees.size() == universe.getNrOfAtoms());
+    for (size_t i = 0; i < degrees.size(); ++i) {
+      CHECK(degrees[i] ==
+            universe.getConnectedAtoms(universe.getAtomByVertexIdx(i)).size());
     }
   }
 }
@@ -1401,3 +1424,26 @@ TEST_CASE("Querying the universe", "[Universe][entity]")
   CHECK_FALSE(universe.containsAtom(wrongAtom));
   CHECK_THAT(universe.getVolume(), Catch::Matchers::WithinRel(10. * 10. * 10.));
 }
+
+#ifdef CERALIZABLE
+TEST_CASE("Universe can be serialized and deserialized",
+          "[Universe][entity][serialization]")
+{
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+  REQUIRE(std::filesystem::exists(suspectedPath));
+  universeSeq.initializeFromDataSequence(
+    { { suspectedPath + "/lammps_data_file_small_wangles.out" } });
+  REQUIRE(universeSeq.getLength() == 1);
+  pe::Universe universe = universeSeq.next();
+  REQUIRE(universe.getNrOfAngles() == 1);
+
+  std::string universeSerizalized =
+    pylimer_tools::utils::serializeToString(universe);
+  pe::Universe deserializedUniverse;
+  pylimer_tools::utils::deserializeFromString(deserializedUniverse,
+                                              universeSerizalized);
+  CHECK(deserializedUniverse == universe);
+}
+#endif

@@ -27,6 +27,22 @@ namespace entities {
                        double cutoff,
                        double scalingFactor = 1.);
 
+    /**
+     * @brief Equality operator to compare two EigenNeighbourList instances
+     *
+     * @param other The other EigenNeighbourList to compare with
+     * @return bool True if the two instances are equal
+     */
+    bool operator==(const EigenNeighbourList& other) const;
+
+    /**
+     * @brief Inequality operator to compare two EigenNeighbourList instances
+     *
+     * @param other The other EigenNeighbourList to compare with
+     * @return bool True if the two instances are not equal
+     */
+    bool operator!=(const EigenNeighbourList& other) const;
+
     void initialize(const Eigen::VectorXd& coordinates,
                     const Box& box,
                     double cutoff,

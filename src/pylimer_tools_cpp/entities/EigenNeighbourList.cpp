@@ -26,6 +26,69 @@ namespace entities {
     this->initialize(coordinates, box, cutoff, scalingFactor);
   }
 
+  bool EigenNeighbourList::operator==(const EigenNeighbourList& other) const
+  {
+    // Compare basic properties
+    if (cutoff != other.cutoff || scalingFactor != other.scalingFactor ||
+        actualCutoff != other.actualCutoff ||
+        totalNrOfBuckets != other.totalNrOfBuckets || box != other.box) {
+      return false;
+    }
+
+    // Compare Eigen arrays
+    if ((bucketWidths != other.bucketWidths).any() ||
+        (nrOfBuckets != other.nrOfBuckets).any() ||
+        (neighbourBucketSizes.array() != other.neighbourBucketSizes.array())
+          .any()) {
+      return false;
+    }
+
+    // Compare bucket data
+    if (neighbourBuckets.size() != other.neighbourBuckets.size()) {
+      return false;
+    }
+
+    for (size_t i = 0; i < neighbourBuckets.size(); ++i) {
+      if (neighbourBuckets[i].size() != other.neighbourBuckets[i].size()) {
+        return false;
+      }
+
+      for (size_t j = 0; j < neighbourBuckets[i].size(); ++j) {
+        if (neighbourBuckets[i][j] != other.neighbourBuckets[i][j]) {
+          return false;
+        }
+      }
+    }
+
+    // Compare bucket neighbors
+    if (neighbourBucketNeighboursDefaultCutoff.size() !=
+        other.neighbourBucketNeighboursDefaultCutoff.size()) {
+      return false;
+    }
+
+    for (size_t i = 0; i < neighbourBucketNeighboursDefaultCutoff.size(); ++i) {
+      if (neighbourBucketNeighboursDefaultCutoff[i].size() !=
+          other.neighbourBucketNeighboursDefaultCutoff[i].size()) {
+        return false;
+      }
+
+      for (size_t j = 0; j < neighbourBucketNeighboursDefaultCutoff[i].size();
+           ++j) {
+        if (neighbourBucketNeighboursDefaultCutoff[i][j] !=
+            other.neighbourBucketNeighboursDefaultCutoff[i][j]) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  bool EigenNeighbourList::operator!=(const EigenNeighbourList& other) const
+  {
+    return !(*this == other);
+  }
+
   void EigenNeighbourList::initialize(const Eigen::VectorXd& coordinates,
                                       const Box& newBox,
                                       const double newCutoff,

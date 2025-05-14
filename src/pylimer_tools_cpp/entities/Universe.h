@@ -53,6 +53,10 @@ public:
   // 3. copy assignment operator
   Universe& operator=(Universe src);
 
+  // equality operator
+  bool operator==(const Universe& other) const;
+  bool operator!=(const Universe& other) const;
+
   // initilaization/setters (and removers)
   void setBoxLengths(double Lx,
                      double Ly,

@@ -103,6 +103,7 @@ TEST_CASE("Random coordinates EigenNeighbourList",
   pe::Box box = pe::Box(14, 14, 14);
   pe::EigenNeighbourList neighbourList =
     pe::EigenNeighbourList(coordinates, box, 1.0, 1.0);
+  CHECK(neighbourList == neighbourList);
   double cutoff = 1.0;
   // pre-allocate the neighbor indices array
   Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
@@ -223,3 +224,24 @@ TEST_CASE("Manually accurate EigenNeighbourList",
   CHECK(indices.size() == 1);
   CHECK(true);
 }
+
+#ifdef CERALIZABLE
+TEST_CASE("EigenNeighbourList can be serialized and deserialized",
+          "[EigenNeighbourList][entity][serialization]")
+{
+  pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.);
+  Eigen::VectorXd coordinates = Eigen::VectorXd::Random(3 * 10);
+  pe::EigenNeighbourList neighbourList =
+    pe::EigenNeighbourList(coordinates, box, M_PI);
+  std::string neighbourListStr =
+    pylimer_tools::utils::serializeToString(neighbourList);
+  pe::EigenNeighbourList deserializedNeighbourList;
+  pylimer_tools::utils::deserializeFromString(deserializedNeighbourList,
+                                              neighbourListStr);
+  CHECK(neighbourList == deserializedNeighbourList);
+
+  Eigen::VectorXd coordinates2 = Eigen::VectorXd::Random(3 * 10);
+  neighbourList.resetCoordinates(coordinates2);
+  CHECK(neighbourList != deserializedNeighbourList);
+}
+#endif
