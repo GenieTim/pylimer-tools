@@ -12,7 +12,7 @@ fi
 
 # first, run cpp tests
 # (build them first)
-"$ROOT_DIR/bin/build-tests.sh" || exit 3
+time "$ROOT_DIR/bin/build-tests.sh" || exit 3
 cd "$ROOT_DIR/tests/build" || exit 2
 
 GENERATOR_BIN="make"

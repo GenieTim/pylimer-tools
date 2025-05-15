@@ -6,9 +6,6 @@ ROOT_DIR=$(pwd)
 mkdir -p "$ROOT_DIR/test-reports"
 
 cd "$ROOT_DIR/tests" || exit 2
-# remove old coverage files
-rm ./**/*.gcda 
-rm ./**/*.gcno
 
 PATH="/usr/local/opt/llvm/bin:$PATH"
 
