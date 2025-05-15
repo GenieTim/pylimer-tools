@@ -166,7 +166,6 @@ if (CODE_COVERAGE)
             NAME pylimer_tests-gcov
             EXECUTABLE pylimer_tests
             DEPENDENCIES pylimer_tests
-            BASE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/../"
             LCOV_ARGS --ignore-errors inconsistent,source,format,empty,unused
             EXECUTABLE_ARGS --skip-benchmarks --order rand --durations yes "~[long]" --reporter JUnit::out=${CMAKE_CURRENT_LIST_DIR}/../test-reports/pylimer-tests-result-junit.xml --reporter console &> "${CMAKE_CURRENT_LIST_DIR}/build/pylimer_test_output.log.txt"
             EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/../vendor/*" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*" "${CMAKE_CURRENT_LIST_DIR}/pylimer_tools_cpp"
