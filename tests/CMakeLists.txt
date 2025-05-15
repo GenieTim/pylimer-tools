@@ -162,13 +162,16 @@ if (CODE_COVERAGE)
     set(CODE_COVERAGE_VERBOSE ON)
     include(CodeCoverage)
     append_coverage_compiler_flags()
+    # NOTE: we ignore the return type of the test executable here.
+    # this is required for lcov to finish running.
+    # Whether the tests passed or not is determined by peeking into the output log file.
     setup_target_for_coverage_lcov(
             NAME pylimer_tests-gcov
             EXECUTABLE pylimer_tests
             DEPENDENCIES pylimer_tests
             LCOV_ARGS --ignore-errors inconsistent,source,format,empty,unused
-            EXECUTABLE_ARGS --skip-benchmarks --order rand --durations yes "~[long]" --reporter JUnit::out=${CMAKE_CURRENT_LIST_DIR}/../test-reports/pylimer-tests-result-junit.xml --reporter console &> "${CMAKE_CURRENT_LIST_DIR}/build/pylimer_test_output.log.txt"
-            EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/../vendor/*" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*" "${CMAKE_CURRENT_LIST_DIR}/pylimer_tools_cpp"
+            EXECUTABLE_ARGS --skip-benchmarks --order rand --durations yes "~[long]" --reporter JUnit::out=${CMAKE_CURRENT_LIST_DIR}/../test-reports/pylimer-tests-result-junit.xml --reporter console &> "${CMAKE_CURRENT_LIST_DIR}/build/pylimer_test_output.log.txt" || true
+            EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/../vendor/*" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*" "${CMAKE_CURRENT_LIST_DIR}/pylimer_tools_cpp/*"
     )
     # BASE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/.."
 endif ()
