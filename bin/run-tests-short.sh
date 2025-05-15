@@ -4,7 +4,7 @@ cd "$(dirname "$0")/.." || exit 10
 ROOT_DIR=$(pwd)
 
 # Create arrays to store timing information
-# (associative arrays are not supported in bash < 4, 
+# (associative arrays are not supported in bash < 4,
 # and MacOS comes with 3, so let's go without)
 timing_names=()
 timing_values=()
@@ -15,17 +15,20 @@ run_timed() {
   shift
   local start_time
   start_time=$(date +%s.%N)
-  time "$@" || return $?
+  echo "Running $name: $*"
+  time "$@"
+  local exit_code
+  exit_code=$?
   local end_time
   end_time=$(date +%s.%N)
   local elapsed
   elapsed=$(echo "$end_time - $start_time" | bc)
-  
+
   # Store timing information in parallel arrays
   timing_names+=("$name")
   timing_values+=("$elapsed")
 
-  return 0
+  return $exit_code
 }
 
 # pip/skbuild uses ninja as a generator,
@@ -73,7 +76,7 @@ fi
 
 # then, build/install project for Python
 echo "====== Installing with PIP ======"
-run_timed "PIP Installation" python ./bin/dev_install.py || exit 3
+run_timed "PIP Installation" python "$ROOT_DIR/bin/dev_install.py" || exit 3
 echo "===== /Installing with PIP ======"
 
 cd "$ROOT_DIR" || exit 4
@@ -100,6 +103,5 @@ for i in "${!timing_values[@]}"; do
 done
 printf "%-22s: %7.2f s\n" "Total Runtime" "$total_time"
 echo "================================="
-
 
 exit 0
