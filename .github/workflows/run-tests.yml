@@ -33,9 +33,9 @@ jobs:
             ./vendor/cereal
             ./vendor/cereal-skbuild
             ./tests/build
-          key: ${{ runner.os }}-py-3.13.3
+          key: pt-${{ runner.os }}-py-3.13
           restore-keys: |
-            ${{ runner.os }}-py-3.13.3
+            pt-${{ runner.os }}-py-3.13
 
       - uses: actions/setup-python@v5
         with:
