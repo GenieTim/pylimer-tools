@@ -90,6 +90,7 @@ namespace utils {
    * @brief Do a random walk of certain length to add a chain from one to
    * another atom
    *
+   * @param box the simulation box for PBC
    * @param from the atom to start the random walk from
    * @param to the atom to end the random walk at
    * @param chainLen the number of atoms to add in between from and to

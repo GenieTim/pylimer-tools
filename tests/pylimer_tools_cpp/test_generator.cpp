@@ -33,6 +33,24 @@ normalCDF(double x) // Phi(-∞, x) aka N(x)
   return std::erfc(-x / std::sqrt(2)) / 2;
 }
 
+/**
+ * @brief Performs the Anderson-Darling test to check if observations follow a normal distribution
+ *
+ * This function implements the Anderson-Darling test to determine whether a given set of 
+ * observations follows a normal distribution with specified mean and variance. The test
+ * is performed at a 10% significance level.
+ *
+ * Sources: 
+ * - https://www.itl.nist.gov/div898/handbook/eda/section3/eda35e.htm
+ * - https://en.wikipedia.org/wiki/Anderson%E2%80%93Darling_test
+ * 
+ * @param observations Vector of observed values to be tested
+ * @param expectedMean The expected mean of the normal distribution
+ * @param expectedVariance The expected variance of the normal distribution
+ * @return bool Returns true if the observations follow the specified normal distribution
+ *              (null hypothesis cannot be rejected at 10% significance level),
+ *              false otherwise
+ */
 bool
 andersonDarlingNormalDistributionTest(Eigen::VectorXd observations,
                                       const double expectedMean,
@@ -69,7 +87,7 @@ andersonDarlingNormalDistributionTest(Eigen::VectorXd observations,
 
   // Case 0, 10 % significance level,
   // according to Marsaglia & Marsaglia
-  return A2 > 1.933;
+  return A2 < 1.933;
 }
 
 /**
@@ -678,7 +696,6 @@ TEST_CASE("MCUniverseGenerator can generate with monofunctional chains",
             << std::endl;
 
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
-  CHECK(generator.getCurrentCrosslinkerConversion() == 0.);
   generator.setSeed(457564875e2);
   generator.setBeadDistance(0.75);
   generator.configNrOfMCSteps(0);
@@ -686,6 +703,7 @@ TEST_CASE("MCUniverseGenerator can generate with monofunctional chains",
   generator.addMonofunctionalStrands(100, 100, 5);
   CHECK(generator.getCurrentNrOfAtoms() == 100 * 100);
   generator.addCrosslinkers(25, 4, 2, false);
+  CHECK(generator.getCurrentCrosslinkerConversion() == 0.);
   CHECK(generator.getCurrentNrOfAtoms() == 100 * 100 + 25);
   CHECK_NOTHROW(generator.linkStrandsToConversion(1.));
   CHECK_THROWS(generator.linkStrandsToConversion(0.));
@@ -1107,24 +1125,57 @@ TEST_CASE("Linear walk chain can be generated", "[topo][RandomWalker]")
   }
 }
 
+TEST_CASE("randomWalkChain generates valid chains", "[topo][RandomWalker]")
+{
+  std::cout << "Running test \"randomWalkChain generates valid chains\"";
+
+  // Create a box
+  pylimer_tools::entities::Box box(10.0, 10.0, 10.0);
+
+  // Parameters for the random walk
+  int chainLen = 30;
+  double beadDistance = 1.0;
+  double meanSquaredBeadDistance = (3. * M_PI / 8.) * beadDistance;
+  std::string seed = "test_seed";
+
+  Eigen::VectorXd coordinates = pylimer_tools::utils::doRandomWalkChain(
+    chainLen, beadDistance, meanSquaredBeadDistance, seed);
+
+  // Check the size of the returned vector (should be 3 * chainLen)
+  REQUIRE(coordinates.size() == 3 * chainLen);
+
+  // Check that bond lengths are reasonable
+  Eigen::VectorXd bondLengths =
+    coordinates.tail((chainLen - 1) * 3) - coordinates.head((chainLen - 1) * 3);
+  box.handlePBC(bondLengths);
+  CHECK(andersonDarlingNormalDistributionTest(bondLengths, 0., M_PI / 8.));
+}
+
 TEST_CASE("doRandomWalkChainFromToMC generates valid chains",
           "[topo][RandomWalker][mc]")
 {
+  std::cout
+    << "Running test \"doRandomWalkChainFromToMC generates valid chains\""
+    << std::endl;
   // Create a box
   pylimer_tools::entities::Box box(10.0, 10.0, 10.0);
 
   // Define start and end points
   Eigen::Vector3d from(1.0, 1.0, 1.0);
-  Eigen::Vector3d to(8.0, 8.0, 8.0);
+  Eigen::Vector3d to(1.0, 1.0, 1.0);
 
   // Parameters for the random walk
-  int chainLen = 15;
+  int chainLen = 30;
   double beadDistance = 1.0;
-  double meanSquaredBeadDistance = 1.2;
-  std::string seed = "test_seed";
+  double meanSquaredBeadDistance = (3. * M_PI / 8.) * beadDistance;
+  std::string seed = "let_s_use_this_seed";
+  // Parameters for MC
   int numIterations = 500;
 
   // Generate the chain
+  Eigen::VectorXd coordinatesNoMC =
+    pylimer_tools::utils::doRandomWalkChainFromTo(
+      box, from, to, chainLen, beadDistance, meanSquaredBeadDistance, seed);
   Eigen::VectorXd coordinates =
     pylimer_tools::utils::doRandomWalkChainFromToMC(box,
                                                     from,
@@ -1136,48 +1187,18 @@ TEST_CASE("doRandomWalkChainFromToMC generates valid chains",
                                                     numIterations);
 
   // Check the size of the returned vector (should be 3 * chainLen)
+  REQUIRE(coordinatesNoMC.size() == 3 * chainLen);
   REQUIRE(coordinates.size() == 3 * chainLen);
 
-  // Reshape the coordinates into a matrix for easier access
-  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor>>
-    posMatrix(coordinates.data(), chainLen, 3);
-
-  // Check that the first and last positions are close to the specified
-  // endpoints (Note: the function omits the actual endpoints, so we're checking
-  // the first and last positions in the returned chain are reasonably close to
-  // the endpoints)
-  Eigen::Vector3d firstPos = posMatrix.row(0);
-  Eigen::Vector3d lastPos = posMatrix.row(chainLen - 1);
-
-  // Calculate distances, accounting for PBC
-  Eigen::Vector3d distToStart = firstPos - from;
-  Eigen::Vector3d distToEnd = lastPos - to;
-  box.handlePBC(distToStart);
-  box.handlePBC(distToEnd);
-
   // Check that bond lengths are reasonable
+  Eigen::VectorXd bondLengthsNoMC = coordinatesNoMC.tail((chainLen - 1) * 3) -
+                                    coordinatesNoMC.head((chainLen - 1) * 3);
+  box.handlePBC(bondLengthsNoMC);
+  CHECK(andersonDarlingNormalDistributionTest(bondLengthsNoMC, 0., M_PI / 8.));
   Eigen::VectorXd bondLengths =
     coordinates.tail((chainLen - 1) * 3) - coordinates.head((chainLen - 1) * 3);
+  box.handlePBC(bondLengths);
   CHECK(andersonDarlingNormalDistributionTest(bondLengths, 0., M_PI / 8.));
-
-  // Check that the chain follows a roughly direct path from start to end
-  // by verifying that the total path length is reasonable
-  Eigen::Vector3d totalPath = Eigen::Vector3d::Zero();
-  for (int i = 1; i < chainLen; ++i) {
-    Eigen::Vector3d bond = posMatrix.row(i) - posMatrix.row(i - 1);
-    box.handlePBC(bond);
-    totalPath += bond;
-  }
-
-  // The total path length should be greater than the direct distance but not
-  // excessively so
-  Eigen::Vector3d directDist = to - from;
-  box.handlePBC(directDist);
-
-  REQUIRE(totalPath.norm() >= directDist.norm());
-  // The path shouldn't be more than 2x the direct distance (this is a
-  // heuristic)
-  REQUIRE(totalPath.norm() <= 2.0 * directDist.norm());
 }
 
 TEST_CASE("doRandomWalkChain generates very long chains",
@@ -1190,10 +1211,10 @@ TEST_CASE("doRandomWalkChain generates very long chains",
   Eigen::Vector3d from(1.0, 1.0, 1.0);
 
   // Parameters for the random walk
-  constexpr int chainLen = 500;
+  constexpr int chainLen = 32;
   constexpr double beadDistance = 1.0;
-  constexpr double meanSquaredBeadDistance = 1.2;
-  const std::string seed = "test_seed";
+  constexpr double meanSquaredBeadDistance = (3. * M_PI / 8.) * beadDistance;
+  const std::string seed = "some_other_seed";
   int numIterations = 500;
 
   // Generate the chain

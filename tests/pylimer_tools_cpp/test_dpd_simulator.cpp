@@ -768,3 +768,51 @@ TEST_CASE("DPD Simulator's restart files are accurate",
     CHECK(sim2.getTemperature() == simulator.getTemperature());
   }
 }
+#ifdef CEREALIZABLE
+TEST_CASE("DPD Simulator can be serialized",
+          "[DPDSimulator][serialization][1proc]")
+{
+  // note that the random force might lead to deviations compared to LAMMPS
+  const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
+  REQUIRE(std::filesystem::exists(suspectedPath));
+
+  std::string inputFile =
+    suspectedPath + "/structure/melt_83_a_100.structure.out";
+  REQUIRE(std::filesystem::exists(inputFile));
+  pe::UniverseSequence universeSequence = pe::UniverseSequence();
+  REQUIRE(universeSequence.getLength() == 0);
+  universeSequence.initializeFromDataSequence({ { inputFile } });
+  REQUIRE(universeSequence.getLength() == 1);
+  pe::Universe universe = universeSequence.atIndex(0);
+
+  pcd::DPDSimulator simulator =
+    pcd::DPDSimulator(universe, 2, 9, false, "14th_seed");
+
+  CHECK_THROWS(simulator.configSlipspringHighCutoff(-1));
+  CHECK_NOTHROW(simulator.configSlipspringHighCutoff(2.));
+  CHECK_THROWS(simulator.configSlipspringLowCutoff(3.));
+  CHECK_NOTHROW(simulator.configSlipspringLowCutoff(0.5));
+  simulator.createSlipSprings(100, 2);
+
+  simulator.configNumStepsMC(50);
+  simulator.configNumStepsDPD(50);
+  simulator.configShiftPossibilityEmpty(true);
+  simulator.configAssumeBoxLargeEnough();
+  CHECK(simulator.getCurrentTime(0.) == 0.);
+  CHECK(simulator.getCurrentTime(1000.) == 0.);
+
+  std::string restartFile = "restartFile-for-accuracy-test.bin";
+  simulator.writeRestartFile(restartFile);
+
+  REQUIRE(std::filesystem::exists(restartFile));
+
+  pcd::DPDSimulator sim2 = pcd::DPDSimulator::readRestartFile(restartFile);
+  std::remove(restartFile.c_str());
+
+  CHECK(simulator.getCoordinates().isApprox(sim2.getCoordinates()));
+  CHECK(simulator.getBondLengths().isApprox(sim2.getBondLengths()));
+  CHECK(simulator.getStressTensor().isApprox(sim2.getStressTensor()));
+  CHECK(sim2.getTemperature() == simulator.getTemperature());
+  CHECK(simulator.computeBondLength(2) == sim2.computeBondLength(2));
+}
+#endif
