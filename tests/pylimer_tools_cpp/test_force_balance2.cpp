@@ -1953,6 +1953,8 @@ TEST_CASE(
     CHECK(fb2_phantom.breakTooLongStrands(net2, displacements) == 8);
     CHECK(net2.nrOfSprings == 0);
     CHECK_NOTHROW(fb2_phantom.validateNetwork(net2, displacements));
+    CHECK_NOTHROW(fb2_phantom.displaceToMeanPosition(net2, displacements, 0));
+    CHECK_NOTHROW(fb2_phantom.displaceToMeanPosition(net2, displacements));
   }
 
   SECTION("Entangled")

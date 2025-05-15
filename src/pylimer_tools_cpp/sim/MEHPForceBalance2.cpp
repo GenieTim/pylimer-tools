@@ -1890,16 +1890,22 @@ MEHPForceBalance2::deformTo(const pylimer_tools::entities::Box& newBox)
  * @return double, the distance (squared norm) displaced
  */
 double
-MEHPForceBalance2::displaceToMeanPosition(
-  const ForceBalance2Network& net,
-  Eigen::VectorXd& u,
-  const Eigen::ArrayXd& oneOverSpringPartitions) const
+MEHPForceBalance2::displaceToMeanPosition(const ForceBalance2Network& net,
+                                          Eigen::VectorXd& u) const
 {
-  assert(oneOverSpringPartitions.size() == net.nrOfSprings * 3);
   Eigen::ArrayXd objectiveDisplacement =
     Eigen::ArrayXd::Zero(3 * net.nrOfLinks);
   Eigen::ArrayXd partialSpringDistances =
     this->evaluateSpringVectors(net, u, this->is2D).array();
+  // assemble
+  Eigen::ArrayXd oneOverSpringPartitions =
+    Eigen::ArrayXd::Ones(3 * net.nrOfSprings);
+  for (size_t i = 0; i < net.nrOfSprings; ++i) {
+    for (size_t dir = 0; dir < 3; ++dir) {
+      oneOverSpringPartitions(3 * i + dir) = 1. / net.springContourLength(i);
+    }
+  }
+  // use
   objectiveDisplacement(net.springCoordinateIndexA) +=
     (oneOverSpringPartitions * partialSpringDistances);
   objectiveDisplacement(net.springCoordinateIndexB) -=

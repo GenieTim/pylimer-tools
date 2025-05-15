@@ -1015,14 +1015,11 @@ public:
    * @param net the force balance network
    * @param u the current displacements, wherein the resulting coordinates
    * shall be stored
-   * @param oneOverSpringPartitions the one over contour length per direction
-   * and spring vector
    * @return double, the distance (squared norm) displaced
    */
   double displaceToMeanPosition(
     const ForceBalance2Network& net,
-    Eigen::VectorXd& u,
-    const Eigen::ArrayXd& oneOverSpringPartitions) const;
+    Eigen::VectorXd& u) const;
 
   /**
    * @brief Displace one link to the mean of all connected neighbours

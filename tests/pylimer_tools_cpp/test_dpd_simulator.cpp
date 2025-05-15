@@ -485,6 +485,10 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
     CHECK(previousEdges["edge_to"][i] == newEdges["edge_to"][i]);
     CHECK(previousEdges["edge_type"][i] == newEdges["edge_type"][i]);
   }
+
+  CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
+  CHECK_NOTHROW(simulator.attemptBondFormation());
+  CHECK_NOTHROW(simulator.relocateSlipSprings());
 }
 
 TEST_CASE("DPD can deform box", "[analysis][DPDSimulator][long]")
@@ -784,9 +788,12 @@ TEST_CASE("DPD Simulator can be serialized",
   universeSequence.initializeFromDataSequence({ { inputFile } });
   REQUIRE(universeSequence.getLength() == 1);
   pe::Universe universe = universeSequence.atIndex(0);
+  universe.resampleVelocities(0.0, 1.0, "", false);
 
   pcd::DPDSimulator simulator =
     pcd::DPDSimulator(universe, 2, 9, false, "14th_seed");
+
+  CHECK(simulator.getTemperature() > 0.0);
 
   CHECK_THROWS(simulator.configSlipspringHighCutoff(-1));
   CHECK_NOTHROW(simulator.configSlipspringHighCutoff(2.));
@@ -809,10 +816,27 @@ TEST_CASE("DPD Simulator can be serialized",
   pcd::DPDSimulator sim2 = pcd::DPDSimulator::readRestartFile(restartFile);
   std::remove(restartFile.c_str());
 
+  // on 1 proc, expect equal randomness state
+  CHECK(simulator.getUniformRandBetween0And1() ==
+        sim2.getUniformRandBetween0And1());
+
+  // and equal everything else
   CHECK(simulator.getCoordinates().isApprox(sim2.getCoordinates()));
   CHECK(simulator.getBondLengths().isApprox(sim2.getBondLengths()));
   CHECK(simulator.getStressTensor().isApprox(sim2.getStressTensor()));
   CHECK(sim2.getTemperature() == simulator.getTemperature());
   CHECK(simulator.computeBondLength(2) == sim2.computeBondLength(2));
+
+  // when reseeding the randomness, the state should be different
+  CHECK_NOTHROW(sim2.reseedRandomness(""));
+  CHECK_NOTHROW(simulator.reseedRandomness(""));
+  CHECK(simulator.getUniformRandBetween0And1() !=
+        sim2.getUniformRandBetween0And1());
+
+  // finally, some other methods should work as well on the clone,
+  // without issues
+  CHECK_NOTHROW(sim2.validateNeighbourlist(1.));
+  CHECK_NOTHROW(sim2.attemptBondFormation());
+  CHECK_NOTHROW(sim2.relocateSlipSprings());
 }
 #endif

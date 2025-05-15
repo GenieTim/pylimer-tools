@@ -599,14 +599,17 @@ TEST_CASE("MEHP Force Relaxation returns the cross-linker universe",
 
     pcm::MEHPForceRelaxation forceRelaxer =
       pcm::MEHPForceRelaxation(universe, 2);
-    CHECK(forceRelaxer.getNrOfNodes() == 83*2);
+    CHECK(forceRelaxer.getNrOfNodes() == 83 * 2);
     CHECK(forceRelaxer.getNrOfSprings() == 0);
     CHECK(forceRelaxer.getNrOfActiveSprings() == 0);
     pe::Universe crossLinkUniverse = forceRelaxer.getCrosslinkerVerse();
-    CHECK(crossLinkUniverse.getNrOfAtoms() == 83*2);
+    CHECK(crossLinkUniverse.getNrOfAtoms() == 83 * 2);
     CHECK(crossLinkUniverse.getNrOfBonds() == 0);
     CHECK(forceRelaxer.getResidualNorm() == 0.);
     CHECK(forceRelaxer.getForce() == 0.);
+
+    Eigen::Matrix3d stressTensor = forceRelaxer.getStressTensor();
+    CHECK(stressTensor.isZero(1e-10));
   }
 
   SECTION("Non-empty universe")
@@ -640,6 +643,8 @@ TEST_CASE("MEHP Force Relaxation returns the cross-linker universe",
     CHECK(forceRelaxer.getResidual() > 0.);
     CHECK(forceRelaxer.getForce() > 0.);
     CHECK(forceRelaxer.getResidual() == forceRelaxer.getResidualNorm());
+    Eigen::Matrix3d stressTensor = forceRelaxer.getStressTensor();
+    CHECK_FALSE(stressTensor.isZero(1e-10));
   }
 }
 

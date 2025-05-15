@@ -115,49 +115,6 @@ MEHPForceRelaxation::runForceRelaxation(
   this->nrOfStepsDone += opt.get_numevals();
 }
 
-void
-MEHPForceRelaxation::runPhantomSteps(const long int nrOfSteps,
-                                     const double dt,
-                                     const double kappa,
-                                     const double T,
-                                     const double gamma)
-{
-  // initialise random generator for Langevin thermostat
-  std::default_random_engine generator;
-  std::normal_distribution<double> distribution(0., 1.);
-  auto gaussian = [&](double) { return distribution(generator); };
-
-  this->prepareAllOutputs();
-
-  // initialise other data structures
-  for (long int step = 0; step < nrOfSteps; ++step) {
-    // compute spring forces
-    double force = this->forceEvaluator->evaluateForceSetGradient(
-      this->forceRelaxationNetwork.nrOfNodes * 3,
-      this->currentSpringDistances,
-      this->currentForces.data());
-    // add Langevin thermo
-    this->currentForces +=
-      -gamma * this->currentVelocities +
-      sqrt(2. * gamma * T / dt) *
-        Eigen::VectorXd::NullaryExpr(this->currentForces.size(), gaussian);
-    this->currentVelocities += 0.5 * this->currentForces * dt;
-
-    // apply deformation
-    this->currentVelocities += 0.5 * this->currentForces * dt;
-    this->forceRelaxationNetwork.coordinates +=
-      this->currentVelocities * dt + 0.5 * this->currentForces * dt * dt;
-    this->currentSpringDistances =
-      this->evaluateSpringDistances(&this->forceRelaxationNetwork, this->is2D);
-
-    // output things
-    this->handleOutput(step);
-  }
-
-  this->forceEvaluator->setNetwork(this->forceRelaxationNetwork);
-  // store final state, potentially
-}
-
 Eigen::VectorXd
 MEHPForceRelaxation::evaluateSpringDistances(const Network* net,
                                              const bool is2D)
