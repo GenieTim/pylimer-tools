@@ -73,7 +73,7 @@ fi
 
 # then, build/install project for Python
 echo "====== Installing with PIP ======"
-run_timed "PIP Installation" python -m pip install --verbose -e . || exit 3
+run_timed "PIP Installation" python ./bin/dev_install.py || exit 3
 echo "===== /Installing with PIP ======"
 
 cd "$ROOT_DIR" || exit 4
