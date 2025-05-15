@@ -52,6 +52,7 @@ MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_
 find . -name "*Universe.cpp.gcov" -exec cat {} \;
 echo "========== /ran gcov =========="
 echo "======= Analyzing output ======"
+ls
 for of in ./*_test_output.log.txt; do
   echo "==== $of ===="
   cat "$of"
