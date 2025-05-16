@@ -6058,6 +6058,8 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
                   "Box direction y must be scalar");
   RUNTIME_EXP_IFN(!std::isinf(net.L[2]) && !std::isnan(net.L[2]),
                   "Box direction z must be scalar");
+  RUNTIME_EXP_IFN(APPROX_EQUAL(net.L[0] * net.L[1] * net.L[2], net.vol, 1e-6),
+                  "Inconsistent box volume and dimensions");
   RUNTIME_EXP_IFN(net.coordinates.size() == net.nrOfLinks * 3,
                   "Invalid size of coordinates");
   RUNTIME_EXP_IFN(u.size() == net.nrOfLinks * 3,

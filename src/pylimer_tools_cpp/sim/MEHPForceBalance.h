@@ -749,8 +749,14 @@ public:
   /**
    * @brief Add slip-links to this system
    *
-   * @param sliplinkDensity
-   * @param cutoff
+   * @param nrOfSliplinksToSample the number of slip-links to sample
+   * @param cutoff the distance (norm) between two atoms to be considered as a
+   * slip-link
+   * @param minimumNrOfSliplinks the minimum number of slip-links to sample
+   * @param sameStrandCutoff the number of beads required between two atoms on
+   * the same strand
+   * @param excludeCrosslinks whether to exclude cross-link atoms when sampling.
+   * @param seed
    * @return size_t the nr of actually added slip-links
    */
   size_t randomlyAddSliplinks(const size_t nrOfSliplinksToSample,
@@ -784,6 +790,7 @@ public:
       this->initialConfig.L[i] = this->box.getL(i);
       this->initialConfig.boxHalfs[i] = 0.5 * this->initialConfig.L[i];
     }
+    this->initialConfig.vol = this->box.getVolume();
   }
 
   /**

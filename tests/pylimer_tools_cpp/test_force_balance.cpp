@@ -864,47 +864,44 @@ TEST_CASE(
 
   std::string inputFile =
     suspectedPath + "/structure/network_100_a_46.structure.out";
-  if (std::filesystem::exists(inputFile)) {
-    CHECK(std::filesystem::exists(suspectedPath));
-    std::cout << "Reading file " << inputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    CHECK(universeSeq.getLength() == 1);
-    pe::Universe universe = universeSeq.atIndex(0);
-    std::cout << "Read file. " << std::endl;
-    pcm::MEHPForceBalance forceBalancer =
-      pcm::MEHPForceBalance(universe, 2, false, false, false);
-    // TODO: using a seed does not seem to work properly
-    size_t nrOfAddedLinks =
-      forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, true, 12);
-    CHECK(nrOfAddedLinks >= 50);
-    CHECK_NOTHROW(forceBalancer.validateNetwork());
-    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
-    nrOfAddedLinks =
-      forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, false, 25);
-    CHECK(nrOfAddedLinks >= 50);
-    CHECK_NOTHROW(forceBalancer.validateNetwork());
-    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+  REQUIRE(std::filesystem::exists(inputFile));
+  CHECK(std::filesystem::exists(suspectedPath));
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  CHECK(universeSeq.getLength() == 1);
+  pe::Universe universe = universeSeq.atIndex(0);
+  std::cout << "Read file. " << std::endl;
+  pcm::MEHPForceBalance forceBalancer =
+    pcm::MEHPForceBalance(universe, 2, false, false, false);
+  // TODO: using a seed does not seem to work properly
+  size_t nrOfAddedLinks =
+    forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, true, 12);
+  CHECK(nrOfAddedLinks >= 50);
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
+  std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+  nrOfAddedLinks =
+    forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, false, 25);
+  CHECK(nrOfAddedLinks >= 50);
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
+  std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
-    pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
-    Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
-    Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
-    CHECK(net.nrOfSprings > 0);
-    size_t numRemoved = forceBalancer.removeTwofunctionalCrosslinks(
-      net, displacements, partitions);
-    CHECK_NOTHROW(
-      forceBalancer.validateNetwork(net, displacements, partitions));
-    CHECK(numRemoved > 0);
-    // numRemoved = forceBalancer.removeInactiveCrosslinks(net, displacements,
-    // partitions, 1e-20); CHECK(numRemoved == 204); // TODO: analyze these
-    size_t nrOfSpringsBefore = net.nrOfSprings;
-    CHECK_NOTHROW(
-      forceBalancer.validateNetwork(net, displacements, partitions));
-    // remove all springs...
-    numRemoved = forceBalancer.removeInactiveCrosslinks(
-      net, displacements, partitions, 1e5);
-    CHECK(net.nrOfSprings == 0);
-    CHECK(numRemoved > 0);
-  }
+  pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
+  Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
+  Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
+  CHECK(net.nrOfSprings > 0);
+  size_t numRemoved =
+    forceBalancer.removeTwofunctionalCrosslinks(net, displacements, partitions);
+  CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements, partitions));
+  CHECK(numRemoved > 0);
+  // numRemoved = forceBalancer.removeInactiveCrosslinks(net, displacements,
+  // partitions, 1e-20); CHECK(numRemoved == 204); // TODO: analyze these
+  size_t nrOfSpringsBefore = net.nrOfSprings;
+  CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements, partitions));
+  // remove all springs...
+  numRemoved =
+    forceBalancer.removeInactiveCrosslinks(net, displacements, partitions, 1e5);
+  CHECK(net.nrOfSprings == 0);
+  CHECK(numRemoved > 0);
 }
 
 TEST_CASE("MEHP Force Balance can run with swapping slip-links",
@@ -1452,11 +1449,22 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
   CHECK(forceBalancer.getNumAtoms() == forceBalancer.getNrOfNodes());
   CHECK(forceBalancer.getNumExtraBonds() == 0);
   CHECK(forceBalancer.getNrOfSprings() == nrOfBeads / nrOfBeadsPerChain);
+  CHECK(forceBalancer.getNumShifts() == 0);
+  CHECK(forceBalancer.getTimestep() == 1);
+  CHECK(forceBalancer.getCurrentTime(12345) == 0.0);
+  CHECK(forceBalancer.getNumRelocations() == 0);
+  CHECK(forceBalancer.getCoordinates().isApprox(
+    forceBalancer.getNetwork().coordinates));
+  CHECK(forceBalancer.getCurrentDisplacements().isZero());
 
   SECTION("Large enough box")
   {
     forceBalancer.configAssumeBoxLargeEnough(true);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(50000, 1e-18));
+    CHECK_FALSE(forceBalancer.getCurrentDisplacements().isZero());
+    CHECK(forceBalancer.getCoordinates().isApprox(
+      forceBalancer.getNetwork().coordinates +
+      forceBalancer.getCurrentDisplacements()));
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
@@ -1467,6 +1475,7 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
                Catch::Matchers::WithinAbs(0., 1e-9));
     CHECK(forceBalancer.getAverageSpringLength() >= 0.0);
     CHECK(forceBalancer.getAverageSpringLength() <= 3e-6);
+    CHECK(forceBalancer.getForceMagnitudeVector().isZero(1e-6));
     CHECK_NOTHROW(forceBalancer.validateNetwork());
   }
 
@@ -1484,6 +1493,7 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
                Catch::Matchers::WithinAbs(0., 1e-9));
     CHECK(forceBalancer.getAverageSpringLength() >= 0.0);
     CHECK(forceBalancer.getAverageSpringLength() <= 3e-6);
+    CHECK(forceBalancer.getForceMagnitudeVector().isZero(1e-6));
     CHECK_NOTHROW(forceBalancer.validateNetwork());
   }
 }
