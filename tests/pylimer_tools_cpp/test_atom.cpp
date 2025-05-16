@@ -11,7 +11,7 @@
 namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 
-TEST_CASE("Atoms persist state", "[entity][Atom]")
+TEST_CASE("Atoms persist state", "[entity][Atom][header_tests]")
 {
   std::cout << "Running test \"Atoms persist state\"" << std::endl;
   pe::Atom atom1 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
@@ -32,7 +32,7 @@ TEST_CASE("Atoms persist state", "[entity][Atom]")
 }
 
 
-TEST_CASE("Atoms can calculate distances", "[entity][Atom]")
+TEST_CASE("Atoms can calculate distances", "[entity][Atom][header_tests]")
 {
   std::cout << "Running test \"Atoms can calculate distances\"" << std::endl;
   pe::Atom atom1 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
@@ -119,7 +119,7 @@ TEST_CASE("Atoms can calculate distances", "[entity][Atom]")
   }
 }
 
-TEST_CASE("LAMMPS Atom styles resolve to correct name", "[entity][Atom]")
+TEST_CASE("LAMMPS Atom styles resolve to correct name", "[entity][Atom][header_tests]")
 {
   std::cout << "Running test \"LAMMPS Atom styles resolve to correct name\""
             << std::endl;

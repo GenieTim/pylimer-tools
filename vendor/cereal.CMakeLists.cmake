@@ -34,3 +34,15 @@ if (NOT DEFINED cereal_LOADED)
 
     set(cereal_LOADED ON)
 endif ()
+
+
+if (NOT DEFINED CEREALIZABLE)
+    option(CEREALIZABLE "Enable serialisation of various classes" ON)
+endif ()
+if (CEREALIZABLE)
+    add_definitions(-DCERALIZABLE)
+    add_compile_definitions(CEREALIZABLE)
+    message(STATUS "Enabling serialization for classes in the project. Use the CEREALIZABLE CMake option to enable/disable this feature.")
+else ()
+    message(STATUS "Disabling serialization for classes in the project. Use the CEREALIZABLE CMake option to enable/disable this feature.")
+endif ()

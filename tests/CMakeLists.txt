@@ -86,7 +86,9 @@ add_library(test_sources
         pylimer_tools_cpp/test_box.cpp
         pylimer_tools_cpp/test_calc.cpp
         pylimer_tools_cpp/test_string_utils.cpp
+        pylimer_tools_cpp/test_graph_utils.cpp
         pylimer_tools_cpp/test_vector_utils.cpp
+        pylimer_tools_cpp/test_counter.cpp
 )
 
 IF (WIN32)

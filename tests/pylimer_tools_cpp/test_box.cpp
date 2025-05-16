@@ -13,7 +13,7 @@ extern "C"
 
 namespace pe = pylimer_tools::entities;
 
-TEST_CASE("Box can do PBC computations", "[entity][Box]")
+TEST_CASE("Box can do PBC computations", "[entity][Box][header_tests]")
 {
   std::cout << "Running test \"Box can do PBC computations\"" << std::endl;
   SECTION("Positive Box")
@@ -136,7 +136,7 @@ TEST_CASE("Box can do PBC computations", "[entity][Box]")
   }
 }
 
-TEST_CASE("Atoms compute distances PBC correctly", "[entity][Atoms][Box]")
+TEST_CASE("Atoms compute distances PBC correctly", "[entity][Atoms][Box][header_tests]")
 {
   // related to test "Universe can be used" > "Local Density Computation"
   std::cout << "Running test \"Atoms compute distances PBC correctly\""
@@ -215,7 +215,7 @@ TEST_CASE("Box works also after simple shear", "[entity][Box]")
   }
 }
 
-TEST_CASE("Box's offset corresponds to PBC", "[entity][Box]")
+TEST_CASE("Box's offset corresponds to PBC", "[entity][Box][header_tests]")
 {
   pe::Box box = pe::Box(10., 10., 10.);
   Eigen::Vector3d diff = Eigen::Vector3d::Constant(15.);
@@ -234,13 +234,13 @@ TEST_CASE("Box's offset corresponds to PBC", "[entity][Box]")
   CHECK(box2.isValidOffset(offset, 1e-3));
 }
 
-TEST_CASE("Box throws", "[entity][Box]")
+TEST_CASE("Box throws", "[entity][Box][header_tests]")
 {
   std::cout << "Running test \"Box throws\"" << std::endl;
   REQUIRE_THROWS(pe::Box(0.0, -1.0, 0.0, -1.0, 0.0, -1.0));
 }
 
-TEST_CASE("Box can interpolate", "[entity][Box]")
+TEST_CASE("Box can interpolate", "[entity][Box][header_tests]")
 {
   std::cout << "Running test \"Box can interpolate\"" << std::endl;
   pe::Box box = pe::Box(10., 10., 10.);
@@ -273,7 +273,7 @@ TEST_CASE("Box can interpolate", "[entity][Box]")
   }
 }
 
-TEST_CASE("Box can compute bounding box", "[entity][Box]")
+TEST_CASE("Box can compute bounding box", "[entity][Box][header_tests]")
 {
   std::cout << "Running test \"Box can compute bounding box\"" << std::endl;
   pe::Box box = pe::Box(10., 10., 10.);

@@ -2637,3 +2637,78 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple melt systems",
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
   }
 }
+
+TEST_CASE("All MEHPForceBalance2 solvers solve simple network systems",
+          "[MEHPForceBalance2]")
+{
+  std::cout
+    << "Running test \"All MEHPForceBalance2 solvers solve simple network "
+       "systems\""
+    << std::endl;
+
+  size_t nrOfBeads = 30;
+  size_t nrOfChains = 5;
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  for (size_t i = 0; i < nrOfChains; ++i) {
+    long int beadOffset = i * nrOfBeads;
+    std::vector<long int> atomIds(nrOfBeads);
+    std::iota(atomIds.begin(), atomIds.end(), 1 + beadOffset);
+    std::vector<double> coords(nrOfBeads);
+    std::iota(coords.begin(), coords.end(), 1. + beadOffset);
+    universe.addAtoms(atomIds,
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 1),
+                      coords,
+                      coords,
+                      coords,
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 0),
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 0),
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 0));
+    std::vector<long int> bondFrom(nrOfBeads - 1);
+    std::vector<long int> bondTo(nrOfBeads - 1);
+    std::iota(bondFrom.begin(), bondFrom.end(), 1 + beadOffset);
+    std::iota(bondTo.begin(), bondTo.end(), 2 + beadOffset);
+    universe.addBonds(bondFrom, bondTo);
+  }
+  CHECK(universe.getNrOfAtoms() == nrOfBeads * nrOfChains);
+  CHECK(universe.getNrOfBonds() == (nrOfBeads - 1) * nrOfChains);
+  // add some more bonds for fun
+  universe.addBonds(
+    { 1, 2, 1, 4, 29 },
+    { 1,
+      1,
+      static_cast<long int>(nrOfChains * nrOfBeads - 1),
+      14,
+      static_cast<long int>((nrOfChains - 1) * nrOfBeads + 1) });
+
+  for (pcm::SLESolver solver : // pylimer_tools::sim::mehp::allSLESolvers
+       {
+         pcm::SLESolver::DEFAULT,
+         // pcm::SLESolver::SIMPLICIAL_LLT,
+         // pcm::SLESolver::SIMPLICIAL_LDLT,
+         // pcm::SLESolver::SPARSE_LU,
+         pcm::SLESolver::SPARSE_QR,
+         pcm::SLESolver::CONJUGATE_GRADIENT,
+         pcm::SLESolver::CONJUGATE_GRADIENT_IDENTITY,
+         pcm::SLESolver::CONJUGATE_GRADIENT_DIAGONALIZED,
+         pcm::SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT,
+         pcm::SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED,
+         pcm::SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY,
+         pcm::SLESolver::BICGSTAB,
+         pcm::SLESolver::BICGSTAB_DIAGONALIZED,
+         pcm::SLESolver::BICGSTAB_IDENTITY,
+         pcm::SLESolver::BICGSTAB_INCOMPLETE_LU,
+         pcm::SLESolver::GRADIENT_DESCENT,
+         pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT,
+         pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG,
+         pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM,
+       }) {
+    INFO("Testing solver: " << solver);
+    pcm::MEHPForceBalance2 forceBalancer =
+      pcm::MEHPForceBalance2(universe, 2, false);
+    CHECK(forceBalancer.getNrOfSprings() == nrOfChains + 9);
+    CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+      pcm::StructureSimplificationMode::NO_SIMPLIFICATION, 1e-6, solver));
+    CHECK(forceBalancer.getNrOfSprings() == nrOfChains + 9);
+    CHECK(forceBalancer.getNrOfActiveSprings() > 0);
+  }
+}

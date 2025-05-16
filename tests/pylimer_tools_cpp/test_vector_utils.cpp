@@ -19,7 +19,7 @@ extern "C"
 
 namespace pu = pylimer_tools::utils;
 
-TEST_CASE("Vector Rows can be removed", "[Eigen]")
+TEST_CASE("Vector Rows can be removed", "[Eigen][header_tests][utils]")
 {
   std::cout << "Running test \"Vector Rows can be removed\"" << std::endl;
   SECTION("VectorXi")
@@ -95,7 +95,7 @@ TEST_CASE("Vector Rows can be removed", "[Eigen]")
   }
 }
 
-TEST_CASE("First occurrence is found", "[VectorUtils]")
+TEST_CASE("First occurrence is found", "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"First occurrence is found\"" << std::endl;
   std::vector<int> testVec = { 1, 2, 3, 4, 4, 5, 5, 5, 6, 7, 8, 9, 10 };
@@ -108,7 +108,8 @@ TEST_CASE("First occurrence is found", "[VectorUtils]")
   CHECK(pu::first_occuring_index(testVec, 11) == testVec.size());
 }
 
-TEST_CASE("Elements can be found and conditionally added", "[VectorUtils]")
+TEST_CASE("Elements can be found and conditionally added",
+          "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Elements can be found and conditionally added\""
             << std::endl;
@@ -135,7 +136,8 @@ TEST_CASE("Elements can be found and conditionally added", "[VectorUtils]")
   CHECK(pu::last(testVec) == 100);
 }
 
-TEST_CASE("Elements are inserted to a sorted vector", "[VectorUtils]")
+TEST_CASE("Elements are inserted to a sorted vector",
+          "[VectorUtils][header_tests][utils]")
 {
   std::vector<size_t> vec = { 1, 3, 5, 7, 9 };
   size_t size_before = vec.size();
@@ -148,7 +150,7 @@ TEST_CASE("Elements are inserted to a sorted vector", "[VectorUtils]")
   }
 }
 
-TEST_CASE("Row removal works", "[VectorUtils]")
+TEST_CASE("Row removal works", "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Row removal works\"" << std::endl;
 
@@ -201,7 +203,7 @@ TEST_CASE("Row removal works", "[VectorUtils]")
   }
 }
 
-TEST_CASE("Index renumbering works", "[VectorUtils]")
+TEST_CASE("Index renumbering works", "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Index renumbering works\"" << std::endl;
   std::vector<size_t> testVecWithIndices = {
@@ -229,7 +231,7 @@ TEST_CASE("Index renumbering works", "[VectorUtils]")
   CHECK(testVecWithIndices[6] == 5);
 }
 
-TEST_CASE("Append and Prepend works")
+TEST_CASE("Append and Prepend works", "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Append and Prepend works\"" << std::endl;
   std::vector<size_t> vec = { 1, 2, 3, 4, 5 };
@@ -317,7 +319,7 @@ TEST_CASE("Append and Prepend works")
   }
 }
 
-TEST_CASE("Duplicates are removed", "[VectorUtils]")
+TEST_CASE("Duplicates are removed", "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Duplicates are removed\"" << std::endl;
   std::vector<size_t> vec = { 1, 7, 77, 7, 3, 3, 3, 4, 4, 2, 2, 4, 4, 5 };
@@ -333,7 +335,7 @@ TEST_CASE("Duplicates are removed", "[VectorUtils]")
   CHECK(vec[4] == 5);
 }
 
-TEST_CASE("Maximum value is found", "[VectorUtils]")
+TEST_CASE("Maximum value is found", "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Maximum value is found\"" << std::endl;
   std::vector<size_t> vec = { 1, 7, 77, 7, 3, 3, 3, 4, 4, 2, 2, 4, 4, 5 };
@@ -349,7 +351,7 @@ TEST_CASE("Maximum value is found", "[VectorUtils]")
         pylimer_tools::utils::max_element<double>(nearlyEmptyVec, 1.));
 }
 
-TEST_CASE("Index of element is found", "[VectorUtils]")
+TEST_CASE("Index of element is found", "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Index of element is found\"" << std::endl;
   std::vector<size_t> vec = { 1, 7, 77, 7, 3, 3, 3, 4, 4, 2, 2, 4, 4, 5 };
@@ -369,7 +371,7 @@ TEST_CASE("Index of element is found", "[VectorUtils]")
   CHECK_THROWS(pylimer_tools::utils::index_of<double>(vecD, 7.7));
 }
 
-TEST_CASE("Vector equality is checked", "[VectorUtils]")
+TEST_CASE("Vector equality is checked", "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Vector equality is checked\"" << std::endl;
   std::vector<size_t> vec1 = { 1, 2, 3, 4, 5 };
@@ -389,7 +391,8 @@ TEST_CASE("Vector equality is checked", "[VectorUtils]")
   CHECK_FALSE(pylimer_tools::utils::equal(vec4, vec6));
 }
 
-TEST_CASE("Eigen and std::vector equality is checked", "[Eigen][VectorUtils]")
+TEST_CASE("Eigen and std::vector equality is checked",
+          "[Eigen][VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Eigen and std::vector equality is checked\""
             << std::endl;
@@ -480,7 +483,8 @@ TEST_CASE("Eigen and std::vector equality is checked", "[Eigen][VectorUtils]")
   }
 }
 
-TEST_CASE("Segment-wise norm is calculated", "[VectorUtils]")
+TEST_CASE("Segment-wise norm is calculated",
+          "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Segment-wise norm is calculated\"" << std::endl;
   Eigen::VectorXd vec1 = Eigen::VectorXd::LinSpaced(6, 1, 6);
@@ -494,7 +498,8 @@ TEST_CASE("Segment-wise norm is calculated", "[VectorUtils]")
   CHECK_THROWS(pu::segmentwise_norm(vec1, 5));
 }
 
-TEST_CASE("Segment-wise norm maximum is calculated", "[VectorUtils]")
+TEST_CASE("Segment-wise norm maximum is calculated",
+          "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Segment-wise norm is calculated\"" << std::endl;
   Eigen::VectorXd vec1 = Eigen::VectorXd::LinSpaced(6, 1, 6);
@@ -507,7 +512,8 @@ TEST_CASE("Segment-wise norm maximum is calculated", "[VectorUtils]")
   CHECK_THROWS(pu::segmentwise_norm(vec1, 5));
 }
 
-TEST_CASE("Finite component check is performed", "[VectorUtils]")
+TEST_CASE("Finite component check is performed",
+          "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Finite component check is performed\""
             << std::endl;
