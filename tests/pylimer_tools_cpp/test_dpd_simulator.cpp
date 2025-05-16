@@ -780,63 +780,80 @@ TEST_CASE("DPD Simulator can be serialized",
   const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
   REQUIRE(std::filesystem::exists(suspectedPath));
 
-  std::string inputFile =
-    suspectedPath + "/structure/melt_83_a_100.structure.out";
-  REQUIRE(std::filesystem::exists(inputFile));
-  pe::UniverseSequence universeSequence = pe::UniverseSequence();
-  REQUIRE(universeSequence.getLength() == 0);
-  universeSequence.initializeFromDataSequence({ { inputFile } });
-  REQUIRE(universeSequence.getLength() == 1);
-  pe::Universe universe = universeSequence.atIndex(0);
-  universe.resampleVelocities(0.0, 1.0, "", false);
+  for (std::string inputFile :
+       { // suspectedPath +
+         // "/structure/melt_213_a_47_106_xlinks_v_1.structure.out",
+         suspectedPath + "/structure/network_100_a_46.structure.out" }) {
+    INFO("Using structure file " << inputFile);
+    REQUIRE(std::filesystem::exists(inputFile));
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
+    universe.resampleVelocities(0.0, 2.0, "abcSEED", false);
+    CHECK(universe.vertexPropertyExists("vx"));
+    CHECK(universe.vertexPropertyExists("vy"));
+    CHECK(universe.vertexPropertyExists("vz"));
 
-  pcd::DPDSimulator simulator =
-    pcd::DPDSimulator(universe, 2, 9, false, "14th_seed");
+    pcd::DPDSimulator simulator =
+      pcd::DPDSimulator(universe, 2, 9, false, "14th_seed");
+    CHECK_FALSE(simulator.getVelocities().isZero());
 
-  CHECK(simulator.getTemperature() > 0.0);
+    double T = simulator.getTemperature();
+    CHECK(T > 0.0);
 
-  CHECK_THROWS(simulator.configSlipspringHighCutoff(-1));
-  CHECK_NOTHROW(simulator.configSlipspringHighCutoff(2.));
-  CHECK_THROWS(simulator.configSlipspringLowCutoff(3.));
-  CHECK_NOTHROW(simulator.configSlipspringLowCutoff(0.5));
-  simulator.createSlipSprings(100, 2);
+    CHECK_THROWS(simulator.configSlipspringHighCutoff(-1));
+    CHECK_NOTHROW(simulator.configSlipspringHighCutoff(2.));
+    CHECK_THROWS(simulator.configSlipspringLowCutoff(3.));
+    CHECK_NOTHROW(simulator.configSlipspringLowCutoff(0.5));
+    simulator.createSlipSprings(100, 2);
 
-  simulator.configNumStepsMC(50);
-  simulator.configNumStepsDPD(50);
-  simulator.configShiftPossibilityEmpty(true);
-  simulator.configAssumeBoxLargeEnough();
-  CHECK(simulator.getCurrentTime(0.) == 0.);
-  CHECK(simulator.getCurrentTime(1000.) == 0.);
+    simulator.configNumStepsMC(50);
+    simulator.configNumStepsDPD(50);
+    simulator.configShiftPossibilityEmpty(true);
+    simulator.configAssumeBoxLargeEnough();
+    CHECK(simulator.getCurrentTime(0.) == 0.);
+    CHECK(simulator.getCurrentTime(1000.) == 0.);
 
-  std::string restartFile = "restartFile-for-accuracy-test.bin";
-  simulator.writeRestartFile(restartFile);
+    std::string restartFile = "restartFile-for-accuracy-test.bin";
+    simulator.writeRestartFile(restartFile);
 
-  REQUIRE(std::filesystem::exists(restartFile));
+    REQUIRE(std::filesystem::exists(restartFile));
 
-  pcd::DPDSimulator sim2 = pcd::DPDSimulator::readRestartFile(restartFile);
-  std::remove(restartFile.c_str());
+    pcd::DPDSimulator sim2 = pcd::DPDSimulator::readRestartFile(restartFile);
+    std::remove(restartFile.c_str());
 
-  // on 1 proc, expect equal randomness state
-  CHECK(simulator.getUniformRandBetween0And1() ==
-        sim2.getUniformRandBetween0And1());
+    // on 1 proc, expect equal randomness state
+    CHECK(simulator.getUniformRandBetween0And1() ==
+          sim2.getUniformRandBetween0And1());
 
-  // and equal everything else
-  CHECK(simulator.getCoordinates().isApprox(sim2.getCoordinates()));
-  CHECK(simulator.getBondLengths().isApprox(sim2.getBondLengths()));
-  CHECK(simulator.getStressTensor().isApprox(sim2.getStressTensor()));
-  CHECK(sim2.getTemperature() == simulator.getTemperature());
-  CHECK(simulator.computeBondLength(2) == sim2.computeBondLength(2));
+    // and equal everything else
+    CHECK(simulator.getCoordinates().isApprox(sim2.getCoordinates()));
+    CHECK(simulator.getBondLengths().isApprox(sim2.getBondLengths()));
+    CHECK(simulator.getStressTensor().isApprox(sim2.getStressTensor()));
+    CHECK(sim2.getTemperature() == simulator.getTemperature());
+    CHECK(simulator.computeBondLength(2) == sim2.computeBondLength(2));
 
-  // when reseeding the randomness, the state should be different
-  CHECK_NOTHROW(sim2.reseedRandomness(""));
-  CHECK_NOTHROW(simulator.reseedRandomness(""));
-  CHECK(simulator.getUniformRandBetween0And1() !=
-        sim2.getUniformRandBetween0And1());
+    // when reseeding the randomness, the state should be different
+    CHECK_NOTHROW(sim2.reseedRandomness(""));
+    CHECK_NOTHROW(simulator.reseedRandomness(""));
+    CHECK(simulator.getUniformRandBetween0And1() !=
+          sim2.getUniformRandBetween0And1());
 
-  // finally, some other methods should work as well on the clone,
-  // without issues
-  CHECK_NOTHROW(sim2.validateNeighbourlist(1.));
-  CHECK_NOTHROW(sim2.attemptBondFormation());
-  CHECK_NOTHROW(sim2.relocateSlipSprings());
+    // finally, some other methods should work as well on the clone,
+    // without issues
+    CHECK_NOTHROW(sim2.validateNeighbourlist(1.));
+    std::unordered_map<int, int> numBondsPerType = {};
+    numBondsPerType[0] = 2;
+    numBondsPerType[1] = 2;
+    numBondsPerType[2] = 4;
+    numBondsPerType[3] = 2;
+    sim2.configBondFormation(3, numBondsPerType);
+    CHECK_NOTHROW(sim2.attemptBondFormation());
+    CHECK_NOTHROW(sim2.relocateSlipSprings());
+    pe::Box newBox = pe::Box(10, 12, 10);
+    CHECK_NOTHROW(sim2.deformBoxImmediately(newBox));
+  }
 }
 #endif

@@ -166,7 +166,7 @@ protected:
   inline bool requiresDEvaluation(const ComputedDoubleValues val,
                                   const long int currentStep) const
   {
-    bool requiresEval =
+    const bool requiresEval =
       (this->doubleValueRequiredEvery[val] > 0) &&
       ((currentStep % this->doubleValueRequiredEvery[val]) == 0);
     // if (requiresEval) {

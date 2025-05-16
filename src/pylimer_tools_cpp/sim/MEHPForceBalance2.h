@@ -356,7 +356,10 @@ public:
 
   size_t getNumBonds() override { return this->getNrOfStrands(); }
 
-  size_t getNumExtraBonds() override { return 0; }
+  size_t getNumExtraBonds() override
+  {
+    return this->initialConfig.springIsEntanglement.count();
+  }
 
   long int getNumBondsToForm() override { return 0; }
 
@@ -416,7 +419,7 @@ public:
     if (this->initialConfig.nrOfNodes == 0) {
       return 0;
     }
-    Eigen::ArrayXb activeNodes = this->findActiveNodes(tolerance);
+    const Eigen::ArrayXb activeNodes = this->findActiveNodes(tolerance);
     return activeNodes.count();
   }
 
@@ -864,7 +867,8 @@ public:
   {
     assert(this->isPartOfSpring(net, linkIdx, springIdx));
 
-    Eigen::Vector3d dist = this->evaluateSpringVector(net, u, springIdx, is2d);
+    const Eigen::Vector3d dist =
+      this->evaluateSpringVector(net, u, springIdx, is2d);
 
     return dist * (net.springIndexA(springIdx) == linkIdx ? -1. : 1.);
   }
@@ -1017,9 +1021,8 @@ public:
    * shall be stored
    * @return double, the distance (squared norm) displaced
    */
-  double displaceToMeanPosition(
-    const ForceBalance2Network& net,
-    Eigen::VectorXd& u) const;
+  double displaceToMeanPosition(const ForceBalance2Network& net,
+                                Eigen::VectorXd& u) const;
 
   /**
    * @brief Displace one link to the mean of all connected neighbours
@@ -1157,7 +1160,7 @@ protected:
   double evaluatePressure(const ForceBalance2Network& net,
                           const Eigen::VectorXd& u) const
   {
-    auto stressTensor = this->evaluateStressTensor(net, u);
+    const auto stressTensor = this->evaluateStressTensor(net, u);
     return this->evaluatePressure(stressTensor);
   }
 
@@ -1332,7 +1335,8 @@ protected:
           net.linkIndicesOfStrand[strandIdx][1];
         assert(!net.linkIsEntanglement[crossLinkIdx0]);
         assert(net.linkIsEntanglement[entanglementLinkIdx0]);
-        for (size_t strandOfXlink : net.strandIndicesOfLink[crossLinkIdx0]) {
+        for (const size_t strandOfXlink :
+             net.strandIndicesOfLink[crossLinkIdx0]) {
           if (strandOfXlink == strandIdx) {
             continue;
           }
@@ -1361,7 +1365,8 @@ protected:
                                 [net.linkIndicesOfStrand[strandIdx].size() - 2];
         assert(!net.linkIsEntanglement[crossLinkIdxN]);
         assert(net.linkIsEntanglement[entanglementLinkIdxN]);
-        for (size_t strandOfXlink : net.strandIndicesOfLink[crossLinkIdxN]) {
+        for (const size_t strandOfXlink :
+             net.strandIndicesOfLink[crossLinkIdxN]) {
           if (strandOfXlink == strandIdx) {
             continue;
           }

@@ -399,7 +399,7 @@ public:
     const bool filterEntanglements = true)
   {
     // sample the "entanglements"
-    pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
+    const pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
       entanglements =
         pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
           universe,
@@ -521,10 +521,11 @@ public:
   {
     // TODO: revise, hard!
     assert(involvedPartitions.size() == 4);
-    double firstMeanVal = 0.5 * (springPartitions[involvedPartitions[0]] +
-                                 springPartitions[involvedPartitions[1]]);
-    double secondMeanVal = 0.5 * (springPartitions[involvedPartitions[2]] +
-                                  springPartitions[involvedPartitions[3]]);
+    const double firstMeanVal = 0.5 * (springPartitions[involvedPartitions[0]] +
+                                       springPartitions[involvedPartitions[1]]);
+    const double secondMeanVal =
+      0.5 * (springPartitions[involvedPartitions[2]] +
+             springPartitions[involvedPartitions[3]]);
     // Eigen::ArrayXi involvedCoordinateIndices = Eigen::ArrayXi(12);
     // for (size_t i = 0; i < 4; ++i) {
     //   involvedCoordinateIndices[3 * i] = 3 * involvedPartitions[i];
@@ -534,14 +535,15 @@ public:
     // }
     // Eigen::VectorXd displacementsBefore =
     //   displacements(involvedCoordinateIndices);
-    Eigen::Vector4d partitionsBefore = springPartitions(involvedPartitions);
+    const Eigen::Vector4d partitionsBefore =
+      springPartitions(involvedPartitions);
     springPartitions[involvedPartitions[0]] = firstMeanVal;
     springPartitions[involvedPartitions[1]] = firstMeanVal;
     springPartitions[involvedPartitions[2]] = secondMeanVal;
     springPartitions[involvedPartitions[3]] = secondMeanVal;
     // this->displaceToMeanPosition(
     //   this->initialConfig, displacements, springPartitions, link_idx);
-    double retVal =
+    const double retVal =
       this->updateSpringPartition(net,
                                   displacements,
                                   springPartitions,
@@ -1036,13 +1038,13 @@ public:
                                        const Eigen::VectorXd& springPartitions,
                                        const double tolerance = 1e-3) const
   {
-    double activeWeightFraction =
+    const double activeWeightFraction =
       this->computeActiveWeightFraction(net, u, springPartitions, tolerance);
     RUNTIME_EXP_IFN(
       APPROX_WITHIN(activeWeightFraction, 0., 1., 1e-6),
       "Expect active weight fraction to be between 0 and 1, got " +
         std::to_string(activeWeightFraction) + ".");
-    double solubleWeightFraction =
+    const double solubleWeightFraction =
       this->computeSolubleWeightFraction(net, u, springPartitions, tolerance);
     RUNTIME_EXP_IFN(
       APPROX_WITHIN(solubleWeightFraction, 0., 1., 1e-6),
@@ -1079,7 +1081,7 @@ public:
       return 0.;
     }
     // find all active springs
-    Eigen::ArrayXb activeSprings =
+    const Eigen::ArrayXb activeSprings =
       this->findActiveSprings(net, u, springPartitions, tolerance);
     const double nActiveSprings = activeSprings.count();
     if (nActiveSprings == 0) {
@@ -1136,11 +1138,11 @@ public:
         if (nodeIsActive(i)) {
           continue;
         }
-        for (size_t springIdx : net->springIndicesOfLinks[i]) {
+        for (const size_t springIdx : net->springIndicesOfLinks[i]) {
           if (springIsActive[springIdx]) {
             hadChanged = true;
             nodeIsActive(i) = true;
-            for (size_t innerSpringIdx : net->springIndicesOfLinks[i]) {
+            for (const size_t innerSpringIdx : net->springIndicesOfLinks[i]) {
               springIsActive[innerSpringIdx] = true;
             }
             break;
@@ -1173,7 +1175,7 @@ public:
       return 0.;
     }
 
-    std::vector<pylimer_tools::entities::Universe> clusters =
+    const std::vector<pylimer_tools::entities::Universe> clusters =
       this->universe.getClusters();
     std::vector<long int> atomIdxToClusterIdx(this->universe.getNrOfAtoms());
     for (size_t i = 0; i < clusters.size(); ++i) {
@@ -1185,11 +1187,11 @@ public:
     std::vector<bool> clusterIsActive(clusters.size(), false);
 
     // find active atoms
-    std::vector<long int> activeNodeIndices =
+    const std::vector<long int> activeNodeIndices =
       this->getIndicesOfActiveNodes(net, u, springPartitions, tolerance);
 
     for (const long int& nodeIdx : activeNodeIndices) {
-      long int universeAtomIdx =
+      const long int universeAtomIdx =
         this->universe.getIdxByAtomId(net->oldAtomIds[nodeIdx]);
       clusterIsActive[atomIdxToClusterIdx[universeAtomIdx]] = true;
     }
@@ -1225,7 +1227,7 @@ public:
     if (net->nrOfSprings < 1) {
       return 1.;
     }
-    double nActiveClusteredAtoms =
+    const double nActiveClusteredAtoms =
       this->countActiveClusteredAtoms(net, u, springPartitions, tolerance);
     // finally, normalize by the number of atoms.
     // NOTE: currently, the weight of the atoms is ignored
@@ -1262,14 +1264,14 @@ public:
 
   std::vector<double> getCurrentSpringLengths() const
   {
-    Eigen::VectorXd vecs = this->getCurrentSpringDistances();
+    const Eigen::VectorXd vecs = this->getCurrentSpringDistances();
 
     return pylimer_tools::utils::segmentwise_norm(vecs, 3);
   }
 
   std::vector<double> getOverallSpringLengths() const
   {
-    std::vector<double> partialSpringDistances =
+    const std::vector<double> partialSpringDistances =
       this->getCurrentPartialSpringLengths();
     assert(partialSpringDistances.size() ==
            this->initialConfig.nrOfPartialSprings);
@@ -1293,7 +1295,7 @@ public:
 
   std::vector<double> getCurrentPartialSpringLengths() const
   {
-    Eigen::VectorXd vecs = this->evaluatePartialSpringVectors(
+    const Eigen::VectorXd vecs = this->evaluatePartialSpringVectors(
       this->initialConfig, this->currentDisplacements);
 
     return pylimer_tools::utils::segmentwise_norm(vecs, 3);
@@ -1444,8 +1446,8 @@ public:
                     const std::vector<double>& alpha2,
                     const bool clampAlpha = false)
   {
-    std::vector<std::vector<size_t>> loops;
-    std::vector<std::vector<size_t>> loopsOfSliplinks;
+    const std::vector<std::vector<size_t>> loops;
+    const std::vector<std::vector<size_t>> loopsOfSliplinks;
     return this->addSlipLinks(strandIdx1,
                               strandIdx2,
                               x,
@@ -1578,7 +1580,7 @@ public:
     double alpha = 0.;
     for (size_t i = 0; i < net.localToGlobalSpringIndex[springIdx].size();
          ++i) {
-      size_t currentPartialSpringIdx =
+      const size_t currentPartialSpringIdx =
         net.localToGlobalSpringIndex[springIdx][i];
       if (net.springPartIndexA[currentPartialSpringIdx] == targetLink) {
         return alpha;
@@ -1673,7 +1675,7 @@ public:
   {
     assert(this->isPartOfSpring(net, linkIdx, springIdx));
 
-    Eigen::Vector3d dist = this->evaluatePartialSpringDistance(
+    const Eigen::Vector3d dist = this->evaluatePartialSpringDistance(
       net, u, springIdx, is2d, boxLargeEnough);
 
     return dist * (net.springPartIndexA(springIdx) == linkIdx ? -1. : 1.);
@@ -1789,9 +1791,9 @@ public:
                        "The requested link does not exist");
     std::vector<size_t> partialSpringIndices;
 
-    std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
+    const std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
 
-    for (size_t springIdx : springIndices) {
+    for (const size_t springIdx : springIndices) {
       for (size_t partialSpringIdx : net.localToGlobalSpringIndex[springIdx]) {
         if (this->isPartOfSpring(net, linkIdx, partialSpringIdx)) {
           partialSpringIndices.push_back(partialSpringIdx);
@@ -2153,8 +2155,9 @@ public:
   {
     std::vector<size_t> results;
     results.reserve(4);
-    for (size_t springIdx : net.springIndicesOfLinks[linkIdx]) {
-      for (size_t partialSpringIdx : net.localToGlobalSpringIndex[springIdx]) {
+    for (const size_t springIdx : net.springIndicesOfLinks[linkIdx]) {
+      for (const size_t partialSpringIdx :
+           net.localToGlobalSpringIndex[springIdx]) {
         if (net.springPartIndexA[partialSpringIdx] == linkIdx) {
           results.push_back(net.springPartIndexB[partialSpringIdx]);
         } //
@@ -2196,7 +2199,7 @@ public:
       Eigen::VectorXd::Zero(this->currentSpringVectors.size() / 3);
 
     for (size_t i = 0; i < this->currentSpringVectors.size() / 3; ++i) {
-      double b = lens.segment(3 * i, 3).norm();
+      const double b = lens.segment(3 * i, 3).norm();
       lens[i] = b;
     }
 
@@ -2230,12 +2233,12 @@ public:
     RUNTIME_EXP_IFN(atomIdx >= 0, "Atom not found.");
     std::cout << "Atom " << atomIdx << " (" << atomId << ")"
               << " connectivity:" << std::endl;
-    for (long int parentSpringIdx :
+    for (const long int parentSpringIdx :
          this->initialConfig.springIndicesOfLinks[atomIdx]) {
       std::vector<size_t> allSpringIndices = this->getAllFullSpringIndicesAlong(
         this->initialConfig, parentSpringIdx);
       std::string prefix = "";
-      for (size_t springIdx : allSpringIndices) {
+      for (const size_t springIdx : allSpringIndices) {
         prefix += "\t";
         std::cout << prefix << "Spring " << springIdx << " (";
         std::cout << this->initialConfig.springPartIndexA[springIdx] << " ⟷ "
@@ -2245,7 +2248,7 @@ public:
                   << std::endl;
         std::cout << prefix << "\t";
 
-        for (long int linkIdx :
+        for (const long int linkIdx :
              this->initialConfig.linkIndicesOfSprings[springIdx]) {
           std::cout << linkIdx << " ";
           if (linkIdx < this->initialConfig.nrOfNodes) {
@@ -2282,7 +2285,8 @@ protected:
                           const Eigen::VectorXd& u,
                           const Eigen::VectorXd& springPartitions) const
   {
-    auto stressTensor = this->evaluateStressTensor(net, u, springPartitions);
+    const auto stressTensor =
+      this->evaluateStressTensor(net, u, springPartitions);
     return this->evaluatePressure(stressTensor);
   }
 
@@ -2673,9 +2677,9 @@ protected:
     }
 
     // set the partition, remember the partial spring mapping
-    size_t from = net.springPartIndexA[partialSpringIdx];
-    size_t to = net.springPartIndexB[partialSpringIdx];
-    std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
+    const size_t from = net.springPartIndexA[partialSpringIdx];
+    const size_t to = net.springPartIndexB[partialSpringIdx];
+    const std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
       chain.getAtomsLinedUp(crossLinkerType, false, true);
     partitions[partialSpringIdx] = static_cast<double>(atom2Idx - atom1Idx) /
                                    static_cast<double>(chain.getNrOfBonds());
@@ -2712,14 +2716,15 @@ protected:
 
     net.springPartBoxOffset.segment(3 * partialSpringIdx, 3) =
       Eigen::Vector3d::Zero();
-    Eigen::Vector3d actualDistance = this->evaluatePartialSpringDistance(
+    const Eigen::Vector3d actualDistance = this->evaluatePartialSpringDistance(
       net, Eigen::VectorXd::Zero(net.coordinates.size()), partialSpringIdx);
     net.springPartBoxOffset.segment(3 * partialSpringIdx, 3) =
       expectedDistance - actualDistance;
     assert(this->box.isValidOffset(expectedDistance - actualDistance));
 #ifndef NDEBUG
-    Eigen::Vector3d newActualDistance = this->evaluatePartialSpringDistance(
-      net, Eigen::VectorXd::Zero(net.coordinates.size()), partialSpringIdx);
+    const Eigen::Vector3d newActualDistance =
+      this->evaluatePartialSpringDistance(
+        net, Eigen::VectorXd::Zero(net.coordinates.size()), partialSpringIdx);
     assert(newActualDistance.isApprox(expectedDistance));
 #endif
   }
@@ -2742,7 +2747,7 @@ protected:
   {
     assert(net.linkIsSliplink[aroundLinkIdx]);
     assert(this->isPartOfSpring(net, aroundLinkIdx, partialSpringIdx));
-    size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
+    const size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
 
     for (size_t i = 0; i < net.localToGlobalSpringIndex[fullSpringIdx].size();
          ++i) {
@@ -2753,8 +2758,10 @@ protected:
         if (i >= (net.localToGlobalSpringIndex[fullSpringIdx].size() - 1)) {
           return net.localToGlobalSpringIndex[fullSpringIdx][i - 1];
         }
-        size_t candidate1 = net.localToGlobalSpringIndex[fullSpringIdx][i - 1];
-        size_t candidate2 = net.localToGlobalSpringIndex[fullSpringIdx][i + 1];
+        const size_t candidate1 =
+          net.localToGlobalSpringIndex[fullSpringIdx][i - 1];
+        const size_t candidate2 =
+          net.localToGlobalSpringIndex[fullSpringIdx][i + 1];
 
         if (this->isPartOfSpring(net, aroundLinkIdx, candidate1) &&
             this->isPartOfSpring(net, aroundLinkIdx, candidate2) &&
@@ -2927,10 +2934,10 @@ protected:
     INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                        "Spring index out of range.");
 
-    std::vector<size_t> fullSpringIndices =
+    const std::vector<size_t> fullSpringIndices =
       this->getAllFullSpringIndicesAlong(net, springIdx);
     std::vector<size_t> result;
-    for (size_t springIdx : fullSpringIndices) {
+    for (const size_t springIdx : fullSpringIndices) {
       for (size_t partialSpringIdx : net.localToGlobalSpringIndex[springIdx]) {
         result.push_back(partialSpringIdx);
       }
@@ -2957,7 +2964,7 @@ protected:
                        "Link must be cross-link.");
 
     std::vector<size_t> result;
-    for (size_t springIdx : net.springIndicesOfLinks[nodeIdx]) {
+    for (const size_t springIdx : net.springIndicesOfLinks[nodeIdx]) {
       std::vector<size_t> subSprings =
         this->getAllFullSpringIndicesAlong(net, springIdx);
       for (size_t subSpringIdx : subSprings) {
@@ -2993,7 +3000,7 @@ protected:
     long int previousEntanglementLinkIdx = -1;
     while (this->springInvolvesEntanglementBead(
       net, currentSpringIdx, previousEntanglementLinkIdx)) {
-      size_t entanglementLinkIdx = this->getInvolvedEntanglementBeadIndex(
+      const size_t entanglementLinkIdx = this->getInvolvedEntanglementBeadIndex(
         net, currentSpringIdx, previousEntanglementLinkIdx);
       RUNTIME_EXP_IFN(net.oldAtomTypes[entanglementLinkIdx] ==
                         this->entanglementType,
@@ -3002,7 +3009,7 @@ protected:
       assert(net.springIndicesOfLinks[entanglementLinkIdx].size() == 3 ||
              net.springIndicesOfLinks[entanglementLinkIdx].size() == 2);
       long int nextSpringIdx = -1;
-      for (size_t involvedSpringIdx :
+      for (const size_t involvedSpringIdx :
            net.springIndicesOfLinks[entanglementLinkIdx]) {
         if (net.springsType[involvedSpringIdx] == this->entanglementType) {
           continue;
@@ -3065,7 +3072,7 @@ protected:
       assert(net.springIndicesOfLinks[entanglementLinkIdx].size() == 3 ||
              net.springIndicesOfLinks[entanglementLinkIdx].size() == 2);
       long int nextSpringIdx = -1;
-      for (size_t involvedSpringIdx :
+      for (const size_t involvedSpringIdx :
            net.springIndicesOfLinks[entanglementLinkIdx]) {
         if (net.springsType[involvedSpringIdx] == this->entanglementType) {
           continue;
@@ -3151,7 +3158,7 @@ protected:
     }
 
     // validation: check distances
-    Eigen::Vector3d distanceBefore =
+    const Eigen::Vector3d distanceBefore =
       this->evaluatePartialSpringDistance(
         net, u, otherInvolvedPartialSpring, this->is2D, false) +
       this->evaluatePartialSpringDistance(
@@ -3187,7 +3194,7 @@ protected:
     assert(
       this->isPartOfSpring(net, involvedCrossLink, targetPartialSpringIdx));
 
-    size_t newPartialSpringIdx =
+    const size_t newPartialSpringIdx =
       this->addSlipLinkToPartialSpring(net,
                                        u,
                                        springPartitions,
@@ -3217,7 +3224,7 @@ protected:
     }
 
     // validation: check distances
-    Eigen::Vector3d distanceAfter =
+    const Eigen::Vector3d distanceAfter =
       this->evaluatePartialSpringDistance(
         net, u, otherInvolvedPartialSpring, this->is2D, false) +
       this->evaluatePartialSpringDistance(

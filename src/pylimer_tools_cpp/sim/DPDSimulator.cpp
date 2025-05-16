@@ -121,6 +121,19 @@ DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe& u,
   // simulation state
   this->currentVelocitiesPlus = Eigen::VectorXd::Zero(coordinates.size());
   this->currentVelocities = Eigen::VectorXd::Zero(coordinates.size());
+  if (universe.vertexPropertyExists("vx") &&
+      universe.vertexPropertyExists("vy") &&
+      universe.vertexPropertyExists("vz")) {
+    const std::vector<double> vx = universe.getPropertyValues<double>("vx");
+    const std::vector<double> vy = universe.getPropertyValues<double>("vy");
+    const std::vector<double> vz = universe.getPropertyValues<double>("vz");
+    for (size_t i = 0; i < universe.getNrOfAtoms(); ++i) {
+      this->currentVelocities(i * 3) = vx[i];
+      this->currentVelocities(i * 3 + 1) = vy[i];
+      this->currentVelocities(i * 3 + 2) = vz[i];
+    }
+  }
+
   this->currentForces = Eigen::VectorXd::Zero(coordinates.size());
   this->currentStressTensor = Eigen::Matrix3d::Zero();
   // with zero velocity, we don't have kinetic contributions
@@ -1723,6 +1736,11 @@ DPDSimulator::getCoordinates()
   // coordinates..."
   //           << std::endl;
   return this->coordinates;
+}
+Eigen::VectorXd
+DPDSimulator::getVelocities() const
+{
+  return this->currentVelocities;
 }
 
 double

@@ -368,7 +368,7 @@ namespace dpd {
       INVALIDARG_EXP_IFN(formBondEvery > 0,
                          "Bond formation iteration must be > 0, got " +
                            std::to_string(formBondEvery) + ".");
-      std::map<int, int> functionalities =
+      const std::map<int, int> functionalities =
         this->universe.determineFunctionalityPerType();
       for (const auto& type : functionalities) {
         INVALIDARG_EXP_IFN(
@@ -454,6 +454,8 @@ namespace dpd {
     Eigen::VectorXd getBondLengths() override;
 
     Eigen::VectorXd getCoordinates() override;
+
+    Eigen::VectorXd getVelocities() const;
 
     double getTemperature() override;
 

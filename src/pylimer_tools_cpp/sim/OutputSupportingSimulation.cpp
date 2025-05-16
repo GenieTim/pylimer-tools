@@ -14,7 +14,7 @@ OutputSupportingSimulation::prepareAllOutputs()
   this->openFilesOutputHeader(this->outputConfigs);
 
   // prepare averages
-  int numAverages = this->openFilesOutputHeader(
+  const int numAverages = this->openFilesOutputHeader(
     this->outputAverageConfigs, "# OutputStep\t", this->outputConfigs.size());
   RUNTIME_EXP_IFN(runningAverages.size() == numAverages,
                   "The nr. of running averages is not consistent with the "
@@ -71,14 +71,14 @@ OutputSupportingSimulation::openFilesOutputHeader(
 
     thisFileOutputBuffer = prefix;
 
-    for (ComputedIntValues val : oc.intValues) {
+    for (const ComputedIntValues val : oc.intValues) {
       switch (val) {
         default:
           numComputes += 1;
           thisFileOutputBuffer += ComputedIntValuesNames[val] + "\t";
       }
     }
-    for (ComputedDoubleValues val : oc.doubleValues) {
+    for (const ComputedDoubleValues val : oc.doubleValues) {
       switch (val) {
         case ComputedDoubleValues::MSD:
           for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
@@ -109,7 +109,7 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
 {
   // "lazily" compute the values we need, others less lazily when they are
   // computationally inexpensive
-  std::array<long int, NUM_COMPUTABLE_INT_VALUES> intvalues = {
+  const std::array<long int, NUM_COMPUTABLE_INT_VALUES> intvalues = {
     currentStep,
     this->requiresIEvaluation(NUM_SHIFT, currentStep) ? this->getNumShifts()
                                                       : 0,
@@ -138,7 +138,7 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
      (currentStep % this->requireStressTensorEvery) == 0)
       ? this->getStressTensor()
       : Eigen::Matrix3d::Zero();
-  double pressure = stressTensor.trace() / 3.;
+  const double pressure = stressTensor.trace() / 3.;
   // double kineticPressureTerm =
   //   requiresDEvaluation(PRESSURE, currentStep)
   //     ? ((getNumParticles() * this->getTemperature()) /
@@ -153,7 +153,7 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
   }
 
   // assemble all computed values into an easy-to-access array
-  std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES> doublevalues = {
+  const std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES> doublevalues = {
     { this->getTimestep(),
       this->requiresDEvaluation(ComputedDoubleValues::TIME, currentStep)
         ? this->getCurrentTime(currentStep)
@@ -202,11 +202,11 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
     size_t msdIdx = 0;
     size_t averagesIdx = 0;
     for (const OutputConfiguration& oc : this->outputAverageConfigs) {
-      size_t previousAverageIdx = averagesIdx;
+      const size_t previousAverageIdx = averagesIdx;
       if ((currentStep % oc.useEvery) == 0) {
-        double multiplier = (static_cast<double>(oc.useEvery) /
-                             static_cast<double>(oc.outputEvery));
-        for (ComputedIntValues val : oc.intValues) {
+        const double multiplier = (static_cast<double>(oc.useEvery) /
+                                   static_cast<double>(oc.outputEvery));
+        for (const ComputedIntValues val : oc.intValues) {
           switch (val) {
             default:
               runningAverages[averagesIdx] +=
@@ -215,13 +215,13 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
               break;
           }
         }
-        for (ComputedDoubleValues val : oc.doubleValues) {
+        for (const ComputedDoubleValues val : oc.doubleValues) {
           switch (val) {
             case ComputedDoubleValues::MSD:
               // compute MSD
               for (msdIdx = 0; msdIdx < this->msdMeasuredIndices.size();
                    ++msdIdx) {
-                double result =
+                const double result =
                   (this->msdOrigins[msdIdx] -
                    getCoordinates()(this->msdMeasuredIndices[msdIdx]))
                     .squaredNorm() /
@@ -259,7 +259,7 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
   size_t autocorrelator_idx = 0;
   for (const OutputConfiguration& oc : this->outputAutoCorrelationConfigs) {
     const size_t autocorrelator_idx_before = autocorrelator_idx;
-    for (ComputedDoubleValues cv : oc.doubleValues) {
+    for (const ComputedDoubleValues cv : oc.doubleValues) {
       assert(autocorrelator_idx < this->autocorrelators.size());
       RUNTIME_EXP_IFN(std::isfinite(doublevalues[cv]),
                       "Expect output quantities to be finite, found " +
@@ -278,7 +278,7 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
       for (int autocorr_idx_offset = 1;
            autocorr_idx_offset < oc.doubleValues.size();
            ++autocorr_idx_offset) {
-        size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
+        const size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
         this->autocorrelators[idx].evaluate();
         RUNTIME_EXP_IFN(this->autocorrelators[idx].npcorr == npcorr,
                         "Autocorrelation states are inconsistent.");
@@ -290,7 +290,7 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
         for (int autocorr_idx_offset = 0;
              autocorr_idx_offset < oc.doubleValues.size();
              ++autocorr_idx_offset) {
-          size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
+          const size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
           outputBuffer +=
             "\t" + std::to_string(this->autocorrelators[idx].f[output_idx]);
         }
@@ -325,7 +325,7 @@ OutputSupportingSimulation::doOutputValues(
 {
   assert(streamIdx <= this->outputStreams.size());
   assert(doubleValues.size() == NUM_COMPUTABLE_DOUBLE_VALUES);
-  for (ComputedIntValues val : oc.intValues) {
+  for (const ComputedIntValues val : oc.intValues) {
     RUNTIME_EXP_IFN(std::isfinite(static_cast<double>(intValues[val])),
                     "Expect output quantities to be finite, found " +
                       std::to_string(intValues[val]) + " for property " +
@@ -335,7 +335,7 @@ OutputSupportingSimulation::doOutputValues(
         outputBuffer += std::to_string(intValues[val]) + "\t";
     }
   }
-  for (ComputedDoubleValues val : oc.doubleValues) {
+  for (const ComputedDoubleValues val : oc.doubleValues) {
     RUNTIME_EXP_IFN(std::isfinite(doubleValues[val]),
                     "Expect output quantities to be finite, found " +
                       std::to_string(doubleValues[val]) + " for property " +
@@ -349,7 +349,7 @@ OutputSupportingSimulation::doOutputValues(
           assert(this->msdOrigins[msdIdx].size() ==
                  this->msdMeasuredIndices[msdIdx].size());
           Eigen::VectorXd relCoords = this->getCoordinates();
-          int maxCoeff = this->msdMeasuredIndices[msdIdx].maxCoeff();
+          const int maxCoeff = this->msdMeasuredIndices[msdIdx].maxCoeff();
           std::cout << "Size: " << relCoords.size() << ", max coeff "
                     << maxCoeff << std::endl;
           assert(relCoords.size() >
@@ -359,7 +359,7 @@ OutputSupportingSimulation::doOutputValues(
           assert(nIndices.size() == this->msdOrigins[msdIdx].size());
           assert(nIndices.minCoeff() >= 0 &&
                  nIndices.maxCoeff() < relCoords.size());
-          double result =
+          const double result =
             (this->msdOrigins[msdIdx] - relCoords(nIndices)).squaredNorm() /
             (static_cast<double>(this->msdMeasuredIndices[msdIdx].size() / 3.));
           outputBuffer += std::to_string(result) + "\t";
@@ -383,7 +383,7 @@ OutputSupportingSimulation::updateValuesRequiredEvery(
   const std::vector<OutputConfiguration>& configs)
 {
   for (OutputConfiguration c : configs) {
-    for (ComputedDoubleValues v : c.doubleValues) {
+    for (const ComputedDoubleValues v : c.doubleValues) {
       if (this->doubleValueRequiredEvery[v] == 0) {
         this->doubleValueRequiredEvery[v] = c.useEvery;
       } else {
@@ -391,7 +391,7 @@ OutputSupportingSimulation::updateValuesRequiredEvery(
           std::gcd(c.useEvery, this->doubleValueRequiredEvery[v]);
       }
     }
-    for (ComputedIntValues i : c.intValues) {
+    for (const ComputedIntValues i : c.intValues) {
       if (this->intValueRequiredEvery[i] == 0) {
         this->intValueRequiredEvery[i] = c.useEvery;
       } else {
@@ -400,11 +400,11 @@ OutputSupportingSimulation::updateValuesRequiredEvery(
       }
     }
   }
-  std::vector<ComputedDoubleValues> stressTensorRequiringValues = {
+  const std::vector<ComputedDoubleValues> stressTensorRequiringValues = {
     STRESS_XX, STRESS_YY,  STRESS_ZZ,  STRESS_XY,  STRESS_YZ,
     STRESS_XZ, STRESS_NXY, STRESS_NYZ, STRESS_NXZ, PRESSURE
   };
-  for (ComputedDoubleValues v : stressTensorRequiringValues) {
+  for (const ComputedDoubleValues v : stressTensorRequiringValues) {
     if (this->requireStressTensorEvery == 0) {
       this->requireStressTensorEvery = this->doubleValueRequiredEvery[v];
     } else {

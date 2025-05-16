@@ -2176,6 +2176,7 @@ TEST_CASE("MEHPFB2 Basic conversion test with entanglements",
     CHECK(net.oldAtomIds[1] == 1);
     CHECK(net.oldAtomIds[2] == 2);
     CHECK(net.oldAtomIds[3] == 9);
+    CHECK(fb2.getNumExtraAtoms() == entanglements.pairsOfAtoms.size());
   }
 
   SECTION("Entanglements as springs")
@@ -2195,6 +2196,8 @@ TEST_CASE("MEHPFB2 Basic conversion test with entanglements",
     CHECK(net.oldAtomIds[3] == 4);
     CHECK(net.oldAtomIds[4] == 5);
     CHECK(net.oldAtomIds[5] == 9);
+    CHECK(fb2.getNumExtraBonds() == entanglements.pairsOfAtoms.size());
+    CHECK(fb2.getNumExtraAtoms() == entanglements.pairsOfAtoms.size() * 2);
   }
 }
 
@@ -2573,4 +2576,64 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
 
   REQUIRE(static_cast<double>(nFilesFound) >
           static_cast<double>(files.size()) * 0.75);
+}
+
+TEST_CASE("All MEHPForceBalance2 solvers solve simple melt systems",
+          "[MEHPForceBalance2]")
+{
+  std::cout << "Running test \"All MEHPForceBalance2 solvers solve simple melt "
+               "systems\""
+            << std::endl;
+
+  size_t nrOfBeads = 30;
+  size_t nrOfChains = 5;
+  pe::Universe universe =
+    pe::Universe(nrOfBeads * 10.0, nrOfBeads * 10.0, nrOfBeads * 10.0);
+  for (size_t i = 0; i < nrOfChains; ++i) {
+    long int beadOffset = i * nrOfBeads;
+    std::vector<long int> atomIds(nrOfBeads);
+    std::iota(atomIds.begin(), atomIds.end(), 1 + beadOffset);
+    std::vector<double> coords(nrOfBeads);
+    std::iota(coords.begin(), coords.end(), 1. + beadOffset);
+    universe.addAtoms(atomIds,
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 1),
+                      coords,
+                      coords,
+                      coords,
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 0),
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 0),
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 0));
+    std::vector<long int> bondFrom(nrOfBeads - 1);
+    std::vector<long int> bondTo(nrOfBeads - 1);
+    std::iota(bondFrom.begin(), bondFrom.end(), 1 + beadOffset);
+    std::iota(bondTo.begin(), bondTo.end(), 2 + beadOffset);
+    universe.addBonds(bondFrom, bondTo);
+  }
+  CHECK(universe.getNrOfAtoms() == nrOfBeads * nrOfChains);
+  CHECK(universe.getNrOfBonds() == (nrOfBeads - 1) * nrOfChains);
+  // add some more bonds for fun
+  universe.addBonds(
+    { 1, 2, 1 }, { 1, 1, static_cast<long int>(nrOfChains * nrOfBeads - 1) });
+
+  for (pcm::SLESolver solver : // pylimer_tools::sim::mehp::allSLESolvers
+       {
+         pcm::SLESolver::DEFAULT,
+         pcm::SLESolver::SIMPLICIAL_LLT,
+         pcm::SLESolver::SIMPLICIAL_LDLT,
+         pcm::SLESolver::SPARSE_LU,
+         pcm::SLESolver::SPARSE_QR,
+         pcm::SLESolver::GRADIENT_DESCENT,
+         pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT,
+         pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG,
+         pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM,
+       }) {
+    INFO("Testing solver: " << solver);
+    pcm::MEHPForceBalance2 forceBalancer =
+      pcm::MEHPForceBalance2(universe, 2, false);
+    CHECK(forceBalancer.getNrOfSprings() == nrOfChains + 5);
+    CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+      pcm::StructureSimplificationMode::NO_SIMPLIFICATION, 1e-6, solver));
+    CHECK(forceBalancer.getNrOfSprings() == nrOfChains + 5);
+    CHECK(forceBalancer.getNrOfActiveSprings() == 0);
+  }
 }

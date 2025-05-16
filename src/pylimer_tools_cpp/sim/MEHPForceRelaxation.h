@@ -252,7 +252,7 @@ public:
   std::vector<pylimer_tools::entities::Molecule> getActiveChains(
     const double tolerance = 0.05) const
   {
-    std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
+    const std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
       this->universe.getChainsWithCrosslinker(crossLinkerType);
     std::vector<pylimer_tools::entities::Molecule> resultingChains;
     Eigen::ArrayXb springIsActive =
@@ -458,7 +458,7 @@ public:
    */
   Eigen::Matrix3d getStressTensor() override
   {
-    std::array<std::array<double, 3>, 3> stressTensor =
+    const std::array<std::array<double, 3>, 3> stressTensor =
       this->evaluateStressTensor(this->currentSpringDistances,
                                  this->getVolume());
     Eigen::Matrix3d result = Eigen::Matrix3d::Zero();
@@ -493,7 +493,7 @@ public:
       Eigen::VectorXd::Zero(this->currentSpringDistances.size() / 3);
 
     for (size_t i = 0; i < this->currentSpringDistances.size() / 3; ++i) {
-      double b = lens.segment(3 * i, 3).norm();
+      const double b = lens.segment(3 * i, 3).norm();
       lens[i] = b;
     }
 
@@ -772,7 +772,7 @@ protected:
    */
   double evaluatePressure(const Eigen::VectorXd& springDistances) const
   {
-    auto stressTensor = this->evaluateStressTensor(
+    const auto stressTensor = this->evaluateStressTensor(
       springDistances, this->forceRelaxationNetwork.vol);
     return this->evaluatePressure(stressTensor);
   }
@@ -786,7 +786,7 @@ protected:
    */
   double evaluatePressure(Network* net, const Eigen::VectorXd& u) const
   {
-    auto stressTensor = this->evaluateStressTensor(net, u, -1);
+    const auto stressTensor = this->evaluateStressTensor(net, u, -1);
     return this->evaluatePressure(stressTensor);
   }
 
@@ -853,7 +853,8 @@ protected:
       return 1.;
     }
     // find all active springs
-    Eigen::ArrayXb activeSprings = this->findActiveSprings(net, tolerance);
+    const Eigen::ArrayXb activeSprings =
+      this->findActiveSprings(net, tolerance);
     if (activeSprings.count() == 0) {
       return 1.;
     }
@@ -895,7 +896,7 @@ protected:
       Eigen::ArrayXb oldActiveSprings = activeSprings;
       for (size_t i = 0; i < net->nrOfNodes; ++i) {
         bool anyActive = false;
-        for (size_t spring_idx : net->springIndicesOfLinks[i]) {
+        for (const size_t spring_idx : net->springIndicesOfLinks[i]) {
           if (activeSprings[spring_idx]) {
             anyActive = true;
             break;
@@ -904,7 +905,7 @@ protected:
 
         nodeIsActive(i) = anyActive;
         if (anyActive) {
-          for (size_t spring_idx : net->springIndicesOfLinks[i]) {
+          for (const size_t spring_idx : net->springIndicesOfLinks[i]) {
             activeSprings[spring_idx] = true;
           }
         }
@@ -931,13 +932,13 @@ protected:
       return 0.;
     }
 
-    std::pair<Eigen::ArrayXb, Eigen::ArrayXb> clusteredToActive =
+    const std::pair<Eigen::ArrayXb, Eigen::ArrayXb> clusteredToActive =
       this->findClusteredToActive(net, tolerance);
     // find all active springs
-    Eigen::ArrayXb activeSprings = clusteredToActive.first;
+    const Eigen::ArrayXb activeSprings = clusteredToActive.first;
     assert(activeSprings.size() == net->nrOfSprings);
 
-    Eigen::ArrayXb nodeIsActive = clusteredToActive.second;
+    const Eigen::ArrayXb nodeIsActive = clusteredToActive.second;
     assert(nodeIsActive.size() == net->nrOfNodes);
 
     // as of now, the springsContourLength is equal to the number of bonds
@@ -946,7 +947,7 @@ protected:
     Eigen::ArrayXd allActiveAtomsPerChains =
       activeSprings.cast<double>() * (net->springsContourLength.array() -
                                       Eigen::ArrayXd::Ones(net->nrOfSprings));
-    double activeNodes = nodeIsActive.count();
+    const double activeNodes = nodeIsActive.count();
 
     return ((allActiveAtomsPerChains).matrix().sum() + activeNodes);
   }
@@ -963,7 +964,7 @@ protected:
   double computeSolubleWeightFraction(Network* net,
                                       const double tolerance = 0.05) const
   {
-    double nActiveClusteredAtoms =
+    const double nActiveClusteredAtoms =
       this->countActiveClusteredAtoms(net, tolerance);
     // finally, normalize by the number of atoms.
     // NOTE: currently, the weight of the atoms is ignored

@@ -1389,8 +1389,9 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
 {
   size_t nrOfBeads = 30;
   size_t nrOfBeadsPerChain = 3;
-  pe::Universe universe =
-    pe::Universe(nrOfBeads * 10.0, nrOfBeads * 10.0, nrOfBeads * 10.0);
+  pe::Box originalBox =
+    pe::Box(nrOfBeads * 10.0, nrOfBeads * 10.0, nrOfBeads * 10.0);
+  pe::Universe universe = pe::Universe(originalBox);
   std::vector<double> xPositions;
   xPositions.reserve(nrOfBeads);
   std::vector<double> yPositions;
@@ -1433,12 +1434,23 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
   CHECK(universe.getNrOfAtoms() == nrOfBeads);
   CHECK(universe.getNrOfBonds() == nrOfBeads - 1);
 
+  pe::Box deformedBox =
+    pe::Box(nrOfBeads * 9.0, nrOfBeads * 9.0, nrOfBeads * 9.0);
+  universe.setBox(deformedBox, true);
+
   // now, check for every force evaluator, that the maximum entropy is when all
   // these beads overlap first, the gaussian spring one
   pcm::MEHPForceBalance forceBalancer =
     pcm::MEHPForceBalance(universe, 2, false);
+  forceBalancer.deformTo(originalBox);
+  CHECK_THAT(forceBalancer.getVolume(),
+             Catch::Matchers::WithinRel(originalBox.getVolume()));
   CHECK(forceBalancer.getNrOfSprings() ==
         forceBalancer.getNrOfPartialSprings());
+  CHECK(forceBalancer.getNumBonds() == forceBalancer.getNrOfSprings());
+  CHECK(forceBalancer.getNumBondsToForm() == 0);
+  CHECK(forceBalancer.getNumAtoms() == forceBalancer.getNrOfNodes());
+  CHECK(forceBalancer.getNumExtraBonds() == 0);
   CHECK(forceBalancer.getNrOfSprings() == nrOfBeads / nrOfBeadsPerChain);
 
   SECTION("Large enough box")

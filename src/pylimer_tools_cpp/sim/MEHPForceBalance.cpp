@@ -219,7 +219,7 @@ MEHPForceBalance::runForceRelaxation(
       for (size_t link_idx = 0; link_idx < this->initialConfig.nrOfNodes;
            ++link_idx) {
         assert(!this->initialConfig.linkIsSliplink[link_idx]);
-        double distanceMoved =
+        const double distanceMoved =
           this->displaceToMeanPosition(this->initialConfig,
                                        this->currentDisplacements,
                                        this->currentSpringPartitionsVec,
@@ -396,11 +396,11 @@ double
 MEHPForceBalance::getDisplacementResidualNorm(
   const double oneOverSpringPartitionUpperLimit) const
 {
-  Eigen::VectorXd oneOverSpringPartitions =
+  const Eigen::VectorXd oneOverSpringPartitions =
     this->assembleOneOverSpringPartition(this->initialConfig,
                                          this->currentSpringPartitionsVec,
                                          oneOverSpringPartitionUpperLimit);
-  Eigen::VectorXd displacements = this->currentDisplacements;
+  const Eigen::VectorXd displacements = this->currentDisplacements;
   return this->getDisplacementResidualNormFor(
     this->initialConfig, displacements, oneOverSpringPartitions);
 }
@@ -421,20 +421,21 @@ MEHPForceBalance::getDisplacementResidualNormFor(
   const Eigen::VectorXd& springPartitions,
   const double oneOverSpringPartitionUpperLimit) const
 {
-  Eigen::ArrayXd oneOverSpringPartitions =
+  const Eigen::ArrayXd oneOverSpringPartitions =
     this
       ->assembleOneOverSpringPartition(
         net, springPartitions, oneOverSpringPartitionUpperLimit)
       .array();
 
-  Eigen::ArrayXd loopPartialSpringEliminator =
+  const Eigen::ArrayXd loopPartialSpringEliminator =
     (net.springPartCoordinateIndexA != net.springPartCoordinateIndexB)
       .cast<double>();
   Eigen::ArrayXd forces = Eigen::ArrayXd::Zero(3 * net.nrOfLinks);
-  Eigen::ArrayXd distances = this
-                               ->evaluatePartialSpringVectors(
-                                 net, u, this->is2D, this->assumeBoxLargeEnough)
-                               .array();
+  const Eigen::ArrayXd distances =
+    this
+      ->evaluatePartialSpringVectors(
+        net, u, this->is2D, this->assumeBoxLargeEnough)
+      .array();
   forces(net.springPartCoordinateIndexA) +=
     (this->kappa * oneOverSpringPartitions * distances *
      loopPartialSpringEliminator);
@@ -511,7 +512,7 @@ MEHPForceBalance::getDisplacementResidualNormFor(
 #endif
 
   assert(relevantPartialDistances.size() == oneOverSpringPartitions.size());
-  Eigen::VectorXd partialDistancesOverSpringPartitions =
+  const Eigen::VectorXd partialDistancesOverSpringPartitions =
     (relevantPartialDistances.array() * oneOverSpringPartitions.array())
       .matrix();
 
@@ -549,8 +550,8 @@ MEHPForceBalance::assembleOneOverSpringPartition(
 
   for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
     const double N = net.springsContourLength[net.partialToFullSpringIndex[i]];
-    double contourLengthFraction = springPartitions0[i];
-    double valueToSet =
+    const double contourLengthFraction = springPartitions0[i];
+    const double valueToSet =
       CLAMP_ONE_OVER_SPRINGPARTITION(net.partialSpringIsPartial[i],
                                      1.0 / (N * contourLengthFraction),
                                      N,
@@ -585,12 +586,12 @@ MEHPForceBalance::setSpringpartitionIndicesOfSliplink(
     linkIdx < net.nrOfLinks,
     "Cannot set spring partition of index higher than nr. of links.");
   INVALIDARG_EXP_IFN(net.linkIsSliplink[linkIdx], "Link must be slip-link");
-  std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
+  const std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
   size_t indexIndex = 0;
   while (results.size() < 4) {
     results.push_back(0);
   }
-  for (size_t springIndex : springIndices) {
+  for (const size_t springIndex : springIndices) {
     std::vector<size_t> springsPartners = net.linkIndicesOfSprings[springIndex];
     for (size_t partner_idx = 1; partner_idx < springsPartners.size() - 1;
          ++partner_idx) {
@@ -598,9 +599,9 @@ MEHPForceBalance::setSpringpartitionIndicesOfSliplink(
         RUNTIME_EXP_IFN(
           indexIndex < 4,
           "Expect spring partitions indices of link not to exceed 4.");
-        size_t currentSpringGlobalIdx =
+        const size_t currentSpringGlobalIdx =
           net.localToGlobalSpringIndex[springIndex][partner_idx - 1];
-        size_t neighbourSpringGlobalIdx =
+        const size_t neighbourSpringGlobalIdx =
           net.localToGlobalSpringIndex[springIndex][partner_idx];
         results[indexIndex] = currentSpringGlobalIdx;
         indexIndex++;
@@ -641,7 +642,8 @@ MEHPForceBalance::removeDuplicateListedSpringsFromLink(
                      "higher than nr. of links.");
   // remove duplicate mentions of the same spring index
   std::ranges::sort(net.springIndicesOfLinks[linkIdx]);
-  auto last = std::ranges::unique(net.springIndicesOfLinks[linkIdx]).begin();
+  const auto last =
+    std::ranges::unique(net.springIndicesOfLinks[linkIdx]).begin();
   if (last != net.springIndicesOfLinks[linkIdx].end()) {
 #ifdef DEBUG_REMOVAL
     std::cout << "Removed duplicate spring indices from link " << linkIdx
@@ -731,7 +733,7 @@ MEHPForceBalance::removeInactiveCrosslinks(ForceBalanceNetwork& net,
       this->getAllPartialSpringIndicesAlong(net, springIdx);
     assert(involvedPartialSprings.size() > 0);
     bool isActive = false;
-    for (size_t partialSpringIdx : involvedPartialSprings) {
+    for (const size_t partialSpringIdx : involvedPartialSprings) {
       RUNTIME_EXP_IFN(
         net.coordinates.size() == displacements.size(),
         "Expected coordinates and displacements to have same size, got " +
@@ -740,10 +742,10 @@ MEHPForceBalance::removeInactiveCrosslinks(ForceBalanceNetwork& net,
       // assert(net.coordinates.size() == displacements.size());
       Eigen::Vector3d distance = this->evaluatePartialSpringDistance(
         net, displacements, partialSpringIdx);
-      double contourLength =
+      const double contourLength =
         net
           .springsContourLength[net.partialToFullSpringIndex[partialSpringIdx]];
-      double partition = springPartitions[partialSpringIdx];
+      const double partition = springPartitions[partialSpringIdx];
       if (!this->distanceIsWithinTolerance(
             distance, tolerance, contourLength, partition)) {
         isActive = true;
@@ -809,7 +811,7 @@ MEHPForceBalance::removeInactiveCrosslinks(ForceBalanceNetwork& net,
       // this also removed some intermediate entanglement links
       // -> crossLinkIdx is now at a different index
       size_t newCrosslinkIdx = crosslinkIdx;
-      for (size_t linkIdx : entanglementLinksRemoved) {
+      for (const size_t linkIdx : entanglementLinksRemoved) {
         assert(linkIdx != crosslinkIdx);
         if (linkIdx < crosslinkIdx) {
           newCrosslinkIdx -= 1;
@@ -870,7 +872,7 @@ MEHPForceBalance::breakTooLongSprings(ForceBalanceNetwork& net,
     if (partialSpringIdx >= net.nrOfPartialSprings) {
       partialSpringIdx = net.nrOfPartialSprings - 1;
     }
-    double len = this->getWeightedPartialSpringLength(
+    const double len = this->getWeightedPartialSpringLength(
       net, displacements, springPartitions, partialSpringIdx);
     if (len > this->springBreakingLength) {
       // break this spring
@@ -1489,7 +1491,7 @@ MEHPForceBalance::removeSpring(ForceBalanceNetwork& net,
     this->evaluateSpringLengths(net, displacements, this->is2D);
 #endif
 
-  std::vector<size_t> affectedLinks = net.linkIndicesOfSprings[springIdx];
+  const std::vector<size_t> affectedLinks = net.linkIndicesOfSprings[springIdx];
   std::vector<size_t> uniqueAffectedLinks = net.linkIndicesOfSprings[springIdx];
   std::ranges::sort(uniqueAffectedLinks);
   uniqueAffectedLinks.erase(
@@ -1522,7 +1524,7 @@ MEHPForceBalance::removeSpring(ForceBalanceNetwork& net,
           ".");
     }
 
-    size_t found =
+    const size_t found =
       std::erase(net.springIndicesOfLinks[affectedLinkIdx], springIdx);
 
     RUNTIME_EXP_IFN(found > 0,
@@ -1569,7 +1571,7 @@ MEHPForceBalance::removeSpring(ForceBalanceNetwork& net,
 
   // need to remove descending
   std::ranges::sort(affectedPartialSprings, std::greater<size_t>());
-  for (size_t partialSpringIdx : affectedPartialSprings) {
+  for (const size_t partialSpringIdx : affectedPartialSprings) {
     pylimer_tools::utils::removeRow(net.springPartIndexA, partialSpringIdx);
     pylimer_tools::utils::removeRows(
       net.springPartCoordinateIndexA, 3 * partialSpringIdx, 3);
@@ -1621,7 +1623,7 @@ MEHPForceBalance::removeSpring(ForceBalanceNetwork& net,
     for (size_t i = 0;
          i < net.localToGlobalSpringIndex[loopingSpringIdx].size();
          ++i) {
-      for (size_t partialSpringIdx : affectedPartialSprings) {
+      for (const size_t partialSpringIdx : affectedPartialSprings) {
         if (net.localToGlobalSpringIndex[loopingSpringIdx][i] >
             partialSpringIdx) {
           net.localToGlobalSpringIndex[loopingSpringIdx][i] -= 1;
@@ -1701,9 +1703,9 @@ MEHPForceBalance::removeSpring(ForceBalanceNetwork& net,
             springsOfLink.begin(), springsOfLink.end(), std::string(", ")) +
           " when removing spring " + std::to_string(springIdx) + ".");
       assert(involvedPartialSprings.size() == 2);
-      size_t partialSpringToKeep =
+      const size_t partialSpringToKeep =
         std::min(involvedPartialSprings[0], involvedPartialSprings[1]);
-      size_t partialSpringToRemove =
+      const size_t partialSpringToRemove =
         std::max(involvedPartialSprings[0], involvedPartialSprings[1]);
       assert(partialSpringToKeep != partialSpringToRemove);
       assert(net.partialToFullSpringIndex[partialSpringToKeep] ==
@@ -1737,7 +1739,7 @@ MEHPForceBalance::removeSpring(ForceBalanceNetwork& net,
     this->evaluateSpringLengths(net, displacements, this->is2D);
   assert(allTotalSpringDistancesAfter.size() == net.nrOfSprings);
   for (size_t i = 0; i < net.nrOfSprings; ++i) {
-    size_t correspondingOldIdx = i >= springIdx ? i + 1 : i;
+    const size_t correspondingOldIdx = i >= springIdx ? i + 1 : i;
     if (springIsAffected[i]) {
       // when slip-links are removed, the overall distance must reduce.
       RUNTIME_EXP_IFN(allTotalSpringDistancesBefore[correspondingOldIdx] +
@@ -1779,7 +1781,7 @@ MEHPForceBalance::removeSpringFollowingEntanglementLinks(
     this->getEntanglementLinkIndicesAlong(net, springIdx);
   assert(springsToRemove.size() > 0);
   std::ranges::sort(springsToRemove, std::greater<>());
-  for (size_t springIdxToDelete : springsToRemove) {
+  for (const size_t springIdxToDelete : springsToRemove) {
     assert(net.springsType[springIdxToDelete] != this->entanglementType);
     this->removeSpring(net, displacements, springPartitions, springIdxToDelete);
   }
@@ -1965,21 +1967,23 @@ MEHPForceBalance::mergePartialSprings(ForceBalanceNetwork& net,
             << keptPartialSpringIdx << " around " << linkToReduce << std::endl;
 #endif
 
-  Eigen::Vector3d distanceBefore =
+  const Eigen::Vector3d distanceBefore =
     this->evaluatePartialSpringDistance(
       net, u, removedPartialSpringIdx, this->is2D, false) +
     this->evaluatePartialSpringDistance(
       net, u, keptPartialSpringIdx, this->is2D, false);
-  size_t fullSpringIdx = net.partialToFullSpringIndex[keptPartialSpringIdx];
+  const size_t fullSpringIdx =
+    net.partialToFullSpringIndex[keptPartialSpringIdx];
   // start with removal
   net.nrOfPartialSprings -= 1;
   // tell the kept one their new end
   // NOTE: if is possible, if the removedPartialSpring is a primary loop,
   // that this procedure is ambiguous.
-  bool removedIsA =
+  const bool removedIsA =
     net.springPartIndexA[removedPartialSpringIdx] == linkToReduce;
-  size_t newEnd = removedIsA ? net.springPartIndexB[removedPartialSpringIdx]
-                             : net.springPartIndexA[removedPartialSpringIdx];
+  const size_t newEnd = removedIsA
+                          ? net.springPartIndexB[removedPartialSpringIdx]
+                          : net.springPartIndexA[removedPartialSpringIdx];
   if (removedIsA) {
     assert(net.springPartIndexB[keptPartialSpringIdx] == linkToReduce);
     net.springPartIndexB[keptPartialSpringIdx] = newEnd;
@@ -2100,10 +2104,10 @@ MEHPForceBalance::mergePartialSprings(ForceBalanceNetwork& net,
   }
 
   // validation
-  size_t newSpringIdx =
+  const size_t newSpringIdx =
     keptPartialSpringIdx +
     (keptPartialSpringIdx > removedPartialSpringIdx ? -1 : 0);
-  Eigen::Vector3d newDistance = this->evaluatePartialSpringDistance(
+  const Eigen::Vector3d newDistance = this->evaluatePartialSpringDistance(
     net, u, newSpringIdx, this->is2D, false);
   RUNTIME_EXP_IFN(pylimer_tools::utils::vector_approx_equal(
                     newDistance, distanceBefore, 1e-5),
@@ -2158,17 +2162,17 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
 #endif
 
   // handle links
-  std::vector<size_t> removedSpringsLinks =
+  const std::vector<size_t> removedSpringsLinks =
     net.linkIndicesOfSprings[removedSpringIdx];
-  std::vector<size_t> keptSpringsLinks =
+  const std::vector<size_t> keptSpringsLinks =
     net.linkIndicesOfSprings[keptSpringIdx];
 
-  size_t removedPartialSpringIdx =
+  const size_t removedPartialSpringIdx =
     (removedSpringsLinks[removedSpringsLinks.size() - 1] == linkToReduce)
       ? pylimer_tools::utils::last(
           net.localToGlobalSpringIndex[removedSpringIdx])
       : net.localToGlobalSpringIndex[removedSpringIdx][0];
-  size_t remainingPartialSpringIdx =
+  const size_t remainingPartialSpringIdx =
     (keptSpringsLinks[keptSpringsLinks.size() - 1] == linkToReduce)
       ? pylimer_tools::utils::last(net.localToGlobalSpringIndex[keptSpringIdx])
       : net.localToGlobalSpringIndex[keptSpringIdx][0];
@@ -2184,7 +2188,7 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
 
   Eigen::Vector3d distanceBefore = this->evaluatePartialSpringDistance(
     net, displacements, removedPartialSpringIdx, this->is2D, false);
-  Eigen::Vector3d distanceBeforeRemainingSpring =
+  const Eigen::Vector3d distanceBeforeRemainingSpring =
     this->evaluatePartialSpringDistance(
       net, displacements, remainingPartialSpringIdx, this->is2D, false);
 
@@ -2203,7 +2207,7 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
                     net.linkIndicesOfSprings[keptSpringIdx].size() - 1,
                   "Invalid sizes when merging springs");
   // tell the partial springs their new full spring
-  for (size_t partialSpringIndex :
+  for (const size_t partialSpringIndex :
        net.localToGlobalSpringIndex[removedSpringIdx]) {
     net.partialToFullSpringIndex[partialSpringIndex] = keptSpringIdx;
   }
@@ -2231,7 +2235,7 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
           net.localToGlobalSpringIndex[removedSpringIdx][i]);
       }
       // invert the direction of these transferred partial springs
-      for (size_t partialSpringIdxToInvert :
+      for (const size_t partialSpringIdxToInvert :
            net.localToGlobalSpringIndex[removedSpringIdx]) {
         if (partialSpringIdxToInvert == removedPartialSpringIdx) {
           continue;
@@ -2310,7 +2314,7 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
       }
 
       // invert the direction of these transferred partial springs
-      for (size_t partialSpringIdxToInvert :
+      for (const size_t partialSpringIdxToInvert :
            net.localToGlobalSpringIndex[removedSpringIdx]) {
         if (partialSpringIdxToInvert == removedPartialSpringIdx) {
           continue;
@@ -2345,7 +2349,7 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
          keptSpringsLinks.size() + removedSpringsLinks.size() - 2);
 
   // tell the links of their new spring index
-  for (size_t linkOfRemovedSpring : removedSpringsLinks) {
+  for (const size_t linkOfRemovedSpring : removedSpringsLinks) {
     for (size_t i = 0; i < net.springIndicesOfLinks[linkOfRemovedSpring].size();
          ++i) {
       if (net.springIndicesOfLinks[linkOfRemovedSpring][i] ==
@@ -2374,9 +2378,9 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
   pylimer_tools::utils::removeRow(net.partialSpringIsPartial,
                                   removedPartialSpringIdx);
 
-  bool removedIsA =
+  const bool removedIsA =
     net.springPartIndexA[removedPartialSpringIdx] == linkToReduce;
-  size_t otherEndOfRemovedSpring =
+  const size_t otherEndOfRemovedSpring =
     removedIsA ? net.springPartIndexB[removedPartialSpringIdx]
                : net.springPartIndexA[removedPartialSpringIdx];
   double offsetMultiplier = removedIsA ? -1. : 1.;
@@ -2505,13 +2509,13 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
 
   pylimer_tools::utils::removeRow(springPartitions, removedPartialSpringIdx);
   RUNTIME_EXP_IFN(springPartitions.size() == net.nrOfPartialSprings, "");
-  size_t newKeptSpringIdx =
+  const size_t newKeptSpringIdx =
     (keptSpringIdx < removedSpringIdx) ? keptSpringIdx : (keptSpringIdx - 1);
   // admittedly, this is possibly dangerous, as it could hide
   // other mistakes
-  double newTotalForNormalization =
+  const double newTotalForNormalization =
     springPartitions(net.localToGlobalSpringIndex[newKeptSpringIdx]).sum();
-  for (size_t globalPartSpringIndex :
+  for (const size_t globalPartSpringIndex :
        net.localToGlobalSpringIndex[newKeptSpringIdx]) {
     springPartitions[globalPartSpringIndex] *= 1. / newTotalForNormalization;
   }
@@ -2531,10 +2535,10 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
   //           << std::endl;
 
   // validation
-  size_t newPartialSpringIdx =
+  const size_t newPartialSpringIdx =
     remainingPartialSpringIdx +
     (remainingPartialSpringIdx > removedPartialSpringIdx ? -1 : 0);
-  Eigen::Vector3d newDistance = this->evaluatePartialSpringDistance(
+  const Eigen::Vector3d newDistance = this->evaluatePartialSpringDistance(
     net, displacements, newPartialSpringIdx, this->is2D, false);
   RUNTIME_EXP_IFN(pylimer_tools::utils::vector_approx_equal(
                     newDistance, distanceBefore, 1e-5),
@@ -2548,9 +2552,10 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
   // check that the ordering is correct
   for (size_t i = 0; i < net.localToGlobalSpringIndex[newKeptSpringIdx].size();
        ++i) {
-    size_t partialSpringIdx = net.localToGlobalSpringIndex[newKeptSpringIdx][i];
-    size_t endA = net.springPartIndexA[partialSpringIdx];
-    size_t endB = net.springPartIndexB[partialSpringIdx];
+    const size_t partialSpringIdx =
+      net.localToGlobalSpringIndex[newKeptSpringIdx][i];
+    const size_t endA = net.springPartIndexA[partialSpringIdx];
+    const size_t endB = net.springPartIndexB[partialSpringIdx];
     std::vector<size_t> linkIndices =
       net.linkIndicesOfSprings[newKeptSpringIdx];
     assert(endA == linkIndices[i]);
@@ -2756,9 +2761,9 @@ MEHPForceBalance::addSlipLinkToPartialSpring(
   springPartitions[newPartialSpringIdx] = minAlpha;
   double remainingNormalisationOffset = minAlpha;
   if (forward) {
-    for (size_t globalPartSpringIndex :
+    for (const size_t globalPartSpringIndex :
          net.localToGlobalSpringIndex[relevantSpring]) {
-      double currAlpha = springPartitions[globalPartSpringIndex];
+      const double currAlpha = springPartitions[globalPartSpringIndex];
       if (currAlpha > minAlpha) {
         springPartitions[globalPartSpringIndex] -= remainingNormalisationOffset;
         springPartitions[globalPartSpringIndex] =
@@ -2774,9 +2779,9 @@ MEHPForceBalance::addSlipLinkToPartialSpring(
     for (int i = net.localToGlobalSpringIndex[relevantSpring].size() - 1;
          i >= 0;
          --i) {
-      size_t globalPartSpringIndex =
+      const size_t globalPartSpringIndex =
         net.localToGlobalSpringIndex[relevantSpring][i];
-      double currAlpha = springPartitions[globalPartSpringIndex];
+      const double currAlpha = springPartitions[globalPartSpringIndex];
       if (currAlpha > minAlpha) {
         springPartitions[globalPartSpringIndex] -= remainingNormalisationOffset;
         springPartitions[globalPartSpringIndex] =
@@ -2790,7 +2795,7 @@ MEHPForceBalance::addSlipLinkToPartialSpring(
     }
   }
   // check that normalisation worked
-  double newTotalForNormalization =
+  const double newTotalForNormalization =
     springPartitions(net.localToGlobalSpringIndex[relevantSpring]).sum();
   RUNTIME_EXP_IFN(APPROX_EQUAL(newTotalForNormalization, 1.0, 1e-9), "");
 
@@ -2801,7 +2806,7 @@ MEHPForceBalance::addSlipLinkToPartialSpring(
   this->reAlignSlipLinkToImages(
     net, u, slipLinkIdx, splitPartialSpringIdx, newPartialSpringIdx);
 
-  Eigen::Vector3d distanceAfter =
+  const Eigen::Vector3d distanceAfter =
     this->evaluatePartialSpringDistance(
       net, u, splitPartialSpringIdx, this->is2D, false) +
     this->evaluatePartialSpringDistance(
@@ -2942,14 +2947,14 @@ MEHPForceBalance::updateSpringPartition(
   }
   double residualNorm = 0.0;
   int residualNormContributions = 0;
-  for (size_t springIndex : springIndices) {
+  for (const size_t springIndex : springIndices) {
     std::vector<size_t> springsPartners = net.linkIndicesOfSprings[springIndex];
     for (size_t partner_idx = 1; partner_idx < springsPartners.size() - 1;
          ++partner_idx) {
       if (springsPartners[partner_idx] == linkIdx) {
-        size_t currentSpringGlobalIdx =
+        const size_t currentSpringGlobalIdx =
           net.localToGlobalSpringIndex[springIndex][partner_idx - 1];
-        size_t neighbourSpringGlobalIdx =
+        const size_t neighbourSpringGlobalIdx =
           net.localToGlobalSpringIndex[springIndex][partner_idx];
         // found position of this link in this spring
         // want to find the ideal value for
@@ -2957,16 +2962,16 @@ MEHPForceBalance::updateSpringPartition(
         // NOTE: The following is slightly problematic for primary loops!
         Eigen::Vector3d vecBack = this->evaluatePartialSpringDistanceFrom(
           net, u, currentSpringGlobalIdx, linkIdx);
-        double distanceBack = (vecBack.squaredNorm());
+        const double distanceBack = (vecBack.squaredNorm());
         Eigen::Vector3d vecForward = this->evaluatePartialSpringDistanceFrom(
           net, u, neighbourSpringGlobalIdx, linkIdx);
-        double distanceForward = vecForward.squaredNorm();
+        const double distanceForward = vecForward.squaredNorm();
         double idealValue = 1. / (1. + sqrt(distanceForward / distanceBack));
         if (distanceBack <= 0.0) {
           idealValue = 0.0; // TODO: really?
         }
-        double currentS = springPartitions[currentSpringGlobalIdx];
-        double nextS = springPartitions[neighbourSpringGlobalIdx];
+        const double currentS = springPartitions[currentSpringGlobalIdx];
+        const double nextS = springPartitions[neighbourSpringGlobalIdx];
         const double N = net.springsContourLength[springIndex];
         const double l = (currentS + nextS);
         if (oneOverSpringPartitionUpperLimit > 0.) {
@@ -2986,14 +2991,14 @@ MEHPForceBalance::updateSpringPartition(
           // currentS = (1./N) * 1. / limitedOneOverCurrent;
           // nextS = (1./N) * 1. / limitedOneOverNext;
         }
-        double newS = idealValue * l;
-        double idealValueM1 = (1. - idealValue);
-        double complementaryS = (1. - idealValue) * l;
+        const double newS = idealValue * l;
+        const double idealValueM1 = (1. - idealValue);
+        const double complementaryS = (1. - idealValue) * l;
         double localResidualNorm = 0.0;
         residualNormContributions += 2;
         if (idealValue > 0.0 && idealValue < 1.0) {
-          double idealValue2 = idealValue * idealValue;
-          double idealValueM12 = idealValueM1 * idealValueM1;
+          const double idealValue2 = idealValue * idealValue;
+          const double idealValueM12 = idealValueM1 * idealValueM1;
           // way too complicated expression to solve subtraction
           // truncation issues?
           localResidualNorm = (std::fma(distanceBack,
@@ -3108,7 +3113,7 @@ MEHPForceBalance::updateSpringPartition(
         springPartitions[currentSpringGlobalIdx] = newS;
         springPartitions[neighbourSpringGlobalIdx] = complementaryS;
         if (oneOverSpringPartitions.size() > 0) {
-          double primaryCorrectionMultiplierC =
+          const double primaryCorrectionMultiplierC =
             static_cast<double>(net.springPartIndexA[currentSpringGlobalIdx] !=
                                 net.springPartIndexB[currentSpringGlobalIdx]);
           double oneOverCurrent =
@@ -3120,7 +3125,7 @@ MEHPForceBalance::updateSpringPartition(
               oneOverSpringPartitionUpperLimit);
           oneOverSpringPartitions.segment(3 * currentSpringGlobalIdx, 3) =
             Eigen::Vector3d::Constant(oneOverCurrent);
-          double primaryCorrectionMultiplierN = static_cast<double>(
+          const double primaryCorrectionMultiplierN = static_cast<double>(
             net.springPartIndexA[neighbourSpringGlobalIdx] !=
             net.springPartIndexB[neighbourSpringGlobalIdx]);
           double oneOverNeighbour =
@@ -3199,13 +3204,14 @@ MEHPForceBalance::moveSlipLinkToItsBestBranch(
 {
   INVALIDARG_EXP_IFN(net.linkIsSliplink[slipLinkIdx],
                      "Passed slip-link must be one.");
-  std::vector<size_t> associatedSprings = net.springIndicesOfLinks[slipLinkIdx];
+  const std::vector<size_t> associatedSprings =
+    net.springIndicesOfLinks[slipLinkIdx];
   // skip slip-links that are with its own spring, for now.
   if (associatedSprings.size() <= 1) {
     return;
   }
 
-  for (size_t springIdx : associatedSprings) {
+  for (const size_t springIdx : associatedSprings) {
     const double N = net.springsContourLength[springIdx];
     const double swappableCutoff =
       (oneOverSpringPartitionUpperLimit > 0.)
@@ -3216,9 +3222,9 @@ MEHPForceBalance::moveSlipLinkToItsBestBranch(
          ++linkI) {
       if (net.linkIndicesOfSprings[springIdx][linkI] == slipLinkIdx) {
         // found index of this slip-link.
-        double partitionBeforeIdx =
+        const double partitionBeforeIdx =
           net.localToGlobalSpringIndex[springIdx][linkI - 1];
-        double partitionAfterIdx =
+        const double partitionAfterIdx =
           net.localToGlobalSpringIndex[springIdx][linkI];
         assert(this->isPartOfSpring(net, slipLinkIdx, partitionBeforeIdx));
         assert(this->isPartOfSpring(net, slipLinkIdx, partitionAfterIdx));
@@ -3279,21 +3285,22 @@ MEHPForceBalance::swapSlipLinkReversibly(
                        std::to_string(partialSpringIdx) + " for " +
                        std::to_string(net.nrOfPartialSprings) +
                        " partial springs.");
-  size_t partnerA = net.springPartIndexA[partialSpringIdx];
-  size_t partnerB = net.springPartIndexB[partialSpringIdx];
+  const size_t partnerA = net.springPartIndexA[partialSpringIdx];
+  const size_t partnerB = net.springPartIndexB[partialSpringIdx];
   INVALIDARG_EXP_IFN(net.linkIsSliplink[partnerA] ||
                        net.linkIsSliplink[partnerB],
                      "Cannot swap cross-link with cross-link.");
   if (partnerA == partnerB) {
     return false;
   }
-  size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
+  const size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
   // analyse spring
-  bool involvesCrosslink =
+  const bool involvesCrosslink =
     (!net.linkIsSliplink[partnerA] || !net.linkIsSliplink[partnerB]);
   if (involvesCrosslink) {
     // first check if allowed.
-    size_t slipLinkIdx = net.linkIsSliplink[partnerA] ? partnerA : partnerB;
+    const size_t slipLinkIdx =
+      net.linkIsSliplink[partnerA] ? partnerA : partnerB;
     if ((nrOfCrosslinkSwapsAllowedPerSliplink < 0) ||
         (net.nrOfCrosslinkSwapsEndured[slipLinkIdx - net.nrOfNodes] <
          nrOfCrosslinkSwapsAllowedPerSliplink)) {
@@ -3308,8 +3315,9 @@ MEHPForceBalance::swapSlipLinkReversibly(
           respectLoops);
       } else {
         // check if energy is smaller
-        size_t xlinkIdx = net.linkIsSliplink[partnerA] ? partnerB : partnerA;
-        size_t otherRailPart = this->getOtherRailPartialSpringIdx(
+        const size_t xlinkIdx =
+          net.linkIsSliplink[partnerA] ? partnerB : partnerA;
+        const size_t otherRailPart = this->getOtherRailPartialSpringIdx(
           net, partialSpringIdx, slipLinkIdx);
         Eigen::Vector3d otherRailDistance =
           this->evaluatePartialSpringDistance(net, u, otherRailPart);
@@ -3327,9 +3335,9 @@ MEHPForceBalance::swapSlipLinkReversibly(
 
         bool found = false;
 
-        std::vector<size_t> partialSpringIndices =
+        const std::vector<size_t> partialSpringIndices =
           this->getPartialSpringIndicesOfLink(net, xlinkIdx);
-        for (size_t attemptedEdge : partialSpringIndices) {
+        for (const size_t attemptedEdge : partialSpringIndices) {
           if (attemptedEdge == partialSpringIdx) {
             found = true;
             continue;
@@ -3341,27 +3349,28 @@ MEHPForceBalance::swapSlipLinkReversibly(
 
           // TODO: involve denominators
           // we only look at a quasi force,
-          double forceEstimateBefore =
+          const double forceEstimateBefore =
             // on the slip-link
             (-otherRailDistance + thisRailDistance).squaredNorm() +
             // and on the cross-link
             (attemptSpringDistance - thisRailDistance).squaredNorm();
           // and for the case that we did switch the slip-link onto the
           // attemptedEdge
-          double forceEstimateAfter =
+          const double forceEstimateAfter =
             // force on the slip-link (-this + this), cancel out
             (attemptSpringDistance).squaredNorm() +
             // and on the cross-link
             (-2 * thisRailDistance - otherRailDistance).squaredNorm();
 
           if (forceEstimateAfter < forceEstimateBefore) {
-            long int newPartialSpringIdx = this->moveSlipLinkFromRailToRail(
-              net,
-              u,
-              springPartitions,
-              partialSpringIdx,
-              attemptedEdge,
-              oneOverSpringPartitionUpperLimit);
+            const long int newPartialSpringIdx =
+              this->moveSlipLinkFromRailToRail(
+                net,
+                u,
+                springPartitions,
+                partialSpringIdx,
+                attemptedEdge,
+                oneOverSpringPartitionUpperLimit);
             didSwap = newPartialSpringIdx >= 0;
           }
           if (didSwap) {
@@ -3387,34 +3396,37 @@ MEHPForceBalance::swapSlipLinkReversibly(
                                            oneOverSpringPartitionUpperLimit);
     } else {
       // check if energy is smaller
-      size_t indexInSpring = pylimer_tools::utils::index_of(
+      const size_t indexInSpring = pylimer_tools::utils::index_of(
         net.localToGlobalSpringIndex[fullSpringIdx], partialSpringIdx);
       assert(indexInSpring > 0 &&
              indexInSpring <
                net.localToGlobalSpringIndex[fullSpringIdx].size() - 1);
-      size_t otherRailFrom =
+      const size_t otherRailFrom =
         net.localToGlobalSpringIndex[fullSpringIdx][indexInSpring - 1];
-      size_t otherRailTo =
+      const size_t otherRailTo =
         net.localToGlobalSpringIndex[fullSpringIdx][indexInSpring + 1];
 
-      double thisPartialSpringDenominator =
+      const double thisPartialSpringDenominator =
         this->getDenominatorOfPartialSpring(net,
                                             springPartitions,
                                             partialSpringIdx,
                                             oneOverSpringPartitionUpperLimit);
-      Eigen::Vector3d thisSpringDistance =
+      const Eigen::Vector3d thisSpringDistance =
         this->evaluatePartialSpringDistance(net, u, partialSpringIdx);
-      double otherRailFromDenominator = this->getDenominatorOfPartialSpring(
-        net, springPartitions, otherRailFrom, oneOverSpringPartitionUpperLimit);
-      Eigen::Vector3d otherRailFromSpringDistance =
+      const double otherRailFromDenominator =
+        this->getDenominatorOfPartialSpring(net,
+                                            springPartitions,
+                                            otherRailFrom,
+                                            oneOverSpringPartitionUpperLimit);
+      const Eigen::Vector3d otherRailFromSpringDistance =
         this->evaluatePartialSpringDistance(net, u, otherRailFrom);
 
-      double otherRailToDenominator = this->getDenominatorOfPartialSpring(
+      const double otherRailToDenominator = this->getDenominatorOfPartialSpring(
         net, springPartitions, otherRailTo, oneOverSpringPartitionUpperLimit);
-      Eigen::Vector3d otherRailToSpringDistance =
+      const Eigen::Vector3d otherRailToSpringDistance =
         this->evaluatePartialSpringDistance(net, u, otherRailTo);
 
-      double forceEstimateBefore =
+      const double forceEstimateBefore =
         // force estimate on `partnerA` (from)
         (-otherRailFromSpringDistance * otherRailFromDenominator +
          thisSpringDistance * thisPartialSpringDenominator)
@@ -3424,7 +3436,7 @@ MEHPForceBalance::swapSlipLinkReversibly(
          otherRailToSpringDistance * otherRailToDenominator)
           .squaredNorm();
       // force estimate if we do the mutation
-      double forceEstimateAfter =
+      const double forceEstimateAfter =
         // force estimate on `partnerA` (from)
         (thisSpringDistance * thisPartialSpringDenominator +
          (otherRailToSpringDistance + thisSpringDistance) *
@@ -3468,18 +3480,19 @@ MEHPForceBalance::swapSlipLinkWithXlinkReversibly(
   const double oneOverSpringPartitionUpperLimit,
   const bool respectLoops) const
 {
-  size_t partnerA = net.springPartIndexA[partialSpringIdx];
-  size_t partnerB = net.springPartIndexB[partialSpringIdx];
+  const size_t partnerA = net.springPartIndexA[partialSpringIdx];
+  const size_t partnerB = net.springPartIndexB[partialSpringIdx];
   INVALIDARG_EXP_IFN(
     XOR(net.linkIsSliplink[partnerA], net.linkIsSliplink[partnerB]),
     "This method only swaps cross-link with slip-link.");
   if (partnerA == partnerB) {
     return false;
   }
-  size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
+  const size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
   // analyse spring
-  size_t crosslinkIdx = net.linkIsSliplink[partnerA] ? partnerB : partnerA;
-  size_t slipLinkIdx = net.linkIsSliplink[partnerB] ? partnerB : partnerA;
+  const size_t crosslinkIdx =
+    net.linkIsSliplink[partnerA] ? partnerB : partnerA;
+  const size_t slipLinkIdx = net.linkIsSliplink[partnerB] ? partnerB : partnerA;
   // compute the residual
   // TODO: check if this is dangerous due to the differences being hidden
   // in the truncated digits
@@ -3509,7 +3522,8 @@ MEHPForceBalance::swapSlipLinkWithXlinkReversibly(
     net.localToGlobalSpringIndex[fullSpringIdx].end());
   // for crosslinkers, we need to take all partners of all springs into
   // account
-  for (size_t crosslinksSpringIdx : net.springIndicesOfLinks[crosslinkIdx]) {
+  for (const size_t crosslinksSpringIdx :
+       net.springIndicesOfLinks[crosslinkIdx]) {
     relevantNeighbours.insert(
       relevantNeighbours.end(),
       net.linkIndicesOfSprings[crosslinksSpringIdx].begin(),
@@ -3521,7 +3535,7 @@ MEHPForceBalance::swapSlipLinkWithXlinkReversibly(
   }
   std::vector<size_t> relevantNeighboursCoordIndices;
   relevantNeighboursCoordIndices.reserve(3 * relevantNeighbours.size());
-  for (size_t relevantNeighbour : relevantNeighbours) {
+  for (const size_t relevantNeighbour : relevantNeighbours) {
     relevantNeighboursCoordIndices.push_back(relevantNeighbour * 3 + 0);
     relevantNeighboursCoordIndices.push_back(relevantNeighbour * 3 + 1);
     relevantNeighboursCoordIndices.push_back(relevantNeighbour * 3 + 2);
@@ -3546,7 +3560,7 @@ MEHPForceBalance::swapSlipLinkWithXlinkReversibly(
   // do swap
   size_t newPartialSpringIdx = 0;
   // swap with cross-link
-  std::vector<size_t> springsOfCrosslink =
+  const std::vector<size_t> springsOfCrosslink =
     net.springIndicesOfLinks[crosslinkIdx];
   if (springsOfCrosslink.size() < 2) {
     return false;
@@ -3602,7 +3616,7 @@ MEHPForceBalance::swapSlipLinkWithXlinkReversibly(
       net.springIndicesOfLinks[slipLinkIdx], fullSpringIdx);
     for (size_t relaxSteps = 0; relaxSteps < 2; ++relaxSteps) {
       // TODO: this is not good at all.
-      for (size_t linkIdx : relevantNeighbours) {
+      for (const size_t linkIdx : relevantNeighbours) {
         this->relaxationLight(
           net, springPartitions, u, linkIdx, oneOverSpringPartitionUpperLimit);
       }
@@ -3642,7 +3656,7 @@ MEHPForceBalance::swapSlipLinkWithXlinkReversibly(
   // change
   for (size_t relaxSteps = 0; relaxSteps < 2; ++relaxSteps) {
     // TODO: this is not good at all.
-    for (size_t linkIdx : relevantNeighbours) {
+    for (const size_t linkIdx : relevantNeighbours) {
       this->relaxationLight(
         net, springPartitions, u, linkIdx, oneOverSpringPartitionUpperLimit);
     }
@@ -3669,15 +3683,15 @@ MEHPForceBalance::swapSlipLinksReversibly(
   const size_t partialSpringIdx,
   const double oneOverSpringPartitionUpperLimit) const
 {
-  size_t partnerA = net.springPartIndexA[partialSpringIdx];
-  size_t partnerB = net.springPartIndexB[partialSpringIdx];
+  const size_t partnerA = net.springPartIndexA[partialSpringIdx];
+  const size_t partnerB = net.springPartIndexB[partialSpringIdx];
   INVALIDARG_EXP_IFN(net.linkIsSliplink[partnerA] &&
                        net.linkIsSliplink[partnerB],
                      "This method only swaps slip-links.");
   if (partnerA == partnerB) {
     return false;
   }
-  size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
+  const size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
   // compute the residual
   // TODO: check if this is dangerous due to the differences being hidden
   // in the truncated digits
@@ -3708,7 +3722,7 @@ MEHPForceBalance::swapSlipLinksReversibly(
 
   std::vector<size_t> relevantNeighboursCoordIndices;
   relevantNeighboursCoordIndices.reserve(3 * relevantNeighbours.size());
-  for (size_t relevantNeighbour : relevantNeighbours) {
+  for (const size_t relevantNeighbour : relevantNeighbours) {
     relevantNeighboursCoordIndices.push_back(relevantNeighbour * 3 + 0);
     relevantNeighboursCoordIndices.push_back(relevantNeighbour * 3 + 1);
     relevantNeighboursCoordIndices.push_back(relevantNeighbour * 3 + 2);
@@ -3726,8 +3740,8 @@ MEHPForceBalance::swapSlipLinksReversibly(
       .squaredNorm();
 
   // remember the current positions and partitions
-  Eigen::VectorXd displacementsBefore = u(relevantNeighboursCoordIndices);
-  Eigen::VectorXd springPartitionsBefore =
+  const Eigen::VectorXd displacementsBefore = u(relevantNeighboursCoordIndices);
+  const Eigen::VectorXd springPartitionsBefore =
     springPartitions(relevantPartialSprings);
 
   // do swap
@@ -3742,7 +3756,7 @@ MEHPForceBalance::swapSlipLinksReversibly(
   }
 
   // compute if the residual is lower now
-  double residualAfter =
+  const double residualAfter =
     this
       ->evaluateStressTensorForLinks(relevantNeighbours,
                                      net,
@@ -3790,7 +3804,7 @@ MEHPForceBalance::reAlignSlipLinkToImages(ForceBalanceNetwork& net,
   Eigen::Vector3d totalOffset =
     this->getPartialSpringBoxOffset(net, partialSpringIdx1) +
     this->getPartialSpringBoxOffset(net, partialSpringIdx2);
-  Eigen::Vector3d totalDistanceBefore =
+  const Eigen::Vector3d totalDistanceBefore =
     this->evaluatePartialSpringDistance(
       net, u, partialSpringIdx1, this->is2D, false) +
     this->evaluatePartialSpringDistance(
@@ -3815,14 +3829,14 @@ MEHPForceBalance::reAlignSlipLinkToImages(ForceBalanceNetwork& net,
 
   // ugly brute-force method to check all possible combinations (ideally,
   // more or less at least)
-  Eigen::Array3i multiplicity1 =
+  const Eigen::Array3i multiplicity1 =
     ((this->box.getOffset(viaCoords - sourceCoords).array().abs() +
       this->getPartialSpringBoxOffset(net, partialSpringIdx1).array().abs()) /
      this->box.getL())
       .rint()
       .cast<int>()
       .abs();
-  Eigen::Array3i multiplicity2 =
+  const Eigen::Array3i multiplicity2 =
     ((this->box.getOffset(targetCoords - viaCoords).array() +
       this->getPartialSpringBoxOffset(net, partialSpringIdx2).array().abs()) /
      this->box.getL())
@@ -3855,7 +3869,7 @@ MEHPForceBalance::reAlignSlipLinkToImages(ForceBalanceNetwork& net,
         assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
           (vec1 + vec2), totalDistanceBefore));
 
-        double currentScore = vec1.squaredNorm() + vec2.squaredNorm();
+        const double currentScore = vec1.squaredNorm() + vec2.squaredNorm();
         // std::cout << "Score: " << currentScore << " for offset "
         //           << currentOffset << std::endl;
         // std::cout << "vec 1: " << vec1 << std::endl;
@@ -3873,7 +3887,7 @@ MEHPForceBalance::reAlignSlipLinkToImages(ForceBalanceNetwork& net,
   net.springPartBoxOffset.segment(3 * partialSpringIdx1, 3) = bestOffset;
   net.springPartBoxOffset.segment(3 * partialSpringIdx2, 3) =
     totalOffset - bestOffset;
-  Eigen::Vector3d totalDistanceNow =
+  const Eigen::Vector3d totalDistanceNow =
     this->evaluatePartialSpringDistance(
       net, u, partialSpringIdx1, this->is2D, false) +
     this->evaluatePartialSpringDistance(
@@ -3955,7 +3969,7 @@ MEHPForceBalance::swapSlipLinksInclXlinks(
       if (springPartitions[net.localToGlobalSpringIndex[springIdx]
                                                        [partialIdx]] <=
           swappableCutoff) {
-        size_t partialSpringIdx =
+        const size_t partialSpringIdx =
           net.localToGlobalSpringIndex[springIdx][partialIdx];
         if (net.springPartIndexA[partialSpringIdx] !=
             net.springPartIndexB[partialSpringIdx]) {
@@ -4030,7 +4044,7 @@ MEHPForceBalance::swapSlipLinks(
       if (springPartitions[net.localToGlobalSpringIndex[springIdx]
                                                        [partialIdx]] <=
           swappableCutoff) {
-        size_t partialSpringIdx =
+        const size_t partialSpringIdx =
           net.localToGlobalSpringIndex[springIdx][partialIdx];
         if (net.springPartIndexA[partialSpringIdx] !=
             net.springPartIndexB[partialSpringIdx]) {
@@ -4084,12 +4098,12 @@ MEHPForceBalance::rotateSlipLinkAroundCrosslink(
       ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)
       : 1e-9;
   const int maxNrOfSliplinksOnSpring = 1.0 / swappableCutoff;
-  size_t partialIdx =
+  const size_t partialIdx =
     net.localToGlobalSpringIndex[springIdx][0] == partialSpringIdx
       ? 0
       : net.localToGlobalSpringIndex[springIdx].size() - 1;
   // decide on the involved parties
-  size_t otherInvolvedPartialSpring =
+  const size_t otherInvolvedPartialSpring =
     partialIdx == 0
       ? net.localToGlobalSpringIndex[springIdx][1]
       : net.localToGlobalSpringIndex
@@ -4098,7 +4112,7 @@ MEHPForceBalance::rotateSlipLinkAroundCrosslink(
     net.linkIndicesOfSprings
       [springIdx]
       [partialIdx == 0 ? 1 : net.linkIndicesOfSprings[springIdx].size() - 2];
-  size_t involvedCrosslink =
+  const size_t involvedCrosslink =
     net.linkIndicesOfSprings
       [springIdx]
       [partialIdx == 0 ? 0 : net.linkIndicesOfSprings[springIdx].size() - 1];
@@ -4118,10 +4132,10 @@ MEHPForceBalance::rotateSlipLinkAroundCrosslink(
         // associated with only the cases of (a) are allowed as possible
         // target springs
         bool allLoopsWithSpringIdxToCheckIncludespringIdx = false;
-        for (size_t loopIdx : net.loopsOfSliplink[involvedSlipLink]) {
+        for (const size_t loopIdx : net.loopsOfSliplink[involvedSlipLink]) {
           bool loopContainsCheck = false;
           bool loopContainsOriginal = false;
-          for (size_t lspringIdx : net.loops[loopIdx]) {
+          for (const size_t lspringIdx : net.loops[loopIdx]) {
             if (lspringIdx == springIdxToCheck) {
               loopContainsCheck = true;
             }
@@ -4176,7 +4190,7 @@ MEHPForceBalance::rotateSlipLinkAroundCrosslink(
     return -1;
   }
 
-  size_t targetPartialSpringIdx =
+  const size_t targetPartialSpringIdx =
     possibleTargetPartialSprings[(currentPartialSpringTargetIdx) %
                                  possibleTargetPartialSprings.size()];
   return this->moveSlipLinkFromRailToRail(net,
@@ -4211,16 +4225,16 @@ MEHPForceBalance::swapSlipLinks(ForceBalanceNetwork& net,
     "Only partial springs with only slip-links allow swapping.");
   const size_t springIdx = net.partialToFullSpringIndex[partialSpringIdx];
 
-  long int firstPositionInSpring = pylimer_tools::utils::index_of(
+  const long int firstPositionInSpring = pylimer_tools::utils::index_of(
     net.localToGlobalSpringIndex[springIdx], partialSpringIdx);
   assert(firstPositionInSpring > 0 &&
          firstPositionInSpring <
            net.localToGlobalSpringIndex[springIdx].size() - 1);
 
   // find the rest of the connectivity required for swapping
-  long int otherPartialOfLinkIdx1 =
+  const long int otherPartialOfLinkIdx1 =
     net.localToGlobalSpringIndex[springIdx][firstPositionInSpring - 1];
-  long int otherPartialOfLinkIdx2 =
+  const long int otherPartialOfLinkIdx2 =
     net.localToGlobalSpringIndex[springIdx][firstPositionInSpring + 1];
   assert(otherPartialOfLinkIdx1 != otherPartialOfLinkIdx2);
 
@@ -4236,8 +4250,8 @@ MEHPForceBalance::swapSlipLinks(ForceBalanceNetwork& net,
   //           unaffectedEnd2
   //           << ") " << std::endl;
 
-  Eigen::VectorXd u = Eigen::VectorXd::Zero(net.coordinates.size());
-  Eigen::Vector3d distanceBefore =
+  const Eigen::VectorXd u = Eigen::VectorXd::Zero(net.coordinates.size());
+  const Eigen::Vector3d distanceBefore =
     this->evaluatePartialSpringDistance(
       net, u, otherPartialOfLinkIdx1, this->is2D, false) +
     this->evaluatePartialSpringDistance(
@@ -4292,7 +4306,7 @@ MEHPForceBalance::swapSlipLinks(ForceBalanceNetwork& net,
   net.linkIndicesOfSprings[springIdx][firstPositionInSpring + 1] = linkIdx1;
 
   // finally, validate result
-  Eigen::Vector3d distanceAfter =
+  const Eigen::Vector3d distanceAfter =
     this->evaluatePartialSpringDistance(
       net, u, otherPartialOfLinkIdx1, this->is2D, false) +
     this->evaluatePartialSpringDistance(
@@ -4322,7 +4336,7 @@ MEHPForceBalance::displaceToMeanPosition(
   assert(oneOverSpringPartitions.size() == net.nrOfPartialSprings * 3);
   Eigen::ArrayXd objectiveDisplacement =
     Eigen::ArrayXd::Zero(3 * net.nrOfLinks);
-  Eigen::ArrayXd partialSpringDistances =
+  const Eigen::ArrayXd partialSpringDistances =
     this
       ->evaluatePartialSpringVectors(
         net, u, this->is2D, this->assumeBoxLargeEnough)
@@ -4334,7 +4348,7 @@ MEHPForceBalance::displaceToMeanPosition(
 
   Eigen::ArrayXd springPartWeightingFactor =
     Eigen::ArrayXd::Zero(net.nrOfLinks * 3);
-  Eigen::ArrayXd loopPartialSpringEliminator =
+  const Eigen::ArrayXd loopPartialSpringEliminator =
     (net.springPartCoordinateIndexA != net.springPartCoordinateIndexB)
       .cast<double>();
 
@@ -4384,7 +4398,7 @@ MEHPForceBalance::displaceToMeanPosition(
 #endif
 
   // actually displace
-  Eigen::VectorXd finalDisplacement =
+  const Eigen::VectorXd finalDisplacement =
     (remainingDisplacement + backForthDisplacement).matrix();
   RUNTIME_EXP_IFN(
     pylimer_tools::utils::all_components_finite(finalDisplacement),
@@ -4392,7 +4406,7 @@ MEHPForceBalance::displaceToMeanPosition(
   // this->box.handlePBC(finalDisplacement);
   u += finalDisplacement;
 
-  double max_disp =
+  const double max_disp =
     pylimer_tools::utils::segmentwise_norm_max(finalDisplacement, 3);
 
   return max_disp;
@@ -4416,7 +4430,7 @@ MEHPForceBalance::displaceToMeanPosition(
   const double oneOverSpringPartitionUpperLimit) const
 {
 #ifndef NDEBUG
-  Eigen::Vector3d forceBefore = this->getForceOn(
+  const Eigen::Vector3d forceBefore = this->getForceOn(
     net, u, springPartitions, linkIdx, oneOverSpringPartitionUpperLimit);
 #endif
   // Eigen::Vector3d currentDisplacement = u.segment(3 * linkIdx, 3);
@@ -4425,7 +4439,7 @@ MEHPForceBalance::displaceToMeanPosition(
   double objectiveDisplacementContributors = 0.0;
   bool cautionPrimaryLoop = false;
 
-  std::vector<size_t> partialSpringIndices =
+  const std::vector<size_t> partialSpringIndices =
     this->getPartialSpringIndicesOfLink(net, linkIdx);
 
   for (const size_t globalSpringIndex : partialSpringIndices) {
@@ -4500,7 +4514,7 @@ MEHPForceBalance::displaceToMeanPosition(
 
 #ifndef NDEBUG
   if (!this->assumeBoxLargeEnough) {
-    Eigen::Vector3d forceAfter = this->getForceOn(
+    const Eigen::Vector3d forceAfter = this->getForceOn(
       net, u, springPartitions, linkIdx, oneOverSpringPartitionUpperLimit);
 
     // this is only true if we don't have "full" PBC
@@ -4513,7 +4527,7 @@ MEHPForceBalance::displaceToMeanPosition(
   }
 #endif
 
-  double dist = (objectiveDisplacement * denominator).squaredNorm();
+  const double dist = (objectiveDisplacement * denominator).squaredNorm();
   // if (dist > 0.1) {
   //   std::cout << "Moving " << linkIdx << " for " << dist
   //             << " with displacements " << u.segment(3 * linkIdx, 3)[0]
@@ -4559,7 +4573,7 @@ MEHPForceBalance::evaluateStressOnLink(
     const double contourLengthFraction = springPartitions[globalSpringIndex];
     const double N =
       net.springsContourLength[net.partialToFullSpringIndex[globalSpringIndex]];
-    double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+    const double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
       net.partialSpringIsPartial[globalSpringIndex],
       1.0 / (N * contourLengthFraction),
       N,
@@ -4607,7 +4621,7 @@ MEHPForceBalance::evaluateForceOnLink(
 {
   Eigen::Vector3d force = Eigen::Vector3d::Zero();
 
-  std::vector<size_t> partialSpringIndices =
+  const std::vector<size_t> partialSpringIndices =
     this->getPartialSpringIndicesOfLink(net, linkIdx);
 
   for (const size_t globalSpringIndex : partialSpringIndices) {
@@ -4626,7 +4640,7 @@ MEHPForceBalance::evaluateForceOnLink(
     const double contourLengthFraction = springPartitions[globalSpringIndex];
     const double N =
       net.springsContourLength[net.partialToFullSpringIndex[globalSpringIndex]];
-    double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+    const double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
       net.partialSpringIsPartial[globalSpringIndex],
       1.0 / (N * contourLengthFraction),
       N,
@@ -4803,7 +4817,7 @@ MEHPForceBalance::getCrosslinkerVerse() const
   std::vector<double> x;
   std::vector<double> y;
   std::vector<double> z;
-  std::vector<int> zeros =
+  const std::vector<int> zeros =
     pylimer_tools::utils::initializeWithValue(this->initialConfig.nrOfNodes, 0);
   ids.reserve(this->initialConfig.nrOfNodes);
   x.reserve(this->initialConfig.nrOfNodes);
@@ -4869,7 +4883,7 @@ MEHPForceBalance::addSlipLinks(
   std::vector<std::vector<size_t>> loopsOfSliplinks,
   const bool clampAlpha)
 {
-  size_t additionalLen = strandIdx1.size();
+  const size_t additionalLen = strandIdx1.size();
   if (additionalLen == 0) {
     return;
   }
@@ -4886,8 +4900,9 @@ MEHPForceBalance::addSlipLinks(
     "Cannot add slip-links with loops to structure without, or vice "
     "versa.");
   // validate inputs
-  size_t currentNrOfLinks = this->initialConfig.nrOfLinks;
-  size_t currentNrOfPartialSprings = this->initialConfig.nrOfPartialSprings;
+  const size_t currentNrOfLinks = this->initialConfig.nrOfLinks;
+  const size_t currentNrOfPartialSprings =
+    this->initialConfig.nrOfPartialSprings;
   if (additionalLen != x.size() || additionalLen != y.size() ||
       additionalLen != z.size()) {
     throw std::invalid_argument("x, y and z must have the same dimensions");
@@ -4946,7 +4961,7 @@ MEHPForceBalance::addSlipLinks(
   this->initialConfig.partialSpringIsPartial.conservativeResize(
     currentNrOfPartialSprings + 2 * additionalLen);
   // handle loops if appropriate
-  size_t previousNrOfLoops = this->initialConfig.loops.size();
+  const size_t previousNrOfLoops = this->initialConfig.loops.size();
   this->initialConfig.loops.reserve(previousNrOfLoops + loops.size());
   this->initialConfig.loops.insert(
     this->initialConfig.loops.end(), loops.begin(), loops.end());
@@ -4984,7 +4999,7 @@ MEHPForceBalance::addSlipLinks(
     this->initialConfig.springIndicesOfLinks.push_back(springIndicesOfLink);
     // add to the springs
     int springIndexIndex = 0;
-    for (size_t springIndex : springIndices) {
+    for (const size_t springIndex : springIndices) {
       std::vector<size_t> springParticipants =
         this->initialConfig.linkIndicesOfSprings[springIndex];
       double alpha = (springIndexIndex == 0) ? alpha1[i] : alpha2[i];
@@ -5033,12 +5048,12 @@ MEHPForceBalance::addSlipLinks(
                         std::to_string(alpha) + ".");
 
       // have to adjust the existing springs, too!
-      size_t springPartner1 = springParticipants[targetIndexInSpring];
-      size_t springPartner2 = springParticipants[targetIndexInSpring + 1];
+      const size_t springPartner1 = springParticipants[targetIndexInSpring];
+      const size_t springPartner2 = springParticipants[targetIndexInSpring + 1];
       size_t newNodeIdx = currentNrOfLinks + i;
 
       // update connectivity
-      size_t dividedPartialSpringIdx =
+      const size_t dividedPartialSpringIdx =
         this->initialConfig
           .localToGlobalSpringIndex[springIndex][targetIndexInSpring];
       size_t newPartialSpringIdx =
@@ -5161,7 +5176,7 @@ MEHPForceBalance::addSlipLinks(
     this->initialConfig, this->currentDisplacements, this->is2D, false);
   for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
     bool containsPrimaryLoop = false;
-    for (size_t partialSpringIdx :
+    for (const size_t partialSpringIdx :
          this->initialConfig.localToGlobalSpringIndex[i]) {
       containsPrimaryLoop =
         containsPrimaryLoop ||
@@ -5254,12 +5269,12 @@ MEHPForceBalance::evaluateStressTensorForLinks(
     springPartitions.size() == net.springPartIndexA.size(),
     "Spring partitions must have the size of partial springs.");
 
-  double halfOverVolume = 0.5 / (net.L[0] * net.L[1] * net.L[2]);
+  const double halfOverVolume = 0.5 / (net.L[0] * net.L[1] * net.L[2]);
 
   Eigen::VectorXi debugNrSpringsVisited =
     Eigen::VectorXi::Zero(net.nrOfPartialSprings);
 
-  for (size_t linkIdx : linkIndices) {
+  for (const size_t linkIdx : linkIndices) {
     Eigen::Matrix3d force =
       this->evaluateStressOnLink(linkIdx,
                                  net,
@@ -5298,12 +5313,12 @@ MEHPForceBalance::evaluateStressTensorLinkBased(
     springPartitions.size() == net.springPartIndexA.size(),
     "Spring partitions must have the size of partial springs.");
 
-  double halfOverVolume = 0.5 / (net.L[0] * net.L[1] * net.L[2]);
+  const double halfOverVolume = 0.5 / (net.L[0] * net.L[1] * net.L[2]);
 
   Eigen::VectorXi debugNrSpringsVisited =
     Eigen::VectorXi::Zero(net.nrOfPartialSprings);
 
-  size_t nrOfLinksToInspect = xlinksOnly ? net.nrOfNodes : net.nrOfLinks;
+  const size_t nrOfLinksToInspect = xlinksOnly ? net.nrOfNodes : net.nrOfLinks;
   for (size_t linkIdx = 0; linkIdx < nrOfLinksToInspect; ++linkIdx) {
     Eigen::Matrix3d stressOnLink =
       this->evaluateStressOnLink(linkIdx,
@@ -5369,7 +5384,7 @@ MEHPForceBalance::evaluateStressTensor(
     springPartitions.size() == net.springPartIndexA.size(),
     "Spring partitions must have the size of partial springs.");
 
-  double oneOverVolume = 1. / (net.L[0] * net.L[1] * net.L[2]);
+  const double oneOverVolume = 1. / (net.L[0] * net.L[1] * net.L[2]);
 
   Eigen::VectorXd displacedCoords = net.coordinates + u;
   Eigen::VectorXd relevantPartialDistancesA =
@@ -5394,7 +5409,7 @@ MEHPForceBalance::evaluateStressTensor(
     const double contourLengthFraction = springPartitions[partialSpringIdx];
     const double N =
       net.springsContourLength[net.partialToFullSpringIndex[partialSpringIdx]];
-    double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+    const double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
       net.partialSpringIsPartial[partialSpringIdx],
       1.0 / (N * contourLengthFraction),
       N,
@@ -5403,8 +5418,8 @@ MEHPForceBalance::evaluateStressTensor(
     /* spring contribution to the overall stress tensor */
     for (size_t j = 0; j < 3; j++) {
       for (size_t k = 0; k < 3; k++) {
-        double contribution = distance[j] * distance[k] * this->kappa *
-                              oneOverContourLengthFraction;
+        const double contribution = distance[j] * distance[k] * this->kappa *
+                                    oneOverContourLengthFraction;
         RUNTIME_EXP_IFN(
           std::isfinite(contribution),
           "Got non-finite contribution to stress tensor: " +
@@ -5460,7 +5475,7 @@ MEHPForceBalance::getStressTensorLinkBased(
   const double oneOverSpringPartitionUpperLimit,
   const bool xlinksOnly) const
 {
-  std::array<std::array<double, 3>, 3> res =
+  const std::array<std::array<double, 3>, 3> res =
     this->evaluateStressTensorLinkBased(this->initialConfig,
                                         this->currentDisplacements,
                                         this->currentSpringPartitionsVec,
@@ -5550,7 +5565,7 @@ MEHPForceBalance::getIdsOfActiveNodes(const double tolerance) const
 {
   std::vector<long int> results;
   // find all active springs
-  std::vector<long int> activeNodes =
+  const std::vector<long int> activeNodes =
     this->getIndicesOfActiveNodes(&this->initialConfig,
                                   this->currentDisplacements,
                                   this->currentSpringPartitionsVec,
@@ -5558,7 +5573,7 @@ MEHPForceBalance::getIdsOfActiveNodes(const double tolerance) const
 
   results.reserve(activeNodes.size());
 
-  for (long int nodeIdx : activeNodes) {
+  for (const long int nodeIdx : activeNodes) {
     results.push_back(this->initialConfig.oldAtomIds[nodeIdx]);
   }
 
@@ -5580,8 +5595,8 @@ MEHPForceBalance::getNrOfActiveSpringsConnected(const double tolerance) const
   Eigen::ArrayXb springIsActive = this->findActiveSprings(tolerance);
   for (size_t i = 0; i < this->initialConfig.nrOfSprings; i++) {
     if (springIsActive[i]) { /* active spring */
-      int a = this->initialConfig.springIndexA[i];
-      int b = this->initialConfig.springIndexB[i];
+      const int a = this->initialConfig.springIndexA[i];
+      const int b = this->initialConfig.springIndexB[i];
       ++(nrOfActiveSpringsConnected[a]);
       ++(nrOfActiveSpringsConnected[b]);
     }
@@ -5614,8 +5629,8 @@ MEHPForceBalance::getNrOfActivePartialSpringsConnected(
       // size_t b =
       //   this->initialConfig
       //     .springIndexB[this->initialConfig.partialToFullSpringIndex[i]];
-      size_t a = this->initialConfig.springPartIndexA[i];
-      size_t b = this->initialConfig.springPartIndexB[i];
+      const size_t a = this->initialConfig.springPartIndexA[i];
+      const size_t b = this->initialConfig.springPartIndexB[i];
       if (!this->initialConfig.linkIsSliplink[a]) {
         ++(nrOfActivePartialSpringsConnected[a]);
       }
@@ -5650,7 +5665,7 @@ MEHPForceBalance::getGammaFactor(double b02,
     return 0.;
   }
 
-  Eigen::VectorXd gammaFactors = this->getGammaFactors(b02);
+  const Eigen::VectorXd gammaFactors = this->getGammaFactors(b02);
 
   if (nrOfChains < 1) {
     return gammaFactors.mean();
@@ -5680,10 +5695,10 @@ MEHPForceBalance::getGammaFactors(
   Eigen::VectorXd gammaFactors(springVectors.size() / 3);
   const double commonDenominator = 1. / b02;
   for (size_t i = 0; i < springVectors.size() / 3; ++i) {
-    double N =
+    const double N =
       this->initialConfig
         .springsContourLength[this->initialConfig.partialToFullSpringIndex[i]];
-    double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+    const double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
       this->initialConfig.partialSpringIsPartial[i],
       1.0 / (N * this->currentSpringPartitionsVec(i)),
       N,
@@ -5726,10 +5741,10 @@ MEHPForceBalance::getGammaFactorsInDir(
   Eigen::VectorXd gammaFactors(springVectors.size() / 3);
   const double commonDenominator = 1. / b02;
   for (size_t i = 0; i < springVectors.size() / 3; ++i) {
-    double N =
+    const double N =
       this->initialConfig
         .springsContourLength[this->initialConfig.partialToFullSpringIndex[i]];
-    double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+    const double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
       this->initialConfig.partialSpringIsPartial[i],
       1.0 / (N * this->currentSpringPartitionsVec(i)),
       N,
@@ -5762,9 +5777,9 @@ MEHPForceBalance::getWeightedPartialSpringLength(
   const size_t partialSpringIdx,
   const double oneOverSpringPartitionUpperLimit) const
 {
-  double N =
+  const double N =
     net.springsContourLength[net.partialToFullSpringIndex[partialSpringIdx]];
-  double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+  const double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
     net.partialSpringIsPartial[partialSpringIdx],
     1.0 / (N * springPartitions(partialSpringIdx)),
     N,
@@ -6168,7 +6183,7 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
                                                  thisLinksSprings.end(),
                                                  std::string("_")) +
                       " for link " + std::to_string(link_idx) + ".");
-    for (size_t spring_idx : thisLinksSprings) {
+    for (const size_t spring_idx : thisLinksSprings) {
       std::vector<size_t> thisSpringsLinks =
         net.linkIndicesOfSprings[spring_idx];
       RUNTIME_EXP_IFN(std::find(thisSpringsLinks.begin(),
@@ -6220,9 +6235,10 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
     for (size_t partialIdx = 0;
          partialIdx < net.localToGlobalSpringIndex[i].size();
          ++partialIdx) {
-      size_t partialSpringIdx = net.localToGlobalSpringIndex[i][partialIdx];
-      size_t partner0 = net.linkIndicesOfSprings[i][partialIdx];
-      size_t partner1 = net.linkIndicesOfSprings[i][partialIdx + 1];
+      const size_t partialSpringIdx =
+        net.localToGlobalSpringIndex[i][partialIdx];
+      const size_t partner0 = net.linkIndicesOfSprings[i][partialIdx];
+      const size_t partner1 = net.linkIndicesOfSprings[i][partialIdx + 1];
       RUNTIME_EXP_IFN(
         ((net.springPartIndexA[partialSpringIdx] == partner0 &&
           net.springPartIndexB[partialSpringIdx] == partner1)),
@@ -6251,7 +6267,7 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
     //   "Springs must have increasing end-point indices");
     std::vector<size_t> links = net.linkIndicesOfSprings[i];
     for (size_t j = 0; j < links.size(); ++j) {
-      size_t link_idx = links[j];
+      const size_t link_idx = links[j];
       nrOfMentions[link_idx] += 1;
       RUNTIME_EXP_IFN(net.linkIsSliplink[link_idx] ==
                         ((j != 0) && (j != (links.size() - 1))),
@@ -6270,7 +6286,7 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
     // also check the sum of the partials
     std::vector<size_t> globalSpringIndices = net.localToGlobalSpringIndex[i];
     double sum = 0.0;
-    for (size_t globalIdx : globalSpringIndices) {
+    for (const size_t globalIdx : globalSpringIndices) {
       sum += springPartitions[globalIdx];
     }
     RUNTIME_EXP_IFN(APPROX_EQUAL(sum, 1.0, 1e-10),
@@ -6290,9 +6306,9 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
    * Test the validity of partial springs and their mapping
    */
   for (size_t i = 0; i < net.nrOfPartialSprings; i++) {
-    size_t fullIdx = net.partialToFullSpringIndex[i];
-    size_t partialEndA = net.springPartIndexA[i];
-    size_t partialEndB = net.springPartIndexB[i];
+    const size_t fullIdx = net.partialToFullSpringIndex[i];
+    const size_t partialEndA = net.springPartIndexA[i];
+    const size_t partialEndB = net.springPartIndexB[i];
     RUNTIME_EXP_IFN(partialEndA < net.nrOfLinks,
                     "Cannot have a spring (" + std::to_string(i) +
                       ") part larger " + std::to_string(partialEndA) +
@@ -6393,12 +6409,12 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
       RUNTIME_EXP_IFN(
         loopsOfSliplink.size() <= 2,
         "Cannot have a slip-link attributed to more than two loops.");
-      for (size_t loopIdx : loopsOfSliplink) {
+      for (const size_t loopIdx : loopsOfSliplink) {
         RUNTIME_EXP_IFN(loopIdx < net.loops.size(), "Loop index out of range.");
       }
     }
     for (std::vector<size_t> loop : net.loops) {
-      for (size_t i : loop) {
+      for (const size_t i : loop) {
         RUNTIME_EXP_IFN(i >= net.nrOfSprings,
                         "Loop's spring index out of range.");
       }
@@ -6419,8 +6435,8 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
           " for link " + std::to_string(linkIdx) + ".");
       size_t nEntanglementPartners = 0;
       size_t nShortEntanglementPartners = 0;
-      for (size_t springIdx : net.springIndicesOfLinks[linkIdx]) {
-        size_t partnerIdx = this->getOtherEnd(net, springIdx, linkIdx);
+      for (const size_t springIdx : net.springIndicesOfLinks[linkIdx]) {
+        const size_t partnerIdx = this->getOtherEnd(net, springIdx, linkIdx);
         if (partnerIdx <= net.nrOfNodes &&
             net.oldAtomTypes[partnerIdx] == this->entanglementType) {
           nEntanglementPartners += 1;
