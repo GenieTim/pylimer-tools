@@ -3,6 +3,9 @@
 #include "../../src/pylimer_tools_cpp/io/DataFileParser.h"
 #include "../../src/pylimer_tools_cpp/io/DataFileWriter.h"
 #include "../../src/pylimer_tools_cpp/io/DumpFileParser.h"
+#include "catch2/matchers/catch_matchers_container_properties.hpp"
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -207,6 +210,86 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
 
     // std::filesystem::remove(fileToWrite);
   }
+}
+
+TEST_CASE("Data-files can be written with velocities",
+          "[utils][DataFileWriter][DataFileParser][io]")
+{
+  std::cout << "Running test \"Data-files can be written with velocities\""
+            << std::endl;
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+  CHECK(std::filesystem::exists(suspectedPath));
+
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  std::string largeInputFile =
+    suspectedPath + "/structure/network_100_a_46.structure.out";
+  universeSeq.initializeFromDataSequence({ { largeInputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  universe.removeAllDihedralAngles();
+  universe.removeAllAngles();
+
+  // add velocities
+  universe.resampleVelocities(1.0, 3.0);
+
+  // write data file
+  pu::DataFileWriter writer = pu::DataFileWriter(universe);
+  writer.configIncludeVelocities(true);
+  writer.configMoleculeIdxForSwap(false);
+  writer.configMoveIntoBox(false);
+  writer.configIncludeAngles(false);
+  writer.configIncludeDihedralAngles(false);
+  writer.configAttemptImageReset(false);
+  std::string fileToWrite =
+    suspectedPath + "/tmp_data_file_with_velocities.structure.out";
+
+  SECTION("Without re-indexing or moving of images")
+  {
+    writer.configAtomStyle(pu::AtomStyle::MOLECULAR);
+    writer.writeToFile(fileToWrite);
+
+    pe::UniverseSequence seq = pe::UniverseSequence();
+    seq.initializeFromDataSequence({ { fileToWrite } });
+
+    pe::Universe readUniverse = seq.atIndex(0);
+
+    CHECK(readUniverse.vertexPropertyExists("vx"));
+    CHECK(readUniverse.vertexPropertyExists("vy"));
+    CHECK(readUniverse.vertexPropertyExists("vz"));
+
+    CHECK(universe.getBox() == readUniverse.getBox());
+    CHECK(universe == readUniverse);
+  }
+
+  SECTION("Coordinates into box")
+  {
+    writer.configAtomStyle(pu::AtomStyle::ANGLE);
+    writer.configMoveIntoBox(true);
+    writer.writeToFile(fileToWrite);
+
+    pe::UniverseSequence seq = pe::UniverseSequence();
+    seq.initializeFromDataSequence({ { fileToWrite } });
+
+    pe::Universe readUniverse = seq.atIndex(0);
+
+    CHECK(readUniverse.vertexPropertyExists("vx"));
+    CHECK(readUniverse.vertexPropertyExists("vy"));
+    CHECK(readUniverse.vertexPropertyExists("vz"));
+
+    REQUIRE(universe.getBox() == readUniverse.getBox());
+    std::vector<pe::Atom> atoms = universe.getAtoms();
+    for (size_t i = 0; i < atoms.size(); i++) {
+      pe::Atom readAtom = readUniverse.getAtom(atoms[i].getId());
+      REQUIRE(atoms[i].getId() == readAtom.getId());
+      Eigen::Vector3d prevCoords =
+        atoms[i].getUnwrappedCoordinates(universe.getBox());
+      Eigen::Vector3d readCoords =
+        readAtom.getUnwrappedCoordinates(readUniverse.getBox());
+
+      CHECK(prevCoords.isApprox(readCoords));
+    }
+  }
+
+  std::filesystem::remove(fileToWrite);
 }
 
 TEST_CASE("AveFileReader works", "[AveFileReader][io][utils]")

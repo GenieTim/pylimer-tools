@@ -270,41 +270,47 @@ namespace utils {
     std::string customAtomFormat = "";
     std::vector<std::string> customAtomFormatAdditionalProperties;
     // functions
-    // TODO: move the following to the box
-    int getImageFlagForCoordinate(double coord,
-                                  double boxLo,
-                                  double boxHi) const
+
+    /**
+     *
+     * @param coord the current x, y, or z value
+     * @param n the box offset
+     * @param boxLo the lower bound of the box in the relevant direction
+     * @param boxHi the upper bound of the box in the relevant direction
+     * @return the coord and n, adjusted into the box if requested
+     */
+    std::pair<double, int> conditionallyMoveCoordinateIntoBox(
+      const double coord,
+      const int n,
+      const double boxLo,
+      const double boxHi) const
     {
       assert(boxHi > boxLo);
-      int imageFlag = 0;
-      double L = (boxHi + boxLo);
-      while (coord > boxHi) {
-        coord -= L;
-        imageFlag += 1;
+      if (!this->moveIntoBox) {
+        return std::make_pair(coord, n);
       }
-      while (coord < boxLo) {
-        coord += L;
-        imageFlag -= 1;
+      const double boxL = (boxHi - boxLo);
+      double adjustedCoords = coord + n * boxL;
+      int adjustedN = 0;
+      while (adjustedCoords > boxHi && adjustedCoords > boxLo) {
+        adjustedCoords -= boxL;
+        adjustedN += 1;
       }
-      return imageFlag;
+      while (adjustedCoords < boxLo && adjustedCoords < boxHi) {
+        adjustedCoords += boxL;
+        adjustedN -= 1;
+      }
+      assert(APPROX_EQUAL(
+        (coord + n * boxL), (adjustedCoords + adjustedN * boxL), 1e-9));
+      return std::make_pair(adjustedCoords, adjustedN);
     }
-    double conditionallyMoveCoordinateIntoBox(double coord,
-                                              double boxLo,
-                                              double boxHi) const
-    {
-      assert(boxHi > boxLo);
-      if (this->moveIntoBox == false) {
-        return coord;
-      }
-      double boxL = (boxHi - boxLo);
-      while (coord > boxHi && coord > boxLo) {
-        coord -= boxL;
-      }
-      while (coord < boxLo && coord < boxHi) {
-        coord += boxL;
-      }
-      return coord;
-    }
+    /**
+     *
+     * @param file the file stream to write to
+     * @param atom the atom to write
+     * @param moleculeIdx the id of the molecule the atom belongs to
+     * @param nAtomsOutput how many atoms have been written so far
+     */
     void writeAtom(std::ofstream& file,
                    const pylimer_tools::entities::Atom& atom,
                    int moleculeIdx,
@@ -313,24 +319,12 @@ namespace utils {
       long int atomId = this->reindexAtoms ? nAtomsOutput : atom.getId();
       const pylimer_tools::entities::Box box = this->universe.getBox();
       this->oldNewAtomIdMap[atom.getId()] = atomId;
-      int nx = this->moveIntoBox
-                 ? this->getImageFlagForCoordinate(
-                     atom.getUnwrappedX(box), box.getLowX(), box.getHighX())
-                 : atom.getNX();
-      int ny = this->moveIntoBox
-                 ? this->getImageFlagForCoordinate(
-                     atom.getUnwrappedY(box), box.getLowY(), box.getHighY())
-                 : atom.getNY();
-      int nz = this->moveIntoBox
-                 ? this->getImageFlagForCoordinate(
-                     atom.getUnwrappedZ(box), box.getLowZ(), box.getHighZ())
-                 : atom.getNZ();
-      double x = this->conditionallyMoveCoordinateIntoBox(
-        atom.getUnwrappedX(box), box.getLowX(), box.getHighX());
-      double y = this->conditionallyMoveCoordinateIntoBox(
-        atom.getUnwrappedY(box), box.getLowY(), box.getHighY());
-      double z = this->conditionallyMoveCoordinateIntoBox(
-        atom.getUnwrappedZ(box), box.getLowZ(), box.getHighZ());
+      auto [x, nx] = this->conditionallyMoveCoordinateIntoBox(
+        atom.getX(), atom.getNX(), box.getLowX(), box.getHighX());
+      auto [y, ny] = this->conditionallyMoveCoordinateIntoBox(
+        atom.getY(), atom.getNY(), box.getLowY(), box.getHighY());
+      auto [z, nz] = this->conditionallyMoveCoordinateIntoBox(
+        atom.getZ(), atom.getNZ(), box.getLowZ(), box.getHighZ());
       if (this->customAtomFormat.size() < 2) {
         switch (this->atomStyle) {
           case pylimer_tools::utils::AtomStyle::ANGLE:
@@ -394,7 +388,7 @@ namespace utils {
       std::vector<bool> vertexHasBeenOutput =
         pylimer_tools::utils::initializeWithValue(this->universe.getNrOfAtoms(),
                                                   false);
-      std::vector<pylimer_tools::entities::Atom> crossLinkers =
+      const std::vector<pylimer_tools::entities::Atom> crossLinkers =
         this->universe.getAtomsOfType(this->crossLinkerType);
       for (const pylimer_tools::entities::Atom& crossLinker : crossLinkers) {
         nAtomsOutput += 1;
@@ -405,9 +399,9 @@ namespace utils {
 
       // then, we can output all others
       int nMoleculesOutput = 0;
-      std::vector<pylimer_tools::entities::Molecule> chains =
+      const std::vector<pylimer_tools::entities::Molecule> chains =
         this->universe.getChainsWithCrosslinker(this->crossLinkerType);
-      for (pylimer_tools::entities::Molecule chain : chains) {
+      for (const pylimer_tools::entities::Molecule& chain : chains) {
         // image flag reset attempt might not be the best yet?
         std::vector<pylimer_tools::entities::Atom> atoms =
           (this->moleculeIdxSwappable || this->attemptImageReset)
@@ -423,11 +417,12 @@ namespace utils {
             continue;
           }
           nAtomsOutput += 1;
-          int ip1 = i + 1;
+          const int ip1 = i + 1;
           int swappableMoleculeIdx =
             (i >= (atoms.size() * 0.5)) ? (atoms.size() - i) : ip1;
-          int moleculeIdx = this->moleculeIdxSwappable ? swappableMoleculeIdx
-                                                       : nMoleculesOutput;
+          const int moleculeIdx = this->moleculeIdxSwappable
+                                    ? swappableMoleculeIdx
+                                    : nMoleculesOutput;
 
           this->writeAtom(file, atom, moleculeIdx, nAtomsOutput);
           vertexHasBeenOutput[this->universe.getIdxByAtomId(atom.getId())] =
