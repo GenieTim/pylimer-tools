@@ -29,14 +29,15 @@ namespace entities {
   bool EigenNeighbourList::operator==(const EigenNeighbourList& other) const
   {
     // Compare basic properties
-    if (cutoff != other.cutoff || scalingFactor != other.scalingFactor ||
-        actualCutoff != other.actualCutoff ||
+    if (!APPROX_EQUAL(cutoff, other.cutoff, 1e-9) ||
+        !APPROX_EQUAL(scalingFactor, other.scalingFactor, 1e-9) ||
+        !APPROX_EQUAL(actualCutoff, other.actualCutoff, 1e-9) ||
         totalNrOfBuckets != other.totalNrOfBuckets || box != other.box) {
       return false;
     }
 
     // Compare Eigen arrays
-    if ((bucketWidths != other.bucketWidths).any() ||
+    if (!bucketWidths.isApprox(other.bucketWidths) ||
         (nrOfBuckets != other.nrOfBuckets).any() ||
         (neighbourBucketSizes.array() != other.neighbourBucketSizes.array())
           .any()) {

@@ -1,7 +1,5 @@
 #pragma once
 
-extern "C"
-{}
 #include "../utils/ExtraEigenTypes.h"
 #include "Box.h"
 #include <Eigen/Dense>
@@ -111,6 +109,7 @@ namespace entities {
       double newCutoff,
       bool sort = false) const;
 
+#ifdef CERALIZABLE
     template<class Archive>
     void serialize(Archive& ar)
     {
@@ -119,11 +118,13 @@ namespace entities {
          totalNrOfBuckets,
          cutoff,
          scalingFactor,
+         actualCutoff,
          box,
          neighbourBuckets,
          neighbourBucketNeighboursDefaultCutoff,
          neighbourBucketSizes);
     }
+#endif
 
   protected:
     /**
@@ -164,11 +165,11 @@ namespace entities {
     Eigen::Array3li nrOfBuckets;
 
     // the total number of buckets (integer)
-    size_t totalNrOfBuckets;
+    size_t totalNrOfBuckets = 0;
 
-    double cutoff;
-    double scalingFactor;
-    double actualCutoff;
+    double cutoff = 1.0;
+    double scalingFactor = 1.0;
+    double actualCutoff = 1.0;
 
     pylimer_tools::entities::Box box;
 
