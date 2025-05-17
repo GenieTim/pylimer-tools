@@ -95,6 +95,7 @@ public:
 private:
   std::string cleanHeader(std::string header);
   void rewind();
+  void openFile();
 
   template<typename OUT>
   inline std::vector<OUT> parseTypesInLine(const std::string line)

@@ -71,64 +71,7 @@ DumpFileParser::DumpFileParser(const std::string filePath)
   }
   this->filePath = filePath;
 
-  std::string line;
-  this->file.open(filePath);
-
-  if (!this->file.is_open()) {
-    throw std::invalid_argument("File to read file (" + filePath +
-                                "): failed to open.");
-  }
-
-  // read everything until the first key
-  while (getline(this->file, line)) {
-    line = pylimer_tools::utils::trimLineOmitComment(line);
-    // skip empty lines: break when not empty
-    if (!line.empty()) {
-      break;
-    }
-  }
-
-  // Assemble CSV data for all keys
-  this->newGroupKey = line; // new group key: key for a new timestep (group)
-  this->currentLine = line; // current line
-  this->groupPosMap.emplace(
-    0,
-    this->file.tellg()); // record position of index to jump back at some point
-
-  // read the whole file, skipping all lines that are not the new group key
-  // to record the positions
-  int groupsFound = 0;
-  size_t linesSinceLastIgnore = 0;
-  while (getline(this->file, line)) {
-    linesSinceLastIgnore += 1;
-    // performance improvement: not skipping.
-    // could be bad for certain files.
-    line = pylimer_tools::utils::trimLineOmitComment(line);
-    // skip empty lines
-    if (line.empty()) {
-      continue;
-    }
-
-    if (line == this->newGroupKey) {
-      // new timestep
-      groupsFound += 1;
-      this->groupPosMap.emplace(groupsFound, this->file.tellg());
-    }
-
-    // skip forward. Could be too far, in principle.
-    if (linesSinceLastIgnore > 2) {
-      // jump to next occurrence of the first character of the desired line
-      this->file.ignore(std::numeric_limits<std::streamsize>::max(),
-                        this->file.widen(this->newGroupKey[0]));
-      this->file.unget(); // put the character back
-      linesSinceLastIgnore = 0;
-    }
-  }
-
-  this->nrOfGroups = groupsFound + 1;
-  // reset position to start of first group
-  this->file.clear();
-  this->file.seekg(this->groupPosMap.at(0));
+  this->openFile();
 }
 
 /**
@@ -364,7 +307,8 @@ DumpFileParser::readDumpFileSections(ReadableDumpFileSections sectionsToRead)
                       "File ended before reading an indicated time-step.");
       resultingTimeSteps.push_back(std::stol(line));
     } else if (pylimer_tools::utils::startsWith(line, "ITEM: BOX BOUNDS") &&
-               (sectionsToRead & ReadableDumpFileSections::BOX)) {
+               ((sectionsToRead & ReadableDumpFileSections::BOX) ||
+                (sectionsToRead & ReadableDumpFileSections::ATOM))) {
       double loX, hiX, loY, hiY, loZ, hiZ;
       RUNTIME_EXP_IFN(std::getline(this->file, line),
                       "File ended before box could be read");
@@ -490,6 +434,7 @@ DumpFileParser::readDumpFileSections(ReadableDumpFileSections sectionsToRead)
 #undef CASE
           }
         }
+        assert(resultingBoxes.size() > sectionsRead);
         localResults.push_back(pylimer_tools::entities::Atom(
           id,
           type,
@@ -506,8 +451,15 @@ DumpFileParser::readDumpFileSections(ReadableDumpFileSections sectionsToRead)
       }
 
       sectionsRead += 1;
-      assert(resultingBoxes.size() == sectionsRead);
-      assert(resultingTimeSteps.size() == sectionsRead);
+      if ((sectionsToRead & ReadableDumpFileSections::TIMESTEP)) {
+        assert(resultingTimeSteps.size() == sectionsRead);
+      }
+      if ((sectionsToRead & ReadableDumpFileSections::BOX)) {
+        assert(resultingBoxes.size() == sectionsRead);
+      }
+      if ((sectionsToRead & ReadableDumpFileSections::ATOM)) {
+        assert(resultingAtoms.size() == sectionsRead);
+      }
     }
   }
 
@@ -528,13 +480,76 @@ void
 DumpFileParser::rewind()
 {
   if (!this->file.is_open()) {
-    throw std::runtime_error("Cannot read from closed file.");
+    this->openFile();
   }
 
   if (this->file.eof()) {
     this->file.clear();
   }
   this->file.seekg(0, std::ios::beg);
+}
+
+void
+DumpFileParser::openFile()
+{
+  this->file.open(this->filePath);
+
+  if (!this->file.is_open()) {
+    throw std::invalid_argument("File to read ('" + this->filePath +
+                                "'): failed to open.");
+  }
+
+  std::string line;
+  // read everything until the first key
+  while (getline(this->file, line)) {
+    line = pylimer_tools::utils::trimLineOmitComment(line);
+    // skip empty lines: break when not empty
+    if (!line.empty()) {
+      break;
+    }
+  }
+
+  // Assemble CSV data for all keys
+  this->newGroupKey = line; // new group key: key for a new timestep (group)
+  this->currentLine = line; // current line
+  this->groupPosMap.emplace(
+    0,
+    this->file.tellg()); // record position of index to jump back at some point
+
+  // read the whole file, skipping all lines that are not the new group key
+  // to record the positions
+  int groupsFound = 0;
+  size_t linesSinceLastIgnore = 0;
+  while (getline(this->file, line)) {
+    linesSinceLastIgnore += 1;
+    // performance improvement: not skipping.
+    // could be bad for certain files.
+    line = pylimer_tools::utils::trimLineOmitComment(line);
+    // skip empty lines
+    if (line.empty()) {
+      continue;
+    }
+
+    if (line == this->newGroupKey) {
+      // new timestep
+      groupsFound += 1;
+      this->groupPosMap.emplace(groupsFound, this->file.tellg());
+    }
+
+    // skip forward. Could be too far, in principle.
+    if (linesSinceLastIgnore > 2) {
+      // jump to next occurrence of the first character of the desired line
+      this->file.ignore(std::numeric_limits<std::streamsize>::max(),
+                        this->file.widen(this->newGroupKey[0]));
+      this->file.unget(); // put the character back
+      linesSinceLastIgnore = 0;
+    }
+  }
+
+  this->nrOfGroups = groupsFound + 1;
+  // reset position to start of first group
+  this->file.clear();
+  this->file.seekg(this->groupPosMap.at(0));
 }
 
 /**

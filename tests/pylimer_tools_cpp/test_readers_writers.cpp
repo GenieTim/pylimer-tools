@@ -46,16 +46,16 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
     // test other reading capabilities
     pu::DumpFileParser parser3 =
       pu::DumpFileParser(suspectedPath + "/lammps_dump_small.lammpstrj");
-    CHECK(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
-    CHECK_THROWS(parser.getValuesForAt<double>(0, "NOT EXISTING", 9));
-    std::vector<long int> timeSteps = parser.readTimeSteps();
+    CHECK(parser3.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
+    CHECK_THROWS(parser3.getValuesForAt<double>(0, "NOT EXISTING", 9));
+    std::vector<long int> timeSteps = parser3.readTimeSteps();
     CHECK(timeSteps.size() == 1);
     CHECK(timeSteps[0] == 70764);
-    std::vector<std::vector<pe::Atom>> atoms = parser.readAtoms();
+    std::vector<std::vector<pe::Atom>> atoms = parser3.readAtoms();
     CHECK(atoms.size() == 1);
     CHECK(atoms[0].size() == 12);
     CHECK(atoms[0][2].getId() == 30000);
-    std::vector<pe::Box> boxes = parser.readBoxes();
+    std::vector<pe::Box> boxes = parser3.readBoxes();
     CHECK(boxes.size() == 1);
     CHECK_THAT(boxes[0].getLx(), Catch::Matchers::WithinRel(4.8545999999999999e+01));
 
