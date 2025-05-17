@@ -334,6 +334,12 @@ namespace utils {
                  << atom.getType() << "\t" << x << "\t" << y << "\t" << z
                  << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
             break;
+          case pylimer_tools::utils::AtomStyle::FULL:
+            file << "\t" << atomId << "\t" << moleculeIdx << "\t"
+                 << atom.getType() << "\t" << atom.getExtraData().at("charge")
+                 << "\t" << x << "\t" << y << "\t" << z << "\t" << nx << "\t"
+                 << ny << "\t" << nz << "\n";
+            break;
           default:
             throw std::runtime_error(
               "This atom style is not yet supported for writing without you "
