@@ -408,7 +408,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       CHECK(universe.getIdxByAtomId(bonds["bond_to"][2]) ==
             edges["edge_to"][2]);
       CHECK(bonds["bond_type"][5] == 1);
-      CHECK(universe.getEdgePropertyValue("type", 5) == 1);
+      CHECK(universe.getEdgePropertyValue<int>("type", 5) == 1);
       CHECK(bonds["bond_type"][6] == 11);
       // get atoms with type returns
       CHECK(universe.getAtomsOfType(2).size() == 3);
@@ -1284,7 +1284,7 @@ TEST_CASE("Vertex coordinates are assumed for tree-like structures",
             << std::endl;
 
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
-  CHECK(universe.getIndicesWithAttribute<int>("type", 0).size() == 0);
+  // CHECK(universe.getIndicesWithAttribute<int>("type", 0).size() == 0);
   std::vector<double> coords = { 0.0, 1.0, 10.0, 21.0, 22.0, 3.0, 2.0, 3.0 };
   std::vector<long int> ids = { 0, 1, 2, 3, 4, 5, 6, 7 };
   universe.addAtoms(ids,

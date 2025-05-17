@@ -145,36 +145,36 @@ private:
   // actual dimensional values
   std::map<int, double> masses;
   std::unordered_map<std::string, std::vector<double>> additionalAtomData;
-  std::vector<long int> atomIds;
-  std::vector<int> moleculeIds;
-  std::vector<int> atomTypes;
-  std::vector<double> atomX;
-  std::vector<double> atomY;
-  std::vector<double> atomZ;
-  std::vector<int> atomNx;
-  std::vector<int> atomNy;
-  std::vector<int> atomNz;
+  std::vector<long int> atomIds = {};
+  std::vector<int> moleculeIds = {};
+  std::vector<int> atomTypes = {};
+  std::vector<double> atomX = {};
+  std::vector<double> atomY = {};
+  std::vector<double> atomZ = {};
+  std::vector<int> atomNx = {};
+  std::vector<int> atomNy = {};
+  std::vector<int> atomNz = {};
 
   // bonds
-  std::vector<long int> bondIds;
-  std::vector<int> bondTypes;
-  std::vector<long int> bondFrom;
-  std::vector<long int> bondTo;
+  std::vector<long int> bondIds = {};
+  std::vector<int> bondTypes = {};
+  std::vector<long int> bondFrom = {};
+  std::vector<long int> bondTo = {};
 
   // angles
-  std::vector<long int> angleIds;
-  std::vector<int> angleTypes;
-  std::vector<long int> angleFrom;
-  std::vector<long int> angleVia;
-  std::vector<long int> angleTo;
+  std::vector<long int> angleIds = {};
+  std::vector<int> angleTypes = {};
+  std::vector<long int> angleFrom = {};
+  std::vector<long int> angleVia = {};
+  std::vector<long int> angleTo = {};
 
   // dihedrals
-  std::vector<long int> dihedralAngleIds;
-  std::vector<int> dihedralAngleTypes;
-  std::vector<long int> dihedralAngleFrom;
-  std::vector<long int> dihedralAngleVia1;
-  std::vector<long int> dihedralAngleVia2;
-  std::vector<long int> dihedralAngleTo;
+  std::vector<long int> dihedralAngleIds = {};
+  std::vector<int> dihedralAngleTypes = {};
+  std::vector<long int> dihedralAngleFrom = {};
+  std::vector<long int> dihedralAngleVia1 = {};
+  std::vector<long int> dihedralAngleVia2 = {};
+  std::vector<long int> dihedralAngleTo = {};
 };
 }
 
