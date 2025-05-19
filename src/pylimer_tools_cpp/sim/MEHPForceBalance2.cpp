@@ -2241,18 +2241,21 @@ MEHPForceBalance2::getCrosslinkerVerse() const
   pylimer_tools::entities::Universe xlinkUniverse =
     pylimer_tools::entities::Universe(this->box);
   std::vector<long int> ids;
-  std::vector<int> types = pylimer_tools::utils::initializeWithValue(
-    this->initialConfig.nrOfNodes, crossLinkerType);
+  ids.reserve(this->initialConfig.nrOfNodes);
+  std::vector<int> types;
+  types.reserve(this->initialConfig.nrOfNodes);
   std::vector<double> x;
+  x.reserve(this->initialConfig.nrOfNodes);
   std::vector<double> y;
+  y.reserve(this->initialConfig.nrOfNodes);
   std::vector<double> z;
+  z.reserve(this->initialConfig.nrOfNodes);
   const std::vector<int> zeros =
     pylimer_tools::utils::initializeWithValue(this->initialConfig.nrOfNodes, 0);
-  ids.reserve(this->initialConfig.nrOfNodes);
-  x.reserve(this->initialConfig.nrOfNodes);
-  y.reserve(this->initialConfig.nrOfNodes);
-  z.reserve(this->initialConfig.nrOfNodes);
-  for (int i = 0; i < this->initialConfig.nrOfNodes; ++i) {
+  for (int i = 0; i < this->initialConfig.nrOfLinks; ++i) {
+    if (this->initialConfig.linkIsEntanglement[i]) {
+      continue;
+    }
     x.push_back(this->initialConfig.coordinates[3 * i + 0] +
                 this->currentDisplacements[3 * i + 0]);
     y.push_back(this->initialConfig.coordinates[3 * i + 1] +
@@ -2262,8 +2265,9 @@ MEHPForceBalance2::getCrosslinkerVerse() const
     ids.push_back(this->initialConfig.oldAtomIds[i]);
     // override type, since the types may be different from
     // crossLinkerType if converted with dangling chains
-    types[i] = this->initialConfig.oldAtomTypes[i];
+    types.push_back(this->initialConfig.oldAtomTypes[i]);
   }
+  assert(ids.size() == this->initialConfig.nrOfNodes);
   xlinkUniverse.addAtoms(ids, types, x, y, z, zeros, zeros, zeros);
   std::vector<long int> bondFrom;
   std::vector<long int> bondTo;
@@ -3132,6 +3136,7 @@ MEHPForceBalance2::getNumParticles()
 {
   return this->initialConfig.nrOfNodes;
 }
+// LCOV_EXCL_START
 void
 MEHPForceBalance2::debugAtomVicinity(const size_t atomId) const
 {
@@ -3168,6 +3173,7 @@ MEHPForceBalance2::debugAtomVicinity(const size_t atomId) const
     }
   }
 }
+// LCOV_EXCL_STOP
 bool
 MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
                                    const Eigen::VectorXd& u) const

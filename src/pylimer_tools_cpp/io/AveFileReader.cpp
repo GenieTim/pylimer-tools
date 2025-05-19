@@ -261,7 +261,8 @@ AveFileReader::autocorrelateColumnDifference(const int column1,
   results.reserve(dts.size());
   for (size_t dt : dts) {
     results.push_back(
-      (colData.segment(0, nRows - dt) * colData.segment(dt, nRows - dt)).mean());
+      (colData.segment(0, nRows - dt) * colData.segment(dt, nRows - dt))
+        .mean());
   }
 
   return results;

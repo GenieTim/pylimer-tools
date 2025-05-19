@@ -466,7 +466,9 @@ removeRows(std::vector<T>& vec,
   }
   /* Check if the largest index is valid */
   if (indicesToRemove[0] >= vec.size()) {
-    throw std::out_of_range("Index out of range");
+    throw std::out_of_range("Index " + std::to_string(indicesToRemove[0]) +
+                            " is out of range for a vector of size " +
+                            std::to_string(vec.size()) + ".");
   }
 
   size_t j = 0;

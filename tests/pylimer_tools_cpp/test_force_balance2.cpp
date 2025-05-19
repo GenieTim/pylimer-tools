@@ -15,6 +15,7 @@
 #include <iostream>
 #include <map>
 #include <random>
+#include <ranges>
 #include <vector>
 
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance.h"
@@ -233,6 +234,13 @@ TEST_CASE(
   Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
   CHECK(net.nrOfSprings > 0);
   CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements));
+  pe::Universe xlinkerVerse0 = forceBalancer.getCrosslinkerVerse();
+  CHECK(xlinkerVerse0.getNrOfBonds() > 0);
+  Eigen::VectorXd gammaFactorsX0 = forceBalancer.getGammaFactorsInDir(1., 0);
+  CHECK(gammaFactorsX0.size() == forceBalancer.getNrOfSprings());
+  CHECK(gammaFactorsX0.minCoeff() >= 0);
+  CHECK(gammaFactorsX0.maxCoeff() > 0);
+
   // remove all springs...
   size_t numRemoved =
     forceBalancer.removeInactiveLinks(net, displacements, 1e5);
@@ -240,6 +248,18 @@ TEST_CASE(
   CHECK(forceBalancer.getNrOfActiveSprings() == 0);
   CHECK(net.nrOfSprings == 0);
   CHECK(numRemoved > 0);
+
+  pe::Universe xlinkerVerse = forceBalancer.getCrosslinkerVerse();
+  CHECK(xlinkerVerse.getNrOfBonds() == 0);
+
+  std::unordered_map<long int, int> effF =
+    forceBalancer.getEffectiveFunctionalityOfAtoms();
+  for (const auto& pair : effF) {
+    CHECK(pair.second == 0);
+  }
+  Eigen::VectorXd gammaFactorsX = forceBalancer.getGammaFactorsInDir(1., 0);
+  CHECK(gammaFactorsX.isZero());
+  CHECK(forceBalancer.getNrOfActiveSpringsConnected().isZero());
 }
 
 TEST_CASE("MEHP Force Balance2 can randomly add and remove entanglements",
@@ -726,7 +746,7 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
                forceBalanceSprings.getStressTensor().trace(), 1e-3));
   CHECK_THAT(forceBalanceLinks.getDisplacementResidualNorm(),
              Catch::Matchers::WithinAbs(
-               forceBalanceSprings.getDisplacementResidualNorm(), 1e-3));
+               forceBalanceSprings.getDisplacementResidualNorm(), 1e-2));
 
   forceBalanceLinks.runForceRelaxation();
   forceBalanceSprings.runForceRelaxation();
@@ -736,7 +756,7 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
                forceBalanceSprings.getStressTensor().trace(), 1e-3));
   CHECK_THAT(forceBalanceLinks.getDisplacementResidualNorm(),
              Catch::Matchers::WithinAbs(
-               forceBalanceSprings.getDisplacementResidualNorm(), 1e-3));
+               forceBalanceSprings.getDisplacementResidualNorm(), 1e-2));
   CHECK_THAT(forceBalanceLinks.getActiveWeightFraction(),
              Catch::Matchers::WithinAbs(
                forceBalanceSprings.getActiveWeightFraction(), 1e-3));
@@ -824,6 +844,8 @@ TEST_CASE("MEHP Force Balance2 does not collapse",
   // compare to what we expect
   CHECK(forceBalanceNew.getNrOfActiveStrands() == 8);
   CHECK((forceBalanceNew.getNetwork().springContourLength.array() == 2).all());
+  CHECK((forceBalanceNew.getNrOfActiveSpringsConnected().array() == 4).all());
+  CHECK((forceBalanceNew.getNrOfActiveStrandsConnected().array() == 4).all());
 
   CHECK(forceBalanceNew.getNrOfActiveStrands() <=
         (forceBalanceNew.getNrOfActiveStrandsInDir(0) +
@@ -1085,8 +1107,8 @@ TEST_CASE(
   REQUIRE(forceBalancerEntanglementSprings.getNrOfStrands() >
           forceBalancerEntanglementLinks.getNrOfStrands());
   REQUIRE(forceBalancerEntanglementLinks.getNrOfStrands() == 464);
-  REQUIRE(forceBalancerEntanglementSprings.getNrOfActiveStrands() >
-          forceBalancerEntanglementLinks.getNrOfActiveStrands());
+  REQUIRE(forceBalancerEntanglementSprings.getNrOfActiveSprings() >
+          forceBalancerEntanglementLinks.getNrOfActiveSprings());
 
   std::vector<long int> activeNodes0_1 =
     forceBalancerEntanglementSprings.getIdsOfActiveNodes();

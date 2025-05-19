@@ -82,16 +82,35 @@ TEST_CASE("Vector Rows can be removed", "[Eigen][header_tests][utils]")
   {
     std::vector<int> testVec = { 1, 124, 12, 42, 41, 132, 12, 123, 5, 12, 412 };
 
-    CHECK(testVec.size() == 11);
-    CHECK(pu::contains(testVec, 1));
-    CHECK(pu::contains(testVec, 12));
-    CHECK_FALSE(pu::contains(testVec, -1));
-    CHECK_NOTHROW(pu::removeIfContained(testVec, -1));
-    CHECK(testVec.size() == 11);
-    CHECK_NOTHROW(pu::removeIfContained(testVec, 12));
-    CHECK_FALSE(pu::contains(testVec, 12));
-    CHECK(pu::contains(testVec, 1));
-    CHECK(testVec.size() == 8);
+    SECTION("By value")
+    {
+      CHECK(testVec.size() == 11);
+      CHECK(pu::contains(testVec, 1));
+      CHECK(pu::contains(testVec, 12));
+      CHECK_FALSE(pu::contains(testVec, -1));
+      CHECK_NOTHROW(pu::removeIfContained(testVec, -1));
+      CHECK(testVec.size() == 11);
+      CHECK_NOTHROW(pu::removeIfContained(testVec, 12));
+      CHECK_FALSE(pu::contains(testVec, 12));
+      CHECK(pu::contains(testVec, 1));
+      CHECK(testVec.size() == 8);
+    }
+
+    SECTION("By index")
+    {
+      CHECK(testVec.size() == 11);
+
+      std::vector<size_t> emptyIndices = {};
+      CHECK_NOTHROW(pu::removeRows<int>(testVec, emptyIndices));
+      CHECK(testVec.size() == 11);
+      std::vector<size_t> testVec2 = { 11, 12, 13, 1, 2, 3, 4, 4,
+                                       5,  5,  5,  6, 7, 8, 9, 10 };
+      CHECK_THROWS(pu::removeRows(testVec, testVec2));
+      std::vector<size_t> testVec3 = { 1, 2, 3, 0, 4, 4, 5, 5, 5, 6, 7, 8, 10 };
+      CHECK_NOTHROW(pu::removeRows(testVec, testVec3));
+      CHECK(testVec.size() == 1);
+      CHECK(testVec[0] == 12);
+    }
   }
 }
 
@@ -464,9 +483,9 @@ TEST_CASE("Eigen and std::vector equality is checked",
       vec2.push_back(6);
       CHECK_FALSE(pu::equal(vec1, vec2));
       CHECK_FALSE(pu::equal(vec2, vec3));
-      CHECK_FALSE(pu::vector_approx_equal(vec1, vec2));
+      CHECK_FALSE(pu::vector_approx_equal(vec1, vec2, 1e-12, true));
       CHECK_FALSE(pu::vector_approx_equal(vec2, vec3));
-      CHECK_FALSE(pu::vector_approx_rel_equal(vec1, vec2));
+      CHECK_FALSE(pu::vector_approx_rel_equal(vec1, vec2, 1e-12, true));
       CHECK_FALSE(pu::vector_approx_rel_equal(vec2, vec3));
     }
 
