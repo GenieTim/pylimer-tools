@@ -2953,7 +2953,7 @@ MEHPForceBalance2::getNrOfActiveSpringsConnected(const double tolerance) const
     Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
   Eigen::ArrayXb partialSpringIsActive = this->findActiveSprings(tolerance);
   // translate this to the nodes
-  for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
+  for (Eigen::Index i = 0; i < this->initialConfig.nrOfSprings; ++i) {
     if (partialSpringIsActive[i]) {
       /* active spring */
       // size_t a =
