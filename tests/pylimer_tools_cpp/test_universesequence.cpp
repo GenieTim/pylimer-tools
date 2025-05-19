@@ -231,3 +231,55 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
   //   REQUIRE_NOTHROW(universeSeq.atIndex(0));
   // }
 };
+
+TEST_CASE("Universe sequence can compute things", "[UniverseSequence][entity]")
+{
+  std::cout << "Running test \"Universe sequence can compute things\""
+            << std::endl;
+
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+  REQUIRE(std::filesystem::exists(suspectedPath));
+
+  SECTION("From data files")
+  {
+    universeSeq.initializeFromDataSequence(
+      { suspectedPath + "/structure/network_100_a_46.structure.out",
+        suspectedPath + "/structure/network_100_a_46.structure.out" });
+
+    auto msdRes = universeSeq.computeMsdForAtoms({ 1 }, 1, true);
+    CHECK(msdRes.size() == 1);
+    CHECK(msdRes[1] == 0.);
+  }
+
+  SECTION("From dump files")
+  {
+    universeSeq.initializeFromDumpFile(
+      suspectedPath + "/lammps_data_file_small.out",
+      suspectedPath + "/lammps_dump_small_3step.lammpstrj");
+
+    auto msdRes = universeSeq.computeMsdForAtoms({ 90000 }, 1, true);
+    CHECK(msdRes.size() == 2);
+    CHECK(msdRes.at(1) == 0.);
+    CHECK(msdRes.at(2) == 0.);
+
+    auto msdRes2 = universeSeq.computeMsdForAtomProperties(
+      { 90000 }, "xsu", "ysu", "zsu", 1, true);
+    CHECK(msdRes2.size() == 2);
+    CHECK(msdRes2.at(1) == 0.);
+    CHECK(msdRes2.at(2) == 0.);
+
+    std::vector<Eigen::Vector3d> fromTo =
+      universeSeq.computeVectorFromToAtoms({ 90000 }, { 80000 });
+    CHECK(fromTo.size() == 3);
+
+    std::vector<double> fromToDistance =
+      universeSeq.computeDistanceFromToAtoms({ 90000 }, { 80000 });
+    CHECK(fromToDistance.size() == 3);
+    CHECK_THAT(fromToDistance[0],
+               Catch::Matchers::WithinAbs(fromTo[0].norm(), 1e-7));
+    CHECK_THAT(fromToDistance[1],
+               Catch::Matchers::WithinAbs(fromTo[1].norm(), 1e-7));
+  }
+}

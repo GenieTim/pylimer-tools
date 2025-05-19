@@ -611,8 +611,6 @@ protected:
   igraph_t graph;
   bool atomsHaveCustomAttributes = false;
 
-  igraph_vs_t getVerticesWithDegreeSelector(int degree) const;
-
   std::vector<long int> getVerticesWithDegree(int degree) const;
 
   std::vector<long int> getVerticesWithDegree(
@@ -624,6 +622,32 @@ protected:
 
   std::vector<long int> getVerticesWithDegree(const igraph_t* someGraph,
                                               std::vector<int> degrees) const;
+
+  template<typename ValueT>
+  std::vector<igraph_integer_t> getIndicesWithAttribute(
+    const std::string& attributeName,
+    ValueT value) const
+  {
+    if (this->getNrOfVertices() == 0) {
+      return std::vector<igraph_integer_t>();
+    }
+    RUNTIME_EXP_IFN(
+      igraph_cattribute_has_attr(
+        &this->graph, IGRAPH_ATTRIBUTE_VERTEX, attributeName.c_str()),
+      "The graph does not have any vertex attribute '" + attributeName + "'.");
+    std::vector<igraph_integer_t> indices;
+    igraph_vector_t attribute_vector;
+    igraph_vector_init(&attribute_vector, this->getNrOfVertices());
+    VANV(&this->graph, attributeName.c_str(), &attribute_vector);
+    for (igraph_integer_t i = 0; i < igraph_vector_size(&attribute_vector);
+         ++i) {
+      if (static_cast<ValueT>(VECTOR(attribute_vector)[i]) == value) {
+        indices.push_back(i);
+      }
+    }
+    igraph_vector_destroy(&attribute_vector);
+    return indices;
+  };
 
   bool checkIfAtomsHaveCustomAttributes() const;
 };

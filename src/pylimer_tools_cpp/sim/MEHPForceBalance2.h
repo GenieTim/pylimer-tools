@@ -269,18 +269,6 @@ public:
                              Eigen::VectorXd& displacements) const;
 
   /**
-   * @brief break a spring, given its partial spring index
-   *
-   * @param net
-   * @param displacements
-
-   * @param partialSpringIdx
-   */
-  void breakSpring(ForceBalance2Network& net,
-                   Eigen::VectorXd& displacements,
-                   const size_t partialSpringIdx) const;
-
-  /**
    * @brief Decide for each spring if it should be removed,
    * remove them, then remove orphaned links
    *
@@ -368,7 +356,10 @@ public:
 
   size_t getNumBonds() override { return this->getNrOfStrands(); }
 
-  size_t getNumExtraBonds() override { return 0; }
+  size_t getNumExtraBonds() override
+  {
+    return this->initialConfig.springIsEntanglement.count();
+  }
 
   long int getNumBondsToForm() override { return 0; }
 
@@ -428,7 +419,7 @@ public:
     if (this->initialConfig.nrOfNodes == 0) {
       return 0;
     }
-    Eigen::ArrayXb activeNodes = this->findActiveNodes(tolerance);
+    const Eigen::ArrayXb activeNodes = this->findActiveNodes(tolerance);
     return activeNodes.count();
   }
 
@@ -735,21 +726,7 @@ public:
   static Eigen::Vector3d evaluateSpringVector(const ForceBalance2Network& net,
                                               const Eigen::VectorXd& u,
                                               const size_t springIdx,
-                                              const bool is2d)
-  {
-    Eigen::Vector3d dist =
-      ((net.coordinates.segment(3 * net.springIndexB(springIdx), 3) +
-        u.segment(3 * net.springIndexB(springIdx), 3)) -
-       (net.coordinates.segment(3 * net.springIndexA(springIdx), 3) +
-        u.segment(3 * net.springIndexA(springIdx), 3))) +
-      net.springBoxOffset.segment(3 * springIdx, 3);
-
-    if (is2d) {
-      dist[2] = 0.0;
-    }
-
-    return dist;
-  }
+                                              const bool is2d);
 
   /**
    *
@@ -890,7 +867,8 @@ public:
   {
     assert(this->isPartOfSpring(net, linkIdx, springIdx));
 
-    Eigen::Vector3d dist = this->evaluateSpringVector(net, u, springIdx, is2d);
+    const Eigen::Vector3d dist =
+      this->evaluateSpringVector(net, u, springIdx, is2d);
 
     return dist * (net.springIndexA(springIdx) == linkIdx ? -1. : 1.);
   }
@@ -960,24 +938,7 @@ public:
    */
   std::vector<size_t> getPartialSpringIndicesOfLink(
     const ForceBalance2Network& net,
-    const size_t linkIdx) const
-  {
-    INVALIDARG_EXP_IFN(linkIdx < net.nrOfLinks,
-                       "The requested link does not exist");
-    std::vector<size_t> partialSpringIndices;
-
-    std::vector<size_t> strandIndices = net.strandIndicesOfLink[linkIdx];
-
-    for (size_t strandIdx : strandIndices) {
-      std::vector<size_t> springs = net.springIndicesOfStrand[strandIdx];
-      for (size_t springIdx : springs) {
-        if (this->isPartOfSpring(net, linkIdx, springIdx)) {
-          partialSpringIndices.push_back(springIdx);
-        }
-      }
-    }
-    return partialSpringIndices;
-  }
+    const size_t linkIdx) const;
 
   Eigen::VectorXd getForceMagnitudeVector() const
   {
@@ -1058,14 +1019,10 @@ public:
    * @param net the force balance network
    * @param u the current displacements, wherein the resulting coordinates
    * shall be stored
-   * @param oneOverSpringPartitions the one over contour length per direction
-   * and spring vector
    * @return double, the distance (squared norm) displaced
    */
-  double displaceToMeanPosition(
-    const ForceBalance2Network& net,
-    Eigen::VectorXd& u,
-    const Eigen::ArrayXd& oneOverSpringPartitions) const;
+  double displaceToMeanPosition(const ForceBalance2Network& net,
+                                Eigen::VectorXd& u) const;
 
   /**
    * @brief Displace one link to the mean of all connected neighbours
@@ -1107,6 +1064,17 @@ public:
     const Eigen::VectorXd& oneOverSpringPartitions) const;
 
   /**
+   *
+   * @param net the network for which the entanglement springs are to be listed
+   * @param strandIdx the strand for which the entanglement springs are to be
+   * listed
+   * @return the indices of the entanglement springs associated with a strand
+   */
+  std::vector<size_t> getEntanglementSpringsAtStrand(
+    const ForceBalance2Network& net,
+    size_t strandIdx) const;
+
+  /**
    * @brief Get the Link Indices of all neighbours of a specified link
    *
    * @param net
@@ -1137,62 +1105,15 @@ public:
   int getNumShifts() override { return 0; }
   int getNumRelocations() override { return 0; }
 
-  Eigen::VectorXd getBondLengths() override
-  {
-    return this->evaluateSpringVectors(this->initialConfig,
-                                       this->currentDisplacements);
-  }
+  Eigen::VectorXd getBondLengths() override;
 
-  Eigen::VectorXd getCoordinates() override
-  {
-    return this->initialConfig.coordinates + this->currentDisplacements;
-  }
+  Eigen::VectorXd getCoordinates() override;
 
-  double getTemperature() override
-  {
-    std::cerr << "Warning: Temperature is not a reasonable metric for this "
-                 "type of computation."
-              << std::endl;
-    return 0;
-  }
+  double getTemperature() override;
 
-  size_t getNumParticles() override { return this->initialConfig.nrOfNodes; }
+  size_t getNumParticles() override;
 
-  void debugAtomVicinity(const size_t atomId) const
-  {
-    long int atomIdx = -1;
-    for (size_t i = 0; i < this->initialConfig.oldAtomIds.size(); ++i) {
-      if (this->initialConfig.oldAtomIds[i] == atomId) {
-        atomIdx = i;
-        break;
-      }
-    }
-    RUNTIME_EXP_IFN(atomIdx >= 0, "Atom not found.");
-    std::cout << "Atom " << atomIdx << " (" << atomId << ")"
-              << " connectivity:" << std::endl;
-    for (long int parentSpringIdx :
-         this->initialConfig.strandIndicesOfLink[atomIdx]) {
-      std::vector<size_t> allSpringIndices =
-        this->initialConfig.springIndicesOfStrand[parentSpringIdx];
-      std::string prefix = "";
-      for (size_t springIdx : allSpringIndices) {
-        prefix += "\t";
-        std::cout << prefix << "Spring " << springIdx << " (";
-        std::cout << this->initialConfig.springIndexA[springIdx] << " ⟷ "
-                  << this->initialConfig.springIndexB[springIdx];
-        std::cout << prefix << "\t";
-
-        for (long int linkIdx :
-             this->initialConfig.linkIndicesOfStrand[springIdx]) {
-          std::cout << linkIdx << " ";
-          if (linkIdx < this->initialConfig.nrOfNodes) {
-            std::cout << "(" << this->initialConfig.oldAtomIds[linkIdx] << ") ";
-          }
-        }
-        std::cout << std::endl;
-      }
-    }
-  }
+  void debugAtomVicinity(const size_t atomId) const;
 
   bool validateNetwork() const
   {
@@ -1239,7 +1160,7 @@ protected:
   double evaluatePressure(const ForceBalance2Network& net,
                           const Eigen::VectorXd& u) const
   {
-    auto stressTensor = this->evaluateStressTensor(net, u);
+    const auto stressTensor = this->evaluateStressTensor(net, u);
     return this->evaluatePressure(stressTensor);
   }
 
@@ -1372,23 +1293,36 @@ protected:
     Eigen::ArrayXb activeSprings = this->findActiveSprings(net, u, tolerance);
     const size_t nActiveSprings = activeSprings.count();
 
-    for (size_t i = 0; i < net.nrOfStrands; ++i) {
+    for (size_t strandIdx = 0; strandIdx < net.nrOfStrands; ++strandIdx) {
       // without any springs, the strand is inactive
-      if (net.springIndicesOfStrand[i].empty()) {
+      if (net.springIndicesOfStrand[strandIdx].empty()) {
         continue;
       }
       // with one spring, the strand is active if the spring is active
-      if (net.springIndicesOfStrand[i].size() == 1) {
-        result[i] = activeSprings[net.springIndicesOfStrand[i][0]];
+      if (net.springIndicesOfStrand[strandIdx].size() == 1) {
+        result[strandIdx] =
+          activeSprings[net.springIndicesOfStrand[strandIdx][0]];
         continue;
       }
       // with more springs, the strand is certainly active,
       // if the first and last spring are active
       // (springs in between may be active due to the other involved strands)
-      assert(!this->isLoopingSpring(net, net.springIndicesOfStrand[i][0]));
-      bool isActive0 = activeSprings[net.springIndicesOfStrand[i][0]];
-      assert(!this->isLoopingSpring(net, net.springIndicesOfStrand[i].back()));
-      bool isActiveN = activeSprings[net.springIndicesOfStrand[i].back()];
+      assert(
+        !this->isLoopingSpring(net, net.springIndicesOfStrand[strandIdx][0]));
+      bool isActive0 = activeSprings[net.springIndicesOfStrand[strandIdx][0]];
+      assert(!this->isLoopingSpring(
+        net, net.springIndicesOfStrand[strandIdx].back()));
+      bool isActiveN =
+        activeSprings[net.springIndicesOfStrand[strandIdx].back()];
+
+      const bool isAnyActive =
+        std::ranges::any_of(net.springIndicesOfStrand[strandIdx],
+                            [&activeSprings](const long int springIdx) {
+                              return activeSprings[springIdx];
+                            });
+      if (!isAnyActive) {
+        continue;
+      }
 
       // however, there is one case where the
       // strand would not yet be marked as active, even though it is:
@@ -1396,12 +1330,14 @@ protected:
       // because it is bifunctional and in a sandwich with the same entanglement
       // link
       if (!isActive0) {
-        const size_t crossLinkIdx0 = net.linkIndicesOfStrand[i][0];
-        const size_t entanglementLinkIdx0 = net.linkIndicesOfStrand[i][1];
+        const size_t crossLinkIdx0 = net.linkIndicesOfStrand[strandIdx][0];
+        const size_t entanglementLinkIdx0 =
+          net.linkIndicesOfStrand[strandIdx][1];
         assert(!net.linkIsEntanglement[crossLinkIdx0]);
         assert(net.linkIsEntanglement[entanglementLinkIdx0]);
-        for (size_t strandOfXlink : net.strandIndicesOfLink[crossLinkIdx0]) {
-          if (strandOfXlink == i) {
+        for (const size_t strandOfXlink :
+             net.strandIndicesOfLink[crossLinkIdx0]) {
+          if (strandOfXlink == strandIdx) {
             continue;
           }
           if (net.linkIndicesOfStrand[strandOfXlink][0] == crossLinkIdx0 &&
@@ -1422,13 +1358,16 @@ protected:
       }
 
       if (!isActiveN) {
-        const size_t crossLinkIdxN = net.linkIndicesOfStrand[i].back();
+        const size_t crossLinkIdxN = net.linkIndicesOfStrand[strandIdx].back();
         const size_t entanglementLinkIdxN =
-          net.linkIndicesOfStrand[i][net.linkIndicesOfStrand[i].size() - 2];
+          net
+            .linkIndicesOfStrand[strandIdx]
+                                [net.linkIndicesOfStrand[strandIdx].size() - 2];
         assert(!net.linkIsEntanglement[crossLinkIdxN]);
         assert(net.linkIsEntanglement[entanglementLinkIdxN]);
-        for (size_t strandOfXlink : net.strandIndicesOfLink[crossLinkIdxN]) {
-          if (strandOfXlink == i) {
+        for (const size_t strandOfXlink :
+             net.strandIndicesOfLink[crossLinkIdxN]) {
+          if (strandOfXlink == strandIdx) {
             continue;
           }
           if (net.linkIndicesOfStrand[strandOfXlink][0] == crossLinkIdxN &&
@@ -1449,21 +1388,28 @@ protected:
       }
       // we can, however, anticipate the activeness of dangling links
       // and mark the strand as inactive in that case
-      if (net.linkIndicesOfStrand[i][0] != net.linkIndicesOfStrand[i].back()) {
-        assert(!net.linkIsEntanglement[net.linkIndicesOfStrand[i][0]]);
-        if (net.strandIndicesOfLink[net.linkIndicesOfStrand[i][0]].size() ==
-            1) {
+      if (net.linkIndicesOfStrand[strandIdx][0] !=
+          net.linkIndicesOfStrand[strandIdx].back()) {
+        assert(!net.linkIsEntanglement[net.linkIndicesOfStrand[strandIdx][0]]);
+        if (net.strandIndicesOfLink[net.linkIndicesOfStrand[strandIdx][0]]
+              .size() == 1) {
           isActive0 = false;
         }
-        assert(!net.linkIsEntanglement[net.linkIndicesOfStrand[i].back()]);
-        if (net.strandIndicesOfLink[net.linkIndicesOfStrand[i].back()].size() ==
-            1) {
+        assert(
+          !net.linkIsEntanglement[net.linkIndicesOfStrand[strandIdx].back()]);
+        if (net.strandIndicesOfLink[net.linkIndicesOfStrand[strandIdx].back()]
+              .size() == 1) {
           isActiveN = false;
         }
       }
 
-      result[i] = isActive0 && isActiveN;
+      result[strandIdx] = isActive0 && isActiveN;
     }
+
+#ifndef NDEBUG
+    const size_t nActiveStrands = result.count();
+    assert(nActiveStrands <= nActiveSprings);
+#endif
 
     return result;
   }

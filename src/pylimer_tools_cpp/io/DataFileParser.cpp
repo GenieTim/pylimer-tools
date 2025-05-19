@@ -326,17 +326,17 @@ DataFileParser::readAtom(const std::string& line)
   size_t atomId, nx, ny, nz;
   int atomType, moleculeId;
   double x, y, z;
-  int resFound = sscanf(line.c_str(),
-                        "%lu %d %d %le %le %le %lu %lu %lu",
-                        &atomId,
-                        &moleculeId,
-                        &atomType,
-                        &x,
-                        &y,
-                        &z,
-                        &nx,
-                        &ny,
-                        &nz);
+  const int resFound = sscanf(line.c_str(),
+                              "%lu %d %d %le %le %le %lu %lu %lu",
+                              &atomId,
+                              &moleculeId,
+                              &atomType,
+                              &x,
+                              &y,
+                              &z,
+                              &nx,
+                              &ny,
+                              &nz);
 
   this->atomIds.push_back(atomId);
   this->moleculeIds.push_back(moleculeId);

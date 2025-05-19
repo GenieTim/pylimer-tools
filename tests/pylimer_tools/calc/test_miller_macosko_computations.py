@@ -5,6 +5,7 @@ import sys
 import unittest
 
 import numpy as np
+from pint import UnitRegistry
 
 from pylimer_tools.calc.miller_macosko_theory import (
     compute_miller_macosko_probabilities,
@@ -12,10 +13,13 @@ from pylimer_tools.calc.miller_macosko_theory import (
     compute_weight_fraction_of_soluble_material,
     predict_gelation_point,
     predict_number_density_of_junction_points,
+    predict_p_from_w_sol,
     compute_weight_fraction_of_backbone,
     compute_weight_fraction_of_dangling_chains,
     predict_number_density_of_network_strands,
     predict_shear_modulus,
+    compute_extracted_modulus,
+    compute_junction_modulus,
     predict_maximum_p,
 )
 from pylimer_tools.calc.structure_analysis import (
@@ -140,6 +144,26 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             )
             .to("MPa")
             .magnitude,
+        )
+        ureg = UnitRegistry()
+        self.assertAlmostEqual(
+            compute_junction_modulus(
+                p=1, r=1, f=4, xlink_concentration_0=0 * ureg("g/nm^3"), b2=1, ureg=ureg
+            ).magnitude,
+            0.0,
+        )
+        self.assertAlmostEqual(
+            compute_extracted_modulus(
+                p=1,
+                r=1,
+                f=4,
+                b2=1,
+                xlink_concentration_0=0 * ureg("1/nm^3"),
+                w_sol=0.1,
+                ureg=ureg,
+                g_e_1=0.3 * ureg("MPa"),
+            ).magnitude,
+            0.0,
         )
 
     def test_predict_number_density_of_junction_points(self):
@@ -309,6 +333,19 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             compute_weight_fraction_of_soluble_material(
                 self.saturatedTestUniverse, 2),
         )
+        self.assertAlmostEqual(
+            predict_p_from_w_sol(
+                w_sol=0,
+                network=None,
+                crosslinker_type=2,
+                functionality_per_type={1: 2, 2: 4},
+                weight_fractions={1: 1.0, 2: 0.0},
+                r=1,
+                b2=1.0,
+            ),
+            1.0,
+            3,
+        )
 
     # def testProbabilityCalculations(self):
     #     self.assertRaises(
@@ -384,8 +421,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             temperature=298 * unit_style.get_underlying_unit_registry()("kelvin"),
         )
 
-        alpha, beta = compute_miller_macosko_probabilities(
-            r=1.0, p=0.95, f=4)
+        alpha, beta = compute_miller_macosko_probabilities(r=1.0, p=0.95, f=4)
         self.assertAlmostEqual(alpha, 0.0983588, places=5)
 
         self.assertAlmostEqual(g_anm.to("MPa").magnitude, 0.1930520, places=5)

@@ -23,6 +23,76 @@ namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 namespace pc = pylimer_tools::calc;
 
+/**
+ * Utility functions to validate the resulting distributions
+ */
+
+double
+normalCDF(double x) // Phi(-∞, x) aka N(x)
+{
+  return std::erfc(-x / std::sqrt(2)) / 2;
+}
+
+/**
+ * @brief Performs the Anderson-Darling test to check if observations follow a normal distribution
+ *
+ * This function implements the Anderson-Darling test to determine whether a given set of 
+ * observations follows a normal distribution with specified mean and variance. The test
+ * is performed at a 10% significance level.
+ *
+ * Sources: 
+ * - https://www.itl.nist.gov/div898/handbook/eda/section3/eda35e.htm
+ * - https://en.wikipedia.org/wiki/Anderson%E2%80%93Darling_test
+ * 
+ * @param observations Vector of observed values to be tested
+ * @param expectedMean The expected mean of the normal distribution
+ * @param expectedVariance The expected variance of the normal distribution
+ * @return bool Returns true if the observations follow the specified normal distribution
+ *              (null hypothesis cannot be rejected at 10% significance level),
+ *              false otherwise
+ */
+bool
+andersonDarlingNormalDistributionTest(Eigen::VectorXd observations,
+                                      const double expectedMean,
+                                      const double expectedVariance)
+{
+  std::ranges::sort(observations);
+  const double sampleMean = observations.mean();
+  const double sampleVariance =
+    (observations.array() - sampleMean).square().sum() /
+    (observations.size() - 1);
+  const double n = observations.size();
+
+  // if (std::abs(sampleMean) < 1e-4 || std::abs(expectedMean) < 1e-4) {
+  //   CHECK_THAT(sampleMean, Catch::Matchers::WithinAbs(expectedMean, 10. /
+  //   n));
+  // } else {
+  //   CHECK_THAT(sampleMean, Catch::Matchers::WithinRel(expectedMean, 0.1));
+  // }
+  // CHECK_THAT(sampleVariance, Catch::Matchers::WithinRel(expectedVariance,
+  // 0.1)); Eigen::VectorXd normalizedObservations =
+  //   (observations.array() - sampleMean).matrix() / std::sqrt(sampleVariance);
+  Eigen::VectorXd normalizedObservations =
+    (observations.array() - expectedMean).matrix() /
+    std::sqrt(expectedVariance);
+
+  double A2 = -n;
+  for (double i = 0; i < n; ++i) {
+    A2 -= ((2. * (i + 1) - 1.) / n) *
+          (std::log(
+             normalCDF(normalizedObservations(static_cast<Eigen::Index>(i)))) +
+           std::log(1. - normalCDF(normalizedObservations(
+                           static_cast<Eigen::Index>(n - (i + 1))))));
+  }
+
+  // Case 0, 10 % significance level,
+  // according to Marsaglia & Marsaglia
+  return A2 < 1.933;
+}
+
+/**
+ * Actual test cases
+ */
 TEST_CASE("Certain configurations do not lead to memory corruption",
           "[generator][MCUniverseGenerator]")
 {
@@ -30,8 +100,8 @@ TEST_CASE("Certain configurations do not lead to memory corruption",
                "corruption\""
             << std::endl;
   // the following parameters have led to a `double free or corruption` error?!?
-  int nrOfCrosslinkers = static_cast<int>(5e4 * 2 * 0.7 / 7);
-  double sideLength = std::cbrt((10 * 5e4 * nrOfCrosslinkers) / 0.85);
+  constexpr int nrOfCrosslinkers = static_cast<int>(5e4 * 2 * 0.7 / 7);
+  const double sideLength = std::cbrt((10 * 5e4 * nrOfCrosslinkers) / 0.85);
   pu::MCUniverseGenerator generator =
     pu::MCUniverseGenerator(sideLength, sideLength, sideLength);
   REQUIRE_NOTHROW(generator.setSeed(68419));
@@ -39,6 +109,11 @@ TEST_CASE("Certain configurations do not lead to memory corruption",
 
   pe::Universe universe = generator.getUniverse();
   REQUIRE(universe.getNrOfAtoms() == 0);
+
+  generator.addCrosslinkers(nrOfCrosslinkers);
+  REQUIRE_THROWS(generator.linkStrandsToConversion(0.2));
+  universe = generator.getUniverse();
+  REQUIRE(universe.getNrOfAtoms() == nrOfCrosslinkers);
 }
 
 TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
@@ -120,6 +195,11 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
     REQUIRE_THROWS(generator.linkStrandsToConversion(2.0));
     REQUIRE_THROWS(generator.addRandomlyFunctionalizedStrands(
       2, { 10, 10 }, 7, 3, 2, 2, true));
+    CHECK_THROWS(generator.addRandomlyFunctionalizedStrands(0, {}, 2));
+    CHECK_THROWS(generator.addRandomlyFunctionalizedStrands(1, {}, 2));
+    CHECK_THROWS(generator.addMonofunctionalStrands(1, {}, -1));
+    CHECK_THROWS(generator.addCrosslinkersAt(Eigen::VectorXd::Zero(2)));
+    CHECK_THROWS(generator.addCrosslinkersAt(Eigen::VectorXd::Zero(6), -1));
   }
 
   // SECTION("Universe can be written and read again") {
@@ -146,7 +226,7 @@ TEST_CASE("Large Universe can be generated", "[generator][MCUniverseGenerator]")
   generator.setBeadDistance(0.964);
   generator.addCrosslinkers(1200, 2);
 
-  pe::Universe universe = generator.getUniverse();
+  const pe::Universe universe = generator.getUniverse();
   REQUIRE(universe.getVolume() == 10.0 * 10.0 * 10.0);
   REQUIRE(universe.getAtomsOfType(2).size() == 1200);
 }
@@ -179,6 +259,10 @@ TEST_CASE("MCUniverseGenerator knows about <b> vs. <b^2>",
 
   CHECK_THROWS(generator.setMeanSquaredBeadDistance(-1.));
   CHECK_THROWS(generator.setBeadDistance(-1.));
+  CHECK_THROWS(generator.setMeanSquaredBeadDistance(
+    std::numeric_limits<double>::infinity()));
+  CHECK_THROWS(
+    generator.setBeadDistance(std::numeric_limits<double>::infinity()));
 }
 
 TEST_CASE("MCUniverseGenerator can generate without primary loops",
@@ -192,6 +276,7 @@ TEST_CASE("MCUniverseGenerator can generate without primary loops",
   generator.setBeadDistance(0.964);
   generator.addCrosslinkers(100, 4, 2);
   generator.configPrimaryLoopProbability(0.);
+  generator.configSecondaryLoopProbability(0.5);
   generator.addStrands(200, 10, 1);
 
   SECTION("Without max distance")
@@ -528,6 +613,17 @@ TEST_CASE("MUniverseGenerator can generate with cross-link chains",
   for (pe::Molecule& chain : chains) {
     CHECK(chain.getNrOfAtoms() == 12);
   }
+
+  generator.configPrimaryLoopProbability(0.);
+  generator.configSecondaryLoopProbability(0.);
+  generator.addStrands(
+    20, pylimer_tools::utils::initializeWithValue(20, 10), 3);
+  generator.linkStrandsToConversion(0.5);
+  universe = generator.getUniverse();
+
+  CHECK(universe.getAtomsOfType(2).size() == 2 * 10);
+  CHECK(universe.getAtomsOfType(1).size() == 10 * 10);
+  CHECK(universe.getAtomsOfType(3).size() == 20 * 10);
 }
 
 TEST_CASE(
@@ -590,6 +686,45 @@ TEST_CASE(
     chains = universe.getChainsWithCrosslinker(6);
     CHECK(chains.size() == 1000);
   }
+}
+
+TEST_CASE("MCUniverseGenerator can generate with monofunctional chains",
+          "[generator][MCUniverseGenerator]")
+{
+  std::cout << "Running test \"MCUniverseGenerator can generate with "
+               "monofunctional chains\""
+            << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
+  generator.setSeed(457564875e2);
+  generator.setBeadDistance(0.75);
+  generator.configNrOfMCSteps(0);
+
+  generator.addMonofunctionalStrands(100, 100, 5);
+  CHECK(generator.getCurrentNrOfAtoms() == 100 * 100);
+  generator.addCrosslinkers(25, 4, 2, false);
+  CHECK(generator.getCurrentCrosslinkerConversion() == 0.);
+  CHECK(generator.getCurrentNrOfAtoms() == 100 * 100 + 25);
+  CHECK_NOTHROW(generator.linkStrandsToConversion(1.));
+  CHECK_THROWS(generator.linkStrandsToConversion(0.));
+  pe::Universe universe = generator.getUniverse();
+  std::vector<pe::MoleculeType> moleculeTypes =
+    universe.identifyObviouslyDanglingAtoms(true);
+  CHECK(std::ranges::all_of(moleculeTypes, [](pe::MoleculeType type) {
+    return type == pe::MoleculeType::FREE_CHAIN;
+  }));
+
+  generator.relaxCrosslinks();
+
+  pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
+    generator.getForceBalance2();
+  fb2.runForceRelaxation();
+  CHECK(fb2.getNrOfActiveSprings() == 0);
+  CHECK(fb2.getNrOfActiveStrands() == 0);
+
+  pylimer_tools::sim::mehp::MEHPForceBalance fb = generator.getForceBalance();
+  fb.runForceRelaxation();
+  CHECK(fb.getNrOfActiveSprings() == 0);
 }
 
 TEST_CASE("Randomly functionalized chains collapse",
@@ -882,11 +1017,11 @@ TEST_CASE("Universe generator with randomly functionalized chains use "
   pu::MCUniverseGenerator generator =
     pu::MCUniverseGenerator(35.375493, 35.375493, 35.375493);
   generator.setSeed(8804);
-  double meanSquaredB = 1.107008;
+  constexpr double meanSquaredB = 1.107008;
   generator.setMeanSquaredBeadDistance(meanSquaredB);
   generator.configNrOfMCSteps(0);
 
-  std::vector<int> chainLengths = pu::initializeWithValue(50, 50);
+  const std::vector<int> chainLengths = pu::initializeWithValue(50, 50);
 
   SECTION("Randomly functionalized chains")
   {
@@ -894,10 +1029,9 @@ TEST_CASE("Universe generator with randomly functionalized chains use "
       chainLengths.size(), chainLengths, 0.7, 8, 2, 1, true);
     REQUIRE_NOTHROW(generator.validateInternalState());
 
-    pe::Universe universe = generator.getUniverse();
+    const pe::Universe universe = generator.getUniverse();
     std::vector<double> bondLengths = universe.computeBondLengths();
-    double maxBondLength =
-      *std::max_element(bondLengths.begin(), bondLengths.end());
+    const double maxBondLength = *std::ranges::max_element(bondLengths);
     CHECK(maxBondLength < 5. * meanSquaredB);
   }
 
@@ -907,10 +1041,9 @@ TEST_CASE("Universe generator with randomly functionalized chains use "
       chainLengths.size(), chainLengths, 8, 2, 1, true);
     REQUIRE_NOTHROW(generator.validateInternalState());
 
-    pe::Universe universe = generator.getUniverse();
+    const pe::Universe universe = generator.getUniverse();
     std::vector<double> bondLengths = universe.computeBondLengths();
-    double maxBondLength =
-      *std::max_element(bondLengths.begin(), bondLengths.end());
+    const double maxBondLength = *std::ranges::max_element(bondLengths);
     CHECK(maxBondLength < 5. * meanSquaredB);
   }
 }
@@ -929,7 +1062,8 @@ TEST_CASE("Universe generator uses correct w_sol even for strange structures",
   generator.setMeanSquaredBeadDistance(1.107008);
   generator.configNrOfMCSteps(0);
 
-  std::vector<int> randomFchainLengths = pu::initializeWithValue(2020, 210);
+  const std::vector<int> randomFchainLengths =
+    pu::initializeWithValue(2020, 210);
   generator.addRandomlyFunctionalizedStrands(randomFchainLengths.size(),
                                              randomFchainLengths,
                                              0.024285714285714285,
@@ -938,13 +1072,13 @@ TEST_CASE("Universe generator uses correct w_sol even for strange structures",
                                              1,
                                              true);
 
-  std::vector<int> chainLengths = pu::initializeWithValue(2121, 107);
+  const std::vector<int> chainLengths = pu::initializeWithValue(2121, 107);
   generator.addStrands(chainLengths.size(), chainLengths, 1);
 
   generator.useZScoreMaxDistance(3., 1.107008);
   generator.linkStrandsToSolubleFraction(0.31);
 
-  pe::Universe universe = generator.getUniverse();
+  const pe::Universe universe = generator.getUniverse();
   pylimer_tools::sim::mehp::MEHPForceBalance forceBalance =
     pylimer_tools::sim::mehp::MEHPForceBalance(universe);
 
@@ -952,4 +1086,146 @@ TEST_CASE("Universe generator uses correct w_sol even for strange structures",
 
   CHECK_THAT(forceBalance.getSolubleWeightFraction(),
              Catch::Matchers::WithinAbs(0.31, 0.05));
+}
+
+TEST_CASE("Linear walk chain can be generated", "[topo][RandomWalker]")
+{
+  std::cout << "Running test \"Linear walk chain can be generated\""
+            << std::endl;
+  pe::Box box = pe::Box(10., 10., 10.);
+
+  SECTION("With ends")
+  {
+    Eigen::VectorXd coordinates = pu::doLinearWalkChainFromTo(
+      box, Eigen::Vector3d(0., 0., 0.), Eigen::Vector3d(5., 5., 5.), 10, true);
+    CHECK(coordinates.size() == (10 + 2) * 3);
+    CHECK(coordinates.segment(0, 3) == Eigen::Vector3d(0., 0., 0.));
+    CHECK(coordinates.segment(3 * (10 + 1), 3) == Eigen::Vector3d(5., 5., 5.));
+    Eigen::Vector3d prevDistance =
+      coordinates.segment(0, 3) - coordinates.segment(3, 3);
+    for (size_t i = 3; i < coordinates.size(); i += 3) {
+      Eigen::Vector3d currentDistance =
+        coordinates.segment(i, 3) - coordinates.segment(i - 3, 3);
+      CHECK(currentDistance.norm() == Catch::Approx(prevDistance.norm()));
+    }
+  }
+
+  SECTION("Without ends")
+  {
+    Eigen::VectorXd coordinates = pu::doLinearWalkChainFromTo(
+      box, Eigen::Vector3d(0., 0., 0.), Eigen::Vector3d(5., 5., 5.), 10, false);
+    CHECK(coordinates.size() == (10) * 3);
+    Eigen::Vector3d prevDistance =
+      coordinates.segment(0, 3) - coordinates.segment(3, 3);
+    for (size_t i = 3; i < coordinates.size(); i += 3) {
+      Eigen::Vector3d currentDistance =
+        coordinates.segment(i, 3) - coordinates.segment(i - 3, 3);
+      CHECK(currentDistance.norm() == Catch::Approx(prevDistance.norm()));
+    }
+  }
+}
+
+TEST_CASE("randomWalkChain generates valid chains", "[topo][RandomWalker]")
+{
+  std::cout << "Running test \"randomWalkChain generates valid chains\"";
+
+  // Create a box
+  pylimer_tools::entities::Box box(10.0, 10.0, 10.0);
+
+  // Parameters for the random walk
+  int chainLen = 30;
+  double beadDistance = 1.0;
+  double meanSquaredBeadDistance = (3. * M_PI / 8.) * beadDistance;
+  std::string seed = "test_seed";
+
+  Eigen::VectorXd coordinates = pylimer_tools::utils::doRandomWalkChain(
+    chainLen, beadDistance, meanSquaredBeadDistance, seed);
+
+  // Check the size of the returned vector (should be 3 * chainLen)
+  REQUIRE(coordinates.size() == 3 * chainLen);
+
+  // Check that bond lengths are reasonable
+  Eigen::VectorXd bondLengths =
+    coordinates.tail((chainLen - 1) * 3) - coordinates.head((chainLen - 1) * 3);
+  box.handlePBC(bondLengths);
+  CHECK(andersonDarlingNormalDistributionTest(bondLengths, 0., M_PI / 8.));
+}
+
+TEST_CASE("doRandomWalkChainFromToMC generates valid chains",
+          "[topo][RandomWalker][mc]")
+{
+  std::cout
+    << "Running test \"doRandomWalkChainFromToMC generates valid chains\""
+    << std::endl;
+  // Create a box
+  pylimer_tools::entities::Box box(10.0, 10.0, 10.0);
+
+  // Define start and end points
+  Eigen::Vector3d from(1.0, 1.0, 1.0);
+  Eigen::Vector3d to(1.0, 1.0, 1.0);
+
+  // Parameters for the random walk
+  int chainLen = 30;
+  double beadDistance = 1.0;
+  double meanSquaredBeadDistance = (3. * M_PI / 8.) * beadDistance;
+  std::string seed = "let_s_use_this_seed";
+  // Parameters for MC
+  int numIterations = 500;
+
+  // Generate the chain
+  Eigen::VectorXd coordinatesNoMC =
+    pylimer_tools::utils::doRandomWalkChainFromTo(
+      box, from, to, chainLen, beadDistance, meanSquaredBeadDistance, seed);
+  Eigen::VectorXd coordinates =
+    pylimer_tools::utils::doRandomWalkChainFromToMC(box,
+                                                    from,
+                                                    to,
+                                                    chainLen,
+                                                    beadDistance,
+                                                    meanSquaredBeadDistance,
+                                                    seed,
+                                                    numIterations);
+
+  // Check the size of the returned vector (should be 3 * chainLen)
+  REQUIRE(coordinatesNoMC.size() == 3 * chainLen);
+  REQUIRE(coordinates.size() == 3 * chainLen);
+
+  // Check that bond lengths are reasonable
+  Eigen::VectorXd bondLengthsNoMC = coordinatesNoMC.tail((chainLen - 1) * 3) -
+                                    coordinatesNoMC.head((chainLen - 1) * 3);
+  box.handlePBC(bondLengthsNoMC);
+  CHECK(andersonDarlingNormalDistributionTest(bondLengthsNoMC, 0., M_PI / 8.));
+  Eigen::VectorXd bondLengths =
+    coordinates.tail((chainLen - 1) * 3) - coordinates.head((chainLen - 1) * 3);
+  box.handlePBC(bondLengths);
+  CHECK(andersonDarlingNormalDistributionTest(bondLengths, 0., M_PI / 8.));
+}
+
+TEST_CASE("doRandomWalkChain generates very long chains",
+          "[topo][RandomWalker][mc]")
+{
+  // Create a box
+  pylimer_tools::entities::Box box(100.0, 100.0, 100.0);
+
+  // Define start and end points
+  Eigen::Vector3d from(1.0, 1.0, 1.0);
+
+  // Parameters for the random walk
+  constexpr int chainLen = 32;
+  constexpr double beadDistance = 1.0;
+  constexpr double meanSquaredBeadDistance = (3. * M_PI / 8.) * beadDistance;
+  const std::string seed = "some_other_seed";
+  int numIterations = 500;
+
+  // Generate the chain
+  Eigen::VectorXd coordinates = pylimer_tools::utils::doRandomWalkChain(
+    chainLen, beadDistance, meanSquaredBeadDistance, seed);
+
+  // Check the size of the returned vector (should be 3 * chainLen)
+  REQUIRE(coordinates.size() == 3 * chainLen);
+
+  // Check that bond lengths are reasonable
+  const Eigen::VectorXd bondLengths =
+    coordinates.tail((chainLen - 1) * 3) - coordinates.head((chainLen - 1) * 3);
+  CHECK(andersonDarlingNormalDistributionTest(bondLengths, 0., M_PI / 8.));
 }

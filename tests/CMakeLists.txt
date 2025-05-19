@@ -66,20 +66,29 @@ endif ()
 
 add_library(test_sources
         OBJECT
-        pylimer_tools/test_dpd_simulator.cpp
-        pylimer_tools/test_eigen_neighbourlist_benchmark.cpp
-        pylimer_tools/test_force_balance.cpp
-        pylimer_tools/test_force_balance2.cpp
-        pylimer_tools/test_force_balance_benchmark.cpp
-        pylimer_tools/test_force_relaxation.cpp
-        pylimer_tools/test_generator.cpp
-        pylimer_tools/test_molecule.cpp
-        pylimer_tools/test_neighbourlist.cpp
-        pylimer_tools/test_normal_mode_analysis.cpp
-        pylimer_tools/test_readers_writers.cpp
-        pylimer_tools/test_topo.cpp
-        pylimer_tools/test_universe.cpp
-        pylimer_tools/test_universesequence.cpp
+        pylimer_tools_cpp/test_dpd_simulator.cpp
+        pylimer_tools_cpp/test_eigen_neighbourlist_benchmark.cpp
+        pylimer_tools_cpp/test_force_balance.cpp
+        pylimer_tools_cpp/test_force_balance2.cpp
+        pylimer_tools_cpp/test_force_balance_benchmark.cpp
+        pylimer_tools_cpp/test_force_relaxation.cpp
+        pylimer_tools_cpp/test_generator.cpp
+        pylimer_tools_cpp/test_molecule.cpp
+        pylimer_tools_cpp/test_neighbourlist.cpp
+        pylimer_tools_cpp/test_normal_mode_analysis.cpp
+        pylimer_tools_cpp/test_readers_writers.cpp
+        pylimer_tools_cpp/test_topo.cpp
+        pylimer_tools_cpp/test_universe.cpp
+        pylimer_tools_cpp/test_universesequence.cpp
+        # headers
+        pylimer_tools_cpp/test_extra_eigen.cpp
+        pylimer_tools_cpp/test_atom.cpp
+        pylimer_tools_cpp/test_box.cpp
+        pylimer_tools_cpp/test_calc.cpp
+        pylimer_tools_cpp/test_string_utils.cpp
+        pylimer_tools_cpp/test_graph_utils.cpp
+        pylimer_tools_cpp/test_vector_utils.cpp
+        pylimer_tools_cpp/test_counter.cpp
 )
 
 IF (WIN32)
@@ -115,7 +124,7 @@ target_link_libraries(test_sources
         ${nlopt_LIBRARIES}
 )
 
-add_executable(pylimer_tests pylimer_tools/test.cpp)
+add_executable(pylimer_tests pylimer_tools_cpp/test.cpp)
 
 add_dependencies(pylimer_tests pylimer_tools)
 add_dependencies(pylimer_tests test_sources)
@@ -129,34 +138,6 @@ target_link_libraries(pylimer_tests
         ${nlopt_LIBRARIES}
 )
 
-add_library(header_test_sources
-        OBJECT
-        pylimer_tools/test_calc.cpp
-        pylimer_tools/test_vector_utils.cpp
-)
-add_dependencies(header_test_sources igraph::igraph)
-add_dependencies(header_test_sources cerealLib)
-#add_dependencies(header_test_sources pylimer_tools)
-target_link_libraries(header_test_sources PUBLIC
-        Catch2::Catch2
-        ${igraph_LIBRARIES}
-)
-
-target_link_libraries(header_test_sources PUBLIC Eigen3::Eigen)
-
-# separate the header tests out, for the coverage generation
-add_executable(header_tests pylimer_tools/test_headers.cpp)
-
-add_dependencies(header_tests igraph::igraph)
-add_dependencies(header_tests header_test_sources)
-
-target_link_libraries(header_tests
-        PRIVATE
-        Catch2::Catch2WithMain
-        header_test_sources
-        ${igraph_LIBRARIES}
-)
-
 if (LEAK_ANALYSIS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
     set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
@@ -168,19 +149,12 @@ if (LEAK_ANALYSIS)
             PRIVATE
             -fsanitize=address
     )
-    target_link_libraries(header_tests
-            PRIVATE
-            -fsanitize=address
-    )
 endif ()
 
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(CTest)
 include(Catch)
 catch_discover_tests(pylimer_tests
-        TEST_SPEC "~[long]"
-)
-catch_discover_tests(header_tests
         TEST_SPEC "~[long]"
 )
 
@@ -190,21 +164,16 @@ if (CODE_COVERAGE)
     set(CODE_COVERAGE_VERBOSE ON)
     include(CodeCoverage)
     append_coverage_compiler_flags()
+    # NOTE: we ignore the return type of the test executable here.
+    # this is required for lcov to finish running.
+    # Whether the tests passed or not is determined by peeking into the output log file.
     setup_target_for_coverage_lcov(
             NAME pylimer_tests-gcov
             EXECUTABLE pylimer_tests
             DEPENDENCIES pylimer_tests
-            LCOV_ARGS --ignore-errors inconsistent,source,format
-            EXECUTABLE_ARGS --skip-benchmarks --order rand --durations yes "~[long]" --reporter JUnit::out=${CMAKE_CURRENT_LIST_DIR}/../test-reports/pylimer-tests-result-junit.xml --reporter console &> "${CMAKE_CURRENT_LIST_DIR}/build/pylimer_test_output.log.txt"
-            EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/../vendor/*" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
-    )
-    setup_target_for_coverage_lcov(
-            NAME header_tests-gcov
-            EXECUTABLE header_tests
-            DEPENDENCIES header_tests
-            LCOV_ARGS --ignore-errors inconsistent,source,format
-            EXECUTABLE_ARGS --skip-benchmarks --order rand --durations yes "~[long]" --reporter JUnit::out=${CMAKE_CURRENT_LIST_DIR}/../test-reports/header-tests-result-junit.xml --reporter console &> "${CMAKE_CURRENT_LIST_DIR}/build/header_test_output.log.txt"
-            EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/../vendor/*" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
+            LCOV_ARGS --ignore-errors inconsistent,source,format,empty,unused
+            EXECUTABLE_ARGS --skip-benchmarks --order rand --durations yes "~[long]" --reporter JUnit::out=${CMAKE_CURRENT_LIST_DIR}/../test-reports/pylimer-tests-result-junit.xml --reporter console::out=${CMAKE_CURRENT_LIST_DIR}/build/pylimer_test_output.log.txt || true
+            EXCLUDE "/usr/*" "/opt/homebrew/*" "${CMAKE_CURRENT_LIST_DIR}/../vendor/*" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*" "${CMAKE_CURRENT_LIST_DIR}/pylimer_tools_cpp/*"
     )
     # BASE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/.."
 endif ()

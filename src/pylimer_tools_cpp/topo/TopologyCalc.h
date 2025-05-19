@@ -6,11 +6,12 @@
 namespace pylimer_tools {
 namespace topo {
 
-  Eigen::Vector3d sampleIntersectionPoint(const Eigen::Vector3d origin1,
-                                          const double radius1,
-                                          const Eigen::Vector3d origin2,
-                                          const double radius2,
-                                          double theta = 0.0)
+  static inline Eigen::Vector3d sampleIntersectionPoint(
+    const Eigen::Vector3d origin1,
+    const double radius1,
+    const Eigen::Vector3d origin2,
+    const double radius2,
+    double theta = 0.0)
   {
     // after https://gamedev.stackexchange.com/a/75775
     double d = (origin2 - origin1).norm();
@@ -43,7 +44,7 @@ namespace topo {
                                  intersectionBinormal * std::sin(theta));
   }
 
-  bool segmentIntersectsTriangle(
+  static inline bool segmentIntersectsTriangle(
     const Eigen::Vector3d rayOrigin,
     const Eigen::Vector3d rayTarget,
     const Eigen::Vector3d vertex0,
@@ -103,13 +104,14 @@ namespace topo {
     return false;
   };
 
-  bool segmentIntersectsTriangle(const Eigen::Vector3d rayOrigin,
-                                 const Eigen::Vector3d rayTarget,
-                                 const Eigen::Vector3d vertex0,
-                                 const Eigen::Vector3d vertex1,
-                                 const Eigen::Vector3d vertex2,
-                                 Eigen::Vector3d& outIntersectionPoint,
-                                 const double EPSILON = 1e-6)
+  static inline bool segmentIntersectsTriangle(
+    const Eigen::Vector3d rayOrigin,
+    const Eigen::Vector3d rayTarget,
+    const Eigen::Vector3d vertex0,
+    const Eigen::Vector3d vertex1,
+    const Eigen::Vector3d vertex2,
+    Eigen::Vector3d& outIntersectionPoint,
+    const double EPSILON = 1e-6)
   {
     return segmentIntersectsTriangle(
       rayOrigin,

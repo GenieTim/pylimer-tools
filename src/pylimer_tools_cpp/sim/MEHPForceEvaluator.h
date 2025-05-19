@@ -28,7 +28,7 @@ public:
                                   double* grad,
                                   void* f_data) const
   {
-    Eigen::Map<const Eigen::VectorXd> u =
+    const Eigen::Map<const Eigen::VectorXd> u =
       Eigen::Map<const Eigen::VectorXd>(x, n);
     return evaluateForceSetGradient(n, u, grad, f_data);
   }

@@ -145,6 +145,67 @@ Universe::operator=(Universe src)
   return *this;
 };
 
+// equality operator
+bool
+Universe::operator==(const Universe& other) const
+{
+  // Compare basic properties
+  if (this->timestep != other.timestep || this->NAtoms != other.NAtoms ||
+      this->NBonds != other.NBonds || this->box != other.box ||
+      this->atomIdToVertexIdx != other.atomIdToVertexIdx ||
+      this->atomsHaveCustomAttributes != other.atomsHaveCustomAttributes ||
+      this->massPerType != other.massPerType) {
+    return false;
+  }
+
+  // Compare angles
+  if (this->angleFrom != other.angleFrom || this->angleVia != other.angleVia ||
+      this->angleTo != other.angleTo || this->angleType != other.angleType) {
+    return false;
+  }
+
+  // Compare dihedral angles
+  if (this->dihedralAngleFrom != other.dihedralAngleFrom ||
+      this->dihedralAngleVia1 != other.dihedralAngleVia1 ||
+      this->dihedralAngleVia2 != other.dihedralAngleVia2 ||
+      this->dihedralAngleTo != other.dihedralAngleTo ||
+      this->dihedralAngleType != other.dihedralAngleType) {
+    return false;
+  }
+
+  // Compare graph structure
+  // For a complete equality check, we need to compare all vertex and edge
+  // attributes
+
+  // start with comparing the connectivity
+  igraph_t difference;
+  igraph_difference(&difference, &this->graph, &other.graph);
+  const igraph_integer_t diff_count = igraph_ecount(&difference);
+  igraph_destroy(&difference);
+  if (diff_count != 0) {
+    return false;
+  }
+
+  // Compare vertex attributes
+  std::vector<Atom> atoms = this->getAtoms();
+  std::vector<Atom> otherAtoms = other.getAtoms();
+  for (size_t i = 0; i < atoms.size(); i++) {
+    if (atoms[i] != otherAtoms[i]) {
+      return false;
+    }
+  }
+
+  // TODO: Compare edge attributes / check whether igraph_difference
+  // should take care of it
+  return true;
+}
+
+bool
+Universe::operator!=(const Universe& other) const
+{
+  return !(*this == other);
+}
+
 void
 Universe::initializeFromGraph(const igraph_t* ingraph)
 {
@@ -419,30 +480,30 @@ Universe::removeBondsOfType(const int bondType)
   RUNTIME_EXP_IFN(
     igraph_cattribute_has_attr(&this->graph, IGRAPH_ATTRIBUTE_EDGE, "type"),
     "The graph does not have any bond types associated.");
-  std::vector<size_t> edgesToRemove;
   // load types
   igraph_vector_t typesVec;
-  igraph_vector_init(&typesVec, 0);
+  igraph_vector_init(&typesVec, this->getNrOfBonds());
   if (igraph_cattribute_EANV(
         &this->graph, "type", igraph_ess_all(IGRAPH_EDGEORDER_ID), &typesVec)) {
     throw std::runtime_error("Failed to fetch type attribute");
   }
   // enumerate the bonds to delete
+  igraph_vector_int_t edges_to_remove;
+  igraph_vector_int_init(&edges_to_remove, 0);
   for (size_t i = 0; i < igraph_vector_size(&typesVec); ++i) {
-    if (igraph_vector_get(&typesVec, i) == bondType) {
-      edgesToRemove.push_back(i);
+    int currentBondType = static_cast<int>(igraph_vector_get(&typesVec, i));
+    if (currentBondType == bondType) {
+      igraph_vector_int_push_back(&edges_to_remove, i);
     }
   }
   igraph_vector_destroy(&typesVec);
 
-  // convert to actually usable type
-  igraph_vector_int_t edges_to_remove;
-  igraph_vector_int_init(&edges_to_remove, edgesToRemove.size());
-  pylimer_tools::utils::StdVectorToIgraphVectorT(edgesToRemove,
-                                                 &edges_to_remove);
-
-  igraph_delete_edges(&this->graph, igraph_ess_vector(&edges_to_remove));
+  // actually remove the bonds
+  if (igraph_vector_int_size(&edges_to_remove) > 0) {
+    igraph_delete_edges(&this->graph, igraph_ess_vector(&edges_to_remove));
+  }
   igraph_vector_int_destroy(&edges_to_remove);
+  this->NBonds = igraph_ecount(&this->graph);
 }
 
 void
@@ -903,7 +964,7 @@ Universe::getMolecules(const int atomTypeToOmit) const
 
   // select vertices of type
   std::vector<igraph_integer_t> indicesToRemove =
-    this->getIndicesOfType(atomTypeToOmit);
+    this->getIndicesWithAttribute("type", atomTypeToOmit);
   std::sort(indicesToRemove.rbegin(), indicesToRemove.rend());
   if (indicesToRemove.size() > 0) {
     igraph_vs_t verticesToRemove = this->getVerticesByIndices(indicesToRemove);
@@ -954,7 +1015,8 @@ Universe::getMolecules(const int atomTypeToOmit) const
 igraph_vs_t
 Universe::getVerticesOfType(const int type) const
 {
-  std::vector<igraph_integer_t> indices = this->getIndicesOfType(type);
+  std::vector<igraph_integer_t> indices =
+    this->getIndicesWithAttribute("type", type);
   return this->getVerticesByIndices(indices);
 }
 
@@ -976,32 +1038,6 @@ Universe::getVerticesByIndices(std::vector<igraph_integer_t> indices) const
   }
   igraph_vector_int_destroy(&indicesToSelect);
   return result;
-}
-
-/**
- * @brief Get the vertex indices of atoms with a certain type
- *
- * @param type the type to select
- * @return std::vector<long int>
- */
-std::vector<igraph_integer_t>
-Universe::getIndicesOfType(const int type) const
-{
-  std::vector<igraph_integer_t> indices;
-  if (this->getNrOfAtoms() == 0) {
-    return indices;
-  }
-
-  igraph_vector_t types;
-  igraph_vector_init(&types, this->getNrOfAtoms());
-  VANV(&this->graph, "type", &types);
-  for (int i = 0; i < this->NAtoms; ++i) {
-    if (VECTOR(types)[i] == type) {
-      indices.push_back(i);
-    }
-  }
-  igraph_vector_destroy(&types);
-  return indices;
 }
 
 /**
@@ -1745,7 +1781,7 @@ Universe::hasInfiniteStrand(const int crossLinkerType,
   // and you may run out of memory when using this function, if your graph is
   // lattice-like.
   std::vector<igraph_integer_t> startingCrosslinkers =
-    this->getIndicesOfType(crossLinkerType);
+    this->getIndicesWithAttribute("type", crossLinkerType);
 
   // note: this algorithm is not particularly efficient
   // it is of the order of O(n*n!)
@@ -2351,7 +2387,7 @@ Universe::getNetworkOfCrosslinker(const int crossLinkerType) const
   std::vector<long int> bondFrom;
   std::vector<long int> bondTo;
   std::vector<igraph_integer_t> crossLinkers =
-    this->getIndicesOfType(crossLinkerType);
+    this->getIndicesWithAttribute("type", crossLinkerType);
   for (long int crossLinker : crossLinkers) {
     std::vector<igraph_integer_t> connections =
       this->getVertexIdxsConnectedTo(crossLinker);

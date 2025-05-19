@@ -11,7 +11,7 @@ and dump
 files.
 
 Additionally, in :obj:`~pylimer_tools_cpp.UniverseSequence`,
-an additional level of abstraction is provided: the UniverseSequence automatically 
+an additional level of abstraction is provided: The UniverseSequence automatically 
 translates the data from an (internal) :obj:`~pylimer_tools_cpp.DataFileReader`
 or :obj:`~pylimer_tools_cpp.DumpFileReader` to a 
 :obj:`~pylimer_tools_cpp.Universe`, while also handling this whole operation 

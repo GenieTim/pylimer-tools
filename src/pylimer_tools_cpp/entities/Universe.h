@@ -53,6 +53,10 @@ public:
   // 3. copy assignment operator
   Universe& operator=(Universe src);
 
+  // equality operator
+  bool operator==(const Universe& other) const;
+  bool operator!=(const Universe& other) const;
+
   // initilaization/setters (and removers)
   void setBoxLengths(double Lx,
                      double Ly,
@@ -312,7 +316,6 @@ protected:
 
   // internal functions
   igraph_vs_t getVerticesOfType(int type) const;
-  std::vector<igraph_integer_t> getIndicesOfType(int type) const;
   igraph_vs_t getVerticesByIndices(std::vector<igraph_integer_t> indices) const;
   std::vector<double> computeDs(const std::vector<long int>& bondFrom,
                                 const std::vector<long int>& bondTo,

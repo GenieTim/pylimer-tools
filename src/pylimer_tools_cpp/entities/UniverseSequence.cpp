@@ -733,11 +733,11 @@ UniverseSequence::computeMsdForAtomProperties(
     }
     Eigen::VectorXd localCoordinates =
       Eigen::VectorXd::Zero(3 * atomIds.size());
-    RUNTIME_EXP_IFN(extraAtomData[i].at(x).size() == atomIds.size(),
+    RUNTIME_EXP_IFN(extraAtomData[i].at(x).size() == atoms[i].size(),
                     "Wrong size");
-    RUNTIME_EXP_IFN(extraAtomData[i].at(y).size() == atomIds.size(),
+    RUNTIME_EXP_IFN(extraAtomData[i].at(y).size() == atoms[i].size(),
                     "Wrong size");
-    RUNTIME_EXP_IFN(extraAtomData[i].at(z).size() == atomIds.size(),
+    RUNTIME_EXP_IFN(extraAtomData[i].at(z).size() == atoms[i].size(),
                     "Wrong size");
     for (size_t j = 0; j < atomIds.size(); ++j) {
       size_t row = atomIdToAtomIndex.at(atomIds[j]);

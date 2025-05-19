@@ -12,6 +12,52 @@ typedef Array<long int, Dynamic, 1> ArrayXli;
 typedef Array<size_t, Dynamic, 1> ArrayXst;
 typedef Array<bool, Dynamic, 1> ArrayXb;
 
+/**
+ * @brief Equality comparison between Eigen vector and std::vector
+ *
+ * @tparam Derived The derived Eigen type
+ * @tparam T The scalar type of the std::vector
+ * @param eigenVec The Eigen vector
+ * @param stdVec The std::vector
+ * @return true if vectors are equal
+ * @return false otherwise
+ */
+template<typename Derived, typename T>
+bool
+operator==(const Eigen::DenseBase<Derived>& eigenVec,
+           const std::vector<T>& stdVec)
+{
+  if (eigenVec.size() != static_cast<Eigen::Index>(stdVec.size())) {
+    return false;
+  }
+
+  for (Eigen::Index i = 0; i < eigenVec.size(); ++i) {
+    if (eigenVec(i) != stdVec[static_cast<size_t>(i)]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * @brief Equality comparison between std::vector and Eigen vector
+ *
+ * @tparam T The scalar type of the std::vector
+ * @tparam Derived The derived Eigen type
+ * @param stdVec The std::vector
+ * @param eigenVec The Eigen vector
+ * @return true if vectors are equal
+ * @return false otherwise
+ */
+template<typename T, typename Derived>
+bool
+operator==(const std::vector<T>& stdVec,
+           const Eigen::DenseBase<Derived>& eigenVec)
+{
+  return eigenVec == stdVec;
+}
+
 template<typename Derived>
 typename Derived::Scalar
 median(Eigen::DenseBase<Derived>& d)

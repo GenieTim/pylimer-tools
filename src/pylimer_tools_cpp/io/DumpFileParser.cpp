@@ -71,64 +71,7 @@ DumpFileParser::DumpFileParser(const std::string filePath)
   }
   this->filePath = filePath;
 
-  std::string line;
-  this->file.open(filePath);
-
-  if (!this->file.is_open()) {
-    throw std::invalid_argument("File to read file (" + filePath +
-                                "): failed to open.");
-  }
-
-  // read everything until the first key
-  while (getline(this->file, line)) {
-    line = pylimer_tools::utils::trimLineOmitComment(line);
-    // skip empty lines: break when not empty
-    if (!line.empty()) {
-      break;
-    }
-  }
-
-  // Assemble CSV data for all keys
-  this->newGroupKey = line; // new group key: key for a new timestep (group)
-  this->currentLine = line; // current line
-  this->groupPosMap.emplace(
-    0,
-    this->file.tellg()); // record position of index to jump back at some point
-
-  // read the whole file, skipping all lines that are not the new group key
-  // to record the positions
-  int groupsFound = 0;
-  size_t linesSinceLastIgnore = 0;
-  while (getline(this->file, line)) {
-    linesSinceLastIgnore += 1;
-    // performance improvement: not skipping.
-    // could be bad for certain files.
-    line = pylimer_tools::utils::trimLineOmitComment(line);
-    // skip empty lines
-    if (line.empty()) {
-      continue;
-    }
-
-    if (line == this->newGroupKey) {
-      // new timestep
-      groupsFound += 1;
-      this->groupPosMap.emplace(groupsFound, this->file.tellg());
-    }
-
-    // skip forward. Could be too far, in principle.
-    if (linesSinceLastIgnore > 2) {
-      // jump to next occurrence of the first character of the desired line
-      this->file.ignore(std::numeric_limits<std::streamsize>::max(),
-                        this->file.widen(this->newGroupKey[0]));
-      this->file.unget(); // put the character back
-      linesSinceLastIgnore = 0;
-    }
-  }
-
-  this->nrOfGroups = groupsFound + 1;
-  // reset position to start of first group
-  this->file.clear();
-  this->file.seekg(this->groupPosMap.at(0));
+  this->openFile();
 }
 
 /**
@@ -364,7 +307,8 @@ DumpFileParser::readDumpFileSections(ReadableDumpFileSections sectionsToRead)
                       "File ended before reading an indicated time-step.");
       resultingTimeSteps.push_back(std::stol(line));
     } else if (pylimer_tools::utils::startsWith(line, "ITEM: BOX BOUNDS") &&
-               (sectionsToRead & ReadableDumpFileSections::BOX)) {
+               ((sectionsToRead & ReadableDumpFileSections::BOX) ||
+                (sectionsToRead & ReadableDumpFileSections::ATOM))) {
       double loX, hiX, loY, hiY, loZ, hiZ;
       RUNTIME_EXP_IFN(std::getline(this->file, line),
                       "File ended before box could be read");
@@ -421,70 +365,62 @@ DumpFileParser::readDumpFileSections(ReadableDumpFileSections sectionsToRead)
           pylimer_tools::utils::split(splitFormat, atomFormat, " ");
           std::stringstream ss(line);
           for (const std::string& formatPart : splitFormat) {
+#define CASE(idStr, targetVar)                                                 \
+  case str2int(idStr):                                                         \
+    ss >> targetVar;                                                           \
+    /** always write to the extra data, for all properties */                  \
+    if (sectionsToRead & ReadableDumpFileSections::EXTRA_ATOM) {               \
+      localExtraAtomData[formatPart].push_back(                                \
+        static_cast<double>(targetVar));                                       \
+    }
+
             switch (str2int(formatPart)) {
-              case str2int("id"):
-                ss >> id;
-                break;
-              case str2int("type"):
-                ss >> type;
-                break;
-              case str2int("x"):
-                ss >> x;
-                break;
-              case str2int("xu"):
-                ss >> x;
-                isUnwrappedX = true;
-                break;
-              case str2int("xs"):
-                ss >> x;
-                isScaledX = true;
-                break;
-              case str2int("xsu"):
-                ss >> x;
-                isUnwrappedX = true;
-                isScaledX = true;
-                break;
-              case str2int("y"):
-                ss >> y;
-                break;
-              case str2int("yu"):
-                ss >> y;
-                isUnwrappedY = true;
-                break;
-              case str2int("ys"):
-                ss >> y;
-                isScaledY = true;
-                break;
-              case str2int("ysu"):
-                ss >> y;
-                isUnwrappedY = true;
-                isScaledY = true;
-                break;
-              case str2int("z"):
-                ss >> z;
-                break;
-              case str2int("zu"):
-                ss >> z;
-                isUnwrappedZ = true;
-                break;
-              case str2int("zs"):
-                ss >> z;
-                isScaledZ = true;
-                break;
-              case str2int("zsu"):
-                ss >> z;
-                isUnwrappedZ = true;
-                isScaledZ = true;
-                break;
-              case str2int("ix"):
-                ss >> nx;
-                break;
-              case str2int("iy"):
-                ss >> ny;
-                break;
-              case str2int("iz"):
-                ss >> nz;
-                break;
+              CASE("id", id)
+              break;
+              CASE("type", type)
+              break;
+              CASE("x", x)
+              break;
+              CASE("xu", x)
+              isUnwrappedX = true;
+              break;
+              CASE("xs", x)
+              isScaledX = true;
+              break;
+              CASE("xsu", x)
+              isUnwrappedX = true;
+              isScaledX = true;
+              break;
+              CASE("y", y)
+              break;
+              CASE("yu", y)
+              isUnwrappedY = true;
+              break;
+              CASE("ys", y)
+              isScaledY = true;
+              break;
+              CASE("ysu", y)
+              isUnwrappedY = true;
+              isScaledY = true;
+              break;
+              CASE("z", z)
+              break;
+              CASE("zu", z)
+              isUnwrappedZ = true;
+              break;
+              CASE("zs", z)
+              isScaledZ = true;
+              break;
+              CASE("zsu", z)
+              isUnwrappedZ = true;
+              isScaledZ = true;
+              break;
+              CASE("ix", nx)
+              break;
+              CASE("iy", ny)
+              break;
+              CASE("iz", nz)
+              break;
               default:
                 if (sectionsToRead & ReadableDumpFileSections::EXTRA_ATOM) {
                   double d;
@@ -494,8 +430,11 @@ DumpFileParser::readDumpFileSections(ReadableDumpFileSections sectionsToRead)
                 // throw std::runtime_error("Not implemented format part: '" +
                 //                          formatPart + "'");
             }
+
+#undef CASE
           }
         }
+        assert(resultingBoxes.size() > sectionsRead);
         localResults.push_back(pylimer_tools::entities::Atom(
           id,
           type,
@@ -512,8 +451,15 @@ DumpFileParser::readDumpFileSections(ReadableDumpFileSections sectionsToRead)
       }
 
       sectionsRead += 1;
-      assert(resultingBoxes.size() == sectionsRead);
-      assert(resultingTimeSteps.size() == sectionsRead);
+      if ((sectionsToRead & ReadableDumpFileSections::TIMESTEP)) {
+        assert(resultingTimeSteps.size() == sectionsRead);
+      }
+      if ((sectionsToRead & ReadableDumpFileSections::BOX)) {
+        assert(resultingBoxes.size() == sectionsRead);
+      }
+      if ((sectionsToRead & ReadableDumpFileSections::ATOM)) {
+        assert(resultingAtoms.size() == sectionsRead);
+      }
     }
   }
 
@@ -534,13 +480,76 @@ void
 DumpFileParser::rewind()
 {
   if (!this->file.is_open()) {
-    throw std::runtime_error("Cannot read from closed file.");
+    this->openFile();
   }
 
   if (this->file.eof()) {
     this->file.clear();
   }
   this->file.seekg(0, std::ios::beg);
+}
+
+void
+DumpFileParser::openFile()
+{
+  this->file.open(this->filePath);
+
+  if (!this->file.is_open()) {
+    throw std::invalid_argument("File to read ('" + this->filePath +
+                                "'): failed to open.");
+  }
+
+  std::string line;
+  // read everything until the first key
+  while (getline(this->file, line)) {
+    line = pylimer_tools::utils::trimLineOmitComment(line);
+    // skip empty lines: break when not empty
+    if (!line.empty()) {
+      break;
+    }
+  }
+
+  // Assemble CSV data for all keys
+  this->newGroupKey = line; // new group key: key for a new timestep (group)
+  this->currentLine = line; // current line
+  this->groupPosMap.emplace(
+    0,
+    this->file.tellg()); // record position of index to jump back at some point
+
+  // read the whole file, skipping all lines that are not the new group key
+  // to record the positions
+  int groupsFound = 0;
+  size_t linesSinceLastIgnore = 0;
+  while (getline(this->file, line)) {
+    linesSinceLastIgnore += 1;
+    // performance improvement: not skipping.
+    // could be bad for certain files.
+    line = pylimer_tools::utils::trimLineOmitComment(line);
+    // skip empty lines
+    if (line.empty()) {
+      continue;
+    }
+
+    if (line == this->newGroupKey) {
+      // new timestep
+      groupsFound += 1;
+      this->groupPosMap.emplace(groupsFound, this->file.tellg());
+    }
+
+    // skip forward. Could be too far, in principle.
+    if (linesSinceLastIgnore > 2) {
+      // jump to next occurrence of the first character of the desired line
+      this->file.ignore(std::numeric_limits<std::streamsize>::max(),
+                        this->file.widen(this->newGroupKey[0]));
+      this->file.unget(); // put the character back
+      linesSinceLastIgnore = 0;
+    }
+  }
+
+  this->nrOfGroups = groupsFound + 1;
+  // reset position to start of first group
+  this->file.clear();
+  this->file.seekg(this->groupPosMap.at(0));
 }
 
 /**

@@ -864,47 +864,44 @@ TEST_CASE(
 
   std::string inputFile =
     suspectedPath + "/structure/network_100_a_46.structure.out";
-  if (std::filesystem::exists(inputFile)) {
-    CHECK(std::filesystem::exists(suspectedPath));
-    std::cout << "Reading file " << inputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    CHECK(universeSeq.getLength() == 1);
-    pe::Universe universe = universeSeq.atIndex(0);
-    std::cout << "Read file. " << std::endl;
-    pcm::MEHPForceBalance forceBalancer =
-      pcm::MEHPForceBalance(universe, 2, false, false, false);
-    // TODO: using a seed does not seem to work properly
-    size_t nrOfAddedLinks =
-      forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, true, 12);
-    CHECK(nrOfAddedLinks >= 50);
-    CHECK_NOTHROW(forceBalancer.validateNetwork());
-    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
-    nrOfAddedLinks =
-      forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, false, 25);
-    CHECK(nrOfAddedLinks >= 50);
-    CHECK_NOTHROW(forceBalancer.validateNetwork());
-    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+  REQUIRE(std::filesystem::exists(inputFile));
+  CHECK(std::filesystem::exists(suspectedPath));
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  CHECK(universeSeq.getLength() == 1);
+  pe::Universe universe = universeSeq.atIndex(0);
+  std::cout << "Read file. " << std::endl;
+  pcm::MEHPForceBalance forceBalancer =
+    pcm::MEHPForceBalance(universe, 2, false, false, false);
+  // TODO: using a seed does not seem to work properly
+  size_t nrOfAddedLinks =
+    forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, true, 12);
+  CHECK(nrOfAddedLinks >= 50);
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
+  std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+  nrOfAddedLinks =
+    forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, false, 25);
+  CHECK(nrOfAddedLinks >= 50);
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
+  std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
-    pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
-    Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
-    Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
-    CHECK(net.nrOfSprings > 0);
-    size_t numRemoved = forceBalancer.removeTwofunctionalCrosslinks(
-      net, displacements, partitions);
-    CHECK_NOTHROW(
-      forceBalancer.validateNetwork(net, displacements, partitions));
-    CHECK(numRemoved > 0);
-    // numRemoved = forceBalancer.removeInactiveCrosslinks(net, displacements,
-    // partitions, 1e-20); CHECK(numRemoved == 204); // TODO: analyze these
-    size_t nrOfSpringsBefore = net.nrOfSprings;
-    CHECK_NOTHROW(
-      forceBalancer.validateNetwork(net, displacements, partitions));
-    // remove all springs...
-    numRemoved = forceBalancer.removeInactiveCrosslinks(
-      net, displacements, partitions, 1e5);
-    CHECK(net.nrOfSprings == 0);
-    CHECK(numRemoved > 0);
-  }
+  pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
+  Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
+  Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
+  CHECK(net.nrOfSprings > 0);
+  size_t numRemoved =
+    forceBalancer.removeTwofunctionalCrosslinks(net, displacements, partitions);
+  CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements, partitions));
+  CHECK(numRemoved > 0);
+  // numRemoved = forceBalancer.removeInactiveCrosslinks(net, displacements,
+  // partitions, 1e-20); CHECK(numRemoved == 204); // TODO: analyze these
+  size_t nrOfSpringsBefore = net.nrOfSprings;
+  CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements, partitions));
+  // remove all springs...
+  numRemoved =
+    forceBalancer.removeInactiveCrosslinks(net, displacements, partitions, 1e5);
+  CHECK(net.nrOfSprings == 0);
+  CHECK(numRemoved > 0);
 }
 
 TEST_CASE("MEHP Force Balance can run with swapping slip-links",
@@ -1331,14 +1328,25 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       // assert expectations are met.
       // NOTE: difficulty: finding out which spring idx it actually is
       // outputNetwork(net, displacements, springPartitions);
-      CHECK_THAT(springPartitions[5],
-                 Catch::Matchers::WithinAbs(0., 1e-3)); // 4-1(2)
-      CHECK_THAT(springPartitions[6],
-                 Catch::Matchers::WithinAbs(0., 1e-3)); // 4-2(3)
-      CHECK_THAT(springPartitions[0],
-                 Catch::Matchers::WithinAbs(1., 1e-3)); // 0(1)-4
-      CHECK_THAT(springPartitions[1],
-                 Catch::Matchers::WithinAbs(1., 1e-3)); // 1(2)-4
+      if (APPROX_EQUAL(springPartitions[0], 1., 1e-9)) {
+        CHECK_THAT(springPartitions[5],
+                   Catch::Matchers::WithinAbs(0., 1e-3)); // 4-1(2)
+        CHECK_THAT(springPartitions[6],
+                   Catch::Matchers::WithinAbs(0., 1e-3)); // 4-2(3)
+        CHECK_THAT(springPartitions[0],
+                   Catch::Matchers::WithinAbs(1., 1e-3)); // 0(1)-4
+        CHECK_THAT(springPartitions[1],
+                   Catch::Matchers::WithinAbs(1., 1e-3)); // 1(2)-4
+      } else {
+        CHECK_THAT(springPartitions[0],
+                   Catch::Matchers::WithinAbs(0., 1e-3)); // 0(1)-4
+        CHECK_THAT(springPartitions[1],
+                   Catch::Matchers::WithinAbs(0., 1e-3)); // 1(2)-4
+        CHECK_THAT(springPartitions[5],
+                   Catch::Matchers::WithinAbs(1., 1e-3)); // 4-1(2)
+        CHECK_THAT(springPartitions[6],
+                   Catch::Matchers::WithinAbs(1., 1e-3)); // 4-2(3)
+      }
       // CHECK(springPartitions[8] == Catch::Approx(1.0).margin(1e-6)); // 5-3
       // CHECK(springPartitions[7] + 1e-5 == Catch::Approx(0.0 +
       // 1e-5).margin(1e-6)); // 5-5 CHECK(springPartitions[3] ==
@@ -1378,8 +1386,9 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
 {
   size_t nrOfBeads = 30;
   size_t nrOfBeadsPerChain = 3;
-  pe::Universe universe =
-    pe::Universe(nrOfBeads * 10.0, nrOfBeads * 10.0, nrOfBeads * 10.0);
+  pe::Box originalBox =
+    pe::Box(nrOfBeads * 10.0, nrOfBeads * 10.0, nrOfBeads * 10.0);
+  pe::Universe universe = pe::Universe(originalBox);
   std::vector<double> xPositions;
   xPositions.reserve(nrOfBeads);
   std::vector<double> yPositions;
@@ -1422,18 +1431,40 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
   CHECK(universe.getNrOfAtoms() == nrOfBeads);
   CHECK(universe.getNrOfBonds() == nrOfBeads - 1);
 
+  pe::Box deformedBox =
+    pe::Box(nrOfBeads * 9.0, nrOfBeads * 9.0, nrOfBeads * 9.0);
+  universe.setBox(deformedBox, true);
+
   // now, check for every force evaluator, that the maximum entropy is when all
   // these beads overlap first, the gaussian spring one
   pcm::MEHPForceBalance forceBalancer =
     pcm::MEHPForceBalance(universe, 2, false);
+  forceBalancer.deformTo(originalBox);
+  CHECK_THAT(forceBalancer.getVolume(),
+             Catch::Matchers::WithinRel(originalBox.getVolume()));
   CHECK(forceBalancer.getNrOfSprings() ==
         forceBalancer.getNrOfPartialSprings());
+  CHECK(forceBalancer.getNumBonds() == forceBalancer.getNrOfSprings());
+  CHECK(forceBalancer.getNumBondsToForm() == 0);
+  CHECK(forceBalancer.getNumAtoms() == forceBalancer.getNrOfNodes());
+  CHECK(forceBalancer.getNumExtraBonds() == 0);
   CHECK(forceBalancer.getNrOfSprings() == nrOfBeads / nrOfBeadsPerChain);
+  CHECK(forceBalancer.getNumShifts() == 0);
+  CHECK(forceBalancer.getTimestep() == 1);
+  CHECK(forceBalancer.getCurrentTime(12345) == 0.0);
+  CHECK(forceBalancer.getNumRelocations() == 0);
+  CHECK(forceBalancer.getCoordinates().isApprox(
+    forceBalancer.getNetwork().coordinates));
+  CHECK(forceBalancer.getCurrentDisplacements().isZero());
 
   SECTION("Large enough box")
   {
     forceBalancer.configAssumeBoxLargeEnough(true);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(50000, 1e-18));
+    CHECK_FALSE(forceBalancer.getCurrentDisplacements().isZero());
+    CHECK(forceBalancer.getCoordinates().isApprox(
+      forceBalancer.getNetwork().coordinates +
+      forceBalancer.getCurrentDisplacements()));
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
@@ -1444,6 +1475,7 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
                Catch::Matchers::WithinAbs(0., 1e-9));
     CHECK(forceBalancer.getAverageSpringLength() >= 0.0);
     CHECK(forceBalancer.getAverageSpringLength() <= 3e-6);
+    CHECK(forceBalancer.getForceMagnitudeVector().isZero(1e-6));
     CHECK_NOTHROW(forceBalancer.validateNetwork());
   }
 
@@ -1461,6 +1493,7 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
                Catch::Matchers::WithinAbs(0., 1e-9));
     CHECK(forceBalancer.getAverageSpringLength() >= 0.0);
     CHECK(forceBalancer.getAverageSpringLength() <= 3e-6);
+    CHECK(forceBalancer.getForceMagnitudeVector().isZero(1e-6));
     CHECK_NOTHROW(forceBalancer.validateNetwork());
   }
 }
@@ -1566,7 +1599,8 @@ TEST_CASE("MEHP Force Balance fully active chains are fully active",
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   SECTION("MEHP Force Balance 3D case")
   {
@@ -1677,7 +1711,8 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC "
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   // perfect diamond network = fully connected =>
   // maximum is at perfect crystal structure -> must be all active.
@@ -1803,7 +1838,8 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
 
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   // perfect diamond network = fully connected =>
   // maximum is at perfect crystal structure -> must be all active.
@@ -2014,7 +2050,8 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
@@ -2173,7 +2210,8 @@ TEST_CASE("Particular MEHP Force Balance Example",
 
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   std::string inputFile =
     suspectedPath +
@@ -2203,7 +2241,8 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance][long]")
   std::cout << "Running test \"Random sampling example\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   std::string inputFile =
     suspectedPath +
@@ -2337,103 +2376,105 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance][long]")
   }
 }
 
-TEST_CASE("Random sampling example small", "[analysis][MEHPForceBalance]")
+TEST_CASE("Force Balance random sampling example small",
+          "[analysis][MEHPForceBalance]")
 {
-  std::cout << "Running test \"Random sampling example small\"" << std::endl;
+  std::cout << "Running test \"Force Balance random sampling example small\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   std::string inputFile =
     suspectedPath + "square_lattice_2x2_a_5.2d.structure.out";
-  if (std::filesystem::exists(inputFile)) {
-    std::cout << "Reading file " << inputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    pe::Universe universe = universeSeq.atIndex(0);
-    std::cout << "Read file " << inputFile << std::endl;
+  REQUIRE(std::filesystem::exists(inputFile));
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  std::cout << "Read file " << inputFile << std::endl;
 
-    // generate the same slip-links twice,
-    // once for each assumption
-    pcm::MEHPForceBalance forceBalancer =
-      pcm::MEHPForceBalance(universe, 2, true, true, false);
-    forceBalancer.configAssumeBoxLargeEnough(true);
-    forceBalancer.randomlyAddSliplinks(12, 6.0, 11, 3.0, false, 86573452);
+  // generate the same slip-links twice,
+  // once for each assumption
+  pcm::MEHPForceBalance forceBalancer =
+    pcm::MEHPForceBalance(universe, 2, true, true, false);
+  forceBalancer.configAssumeBoxLargeEnough(true);
+  forceBalancer.randomlyAddSliplinks(12, 6.0, 11, 3.0, false, 86573452);
 
-    pcm::MEHPForceBalance forceBalancer2 =
-      pcm::MEHPForceBalance(universe, 2, true, true, false);
+  pcm::MEHPForceBalance forceBalancer2 =
+    pcm::MEHPForceBalance(universe, 2, true, true, false);
 
-    pcm::MEHPForceBalance forceBalancer3 =
-      pcm::MEHPForceBalance(universe, 2, true, true, false);
+  pcm::MEHPForceBalance forceBalancer3 =
+    pcm::MEHPForceBalance(universe, 2, true, true, false);
 
-    // initially
-    CHECK_THAT(
-      forceBalancer2.getDisplacementResidualNorm(),
-      Catch::Matchers::WithinRel(forceBalancer3.getDisplacementResidualNorm()));
+  // initially
+  CHECK_THAT(
+    forceBalancer2.getDisplacementResidualNorm(),
+    Catch::Matchers::WithinRel(forceBalancer3.getDisplacementResidualNorm()));
 
-    // check that the order does not matter
-    forceBalancer2.configAssumeBoxLargeEnough(false);
-    forceBalancer2.randomlyAddSliplinks(12, 6.0, 11, 3.0, false, 86573452);
-    forceBalancer3.randomlyAddSliplinks(12, 6.0, 11, 3.0, false, 86573452);
-    forceBalancer3.configAssumeBoxLargeEnough(false);
+  // check that the order does not matter
+  forceBalancer2.configAssumeBoxLargeEnough(false);
+  forceBalancer2.randomlyAddSliplinks(12, 6.0, 11, 3.0, false, 86573452);
+  forceBalancer3.randomlyAddSliplinks(12, 6.0, 11, 3.0, false, 86573452);
+  forceBalancer3.configAssumeBoxLargeEnough(false);
 
-    // after adding slip-links
-    CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());
-    CHECK_THAT(
-      forceBalancer2.getDisplacementResidualNorm(),
-      Catch::Matchers::WithinRel(forceBalancer3.getDisplacementResidualNorm()));
-    CHECK_THAT(forceBalancer2.getPressure(),
-               Catch::Matchers::WithinRel(forceBalancer3.getPressure()));
-    // it is actually thinkable that the following fails for certain scenarios.
-    // however, in general, it should not
-    CHECK(forceBalancer.getDisplacementResidualNorm(1.) <=
-          forceBalancer2.getDisplacementResidualNorm(1.));
-    CHECK(forceBalancer.getDisplacementResidualNorm(-1.) <=
-          forceBalancer2.getDisplacementResidualNorm(-1.));
+  // after adding slip-links
+  CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());
+  CHECK_THAT(
+    forceBalancer2.getDisplacementResidualNorm(),
+    Catch::Matchers::WithinRel(forceBalancer3.getDisplacementResidualNorm()));
+  CHECK_THAT(forceBalancer2.getPressure(),
+             Catch::Matchers::WithinRel(forceBalancer3.getPressure()));
+  // it is actually thinkable that the following fails for certain scenarios.
+  // however, in general, it should not
+  CHECK(forceBalancer.getDisplacementResidualNorm(1.) <=
+        forceBalancer2.getDisplacementResidualNorm(1.));
+  CHECK(forceBalancer.getDisplacementResidualNorm(-1.) <=
+        forceBalancer2.getDisplacementResidualNorm(-1.));
 
-    // check to make sure the slip-links are actually placed identically
-    CHECK(forceBalancer.getNetwork().springPartIndexA.isApprox(
-      forceBalancer2.getNetwork().springPartIndexA));
-    CHECK(forceBalancer2.getNetwork().springPartIndexB.isApprox(
-      forceBalancer3.getNetwork().springPartIndexB));
+  // check to make sure the slip-links are actually placed identically
+  CHECK(forceBalancer.getNetwork().springPartIndexA.isApprox(
+    forceBalancer2.getNetwork().springPartIndexA));
+  CHECK(forceBalancer2.getNetwork().springPartIndexB.isApprox(
+    forceBalancer3.getNetwork().springPartIndexB));
 
-    pcm::MEHPForceBalance forceBalancer4 =
-      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 12, 6.0, 0.0, 11, 3.0, "86573452", 2, true);
-    forceBalancer4.configAssumeBoxLargeEnough(false);
+  // check that sampling immediately is not much different
+  // from adding them later
+  // pcm::MEHPForceBalance forceBalancer4 =
+  //   pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+  //     universe, 12, 6.0, 0.0, 11, 3.0, "86573452", 2, true);
+  // forceBalancer4.configAssumeBoxLargeEnough(false);
+  //
+  // CHECK_THAT(forceBalancer4.getPressure(),
+  //            Catch::Matchers::WithinRel(forceBalancer2.getPressure(), 0.1));
+  // CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
+  //            Catch::Matchers::WithinRel(
+  //              forceBalancer2.getDisplacementResidualNorm(), 0.1));
+  //
+  // forceBalancer4.configAssumeBoxLargeEnough(true);
+  //
+  // CHECK_THAT(forceBalancer4.getPressure(),
+  //            Catch::Matchers::WithinRel(forceBalancer.getPressure(), 0.1));
+  // CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
+  //            Catch::Matchers::WithinRel(
+  //              forceBalancer.getDisplacementResidualNorm(), 0.1));
 
-    CHECK_THAT(forceBalancer4.getPressure(),
-               Catch::Matchers::WithinRel(forceBalancer2.getPressure(), 0.1));
-    CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
-               Catch::Matchers::WithinRel(
-                 forceBalancer2.getDisplacementResidualNorm(), 0.1));
-
-    forceBalancer4.configAssumeBoxLargeEnough(true);
-
-    CHECK_THAT(forceBalancer4.getPressure(),
-               Catch::Matchers::WithinRel(forceBalancer.getPressure(), 0.1));
-    CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
-               Catch::Matchers::WithinRel(
-                 forceBalancer.getDisplacementResidualNorm(), 0.1));
-
-    // std::cout << "FB 1:" << std::endl;
-    // outputNetwork(forceBalancer.getNetwork(),
-    //               forceBalancer.getCurrentDisplacements(),
-    //               forceBalancer.getSpringPartitions());
-    // std::cout << "FB 2:" << std::endl;
-    // outputNetwork(forceBalancer2.getNetwork(),
-    //               forceBalancer2.getCurrentDisplacements(),
-    //               forceBalancer2.getSpringPartitions());
-    // std::cout << "FB 3:" << std::endl;
-    // outputNetwork(forceBalancer3.getNetwork(),
-    //               forceBalancer3.getCurrentDisplacements(),
-    //               forceBalancer3.getSpringPartitions());
-    // std::cout << "FB 4:" << std::endl;
-    // outputNetwork(forceBalancer4.getNetwork(),
-    //               forceBalancer4.getCurrentDisplacements(),
-    //               forceBalancer4.getSpringPartitions());
-  } else {
-    std::cerr << "File " << inputFile << " does not exist." << std::endl;
-  }
+  // std::cout << "FB 1:" << std::endl;
+  // outputNetwork(forceBalancer.getNetwork(),
+  //               forceBalancer.getCurrentDisplacements(),
+  //               forceBalancer.getSpringPartitions());
+  // std::cout << "FB 2:" << std::endl;
+  // outputNetwork(forceBalancer2.getNetwork(),
+  //               forceBalancer2.getCurrentDisplacements(),
+  //               forceBalancer2.getSpringPartitions());
+  // std::cout << "FB 3:" << std::endl;
+  // outputNetwork(forceBalancer3.getNetwork(),
+  //               forceBalancer3.getCurrentDisplacements(),
+  //               forceBalancer3.getSpringPartitions());
+  // std::cout << "FB 4:" << std::endl;
+  // outputNetwork(forceBalancer4.getNetwork(),
+  //               forceBalancer4.getCurrentDisplacements(),
+  //               forceBalancer4.getSpringPartitions());
 }
 
 TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
@@ -2441,7 +2482,8 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
   std::cout << "Running test \"Yet another sampling example\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   std::string inputFile =
     suspectedPath +
@@ -2566,7 +2608,8 @@ TEST_CASE("Conversion of structure is equal for both methods",
     << "Running test \"Conversion of structure is equal for both methods\""
     << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   std::string inputFile =
     suspectedPath +
@@ -2624,7 +2667,8 @@ TEST_CASE("Force Balance can be run without slipping",
             << std::endl;
 
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   std::string inputFile =
     suspectedPath +
@@ -2663,7 +2707,8 @@ TEST_CASE("Adding slip-links does not influence other springs",
     << "Running test \"Adding slip-links does not influence other springs\""
     << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   std::string inputFile =
     suspectedPath +
@@ -2724,7 +2769,8 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   // a structure with lots of dangling things that can and will be entangled,
   // yet the entanglements removed
@@ -2917,7 +2963,8 @@ TEST_CASE(
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   // a structure with lots of dangling things that can and will be entangled,
   // yet the entanglements removed

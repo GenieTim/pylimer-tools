@@ -1,11 +1,13 @@
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include "../../src/pylimer_tools_cpp/topo/EntanglementDetector.h"
+#include "../../src/pylimer_tools_cpp/utils/RandomWalker.h"
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include <iostream>
 
 namespace pe = pylimer_tools::entities;
+namespace pu = pylimer_tools::utils;
 namespace pt = pylimer_tools::topo::entanglement_detection;
 
 TEST_CASE("Entanglement Detector can ignore soluble chains",
