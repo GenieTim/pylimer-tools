@@ -144,7 +144,8 @@ def compute_extent_of_reaction(
 
     # assuming strand has functionality 2
     max_formable_bonds = min(
-        num_strands * 2, num_crosslinkers * functionality_per_type[crosslinker_type]
+        num_strands * 2, num_crosslinkers *
+        functionality_per_type[crosslinker_type]
     )
 
     if max_formable_bonds == 0:
@@ -180,7 +181,8 @@ def compute_fraction_of_bifunctional_reactive_sites(
     if functionality_per_type is None:
         functionality_per_type = network.determine_functionality_per_type()
 
-    monofunctional_types = [t for t, f in functionality_per_type.items() if f == 1]
+    monofunctional_types = [
+        t for t, f in functionality_per_type.items() if f == 1]
     if len(monofunctional_types) == 0:
         """
         Assume the whole monofunctional chain has the same atom type
@@ -189,7 +191,8 @@ def compute_fraction_of_bifunctional_reactive_sites(
             crosslinker_type=crosslinker_type
         )
         all_atom_types = set(network.get_atom_types())
-        atom_type_has_only_monofunctional = {atype: True for atype in all_atom_types}
+        atom_type_has_only_monofunctional = {
+            atype: True for atype in all_atom_types}
         for chain in chains_with_crosslinks:
             n_xlinks = len(chain.get_atoms_by_type(crosslinker_type))
             atom_types_in_chain = set(chain.get_atom_types())
@@ -307,7 +310,8 @@ def compute_mean_end_to_end_vectors(
     return end_to_end_vectors
 
 
-def compute_end_to_end_vectors(network: Universe, crosslinker_type: int = 2) -> dict:
+def compute_end_to_end_vectors(
+        network: Universe, crosslinker_type: int = 2) -> dict:
     """
     Compute the end to end vectors between each pair of (indirectly) connected crosslinker
 
@@ -370,9 +374,11 @@ def compute_crosslinker_conversion(
         f = functionality_per_type[crosslinker_type]
 
     if f is None or f <= 0.0 or not np.isfinite(f):
-        raise ValueError("Crosslinker functionality = {} is not reasonable.".format(f))
+        raise ValueError(
+            "Crosslinker functionality = {} is not reasonable.".format(f))
 
-    return compute_effective_crosslinker_functionality(network, crosslinker_type) / f
+    return compute_effective_crosslinker_functionality(
+        network, crosslinker_type) / f
 
 
 def compute_effective_crosslinker_functionality(
@@ -389,7 +395,8 @@ def compute_effective_crosslinker_functionality(
     junction_degrees = compute_effective_crosslinker_functionalities(
         network, crosslinker_type
     )
-    return float(np.mean(junction_degrees)) if len(junction_degrees) > 0 else 0.0
+    return float(np.mean(junction_degrees)) if len(
+        junction_degrees) > 0 else 0.0
 
 
 def compute_effective_crosslinker_functionalities(
@@ -407,7 +414,8 @@ def compute_effective_crosslinker_functionalities(
         return []
     junctions = network.get_atoms_by_type(crosslinker_type)
     junction_ids = [v.get_id() for v in junctions]
-    junction_degrees = [network.get_nr_of_bonds_of_atom(id) for id in junction_ids]
+    junction_degrees = [
+        network.get_nr_of_bonds_of_atom(id) for id in junction_ids]
     return junction_degrees
 
 
@@ -424,7 +432,8 @@ def compute_weight_fractions(network: Universe) -> dict:
     return network.compute_weight_fractions()
 
 
-def measure_weight_fraction_of_backbone(network: Universe, crosslinker_type: int = 2):
+def measure_weight_fraction_of_backbone(
+        network: Universe, crosslinker_type: int = 2):
     """
     Compute the weight fraction of network backbone in infinite network
 
@@ -444,7 +453,8 @@ def measure_weight_fraction_of_backbone(network: Universe, crosslinker_type: int
         network, crosslinker_type
     )
 
-    weight_fraction_soluble = measure_weight_fraction_of_soluble_material(network)
+    weight_fraction_soluble = measure_weight_fraction_of_soluble_material(
+        network)
 
     return 1.0 - weight_fraction_dangling - weight_fraction_soluble
 
@@ -553,7 +563,8 @@ def measure_lower_bound_weight_fraction_of_soluble_material(
 
     def is_soluble_cluster(cluster):
         chains = cluster.get_chains_with_crosslinker(crosslinker_type)
-        if np.any([c.get_strand_type() == MoleculeType.PRIMARY_LOOP for c in chains]):
+        if np.any([c.get_strand_type() ==
+                  MoleculeType.PRIMARY_LOOP for c in chains]):
             return False
         loops = cluster.find_loops(crosslinker_type)
         return len(loops) == 0
@@ -568,7 +579,8 @@ def measure_lower_bound_weight_fraction_of_soluble_material(
             if w < abs_tol and is_soluble_cluster(fractions[i]):
                 soluble_weight += w
         else:
-            if w < rel_tol * weights.max() and is_soluble_cluster(fractions[i]):
+            if w < rel_tol * \
+                    weights.max() and is_soluble_cluster(fractions[i]):
                 soluble_weight += w
 
     return soluble_weight / total_weight

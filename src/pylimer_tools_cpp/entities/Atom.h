@@ -1,6 +1,9 @@
 #pragma once
 
+#include "../io/DataFileParser.h"
+#include "../utils/VectorUtils.h"
 #include "Box.h"
+
 #include <Eigen/Dense>
 #include <cmath>
 #include <unordered_map>
@@ -43,24 +46,43 @@ public:
 
   bool operator==(const Atom& ref) const
   {
-    return this->id == ref.id && this->type == ref.type && this->x == ref.x &&
-           this->y == ref.y && this->z == ref.z && this->nx == ref.nx &&
-           this->ny == ref.ny && this->nz == ref.nz;
+    // compare properties we know that they exist
+    const bool stdPropertiesEqual =
+      (this->id == ref.id && this->type == ref.type &&
+       APPROX_EQUAL(this->x, ref.x, 1e-12) &&
+       APPROX_EQUAL(this->y, ref.y, 1e-12) &&
+       APPROX_EQUAL(this->z, ref.z, 1e-12) && this->nx == ref.nx &&
+       this->ny == ref.ny && this->nz == ref.nz);
+    if (!stdPropertiesEqual) {
+      return false;
+    }
+    // if we have a match so far, compare the extra data
+    for (const auto& [key, value] : ref.extraData) {
+      if (!pylimer_tools::utils::map_has_key(this->extraData, key)) {
+        return false;
+      }
+      if (!APPROX_EQUAL(this->extraData.at(key), value, 1e-12)) {
+        return false;
+      }
+    }
+    return true;
   }
 
-  Eigen::Vector3d vectorTo(const Atom& b, const Box& box) const
+  [[nodiscard]] Eigen::Vector3d vectorTo(const Atom& b, const Box& box) const
   {
     Eigen::Vector3d dist = b.getCoordinates() - this->getCoordinates();
     box.handlePBC(dist);
     return dist;
   }
 
-  Eigen::Vector3d vectorToUnwrapped(const Atom& b, const Box& box) const
+  [[nodiscard]] Eigen::Vector3d vectorToUnwrapped(const Atom& b,
+                                                  const Box& box) const
   {
     return b.getUnwrappedCoordinates(box) - this->getUnwrappedCoordinates(box);
   }
 
-  Eigen::Vector3d meanPositionWith(const Atom& b, const Box& box) const
+  [[nodiscard]] Eigen::Vector3d meanPositionWith(const Atom& b,
+                                                 const Box& box) const
   {
     Eigen::Vector3d result =
       this->getCoordinates() + 0.5 * this->vectorTo(b, box);
@@ -68,7 +90,8 @@ public:
     return result;
   }
 
-  Eigen::Vector3d meanPositionWithUnwrapped(const Atom& b, const Box& box) const
+  [[nodiscard]] Eigen::Vector3d meanPositionWithUnwrapped(const Atom& b,
+                                                          const Box& box) const
   {
     Eigen::Vector3d result =
       this->getCoordinates() + 0.5 * this->vectorToUnwrapped(b, box);
@@ -76,36 +99,36 @@ public:
     return result;
   }
 
-  double distanceTo(const Atom& b, const Box& box) const
+  [[nodiscard]] double distanceTo(const Atom& b, const Box& box) const
   {
     return this->vectorTo(b, box).norm();
   }
 
-  double distanceToUnwrapped(const Atom& b, const Box& box) const
+  [[nodiscard]] double distanceToUnwrapped(const Atom& b, const Box& box) const
   {
     return this->vectorToUnwrapped(b, box).norm();
   }
 
-  long int getId() const { return this->id; }
-  int getType() const { return this->type; }
-  double getX() const { return this->x; }
-  double getY() const { return this->y; }
-  double getZ() const { return this->z; }
-  double getUnwrappedX(const Box& box) const
+  [[nodiscard]] long int getId() const { return this->id; }
+  [[nodiscard]] int getType() const { return this->type; }
+  [[nodiscard]] double getX() const { return this->x; }
+  [[nodiscard]] double getY() const { return this->y; }
+  [[nodiscard]] double getZ() const { return this->z; }
+  [[nodiscard]] double getUnwrappedX(const Box& box) const
   {
     return this->x + (this->nx * box.getLx());
   }
-  double getUnwrappedY(const Box& box) const
+  [[nodiscard]] double getUnwrappedY(const Box& box) const
   {
     return this->y + (this->ny * box.getLy());
   }
-  double getUnwrappedZ(const Box& box) const
+  [[nodiscard]] double getUnwrappedZ(const Box& box) const
   {
     return this->z + (this->nz * box.getLz());
   }
-  int getNX() const { return this->nx; }
-  int getNY() const { return this->ny; }
-  int getNZ() const { return this->nz; }
+  [[nodiscard]] int getNX() const { return this->nx; }
+  [[nodiscard]] int getNY() const { return this->ny; }
+  [[nodiscard]] int getNZ() const { return this->nz; }
 
   template<typename VectorType>
   void getCoordinates(VectorType& vec) const
@@ -117,7 +140,7 @@ public:
     vec[1] = this->getY();
     vec[2] = this->getZ();
   }
-  Eigen::Vector3d getCoordinates() const
+  [[nodiscard]] Eigen::Vector3d getCoordinates() const
   {
     return Eigen::Vector3d(this->x, this->y, this->z);
   }
@@ -131,19 +154,19 @@ public:
     vec[1] = this->getUnwrappedY(box);
     vec[2] = this->getUnwrappedZ(box);
   }
-  Eigen::Vector3d getUnwrappedCoordinates(const Box& box) const
+  [[nodiscard]] Eigen::Vector3d getUnwrappedCoordinates(const Box& box) const
   {
     Eigen::Vector3d coords = Eigen::Vector3d::Zero();
     this->getUnwrappedCoordinates<Eigen::Vector3d>(coords, box);
     return coords;
   }
 
-  std::unordered_map<std::string, double> getExtraData() const
+  [[nodiscard]] std::unordered_map<std::string, double> getExtraData() const
   {
     return this->extraData;
   }
 
-  double getProperty(const std::string property) const
+  [[nodiscard]] double getProperty(const std::string property) const
   {
     return this->extraData.at(property);
   }

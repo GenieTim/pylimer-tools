@@ -40,15 +40,20 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         # empty weight -> empty weight fraction
         self.testUniverse.set_masses({1: 0, 2: 0})
         self.assertEqual(
-            0.0, measure_weight_fraction_of_soluble_material(self.testUniverse, 2)
+            0.0, measure_weight_fraction_of_soluble_material(
+                self.testUniverse, 2)
         )
-        self.assertEqual(1.0, measure_weight_fraction_of_backbone(self.testUniverse, 2))
+        self.assertEqual(
+            1.0, measure_weight_fraction_of_backbone(
+                self.testUniverse, 2))
         # non-empty weights
         self.testUniverse.set_masses({1: 1, 2: 0})
         self.assertTrue(self.testUniverse.get_nr_of_atoms() > 0)
         self.assertEqual(self.testUniverse.get_masses(), {1: 1, 2: 0})
         all_chains = self.testUniverse.get_chains_with_crosslinker(2)
-        self.assertEqual(all_chains[2].get_strand_type(), MoleculeType.DANGLING_CHAIN)
+        self.assertEqual(
+            all_chains[2].get_strand_type(),
+            MoleculeType.DANGLING_CHAIN)
         self.assertEqual(
             (0.2, 0.25),
             measure_weight_fraction_of_dangling_chains(
@@ -58,21 +63,27 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
 
     def test_crosslinker_functionality_calculation(self):
         self.assertCountEqual(
-            [], compute_effective_crosslinker_functionalities(self.emptyUniverse, 2)
+            [], compute_effective_crosslinker_functionalities(
+                self.emptyUniverse, 2)
         )
         self.assertSequenceEqual(
             [0, 2, 3],
-            compute_effective_crosslinker_functionalities(self.testUniverse, 2),
+            compute_effective_crosslinker_functionalities(
+                self.testUniverse, 2),
         )
         self.assertEqual(
-            5.0 / 3.0, compute_effective_crosslinker_functionality(self.testUniverse, 2)
+            5.0 /
+            3.0, compute_effective_crosslinker_functionality(
+                self.testUniverse, 2)
         )
         self.assertEqual(
-            5.0 / 3.0 / 3.0, compute_crosslinker_conversion(self.testUniverse, 2, f=3)
+            5.0 / 3.0 /
+            3.0, compute_crosslinker_conversion(self.testUniverse, 2, f=3)
         )
         self.assertRaises(
             ValueError,
-            lambda: compute_crosslinker_conversion(self.testUniverse, 2, np.inf),  # type: ignore
+            lambda: compute_crosslinker_conversion(
+                self.testUniverse, 2, np.inf),  # type: ignore
         )
 
     def test_mean_end_to_end_computation(self):
@@ -172,11 +183,13 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(0, compute_cycle_rank(None, 1, 1))
         self.assertEqual(-1, compute_cycle_rank(None, 0, 1))
         universe = Universe(10, 10, 10)
-        universe = self.addAtomBondData(universe, self.testAtoms, self.testBonds)
+        universe = self.addAtomBondData(
+            universe, self.testAtoms, self.testBonds)
         # test basic exception thrown when specifying the wrong arguments
         self.assertRaises(
             ValueError,
-            lambda: compute_cycle_rank(networks=[universe], crosslinker_type=None),
+            lambda: compute_cycle_rank(
+                networks=[universe], crosslinker_type=None),
         )
         self.assertRaises(
             ValueError,
@@ -211,14 +224,16 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
 
     def test_topological_factor_computation(self):
         self.assertEqual(
-            1 + 1.0 / 3.0, compute_topological_factor([self.testUniverse], 2, b=1)
+            1 + 1.0 /
+            3.0, compute_topological_factor([self.testUniverse], 2, b=1)
         )
         bond_lengths = []
         for m in self.testUniverse.get_molecules(2):
             bond_lengths.extend(m.compute_bond_lengths())
         self.assertEqual(1, np.mean(bond_lengths))
         self.assertEqual(
-            0.5485762961986437, compute_topological_factor([self.testUniverse], 2)
+            0.5485762961986437, compute_topological_factor(
+                [self.testUniverse], 2)
         )
         # larger system
         # g = self.saturatedTestUniverse.getUnderlyingGraph()
@@ -231,11 +246,13 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
 
     def test_shear_modulus_prediction(self):
         self.assertEqual(
-            0.0, predict_shear_modulus([self.emptyUniverse], crosslinker_type=2)
+            0.0, predict_shear_modulus(
+                [self.emptyUniverse], crosslinker_type=2)
         )
         self.assertEqual(
             0.003624521957026753,
-            predict_shear_modulus([self.saturatedTestUniverse], crosslinker_type=2),
+            predict_shear_modulus(
+                [self.saturatedTestUniverse], crosslinker_type=2),
         )
 
 
