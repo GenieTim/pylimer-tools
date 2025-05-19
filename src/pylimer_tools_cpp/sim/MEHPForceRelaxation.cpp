@@ -37,8 +37,8 @@ MEHPForceRelaxation::runForceRelaxation(
     }
   }
 
-  Network net = this->forceRelaxationNetwork;
-  bool is2D = this->is2D;
+  const Network net = this->forceRelaxationNetwork;
+  const bool is2D = this->is2D;
 
   /* array allocation */
   std::vector<double> u0 =
@@ -47,11 +47,12 @@ MEHPForceRelaxation::runForceRelaxation(
   /* force relaxation */
   nlopt::opt opt(algorithm, 3 * net.nrOfNodes);
 
-  nlopt::func objectiveF = [](const unsigned n,
-                              const double* x,
-                              double* grad,
-                              void* f_data) -> double {
-    MEHPForceEvaluator* fEvaluator = static_cast<MEHPForceEvaluator*>(f_data);
+  const nlopt::func objectiveF = [](const unsigned n,
+                                    const double* x,
+                                    double* grad,
+                                    void* f_data) -> double {
+    const MEHPForceEvaluator* fEvaluator =
+      static_cast<MEHPForceEvaluator*>(f_data);
     return fEvaluator->evaluateForceSetGradient(n, x, grad, f_data);
   };
   opt.set_min_objective(objectiveF, this->forceEvaluator);
@@ -115,54 +116,11 @@ MEHPForceRelaxation::runForceRelaxation(
   this->nrOfStepsDone += opt.get_numevals();
 }
 
-void
-MEHPForceRelaxation::runPhantomSteps(const long int nrOfSteps,
-                                     const double dt,
-                                     const double kappa,
-                                     const double T,
-                                     const double gamma)
-{
-  // initialise random generator for Langevin thermostat
-  std::default_random_engine generator;
-  std::normal_distribution<double> distribution(0., 1.);
-  auto gaussian = [&](double) { return distribution(generator); };
-
-  this->prepareAllOutputs();
-
-  // initialise other data structures
-  for (long int step = 0; step < nrOfSteps; ++step) {
-    // compute spring forces
-    double force = this->forceEvaluator->evaluateForceSetGradient(
-      this->forceRelaxationNetwork.nrOfNodes * 3,
-      this->currentSpringDistances,
-      this->currentForces.data());
-    // add Langevin thermo
-    this->currentForces +=
-      -gamma * this->currentVelocities +
-      sqrt(2. * gamma * T / dt) *
-        Eigen::VectorXd::NullaryExpr(this->currentForces.size(), gaussian);
-    this->currentVelocities += 0.5 * this->currentForces * dt;
-
-    // apply deformation
-    this->currentVelocities += 0.5 * this->currentForces * dt;
-    this->forceRelaxationNetwork.coordinates +=
-      this->currentVelocities * dt + 0.5 * this->currentForces * dt * dt;
-    this->currentSpringDistances =
-      this->evaluateSpringDistances(&this->forceRelaxationNetwork, this->is2D);
-
-    // output things
-    this->handleOutput(step);
-  }
-
-  this->forceEvaluator->setNetwork(this->forceRelaxationNetwork);
-  // store final state, potentially
-}
-
 Eigen::VectorXd
 MEHPForceRelaxation::evaluateSpringDistances(const Network* net,
                                              const bool is2D)
 {
-  Eigen::VectorXd u = Eigen::VectorXd::Zero(net->coordinates.size());
+  const Eigen::VectorXd u = Eigen::VectorXd::Zero(net->coordinates.size());
   return MEHPForceRelaxation::evaluateSpringDistances(net, u, is2D);
 }
 
@@ -172,7 +130,7 @@ MEHPForceRelaxation::evaluateSpringDistances(const Network* net,
                                              const bool is2D)
 {
   // this is unnecessary overhead :P
-  pylimer_tools::entities::Box box =
+  const pylimer_tools::entities::Box box =
     pylimer_tools::entities::Box(net->L[0], net->L[1], net->L[2]);
 
   // first, the distances
@@ -215,7 +173,7 @@ MEHPForceRelaxation::getCrosslinkerVerse() const
   std::vector<double> x;
   std::vector<double> y;
   std::vector<double> z;
-  std::vector<int> zeros = pylimer_tools::utils::initializeWithValue(
+  const std::vector<int> zeros = pylimer_tools::utils::initializeWithValue(
     this->forceRelaxationNetwork.nrOfNodes, 0);
   ids.reserve(this->forceRelaxationNetwork.nrOfNodes);
   x.reserve(this->forceRelaxationNetwork.nrOfNodes);
@@ -302,7 +260,7 @@ MEHPForceRelaxation::evaluateStressTensor(
     /* spring contribution to the overall stress tensor */
     for (size_t j = 0; j < 3; j++) {
       for (size_t k = 0; k < 3; k++) {
-        double contribution =
+        const double contribution =
           this->forceEvaluator->evaluateStressContribution(s, j, k, i);
         stress[j][k] += contribution;
       }
@@ -331,7 +289,7 @@ MEHPForceRelaxation::evaluateStressTensor(Network* net,
                                           const Eigen::VectorXd& u,
                                           const double loopTol) const
 {
-  Eigen::VectorXd springDistances =
+  const Eigen::VectorXd springDistances =
     this->evaluateSpringDistances(net, u, this->is2D);
 
   return this->evaluateStressTensor(springDistances, net->vol);
@@ -410,8 +368,8 @@ MEHPForceRelaxation::getNrOfActiveSpringsConnected(const double tolerance) const
     this->findActiveSprings(&this->forceRelaxationNetwork, tolerance);
   for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfSprings; i++) {
     if (springIsActive[i] == true) { /* active spring */
-      int a = this->forceRelaxationNetwork.springIndexA[i];
-      int b = this->forceRelaxationNetwork.springIndexB[i];
+      const int a = this->forceRelaxationNetwork.springIndexA[i];
+      const int b = this->forceRelaxationNetwork.springIndexB[i];
       ++(nrOfActiveSpringsConnected[a]);
       ++(nrOfActiveSpringsConnected[b]);
     }

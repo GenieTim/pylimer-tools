@@ -3,6 +3,9 @@
 #include "../../src/pylimer_tools_cpp/io/DataFileParser.h"
 #include "../../src/pylimer_tools_cpp/io/DataFileWriter.h"
 #include "../../src/pylimer_tools_cpp/io/DumpFileParser.h"
+#include "catch2/matchers/catch_matchers_container_properties.hpp"
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -26,8 +29,9 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
 
   SECTION("Reading from dump file works")
   {
-    pu::DumpFileParser parser =
-      pu::DumpFileParser(suspectedPath + "/lammps_dump_small.lammpstrj");
+    std::string inputFile = suspectedPath + "/lammps_dump_small.lammpstrj";
+    pu::DumpFileParser parser = pu::DumpFileParser(inputFile);
+    CHECK(parser.getFile() == inputFile);
     CHECK_THROWS(parser.hasKey("BOX BOUNDS"));
     CHECK(parser.getLength() == 1);
     CHECK_NOTHROW(parser.read());
@@ -42,8 +46,18 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
     // test other reading capabilities
     pu::DumpFileParser parser3 =
       pu::DumpFileParser(suspectedPath + "/lammps_dump_small.lammpstrj");
-    CHECK(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
-    CHECK_THROWS(parser.getValuesForAt<double>(0, "NOT EXISTING", 9));
+    CHECK(parser3.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
+    CHECK_THROWS(parser3.getValuesForAt<double>(0, "NOT EXISTING", 9));
+    std::vector<long int> timeSteps = parser3.readTimeSteps();
+    CHECK(timeSteps.size() == 1);
+    CHECK(timeSteps[0] == 70764);
+    std::vector<std::vector<pe::Atom>> atoms = parser3.readAtoms();
+    CHECK(atoms.size() == 1);
+    CHECK(atoms[0].size() == 12);
+    CHECK(atoms[0][2].getId() == 30000);
+    std::vector<pe::Box> boxes = parser3.readBoxes();
+    CHECK(boxes.size() == 1);
+    CHECK_THAT(boxes[0].getLx(), Catch::Matchers::WithinRel(4.8545999999999999e+01));
 
     // test throws
     CHECK_THROWS(pu::DumpFileParser("not-existing-file.out"));
@@ -209,6 +223,125 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
   }
 }
 
+TEST_CASE("Data-files can be written with velocities",
+          "[utils][DataFileWriter][DataFileParser][io]")
+{
+  std::cout << "Running test \"Data-files can be written with velocities\""
+            << std::endl;
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+  CHECK(std::filesystem::exists(suspectedPath));
+
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  std::string largeInputFile =
+    suspectedPath + "/structure/network_100_a_46.structure.out";
+  universeSeq.initializeFromDataSequence({ { largeInputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  universe.removeAllDihedralAngles();
+  universe.removeAllAngles();
+
+  // add velocities
+  universe.resampleVelocities(1.0, 3.0);
+
+  // write data file
+  pu::DataFileWriter writer = pu::DataFileWriter(universe);
+  writer.configIncludeVelocities(true);
+  writer.configMoleculeIdxForSwap(false);
+  writer.configMoveIntoBox(false);
+  writer.configIncludeAngles(false);
+  writer.configIncludeDihedralAngles(false);
+  writer.configAttemptImageReset(false);
+  std::string fileToWrite =
+    suspectedPath + "/tmp_data_file_with_velocities.structure.out";
+
+  SECTION("Without re-indexing or moving of images")
+  {
+    writer.configAtomStyle(pu::AtomStyle::MOLECULAR);
+    writer.writeToFile(fileToWrite);
+
+    pe::UniverseSequence seq = pe::UniverseSequence();
+    seq.initializeFromDataSequence({ { fileToWrite } });
+
+    pe::Universe readUniverse = seq.atIndex(0);
+
+    CHECK(readUniverse.vertexPropertyExists("vx"));
+    CHECK(readUniverse.vertexPropertyExists("vy"));
+    CHECK(readUniverse.vertexPropertyExists("vz"));
+
+    CHECK(universe.getBox() == readUniverse.getBox());
+    CHECK(universe == readUniverse);
+  }
+
+  SECTION("Coordinates into box")
+  {
+    writer.configAtomStyle(pu::AtomStyle::ANGLE);
+    writer.configMoveIntoBox(true);
+    writer.writeToFile(fileToWrite);
+
+    pe::UniverseSequence seq = pe::UniverseSequence();
+    seq.initializeFromDataSequence({ { fileToWrite } });
+
+    pe::Universe readUniverse = seq.atIndex(0);
+
+    CHECK(readUniverse.vertexPropertyExists("vx"));
+    CHECK(readUniverse.vertexPropertyExists("vy"));
+    CHECK(readUniverse.vertexPropertyExists("vz"));
+
+    REQUIRE(universe.getBox() == readUniverse.getBox());
+    std::vector<pe::Atom> atoms = universe.getAtoms();
+    for (size_t i = 0; i < atoms.size(); i++) {
+      pe::Atom readAtom = readUniverse.getAtom(atoms[i].getId());
+      REQUIRE(atoms[i].getId() == readAtom.getId());
+      Eigen::Vector3d prevCoords =
+        atoms[i].getUnwrappedCoordinates(universe.getBox());
+      Eigen::Vector3d readCoords =
+        readAtom.getUnwrappedCoordinates(readUniverse.getBox());
+
+      CHECK(prevCoords.isApprox(readCoords));
+    }
+  }
+
+  std::filesystem::remove(fileToWrite);
+}
+
+TEST_CASE("Atom type FULL can be read/written",
+          "[DataFileWriter][DataFileParser][io]")
+{
+  std::cout << "Running test \"Atom type FULL can be read/written\"";
+
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+  CHECK(std::filesystem::exists(suspectedPath));
+
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  std::string largeInputFile =
+    suspectedPath + "/structure/network_100_a_46.structure.out";
+  universeSeq.initializeFromDataSequence({ { largeInputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  universe.removeAllDihedralAngles();
+  universe.removeAllAngles();
+
+  // add velocities
+  universe.resampleVelocities(1.0, 3.0);
+  // add charge
+  universe.setPropertyValue(0, "charge", 1.075);
+
+  // write data file
+  pu::DataFileWriter writer = pu::DataFileWriter(universe);
+  writer.configAtomStyle(pu::AtomStyle::FULL);
+  std::string fileToWrite =
+    suspectedPath + "/tmp_data_file_style_full.structure.out";
+  writer.writeToFile(fileToWrite);
+
+  // read it again
+  pu::DataFileParser parser = pu::DataFileParser();
+  parser.read(fileToWrite, pu::AtomStyle::FULL);
+  CHECK(parser.getAdditionalAtomData().at("charge").size() ==
+        universe.getNrOfAtoms());
+  CHECK_THAT(parser.getAdditionalAtomData().at("charge")[0],
+             Catch::Matchers::WithinRel(1.075));
+
+  std::filesystem::remove(fileToWrite);
+}
+
 TEST_CASE("AveFileReader works", "[AveFileReader][io][utils]")
 {
   std::cout << "Running test \"AveFileReader works\"" << std::endl;
@@ -235,5 +368,12 @@ TEST_CASE("AveFileReader works", "[AveFileReader][io][utils]")
     CHECK(results.size() == dts.size());
     // ((5000*6000)+(6000*1000)+(1000*8000)+(8000*9000))/4
     CHECK(results[0] == Catch::Approx(29000000.0));
+  }
+
+  SECTION("Autocorrelation works on columns")
+  {
+    std::vector<double> results =
+      reader.autocorrelateColumnDifference(1, 2, { 1, 2 });
+    CHECK(results.size() == 2);
   }
 }

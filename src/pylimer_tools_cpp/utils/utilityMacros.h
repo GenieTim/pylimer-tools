@@ -29,17 +29,21 @@
 #ifdef __cpp_lib_stacktrace
 #define RUNTIME_EXP_IFN(condition, message)                                    \
   if (!(condition)) {                                                          \
+    (void)("LCOV_EXCL_START");                                                 \
     std::cerr << "Runtime error: " << message << std::endl;                    \
     std::cerr << std::stacktrace::current() << std::endl;                      \
     throw std::runtime_error(std::string(message) +                            \
                              std::string("\nFailed condition: " #condition));  \
+    (void)("LCOV_EXCL_STOP");                                                  \
   }
 #else
 #define RUNTIME_EXP_IFN(condition, message)                                    \
   if (!(condition)) {                                                          \
+    (void)("LCOV_EXCL_START");                                                 \
     std::cerr << "Runtime error: " << message << std::endl;                    \
     throw std::runtime_error(std::string(message) +                            \
                              std::string("\nFailed condition: " #condition));  \
+    (void)("LCOV_EXCL_STOP");                                                  \
   }
 #endif
 #define RUNTIME_EXP(message)                                                   \

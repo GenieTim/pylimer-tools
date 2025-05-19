@@ -1,5 +1,6 @@
 #include "../../src/pylimer_tools_cpp/entities/Atom.h"
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
+#include "../../src/pylimer_tools_cpp/utils/ExtraEigenTypes.h"
 #include "../../src/pylimer_tools_cpp/utils/StringUtils.h"
 #include "../../src/pylimer_tools_cpp/utils/VectorUtils.h"
 #include <catch2/catch_approx.hpp>
@@ -18,93 +19,7 @@ extern "C"
 
 namespace pu = pylimer_tools::utils;
 
-TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
-{
-  std::cout << "Running test \"Eigen behaves as required\"" << std::endl;
-  SECTION("Summation works with repeated indices")
-  {
-    Eigen::VectorXd testVec = Eigen::VectorXd::Zero(10);
-    Eigen::ArrayXi testIdx = Eigen::ArrayXi::Zero(5);
-    testIdx << 0, 0, 5, 5, 1;
-    testVec(testIdx) += Eigen::VectorXd::Ones(5);
-    REQUIRE(testVec[5] == Catch::Approx(2.));
-    REQUIRE(testVec[0] == Catch::Approx(2.));
-    REQUIRE(testVec[1] == Catch::Approx(1.));
-    REQUIRE(testVec[2] == 0.0);
-  }
-
-  SECTION("Summation works with different repeated indices")
-  {
-    Eigen::VectorXd testVec = Eigen::VectorXd::Zero(10);
-    Eigen::ArrayXi testIdx = Eigen::ArrayXi::Zero(5);
-    testIdx << 0, 0, 5, 5, 1;
-    Eigen::ArrayXi testIdx2 = Eigen::ArrayXi::Zero(5);
-    testIdx2 << 5, 0, 5, 1, 5;
-    Eigen::VectorXd seq = Eigen::VectorXd::Zero(7);
-    seq << 0, 1, 2, 3, 4, 5, 6;
-    Eigen::VectorXd resultsVec = Eigen::VectorXd::Zero(5);
-    resultsVec = seq(testIdx) + seq(testIdx2);
-    REQUIRE(resultsVec[0] == Catch::Approx(5.));
-    REQUIRE(resultsVec[1] == Catch::Approx(0.));
-    REQUIRE(resultsVec[2] == Catch::Approx(10.));
-    REQUIRE(resultsVec[3] == Catch::Approx(6.));
-    REQUIRE(resultsVec[4] == Catch::Approx(6.));
-  }
-
-  SECTION("Casting bool to double results in 1.0/0.0")
-  {
-    auto gen = std::bind(std::uniform_int_distribution<>(0, 1),
-                         std::default_random_engine());
-    Eigen::Array<bool, 1, 100> boolArray;
-    for (int i = 0; i < 100; i++) {
-      bool b = gen();
-      boolArray[i] = b;
-    }
-    Eigen::ArrayXd castedBoolArray = boolArray.cast<double>();
-    for (int i = 0; i < 100; i++) {
-      if (boolArray[i]) {
-        CHECK(castedBoolArray[i] == 1.0);
-      } else {
-        CHECK(castedBoolArray[i] + 1e-5 == 1e-5);
-      }
-    }
-  }
-
-  SECTION("Empty vectors are empty")
-  {
-    Eigen::VectorXd v = Eigen::VectorXd::Zero(0);
-    CHECK(v.size() == 0);
-    Eigen::ArrayXi a = Eigen::ArrayXi::Zero(0);
-    CHECK(a.size() == 0);
-  }
-
-  // SECTION("Vector addition/subtraction is as expected")
-  // {
-  //   Eigen::Vector3d coords = Eigen::Vector3d::Zero();
-  //   coords << 15.0609, 1.663, 2.32802;
-  //   Eigen::Vector3d other = Eigen::Vector3d::Zero();
-  //   other << 12.2155, 1.36349, 6.70744;
-
-  //   Eigen::Vector3d offset = Eigen::Vector3d::Zero();
-  //   offset << -0., -0., -0.;
-
-  //   Eigen::Vector3d diff = other - coords + offset;
-  //   CHECK(diff[0] == Catch::Approx(-2.84534));
-  //   CHECK(diff[1] == Catch::Approx(-0.299508));
-  //   CHECK(diff[2] == Catch::Approx(4.37942));
-  // }
-
-  SECTION("Entries can be swapped")
-  {
-    Eigen::VectorXi testVec(11);
-    testVec = Eigen::VectorXi::LinSpaced(11, 0, 10);
-    CHECK(testVec[4] == 4);
-    std::swap(testVec[3], testVec[4]);
-    CHECK(testVec[3] == 4);
-  }
-}
-
-TEST_CASE("Vector Rows can be removed", "[Eigen]")
+TEST_CASE("Vector Rows can be removed", "[Eigen][header_tests][utils]")
 {
   std::cout << "Running test \"Vector Rows can be removed\"" << std::endl;
   SECTION("VectorXi")
@@ -167,22 +82,41 @@ TEST_CASE("Vector Rows can be removed", "[Eigen]")
   {
     std::vector<int> testVec = { 1, 124, 12, 42, 41, 132, 12, 123, 5, 12, 412 };
 
-    CHECK(testVec.size() == 11);
-    CHECK(pu::contains(testVec, 1));
-    CHECK(pu::contains(testVec, 12));
-    CHECK_FALSE(pu::contains(testVec, -1));
-    CHECK_NOTHROW(pu::removeIfContained(testVec, -1));
-    CHECK(testVec.size() == 11);
-    CHECK_NOTHROW(pu::removeIfContained(testVec, 12));
-    CHECK_FALSE(pu::contains(testVec, 12));
-    CHECK(pu::contains(testVec, 1));
-    CHECK(testVec.size() == 8);
+    SECTION("By value")
+    {
+      CHECK(testVec.size() == 11);
+      CHECK(pu::contains(testVec, 1));
+      CHECK(pu::contains(testVec, 12));
+      CHECK_FALSE(pu::contains(testVec, -1));
+      CHECK_NOTHROW(pu::removeIfContained(testVec, -1));
+      CHECK(testVec.size() == 11);
+      CHECK_NOTHROW(pu::removeIfContained(testVec, 12));
+      CHECK_FALSE(pu::contains(testVec, 12));
+      CHECK(pu::contains(testVec, 1));
+      CHECK(testVec.size() == 8);
+    }
+
+    SECTION("By index")
+    {
+      CHECK(testVec.size() == 11);
+
+      std::vector<size_t> emptyIndices = {};
+      CHECK_NOTHROW(pu::removeRows<int>(testVec, emptyIndices));
+      CHECK(testVec.size() == 11);
+      std::vector<size_t> testVec2 = { 11, 12, 13, 1, 2, 3, 4, 4,
+                                       5,  5,  5,  6, 7, 8, 9, 10 };
+      CHECK_THROWS(pu::removeRows(testVec, testVec2));
+      std::vector<size_t> testVec3 = { 1, 2, 3, 0, 4, 4, 5, 5, 5, 6, 7, 8, 10 };
+      CHECK_NOTHROW(pu::removeRows(testVec, testVec3));
+      CHECK(testVec.size() == 1);
+      CHECK(testVec[0] == 12);
+    }
   }
 }
 
-TEST_CASE("First occurence is found", "[VectorUtils]")
+TEST_CASE("First occurrence is found", "[VectorUtils][header_tests][utils]")
 {
-  std::cout << "Running test \"First occurence is found\"" << std::endl;
+  std::cout << "Running test \"First occurrence is found\"" << std::endl;
   std::vector<int> testVec = { 1, 2, 3, 4, 4, 5, 5, 5, 6, 7, 8, 9, 10 };
   CHECK(pu::first_occuring_index(testVec, 5) == 5);
   CHECK(pu::first_occuring_index(testVec, 5, 6) == 5);
@@ -193,11 +127,13 @@ TEST_CASE("First occurence is found", "[VectorUtils]")
   CHECK(pu::first_occuring_index(testVec, 11) == testVec.size());
 }
 
-TEST_CASE("Elements can be found and conditionally added", "[VectorUtils]")
+TEST_CASE("Elements can be found and conditionally added",
+          "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Elements can be found and conditionally added\""
             << std::endl;
   std::vector<int> testVec;
+  CHECK_THROWS(pu::last(testVec));
   testVec.push_back(1);
   testVec.push_back(10000);
   testVec.push_back(99);
@@ -219,7 +155,8 @@ TEST_CASE("Elements can be found and conditionally added", "[VectorUtils]")
   CHECK(pu::last(testVec) == 100);
 }
 
-TEST_CASE("Elements are inserted to a sorted vector")
+TEST_CASE("Elements are inserted to a sorted vector",
+          "[VectorUtils][header_tests][utils]")
 {
   std::vector<size_t> vec = { 1, 3, 5, 7, 9 };
   size_t size_before = vec.size();
@@ -232,7 +169,7 @@ TEST_CASE("Elements are inserted to a sorted vector")
   }
 }
 
-TEST_CASE("Row removal works")
+TEST_CASE("Row removal works", "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Row removal works\"" << std::endl;
 
@@ -285,7 +222,7 @@ TEST_CASE("Row removal works")
   }
 }
 
-TEST_CASE("Index renumbering works")
+TEST_CASE("Index renumbering works", "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Index renumbering works\"" << std::endl;
   std::vector<size_t> testVecWithIndices = {
@@ -313,7 +250,7 @@ TEST_CASE("Index renumbering works")
   CHECK(testVecWithIndices[6] == 5);
 }
 
-TEST_CASE("Append and Prepend works")
+TEST_CASE("Append and Prepend works", "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Append and Prepend works\"" << std::endl;
   std::vector<size_t> vec = { 1, 2, 3, 4, 5 };
@@ -401,7 +338,7 @@ TEST_CASE("Append and Prepend works")
   }
 }
 
-TEST_CASE("Duplicates are removed")
+TEST_CASE("Duplicates are removed", "[VectorUtils][header_tests][utils]")
 {
   std::cout << "Running test \"Duplicates are removed\"" << std::endl;
   std::vector<size_t> vec = { 1, 7, 77, 7, 3, 3, 3, 4, 4, 2, 2, 4, 4, 5 };
@@ -415,4 +352,201 @@ TEST_CASE("Duplicates are removed")
   CHECK(vec[2] == 3);
   CHECK(vec[3] == 4);
   CHECK(vec[4] == 5);
+}
+
+TEST_CASE("Maximum value is found", "[VectorUtils][header_tests][utils]")
+{
+  std::cout << "Running test \"Maximum value is found\"" << std::endl;
+  std::vector<size_t> vec = { 1, 7, 77, 7, 3, 3, 3, 4, 4, 2, 2, 4, 4, 5 };
+  size_t maxValue = pylimer_tools::utils::max_element<size_t>(vec, 0);
+  CHECK(maxValue == 77);
+
+  std::vector<double> emptyVec;
+  CHECK(1. == pylimer_tools::utils::max_element<double>(emptyVec, 1.));
+
+  std::vector<double> nearlyEmptyVec;
+  nearlyEmptyVec.push_back(std::numeric_limits<double>::min());
+  CHECK(std::numeric_limits<double>::min() ==
+        pylimer_tools::utils::max_element<double>(nearlyEmptyVec, 1.));
+}
+
+TEST_CASE("Index of element is found", "[VectorUtils][header_tests][utils]")
+{
+  std::cout << "Running test \"Index of element is found\"" << std::endl;
+  std::vector<size_t> vec = { 1, 7, 77, 7, 3, 3, 3, 4, 4, 2, 2, 4, 4, 5 };
+  size_t index = pylimer_tools::utils::index_of<size_t>(vec, 7);
+  CHECK(index == 1);
+  index = pylimer_tools::utils::index_of<size_t>(vec, 3);
+  CHECK(index == 4);
+
+  CHECK_THROWS(pylimer_tools::utils::index_of<size_t>(vec, 99));
+
+  // same for a different type of vector
+  std::vector<double> vecD = { 1.1, 2.2, 3.3, 4.4, 5.5, 6.6 };
+  index = pylimer_tools::utils::index_of<double>(vecD, 4.4);
+  CHECK(index == 3);
+  index = pylimer_tools::utils::index_of<double>(vecD, 6.6);
+  CHECK(index == 5);
+  CHECK_THROWS(pylimer_tools::utils::index_of<double>(vecD, 7.7));
+}
+
+TEST_CASE("Vector equality is checked", "[VectorUtils][header_tests][utils]")
+{
+  std::cout << "Running test \"Vector equality is checked\"" << std::endl;
+  std::vector<size_t> vec1 = { 1, 2, 3, 4, 5 };
+  std::vector<size_t> vec2 = { 1, 2, 3, 4, 5 };
+  std::vector<size_t> vec3 = { 1, 2, 3, 4, 6 };
+  CHECK(pylimer_tools::utils::equal(vec1, vec2));
+  CHECK_FALSE(pylimer_tools::utils::equal(vec1, vec3));
+  vec2.push_back(6);
+  CHECK_FALSE(pylimer_tools::utils::equal(vec1, vec2));
+  CHECK_FALSE(pylimer_tools::utils::equal(vec2, vec3));
+
+  // similary for a different type of vector
+  std::vector<double> vec4 = { 1.1, 2.2, 3.3, 4.4, 5.5 };
+  std::vector<double> vec5 = { 1.1, 2.2, 3.3, 4.4, 5.5 };
+  std::vector<double> vec6 = { 1.1, 2.2, 3.3, 4.4, 6.6 };
+  CHECK(pylimer_tools::utils::equal(vec4, vec5));
+  CHECK_FALSE(pylimer_tools::utils::equal(vec4, vec6));
+}
+
+TEST_CASE("Eigen and std::vector equality is checked",
+          "[Eigen][VectorUtils][header_tests][utils]")
+{
+  std::cout << "Running test \"Eigen and std::vector equality is checked\""
+            << std::endl;
+
+  SECTION("Integer vectors")
+  {
+    std::vector<int> stdVec = { 1, 2, 3, 4, 5 };
+    Eigen::VectorXi eigenVec(5);
+    eigenVec << 1, 2, 3, 4, 5;
+
+    CHECK(stdVec == eigenVec);
+    CHECK(eigenVec == stdVec);
+
+    stdVec[2] = 10;
+    CHECK_FALSE(stdVec == eigenVec);
+    CHECK_FALSE(eigenVec == stdVec);
+
+    stdVec = { 1, 2, 3, 4, 5, 6 };
+    CHECK_FALSE(stdVec == eigenVec);
+    CHECK_FALSE(eigenVec == stdVec);
+  }
+
+  SECTION("Double vectors")
+  {
+    std::vector<double> stdVec = { 1.1, 2.2, 3.3, 4.4, 5.5 };
+    Eigen::VectorXd eigenVec(5);
+    eigenVec << 1.1, 2.2, 3.3, 4.4, 5.5;
+
+    CHECK(stdVec == eigenVec);
+    CHECK(eigenVec == stdVec);
+
+    eigenVec(3) = 4.5;
+    CHECK_FALSE(stdVec == eigenVec);
+    CHECK_FALSE(eigenVec == stdVec);
+  }
+
+  SECTION("Array types")
+  {
+    std::vector<double> stdVec = { 1.1, 2.2, 3.3, 4.4, 5.5 };
+    Eigen::ArrayXd eigenArray(5);
+    eigenArray << 1.1, 2.2, 3.3, 4.4, 5.5;
+
+    CHECK(stdVec == eigenArray);
+    CHECK(eigenArray == stdVec);
+  }
+
+  SECTION("Empty vectors")
+  {
+    std::vector<int> emptyStdVec;
+    Eigen::VectorXi emptyEigenVec(0);
+
+    CHECK(emptyStdVec == emptyEigenVec);
+    CHECK(emptyEigenVec == emptyStdVec);
+  }
+
+  SECTION("Approximate equality")
+  {
+    SECTION("Integer vectors")
+    {
+      std::vector<int> vec1 = { 1, 2, 3, 4, 5 };
+      std::vector<int> vec2 = { 1, 2, 3, 4, 5 };
+      std::vector<int> vec3 = { 1, 2, 3, 4, 6 };
+      CHECK(pu::equal(vec1, vec2));
+      CHECK_FALSE(pu::equal(vec1, vec3));
+      CHECK(pu::vector_approx_equal(vec1, vec2));
+      CHECK_FALSE(pu::vector_approx_equal(vec1, vec3));
+      CHECK(pu::vector_approx_rel_equal(vec1, vec2));
+      CHECK_FALSE(pu::vector_approx_rel_equal(vec1, vec3));
+      vec2.push_back(6);
+      CHECK_FALSE(pu::equal(vec1, vec2));
+      CHECK_FALSE(pu::equal(vec2, vec3));
+      CHECK_FALSE(pu::vector_approx_equal(vec1, vec2, 1e-12, true));
+      CHECK_FALSE(pu::vector_approx_equal(vec2, vec3));
+      CHECK_FALSE(pu::vector_approx_rel_equal(vec1, vec2, 1e-12, true));
+      CHECK_FALSE(pu::vector_approx_rel_equal(vec2, vec3));
+    }
+
+    SECTION("Double Eigen vectors")
+    {
+      Eigen::VectorXd vec4 = Eigen::VectorXd::LinSpaced(6, 1, 6);
+      Eigen::VectorXd vec5 = Eigen::VectorXd::LinSpaced(6, 1, 6);
+      Eigen::VectorXd vec6 = Eigen::VectorXd::LinSpaced(7, 1, 7);
+      CHECK(pu::vector_approx_equal(vec4, vec5));
+      CHECK_FALSE(pu::vector_approx_equal(vec4, vec6));
+      CHECK(pu::vector_approx_rel_equal(vec4, vec5));
+      CHECK_FALSE(pu::vector_approx_rel_equal(vec4, vec6));
+    }
+  }
+}
+
+TEST_CASE("Segment-wise norm is calculated",
+          "[VectorUtils][header_tests][utils]")
+{
+  std::cout << "Running test \"Segment-wise norm is calculated\"" << std::endl;
+  Eigen::VectorXd vec1 = Eigen::VectorXd::LinSpaced(6, 1, 6);
+
+  CHECK(pu::segmentwise_norm(vec1, 1) == vec1);
+  const std::vector<double> res6 = pu::segmentwise_norm(vec1, 6);
+  CHECK(res6.size() == 1);
+  CHECK(res6[0] == std::sqrt(vec1.array().square().sum()));
+
+  CHECK_THROWS(pu::segmentwise_norm(vec1, 0));
+  CHECK_THROWS(pu::segmentwise_norm(vec1, 5));
+}
+
+TEST_CASE("Segment-wise norm maximum is calculated",
+          "[VectorUtils][header_tests][utils]")
+{
+  std::cout << "Running test \"Segment-wise norm is calculated\"" << std::endl;
+  Eigen::VectorXd vec1 = Eigen::VectorXd::LinSpaced(6, 1, 6);
+
+  CHECK(pu::segmentwise_norm_max(vec1, 1) == 6);
+  const double res6 = pu::segmentwise_norm_max(vec1, 6);
+  CHECK(res6 == std::sqrt(vec1.array().square().sum()));
+
+  CHECK_THROWS(pu::segmentwise_norm(vec1, 0));
+  CHECK_THROWS(pu::segmentwise_norm(vec1, 5));
+}
+
+TEST_CASE("Finite component check is performed",
+          "[VectorUtils][header_tests][utils]")
+{
+  std::cout << "Running test \"Finite component check is performed\""
+            << std::endl;
+  Eigen::VectorXd vec1 = Eigen::VectorXd::LinSpaced(6, 1, 6);
+  Eigen::VectorXd vec2 = vec1.array() * std::numeric_limits<double>::infinity();
+
+  CHECK(pu::all_components_finite(vec1));
+  CHECK_FALSE(pu::all_components_finite(vec2));
+
+  Eigen::VectorXd vec3 =
+    vec1.array() * std::numeric_limits<double>::quiet_NaN();
+  CHECK_FALSE(pu::all_components_finite(vec3));
+
+  Eigen::VectorXd vec4 =
+    vec1.array() * std::numeric_limits<double>::signaling_NaN();
+  CHECK_FALSE(pu::all_components_finite(vec4));
 }

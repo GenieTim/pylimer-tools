@@ -129,9 +129,8 @@ namespace utils {
     void setBeadDistance(double newBeadDistance, bool updateMeanSquared = true)
     {
       INVALIDARG_EXP_IFN(newBeadDistance > 0, "Invalid mean bead distance");
-      INVALIDARG_EXP_IFN(
-        !(std::isnan(newBeadDistance) || std::isinf(newBeadDistance)),
-        "Invalid mean bead distance");
+      INVALIDARG_EXP_IFN(std::isfinite(newBeadDistance),
+                         "Invalid mean bead distance");
       this->beadDistance = newBeadDistance;
       if (updateMeanSquared) {
         this->meanSquaredBeadDistance =
@@ -148,8 +147,7 @@ namespace utils {
     {
       INVALIDARG_EXP_IFN(newMeanSquaredBeadDistance > 0,
                          "Invalid mean squared bead distance");
-      INVALIDARG_EXP_IFN(!(std::isnan(newMeanSquaredBeadDistance) ||
-                           std::isinf(newMeanSquaredBeadDistance)),
+      INVALIDARG_EXP_IFN(std::isfinite(newMeanSquaredBeadDistance),
                          "Invalid mean squared bead distance");
       this->meanSquaredBeadDistance = newMeanSquaredBeadDistance;
       if (updateMean) {
@@ -2317,10 +2315,10 @@ namespace utils {
               : from;
           assert(xlinkIdxOnStrand1 <
                  this->simplifiedUniverse.xlinkChainId.size());
-          while (this->simplifiedUniverse.xlinkChainId[xlinkIdxOnStrand1] ==
-                   strand1 &&
-                 xlinkIdxOnStrand1 <
-                   this->simplifiedUniverse.xlinkChainId.size()) {
+          while (xlinkIdxOnStrand1 <
+                   this->simplifiedUniverse.xlinkChainId.size() &&
+                 this->simplifiedUniverse.xlinkChainId[xlinkIdxOnStrand1] ==
+                   strand1) {
             for (size_t partnersSubStrand :
                  this->simplifiedUniverse.strandsOfXlink[xlinkIdxOnStrand1]) {
               assert(this->simplifiedUniverse.strandFrom[partnersSubStrand] ==

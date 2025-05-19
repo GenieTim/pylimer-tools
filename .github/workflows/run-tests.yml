@@ -22,10 +22,10 @@ jobs:
         with:
           submodules: "recursive"
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
-            ./_skbuild
+            ./build
             ./vendor/igraph
             ./vendor/igraph-skbuild
             ./vendor/nlopt
@@ -33,13 +33,13 @@ jobs:
             ./vendor/cereal
             ./vendor/cereal-skbuild
             ./tests/build
-          key: ${{ runner.os }}-py-3.12.4-${{ hashFiles('**/requirements.txt') }}
+          key: pt-${{ runner.os }}-py-3.13
           restore-keys: |
-            ${{ runner.os }}-py-3.12.4-
+            pt-${{ runner.os }}-py-3.13
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12.4"
+          python-version: "3.13.3"
           cache: "pip"
 
       - name: Install Dependencies

@@ -19,7 +19,7 @@ MEHPForceEvaluator::evaluateForceSetGradient(const size_t n,
 {
   assert(n == this->net.nrOfNodes * 3);
   assert(u.size() == this->net.coordinates.size());
-  Eigen::VectorXd springDistances =
+  const Eigen::VectorXd springDistances =
     -1. *
     MEHPForceRelaxation::evaluateSpringDistances(&this->net, u, this->is2D);
   assert(n == this->net.nrOfNodes * 3);
@@ -224,13 +224,14 @@ NonGaussianSpringForceEvaluator::evaluateForceSetGradient(
   }
 
   for (size_t i = 0; i < this->net.nrOfSprings; ++i) {
-    double r =
+    const double r =
       std::sqrt(springDistances[3 * i] * springDistances[3 * i] +
                 springDistances[3 * i + 1] * springDistances[3 * i + 1] +
                 springDistances[3 * i + 2] * springDistances[3 * i + 2]);
-    double rOverNl = r * this->oneOverl / (this->net.springsContourLength[i]);
-    double beta = langevin_inv(rOverNl);
-    double cschTerm =
+    const double rOverNl =
+      r * this->oneOverl / (this->net.springsContourLength[i]);
+    const double beta = langevin_inv(rOverNl);
+    const double cschTerm =
       csch(beta) *
       beta; // can be inf or 0. In case of zero, std::log() returns -inf.
     if (beta > 0.0 && !std::isinf(cschTerm) && cschTerm > 0.0) {

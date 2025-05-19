@@ -1,3 +1,4 @@
+import multiprocessing
 import os
 import platform
 import re
@@ -19,11 +20,11 @@ cmake_args = [
 ]
 # cmake_args = ["-Digraph_DEBUG=ON", "-DCMAKE_FIND_DEBUG_MODE=ON"]
 if os.environ.get("CMAKE_ARGS"):
-    cmake_args.extend(os.environ.get("CMAKE_ARGS").split())
+    cmake_args.extend(os.environ.get("CMAKE_ARGS", "").split())
 
 if os.getenv("VCPKG_ROOT"):
     toolchain_file = os.path.join(
-        os.getenv("VCPKG_ROOT"), "scripts", "buildsystems", "vcpkg.cmake"
+        os.getenv("VCPKG_ROOT", ""), "scripts", "buildsystems", "vcpkg.cmake"
     )
     if os.path.isfile(toolchain_file):
         cmake_args.append(
@@ -94,7 +95,6 @@ for vendor_file in vendor_files_to_delete:
 with open("README.md", "r") as file:
     readme_content = file.read()
 
-
 # Convert distutils Windows platform specifiers to CMake -A arguments
 PLAT_TO_CMAKE = {
     "win32": "Win32",
@@ -145,6 +145,8 @@ class CMakeBuild(build_ext):
             [
                 f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
                 f"-DPYTHON_EXECUTABLE={sys.executable}",
+                "-DCODE_COVERAGE=OFF",
+                "-DLEAK_ANALYSIS=OFF",
                 f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
             ]
         )
@@ -164,10 +166,15 @@ class CMakeBuild(build_ext):
             # exported for Ninja to pick it up, which is a little tricky to do.
             # Users can override the generator with CMAKE_GENERATOR in CMake
             # 3.15+.
-            if not cmake_generator or cmake_generator == "Ninja":
+            if (
+                not cmake_generator
+                or cmake_generator == "Ninja"
+                or cmake_generator == ""
+            ):
                 # import ninja
                 # ninja_executable_path = Path(ninja.BIN_DIR) / "ninja"
                 import shutil
+
                 ninja_executable_path = shutil.which("ninja")
 
                 if ninja_executable_path:
@@ -197,6 +204,8 @@ class CMakeBuild(build_ext):
                             "Ninja check did not pass, using default generator."
                         )
                         pass
+                else:
+                    warnings.warn("Ninja is not available, using default generator.")
 
         else:
             # Single config generators are handled "normally"
@@ -234,6 +243,9 @@ class CMakeBuild(build_ext):
             if hasattr(self, "parallel") and self.parallel:
                 # CMake 3.12+ only.
                 build_args += [f"-j{self.parallel}"]
+            elif multiprocessing.cpu_count() > 2:
+                # find the number of CPUs for parallel build
+                build_args += [f"-j{multiprocessing.cpu_count()-1}"]
 
         subprocess.run(
             ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True

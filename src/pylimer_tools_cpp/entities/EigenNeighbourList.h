@@ -1,7 +1,5 @@
 #pragma once
 
-extern "C"
-{}
 #include "../utils/ExtraEigenTypes.h"
 #include "Box.h"
 #include <Eigen/Dense>
@@ -26,6 +24,22 @@ namespace entities {
                        const Box& box,
                        double cutoff,
                        double scalingFactor = 1.);
+
+    /**
+     * @brief Equality operator to compare two EigenNeighbourList instances
+     *
+     * @param other The other EigenNeighbourList to compare with
+     * @return bool True if the two instances are equal
+     */
+    bool operator==(const EigenNeighbourList& other) const;
+
+    /**
+     * @brief Inequality operator to compare two EigenNeighbourList instances
+     *
+     * @param other The other EigenNeighbourList to compare with
+     * @return bool True if the two instances are not equal
+     */
+    bool operator!=(const EigenNeighbourList& other) const;
 
     void initialize(const Eigen::VectorXd& coordinates,
                     const Box& box,
@@ -95,6 +109,7 @@ namespace entities {
       double newCutoff,
       bool sort = false) const;
 
+#ifdef CERALIZABLE
     template<class Archive>
     void serialize(Archive& ar)
     {
@@ -103,11 +118,13 @@ namespace entities {
          totalNrOfBuckets,
          cutoff,
          scalingFactor,
+         actualCutoff,
          box,
          neighbourBuckets,
          neighbourBucketNeighboursDefaultCutoff,
          neighbourBucketSizes);
     }
+#endif
 
   protected:
     /**
@@ -148,11 +165,11 @@ namespace entities {
     Eigen::Array3li nrOfBuckets;
 
     // the total number of buckets (integer)
-    size_t totalNrOfBuckets;
+    size_t totalNrOfBuckets = 0;
 
-    double cutoff;
-    double scalingFactor;
-    double actualCutoff;
+    double cutoff = 1.0;
+    double scalingFactor = 1.0;
+    double actualCutoff = 1.0;
 
     pylimer_tools::entities::Box box;
 

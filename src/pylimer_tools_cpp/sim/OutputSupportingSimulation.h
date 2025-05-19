@@ -4,7 +4,6 @@
 #include "../calc/Correlator.h"
 #include "../utils/CerealUtils.h"
 #include "../utils/VectorUtils.h"
-#include "../utils/utilityMacros.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>
@@ -152,45 +151,13 @@ protected:
    * @brief Open all files required for output
    *
    */
-  void prepareAllOutputs()
-  {
-    this->outputStreams.clear();
-    this->outputFileStreams.clear();
-
-    // output headers
-    std::cout.flush();
-    std::ios::sync_with_stdio(false);
-    this->openFilesOutputHeader(this->outputConfigs);
-
-    // prepare averages
-    int numAverages = this->openFilesOutputHeader(
-      this->outputAverageConfigs, "# OutputStep\t", this->outputConfigs.size());
-    RUNTIME_EXP_IFN(runningAverages.size() == numAverages,
-                    "The nr. of running averages is not consistent with the "
-                    "number of output quantities.");
-
-    // prepare autocorrelation
-    this->openFilesOutputHeader(this->outputAutoCorrelationConfigs,
-                                "Step\t",
-                                this->outputConfigs.size() +
-                                  this->outputAverageConfigs.size());
-    std::string autocorrelationOutputBuffer;
-    autocorrelationOutputBuffer.reserve(
-      this->outputAutoCorrelationConfigs.size() * 50);
-  }
+  void prepareAllOutputs();
 
   /**
    * @brief Close all files required for output
    *
    */
-  void closeAllOutputs()
-  {
-    // finish up
-    std::ios::sync_with_stdio(true);
-    std::cout.flush();
-    this->outputStreams.clear();
-    this->outputFileStreams.clear();
-  }
+  void closeAllOutputs();
 
   int openFilesOutputHeader(const std::vector<OutputConfiguration>& configs,
                             const std::string& prefix = "",
@@ -199,7 +166,7 @@ protected:
   inline bool requiresDEvaluation(const ComputedDoubleValues val,
                                   const long int currentStep) const
   {
-    bool requiresEval =
+    const bool requiresEval =
       (this->doubleValueRequiredEvery[val] > 0) &&
       ((currentStep % this->doubleValueRequiredEvery[val]) == 0);
     // if (requiresEval) {
@@ -222,219 +189,7 @@ protected:
    *
    * @param currentStep
    */
-  void handleOutput(const long int currentStep)
-  {
-    // "lazily" compute the values we need, others less lazily when they are
-    // computationally inexpensive
-    std::array<long int, NUM_COMPUTABLE_INT_VALUES> intvalues = {
-      currentStep,
-      this->requiresIEvaluation(NUM_SHIFT, currentStep) ? this->getNumShifts()
-                                                        : 0,
-      this->requiresIEvaluation(NUM_RELOC, currentStep)
-        ? this->getNumRelocations()
-        : 0,
-      this->requiresIEvaluation(NUM_ATOMS, currentStep)
-        ? static_cast<long int>(this->getNumAtoms())
-        : 0,
-      this->requiresIEvaluation(NUM_EXTRA_ATOMS, currentStep)
-        ? static_cast<long int>(this->getNumExtraAtoms())
-        : 0,
-      this->requiresIEvaluation(NUM_BONDS, currentStep)
-        ? static_cast<long int>(this->getNumBonds())
-        : 0,
-      this->requiresIEvaluation(NUM_EXTRA_BONDS, currentStep)
-        ? static_cast<long int>(this->getNumExtraBonds())
-        : 0,
-      this->requiresIEvaluation(NUM_BONDS_TO_FORM, currentStep)
-        ? this->getNumBondsToForm()
-        : 0,
-    };
-
-    Eigen::Matrix3d stressTensor =
-      ((this->requireStressTensorEvery > 0) &&
-       (currentStep % this->requireStressTensorEvery) == 0)
-        ? this->getStressTensor()
-        : Eigen::Matrix3d::Zero();
-    double pressure = stressTensor.trace() / 3.;
-    // double kineticPressureTerm =
-    //   requiresDEvaluation(PRESSURE, currentStep)
-    //     ? ((getNumParticles() * this->getTemperature()) /
-    //     this->getVolume()) : 0.0;
-    Eigen::VectorXd bondLengths =
-      (((this->requireBondLenEvery > 0)) &&
-       ((currentStep % this->requireBondLenEvery) == 0))
-        ? this->getBondLengths()
-        : Eigen::Vector3d::Zero();
-    if (bondLengths.size() == 0) {
-      bondLengths = Eigen::Vector3d::Zero();
-    }
-
-    // assemble all computed values into an easy-to-access array
-    std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES> doublevalues = {
-      { this->getTimestep(),
-        this->requiresDEvaluation(ComputedDoubleValues::TIME, currentStep)
-          ? this->getCurrentTime(currentStep)
-          : 0.,
-        this->requiresDEvaluation(ComputedDoubleValues::VOLUME, currentStep)
-          ? this->getVolume()
-          : 0.,
-        pressure, // + kineticPressureTerm,
-        this->requiresDEvaluation(ComputedDoubleValues::TEMPERATURE,
-                                  currentStep)
-          ? this->getTemperature()
-          : 0.,
-        stressTensor(0, 0),
-        stressTensor(1, 1),
-        stressTensor(2, 2),
-        stressTensor(0, 1),
-        stressTensor(1, 2),
-        stressTensor(0, 2),
-        stressTensor(0, 0) - stressTensor(1, 1),
-        stressTensor(1, 1) - stressTensor(2, 2),
-        stressTensor(0, 0) - stressTensor(2, 2),
-        this->requiresDEvaluation(ComputedDoubleValues::GAMMA, currentStep)
-          ? this->getGamma()
-          : 0.,
-        this->requiresDEvaluation(ComputedDoubleValues::RESIDUAL, currentStep)
-          ? this->getResidual()
-          : 0.,
-        this->requiresDEvaluation(ComputedDoubleValues::MEAN_B, currentStep)
-          ? bondLengths.mean()
-          : 0.0,
-        this->requiresDEvaluation(ComputedDoubleValues::MAX_B, currentStep)
-          ? bondLengths.maxCoeff()
-          : 0.0,
-        0. }
-    };
-    int streamIdx = 0;
-    for (streamIdx = 0; streamIdx < this->outputConfigs.size(); ++streamIdx) {
-      if (currentStep % this->outputConfigs[streamIdx].outputEvery == 0) {
-        this->doOutputValues(
-          this->outputConfigs[streamIdx], intvalues, doublevalues, streamIdx);
-        outputBuffer.clear();
-      }
-    }
-
-    // compute averages
-    if (doAverage) {
-      size_t msdIdx = 0;
-      size_t averagesIdx = 0;
-      for (const OutputConfiguration& oc : this->outputAverageConfigs) {
-        size_t previousAverageIdx = averagesIdx;
-        if ((currentStep % oc.useEvery) == 0) {
-          double multiplier = (static_cast<double>(oc.useEvery) /
-                               static_cast<double>(oc.outputEvery));
-          for (ComputedIntValues val : oc.intValues) {
-            switch (val) {
-              default:
-                runningAverages[averagesIdx] +=
-                  static_cast<double>(intvalues[val]) * multiplier;
-                averagesIdx += 1;
-                break;
-            }
-          }
-          for (ComputedDoubleValues val : oc.doubleValues) {
-            switch (val) {
-              case ComputedDoubleValues::MSD:
-                // compute MSD
-                for (msdIdx = 0; msdIdx < this->msdMeasuredIndices.size();
-                     ++msdIdx) {
-                  double result =
-                    (this->msdOrigins[msdIdx] -
-                     getCoordinates()(this->msdMeasuredIndices[msdIdx]))
-                      .squaredNorm() /
-                    (static_cast<double>(
-                      this->msdMeasuredIndices[msdIdx].size() / 3.));
-                  runningAverages[averagesIdx + msdIdx] += result * multiplier;
-                }
-                averagesIdx += msdIdx;
-                break;
-              default:
-                runningAverages[averagesIdx] += doublevalues[val] * multiplier;
-                averagesIdx += 1;
-                break;
-            }
-          }
-        }
-
-        // check (and if, output) averages
-        if (currentStep % oc.outputEvery == 0) {
-          // output & start again
-          outputBuffer += std::to_string(intvalues[ComputedIntValues::STEP]);
-          for (size_t i = previousAverageIdx; i < averagesIdx; ++i) {
-            outputBuffer += "\t" + std::to_string(runningAverages[i]);
-            runningAverages[i] = 0.;
-          }
-          (*(this->outputStreams[streamIdx])) << outputBuffer << std::endl;
-          outputBuffer.clear();
-        }
-
-        streamIdx += 1;
-      }
-    }
-
-    // do autocorrelation
-    size_t autocorrelator_idx = 0;
-    for (const OutputConfiguration& oc : this->outputAutoCorrelationConfigs) {
-      const size_t autocorrelator_idx_before = autocorrelator_idx;
-      for (ComputedDoubleValues cv : oc.doubleValues) {
-        assert(autocorrelator_idx < this->autocorrelators.size());
-        RUNTIME_EXP_IFN(std::isfinite(doublevalues[cv]),
-                        "Expect output quantities to be finite, found " +
-                          std::to_string(doublevalues[cv]) + " for property " +
-                          ComputedDoubleValuesNames[cv] + ".");
-        this->autocorrelators[autocorrelator_idx].add(doublevalues[cv]);
-        autocorrelator_idx += 1;
-      }
-      if (currentStep % oc.outputEvery == 0) {
-        outputBuffer += "# TimeStep " +
-                        std::to_string(intvalues[ComputedIntValues::STEP]) +
-                        "\n";
-        this->autocorrelators[autocorrelator_idx_before].evaluate();
-        const unsigned int npcorr =
-          this->autocorrelators[autocorrelator_idx_before].npcorr;
-        RUNTIME_EXP_IFN(npcorr > 0, "Expected more than 0 correlator results.");
-        for (int autocorr_idx_offset = 1;
-             autocorr_idx_offset < oc.doubleValues.size();
-             ++autocorr_idx_offset) {
-          size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
-          this->autocorrelators[idx].evaluate();
-          RUNTIME_EXP_IFN(this->autocorrelators[idx].npcorr == npcorr,
-                          "Autocorrelation states are inconsistent.");
-        }
-
-        for (size_t output_idx = 0; output_idx < npcorr; output_idx += 1) {
-          outputBuffer += std::to_string(
-            this->autocorrelators[autocorrelator_idx_before].t[output_idx]);
-          for (int autocorr_idx_offset = 0;
-               autocorr_idx_offset < oc.doubleValues.size();
-               ++autocorr_idx_offset) {
-            size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
-            outputBuffer +=
-              "\t" + std::to_string(this->autocorrelators[idx].f[output_idx]);
-          }
-          outputBuffer += "\n";
-        }
-        (*(this->outputStreams[streamIdx])) << outputBuffer << std::flush;
-        streamIdx += 1;
-        outputBuffer.clear();
-      }
-
-      streamIdx += 1;
-    }
-
-    // potentially write restart file
-#ifdef CEREALIZABLE
-    if (this->outputRestartEvery > 0 &&
-        currentStep % this->outputRestartEvery == 0) {
-      this->writeRestartFile(this->restartOutputFile);
-    }
-#endif
-
-    if (currentStep % 50 == 0) {
-      std::flush(std::cout);
-    }
-  }
+  void handleOutput(const long int currentStep);
 
   // static OutputSupportingSimulation readRestartFile(std::string filename)
   // {
@@ -443,72 +198,18 @@ protected:
   // };
 
   /**
-   * @brief Output the passed valus
+   * @brief Output the passed values
    *
    * @param oc
    * @param intValues
    * @param doubleValues
    * @param streamIdx
    */
-  inline void doOutputValues(
+  void doOutputValues(
     const OutputConfiguration& oc,
     const std::array<long int, NUM_COMPUTABLE_INT_VALUES>& intValues,
     const std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES>& doubleValues,
-    const int streamIdx = 0)
-  {
-    assert(streamIdx <= this->outputStreams.size());
-    assert(doubleValues.size() == NUM_COMPUTABLE_DOUBLE_VALUES);
-    for (ComputedIntValues val : oc.intValues) {
-      RUNTIME_EXP_IFN(std::isfinite(static_cast<double>(intValues[val])),
-                      "Expect output quantities to be finite, found " +
-                        std::to_string(intValues[val]) + " for property " +
-                        ComputedIntValuesNames[val] + ".");
-      switch (val) {
-        default:
-          outputBuffer += std::to_string(intValues[val]) + "\t";
-      }
-    }
-    for (ComputedDoubleValues val : oc.doubleValues) {
-      RUNTIME_EXP_IFN(std::isfinite(doubleValues[val]),
-                      "Expect output quantities to be finite, found " +
-                        std::to_string(doubleValues[val]) + " for property " +
-                        ComputedDoubleValuesNames[val] + ".");
-      switch (val) {
-        case ComputedDoubleValues::MSD:
-          // compute MSD
-          for (size_t msdIdx = 0; msdIdx < this->msdMeasuredIndices.size();
-               ++msdIdx) {
-            assert(this->msdOrigins.size() > msdIdx);
-            assert(this->getCoordinates().size() >
-                   this->msdMeasuredIndices[msdIdx].maxCoeff());
-            assert(this->msdOrigins[msdIdx].size() ==
-                   this->msdMeasuredIndices[msdIdx].size());
-            Eigen::ArrayXi nIndices = this->msdMeasuredIndices[msdIdx];
-            assert(nIndices.size() > 0);
-            assert(nIndices.size() == this->msdOrigins[msdIdx].size());
-            Eigen::VectorXd relCoords = this->getCoordinates();
-            assert(nIndices.minCoeff() >= 0 &&
-                   nIndices.maxCoeff() < relCoords.size());
-            double result =
-              (this->msdOrigins[msdIdx] - relCoords(nIndices)).squaredNorm() /
-              (static_cast<double>(this->msdMeasuredIndices[msdIdx].size() /
-                                   3.));
-            outputBuffer += std::to_string(result) + "\t";
-          }
-          break;
-        default:
-          outputBuffer += "(" + std::to_string(val) + ")" +
-                          std::to_string(doubleValues[val]) + "\t";
-      }
-    }
-    if (!outputBuffer.empty()) {
-      outputBuffer.pop_back(); // remove last "\t"
-      outputBuffer += "\n";
-      // output the buffer, clear it
-      (*(this->outputStreams[streamIdx])) << outputBuffer;
-      outputBuffer.clear();
-    }
-  };
+    const int streamIdx = 0);
 
   /**
    * @brief Remember how often a particular value is needed to be computed for
@@ -517,43 +218,7 @@ protected:
    * @param configs
    */
   void updateValuesRequiredEvery(
-    const std::vector<OutputConfiguration>& configs)
-  {
-    for (OutputConfiguration c : configs) {
-      for (ComputedDoubleValues v : c.doubleValues) {
-        if (this->doubleValueRequiredEvery[v] == 0) {
-          this->doubleValueRequiredEvery[v] = c.useEvery;
-        } else {
-          this->doubleValueRequiredEvery[v] =
-            std::gcd(c.useEvery, this->doubleValueRequiredEvery[v]);
-        }
-      }
-      for (ComputedIntValues i : c.intValues) {
-        if (this->intValueRequiredEvery[i] == 0) {
-          this->intValueRequiredEvery[i] = c.useEvery;
-        } else {
-          this->intValueRequiredEvery[i] =
-            std::gcd(c.useEvery, this->intValueRequiredEvery[i]);
-        }
-      }
-    }
-    std::vector<ComputedDoubleValues> stressTensorRequiringValues = {
-      STRESS_XX, STRESS_YY,  STRESS_ZZ,  STRESS_XY,  STRESS_YZ,
-      STRESS_XZ, STRESS_NXY, STRESS_NYZ, STRESS_NXZ, PRESSURE
-    };
-    for (ComputedDoubleValues v : stressTensorRequiringValues) {
-      if (this->requireStressTensorEvery == 0) {
-        this->requireStressTensorEvery = this->doubleValueRequiredEvery[v];
-      } else {
-        this->requireStressTensorEvery = std::gcd(
-          this->requireStressTensorEvery, this->doubleValueRequiredEvery[v]);
-      }
-    }
-    // similarly for the bond length
-    this->requireBondLenEvery =
-      std::gcd(this->doubleValueRequiredEvery[ComputedDoubleValues::MAX_B],
-               this->doubleValueRequiredEvery[ComputedDoubleValues::MEAN_B]);
-  }
+    const std::vector<OutputConfiguration>& configs);
 
 public:
   virtual ~OutputSupportingSimulation() = default;
@@ -569,89 +234,46 @@ public:
   virtual void writeRestartFile(std::string& filename) = 0;
 #endif
 
+  /**
+   *
+   * @param vals the output configurations whose output to validate and truncate
+   */
   static void validateAndTruncateOutputFiles(
-    const std::vector<OutputConfiguration>& vals)
-  {
-    for (size_t i = 0; i < vals.size(); ++i) {
-      if (vals[i].filename.size() > 0) {
-        // empty the file
-        std::ifstream file;
-        file.open(vals[i].filename.c_str(),
-                  std::ifstream::out | (vals[i].append ? std::ifstream::app
-                                                       : std::ifstream::trunc));
-        if (!file.is_open() || file.fail()) {
-          file.close();
-          throw std::invalid_argument("The file " + vals[i].filename +
-                                      " could not be opened.");
-        }
-        file.close();
-      }
-    }
-  }
+    const std::vector<OutputConfiguration>& vals);
 
+  /**
+   * Configure the simulation to do autocorrelation computation
+   *
+   * @param vals the autocorrelation output configurations
+   * @param numcorrin a parameter for the autocorrelation computation
+   * @param pin a parameter for the autocorrelation computation
+   * @param min a parameter for the autocorrelation computation
+   */
   void configAutoCorrelatorOutput(const std::vector<OutputConfiguration>& vals,
                                   const unsigned int numcorrin = 32,
                                   const unsigned int pin = 16,
-                                  const unsigned int min = 2)
-  {
-    int num_values_to_correlate = 0;
-    for (size_t i = 0; i < vals.size(); ++i) {
-      INVALIDARG_EXP_IFN(vals[i].intValues.size() == 0,
-                         "Correlation of integer values is not supported yet.");
-      INVALIDARG_EXP_IFN(vals[i].outputEvery >= vals[i].useEvery,
-                         "Require useEvery to be smaller than output every");
-      num_values_to_correlate += vals[i].doubleValues.size();
-    }
-    this->validateAndTruncateOutputFiles(vals);
-    this->autocorrelators.clear();
-    this->autocorrelators.reserve(num_values_to_correlate);
-    this->updateValuesRequiredEvery(vals);
-    for (size_t i = 0; i < num_values_to_correlate; ++i) {
-      pylimer_tools::calc::Correlator correlator =
-        pylimer_tools::calc::Correlator(numcorrin, pin, min);
-      this->autocorrelators.push_back(correlator);
-    }
-    this->outputAutoCorrelationConfigs = vals;
-  }
+                                  const unsigned int min = 2);
 
-  void configAverageOutput(const std::vector<OutputConfiguration>& configs)
-  {
-    this->outputAverageConfigs = configs;
-    this->updateValuesRequiredEvery(configs);
+  /**
+   *
+   * @param configs the configuration for the output and computation of the
+   * averages
+   */
+  void configAverageOutput(const std::vector<OutputConfiguration>& configs);
 
-    int numAverages = 0;
-    for (const OutputConfiguration& c : configs) {
-      numAverages += c.doubleValues.size();
-      numAverages += c.intValues.size();
-      INVALIDARG_EXP_IFN(c.outputEvery >= c.useEvery,
-                         "Require useEvery to be smaller than output every");
-      INVALIDARG_EXP_IFN(c.outputEvery % c.useEvery == 0,
-                         "Output every must be a multiple of useEvery");
-    }
+  /**
+   *
+   * @param vals the configuration for the output and computation per step
+   */
+  void configStepOutput(std::vector<OutputConfiguration>& vals);
 
-    this->validateAndTruncateOutputFiles(configs);
-
-    this->runningAverages =
-      pylimer_tools::utils::initializeWithValue<double>(numAverages, 0.);
-    this->doAverage = numAverages > 0;
-  }
-
-  void configStepOutput(std::vector<OutputConfiguration>& vals)
-  {
-    for (size_t i = 0; i < vals.size(); ++i) {
-      vals[i].useEvery = vals[i].outputEvery;
-    }
-
-    this->validateAndTruncateOutputFiles(vals);
-    this->outputConfigs = vals;
-    this->updateValuesRequiredEvery(vals);
-  }
-
-  void configRestartOutput(const std::string& outputFile, const int outputEvery)
-  {
-    this->outputRestartEvery = outputEvery;
-    this->restartOutputFile = outputFile;
-  }
+  /**
+   *
+   * @param outputFile the file-path to which the restart file should be written
+   * @param outputEvery how often to write the restart file
+   */
+  void configRestartOutput(const std::string& outputFile,
+                           const int outputEvery);
 
 #ifdef CEREALIZABLE
   template<class Archive>

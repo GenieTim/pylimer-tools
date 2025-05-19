@@ -17,6 +17,43 @@ extern "C"
 
 namespace pylimer_tools::utils {
 /**
+ * @brief Creates a vector with n times the specified value.
+ *
+ * @tparam IN the type of the elements in the vector
+ * @param n the number of elements to initialize
+ * @param value the value to initialize with
+ * @return the vector of `n` times the `value`
+ */
+template<typename IN>
+static inline std::vector<IN>
+initializeWithValue(size_t n, IN value)
+{
+  std::vector<IN> result = std::vector<IN>(n, value);
+  // for (size_t i = 0; i < n; ++i) {
+  //   result.push_back(value);
+  // }
+  return result;
+}
+
+/**
+ * @brief Gets the last element of a vector. Throws an exception if the vector
+ * is empty.
+ *
+ * @tparam T the vector's type
+ * @param v the vector to get the last element from
+ * @return the last element of the vector
+ */
+template<typename T>
+static inline T
+last(const std::vector<T>& v)
+{
+  if (v.empty()) {
+    throw std::runtime_error("Cannot get last element from an empty vector.");
+  }
+  return v[v.size() - 1];
+}
+
+/**
  * @brief Removes all occurrences of a specific value from a vector.
  *
  * This function uses the erase-remove idiom to efficiently remove all
@@ -429,7 +466,9 @@ removeRows(std::vector<T>& vec,
   }
   /* Check if the largest index is valid */
   if (indicesToRemove[0] >= vec.size()) {
-    throw std::out_of_range("Index out of range");
+    throw std::out_of_range("Index " + std::to_string(indicesToRemove[0]) +
+                            " is out of range for a vector of size " +
+                            std::to_string(vec.size()) + ".");
   }
 
   size_t j = 0;
@@ -460,7 +499,8 @@ getMappingForRenumbering(const std::vector<size_t>& removedValues,
   }
 
   // for performance reasons, first assemble a new mapping
-  std::vector<long int> newMapping(nRemovableValues, -1);
+  std::vector<long int> newMapping =
+    initializeWithValue<long int>(nRemovableValues, -1);
   long int idxInDeletedStrands = removedValues.size() - 1;
   long int nDeletedSoFar = 0;
   for (size_t i = 0; i < nRemovableValues; ++i) {
@@ -509,24 +549,6 @@ renumberWithMapping(VecType& v, const std::vector<long int>& newMapping)
     assert(newMapping[v[i]] >= 0);
     v[i] = newMapping[v[i]];
   }
-}
-
-/**
- * @brief Gets the last element of a vector. Throws an exception if the vector
- * is empty.
- *
- * @tparam T the vector's type
- * @param v the vector to get the last element from
- * @return the last element of the vector
- */
-template<typename T>
-static inline T
-last(const std::vector<T>& v)
-{
-  if (v.empty()) {
-    throw std::runtime_error("Cannot get last element from an empty vector.");
-  }
-  return v[v.size() - 1];
 }
 
 /**
@@ -765,7 +787,9 @@ vector_approx_equal(const IN& v1,
                     const double absEps = 1e-12,
                     const bool echo = false)
 {
-  assert(v1.size() == v2.size());
+  if (v1.size() != v2.size()) {
+    return false;
+  }
   for (size_t i = 0; i < v1.size(); ++i) {
     if (!APPROX_EQUAL(v1[i], v2[i], absEps)) {
       if (echo) {
@@ -785,7 +809,9 @@ vector_approx_rel_equal(const IN& v1,
                         const double eps = 1e-12,
                         const bool echo = false)
 {
-  assert(v1.size() == v2.size());
+  if (v1.size() != v2.size()) {
+    return false;
+  }
   for (size_t i = 0; i < v1.size(); ++i) {
     if (!APPROX_REL_EQUAL(v1[i], v2[i], eps)) {
       if (echo) {
@@ -857,17 +883,6 @@ StdVectorToIgraphVectorT(std::vector<std::string>& vectR, igraph_strvector_t* v)
 MAKE_CONVERSION_FROM_IGRAPH_VEC_TO_STD(igraph_vector);
 MAKE_CONVERSION_FROM_IGRAPH_VEC_TO_STD(igraph_vector_int);
 MAKE_CONVERSION_FROM_IGRAPH_VEC_TO_STD(igraph_strvector);
-
-template<typename IN>
-static inline std::vector<IN>
-initializeWithValue(size_t n, IN value)
-{
-  std::vector<IN> result = std::vector<IN>(n, value);
-  // for (size_t i = 0; i < n; ++i) {
-  //   result.push_back(value);
-  // }
-  return result;
-}
 
 /**
  * @brief Add an element to a (assumed) sorted vector where it belongs

@@ -7,27 +7,12 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug C++ Header Tests",
-      "cwd": "${workspaceFolder}/tests/build",
-      "program": "${workspaceFolder}/tests/build/header_tests",
-      "args": ["Box can compute bounding box"],
-      "env": {
-        "MallocNanoZone": "0",
-        "ASAN_OPTIONS": "detect_leaks=0",
-        // "ASAN_OPTIONS": "detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1",
-        "LSAN_OPTIONS": "suppressions=${workspaceFolder}/tests/lsan.supp"
-      },
-      "preLaunchTask": "Compile Tests"
-    },
-    {
-      "type": "lldb",
-      "request": "launch",
       "name": "Debug C++ Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
         //"[MEHPForceBalance2]"
-        "All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and Simplification"
+        "[utils]"
       ],
       "env": {
         "MallocNanoZone": "0",

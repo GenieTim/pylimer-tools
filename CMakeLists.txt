@@ -7,14 +7,6 @@ if (POLICY CMP0025)
     cmake_policy(SET CMP0025 NEW)
 endif ()
 
-if (NOT DEFINED CEREALIZABLE)
-    option(CEREALIZABLE "Enable serialisation of various classes" ON)
-endif ()
-if (CEREALIZABLE)
-    add_definitions(-DCERALIZABLE)
-    add_compile_definitions(CEREALIZABLE)
-endif ()
-
 # start project
 if (NOT DEFINED VERSION_NR)
     project(pylimer_tools VERSION "0.2.4" LANGUAGES CXX)

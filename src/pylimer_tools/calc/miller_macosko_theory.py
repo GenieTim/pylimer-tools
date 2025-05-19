@@ -583,9 +583,9 @@ def compute_extracted_modulus(
     w_sol: float,
     xlink_concentration_0: pint.Quantity,
     ureg: pint.UnitRegistry,
-    alpha: Union[float, None] = None,
     temperature: Union[pint.Quantity, None] = None,
-):
+    b2: float = 1.0,
+) -> pint.Quantity:
     """
     Compute MMT's modulus, assuming the solvent is removed
 
@@ -605,17 +605,15 @@ def compute_extracted_modulus(
                 "Unit registry must be initialized, or temperature specified."
             )
         temperature = (273.15 + 25) * ureg.kelvin
-    if alpha is None:
-        alpha, _ = compute_miller_macosko_probabilities(r, p, f)
 
     junction_part = (1 - w_sol) ** (-1 / 3) * compute_junction_modulus(
         p=p,
         r=r,
         xlink_concentration_0=xlink_concentration_0,
         f=f,
-        alpha=alpha,
         ureg=ureg,
         temperature=temperature,
+        b2=b2,
     )
     entanglement_part = (1 - w_sol) ** (-2) * compute_entanglement_modulus(
         p=p,
@@ -623,6 +621,7 @@ def compute_extracted_modulus(
         f=f,
         g_e_1=g_e_1,
         temperature=temperature,
+        b2=b2,
     )
     return junction_part + entanglement_part
 
@@ -637,7 +636,7 @@ def compute_entanglement_modulus(
     f: Union[int, None] = None,
     b2: Union[float, None] = None,
     beta: Union[float, None] = None,
-):
+) -> pint.Quantity:
     """
     Compute MMT's entanglement contribution to the equilibrium shear modulus, given by
     :math:`k_B T \\epsilon_e T_e`.
@@ -666,9 +665,9 @@ def compute_junction_modulus(
     xlink_concentration_0: pint.Quantity,
     ureg: pint.UnitRegistry,
     f: int,
-    alpha: Union[float, None] = None,
     temperature: Union[pint.Quantity, None] = None,
-):
+    b2: Union[float, None] = None,
+) -> pint.Quantity:
     """
     Compute MMT's junction modulus, given by
     :math:`G_{junctions} = k_B T [A_f]_0 \\sum_{m=3}^{f} \\frac{m-2}{2} P(X_{m,f})`.
@@ -682,12 +681,16 @@ def compute_junction_modulus(
     :param temperature: The temperatures; defaults to room temperature (25 °C)
     :return: The junction modulus contribution
     """
+    param = _compute_validate_parameters(
+        {**locals()},
+        ["p_f_a_out"],
+    )
+
+    alpha = param["p_f_a_out"]
+    assert alpha is not None
     if temperature is None:
         assert ureg is not None, "Unit registry must be initialized."
         temperature = (273.15 + 25) * ureg.kelvin
-    if alpha is None:
-        assert f is not None and f > 0, "f must be a positive integer."
-        alpha, _ = compute_miller_macosko_probabilities(r, p, f)
     assert alpha is not None
     gamma_mmt_sum = 0.0
     for m in range(3, f + 1):
@@ -716,7 +719,7 @@ def compute_trapping_factor(beta: float) -> float:
 
 def compute_probability_that_crosslink_is_effective(
     functionality_of_monomer: int, expected_degree_of_effect: int, p_f_a_out: float
-):
+) -> float:
     """
     Compute the probability that an Af, monomer will be an effective cross-link of exactly degree m
 
@@ -739,7 +742,8 @@ def compute_probability_that_crosslink_is_effective(
 
 
 def compute_probability_that_bifunctional_monomer_is_effective(
-        p_f_b_out: float):
+    p_f_b_out: float,
+) -> float:
     """
     Consider a copolymerization of A_f with B_2.
     This function computes the probability that a random B_2 unit will be effective.
@@ -753,7 +757,7 @@ def compute_probability_that_bifunctional_monomer_is_effective(
 
 def compute_probability_that_crosslink_with_degree_is_dangling(
     functionality_of_monomer: int, degree_of_ineffectiveness: int, p_f_a_out: float
-):
+) -> float:
     """
     Consider a copolymerization of A_f with B_2.
     This function computes the probability that a random A_f unit will have i pendant arms.
@@ -779,7 +783,7 @@ def compute_probability_that_crosslink_with_degree_is_dangling(
 
 def compute_probability_that_crosslink_is_dangling(
     functionality_of_monomer: int, p_f_a_out: float
-):
+) -> float:
     """
     Consider a copolymerization of A_f with B_2.
     This function computes the probability that a random A_f unit will be dangling (pendant).
@@ -799,7 +803,8 @@ def compute_probability_that_crosslink_is_dangling(
 
 
 def compute_probability_that_bifunctional_monomer_is_dangling(
-        p_f_b_out: float):
+    p_f_b_out: float,
+) -> float:
     """
     Consider a copolymerization of A_f with B_2.
     This function computes the probability that a random B_2 unit will be dangling.

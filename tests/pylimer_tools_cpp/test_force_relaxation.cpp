@@ -573,6 +573,81 @@ TEST_CASE(
   }
 }
 
+TEST_CASE("MEHP Force Relaxation returns the cross-linker universe",
+          "[analysis][MEHPForceRelaxation][Universe]")
+{
+  std::cout << "Running test \"MEHP Force Relaxation returns the cross-linker "
+               "universe\""
+            << std::endl;
+  const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
+  REQUIRE(std::filesystem::exists(suspectedPath));
+
+  SECTION("Melt universe")
+  {
+    std::string inputFile =
+      suspectedPath + "/structure/melt_83_a_100.structure.out";
+    REQUIRE(std::filesystem::exists(inputFile));
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    std::vector<pu::AtomStyle> atomStyles = { pu::AtomStyle::HYBRID,
+                                              pu::AtomStyle::BOND,
+                                              pu::AtomStyle::EDPD };
+    universeSequence.setDataFileAtomStyle(atomStyles);
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
+
+    pcm::MEHPForceRelaxation forceRelaxer =
+      pcm::MEHPForceRelaxation(universe, 2);
+    CHECK(forceRelaxer.getNrOfNodes() == 83 * 2);
+    CHECK(forceRelaxer.getNrOfSprings() == 0);
+    CHECK(forceRelaxer.getNrOfActiveSprings() == 0);
+    pe::Universe crossLinkUniverse = forceRelaxer.getCrosslinkerVerse();
+    CHECK(crossLinkUniverse.getNrOfAtoms() == 83 * 2);
+    CHECK(crossLinkUniverse.getNrOfBonds() == 0);
+    CHECK(forceRelaxer.getResidualNorm() == 0.);
+    CHECK(forceRelaxer.getForce() == 0.);
+
+    Eigen::Matrix3d stressTensor = forceRelaxer.getStressTensor();
+    CHECK(stressTensor.isZero(1e-10));
+  }
+
+  SECTION("Non-empty universe")
+  {
+    std::string inputFile =
+      suspectedPath +
+      "/structure/3d-diamond-lattice_3x3x3_a_23_d_3_v_0.structure.out";
+    REQUIRE(std::filesystem::exists(inputFile));
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
+
+    pcm::MEHPForceRelaxation forceRelaxer =
+      pcm::MEHPForceRelaxation(universe, 2);
+    CHECK(forceRelaxer.getNrOfNodes() == 3 * 3 * 3 * 40);
+    pe::Universe crossLinkUniverse = forceRelaxer.getCrosslinkerVerse();
+    CHECK(crossLinkUniverse.getNrOfAtoms() == forceRelaxer.getNrOfNodes());
+
+    std::unordered_map<long int, int> effectiveFunctionality =
+      forceRelaxer.getEffectiveFunctionalityOfAtoms();
+    REQUIRE(effectiveFunctionality.size() == forceRelaxer.getNrOfNodes());
+    for (size_t i = 0; i < universe.getNrOfAtoms(); ++i) {
+      pe::Atom atom = universe.getAtomByVertexIdx(i);
+      if (atom.getType() == 2) {
+        CHECK(effectiveFunctionality[atom.getId()] == 4);
+      }
+    }
+
+    CHECK(forceRelaxer.getResidual() > 0.);
+    CHECK(forceRelaxer.getForce() > 0.);
+    CHECK(forceRelaxer.getResidual() == forceRelaxer.getResidualNorm());
+    Eigen::Matrix3d stressTensor = forceRelaxer.getStressTensor();
+    CHECK_FALSE(stressTensor.isZero(1e-10));
+  }
+}
+
 TEST_CASE(
   "MEHP Force Relaxation2 runs with Langevin force evaluator and non-network",
   "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator]")

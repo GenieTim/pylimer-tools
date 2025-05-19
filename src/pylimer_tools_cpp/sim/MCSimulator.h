@@ -38,7 +38,8 @@ namespace sim {
       numLastStepsAccepted = 0;
 
       // TODO: improve performance by doing more than one bead at a time
-      for (size_t i = (fixFirst ? 1 : 0); i < (fixLast ? nBeads - 1 : nBeads);
+      for (Eigen::Index i = (fixFirst ? 1 : 0);
+           i < (fixLast ? nBeads - 1 : nBeads);
            ++i) {
         double bondLen21 = i == 0 ? 0.
                                   : (coordinates.segment(3 * i, 3) -
@@ -73,6 +74,7 @@ namespace sim {
                                          (newBondLen21 + newBondLen22));
 
         if ((newProbability / currentProbability) >
+            //((bondLen21 + bondLen22) - (newBondLen21 + newBondLen22)) >
             probabilitySamplingDist(rng)) {
           coordinates.segment(3 * i, 3) += displacement;
           numLastStepsAccepted += 1;

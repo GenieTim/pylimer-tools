@@ -11,6 +11,9 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#ifdef CEREALIZABLE
+#include "../../src/pylimer_tools_cpp/utils/CerealUtils.h"
+#endif
 
 extern "C"
 {
@@ -405,6 +408,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       CHECK(universe.getIdxByAtomId(bonds["bond_to"][2]) ==
             edges["edge_to"][2]);
       CHECK(bonds["bond_type"][5] == 1);
+      CHECK(universe.getEdgePropertyValue<int>("type", 5) == 1);
       CHECK(bonds["bond_type"][6] == 11);
       // get atoms with type returns
       CHECK(universe.getAtomsOfType(2).size() == 3);
@@ -1100,6 +1104,7 @@ TEST_CASE("Coordinates work")
                       // ny
                       { { 0, 0, 0, 0, 1, 2, 2, 2 } } // nz
     );
+    CHECK(universe.getConnectedAtoms(universe.getAtom(1)).size() == 0);
     std::vector<igraph_integer_t> indices = { { 1, 2, 3 } };
     Eigen::VectorXd coordinates =
       universe.getUnwrappedVertexCoordinates(indices, box);
@@ -1109,6 +1114,15 @@ TEST_CASE("Coordinates work")
         CHECK(coordinates[i * 3 + dir] == i + 2);
       }
     }
+    CHECK(universe.getPathLength(0, 3, 0) == 0);
+    CHECK(universe.getPathLength(0, 3, 12) == 0);
+    CHECK(universe.getUnwrappedPositionVectorForVertex(0, universe.getBox())
+            .isApprox(universe.getPositionVectorForVertex(0)));
+    CHECK_FALSE(universe.getPositionVectorForVertex(1).isApprox(
+      universe.getPositionVectorForVertex(0)));
+    CHECK_FALSE(
+      universe.getUnwrappedPositionVectorForVertex(5, universe.getBox())
+        .isApprox(universe.getPositionVectorForVertex(5)));
   }
 }
 
@@ -1250,6 +1264,16 @@ TEST_CASE("Free & Dangling Chains are identified", "[Universe][entity]")
       }
     }
   }
+
+  SECTION("Functionality and number of connected atoms are consistent")
+  {
+    std::vector<int> degrees = universe.getVertexDegrees();
+    CHECK(degrees.size() == universe.getNrOfAtoms());
+    for (size_t i = 0; i < degrees.size(); ++i) {
+      CHECK(degrees[i] ==
+            universe.getConnectedAtoms(universe.getAtomByVertexIdx(i)).size());
+    }
+  }
 }
 
 TEST_CASE("Vertex coordinates are assumed for tree-like structures",
@@ -1260,6 +1284,7 @@ TEST_CASE("Vertex coordinates are assumed for tree-like structures",
             << std::endl;
 
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  // CHECK(universe.getIndicesWithAttribute<int>("type", 0).size() == 0);
   std::vector<double> coords = { 0.0, 1.0, 10.0, 21.0, 22.0, 3.0, 2.0, 3.0 };
   std::vector<long int> ids = { 0, 1, 2, 3, 4, 5, 6, 7 };
   universe.addAtoms(ids,
@@ -1287,4 +1312,147 @@ TEST_CASE("Vertex coordinates are assumed for tree-like structures",
        assumedCoordinates.segment(3 * bondFrom[i], 3));
     CHECK(bondVector.norm() < 5.);
   }
+
+  std::vector<double> assumedCoords2;
+  CHECK_NOTHROW(universe.getAssumedVertexCoordinates(
+    assumedCoords2, universe.getBox(), {}));
+  CHECK(assumedCoords2.size() == 0);
+  CHECK_THROWS(universe.getAssumedVertexCoordinates(
+    assumedCoords2, universe.getBox(), { 0, 1, 2 }));
 }
+
+TEST_CASE("Parts can be removed and added to the universe",
+          "[Universe][entity]")
+{
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  REQUIRE_NOTHROW(universe.simplify());
+  std::vector<double> coords = { 0.0, 1.0, 2.0, 3.0, 4.0,
+                                 5.0, 6.0, 7.0, 8.0, 9.0 };
+  std::vector<long int> ids = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  universe.addAtoms(ids,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 1),
+                    coords,
+                    coords,
+                    coords,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0));
+  universe.addBonds({ 0, 1, 2 }, { 1, 2, 3 }, { 1, 1, 1 });
+
+  CHECK(universe.getNrOfAtoms() == ids.size());
+  CHECK(universe.getNrOfBonds() == 3);
+
+  SECTION("Atoms")
+  {
+    CHECK(universe.getAtomsOfType(2).size() == 0);
+    universe.replaceAtomType(0, 2);
+    CHECK(universe.getAtom(0).getType() == 2);
+    CHECK(universe.getAtomsOfType(2).size() == 1);
+    CHECK(universe.getNrOfBonds() == 3);
+
+    CHECK_NOTHROW(universe.removeAtoms({ 0 }));
+    CHECK(universe.getAtomsOfType(2).size() == 0);
+    CHECK(universe.getNrOfBonds() == 2);
+
+    CHECK(universe.getMasses().size() == 0);
+    universe.setMassForType(1, 1.0);
+    universe.setMassForType(2, 2.0);
+    CHECK(universe.getMasses().size() == 2);
+
+    CHECK(universe.computeWeightFractionOfClustersAssociatedWith({ 0 }) == 0.);
+    CHECK(universe.computeWeightFractionOfClustersAssociatedWith({ 1 }) ==
+          3. / 9.);
+  }
+
+  SECTION("Bonds")
+  {
+    CHECK(universe.getNrOfBonds() == 3);
+    CHECK_NOTHROW(universe.removeBondsOfType(1));
+    CHECK(universe.getNrOfBonds() == 0);
+
+    universe.addBonds({ 1, 2 }, { 2, 3 }, { 1, 1 });
+    CHECK(universe.getNrOfBonds() == 2);
+    universe.removeBonds({ 2, 3 }, { 1, 2 });
+    CHECK(universe.getNrOfBonds() == 0);
+  }
+
+  SECTION("Angles")
+  {
+    CHECK(universe.getNrOfAngles() == 0);
+    auto angles = universe.detectAngles();
+    REQUIRE(angles["angle_from"].size() == 2);
+    std::vector<int> angleTypes = { 1, 1 };
+    universe.addAngles(angles["angle_from"],
+                       angles["angle_to"],
+                       angles["angle_via"],
+                       angleTypes);
+    CHECK(universe.getNrOfAngles() == 2);
+    CHECK_NOTHROW(universe.removeAllAngles());
+    CHECK(universe.getNrOfAngles() == 0);
+  }
+
+  SECTION("Dihedrals")
+  {
+    CHECK(universe.getNrOfDihedralAngles() == 0);
+    auto dihedrals = universe.detectDihedralAngles();
+    REQUIRE(dihedrals["dihedral_angle_from"].size() == 1);
+    std::vector<int> dihedralAngleTypes = { 1 };
+    universe.addDihedralAngles(dihedrals["dihedral_angle_from"],
+                               dihedrals["dihedral_angle_via1"],
+                               dihedrals["dihedral_angle_via2"],
+                               dihedrals["dihedral_angle_to"],
+                               dihedralAngleTypes);
+    CHECK(universe.getNrOfDihedralAngles() == 1);
+    CHECK_NOTHROW(universe.removeAllDihedralAngles());
+    CHECK(universe.getNrOfDihedralAngles() == 0);
+  }
+}
+
+TEST_CASE("Querying the universe", "[Universe][entity]")
+{
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  std::vector<double> coords = { 0.0, 1.0, 2.0, 3.0, 4.0,
+                                 5.0, 6.0, 7.0, 8.0, 9.0 };
+  std::vector<long int> ids = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  universe.addAtoms(ids,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 1),
+                    coords,
+                    coords,
+                    coords,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0));
+  universe.addBonds({ 0, 1, 2 }, { 1, 2, 3 }, { 1, 1, 1 });
+  CHECK_NOTHROW(universe.simplify());
+  CHECK(universe.getAtomIdByIdx(0) == 0);
+  CHECK(universe.containsAtomWithId(0));
+  CHECK_FALSE(universe.containsAtomWithId(10));
+  pe::Atom atom = universe.getAtom(0);
+  CHECK(universe.containsAtom(atom));
+  pe::Atom wrongAtom = pe::Atom(0, 1, 0., 0., 0., 1, 1, 1);
+  CHECK_FALSE(universe.containsAtom(wrongAtom));
+  CHECK_THAT(universe.getVolume(), Catch::Matchers::WithinRel(10. * 10. * 10.));
+}
+
+#ifdef CERALIZABLE
+TEST_CASE("Universe can be serialized and deserialized",
+          "[Universe][entity][serialization]")
+{
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+  REQUIRE(std::filesystem::exists(suspectedPath));
+  universeSeq.initializeFromDataSequence(
+    { { suspectedPath + "/lammps_data_file_small_wangles.out" } });
+  REQUIRE(universeSeq.getLength() == 1);
+  pe::Universe universe = universeSeq.next();
+  REQUIRE(universe.getNrOfAngles() == 1);
+
+  std::string universeSerizalized =
+    pylimer_tools::utils::serializeToString(universe);
+  pe::Universe deserializedUniverse;
+  pylimer_tools::utils::deserializeFromString(deserializedUniverse,
+                                              universeSerizalized);
+  CHECK(deserializedUniverse == universe);
+}
+#endif
