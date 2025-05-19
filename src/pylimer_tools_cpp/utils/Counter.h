@@ -11,9 +11,9 @@ namespace utils {
     std::vector<int> counts = {};
 
   public:
-    IndexCounter(int size = 0) { this->counts.resize(size, 0); }
+    explicit IndexCounter(const int size = 0) { this->counts.resize(size, 0); }
 
-    void increment(int index)
+    void increment(const int index)
     {
       if (index >= this->counts.size()) {
         this->counts.resize(index + 1, 0);
@@ -48,7 +48,7 @@ namespace utils {
     std::unordered_map<T, IntDefaultZero> counts;
 
   public:
-    Counter(int size = 0) { this->counts.reserve(size); }
+    explicit Counter(int size = 0) { this->counts.reserve(size); }
 
     void increment(const T& value) { this->counts[value].i += 1; }
 
