@@ -225,6 +225,10 @@ public:
   {
     return AtomGraphParent::computeBondLengths(this->box);
   };
+  [[nodiscard]] std::vector<Eigen::Vector3d> computeBondVectors() const
+  {
+    return AtomGraphParent::computeBondVectors(this->box);
+  };
   [[nodiscard]] double computeMeanSquaredBondLength() const
   {
     return AtomGraphParent::computeMeanSquaredBondLength(this->box);

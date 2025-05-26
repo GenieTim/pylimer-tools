@@ -609,6 +609,39 @@ AtomGraphParent::computeBondLengths(const Box& box) const
   return lengths;
 }
 
+/**
+ * @brief compute the vectors of all bonds
+ *
+ * @return std::vector<Eigen::Vector3d>
+ */
+std::vector<Eigen::Vector3d>
+AtomGraphParent::computeBondVectors(const Box& box) const
+{
+  std::vector<Eigen::Vector3d> lengths;
+  lengths.reserve(this->getNrOfEdges());
+  if (this->getNrOfEdges() == 0) {
+    return lengths;
+  }
+  // construct iterator
+  igraph_eit_t bondIterator;
+  if (igraph_eit_create(
+        &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator)) {
+    throw std::runtime_error("Cannot create iterator to loop bonds");
+  }
+
+  while (!IGRAPH_EIT_END(bondIterator)) {
+    long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
+    Eigen::Vector3d distance =
+      this->getPositionVectorForVertex(IGRAPH_TO(&this->graph, edgeId)) -
+      this->getPositionVectorForVertex(IGRAPH_FROM(&this->graph, edgeId));
+    lengths.push_back(distance);
+    IGRAPH_EIT_NEXT(bondIterator);
+  }
+
+  igraph_eit_destroy(&bondIterator);
+  return lengths;
+}
+
 double
 AtomGraphParent::computeMeanSquaredBondLength(const Box& box) const
 {

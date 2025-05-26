@@ -2320,6 +2320,7 @@ TEST_CASE("All MEHP Force Balance2 vs. Force Relaxation Phantom Comparisons",
 
   size_t nFilesFound = 0;
   for (const std::string& file : files) {
+    INFO("Processing file: " << file);
     pe::UniverseSequence universeSeq = pe::UniverseSequence();
     REQUIRE(universeSeq.getLength() == 0);
     std::string inputFile = suspectedPath + "/structure/" + file;
@@ -2371,7 +2372,7 @@ TEST_CASE("All MEHP Force Balance2 vs. Force Relaxation Phantom Comparisons",
 
     auto start_fr = std::chrono::high_resolution_clock::now();
     while (forceRelaxation.suggestsRerun()) {
-      forceRelaxation.runForceRelaxation("LD_MMA", 50000, 1e-15, 1e-12);
+      forceRelaxation.runForceRelaxation("LD_MMA", 50000, 1e-15, 1e-15);
     }
     auto end_fr = std::chrono::high_resolution_clock::now();
     auto duration_fr =
@@ -2442,6 +2443,7 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
 
   size_t nFilesFound = 0;
   for (const std::string& file : files) {
+    INFO("Processing file: " << file);
     pe::UniverseSequence universeSeq = pe::UniverseSequence();
     REQUIRE(universeSeq.getLength() == 0);
     std::string inputFile = suspectedPath + "/structure/" + file;
