@@ -419,6 +419,13 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     SECTION("internal lengths are computed correctly")
     {
       REQUIRE(universe.computeMeanBondLength() == Catch::Approx(1.1452634834));
+      std::vector<double> lengths = universe.computeBondLengths();
+      std::vector<Eigen::Vector3d> vecs = universe.computeBondVectors();
+      REQUIRE(lengths.size() == vecs.size());
+      for (size_t i = 0; i < lengths.size(); i++) {
+        CHECK(lengths[i] == Catch::Approx(vecs[i].norm()));
+      }
+
       auto chains = universe.getChainsWithCrosslinker(2);
       REQUIRE(chains.size() == 3);
       REQUIRE(chains[0].computeEndToEndDistance() == Catch::Approx(sqrt(10.0)));
