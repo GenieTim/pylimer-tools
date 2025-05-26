@@ -17,6 +17,7 @@ Universe
       ~Universe.add_dihedral_angles
       ~Universe.compute_angles
       ~Universe.compute_bond_lengths
+      ~Universe.compute_bond_vectors
       ~Universe.compute_dxs
       ~Universe.compute_dys
       ~Universe.compute_dzs
@@ -100,6 +101,7 @@ Universe
    .. automethod:: add_dihedral_angles
    .. automethod:: compute_angles
    .. automethod:: compute_bond_lengths
+   .. automethod:: compute_bond_vectors
    .. automethod:: compute_dxs
    .. automethod:: compute_dys
    .. automethod:: compute_dzs
