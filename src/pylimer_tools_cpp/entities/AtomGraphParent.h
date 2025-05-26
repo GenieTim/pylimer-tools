@@ -466,6 +466,8 @@ public:
 
   double computeMeanSquaredBondLength(const Box& box) const;
 
+  std::vector<Eigen::Vector3d> computeBondVectors(const Box& box) const;
+
   /**
    * @brief Count the number of edges leading to/from one vertex
    *

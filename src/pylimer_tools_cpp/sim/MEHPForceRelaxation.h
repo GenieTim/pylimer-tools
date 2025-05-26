@@ -856,7 +856,7 @@ protected:
     const Eigen::ArrayXb activeSprings =
       this->findActiveSprings(net, tolerance);
     if (activeSprings.count() == 0) {
-      return 1.;
+      return 1. - this->computeSolubleWeightFraction(net, tolerance);
     }
     // as of now, the springsContourLength is equal to the number of bonds
     // from cross-link to cross-link. therefore, the number of atoms of each

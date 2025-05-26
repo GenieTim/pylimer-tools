@@ -1044,6 +1044,10 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("vertex_id_to"),
          py::arg("max_length") = -1)
     // computations
+    .def("compute_bond_vectors",
+         &Universe::computeBondVectors,
+         "Computes the vectors :math:`\\vec{b}` of each bond in the molecule, "
+         "respecting periodic boundaries.")
     .def("compute_bond_lengths",
          &Universe::computeBondLengths,
          "Computes the length :math:`b` of each bond in the molecule, "
