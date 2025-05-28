@@ -760,7 +760,7 @@ Universe::countAtomsInSkinDistance(const std::vector<double>& distances,
     pylimer_tools::utils::initializeWithValue<size_t>(distances.size() - 1, 0);
 
   // first, validate the input distances
-  INVALIDARG_EXP_IFN(distances[0] > 0.0, "Distances must be positive.");
+  INVALIDARG_EXP_IFN(distances[0] >= 0.0, "Distances must be positive.");
   for (size_t i = 1; i < distances.size(); ++i) {
     if (distances[i] <= distances[i - 1]) {
       throw std::invalid_argument(
