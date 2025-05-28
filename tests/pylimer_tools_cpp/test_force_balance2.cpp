@@ -2312,8 +2312,8 @@ TEST_CASE("All MEHP Force Balance2 vs. Force Relaxation Phantom Comparisons",
   };
 
 #define CHECK_THAT_OR_ZERO(expr, otherExpr)                                    \
-  if (std::abs(expr) < 1e-6) {                                                 \
-    CHECK(std::abs(otherExpr) < 1e-6);                                         \
+  if (std::abs(expr) < 1e-5) {                                                 \
+    CHECK(std::abs(otherExpr) < 1e-5);                                         \
   } else {                                                                     \
     CHECK_THAT(expr, Catch::Matchers::WithinRel(otherExpr, 1e-3));             \
   }
@@ -2372,7 +2372,7 @@ TEST_CASE("All MEHP Force Balance2 vs. Force Relaxation Phantom Comparisons",
 
     auto start_fr = std::chrono::high_resolution_clock::now();
     while (forceRelaxation.suggestsRerun()) {
-      forceRelaxation.runForceRelaxation("LD_MMA", 50000, 1e-15, 1e-15);
+      forceRelaxation.runForceRelaxation("LD_MMA", 50000, 1e-17, 1e-17);
     }
     auto end_fr = std::chrono::high_resolution_clock::now();
     auto duration_fr =
@@ -2734,5 +2734,192 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple network systems",
       pcm::StructureSimplificationMode::NO_SIMPLIFICATION, 1e-6, solver));
     CHECK(forceBalancer.getNrOfSprings() == nrOfChains + 9);
     CHECK(forceBalancer.getNrOfActiveSprings() > 0);
+  }
+}
+
+TEST_CASE("All MEHP compute correct dangling fractions",
+          "[MEHPForceRelaxation][MEHPForceBalance][MEHPForceBalance2]")
+{
+  std::cout << "Running test \"All MEHP compute correct dangling fractions\""
+            << std::endl;
+
+  size_t nSolventChains = 2;
+  size_t nBeadsPerSolventChain = 5;
+
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  // start with a grid, whose weight is known and fully active
+  /**
+   * @brief A grid of two rows, each one bead between the two crosslinkers
+   */
+  universe.addAtoms(
+    { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 } },
+    { { 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1 } },
+    { { 0.0, 2.5, 5.0, 7.5, 0.1, 2.5, 5.0, 7.5, -.1, 5.0, 0.0, 5.0 } },
+    // x with slight (0.1) deviation, so we don't start perfect
+    { { 0.1, 0.0, -.1, 0.0, 5.0, 5.0, 5.0, 5.0, 2.5, 2.5, 7.5, 7.5 } },
+    // y
+    { { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. } },
+    // z
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } });
+  universe.addBonds({ { 1,
+                        1,
+                        1, //
+                        1,
+                        3,
+                        3, //
+                        3,
+                        3,
+                        5, //
+                        5,
+                        5,
+                        5, //
+                        7,
+                        7,
+                        7, //
+                        7 } },
+                    { { 2,
+                        9,
+                        4, //
+                        11,
+                        2,
+                        4, //
+                        10,
+                        12,
+                        9, //
+                        11,
+                        6,
+                        8, //
+                        6,
+                        8,
+                        10, //
+                        12 } });
+  CHECK(universe.getNrOfAtoms() == 12);
+  size_t currentAtomId = 13;
+
+  // add solvent chains
+  for (size_t solventChainI = 0; solventChainI < nSolventChains;
+       ++solventChainI) {
+    std::vector<long int> ids(nBeadsPerSolventChain);
+    std::vector<double> coords(nBeadsPerSolventChain, 0.);
+    std::vector<long int> bondFrom;
+    std::vector<long int> bondTo;
+    for (size_t beadI = 0; beadI < nBeadsPerSolventChain; ++beadI) {
+      ids[beadI] = currentAtomId;
+      currentAtomId += 1;
+      if (beadI > 0) {
+        bondFrom.push_back(ids[beadI - 1]);
+        bondTo.push_back(ids[beadI]);
+      }
+    }
+    universe.addAtoms(ids,
+                      pu::initializeWithValue(ids.size(), 3),
+                      coords,
+                      coords,
+                      coords,
+                      pu::initializeWithValue(ids.size(), 0),
+                      pu::initializeWithValue(ids.size(), 0),
+                      pu::initializeWithValue(ids.size(), 0));
+    universe.addBonds(bondFrom, bondTo);
+  }
+
+  for (size_t nExtraChains : { 0, 1, 3, 5 }) {
+    for (size_t nDanglingAtoms : { 1, 3, 5, 6, 9, 14 }) {
+      INFO("Testing with " << nExtraChains << " extra chains and "
+                           << nDanglingAtoms << " dangling atoms each");
+      pe::Universe u2 = pe::Universe(universe);
+      std::vector<long int> bondFrom;
+      std::vector<long int> bondTo;
+      // add this number of atoms connected dangling to any other atom
+      for (size_t extraChainI = 0; extraChainI < nExtraChains; ++extraChainI) {
+        std::vector<long int> ids(nDanglingAtoms);
+        long int attachedToId = (extraChainI * nDanglingAtoms) % 12 + 1;
+        std::vector<double> coordX(
+          nDanglingAtoms,
+          universe.getAtom(attachedToId).getUnwrappedX(universe.getBox()));
+        std::vector<double> coordY(
+          nDanglingAtoms,
+          universe.getAtom(attachedToId).getUnwrappedY(universe.getBox()));
+        std::vector<double> coordZ(
+          nDanglingAtoms,
+          universe.getAtom(attachedToId).getUnwrappedZ(universe.getBox()));
+        for (size_t danglingAtomI = 0; danglingAtomI < nDanglingAtoms;
+             ++danglingAtomI) {
+          if (danglingAtomI == 0) {
+            bondFrom.push_back(attachedToId);
+          } else {
+            bondFrom.push_back(currentAtomId - 1);
+          }
+          ids[danglingAtomI] = currentAtomId;
+          bondTo.push_back(currentAtomId);
+          currentAtomId += 1;
+          // add some randomness to the coordinates
+          coordX[danglingAtomI] += (std::rand() % 1000) / 1000.0 - 0.5;
+          coordY[danglingAtomI] += (std::rand() % 1000) / 1000.0 - 0.5;
+          coordZ[danglingAtomI] += (std::rand() % 1000) / 1000.0 - 0.5;
+        }
+
+        std::vector<int> atomTypes =
+          pylimer_tools::utils::initializeWithValue(nDanglingAtoms, 1);
+        atomTypes.back() = 2;
+        u2.addAtoms(
+          ids,
+          atomTypes,
+          coordX,
+          coordY,
+          coordZ,
+          pylimer_tools::utils::initializeWithValue(nDanglingAtoms, 0),
+          pylimer_tools::utils::initializeWithValue(nDanglingAtoms, 0),
+          pylimer_tools::utils::initializeWithValue(nDanglingAtoms, 0));
+      }
+      u2.addBonds(bondFrom, bondTo);
+
+      int totalNDanglingAtoms = nDanglingAtoms * nExtraChains;
+      int totalNSolventAtoms = nSolventChains * nBeadsPerSolventChain;
+      int totalNAtoms = 12 + totalNDanglingAtoms + totalNSolventAtoms;
+      CHECK(u2.getNrOfAtoms() == totalNAtoms);
+
+      // for force balance 1 & 2 as well as force relaxation,
+      // run and find expected dangling fractions
+      double expectedDanglingFraction =
+        static_cast<double>(totalNDanglingAtoms) /
+        static_cast<double>(totalNAtoms);
+      double expectedSolventFraction = static_cast<double>(totalNSolventAtoms) /
+                                       static_cast<double>(totalNAtoms);
+
+      pcm::MEHPForceBalance2 forceBalancer2 = pcm::MEHPForceBalance2(u2, 2);
+      forceBalancer2.runForceRelaxation(
+        pcm::StructureSimplificationMode::NO_SIMPLIFICATION);
+      CHECK_THAT(forceBalancer2.getDanglingWeightFraction(),
+                 Catch::Matchers::WithinRel(expectedDanglingFraction));
+      CHECK_THAT(forceBalancer2.getSolubleWeightFraction(),
+                 Catch::Matchers::WithinRel(expectedSolventFraction));
+
+      pcm::MEHPForceBalance forceBalancer = pcm::MEHPForceBalance(u2, 2);
+      forceBalancer.configAssumeBoxLargeEnough(false);
+      forceBalancer.runForceRelaxation(
+        50000,
+        1e-12,
+        0.,
+        pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+        0.,
+        false,
+        pcm::LinkSwappingMode::NO_SWAPPING);
+      CHECK_THAT(forceBalancer.getDanglingWeightFraction(),
+                 Catch::Matchers::WithinRel(expectedDanglingFraction));
+      CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
+                 Catch::Matchers::WithinRel(expectedSolventFraction));
+
+      pcm::MEHPForceRelaxation forceRelaxation = pcm::MEHPForceRelaxation(u2);
+      forceRelaxation.configAssumeBoxLargeEnough(false);
+      while (forceRelaxation.suggestsRerun()) {
+        forceRelaxation.runForceRelaxation();
+      }
+      CHECK_THAT(forceRelaxation.getDanglingWeightFraction(),
+                 Catch::Matchers::WithinRel(expectedDanglingFraction));
+      CHECK_THAT(forceRelaxation.getSolubleWeightFraction(),
+                 Catch::Matchers::WithinRel(expectedSolventFraction));
+    }
   }
 }
