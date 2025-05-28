@@ -2737,7 +2737,7 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple network systems",
   }
 }
 
-TEST_CASE("All MEHP compute correct dangling fractions",
+TEST_CASE("All MEHP compute correct dangling and soluble fractions",
           "[MEHPForceRelaxation][MEHPForceBalance][MEHPForceBalance2]")
 {
   std::cout << "Running test \"All MEHP compute correct dangling fractions\""

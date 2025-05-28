@@ -207,7 +207,8 @@ TEST_CASE("Universe can be resized", "[entity][Universe]")
     REQUIRE(universe.computeMeanEndToEndDistance(2) == 0.0);
     REQUIRE(universe.computeMeanSquareEndToEndDistance(2) == 0.0);
     REQUIRE(universe.computeEndToEndDistances(2).size() == 0);
-    REQUIRE(universe.findLoops(2).size() == 0);
+    std::vector<std::vector<igraph_integer_t>> edgesOfLoops;
+    REQUIRE(universe.findLoops(2, -1, false, &edgesOfLoops).size() == 0);
   }
 
   SECTION("resizing bigger changes volume")
@@ -1463,3 +1464,44 @@ TEST_CASE("Universe can be serialized and deserialized",
   CHECK(deserializedUniverse == universe);
 }
 #endif
+
+TEST_CASE("Universe can contract vertices", "[Universe][entity]")
+{
+  std::cout << "Running test \"Universe can contract vertices\"" << std::endl;
+
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+
+  std::vector<double> coords = { 0.0, 1.0, 2.0, 3.0, 4.0,
+                                 5.0, 6.0, 7.0, 8.0, 9.0 };
+  std::vector<long int> ids = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  universe.addAtoms(ids,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 1),
+                    coords,
+                    coords,
+                    coords,
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0),
+                    pylimer_tools::utils::initializeWithValue(ids.size(), 0));
+  universe.addBonds({ 0, 1, 2, 3, 4, 5, 6, 7, 8 },
+                    { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+                    { 5, 1, 1, 1, 1, 1, 1, 1, 5 });
+
+  pe::StrandAffiliationInfo strandAffiliationInfo =
+    universe.getStrandAffiliation(2);
+  CHECK(strandAffiliationInfo.strandIdOfVertex.size() == 10);
+  for (size_t vIdx = 1; vIdx < 9; ++vIdx) {
+    CHECK(strandAffiliationInfo.strandIdOfVertex[vIdx] ==
+          strandAffiliationInfo.strandIdOfVertex[1]);
+  }
+  pe::Universe contractedUniverse = universe.contractVerticesAlongBondType(1);
+  CHECK(contractedUniverse.getNrOfAtoms() == 3);
+  CHECK(contractedUniverse.getNrOfBonds() == 2);
+
+  CHECK(contractedUniverse.validate());
+
+  strandAffiliationInfo = contractedUniverse.getStrandAffiliation(2);
+  CHECK(strandAffiliationInfo.strandIdOfVertex.size() == 3);
+  // for (long int strandId : strandAffiliationInfo.strandIdOfVertex) {
+  //   CHECK(strandId == strandAffiliationInfo.strandIdOfVertex[0]);
+  // }
+}
