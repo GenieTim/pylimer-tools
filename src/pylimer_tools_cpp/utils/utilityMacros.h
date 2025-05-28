@@ -53,8 +53,12 @@
 #define SHOULD_NOT_REACH_HERE(message) RUNTIME_EXP(message)
 
 #define REQUIRE_IGRAPH_SUCCESS(igraph_call)                                    \
-  if (igraph_call) {                                                           \
-    RUNTIME_EXP("Failure when calling igraph: " #igraph_call);                 \
+  {                                                                            \
+    igraph_error_t igraph_call_result_in_macro = igraph_call;                  \
+    RUNTIME_EXP_IFN(igraph_call_result_in_macro == IGRAPH_SUCCESS,             \
+                    "Failure when calling igraph, got result " +               \
+                      std::to_string(igraph_call_result_in_macro) +            \
+                      " from calling " #igraph_call);                          \
   }
 
 // mathematical closeness

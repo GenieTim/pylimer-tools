@@ -284,9 +284,7 @@ Universe::addAtoms(
     }
   }
   // actually add the vertices
-  if (igraph_add_vertices(&this->graph, NNewAtoms, 0)) {
-    throw std::runtime_error("Failed to add new atoms to graph.");
-  }
+  REQUIRE_IGRAPH_SUCCESS(igraph_add_vertices(&this->graph, NNewAtoms, 0));
   this->atomIdToVertexIdx.reserve(this->NAtoms + NNewAtoms);
   // do map for easy access afterwards
   // simultaneously, check that the input ids are unique
@@ -452,10 +450,8 @@ void
 Universe::removeBonds(const std::vector<long int>& atomIdsFrom,
                       const std::vector<long int>& atomIdsTo)
 {
-  if (atomIdsFrom.size() != atomIdsTo.size()) {
-    throw std::invalid_argument(
-      "Vertex ids from and to must have the same length.");
-  }
+  INVALIDARG_EXP_IFN(atomIdsFrom.size() == atomIdsTo.size(),
+                     "Vertex ids from and to must have the same length.");
   for (size_t i = 0; i < atomIdsFrom.size(); ++i) {
     std::vector<igraph_integer_t> edgeIds = this->getEdgeIdsFromTo(
       this->getIdxByAtomId(atomIdsFrom[i]), this->getIdxByAtomId(atomIdsTo[i]));
@@ -483,10 +479,8 @@ Universe::removeBondsOfType(const int bondType)
   // load types
   igraph_vector_t typesVec;
   igraph_vector_init(&typesVec, this->getNrOfBonds());
-  if (igraph_cattribute_EANV(
-        &this->graph, "type", igraph_ess_all(IGRAPH_EDGEORDER_ID), &typesVec)) {
-    throw std::runtime_error("Failed to fetch type attribute");
-  }
+  REQUIRE_IGRAPH_SUCCESS(igraph_cattribute_EANV(
+    &this->graph, "type", igraph_ess_all(IGRAPH_EDGEORDER_ID), &typesVec));
   // enumerate the bonds to delete
   igraph_vector_int_t edges_to_remove;
   igraph_vector_int_init(&edges_to_remove, 0);
@@ -537,15 +531,14 @@ Universe::addBonds(const size_t NNewBonds,
                    const bool ignoreNonExistentAtoms,
                    const bool simplify)
 {
-  if (from.size() != to.size() || from.size() != NNewBonds ||
-      (bondTypes.size() != NNewBonds && bondTypes.size() != 0)) {
-    throw std::invalid_argument(
-      "All bond inputs must have the same size. Got " +
-      std::to_string(from.size()) + " atoms from, " +
-      std::to_string(to.size()) + " to, and " +
-      std::to_string(bondTypes.size()) + " types, alleged " +
-      std::to_string(NNewBonds) + ".");
-  }
+  INVALIDARG_EXP_IFN(from.size() == to.size() && from.size() == NNewBonds &&
+                       (bondTypes.size() == NNewBonds || bondTypes.size() == 0),
+                     "All bond inputs must have the same size. Got " +
+                       std::to_string(from.size()) + " atoms from, " +
+                       std::to_string(to.size()) + " to, and " +
+                       std::to_string(bondTypes.size()) + " types, alleged " +
+                       std::to_string(NNewBonds) + ".");
+
   std::vector<long int> newEdgesVector =
     pylimer_tools::utils::interleave(from, to);
   size_t edgesSize = newEdgesVector.size();
@@ -581,9 +574,7 @@ Universe::addBonds(const size_t NNewBonds,
   }
   igraph_vector_int_resize(&newEdges, 2 * actualNrOfBondsAdded);
   // add the new edges
-  if (igraph_add_edges(&this->graph, &newEdges, 0)) {
-    throw std::runtime_error("Failed to add edges to graph.");
-  }
+  REQUIRE_IGRAPH_SUCCESS(igraph_add_edges(&this->graph, &newEdges, 0));
   igraph_vector_int_destroy(&newEdges);
   if (actualNrOfBondsAdded > 0) {
     // add attributes
@@ -676,10 +667,10 @@ Universe::addDihedralAngles(const std::vector<long int>& from,
                             const std::vector<long int>& to,
                             const std::vector<int>& types)
 {
-  if (!all_equal<size_t>(
-        5, from.size(), to.size(), via1.size(), via2.size(), types.size())) {
-    throw std::invalid_argument("All angle inputs must have the same size.");
-  }
+  INVALIDARG_EXP_IFN(
+    all_equal<size_t>(
+      5, from.size(), to.size(), via1.size(), via2.size(), types.size()),
+    "All dihedral angle inputs must have the same size.");
 
   this->dihedralAngleFrom.insert(
     std::end(this->dihedralAngleFrom), std::begin(from), std::end(from));
@@ -728,8 +719,8 @@ Universe::simplify()
   // how to combine two edges and their attributes
   // currently, only the type attribute exists.
   // let's take the mean.
-  igraph_attribute_combination_add(
-    &comb, NULL, IGRAPH_ATTRIBUTE_COMBINE_MEAN, NULL);
+  REQUIRE_IGRAPH_SUCCESS(igraph_attribute_combination_add(
+    &comb, NULL, IGRAPH_ATTRIBUTE_COMBINE_MEAN, NULL));
   igraph_simplify(&this->graph, /*multiple=*/1, /*loops=*/1, &comb);
   igraph_attribute_combination_destroy(&comb);
   this->NBonds = igraph_ecount(&this->graph);
@@ -769,9 +760,7 @@ Universe::countAtomsInSkinDistance(const std::vector<double>& distances,
     pylimer_tools::utils::initializeWithValue<size_t>(distances.size() - 1, 0);
 
   // first, validate the input distances
-  if (distances[0] < 0.0) {
-    throw std::invalid_argument("Distances must be positive.");
-  }
+  INVALIDARG_EXP_IFN(distances[0] > 0.0, "Distances must be positive.");
   for (size_t i = 1; i < distances.size(); ++i) {
     if (distances[i] <= distances[i - 1]) {
       throw std::invalid_argument(
@@ -840,9 +829,8 @@ Universe::getClusters() const
   // split the copy into the separate components
   igraph_graph_list_t components;
   igraph_graph_list_init(&components, 0);
-  if (igraph_decompose(&graph, &components, IGRAPH_WEAK, -1, 0)) {
-    throw std::runtime_error("Failed to decompose graph.");
-  }
+  REQUIRE_IGRAPH_SUCCESS(
+    igraph_decompose(&graph, &components, IGRAPH_WEAK, -1, 0));
   size_t NComponents = igraph_graph_list_size(&components);
   // std::cout << NComponents << " clusters found." << std::endl;
   clusters.reserve(NComponents);
@@ -886,7 +874,7 @@ Universe::getStrandAffiliation(const int crosslinkerType) const
   // assemble the starting points
   std::vector<igraph_integer_t> startingPoints;
   for (size_t i = 0; i < this->getNrOfAtoms(); ++i) {
-    if (vertexAtomTypes[i] == crosslinkerType || vertexDegree[i] != 1) {
+    if (vertexAtomTypes[i] == crosslinkerType || vertexDegree[i] != 2) {
       vertexIsStartingPoint[i] = true;
       startingPoints.push_back(i);
     }
@@ -910,6 +898,9 @@ Universe::getStrandAffiliation(const int crosslinkerType) const
   while (!verticesToVisit.empty()) {
     const long int currentVertex = verticesToVisit.top();
     visited[currentVertex] = true;
+    // TODO: this fails for primary ends, since they will be their own strand.
+    // while we want them as starting points, they should only increase the
+    // strandId if actually used as starting points
     if (vertexIsStartingPoint[currentVertex]) {
       currentStrandId += 1;
       currentIndexOfVertexInStrand = 0;
@@ -958,9 +949,7 @@ Universe::getMolecules(const int atomTypeToOmit) const
   }
   // make a copy to remove crossLinkers from
   igraph_t graphWithoutCrosslinkers;
-  if (igraph_copy(&graphWithoutCrosslinkers, &this->graph)) {
-    throw std::runtime_error("Failed to copy graph.");
-  }
+  REQUIRE_IGRAPH_SUCCESS(igraph_copy(&graphWithoutCrosslinkers, &this->graph));
 
   // select vertices of type
   std::vector<igraph_integer_t> indicesToRemove =
@@ -970,9 +959,8 @@ Universe::getMolecules(const int atomTypeToOmit) const
     igraph_vs_t verticesToRemove = this->getVerticesByIndices(indicesToRemove);
 
     // remove elements of type
-    if (igraph_delete_vertices(&graphWithoutCrosslinkers, verticesToRemove)) {
-      throw std::runtime_error("Failed to delete crossLinkers from graph.");
-    }
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_delete_vertices(&graphWithoutCrosslinkers, verticesToRemove));
 
     igraph_vs_destroy(&verticesToRemove);
   }
@@ -980,10 +968,8 @@ Universe::getMolecules(const int atomTypeToOmit) const
   // split the copy into the separate components
   igraph_graph_list_t components;
   igraph_graph_list_init(&components, 1);
-  if (igraph_decompose(
-        &graphWithoutCrosslinkers, &components, IGRAPH_WEAK, -1, 0)) {
-    throw std::runtime_error("Failed to decompose graph.");
-  }
+  REQUIRE_IGRAPH_SUCCESS(igraph_decompose(
+    &graphWithoutCrosslinkers, &components, IGRAPH_WEAK, -1, 0));
   size_t NComponents = igraph_graph_list_size(&components);
   // std::cout << NComponents << " molecules found. Removed " <<
   // indicesToRemove.size()
@@ -1033,9 +1019,7 @@ Universe::getVerticesByIndices(std::vector<igraph_integer_t> indices) const
   igraph_vector_int_init(&indicesToSelect, indices.size());
   pylimer_tools::utils::StdVectorToIgraphVectorT(indices, &indicesToSelect);
   igraph_vs_t result;
-  if (igraph_vs_vector_copy(&result, &indicesToSelect)) {
-    throw std::runtime_error("Failed to select vertices");
-  }
+  REQUIRE_IGRAPH_SUCCESS(igraph_vs_vector_copy(&result, &indicesToSelect));
   igraph_vector_int_destroy(&indicesToSelect);
   return result;
 }
@@ -1058,9 +1042,7 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
     pylimer_tools::utils::initializeWithValue(this->getNrOfAtoms(), false);
   // make a copy to remove junctions from
   igraph_t graphWithoutJunctions;
-  if (igraph_copy(&graphWithoutJunctions, &this->graph)) {
-    throw std::runtime_error("Failed to copy graph.");
-  }
+  REQUIRE_IGRAPH_SUCCESS(igraph_copy(&graphWithoutJunctions, &this->graph));
   // select vertices of junctions type
   std::vector<int> vertexDegrees = this->getVertexDegrees();
   std::vector<int> vertexTypes = this->getPropertyValues<int>("type");
@@ -1076,9 +1058,8 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
     igraph_vs_t verticesToRemove = this->getVerticesByIndices(indicesToRemove);
 
     // remove elements of type
-    if (igraph_delete_vertices(&graphWithoutJunctions, verticesToRemove)) {
-      throw std::runtime_error("Failed to delete junctions from graph.");
-    }
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_delete_vertices(&graphWithoutJunctions, verticesToRemove));
 
     igraph_vs_destroy(&verticesToRemove);
     RUNTIME_EXP_IFN(igraph_vcount(&graphWithoutJunctions) ==
@@ -1135,10 +1116,8 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
         igraph_vector_int_t neighbors;
         igraph_vector_int_init(&neighbors, 0);
 
-        if (igraph_neighbors(
-              &graph, &neighbors, originalEndNodeVertexId, IGRAPH_ALL)) {
-          throw std::runtime_error("Failed to get neighbors in graph");
-        }
+        REQUIRE_IGRAPH_SUCCESS(igraph_neighbors(
+          &graph, &neighbors, originalEndNodeVertexId, IGRAPH_ALL));
 
         // loop neighbors of this end node
         for (igraph_integer_t neighIdx = 0;
@@ -1173,7 +1152,7 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
       std::unordered_map<long int, long int> newAtomsMap;
       // actually add the atoms...
       for (auto atomToAddOriginalIdx : atomsToAdd) {
-        igraph_add_vertices(chain, 1, nullptr);
+        REQUIRE_IGRAPH_SUCCESS(igraph_add_vertices(chain, 1, nullptr));
         long int newCrosslinkerVertexIdx = igraph_vcount(chain) - 1;
         newAtomsMap.insert_or_assign(atomToAddOriginalIdx,
                                      newCrosslinkerVertexIdx);
@@ -1195,7 +1174,8 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
       }
       // ...and bonds
       for (auto bond : bondsToAdd) {
-        igraph_add_edge(chain, bond[1], newAtomsMap.at(bond[2]));
+        REQUIRE_IGRAPH_SUCCESS(
+          igraph_add_edge(chain, bond[1], newAtomsMap.at(bond[2])));
         // also copy the bond attributes
         std::vector<igraph_integer_t> oldEIds =
           this->getEdgeIdsFromTo(bond[0], bond[2]);
@@ -1239,8 +1219,8 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
     // how to combine two edges and their attributes
     // currently, only the type attribute exists.
     // let's take the mean.
-    igraph_attribute_combination_add(
-      &comb, nullptr, IGRAPH_ATTRIBUTE_COMBINE_MEAN, nullptr);
+    REQUIRE_IGRAPH_SUCCESS(igraph_attribute_combination_add(
+      &comb, nullptr, IGRAPH_ATTRIBUTE_COMBINE_MEAN, nullptr));
     bool hasPrimary = false;
     for (size_t i = 0; i < connections.size(); ++i) {
       long int connectedVertexIdx = connections[i];
@@ -1265,7 +1245,7 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
         // could also use igraph_induced_subgraph, but performance is very
         // bad for large structures, given how this is more or less O(1)
         igraph_t chain;
-        igraph_empty(&chain, 2, IGRAPH_UNDIRECTED);
+        REQUIRE_IGRAPH_SUCCESS(igraph_empty(&chain, 2, IGRAPH_UNDIRECTED));
         pylimer_tools::utils::copyVertexProperties(
           &this->graph, junctionIdx, &chain, 0, vertexAndEdgeProperties.first);
         pylimer_tools::utils::copyVertexProperties(
@@ -1274,7 +1254,7 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
           &chain,
           1,
           vertexAndEdgeProperties.first);
-        igraph_add_edge(&chain, 0, 1);
+        REQUIRE_IGRAPH_SUCCESS(igraph_add_edge(&chain, 0, 1));
         pylimer_tools::utils::copyEdgeProperties(
           &this->graph, edgeIds[i], &chain, 0, vertexAndEdgeProperties.second);
         molecules.emplace_back(this->box, &chain, molType, this->massPerType);
@@ -1297,10 +1277,10 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
         // could also use igraph_induced_subgraph, but performance is very
         // bad for large structures, given how this is more or less O(1)
         igraph_t chain;
-        igraph_empty(&chain, 1, IGRAPH_UNDIRECTED);
+        REQUIRE_IGRAPH_SUCCESS(igraph_empty(&chain, 1, IGRAPH_UNDIRECTED));
         pylimer_tools::utils::copyVertexProperties(
           &this->graph, junctionIdx, &chain, 0, vertexAndEdgeProperties.first);
-        igraph_add_edge(&chain, 0, 0);
+        REQUIRE_IGRAPH_SUCCESS(igraph_add_edge(&chain, 0, 0));
         pylimer_tools::utils::copyEdgeProperties(
           &this->graph, edgeId, &chain, 0, vertexAndEdgeProperties.second);
         molecules.emplace_back(this->box, &chain, molType, this->massPerType);
@@ -1348,12 +1328,12 @@ Universe::identifyObviouslyDanglingAtoms(const bool distinguishFree) const
     pylimer_tools::utils::initializeWithValue(this->getNrOfBonds(), false);
   std::vector<int> vertexDegrees = this->getVertexDegrees();
   igraph_lazy_adjlist_t adjlist;
-  igraph_lazy_adjlist_init(
-    &this->graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+  REQUIRE_IGRAPH_SUCCESS(igraph_lazy_adjlist_init(
+    &this->graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
   igraph_vector_int_t* neighbors = nullptr;
   igraph_lazy_inclist_t inclist;
-  igraph_lazy_inclist_init(
-    &this->graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
+  REQUIRE_IGRAPH_SUCCESS(igraph_lazy_inclist_init(
+    &this->graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
   igraph_vector_int_t* neighbourEdges = nullptr;
 
   for (igraph_integer_t startingVertexIdx = 0;
@@ -1535,8 +1515,8 @@ Universe::findLoops(const int crossLinkerType,
   igraph_vector_int_list_t e_results;
   igraph_vector_int_list_init(&e_results, 0);
 
-  igraph_simple_cycles(
-    &this->graph, &v_results, &e_results, IGRAPH_ALL, -1, maxLength);
+  REQUIRE_IGRAPH_SUCCESS(igraph_simple_cycles(
+    &this->graph, &v_results, &e_results, IGRAPH_ALL, -1, maxLength));
 
   std::vector<std::vector<igraph_integer_t>> results;
 
@@ -1593,8 +1573,8 @@ Universe::countLoopLengths(const int maxLength) const
   pylimer_tools::utils::Counter<int> loopLengths;
 
   // TODO: shrink the graph by collapsing all 2-functional vertices?
-  igraph_simple_cycles_callback(
-    &this->graph, IGRAPH_ALL, -1, maxLength, &count_found_cycle, &loopLengths);
+  REQUIRE_IGRAPH_SUCCESS(igraph_simple_cycles_callback(
+    &this->graph, IGRAPH_ALL, -1, maxLength, &count_found_cycle, &loopLengths));
 
   return loopLengths.asMap();
 }
@@ -1702,14 +1682,13 @@ Universe::findMinimalOrderLoopFrom(const long int loopStart,
          (maxLength < 0 || currentMaxLength <= maxLength)) {
     // for this specified neighbour, we search the simple paths
     // (multiple times as we, for memory issue prevention, increase the )
-    if (igraph_get_all_simple_paths(&this->graph,
-                                    &paths,
-                                    startingCrosslinkerVertexId,
-                                    igraph_vss_1(nextStepVertexId),
-                                    currentMaxLength,
-                                    IGRAPH_ALL)) {
-      throw std::runtime_error("Failed to get simple paths in graph");
-    }
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_get_all_simple_paths(&this->graph,
+                                  &paths,
+                                  startingCrosslinkerVertexId,
+                                  igraph_vss_1(nextStepVertexId),
+                                  currentMaxLength,
+                                  IGRAPH_ALL));
     if (currentMaxLength == maxLength || currentMaxLength < 1) {
       break;
     }
@@ -1790,23 +1769,20 @@ Universe::hasInfiniteStrand(const int crossLinkerType,
     igraph_vector_int_t neighbours;
     igraph_vector_int_init(&neighbours, 0);
 
-    if (igraph_neighbors(
-          &graph, &neighbours, startingCrosslinkerVertexId, IGRAPH_ALL)) {
-      throw std::runtime_error("Failed to get neighbours in graph");
-    }
+    REQUIRE_IGRAPH_SUCCESS(igraph_neighbors(
+      &graph, &neighbours, startingCrosslinkerVertexId, IGRAPH_ALL));
 
     // loop neighbours
     igraph_vector_int_t paths;
     igraph_vector_int_init(&paths, 0);
     // for each neighbour, we search the simple paths
-    if (igraph_get_all_simple_paths(&this->graph,
-                                    &paths,
-                                    startingCrosslinkerVertexId,
-                                    igraph_vss_vector(&neighbours),
-                                    maxLength,
-                                    IGRAPH_ALL)) {
-      throw std::runtime_error("Failed to get simple paths in graph");
-    }
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_get_all_simple_paths(&this->graph,
+                                  &paths,
+                                  startingCrosslinkerVertexId,
+                                  igraph_vss_vector(&neighbours),
+                                  maxLength,
+                                  IGRAPH_ALL));
 
     igraph_vector_int_destroy(&neighbours);
     // translate the paths we found
@@ -1868,15 +1844,12 @@ Universe::determineFunctionalityPerType() const
 {
   std::map<int, int> result;
   igraph_vector_int_t degrees;
-  if (igraph_vector_int_init(&degrees, 0)) {
-    throw std::runtime_error("Failed to instantiate result vector.");
-  }
+  REQUIRE_IGRAPH_SUCCESS(igraph_vector_int_init(&degrees, 0));
   igraph_vs_t allVertexIds;
   igraph_vs_all(&allVertexIds);
   // complexity: O(|v|*d)
-  if (igraph_degree(&this->graph, &degrees, allVertexIds, IGRAPH_ALL, false)) {
-    throw std::runtime_error("Failed to determine degree of vertices");
-  }
+  REQUIRE_IGRAPH_SUCCESS(
+    igraph_degree(&this->graph, &degrees, allVertexIds, IGRAPH_ALL, false));
 
   std::vector<int> types = this->getPropertyValues<int>("type");
   std::set<int> uniqueTypes(types.begin(), types.end());
@@ -1890,7 +1863,7 @@ Universe::determineFunctionalityPerType() const
 
   // complexity: O(|V|)
   igraph_vit_t vit;
-  igraph_vit_create(&graph, allVertexIds, &vit);
+  REQUIRE_IGRAPH_SUCCESS(igraph_vit_create(&graph, allVertexIds, &vit));
   while (!IGRAPH_VIT_END(vit)) {
     long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
     result[types[vertexId]] =
@@ -1915,15 +1888,13 @@ Universe::determineEffectiveFunctionalityPerType() const
 {
   std::map<int, double> result;
   igraph_vector_int_t degrees;
-  if (igraph_vector_int_init(&degrees, 0)) {
-    throw std::runtime_error("Failed to instantiate result vector.");
-  }
+  REQUIRE_IGRAPH_SUCCESS(igraph_vector_int_init(&degrees, 0));
+
   igraph_vs_t allVertexIds;
   igraph_vs_all(&allVertexIds);
   // complexity: O(|v|*d)
-  if (igraph_degree(&this->graph, &degrees, allVertexIds, IGRAPH_ALL, false)) {
-    throw std::runtime_error("Failed to determine degree of vertices");
-  }
+  REQUIRE_IGRAPH_SUCCESS(
+    igraph_degree(&this->graph, &degrees, allVertexIds, IGRAPH_ALL, false));
 
   std::vector<int> types = this->getPropertyValues<int>("type");
   std::set<int> uniqueTypes(types.begin(), types.end());
@@ -1934,7 +1905,7 @@ Universe::determineEffectiveFunctionalityPerType() const
 
   // complexity: O(|V|)
   igraph_vit_t vit;
-  igraph_vit_create(&graph, allVertexIds, &vit);
+  REQUIRE_IGRAPH_SUCCESS(igraph_vit_create(&graph, allVertexIds, &vit));
   while (!IGRAPH_VIT_END(vit)) {
     long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
     result[types[vertexId]] += igraph_vector_int_get(&degrees, vertexId);
@@ -2113,7 +2084,7 @@ Universe::getAtoms() const
   std::vector<Atom> atoms;
   atoms.reserve(this->getNrOfAtoms());
   igraph_vit_t vit;
-  igraph_vit_create(&graph, igraph_vss_all(), &vit);
+  REQUIRE_IGRAPH_SUCCESS(igraph_vit_create(&graph, igraph_vss_all(), &vit));
   while (!IGRAPH_VIT_END(vit)) {
     long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
     atoms.push_back(this->getAtomByVertexIdx(vertexId));
@@ -2217,7 +2188,8 @@ Universe::detectAngles() const
   std::vector<long int> angleTypeFound;
   // query all atoms
   igraph_vit_t vit;
-  igraph_vit_create(&this->graph, igraph_vss_all(), &vit);
+  REQUIRE_IGRAPH_SUCCESS(
+    igraph_vit_create(&this->graph, igraph_vss_all(), &vit));
   while (!IGRAPH_VIT_END(vit)) {
     const igraph_integer_t vertexIdx = IGRAPH_VIT_GET(vit);
     // find the connected atoms
@@ -2276,18 +2248,19 @@ Universe::detectDihedralAngles() const
   std::vector<long int> angleTypeFound;
   // query all atoms
   igraph_vit_t vit;
-  igraph_vit_create(&this->graph, igraph_vss_all(), &vit);
+  REQUIRE_IGRAPH_SUCCESS(
+    igraph_vit_create(&this->graph, igraph_vss_all(), &vit));
   while (!IGRAPH_VIT_END(vit)) {
     const long int vertexIdx = static_cast<long int>(IGRAPH_VIT_GET(vit));
     // find the connected atoms
     igraph_vector_int_t dihedral_paths_v;
     igraph_vector_int_init(&dihedral_paths_v, 4);
-    igraph_get_all_simple_paths(&this->graph,
-                                &dihedral_paths_v,
-                                vertexIdx,
-                                igraph_vss_all(),
-                                5,
-                                IGRAPH_ALL);
+    REQUIRE_IGRAPH_SUCCESS(igraph_get_all_simple_paths(&this->graph,
+                                                       &dihedral_paths_v,
+                                                       vertexIdx,
+                                                       igraph_vss_all(),
+                                                       5,
+                                                       IGRAPH_ALL));
 
     std::vector<std::vector<int>> dihedral_sets;
     // std::cout << "Found paths: " <<
@@ -2499,20 +2472,22 @@ Universe::contractVerticesAlongBondType(const int bondType) const
         // merge the two vertices connected by this edge
         igraph_integer_t vertex1OfEdge;
         igraph_integer_t vertex2OfEdge;
-        igraph_edge(&result.graph, edgeIdx, &vertex1OfEdge, &vertex2OfEdge);
+        REQUIRE_IGRAPH_SUCCESS(
+          igraph_edge(&result.graph, edgeIdx, &vertex1OfEdge, &vertex2OfEdge));
         if (vertex1OfEdge == vertex2OfEdge) {
           // no need to merge, the vertices are the same already
-          igraph_delete_edges(&result.graph, igraph_ess_1(edgeIdx));
+          REQUIRE_IGRAPH_SUCCESS(
+            igraph_delete_edges(&result.graph, igraph_ess_1(edgeIdx)));
         } else {
-          igraph_incident(
-            &result.graph, &edgesToCopy, vertex1OfEdge, IGRAPH_ALL);
+          REQUIRE_IGRAPH_SUCCESS(igraph_incident(
+            &result.graph, &edgesToCopy, vertex1OfEdge, IGRAPH_ALL));
           for (size_t i = 0; i < igraph_vector_int_size(&edgesToCopy); ++i) {
             igraph_integer_t edgeToCopy = VECTOR(edgesToCopy)[i];
             if (edgeToCopy != edgeIdx) {
-              igraph_add_edge(
+              REQUIRE_IGRAPH_SUCCESS(igraph_add_edge(
                 &result.graph,
                 vertex2OfEdge,
-                IGRAPH_OTHER(&result.graph, edgeToCopy, vertex1OfEdge));
+                IGRAPH_OTHER(&result.graph, edgeToCopy, vertex1OfEdge)));
               // copy edge properties
               pylimer_tools::utils::copyEdgeProperties(
                 &result.graph,
@@ -2525,7 +2500,8 @@ Universe::contractVerticesAlongBondType(const int bondType) const
               // having a higher index
             }
           }
-          igraph_delete_vertices(&result.graph, igraph_vss_1(vertex1OfEdge));
+          REQUIRE_IGRAPH_SUCCESS(
+            igraph_delete_vertices(&result.graph, igraph_vss_1(vertex1OfEdge)));
           edgeIdx = std::min(edgeIdx, igraph_ecount(&result.graph) - 1);
         }
       }
@@ -2592,7 +2568,7 @@ Universe::findVertexIdForProperty(const char* propertyName,
                                   IN propertyValue) const
 {
   igraph_vector_t allValues;
-  igraph_vector_init(&allValues, this->getNrOfAtoms());
+  REQUIRE_IGRAPH_SUCCESS(igraph_vector_init(&allValues, this->getNrOfAtoms()));
   VANV(&this->graph, propertyName, &allValues);
   for (int i = 0; i < this->NAtoms; ++i) {
     if (VECTOR(allValues)[i] == propertyValue) {
@@ -2820,17 +2796,15 @@ Universe::computeDs(const std::vector<long int>& bondFrom,
                     const std::string& direction,
                     const double boxLimit) const
 {
-  if (bondFrom.size() != bondTo.size()) {
-    throw std::invalid_argument(
-      "bond from and bond to must have the same size");
-  }
+  INVALIDARG_EXP_IFN(bondFrom.size() == bondTo.size(),
+                     "bond from and bond to must have the same size");
 
   size_t nBonds = bondFrom.size();
 
   igraph_vector_int_t vertexIdFrom;
-  igraph_vector_int_init(&vertexIdFrom, nBonds);
+  REQUIRE_IGRAPH_SUCCESS(igraph_vector_int_init(&vertexIdFrom, nBonds));
   igraph_vector_int_t vertexIdTo;
-  igraph_vector_int_init(&vertexIdTo, nBonds);
+  REQUIRE_IGRAPH_SUCCESS(igraph_vector_int_init(&vertexIdTo, nBonds));
 
   for (size_t i = 0; i < nBonds; ++i) {
     igraph_vector_int_set(
@@ -2840,17 +2814,20 @@ Universe::computeDs(const std::vector<long int>& bondFrom,
   }
 
   igraph_vector_t dValuesFrom;
-  igraph_vector_init(&dValuesFrom, nBonds);
+  REQUIRE_IGRAPH_SUCCESS(igraph_vector_init(&dValuesFrom, nBonds));
   igraph_vector_t dValuesTo;
-  igraph_vector_init(&dValuesTo, nBonds);
+  REQUIRE_IGRAPH_SUCCESS(igraph_vector_init(&dValuesTo, nBonds));
 
   std::string property = direction;
-  igraph_cattribute_VANV(&this->graph,
-                         property.c_str(),
-                         igraph_vss_vector(&vertexIdFrom),
-                         &dValuesFrom);
-  igraph_cattribute_VANV(
-    &this->graph, property.c_str(), igraph_vss_vector(&vertexIdTo), &dValuesTo);
+  REQUIRE_IGRAPH_SUCCESS(
+    igraph_cattribute_VANV(&this->graph,
+                           property.c_str(),
+                           igraph_vss_vector(&vertexIdFrom),
+                           &dValuesFrom));
+  REQUIRE_IGRAPH_SUCCESS(igraph_cattribute_VANV(&this->graph,
+                                                property.c_str(),
+                                                igraph_vss_vector(&vertexIdTo),
+                                                &dValuesTo));
 
   igraph_vector_int_destroy(&vertexIdFrom);
   igraph_vector_int_destroy(&vertexIdTo);
@@ -3067,16 +3044,15 @@ Universe::computeMeanBondLength() const
   }
   // construct iterator
   igraph_eit_t bondIterator;
-  if (igraph_eit_create(
-        &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator)) {
-    throw std::runtime_error("Cannot create iterator to loop bonds");
-  }
+  REQUIRE_IGRAPH_SUCCESS(igraph_eit_create(
+    &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator));
 
   while (!IGRAPH_EIT_END(bondIterator)) {
     long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
     igraph_integer_t bondFrom;
     igraph_integer_t bondTo;
-    igraph_edge(&this->graph, edgeId, &bondFrom, &bondTo);
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_edge(&this->graph, edgeId, &bondFrom, &bondTo));
     // TODO: this is more intensive than needed
     // check whether the compiler optimizes this or not
     Atom atom1 = this->getAtomByVertexIdx(bondFrom);
@@ -3171,17 +3147,16 @@ Universe::resetAtomIdMapping()
 bool
 Universe::validate() const
 {
-  if (this->getNrOfAtoms() != igraph_vcount(&this->graph)) {
-    throw std::runtime_error(
-      "Validation failed: " + std::to_string(this->getNrOfAtoms()) +
-      " atoms for " + std::to_string(igraph_vcount(&this->graph)) +
-      " vertices.");
-  }
-  if (this->getNrOfBonds() != igraph_ecount(&this->graph)) {
-    throw std::runtime_error(
-      "Validation failed: " + std::to_string(this->getNrOfBonds()) +
-      " bonds for " + std::to_string(igraph_ecount(&this->graph)) + " edges.");
-  }
+  RUNTIME_EXP_IFN(this->getNrOfAtoms() == igraph_vcount(&this->graph),
+                  "Validation failed: " + std::to_string(this->getNrOfAtoms()) +
+                    " atoms for " +
+                    std::to_string(igraph_vcount(&this->graph)) + " vertices.");
+
+  RUNTIME_EXP_IFN(this->getNrOfBonds() == igraph_ecount(&this->graph),
+                  "Validation failed: " + std::to_string(this->getNrOfBonds()) +
+                    " bonds for " +
+                    std::to_string(igraph_ecount(&this->graph)) + " edges.");
+
   return true;
 }
 
@@ -3217,20 +3192,26 @@ Universe::setBox(const Box& passedBox, const bool rescaleAtomCoordinates)
     double scalingFactorX = passedBox.getLx() / this->box.getLx();
     double offsetX = passedBox.getLowX() - scalingFactorX * this->box.getLowX();
     igraph_vector_t xValueVec;
-    igraph_vector_init(&xValueVec, this->getNrOfAtoms());
-    igraph_cattribute_VANV(&this->graph, "x", igraph_vss_all(), &xValueVec);
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_vector_init(&xValueVec, this->getNrOfAtoms()));
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_cattribute_VANV(&this->graph, "x", igraph_vss_all(), &xValueVec));
 
     double scalingFactorY = passedBox.getLy() / this->box.getLy();
     double offsetY = passedBox.getLowY() - scalingFactorY * this->box.getLowY();
     igraph_vector_t yValueVec;
-    igraph_vector_init(&yValueVec, this->getNrOfAtoms());
-    igraph_cattribute_VANV(&this->graph, "y", igraph_vss_all(), &yValueVec);
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_vector_init(&yValueVec, this->getNrOfAtoms()));
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_cattribute_VANV(&this->graph, "y", igraph_vss_all(), &yValueVec));
 
     double scalingFactorZ = passedBox.getLz() / this->box.getLz();
     double offsetZ = passedBox.getLowZ() - scalingFactorZ * this->box.getLowZ();
     igraph_vector_t zValueVec;
-    igraph_vector_init(&zValueVec, this->getNrOfAtoms());
-    igraph_cattribute_VANV(&this->graph, "z", igraph_vss_all(), &zValueVec);
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_vector_init(&zValueVec, this->getNrOfAtoms()));
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_cattribute_VANV(&this->graph, "z", igraph_vss_all(), &zValueVec));
 
     for (size_t i = 0; i < this->getNrOfAtoms(); ++i) {
       igraph_vector_set(&xValueVec,
@@ -3247,9 +3228,12 @@ Universe::setBox(const Box& passedBox, const bool rescaleAtomCoordinates)
                           offsetZ);
     }
 
-    igraph_cattribute_VAN_setv(&this->graph, "x", &xValueVec);
-    igraph_cattribute_VAN_setv(&this->graph, "y", &yValueVec);
-    igraph_cattribute_VAN_setv(&this->graph, "z", &zValueVec);
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_cattribute_VAN_setv(&this->graph, "x", &xValueVec));
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_cattribute_VAN_setv(&this->graph, "y", &yValueVec));
+    REQUIRE_IGRAPH_SUCCESS(
+      igraph_cattribute_VAN_setv(&this->graph, "z", &zValueVec));
 
     igraph_vector_destroy(&xValueVec);
     igraph_vector_destroy(&yValueVec);
