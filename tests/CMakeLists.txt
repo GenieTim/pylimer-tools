@@ -173,7 +173,7 @@ if (CODE_COVERAGE)
             DEPENDENCIES pylimer_tests
             LCOV_ARGS --ignore-errors inconsistent,source,format,empty,unused
             EXECUTABLE_ARGS --skip-benchmarks --order rand --durations yes "~[long]" --reporter JUnit::out=${CMAKE_CURRENT_LIST_DIR}/../test-reports/pylimer-tests-result-junit.xml --reporter console::out=${CMAKE_CURRENT_LIST_DIR}/build/pylimer_test_output.log.txt || true
-            EXCLUDE "/usr/*" "/opt/homebrew/*" "${CMAKE_CURRENT_LIST_DIR}/../vendor/*" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*" "${CMAKE_CURRENT_LIST_DIR}/pylimer_tools_cpp/*"
+            EXCLUDE "/usr/" "/opt/homebrew/" "${CMAKE_CURRENT_LIST_DIR}/../vendor/" "${CMAKE_CURRENT_LIST_DIR}/build/_deps/" "${CMAKE_CURRENT_LIST_DIR}/_deps/" "${CMAKE_CURRENT_LIST_DIR}/../_deps/" "${CMAKE_CURRENT_LIST_DIR}/pylimer_tools_cpp/"
     )
     # BASE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/.."
 endif ()
