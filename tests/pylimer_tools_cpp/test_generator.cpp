@@ -34,21 +34,22 @@ normalCDF(double x) // Phi(-∞, x) aka N(x)
 }
 
 /**
- * @brief Performs the Anderson-Darling test to check if observations follow a normal distribution
+ * @brief Performs the Anderson-Darling test to check if observations follow a
+ * normal distribution
  *
- * This function implements the Anderson-Darling test to determine whether a given set of 
- * observations follows a normal distribution with specified mean and variance. The test
- * is performed at a 10% significance level.
+ * This function implements the Anderson-Darling test to determine whether a
+ * given set of observations follows a normal distribution with specified mean
+ * and variance. The test is performed at a 10% significance level.
  *
- * Sources: 
+ * Sources:
  * - https://www.itl.nist.gov/div898/handbook/eda/section3/eda35e.htm
  * - https://en.wikipedia.org/wiki/Anderson%E2%80%93Darling_test
- * 
+ *
  * @param observations Vector of observed values to be tested
  * @param expectedMean The expected mean of the normal distribution
  * @param expectedVariance The expected variance of the normal distribution
- * @return bool Returns true if the observations follow the specified normal distribution
- *              (null hypothesis cannot be rejected at 10% significance level),
+ * @return bool Returns true if the observations follow the specified normal
+ * distribution (null hypothesis cannot be rejected at 10% significance level),
  *              false otherwise
  */
 bool
@@ -1086,6 +1087,28 @@ TEST_CASE("Universe generator uses correct w_sol even for strange structures",
 
   CHECK_THAT(forceBalance.getSolubleWeightFraction(),
              Catch::Matchers::WithinAbs(0.31, 0.05));
+}
+
+TEST_CASE("Universe generator handles structures without cross-links",
+          "[generator][MCUniverseGenerator]")
+{
+  std::cout << "Running test \"Universe generator handles structures without "
+               "cross-links\""
+            << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(
+    76.21419834207877, 76.21419834207877, 76.21419834207877);
+  generator.setSeed(8804);
+  generator.setMeanSquaredBeadDistance(1.107008);
+  generator.configNrOfMCSteps(0);
+
+  const std::vector<int> chainLengths = pu::initializeWithValue(50, 50);
+  generator.addStrands(chainLengths.size(), chainLengths, 1);
+
+  CHECK_NOTHROW(generator.validateInternalState());
+  CHECK_NOTHROW(generator.linkStrandsToSolubleFraction(1.));
+  CHECK_THROWS(generator.linkStrandsToConversion(0.));
+  CHECK_THROWS(generator.linkStrandsToConversion(1.));
 }
 
 TEST_CASE("Linear walk chain can be generated", "[topo][RandomWalker]")

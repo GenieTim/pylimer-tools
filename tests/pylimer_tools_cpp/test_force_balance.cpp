@@ -851,6 +851,39 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
   }
 }
 
+TEST_CASE("MEHP Force Balance can adjust the network",
+          "[analysis][MEHPForceBalance]")
+{
+  std::cout << "Running test \"MEHP Force Balance can adjust the network\""
+            << std::endl;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  CHECK(universeSeq.getLength() == 0);
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+
+  std::string inputFile =
+    suspectedPath + "/structure/mini_melt_3_a_10.structure.out";
+  REQUIRE(std::filesystem::exists(inputFile));
+  CHECK(std::filesystem::exists(suspectedPath));
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  CHECK(universeSeq.getLength() == 1);
+  pe::Universe universe = universeSeq.atIndex(0);
+  pcm::MEHPForceBalance forceBalancer =
+    pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+      universe, 5, 5., 0., 3, 0., "test_seed", 2, false, false);
+  // start with the actually relevant test
+  pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
+  CHECK_NOTHROW(forceBalancer.removeDuplicateListedSpringsFromLinks(net));
+  // add a duplicate spring
+  size_t nSpringLinksBefore = net.springIndicesOfLinks[0].size();
+  net.springIndicesOfLinks[0].push_back(net.springIndicesOfLinks[0][0]);
+  CHECK(net.springIndicesOfLinks[0].size() == nSpringLinksBefore + 1);
+  // and remove the duplicate again
+  CHECK_NOTHROW(forceBalancer.removeDuplicateListedSpringsFromLinks(net));
+  CHECK(net.springIndicesOfLinks[0].size() == nSpringLinksBefore);
+  CHECK_NOTHROW(forceBalancer.validateNetwork(net));
+}
+
 TEST_CASE(
   "MEHP Force Balance can randomly add slip-links ignoring crosslinkers",
   "[analysis][MEHPForceBalance]")

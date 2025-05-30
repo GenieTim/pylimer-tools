@@ -1028,12 +1028,17 @@ namespace utils {
     void linkStrandsToConversion(const double targetCrossLinkerConversion,
                                  const double cInfinity = 1.)
     {
+      RUNTIME_EXP_IFN(this->originalNrOfAvailableCrosslinkSites > 0, "No available cross-link sites.");
+
       const double conversionPerBond =
         (1.0) /
         (static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
       const double currentCrosslinkerConversion =
-        1.0 - (static_cast<double>(this->nrOfAvailableCrosslinkSites) /
-               static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
+        this->originalNrOfAvailableCrosslinkSites > 0
+          ? (1.0 -
+             (static_cast<double>(this->nrOfAvailableCrosslinkSites) /
+              static_cast<double>(this->originalNrOfAvailableCrosslinkSites)))
+          : 0.0;
 
       INVALIDARG_EXP_IFN(
         APPROX_WITHIN(
