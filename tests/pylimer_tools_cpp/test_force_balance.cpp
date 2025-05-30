@@ -868,20 +868,82 @@ TEST_CASE("MEHP Force Balance can adjust the network",
   universeSeq.initializeFromDataSequence({ { inputFile } });
   CHECK(universeSeq.getLength() == 1);
   pe::Universe universe = universeSeq.atIndex(0);
+
+  SECTION("Duplicate springs")
+  {
+    pcm::MEHPForceBalance forceBalancer =
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+        universe, 5, 5., 0., 3, 0., "test_seed", 2, false, false);
+    CHECK(forceBalancer.getNrOfSprings() == 3);
+    // start with the actually relevant test
+    pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
+    CHECK_NOTHROW(forceBalancer.removeDuplicateListedSpringsFromLinks(net));
+    // add a duplicate spring
+    size_t nSpringLinksBefore = net.springIndicesOfLinks[0].size();
+    net.springIndicesOfLinks[0].push_back(net.springIndicesOfLinks[0][0]);
+    CHECK(net.springIndicesOfLinks[0].size() == nSpringLinksBefore + 1);
+    // and remove the duplicate again
+    CHECK_NOTHROW(forceBalancer.removeDuplicateListedSpringsFromLinks(net));
+    CHECK(net.springIndicesOfLinks[0].size() == nSpringLinksBefore);
+    CHECK_NOTHROW(forceBalancer.validateNetwork(net));
+  }
+
+  SECTION("Primary loops")
+  {
+    // add a primary loop
+    universe.addAtoms(
+      { 69 }, { 1 }, { 0. }, { 0. }, { 0. }, { 0 }, { 0 }, { 0 });
+    universe.addBonds({ 1, 69 }, { 69, 1 });
+
+    // we don't sample entanglements, as it could hit atom 69.
+    // we don't use the "normal" conversion, as that one would remove the
+    // soluble chains
+    pcm::MEHPForceBalance forceBalancer =
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+        universe, 0, 5., 0., 0, 0., "test_seed", 2, false, false);
+
+    CHECK(forceBalancer.getNrOfSprings() == 4);
+    CHECK(forceBalancer.getNumIntraChainSlipLinks() == 0);
+
+    CHECK(forceBalancer.removePrimaryLoops() == 1);
+  }
+}
+
+TEST_CASE("MEHP Force Balance can break all springs",
+          "[analysis][MEHPForceBalance]")
+{
+  std::cout << "Running test \"MEHP Force Balance can break all springs\""
+            << std::endl;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  CHECK(universeSeq.getLength() == 0);
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+
+  std::string inputFile =
+    suspectedPath + "/structure/mini_melt_3_a_10.structure.out";
+  REQUIRE(std::filesystem::exists(inputFile));
+  CHECK(std::filesystem::exists(suspectedPath));
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  CHECK(universeSeq.getLength() == 1);
+  pe::Universe universe = universeSeq.atIndex(0);
+
   pcm::MEHPForceBalance forceBalancer =
     pcm::MEHPForceBalance::constructWithRandomSlipLinks(
       universe, 5, 5., 0., 3, 0., "test_seed", 2, false, false);
-  // start with the actually relevant test
-  pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
-  CHECK_NOTHROW(forceBalancer.removeDuplicateListedSpringsFromLinks(net));
-  // add a duplicate spring
-  size_t nSpringLinksBefore = net.springIndicesOfLinks[0].size();
-  net.springIndicesOfLinks[0].push_back(net.springIndicesOfLinks[0][0]);
-  CHECK(net.springIndicesOfLinks[0].size() == nSpringLinksBefore + 1);
-  // and remove the duplicate again
-  CHECK_NOTHROW(forceBalancer.removeDuplicateListedSpringsFromLinks(net));
-  CHECK(net.springIndicesOfLinks[0].size() == nSpringLinksBefore);
-  CHECK_NOTHROW(forceBalancer.validateNetwork(net));
+  CHECK(forceBalancer.addSliplinksBasedOnCycles() == 0);
+  CHECK(forceBalancer.getNrOfSprings() == 3);
+  CHECK(forceBalancer.breakTooLongSprings() == 0);
+  forceBalancer.configSpringBreakingDistance(1e-5);
+  CHECK(forceBalancer.breakTooLongSprings() == 3);
+
+  pe::Universe xlinkVerse = forceBalancer.getCrosslinkerVerse();
+  CHECK(xlinkVerse.getNrOfBonds() == 0);
+  std::unordered_map<long int, int> fs =
+    forceBalancer.getEffectiveFunctionalityOfAtoms();
+  CHECK(fs.size() == forceBalancer.getNrOfNodes());
+  for (const auto& pair : fs) {
+    CHECK(pair.second == 0);
+  }
 }
 
 TEST_CASE(
@@ -935,6 +997,52 @@ TEST_CASE(
     forceBalancer.removeInactiveCrosslinks(net, displacements, partitions, 1e5);
   CHECK(net.nrOfSprings == 0);
   CHECK(numRemoved > 0);
+}
+
+TEST_CASE("MEHP Force Balance can run with empty universe",
+          "[analysis][MEHPForceBalance]")
+{
+  std::cout << "Running test \"MEHP Force Balance can run with empty universe\""
+            << std::endl;
+  pcm::MEHPForceBalance forceBalancer =
+    pcm::MEHPForceBalance(pe::Universe(), 2, false, false, false);
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
+  CHECK_NOTHROW(forceBalancer.runForceRelaxation());
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
+}
+
+TEST_CASE("MEHP Force Balance can be interrupted",
+          "[analysis][MEHPForceBalance]")
+{
+  std::cout << "Running test \"MEHP Force Balance can be interrupted\""
+            << std::endl;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  CHECK(universeSeq.getLength() == 0);
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+
+  std::string inputFile =
+    suspectedPath + "/structure/network_100_a_46.structure.out";
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  CHECK(universeSeq.getLength() == 1);
+  pe::Universe universe = universeSeq.atIndex(0);
+  pcm::MEHPForceBalance forceBalancer =
+    pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+      universe, 1000, 3., 0, 100, 0, "test_seed", 2, false, true);
+  CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+    1000,
+    1e-12,
+    -1,
+    pcm::StructureSimplificationMode::ALL_ANDREI,
+    1e-3,
+    true,
+    pcm::LinkSwappingMode::SLIPLINKS_ONLY,
+    1,
+    1.,
+    1,
+    false,
+    []() -> bool { return true; },
+    []() -> void {}));
+  CHECK(forceBalancer.getExitReason() == pcm::ExitReason::INTERRUPT);
 }
 
 TEST_CASE("MEHP Force Balance can run with swapping slip-links",
@@ -3123,3 +3231,83 @@ TEST_CASE("Temporary force balance test case",
     -1,
     true));
 };
+
+#ifdef CEREALIZABLE
+TEST_CASE("MEHP Force Balance can be serialized",
+          "[MEHPForceBalance][CerealUtils]")
+{
+  std::cout << "Running test \"MEHP Force Balance can be serialized\""
+            << std::endl;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  CHECK(universeSeq.getLength() == 0);
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+
+  std::string inputFile =
+    suspectedPath + "/structure/network_100_a_46.structure.out";
+  REQUIRE(std::filesystem::exists(inputFile));
+  CHECK(std::filesystem::exists(suspectedPath));
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  CHECK(universeSeq.getLength() == 1);
+  pe::Universe universe = universeSeq.atIndex(0);
+
+  pcm::MEHPForceBalance forceBalancerEntanglements =
+    pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+      universe, 1000, 3.25, 0., 100, 0, "", 2, false);
+
+  SECTION("To binary")
+  {
+    std::stringstream os;
+    cereal::BinaryOutputArchive oarchive(os);
+    oarchive(forceBalancerEntanglements);
+
+    std::string binString = os.str();
+
+    pcm::MEHPForceBalance forceBalancerLoaded =
+      pcm::MEHPForceBalance::constructFromString(binString);
+
+    CHECK(forceBalancerEntanglements.getNrOfSprings() ==
+          forceBalancerLoaded.getNrOfSprings());
+    CHECK(forceBalancerEntanglements.getNrOfActiveSprings() ==
+          forceBalancerLoaded.getNrOfActiveSprings());
+    CHECK(forceBalancerEntanglements.getDisplacementResidualNorm() ==
+          forceBalancerLoaded.getDisplacementResidualNorm());
+    CHECK(forceBalancerEntanglements.getSolubleWeightFraction() ==
+          forceBalancerLoaded.getSolubleWeightFraction());
+    CHECK(forceBalancerEntanglements.getActiveWeightFraction() ==
+          forceBalancerLoaded.getActiveWeightFraction());
+    CHECK(forceBalancerEntanglements.getVolume() ==
+          forceBalancerLoaded.getVolume());
+    CHECK(forceBalancerEntanglements.getCrosslinkerVerse() ==
+          forceBalancerLoaded.getCrosslinkerVerse());
+  }
+
+  SECTION("To file")
+  {
+    std::string outputFile =
+      suspectedPath + "/tmp_force_balance_serialization.bin";
+    forceBalancerEntanglements.writeRestartFile(outputFile);
+    CHECK(std::filesystem::exists(outputFile));
+
+    pcm::MEHPForceBalance forceBalancerLoaded =
+      pcm::MEHPForceBalance::readRestartFile(outputFile);
+
+    std::filesystem::remove(outputFile);
+
+    CHECK(forceBalancerEntanglements.getNrOfSprings() ==
+          forceBalancerLoaded.getNrOfSprings());
+    CHECK(forceBalancerEntanglements.getNrOfActiveSprings() ==
+          forceBalancerLoaded.getNrOfActiveSprings());
+    CHECK(forceBalancerEntanglements.getDisplacementResidualNorm() ==
+          forceBalancerLoaded.getDisplacementResidualNorm());
+    CHECK(forceBalancerEntanglements.getSolubleWeightFraction() ==
+          forceBalancerLoaded.getSolubleWeightFraction());
+    CHECK(forceBalancerEntanglements.getActiveWeightFraction() ==
+          forceBalancerLoaded.getActiveWeightFraction());
+    CHECK(forceBalancerEntanglements.getVolume() ==
+          forceBalancerLoaded.getVolume());
+    CHECK(forceBalancerEntanglements.getCrosslinkerVerse() ==
+          forceBalancerLoaded.getCrosslinkerVerse());
+  }
+}
+#endif

@@ -23,7 +23,7 @@ enum MoleculeType
   FREE_CHAIN
 };
 
-class Molecule : public AtomGraphParent
+class Molecule final : public AtomGraphParent
 {
 public:
   Molecule(const Box& parent,

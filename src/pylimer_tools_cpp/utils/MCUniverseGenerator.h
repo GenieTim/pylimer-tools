@@ -1028,7 +1028,8 @@ namespace utils {
     void linkStrandsToConversion(const double targetCrossLinkerConversion,
                                  const double cInfinity = 1.)
     {
-      RUNTIME_EXP_IFN(this->originalNrOfAvailableCrosslinkSites > 0, "No available cross-link sites.");
+      RUNTIME_EXP_IFN(this->originalNrOfAvailableCrosslinkSites > 0,
+                      "No available cross-link sites.");
 
       const double conversionPerBond =
         (1.0) /
