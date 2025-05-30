@@ -256,15 +256,6 @@ MEHPForceBalance::runForceRelaxation(
     //     "sense and hints at a mistake.");
     // }
 
-    if (!iterateForDisplacements && currentResidual > previousResidual) {
-      // TODO: this cannot be a real solution…
-      std::cerr << "Residual is bigger than previous (" << currentResidual
-                << " vs. " << previousResidual << ") in iteration "
-                << iterationsDone + 1 << ". Switching displacement method."
-                << std::endl;
-      iterateForDisplacements = true;
-    }
-
     previousResidual = currentResidual;
     iterationsDone += 1;
     if (iterationsDone % this->simplificationFrequency == 0) {
@@ -871,6 +862,9 @@ MEHPForceBalance::breakTooLongSprings(ForceBalanceNetwork& net,
        --partialSpringIdx) {
     if (partialSpringIdx >= net.nrOfPartialSprings) {
       partialSpringIdx = net.nrOfPartialSprings - 1;
+    }
+    if (partialSpringIdx < 0) {
+      break;
     }
     const double len = this->getWeightedPartialSpringLength(
       net, displacements, springPartitions, partialSpringIdx);

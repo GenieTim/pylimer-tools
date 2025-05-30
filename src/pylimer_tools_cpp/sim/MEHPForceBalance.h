@@ -55,14 +55,10 @@ private:
   int crossLinkerType = 2;
   int sliplinkType = 3;
   int nrOfStepsDone = 0;
-  int stepOutputFrequency = 0;
   int simplificationFrequency = 10;
   int entanglementType = -999;
   double defaultBondLength = 0.0;
   double springBreakingLength = -1.;
-  std::string stepOutputFile;
-  bool outputEndNodes = false;
-  std::string endNodesFile;
 
 public:
   MEHPForceBalance(const pylimer_tools::entities::Universe& u,
@@ -98,15 +94,6 @@ public:
     this->box = pylimer_tools::entities::Box(net.L[0], net.L[1], net.L[2]);
     this->completeInitialization();
   }
-
-#ifdef CEREALIZABLE
-  static MEHPForceBalance constructFromString(std::string s)
-  {
-    MEHPForceBalance res = MEHPForceBalance();
-    pylimer_tools::utils::deserializeFromString(res, s);
-    return res;
-  }
-#endif
 
   /**
    * @brief Instantiate this simulator with randomly chosen slip-links.
@@ -598,6 +585,13 @@ public:
                              Eigen::VectorXd& displacements,
                              Eigen::VectorXd& springPartitions) const;
 
+  size_t breakTooLongSprings()
+  {
+    return this->breakTooLongSprings(this->initialConfig,
+                                     this->currentDisplacements,
+                                     this->currentSpringPartitionsVec);
+  }
+
   /**
    * @brief Remove double listed springs from crosslinkers
    *
@@ -610,9 +604,23 @@ public:
     size_t linkIdx,
     bool allowOnEntanglement = false) const;
 
+  /**
+   *
+   * @param net the network to rid of primary loops
+   * @param displacements the corresponding displacements
+   * @param springPartitions the corresponding spring partitions
+   * @return the number of primary loops removed
+   */
   size_t removePrimaryLoops(ForceBalanceNetwork& net,
                             Eigen::VectorXd& displacements,
                             Eigen::VectorXd& springPartitions) const;
+
+  size_t removePrimaryLoops()
+  {
+    return this->removePrimaryLoops(this->initialConfig,
+                                    this->currentDisplacements,
+                                    this->currentSpringPartitionsVec);
+  };
 
   /**
    * @brief Remove a spring (and all its parts, incl. slip-links) from the
@@ -2177,9 +2185,50 @@ public:
   }
 
 #ifdef CEREALIZABLE
+  template<class Archive>
+  void serialize(Archive& ar, std::uint32_t const version)
+  {
+    ar(cereal::virtual_base_class<OutputSupportingSimulation>(this));
+
+    // properties
+    ar(universe,
+       box,
+       exitReason,
+       simulationHasRun,
+       initialConfig,
+       currentDisplacements,
+       currentSpringVectors,
+       currentPartialSpringVectors,
+       currentSpringPartitionsVec);
+    // configuration
+    ar(is2D,
+       assumeBoxLargeEnough,
+       kappa,
+       crossLinkerType,
+       nrOfStepsDone,
+       simplificationFrequency,
+       entanglementType,
+       defaultBondLength,
+       springBreakingLength);
+  }
+
+  static MEHPForceBalance readRestartFile(std::string& file)
+  {
+    MEHPForceBalance res = MEHPForceBalance();
+    pylimer_tools::utils::deserializeFromFile(res, file);
+    return res;
+  }
+
   void writeRestartFile(std::string& file) override
   {
-    throw std::runtime_error("Restart not supported yet");
+    pylimer_tools::utils::serializeToFile<MEHPForceBalance>(*this, file);
+  }
+
+  static MEHPForceBalance constructFromString(std::string s)
+  {
+    MEHPForceBalance res = MEHPForceBalance();
+    pylimer_tools::utils::deserializeFromString(res, s);
+    return res;
   }
 #endif
 
@@ -3260,3 +3309,11 @@ protected:
     const bool respectLoops = true) const;
 };
 }
+
+#ifdef CEREALIZABLE
+CEREAL_REGISTER_TYPE(pylimer_tools::sim::mehp::MEHPForceBalance);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(
+  pylimer_tools::sim::OutputSupportingSimulation,
+  pylimer_tools::sim::mehp::MEHPForceBalance);
+CEREAL_CLASS_VERSION(pylimer_tools::sim::mehp::MEHPForceBalance, 1);
+#endif

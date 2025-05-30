@@ -217,6 +217,61 @@ struct ForceBalanceNetwork
   Eigen::ArrayXi springIndexB;
 };
 
+#ifdef CEREALIZABLE
+
+template<class Archive>
+void
+serialize(Archive& ar, ForceBalanceNetwork& fbn)
+{
+  // Box properties
+  ar(fbn.L, fbn.boxHalfs, fbn.vol);
+
+  // Network properties
+  ar(fbn.meanSpringContourLength,
+     fbn.nrOfLinks,
+     fbn.nrOfNodes,
+     fbn.nrOfSprings,
+     fbn.nrOfPartialSprings,
+     fbn.nrOfSpringsWithPartition,
+     fbn.isUpToDate);
+
+  // Coordinates and connectivity
+  ar(fbn.coordinates, fbn.springsContourLength, fbn.springsType);
+
+  // Mapping structures
+  ar(fbn.springIndicesOfLinks,
+     fbn.linkIndicesOfSprings,
+     fbn.partialSpringIsPartial,
+     fbn.localToGlobalSpringIndex,
+     fbn.oldAtomIdToSpringIndex);
+
+  // Link properties
+  ar(fbn.linkIsSliplink, fbn.nrOfCrosslinkSwapsEndured);
+
+  // Partial spring properties
+  ar(fbn.springPartCoordinateIndexA,
+     fbn.springPartCoordinateIndexB,
+     fbn.springPartIndexA,
+     fbn.springPartIndexB,
+     fbn.springPartBoxOffset,
+     fbn.partialToFullSpringIndex);
+
+  // Loop information
+  ar(fbn.loops, fbn.loopsOfSliplink);
+
+  // Old stuff used for conversion
+  ar(fbn.springCoordinateIndexA,
+     fbn.springCoordinateIndexB,
+     fbn.oldAtomIds,
+     fbn.oldAtomTypes,
+     fbn.springToMoleculeIds,
+     fbn.springIsActive,
+     fbn.springIndexA,
+     fbn.springIndexB);
+}
+
+#endif
+
 struct ForceBalance2Network
 {
   // TODO: some info is redundant.

@@ -13,7 +13,8 @@ fixes:
 ignore:
   - "docs/*"
   - "docs-template/*"
-  - "tests/pylimer*/*"
+  - "tests/pylimer*/**/*"
+  - "tests/pylimer_tools/__init__.py"
   - "setup.py"
   - "update-all.py"
   - "pyproject.toml"

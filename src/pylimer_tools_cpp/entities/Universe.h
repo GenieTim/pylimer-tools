@@ -292,7 +292,7 @@ public:
 
 protected:
   // properties of the universe
-  long int timestep;
+  long int timestep = 0;
   size_t NAtoms = 0;
   size_t NBonds = 0;
   Box box;
@@ -302,20 +302,20 @@ protected:
   // extra info
   // TODO: might want to move the angle business to the parent?!?
   // angles (NOTE: only atom-ids, not vertex-idxs are used!)
-  std::vector<long int> angleFrom;
-  std::vector<long int> angleTo;
-  std::vector<long int> angleVia;
-  std::vector<int> angleType;
+  std::vector<long int> angleFrom = {};
+  std::vector<long int> angleTo = {};
+  std::vector<long int> angleVia = {};
+  std::vector<int> angleType = {};
   // dihedral angles (NOTE: only atom-ids, not vertex-idxs are used!)
-  std::vector<long int> dihedralAngleFrom;
-  std::vector<long int> dihedralAngleVia1;
-  std::vector<long int> dihedralAngleVia2;
-  std::vector<long int> dihedralAngleTo;
-  std::vector<int> dihedralAngleType;
+  std::vector<long int> dihedralAngleFrom = {};
+  std::vector<long int> dihedralAngleVia1 = {};
+  std::vector<long int> dihedralAngleVia2 = {};
+  std::vector<long int> dihedralAngleTo = {};
+  std::vector<int> dihedralAngleType = {};
 
   // type's properties
   std::map<int, double>
-    massPerType; // a dictionary with key: type, and value: weight per atom
+    massPerType = {}; // a dictionary with key: type, and value: weight per atom
   // of this atom type.
 
   // internal functions
