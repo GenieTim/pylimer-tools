@@ -11,13 +11,12 @@ import pandas.testing as pd_testing
 
 from pylimer_tools_cpp import Atom, Molecule, MoleculeType, Universe
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))
 from tests.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 
 
 class TestEntities(UniverseUsingTestCase):
-
     def assert_series_equal(self, a, b, msg):
         try:
             pd_testing.assert_series_equal(a, b)
@@ -41,13 +40,19 @@ class TestEntities(UniverseUsingTestCase):
         self.assertEqual(0, self.emptyUniverse.get_nr_of_atoms())
 
         atom = self.testUniverseSmall.get_atom(1)
-        self.assertEqual(atom, Atom(self.testAtomsSmall.iloc[0]["id"], self.testAtomsSmall.iloc[0]["type"],
-                         self.testAtomsSmall.iloc[0]["x"],
-                         self.testAtomsSmall.iloc[0]["y"],
-                         self.testAtomsSmall.iloc[0]["z"],
-                         self.testAtomsSmall.iloc[0]["nx"],
-                         self.testAtomsSmall.iloc[0]["ny"],
-                         self.testAtomsSmall.iloc[0]["nz"]))
+        self.assertEqual(
+            atom,
+            Atom(
+                self.testAtomsSmall.iloc[0]["id"],
+                self.testAtomsSmall.iloc[0]["type"],
+                self.testAtomsSmall.iloc[0]["x"],
+                self.testAtomsSmall.iloc[0]["y"],
+                self.testAtomsSmall.iloc[0]["z"],
+                self.testAtomsSmall.iloc[0]["nx"],
+                self.testAtomsSmall.iloc[0]["ny"],
+                self.testAtomsSmall.iloc[0]["nz"],
+            ),
+        )
         self.assertIsInstance(atom, Atom)
 
     def test_molecule_entity(self):
@@ -57,8 +62,10 @@ class TestEntities(UniverseUsingTestCase):
         molecules = universe.get_molecules(0)
         self.assertEqual(len(molecules), 2)
         self.assertEqual(molecules[0].get_nr_of_atoms(), 3)
-        self.assertEqual(np.sum([m.get_nr_of_atoms()
-                                 for m in molecules]), len(self.testAtomsSmall))
+        self.assertEqual(
+            np.sum([m.get_nr_of_atoms()
+                   for m in molecules]), len(self.testAtomsSmall)
+        )
         molecules = universe.get_molecules(2)
         self.assertEqual(len(molecules), 2)
         self.assertEqual(len(universe.get_chains_with_crosslinker(0)), 2)
@@ -68,17 +75,23 @@ class TestEntities(UniverseUsingTestCase):
             self.assertIsInstance(molecule, Molecule)
         for molecule in universe.get_chains_with_crosslinker(0):
             self.assertIsInstance(molecule, Molecule)
-            self.assertEqual(molecule.get_strand_type(),
-                             MoleculeType.FREE_CHAIN)
+            self.assertEqual(
+                molecule.get_strand_type(),
+                MoleculeType.FREE_CHAIN)
 
         chains_with_crosslinker = universe.get_chains_with_crosslinker(2)
-        self.assertEqual(chains_with_crosslinker[0].get_strand_type(
-        ), MoleculeType.FREE_CHAIN)
         self.assertEqual(
-            chains_with_crosslinker[1].get_strand_type(), MoleculeType.DANGLING_CHAIN)
+            chains_with_crosslinker[0].get_strand_type(
+            ), MoleculeType.FREE_CHAIN
+        )
+        self.assertEqual(
+            chains_with_crosslinker[1].get_strand_type(
+            ), MoleculeType.DANGLING_CHAIN
+        )
         universe_clone = copy.copy(universe)
-        self.assertEqual(universe.get_nr_of_atoms(),
-                         universe_clone.get_nr_of_atoms())
+        self.assertEqual(
+            universe.get_nr_of_atoms(),
+            universe_clone.get_nr_of_atoms())
 
     def test_molecule_entity_iterations(self):
         molecules = self.testUniverseSmall.get_molecules(0)
@@ -102,5 +115,5 @@ class TestEntities(UniverseUsingTestCase):
         self.assertEqual(atom1.get_nz(), 0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

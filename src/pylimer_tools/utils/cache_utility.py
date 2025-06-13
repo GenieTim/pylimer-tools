@@ -23,12 +23,17 @@ def do_cache(obj, file: str, suffix: str, tmp_dir: str = None):
         - tmp_dir: The directory to store the cache in
     """
     cache_file_name = get_cache_file_name(file, suffix, tmp_dir)
-    with open(cache_file_name, 'wb') as cache_file:
+    with open(cache_file_name, "wb") as cache_file:
         pickle.dump(obj, cache_file)
 
 
-def load_cache(file: Union[str, List[str], None], suffix: str, disable_warnings: bool = False,
-               tmp_dir: str = None, anyway: bool = False):
+def load_cache(
+    file: Union[str, List[str], None],
+    suffix: str,
+    disable_warnings: bool = False,
+    tmp_dir: str = None,
+    anyway: bool = False,
+):
     """
     Load an object from cache, iff the cache is new enough.
 
@@ -44,36 +49,41 @@ def load_cache(file: Union[str, List[str], None], suffix: str, disable_warnings:
     Returns:
         - cache: either the content of the cache, or None if the cache has to be loaded again / is non existent
     """
-    if (file is None):
+    if file is None:
         file = ""
-    if (not isinstance(file, list)):
+    if not isinstance(file, list):
         file = [file]
     cache_file_name = get_cache_file_name(file, suffix, tmp_dir)
     old_cache_file_name = get_cache_file_name(file, suffix, tmp_dir, True)
-    if (os.path.isfile(old_cache_file_name)
-            and not os.path.isfile(cache_file_name)):
+    if os.path.isfile(old_cache_file_name) and not os.path.isfile(
+            cache_file_name):
         shutil.copy2(old_cache_file_name, cache_file_name)
         os.remove(old_cache_file_name)
-    if (os.path.isfile(cache_file_name)):
-        if (not np.all([os.path.isfile(f) for f in file])):
-            if (not disable_warnings):
+    if os.path.isfile(cache_file_name):
+        if not np.all([os.path.isfile(f) for f in file]):
+            if not disable_warnings:
                 warnings.warn(
-                    'Cache called for non-existent file. Make sure the key is time-restricted')
-            with open(cache_file_name, 'rb') as cache_file:
+                    "Cache called for non-existent file. Make sure the key is time-restricted"
+                )
+            with open(cache_file_name, "rb") as cache_file:
                 to_return = pickle.load(cache_file)
             return to_return
         else:
-            if (anyway or is_current_cache(cache_file_name, file)):
+            if anyway or is_current_cache(cache_file_name, file):
                 try:
-                    with open(cache_file_name, 'rb') as cache_file:
+                    with open(cache_file_name, "rb") as cache_file:
                         to_return = pickle.load(cache_file)
                     return to_return
                 except pickle.UnpicklingError as e:
                     warnings.warn(
-                        "Unpickling of cache file {} failed: {}".format(file, e))
+                        "Unpickling of cache file {} failed: {}".format(
+                            file, e)
+                    )
                 except ModuleNotFoundError as e:
                     warnings.warn(
-                        "Unpickling of cache file {} failed: {}".format(file, e))
+                        "Unpickling of cache file {} failed: {}".format(
+                            file, e)
+                    )
             else:
                 # print("Dump cache file is elder than dump. Reloading...")
                 pass
@@ -81,8 +91,12 @@ def load_cache(file: Union[str, List[str], None], suffix: str, disable_warnings:
     return None
 
 
-def get_cache_file_name(file: Union[str, List[str], None],
-                        suffix: str, tmp_dir: str = None, old: bool = False):
+def get_cache_file_name(
+    file: Union[str, List[str], None],
+    suffix: str,
+    tmp_dir: str = None,
+    old: bool = False,
+):
     """
     Get the name and path of a cache file. Internal method.
 
@@ -96,13 +110,15 @@ def get_cache_file_name(file: Union[str, List[str], None],
     Returns:
         - cache_file_name: The path to the cache file
     """
-    if (isinstance(file, list)):
+    if isinstance(file, list):
         file = "".join(sorted(file) if not old else file)
-    if (file is None):
+    if file is None:
         file = ""
     cache_file_name = "{}/{}-{}.pickle".format(
         tempfile.gettempdir() if tmp_dir is None else tmp_dir,
-        hashlib.md5(file.encode()).hexdigest(), suffix)
+        hashlib.md5(file.encode()).hexdigest(),
+        suffix,
+    )
     return cache_file_name
 
 
@@ -117,12 +133,13 @@ def is_current_cache(cache_file: str, dependencies: Union[str, List[str]]):
     Returns:
         - True if the file is newer than all its dependencies, False otherwise
     """
-    if (not os.path.exists(cache_file)):
+    if not os.path.exists(cache_file):
         return False
-    if (not isinstance(dependencies, list)):
+    if not isinstance(dependencies, list):
         dependencies = [dependencies]
     mtime_cache = datetime.datetime.fromtimestamp(os.path.getmtime(cache_file))
-    mtimes_origin = [datetime.datetime.fromtimestamp(
-        os.path.getmtime(f)) for f in dependencies]
+    mtimes_origin = [
+        datetime.datetime.fromtimestamp(os.path.getmtime(f)) for f in dependencies
+    ]
 
     return np.all([mtime_cache > mt for mt in mtimes_origin])

@@ -18,18 +18,26 @@ def get_tail(data, percentage=0.2, min_n=25, max_percentage=0.5):
             at least minN entries (assuming the initial data is as large),
             but ideally `percentage` many percentage of the last entries.
     """
-    assert (percentage <= 1)
-    assert (max_percentage <= 1)
-    tail_n = int(min(max(min(min_n, max_percentage * len(data)),
-                         percentage * len(data)), len(data)))
-    if (isinstance(data, pd.DataFrame) or isinstance(data, pd.Series)):
+    assert percentage <= 1
+    assert max_percentage <= 1
+    tail_n = int(
+        min(
+            max(min(min_n, max_percentage * len(data)), percentage * len(data)),
+            len(data),
+        )
+    )
+    if isinstance(data, pd.DataFrame) or isinstance(data, pd.Series):
         return data.tail(tail_n)
     else:
         return data[-tail_n:]
 
 
-def unify_data_stepsizes(data: pd.DataFrame, key: str, step_size: int = None,
-                         max_expected_step_size: int = 100) -> pd.DataFrame:
+def unify_data_stepsizes(
+    data: pd.DataFrame,
+    key: str,
+    step_size: int = None,
+    max_expected_step_size: int = 100,
+) -> pd.DataFrame:
     """
     Get a DataFrame where all data points have the same step between the values in column given by `key`
     NOTE: this function is rather unstable, as it has a few dirty assumptions, such as:
@@ -45,11 +53,14 @@ def unify_data_stepsizes(data: pd.DataFrame, key: str, step_size: int = None,
         - data: a DataFrame with a consistent step-size
     """
     # lenBefore = len(data)
-    if (step_size is None):
+    if step_size is None:
         step_size = data[key].sort_values().diff().max()
-    if (step_size > max_expected_step_size):
-        warnings.warn("Step size {} unexpectedly large, with max expected {}".format(
-            step_size, max_expected_step_size))
+    if step_size > max_expected_step_size:
+        warnings.warn(
+            "Step size {} unexpectedly large, with max expected {}".format(
+                step_size, max_expected_step_size
+            )
+        )
     data = data[(data[key] % step_size) == 0]
     # print("Reduced from {} to {} data-points using step size of {}".format(lenBefore, len(data), step_size))
     return data
