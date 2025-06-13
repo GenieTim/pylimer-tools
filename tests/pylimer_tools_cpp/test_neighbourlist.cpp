@@ -225,6 +225,67 @@ TEST_CASE("Manually accurate EigenNeighbourList",
   CHECK(true);
 }
 
+TEST_CASE("EigenNeighbourList Works as intended",
+          "[entity][EigenNeighbourList]")
+{
+  std::cout << "Running test \"EigenNeighbourList Works as intended\""
+            << std::endl;
+  Eigen::VectorXd coordinates = Eigen::VectorXd::Zero(3 * 20);
+  // one diagonal line of coordinates, breaking outside the box boundaries
+  for (int i = 0; i < 20; ++i) {
+    coordinates.segment(3 * i, 3) = Eigen::Vector3d(i, i, i);
+  }
+  pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+
+  double distanceBetweenAtoms = std::sqrt(3.);
+
+  pe::EigenNeighbourList neighbourList =
+    pe::EigenNeighbourList(coordinates, box, 1.1 * distanceBetweenAtoms);
+
+  Eigen::ArrayXi neighbours;
+  for (size_t i = 0; i < 20; ++i) {
+    INFO("Checking neighbours within default distance of atom " << i);
+    neighbourList.getIndicesCloseToCoordinates(neighbours,
+                                               coordinates.segment(3 * i, 3),
+                                               1.1 * distanceBetweenAtoms,
+                                               true);
+
+    CHECK(neighbours.size() >= 3);
+    // expect one of the neighbours to be itself, one before and one after
+    bool foundItself = false;
+    bool foundBefore = false;
+    bool foundAfter = false;
+    for (size_t j = 0; j < neighbours.size(); ++j) {
+      foundItself = (neighbours[j] == i) || foundItself;
+      foundBefore = (neighbours[j] == ((20 + (i - 1)) % 20)) || foundBefore;
+      foundAfter = (neighbours[j] == ((i + 1) % 20)) || foundAfter;
+    }
+    CHECK(foundItself);
+    CHECK(foundBefore);
+    CHECK(foundAfter);
+
+    INFO("Checking neighbours within new distance of atom " << i);
+    neighbourList.getIndicesCloseToCoordinates(neighbours,
+                                               coordinates.segment(3 * i, 3),
+                                               1.3 * distanceBetweenAtoms,
+                                               false);
+
+    CHECK(neighbours.size() >= 3);
+    // expect one of the neighbours to be itself, one before and one after
+    foundItself = false;
+    foundBefore = false;
+    foundAfter = false;
+    for (size_t j = 0; j < neighbours.size(); ++j) {
+      foundItself = (neighbours[j] == i) || foundItself;
+      foundBefore = (neighbours[j] == ((20 + (i - 1)) % 20)) || foundBefore;
+      foundAfter = (neighbours[j] == ((i + 1) % 20)) || foundAfter;
+    }
+    CHECK(foundItself);
+    CHECK(foundBefore);
+    CHECK(foundAfter);
+  }
+}
+
 #ifdef CERALIZABLE
 TEST_CASE("EigenNeighbourList can be serialized and deserialized",
           "[EigenNeighbourList][entity][serialization]")

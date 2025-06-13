@@ -12,7 +12,7 @@
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
         //"[MEHPForceBalance2]"
-        "[utils]"
+        "EigenNeighbourList Works as intended"
       ],
       "env": {
         "MallocNanoZone": "0",
@@ -29,7 +29,7 @@
       "name": "Debug Cpp Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["MEHP Force Balance Entanglement Beads Are Removed"],
+      "args": ["[EigenNeighbourList]", "--skip-benchmarks"],
       "environment": [
         {
           "name": "MallocNanoZone",
