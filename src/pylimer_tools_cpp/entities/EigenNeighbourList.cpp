@@ -1,13 +1,8 @@
-
-extern "C"
-{
-#include <igraph/igraph.h>
-}
+#include "EigenNeighbourList.h"
 #include "../utils/StringUtils.h"
 #include "../utils/VectorUtils.h"
 #include "../utils/utilityMacros.h"
 #include "Box.h"
-#include "EigenNeighbourList.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <iostream>
@@ -421,7 +416,7 @@ namespace entities {
 #endif
 
     int results_idx = 0;
-    if (upperCutoff == this->cutoff) {
+    if (APPROX_EQUAL(upperCutoff, this->cutoff, 1e-12)) {
       const bucket_idx_t coordinatesBucketIdx = this->getBucketIndexForTriplet(
         this->getBucketTripletForCoordinates(coordinates));
       // first, count the number of results we will get
