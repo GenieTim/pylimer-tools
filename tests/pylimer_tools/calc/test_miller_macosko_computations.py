@@ -39,7 +39,6 @@ from tests.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 
 
 class TestMMTAnalysisFunctions(UniverseUsingTestCase):
-
     def test_stoichiometric_imbalance(self):
         self.assertAlmostEqual(
             0, compute_stoichiometric_imbalance(self.emptyUniverse, 2)

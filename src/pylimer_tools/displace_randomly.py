@@ -10,8 +10,8 @@ from pylimer_tools_cpp import Atom, DataFileWriter
 
 
 @click.command()
-@click.argument('file', type=click.Path(exists=True), required=True)
-@click.argument('max_displacement', default=0.5, type=click.FLOAT)
+@click.argument("file", type=click.Path(exists=True), required=True)
+@click.argument("max_displacement", default=0.5, type=click.FLOAT)
 def cli(file, max_displacement):
     """
     Basic CLI application iterating all atoms in a file, displacing them by a bit.
@@ -32,19 +32,16 @@ def cli(file, max_displacement):
             atom.get_z() + (random.random() - 0.5) * max_displacement,
             atom.get_nx(),
             atom.get_ny(),
-            atom.get_nz()
+            atom.get_nz(),
         )
         universe.replace_atom(atom.get_id(), new_atom)
 
     writer = DataFileWriter(universe)
 
     target_file = os.path.join(
-        os.path.dirname(file),
-        "random-displaced-" + os.path.basename(file)
+        os.path.dirname(file), "random-displaced-" + os.path.basename(file)
     )
-    writer.write_to_file(
-        target_file
-    )
+    writer.write_to_file(target_file)
     click.echo("Written file '{}'".format(target_file))
 
 

@@ -31,7 +31,6 @@ from tests.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 
 
 class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
-
     def test_weight_fraction_calculations(self):
         self.assertEqual(
             (0.0, 0.0),

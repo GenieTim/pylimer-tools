@@ -5,7 +5,6 @@ This module provides functions to compute various quantities related to polymer 
 from __future__ import annotations
 
 import math
-import numbers
 import warnings
 from collections import Counter
 from typing import Sequence, Tuple, Union

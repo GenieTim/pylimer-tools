@@ -816,7 +816,7 @@ def compute_probability_that_bifunctional_monomer_is_dangling(
     :return: The probability that a bifunctional monomer is dangling
     """
     assert 0 <= p_f_b_out <= 1, "p_f_b_out must be between 0 and 1"
-    return scipy.special.binom(2, 1) * (p_f_b_out) * ((1.0 - p_f_b_out))
+    return scipy.special.binom(2, 1) * (p_f_b_out) * (1.0 - p_f_b_out)
 
 
 def predict_gelation_point(r: float, f: int, b2: float = 1) -> float:
