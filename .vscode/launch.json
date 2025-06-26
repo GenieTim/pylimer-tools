@@ -12,7 +12,7 @@
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
         //"[MEHPForceBalance2]"
-        "EigenNeighbourList Works as intended"
+        "DPD Simulator's restart files are accurate"
       ],
       "env": {
         "MallocNanoZone": "0",

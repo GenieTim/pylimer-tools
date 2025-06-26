@@ -267,14 +267,16 @@ and finally springs will be any number of connected bonds between links.
     .def_readonly("coordinates", &mehp::ForceBalance2Network::coordinates)
     .def_readonly("old_atom_ids", &mehp::ForceBalance2Network::oldAtomIds)
     .def_readonly("old_atom_types", &mehp::ForceBalance2Network::oldAtomTypes)
+    .def_readonly("link_is_entanglement",
+                  &mehp::ForceBalance2Network::linkIsEntanglement)
+    .def_readonly("spring_is_entanglement",
+                  &mehp::ForceBalance2Network::springIsEntanglement)
     .def_readonly("spring_coordinate_index_a",
                   &mehp::ForceBalance2Network::springCoordinateIndexA)
     .def_readonly("spring_coordinate_index_b",
                   &mehp::ForceBalance2Network::springCoordinateIndexB)
     .def_readonly("spring_index_a", &mehp::ForceBalance2Network::springIndexA)
     .def_readonly("spring_index_b", &mehp::ForceBalance2Network::springIndexB)
-    .def_readonly("link_is_entanglement",
-                  &mehp::ForceBalance2Network::linkIsEntanglement)
     .def_readonly("spring_contour_length",
                   &mehp::ForceBalance2Network::springContourLength)
     .def_readonly("spring_indices_of_strand",
@@ -1685,6 +1687,11 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
            Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
            )pbdoc")
+    .def("get_coordinates",
+         &mehp::MEHPForceBalance2::getCoordinates,
+         R"pbdoc(
+             Get the current coordinates of the cross-linkers and entanglement links.
+      )pbdoc")
     .def("get_displacements",
          &mehp::MEHPForceBalance2::getCurrentDisplacements,
          R"pbdoc(
