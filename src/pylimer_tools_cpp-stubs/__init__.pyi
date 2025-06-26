@@ -1707,6 +1707,10 @@ class MEHPForceBalance2:
                     Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()`,
                     this value is normalized by the number of springs rather than the number of chains.
         """
+    def get_coordinates(self) -> numpy.ndarray:
+        """
+                     Get the current coordinates of the cross-linkers and entanglement links.
+        """
     def get_crosslinker_universe(self) -> Universe:
         """
                    Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
@@ -2793,6 +2797,9 @@ class SimplifiedBalance2Network:
         ...
     @property
     def spring_indices_of_strand(self) -> list[list[int]]:
+        ...
+    @property
+    def spring_is_entanglement(self) -> numpy.ndarray:
         ...
     @property
     def strand_index_of_spring(self) -> numpy.ndarray:
