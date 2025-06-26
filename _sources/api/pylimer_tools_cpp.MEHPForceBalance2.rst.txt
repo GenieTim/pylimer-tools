@@ -25,6 +25,7 @@ MEHPForceBalance2
       ~MEHPForceBalance2.evaluate_partial_spring_distance_from
       ~MEHPForceBalance2.evaluate_partial_spring_distance_to
       ~MEHPForceBalance2.get_average_spring_length
+      ~MEHPForceBalance2.get_coordinates
       ~MEHPForceBalance2.get_crosslinker_universe
       ~MEHPForceBalance2.get_current_partial_spring_lengths
       ~MEHPForceBalance2.get_current_partial_spring_vectors
@@ -81,6 +82,7 @@ MEHPForceBalance2
    .. automethod:: evaluate_partial_spring_distance_from
    .. automethod:: evaluate_partial_spring_distance_to
    .. automethod:: get_average_spring_length
+   .. automethod:: get_coordinates
    .. automethod:: get_crosslinker_universe
    .. automethod:: get_current_partial_spring_lengths
    .. automethod:: get_current_partial_spring_vectors

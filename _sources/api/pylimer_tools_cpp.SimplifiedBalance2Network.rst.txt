@@ -27,6 +27,7 @@ SimplifiedBalance2Network
       ~SimplifiedBalance2Network.spring_index_a
       ~SimplifiedBalance2Network.spring_index_b
       ~SimplifiedBalance2Network.spring_indices_of_strand
+      ~SimplifiedBalance2Network.spring_is_entanglement
       ~SimplifiedBalance2Network.strand_index_of_spring
       ~SimplifiedBalance2Network.strand_indices_of_link
 
@@ -49,5 +50,6 @@ SimplifiedBalance2Network
    .. autoattribute:: spring_index_a
    .. autoattribute:: spring_index_b
    .. autoattribute:: spring_indices_of_strand
+   .. autoattribute:: spring_is_entanglement
    .. autoattribute:: strand_index_of_spring
    .. autoattribute:: strand_indices_of_link
