@@ -1794,6 +1794,10 @@ class MEHPForceBalance2:
         
                    :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
         """
+    def get_initial_coordinates(self) -> numpy.ndarray:
+        """
+                     Get the initial coordinates of the cross-linkers and entanglement links.
+        """
     def get_nr_of_active_nodes(self, tolerance: float = 0.001) -> int:
         """
                    Get the number of active nodes (incl. entanglement nodes [atoms with type = entanglementType, present in the universe when creating this simulator],

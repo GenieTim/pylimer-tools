@@ -1107,6 +1107,8 @@ public:
 
   Eigen::VectorXd getBondLengths() override;
 
+  Eigen::VectorXd getInitialCoordinates();
+
   Eigen::VectorXd getCoordinates() override;
 
   double getTemperature() override;
