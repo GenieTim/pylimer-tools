@@ -1198,6 +1198,11 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
           Set the current spring partitions.
      )pbdoc")
+    .def("get_coordinates",
+         &mehp::MEHPForceBalance::getCoordinates,
+         R"pbdoc(
+          Get the current link coordinates.
+     )pbdoc")
     .def("get_displacements",
          &mehp::MEHPForceBalance::getCurrentDisplacements,
          R"pbdoc(

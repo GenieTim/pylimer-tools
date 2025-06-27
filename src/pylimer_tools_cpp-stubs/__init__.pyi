@@ -1368,6 +1368,10 @@ class MEHPForceBalance:
                    Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()`,
                    this value is normalized by the number of springs rather than the number of chains.
         """
+    def get_coordinates(self) -> numpy.ndarray:
+        """
+                  Get the current link coordinates.
+        """
     def get_crosslinker_universe(self) -> Universe:
         """
                   Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
