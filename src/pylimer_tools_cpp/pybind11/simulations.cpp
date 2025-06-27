@@ -1687,6 +1687,11 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
            Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
            )pbdoc")
+    .def("get_initial_coordinates",
+         &mehp::MEHPForceBalance2::getInitialCoordinates,
+         R"pbdoc(
+             Get the initial coordinates of the cross-linkers and entanglement links.
+      )pbdoc")
     .def("get_coordinates",
          &mehp::MEHPForceBalance2::getCoordinates,
          R"pbdoc(

@@ -3119,6 +3119,11 @@ MEHPForceBalance2::getBondLengths()
                                      this->currentDisplacements);
 }
 Eigen::VectorXd
+MEHPForceBalance2::getInitialCoordinates()
+{
+  return this->initialConfig.coordinates;
+}
+Eigen::VectorXd
 MEHPForceBalance2::getCoordinates()
 {
   return this->initialConfig.coordinates + this->currentDisplacements;
