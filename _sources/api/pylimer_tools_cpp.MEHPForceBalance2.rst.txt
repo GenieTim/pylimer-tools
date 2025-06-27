@@ -41,6 +41,7 @@ MEHPForceBalance2
       ~MEHPForceBalance2.get_gamma_factors
       ~MEHPForceBalance2.get_gamma_factors_in_dir
       ~MEHPForceBalance2.get_ids_of_active_nodes
+      ~MEHPForceBalance2.get_initial_coordinates
       ~MEHPForceBalance2.get_neighbour_link_indices
       ~MEHPForceBalance2.get_nr_of_active_nodes
       ~MEHPForceBalance2.get_nr_of_active_partial_springs
@@ -98,6 +99,7 @@ MEHPForceBalance2
    .. automethod:: get_gamma_factors
    .. automethod:: get_gamma_factors_in_dir
    .. automethod:: get_ids_of_active_nodes
+   .. automethod:: get_initial_coordinates
    .. automethod:: get_neighbour_link_indices
    .. automethod:: get_nr_of_active_nodes
    .. automethod:: get_nr_of_active_partial_springs
