@@ -12,6 +12,7 @@
 """
 from __future__ import annotations
 import numpy
+import pybind11_stubgen.typing_ext
 import scipy.sparse
 import typing
 __all__ = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NeighbourList', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'OutputConfiguration', 'SLESolver', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'compute_stoichiometric_imbalance', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'predict_gelation_point', 'randomly_sample_entanglements', 'split_csv', 'version_information']
@@ -2756,7 +2757,7 @@ class SimplifiedBalance2Network:
     and finally springs will be any number of connected bonds between links.
     """
     @property
-    def box_lengths(self) -> float:
+    def box_lengths(self) -> typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)]:
         ...
     @property
     def coordinates(self) -> numpy.ndarray:
@@ -2828,7 +2829,7 @@ class SimplifiedBalanceNetwork:
      
     """
     @property
-    def box_lengths(self) -> float:
+    def box_lengths(self) -> typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)]:
         ...
     @property
     def coordinates(self) -> numpy.ndarray:
@@ -2908,7 +2909,7 @@ class SimplifiedNetwork:
      
     """
     @property
-    def box_lengths(self) -> float:
+    def box_lengths(self) -> typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)]:
         ...
     @property
     def coordinates(self) -> numpy.ndarray:
