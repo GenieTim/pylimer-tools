@@ -134,12 +134,12 @@ typedef std::vector<std::vector<double>> ArrayXArrayXd;
 // improved structures using Eigen
 struct Network
 {
-  double L[3];                    /* box sizes */
-  double vol;                     /* box volume */
-  double meanSpringContourLength; /* mean N */
-  size_t nrOfNodes = 0;           /* number of nodes */
-  size_t nrOfSprings = 0;         /* number of springs */
-  size_t nrOfLoops = 0;           /* loops */
+  std::array<double, 3> L = { 0., 0., 0. }; /* box sizes */
+  double vol;                               /* box volume */
+  double meanSpringContourLength;           /* mean N */
+  size_t nrOfNodes = 0;                     /* number of nodes */
+  size_t nrOfSprings = 0;                   /* number of springs */
+  size_t nrOfLoops = 0;                     /* loops */
   // coordinates & connectivity
   Eigen::VectorXd coordinates;
   Eigen::VectorXd springsContourLength; /* the N for each spring */
@@ -163,10 +163,10 @@ struct ForceBalanceNetwork
 {
   // TODO: some info is redundant.
   // adjust code to support one way of storing things only
-  double L[3];                          /* box sizes */
-  double boxHalfs[3];                   /* half box sizes */
-  double vol = 0.0;                     /* box volume */
-  double meanSpringContourLength = 0.0; /* mean N */
+  std::array<double, 3> L = { 0., 0., 0. };        /* box sizes */
+  std::array<double, 3> boxHalfs = { 0., 0., 0. }; /* half box sizes */
+  double vol = 0.0;                                /* box volume */
+  double meanSpringContourLength = 0.0;            /* mean N */
   size_t nrOfLinks = 0; /* number of links, = nrOfNodes + nrOfSlipLinks */
   size_t nrOfNodes = 0; /* number of crosslinkers */
   size_t nrOfSprings = 0;
@@ -276,8 +276,8 @@ struct ForceBalance2Network
 {
   // TODO: some info is redundant.
   // adjust code to support one way of storing things only
-  double L[3];          /* box sizes */
-  double boxHalfs[3];   /* half box sizes */
+  std::array<double, 3> L = { 0., 0., 0. };        /* box sizes */
+  std::array<double, 3> boxHalfs = { 0., 0., 0. }; /* half box sizes */
   size_t nrOfLinks = 0; /* number of links, = nrOfNodes + nrOfSlipLinks */
   size_t nrOfNodes = 0; /* number of crosslinkers */
   size_t nrOfStrands = 0;
