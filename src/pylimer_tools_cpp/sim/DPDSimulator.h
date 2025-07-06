@@ -291,7 +291,7 @@ namespace dpd {
           this->isRelocationTarget[i] = true;
           this->chainEndIndices.push_back(i);
         } else if (allowReloc && this->atomTypes[i] != this->crossLinkerType) {
-          // check if this is a bead that's connected to a cross-linker
+          // check if this is a bead that's connected to a crosslinker
           if (this->idxFunctionalities[i] == 2) {
             // this "any of" here might be a bit overkill, given that we know
             // that there are only two cases

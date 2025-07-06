@@ -288,7 +288,7 @@ TEST_CASE("MC swap accept and reject work with crosslinkers",
       net, u, partitions, 5, 1., 0, true, false));
     CHECK(forceBalancer.swapSlipLinkReversibly(
       net, u, partitions, 5, 1., 5, false, true));
-    // check that the connectivity around the cross-link changed
+    // check that the connectivity around the crosslink changed
     // outputNetwork(net, u, partitions);
     CHECK(net.linkIndicesOfSprings[1].size() == 2);
     CHECK(net.nrOfCrosslinkSwapsEndured[0] == 1);
@@ -2265,12 +2265,12 @@ TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
     CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 0, 1));
     CHECK((net.springPartBoxOffset.array() == (0.0)).all());
 
-    net.coordinates << 5, 2.5, 0., // cross-link 1,
-      5., 7.5, 0.,                 // cross-link 2,
+    net.coordinates << 5, 2.5, 0., // crosslink 1,
+      5., 7.5, 0.,                 // crosslink 2,
       5., 5., 0.;                  // slip-link
 
-    net.springPartBoxOffset << 0., 0., 0., // cross-link 1 -> slip-link
-      20., 0., 0.;                         // slip-link -> cross-link 2
+    net.springPartBoxOffset << 0., 0., 0., // crosslink 1 -> slip-link
+      20., 0., 0.;                         // slip-link -> crosslink 2
 
     CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 0, 1));
     CHECK(net.coordinates.segment(3 * 2, 3)[1] == 5.);
@@ -2295,12 +2295,12 @@ TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
     CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 0, 1));
     CHECK((net.springPartBoxOffset.array() == (0.0)).all());
 
-    net.coordinates << 5, 2.5, 0., // cross-link 1,
-      5., 7.5, 0.,                 // cross-link 2,
+    net.coordinates << 5, 2.5, 0., // crosslink 1,
+      5., 7.5, 0.,                 // crosslink 2,
       5., 7.5, 0.;                 // slip-link
 
-    net.springPartBoxOffset << 20., 0., 0., // cross-link 2 -> slip-link
-      0., 0., 0.;                           // slip-link -> cross-link 1
+    net.springPartBoxOffset << 20., 0., 0., // crosslink 2 -> slip-link
+      0., 0., 0.;                           // slip-link -> crosslink 1
 
     CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 0, 1));
 
@@ -2324,12 +2324,12 @@ TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
     CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 1, 0));
     CHECK((net.springPartBoxOffset.array() == (0.0)).all());
 
-    net.coordinates << 5, 2.5, 0., // cross-link 1,
-      5., 7.5, 0.,                 // cross-link 2,
+    net.coordinates << 5, 2.5, 0., // crosslink 1,
+      5., 7.5, 0.,                 // crosslink 2,
       5., 2.5, 0.;                 // slip-link
 
-    net.springPartBoxOffset << 10., 0., 0., // slip-link -> cross-link 2
-      -10., 0., 0.;                         // slip-link -> cross-link 1
+    net.springPartBoxOffset << 10., 0., 0., // slip-link -> crosslink 2
+      -10., 0., 0.;                         // slip-link -> crosslink 1
 
     CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 1, 0));
 

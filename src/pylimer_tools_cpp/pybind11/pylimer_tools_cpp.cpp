@@ -25,7 +25,7 @@ init_pylimer_bound_writers(py::module_&);
 PYBIND11_MODULE(pylimer_tools_cpp, m)
 {
   m.doc() = R"pbdoc(
-    PylimerTools Cpp
+    pylimer_tools_cpp
     -----------------
 
     A collection of utility python functions for handling LAMMPS output and polymers in Python.
@@ -55,4 +55,5 @@ PYBIND11_MODULE(pylimer_tools_cpp, m)
     R"pbdoc(
     Returns  a string of the the current version, incl. git hash and date of compilation.
   )pbdoc");
+  m.attr("__version__") = __PROJECT_VERSION__;
 }

@@ -273,7 +273,7 @@ MEHPForceBalance::runForceRelaxation(
         if (simplificationMode == StructureSimplificationMode::INACTIVE_ONLY ||
             simplificationMode == StructureSimplificationMode::ALL_TIM) {
 #ifdef DEBUG_REMOVAL
-          std::cout << "Checking and possibly removing inactive cross-links"
+          std::cout << "Checking and possibly removing inactive crosslinks"
                     << std::endl;
 #endif
           nRemovedThisLoop +=
@@ -289,7 +289,7 @@ MEHPForceBalance::runForceRelaxation(
         if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
             simplificationMode == StructureSimplificationMode::ALL_TIM) {
 #ifdef DEBUG_REMOVAL
-          std::cout << "Checking and possibly removing cross-links with f = 2"
+          std::cout << "Checking and possibly removing crosslinks with f = 2"
                     << std::endl;
 #endif
           nRemovedThisLoop += this->removeTwofunctionalCrosslinks(
@@ -303,7 +303,7 @@ MEHPForceBalance::runForceRelaxation(
         }
         if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
 #ifdef DEBUG_REMOVAL
-          std::cout << "Checking and possibly removing cross-links and "
+          std::cout << "Checking and possibly removing crosslinks and "
                        "springs, Andrei's way"
                     << std::endl;
 #endif
@@ -605,7 +605,7 @@ MEHPForceBalance::setSpringpartitionIndicesOfSliplink(
 }
 
 /**
- * @brief Remove double listed springs from cross-linkers
+ * @brief Remove double listed springs from crosslinkers
  *
  * @param net
  */
@@ -812,7 +812,7 @@ MEHPForceBalance::removeInactiveCrosslinks(ForceBalanceNetwork& net,
       assert(net.oldAtomTypes[newCrosslinkIdx] != this->entanglementType);
       assert(net.springIndicesOfLinks[newCrosslinkIdx].size() == 0);
       numRemoved += 1;
-      // to then remove the cross-link
+      // to then remove the crosslink
       this->removeLink(net, displacements, newCrosslinkIdx);
 #ifdef DEBUG_REMOVAL
       std::cout << "Effectively removed f = 1 x-link " << newCrosslinkIdx
@@ -913,7 +913,7 @@ MEHPForceBalance::randomlyAddSliplinks(const size_t nrOfSliplinksToSample,
   INVALIDARG_EXP_IFN(nrOfSliplinksToSample < this->universe.getNrOfAtoms() / 2,
                      "Number of slip-links to place must be less than "
                      "the possible number of slip-links to place.");
-  // query all the cross-linker chains we actually use to place
+  // query all the crosslinker chains we actually use to place
   // slip-links on
   std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
     this->universe.getChainsWithCrosslinker(crossLinkerType);
@@ -1002,7 +1002,7 @@ MEHPForceBalance::randomlyAddSliplinks(const size_t nrOfSliplinksToSample,
     for (pylimer_tools::entities::Atom a : atomsForNeighbourList) {
       RUNTIME_EXP_IFN(
         a.getType() != this->crossLinkerType,
-        "Removing cross-linkers from neighborlist did not seem to work.");
+        "Removing crosslinkers from neighborlist did not seem to work.");
     }
   }
   pylimer_tools::entities::NeighbourList neighbourList =
@@ -1065,7 +1065,7 @@ MEHPForceBalance::randomlyAddSliplinks(const size_t nrOfSliplinksToSample,
     pylimer_tools::entities::Atom a1 =
       this->universe.getAtomByVertexIdx(sampledVertexId);
     RUNTIME_EXP_IFN(!excludeCrosslinks || a1.getType() != this->crossLinkerType,
-                    "Sampled atom is cross-link, but may not be");
+                    "Sampled atom is crosslink, but may not be");
     isMasked[sampledVertexId] = true;
     // then, find neighbouring atoms (but not from the same strand?!)
     std::vector<pylimer_tools::entities::Atom> neighbours =
@@ -1101,7 +1101,7 @@ MEHPForceBalance::randomlyAddSliplinks(const size_t nrOfSliplinksToSample,
     RUNTIME_EXP_IFN(sampledVertexId2 != sampledVertexId,
                     "Second sample may not be equal to the first");
     RUNTIME_EXP_IFN(!excludeCrosslinks || a2.getType() != this->crossLinkerType,
-                    "Sampled atom is cross-link, but may not be");
+                    "Sampled atom is crosslink, but may not be");
     RUNTIME_EXP_IFN(!isMasked[sampledVertexId2],
                     "Sampled vertex 2 is masked, but could not be");
     neighbourList.removeAtom(a2, "Removing sampled vertex 2");
@@ -2132,7 +2132,7 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
                        keptSpringIdx < net.nrOfSprings,
                      "Only full springs can be merged.");
   INVALIDARG_EXP_IFN(!net.linkIsSliplink[linkToReduce],
-                     "The link to reduce must be a cross-link");
+                     "The link to reduce must be a crosslink");
   INVALIDARG_EXP_IFN(keptSpringIdx != removedSpringIdx,
                      "Cannot replace one spring with the same one.");
   INVALIDARG_EXP_IFN(net.springsType[keptSpringIdx] != this->entanglementType,
@@ -2559,7 +2559,7 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
 }
 
 /**
- * @brief Remove cross-linkers, springs and associated slip-links with the
+ * @brief Remove crosslinkers, springs and associated slip-links with the
  * scheme suggested by Andrei
  *
  * @param net
@@ -2662,7 +2662,7 @@ MEHPForceBalance::addSlipLinkToPartialSpring(
   INVALIDARG_EXP_IFN(
     !net.linkIsSliplink[net.springPartIndexA[splitPartialSpringIdx]] ||
       !net.linkIsSliplink[net.springPartIndexB[splitPartialSpringIdx]],
-    "Require at least one part to be a cross-link.");
+    "Require at least one part to be a crosslink.");
   const size_t newPartialSpringIdx = net.nrOfPartialSprings;
   net.nrOfPartialSprings += 1;
   const size_t relevantSpring =
@@ -2707,7 +2707,7 @@ MEHPForceBalance::addSlipLinkToPartialSpring(
 
   // slightly change numbering to keep the numbering of
   // localToGlobalSpringIndex constant. I.e., we want the
-  // `newPartialSpringIdx` to correspond to the spring with the cross-link
+  // `newPartialSpringIdx` to correspond to the spring with the crosslink
   const bool forward = !net.linkIsSliplink[oldPartnerA];
   if (forward) {
     assert(net.linkIndicesOfSprings[relevantSpring][0] == oldPartnerA);
@@ -2891,7 +2891,7 @@ MEHPForceBalance::removeTwofunctionalCrosslinks(
         // std::cout << "Removing link " << crosslinkIdx << std::endl;
         this->removeLink(net, displacements, crosslinkIdx);
 
-        // std::cout << "Removed cross-link " << crosslinkIdx << std::endl;
+        // std::cout << "Removed crosslink " << crosslinkIdx << std::endl;
 
 #ifndef NDEBUG
         this->validateNetwork(net, displacements, springPartitions);
@@ -3283,7 +3283,7 @@ MEHPForceBalance::swapSlipLinkReversibly(
   const size_t partnerB = net.springPartIndexB[partialSpringIdx];
   INVALIDARG_EXP_IFN(net.linkIsSliplink[partnerA] ||
                        net.linkIsSliplink[partnerB],
-                     "Cannot swap cross-link with cross-link.");
+                     "Cannot swap crosslink with crosslink.");
   if (partnerA == partnerB) {
     return false;
   }
@@ -3318,7 +3318,7 @@ MEHPForceBalance::swapSlipLinkReversibly(
         Eigen::Vector3d thisRailDistance =
           this->evaluatePartialSpringDistance(net, u, partialSpringIdx);
 
-        // make sure the vectors are in the direction of the cross-link
+        // make sure the vectors are in the direction of the crosslink
         if (slipLinkIdx == partnerA) {
           otherRailDistance *= -1.;
           thisRailDistance *= -1.;
@@ -3346,14 +3346,14 @@ MEHPForceBalance::swapSlipLinkReversibly(
           const double forceEstimateBefore =
             // on the slip-link
             (-otherRailDistance + thisRailDistance).squaredNorm() +
-            // and on the cross-link
+            // and on the crosslink
             (attemptSpringDistance - thisRailDistance).squaredNorm();
           // and for the case that we did switch the slip-link onto the
           // attemptedEdge
           const double forceEstimateAfter =
             // force on the slip-link (-this + this), cancel out
             (attemptSpringDistance).squaredNorm() +
-            // and on the cross-link
+            // and on the crosslink
             (-2 * thisRailDistance - otherRailDistance).squaredNorm();
 
           if (forceEstimateAfter < forceEstimateBefore) {
@@ -3380,7 +3380,7 @@ MEHPForceBalance::swapSlipLinkReversibly(
     }
     return false;
   } else {
-    // does not involve cross-link
+    // does not involve crosslink
     // first, decide: do we attempt the move, or not?
     if (moveAttempt) {
       return this->swapSlipLinksReversibly(net,
@@ -3478,7 +3478,7 @@ MEHPForceBalance::swapSlipLinkWithXlinkReversibly(
   const size_t partnerB = net.springPartIndexB[partialSpringIdx];
   INVALIDARG_EXP_IFN(
     XOR(net.linkIsSliplink[partnerA], net.linkIsSliplink[partnerB]),
-    "This method only swaps cross-link with slip-link.");
+    "This method only swaps crosslink with slip-link.");
   if (partnerA == partnerB) {
     return false;
   }
@@ -3553,7 +3553,7 @@ MEHPForceBalance::swapSlipLinkWithXlinkReversibly(
 
   // do swap
   size_t newPartialSpringIdx = 0;
-  // swap with cross-link
+  // swap with crosslink
   const std::vector<size_t> springsOfCrosslink =
     net.springIndicesOfLinks[crosslinkIdx];
   if (springsOfCrosslink.size() < 2) {
@@ -3636,7 +3636,7 @@ MEHPForceBalance::swapSlipLinkWithXlinkReversibly(
                    net.springIndicesOfLinks[slipLinkIdx].begin(),
                    net.springIndicesOfLinks[slipLinkIdx].end(),
                    std::string(", "))
-              << ". Cross-link is " << crosslinkIdx
+              << ". Crosslink is " << crosslinkIdx
               << " which is associated with springs "
               << pylimer_tools::utils::join(
                    net.springIndicesOfLinks[crosslinkIdx].begin(),
@@ -3981,7 +3981,7 @@ MEHPForceBalance::swapSlipLinksInclXlinks(
               respectLoops);
             // this->validateNetwork(net, u, springPartitions);
             // std::cout << "Finished moving link " << involvedSlipLink
-            //           << " around cross-link " << involvedCrosslink
+            //           << " around crosslink " << involvedCrosslink
             //           << " from partial " << partialSpringIdx << " to "
             //           << targetPartialSpringIdx << std::endl;
           } else {
@@ -4052,8 +4052,8 @@ MEHPForceBalance::swapSlipLinks(
 }
 
 /**
- * @brief Move a slip-link from one spring attached to a cross-link to
- * another spring attached to the same cross-link
+ * @brief Move a slip-link from one spring attached to a crosslink to
+ * another spring attached to the same crosslink
  *
  * Returns the idx of the new partial spring that had to be introduced.
  * Returns a negative idx if the move was illegal or impossible.
@@ -4075,7 +4075,7 @@ MEHPForceBalance::rotateSlipLinkAroundCrosslink(
   INVALIDARG_EXP_IFN(net.springPartIndexA[partialSpringIdx] !=
                        net.springPartIndexB[partialSpringIdx],
                      "One of the two ends of the partial spring must be a "
-                     "slip-link, one a cross-link");
+                     "slip-link, one a crosslink");
   INVALIDARG_EXP_IFN(net.springPartIndexA[partialSpringIdx] !=
                        net.springPartIndexB[partialSpringIdx],
                      "Cannot rotate");
@@ -4148,7 +4148,7 @@ MEHPForceBalance::rotateSlipLinkAroundCrosslink(
   }
   if (possibleTargetSprings.size() <= 1) {
     // e.g. in the case of many loops :P
-    // std::cerr << "Spring " << springIdx << "'s cross-link " <<
+    // std::cerr << "Spring " << springIdx << "'s crosslink " <<
     // involvedCrosslink << " has too few attached springs to
     // reasonably make swaps." << std::endl;
     return -1;
@@ -5131,7 +5131,7 @@ MEHPForceBalance::addSlipLinks(
 
       this->initialConfig.linkIndicesOfSprings[springIndex].insert(
         this->initialConfig.linkIndicesOfSprings[springIndex].begin() +
-          targetIndexInSpring + 1, // + 1 to compensate for the first cross-link
+          targetIndexInSpring + 1, // + 1 to compensate for the first crosslink
         newNodeIdx);
 
       Eigen::Vector3d distanceAfter =
@@ -5547,7 +5547,7 @@ MEHPForceBalance::getIndicesOfActiveNodes(
 };
 
 /**
- * @brief Get the atom ids of the active cross-links (not entanglement
+ * @brief Get the atom ids of the active crosslinks (not entanglement
  * beads/links)
  *
  * @param tolerance the tolerance: springs under a certain length are
@@ -5799,8 +5799,8 @@ MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
   if (remove2functionalCrosslinkers) {
     for (pylimer_tools::entities::Atom xlinker :
          this->universe.getAtomsOfType(crossLinkerType)) {
-      // change type of cross-linkers with a degree <= 2 to "normal",
-      // non-cross-link beads
+      // change type of crosslinkers with a degree <= 2 to "normal",
+      // non-crosslink beads
       size_t vertexId = this->universe.getIdxByAtomId(xlinker.getId());
       if (this->universe.computeFunctionalityForVertex(vertexId) <= 2) {
         this->universe.setPropertyValue(vertexId, "type", crossLinkerType - 1);
@@ -5823,7 +5823,7 @@ MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
   for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
     RUNTIME_EXP_IFN(crossLinkerChains[i].getType() !=
                       pylimer_tools::entities::MoleculeType::UNDEFINED,
-                    "Cross-linker chain's chain type could not be "
+                    "Crosslinker chain's chain type could not be "
                     "detected. Cannot work like that.");
     if (crossLinkerChains[i].getType() ==
         pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
@@ -5833,7 +5833,7 @@ MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
       nrOfSprings += 1;
     } else if (crossLinkerChains[i].getType() ==
                pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
-      // when omitting f=2 cross-links, it's possible that we end up with
+      // when omitting f=2 crosslinks, it's possible that we end up with
       // "free" primary loops – let's not use those
       if (crossLinkerChains[i].getAtomsOfType(crossLinkerType).size() > 0) {
         useChain[i] = true;
@@ -5910,7 +5910,7 @@ MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
   net.springToMoleculeIds.reserve(nrOfSprings);
   net.partialSpringIsPartial = Eigen::ArrayXb::Constant(net.nrOfSprings, false);
 
-  // convert (cross-linker-)beads
+  // convert (crosslinker-)beads
   std::map<int, int> atomIdToNode;
   for (size_t i = 0; i < vertexIdToLinkIdx.size(); ++i) {
     if (vertexIdToLinkIdx[i] != -1) {
@@ -5947,7 +5947,7 @@ MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork& net,
         pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
       addChain = true;
 
-      // spring contour length = nr of bonds between two cross-linkers
+      // spring contour length = nr of bonds between two crosslinkers
       net.springsContourLength[spring_idx] =
         crossLinkerChains[i].getNrOfAtoms() - 1;
     } else if (crossLinkerChains[i].getType() ==
@@ -6084,7 +6084,7 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
                   "Invalid size of link is sliplink");
   RUNTIME_EXP_IFN(net.nrOfCrosslinkSwapsEndured.size() ==
                     net.nrOfLinks - net.nrOfNodes,
-                  "Invalid size of nr of cross-link swaps endured");
+                  "Invalid size of nr of crosslink swaps endured");
   RUNTIME_EXP_IFN(
     net.linkIsSliplink.count() == (net.nrOfLinks - net.nrOfNodes),
     "Nr of nodes plus nr of slp-links should give the total nr of links");
@@ -6267,7 +6267,7 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
       nrOfMentions[link_idx] += 1;
       RUNTIME_EXP_IFN(net.linkIsSliplink[link_idx] ==
                         ((j != 0) && (j != (links.size() - 1))),
-                      "Cross-links must be first and last in a spring, "
+                      "Crosslinks must be first and last in a spring, "
                       "slip-links in-between. Found discrepancy at " +
                         std::to_string(j) + "/" + std::to_string(links.size()) +
                         " in spring " + std::to_string(i) + ".")
@@ -6331,7 +6331,7 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
       RUNTIME_EXP_IFN(
         net.springIndexA[fullIdx] == partialEndA,
         "Expect mapping of springs to work: " + std::to_string(partialEndA) +
-          " is a cross-link, yet not part of the two ends of spring " +
+          " is a crosslink, yet not part of the two ends of spring " +
           std::to_string(fullIdx) + ", where we have " +
           std::to_string(net.springIndexA[fullIdx]) + " and " +
           std::to_string(net.springIndexB[fullIdx]) + ".");
@@ -6340,7 +6340,7 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
       RUNTIME_EXP_IFN(
         net.springIndexB[fullIdx] == partialEndB,
         "Expect mapping of springs to work: " + std::to_string(partialEndB) +
-          " is a cross-link, yet not part of the two ends of spring " +
+          " is a crosslink, yet not part of the two ends of spring " +
           std::to_string(fullIdx) + ", where we have " +
           std::to_string(net.springIndexA[fullIdx]) + " and " +
           std::to_string(net.springIndexB[fullIdx]) + ".");

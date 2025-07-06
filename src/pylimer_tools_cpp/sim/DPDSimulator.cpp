@@ -984,7 +984,7 @@ DPDSimulator::relocateSlipSprings(const double kbT)
     if ((!(this->isRelocationTarget[this->bondPartnersA[springIdx]] ||
            this->isRelocationTarget[this->bondPartnersB[springIdx]])) &&
         // always relocate from crosslinkers away, e.g. in case the
-        // cross-link has gained an additional bond and is no longer a
+        // crosslink has gained an additional bond and is no longer a
         // relocation target.
         // consequently, we are inconsistent for crosslinkers with f = 2
         !(this->atomTypes[this->bondPartnersA[springIdx]] ==
@@ -1104,7 +1104,7 @@ DPDSimulator::shiftSlipSprings(const double kbT)
         firstPartner = uniformDistNatoms(this->e2);
         n_attempts++;
         RUNTIME_EXP_IFN(n_attempts < 1000,
-                        "Too many times, a cross-link was chosen randomly.");
+                        "Too many times, a crosslink was chosen randomly.");
       }
       // search for neighbours
       int numCandidates = 0;
@@ -1227,7 +1227,7 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx, const double kbT)
                     : this->bondPartnersA[selectedRailBondB];
   }
 
-  // if it's a cross-link, we don't allow shifting
+  // if it's a crosslink, we don't allow shifting
   if (this->idxFunctionalities[newPartnerA] > 2 ||
       this->idxFunctionalities[newPartnerB] > 2) {
     return false;
@@ -1388,7 +1388,7 @@ DPDSimulator::attemptSlipSpringShift(const size_t springIdx,
   const size_t replacementForA = shiftEndIsFirstOnRailBond
                                    ? this->bondPartnersB[selectedRailBond]
                                    : this->bondPartnersA[selectedRailBond];
-  // if it's a cross-link, we don't allow shifting
+  // if it's a crosslink, we don't allow shifting
   if (this->idxFunctionalities[replacementForA] > 2) {
     return false;
   }
@@ -1923,7 +1923,7 @@ DPDSimulator::validateState()
                       ") was not found in bonds of partner B, " +
                       std::to_string(this->bondPartnersA[i]) + ".");
     // the following check is incorrect, as crosslinkers may have
-    // slip-springs for f < 2, and during cross-linking might have one while
+    // slip-springs for f < 2, and during crosslinking might have one while
     // being upgraded to f > 2
     // if (i >= this->numBonds) {
     //   RUNTIME_EXP_IFN(this->atomType[this->bondPartnersA[i]] !=

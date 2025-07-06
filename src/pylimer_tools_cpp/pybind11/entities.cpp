@@ -179,7 +179,19 @@ init_pylimer_bound_entities(py::module_& m)
                   const int,
                   const int,
                   const int>(),
-         "Construct this atom",
+         R"pbdoc(
+         Construct this atom
+
+         Parameters:
+             id: Unique identifier for the atom
+             type: Type classification of the atom
+             x: X coordinate position
+             y: Y coordinate position  
+             z: Z coordinate position
+             nx: Periodic image flag in x direction
+             ny: Periodic image flag in y direction
+             nz: Periodic image flag in z direction
+         )pbdoc",
          py::arg("id"),
          py::arg("type"),
          py::arg("x"),
@@ -237,11 +249,29 @@ init_pylimer_bound_entities(py::module_& m)
          &Atom::getNZ,
          "Get the box image that the atom is in in z direction (also known "
          "as `iz` or `nz`).")
-    .def("get_coordinates", [](const Atom& a) { return a.getCoordinates(); })
-    .def("get_unwrapped_coordinates",
-         [](const Atom& a, const Box& box) {
-           return a.getUnwrappedCoordinates(box);
-         })
+    .def(
+      "get_coordinates",
+      [](const Atom& a) { return a.getCoordinates(); },
+      R"pbdoc(
+         Get the coordinates of this atom as a vector.
+         
+         Returns:
+             A vector containing the x, y, z coordinates
+         )pbdoc")
+    .def(
+      "get_unwrapped_coordinates",
+      [](const Atom& a, const Box& box) {
+        return a.getUnwrappedCoordinates(box);
+      },
+      R"pbdoc(
+         Get the unwrapped coordinates of this atom.
+         
+         Parameters:
+             box: The simulation box to use for unwrapping
+             
+         Returns:
+             A vector containing the unwrapped x, y, z coordinates
+         )pbdoc")
 #ifdef CEREALIZABLE
     .def(py::pickle(
            [](const Atom& b) { // __getstate__
@@ -299,13 +329,13 @@ init_pylimer_bound_entities(py::module_& m)
            A network strand is a strand in a network.
       )pbdoc")
     .value("PRIMARY_LOOP", MoleculeType::PRIMARY_LOOP, R"pbdoc(
-           A primary loop is a network strand looping from and to the same cross-linker.
+           A primary loop is a network strand looping from and to the same crosslinker.
       )pbdoc")
     .value("DANGLING_CHAIN", MoleculeType::DANGLING_CHAIN, R"pbdoc(
-           A dangling chain is a network strand where only one end is attached to a cross-linker.
+           A dangling chain is a network strand where only one end is attached to a crosslinker.
       )pbdoc")
     .value("FREE_CHAIN", MoleculeType::FREE_CHAIN, R"pbdoc(
-           A free chain is a strand not connected to any cross-linker.
+           A free chain is a strand not connected to any crosslinker.
       )pbdoc");
 
   py::class_<Molecule>(m,
@@ -314,16 +344,33 @@ init_pylimer_bound_entities(py::module_& m)
        An (ideally) connected series of atoms/beads.
   )pbdoc",
                        py::module_local())
-    .def(py::init<Box&, igraph_t*, MoleculeType, std::map<int, double>>())
+    .def(py::init<Box&, igraph_t*, MoleculeType, std::map<int, double>>(),
+         R"pbdoc(
+         Construct a molecule from a graph structure.
+         
+         Parameters:
+             box: The simulation box containing this molecule
+             graph: Pointer to the igraph structure representing connectivity
+             type: The type of molecule (see MoleculeType enum)
+             mass_map: Map of atom types to their masses
+         )pbdoc")
     // getters
     .def("get_nr_of_bonds",
          &Molecule::getNrOfBonds,
-         "Counts and returns the number of bonds associated with this "
-         "molecule.")
+         R"pbdoc(
+         Counts and returns the number of bonds associated with this molecule.
+         
+         Returns:
+             The number of bonds in this molecule
+         )pbdoc")
     .def("get_nr_of_atoms",
          &Molecule::getNrOfAtoms,
-         "Counts and returns the number of atoms associated with this "
-         "molecule.")
+         R"pbdoc(
+         Counts and returns the number of atoms associated with this molecule.
+         
+         Returns:
+             The number of atoms in this molecule
+         )pbdoc")
     .def("get_strand_type", &Molecule::getType, R"pbdoc(
            Get the type of this molecule (see :obj:`~pylimer_tools_cpp.MoleculeType` enum).
 
@@ -334,7 +381,7 @@ init_pylimer_bound_entities(py::module_& m)
          &Molecule::getChainEnds,
          R"pbdoc(
           Get the ends of the given strand (= molecule).
-          In case of a primary loop, the cross-link is returned, if there is one.
+          In case of a primary loop, the crosslink is returned, if there is one.
           Use the argument `close_loop` to decide, whether this should be returned once or twice.
 
           NOTE: 
@@ -355,7 +402,7 @@ init_pylimer_bound_entities(py::module_& m)
             for example because of crosslinkers.
 
             Use the `crosslinker_type` parameter to force the atoms in a primary loop 
-            to start with the cross-link.
+            to start with the crosslink.
             )pbdoc",
          py::arg("crosslinker_type") = 2,
          py::arg("assumed_coordinates") = false,
@@ -400,7 +447,12 @@ init_pylimer_bound_entities(py::module_& m)
             )pbdoc")
     .def("get_atom_types",
          &Molecule::getAtomTypes,
-         "Query all types (each one for each atom) ordered by atom vertex id.")
+         R"pbdoc(
+         Query all types (each one for each atom) ordered by atom vertex id.
+         
+         Returns:
+             A vector of atom types in vertex order
+         )pbdoc")
     .def("get_atom_by_vertex_idx",
          &Molecule::getAtomByVertexIdx,
          R"pbdoc(
@@ -419,25 +471,48 @@ init_pylimer_bound_entities(py::module_& m)
     .def("get_atom_id_by_vertex_idx",
          &Molecule::getAtomIdByIdx,
          R"pbdoc(
-            Get the id of the atom by the vertex id of the underlying graph.
-            )pbdoc",
-         py::arg("vertex_idx"))
+         Get the id of the atom by the vertex id of the underlying graph.
+         
+         Parameters:
+             vertex_id: The vertex index in the underlying graph
+             
+         Returns:
+             The atom ID corresponding to the vertex
+         )pbdoc",
+         py::arg("vertex_id"))
     .def("get_vertex_idx_by_atom_id",
          &Molecule::getIdxByAtomId,
-         "Get the vertex index of the underlying graph for an atom with a "
-         "specified id.",
+         R"pbdoc(
+         Get the vertex id of the underlying graph for an atom with a specified id.
+         
+         Parameters:
+             atom_id: The atom ID to look up
+             
+         Returns:
+             The vertex index corresponding to the atom
+         )pbdoc",
          py::arg("atom_id"))
     .def("get_key", &Molecule::getKey, R"pbdoc(
             Get a unique identifier for this molecule.
+            
+            Returns:
+                A unique string identifier for this molecule
             )pbdoc")
     // computations
     .def("compute_total_mass", &Molecule::computeTotalMass, R"pbdoc(
             Computes the total mass of this molecule.
+            
+            Returns:
+                The total mass of all atoms in this molecule
             )pbdoc")
     .def("compute_bond_lengths",
          &Molecule::computeBondLengths,
-         "Computes the length :math:`b` of each bond in the molecule, "
-         "respecting periodic boundaries.")
+         R"pbdoc(
+         Computes the length of each bond in the molecule, respecting periodic boundaries.
+         
+         Returns:
+             A vector of bond lengths
+         )pbdoc")
     .def("compute_radius_of_gyration",
          &Molecule::computeRadiusOfGyration,
          R"pbdoc(
@@ -521,12 +596,23 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("crosslinker_type") = 2,
          py::arg("require_order") = true)
     .def("compute_total_length", &Molecule::computeTotalLength, R"pbdoc(
-     Computes the sum of the lengths of all bonds.
-     In most cases, this is equal to the contour length.
-    )pbdoc")
+         Computes the sum of the lengths of all bonds.
+         In most cases, this is equal to the contour length.
+         
+         Returns:
+             The total contour length of the molecule
+         )pbdoc")
     .def("get_edge_ids_from",
          &Universe::getIncidentEdgeIds,
-         R"pbdoc()pbdoc",
+         R"pbdoc(
+         Get the edge ids incident to a specific vertex.
+         
+         Parameters:
+             vertex_id: The vertex to query
+             
+         Returns:
+             A vector of edge ids connected to the vertex
+         )pbdoc",
          py::arg("vertex_id"))
     .def("get_edge_ids_from_to",
          &Universe::getEdgeIdsFromTo,
@@ -578,18 +664,36 @@ init_pylimer_bound_entities(py::module_& m)
     //           return py::make_tuple(molecule.)
     //      }
     // ))
-    .def("__copy__",
-         [](const Molecule& molecule) { return Molecule(molecule); });
+    .def(
+      "__copy__",
+      [](const Molecule& molecule) { return Molecule(molecule); },
+      R"pbdoc(
+         Create a copy of this molecule.
+         
+         Returns:
+             A new Molecule instance that is a copy of this one
+         )pbdoc");
 
-  py::class_<NeighbourList>(
-    m,
-    "NeighbourList",
-    "Gives access to somewhat fast queries on the neighbourhood of atoms",
-    py::module_local())
+  py::class_<NeighbourList>(m,
+                            "NeighbourList",
+                            R"pbdoc(
+    Gives access to somewhat fast queries on the neighbourhood of atoms.
+    
+    This class provides efficient spatial queries for finding atoms within
+    a specified distance of each other.
+    )pbdoc",
+                            py::module_local())
     .def(py::init<const std::vector<pylimer_tools::entities::Atom>&,
                   const pylimer_tools::entities::Box&,
                   double>(),
-         "Instantiates a new neighbour list",
+         R"pbdoc(
+         Instantiates a new neighbour list.
+         
+         Parameters:
+             atoms: Vector of atoms to include in the neighbour list
+             box: The simulation box
+             cutoff: Maximum distance for neighbour searches
+         )pbdoc",
          py::arg("atoms"),
          py::arg("box"),
          py::arg("cutoff"))
@@ -615,21 +719,35 @@ init_pylimer_bound_entities(py::module_& m)
     .def("remove_atom",
          &NeighbourList::removeAtom,
          R"pbdoc(
-          Remove an atom from this neighbour list.
-          It will not show up when querying for neighbours, 
-          but its neighbours cannot be queried either.
+         Remove an atom from this neighbour list.
+         It will not show up when querying for neighbours, 
+         but its neighbours cannot be queried either.
+         
+         Parameters:
+             atom: The atom to remove
+             debug_hint: Optional debug information
          )pbdoc",
          py::arg("atom"),
          py::arg("debug_hint") = "");
 
-  py::class_<Universe>(
-    m,
-    "Universe",
-    "Represents a full Polymer Network structure, a collection of molecules.",
-    py::module_local())
+  py::class_<Universe>(m,
+                       "Universe",
+                       R"pbdoc(
+    Represents a full Polymer Network structure, a collection of molecules.
+    
+    This is the main class for representing molecular systems, containing
+    atoms, bonds, angles, and the simulation box.
+    )pbdoc",
+                       py::module_local())
     .def(py::init<const double, const double, const double>(),
-         "Instantiate this Universe (Collection of Molecules) providing the "
-         "box lengths.",
+         R"pbdoc(
+         Instantiate this Universe (Collection of Molecules) providing the box lengths.
+         
+         Parameters:
+             Lx: Box length in x direction
+             Ly: Box length in y direction
+             Lz: Box length in z direction
+         )pbdoc",
          py::arg("Lx"),
          py::arg("Ly"),
          py::arg("Lz"))
@@ -643,7 +761,19 @@ init_pylimer_bound_entities(py::module_& m)
                            const std::vector<int>&,
                            const std::vector<int>&,
                            const std::vector<int>&>(&Universe::addAtoms),
-         "Add atoms to the Universe, vertices to the underlying graph.",
+         R"pbdoc(
+         Add atoms to the Universe, vertices to the underlying graph.
+         
+         Parameters:
+             ids: Vector of atom IDs
+             types: Vector of atom types
+             x: Vector of x coordinates
+             y: Vector of y coordinates
+             z: Vector of z coordinates
+             nx: Vector of periodic image flags in x direction
+             ny: Vector of periodic image flags in y direction
+             nz: Vector of periodic image flags in z direction
+         )pbdoc",
          py::arg("ids"),
          py::arg("types"),
          py::arg("x"),
@@ -682,9 +812,14 @@ init_pylimer_bound_entities(py::module_& m)
     .def("add_bonds",
          py::overload_cast<const std::vector<long int>&,
                            const std::vector<long int>&>(&Universe::addBonds),
-         "Add bonds to the underlying atoms, edges to the underlying graph. "
-         "If the connected atoms are not found, the bonds are silently "
-         "skipped.",
+         R"pbdoc(
+         Add bonds to the underlying atoms, edges to the underlying graph. 
+         If the connected atoms are not found, the bonds are silently skipped.
+         
+         Parameters:
+             bonds_from: Vector of atom IDs for bond start points
+             bonds_to: Vector of atom IDs for bond end points
+         )pbdoc",
          py::arg("bonds_from"),
          py::arg("bonds_to"))
     .def("add_bonds",
@@ -694,7 +829,17 @@ init_pylimer_bound_entities(py::module_& m)
                            const std::vector<int>&,
                            const bool,
                            const bool>(&Universe::addBonds),
-         "Add bonds to the underlying atoms, edges to the underlying graph. ",
+         R"pbdoc(
+         Add bonds to the underlying atoms, edges to the underlying graph.
+         
+         Parameters:
+             nr_of_bonds: Number of bonds to add
+             bonds_from: Vector of atom IDs for bond start points
+             bonds_to: Vector of atom IDs for bond end points
+             bond_types: Vector of bond types
+             ignore_non_existent_atoms: Whether to skip bonds to non-existent atoms
+             simplify_universe: Whether to simplify the universe after adding bonds
+         )pbdoc",
          py::arg("nr_of_bonds"),
          py::arg("bonds_from"),
          py::arg("bonds_to"),
@@ -705,9 +850,15 @@ init_pylimer_bound_entities(py::module_& m)
          py::overload_cast<const std::vector<long int>&,
                            const std::vector<long int>&,
                            const std::vector<int>&>(&Universe::addBonds),
-         "Add bonds to the underlying atoms, edges to the underlying graph. "
-         "If the connected atoms are not found, the bonds are silently "
-         "skipped.",
+         R"pbdoc(
+         Add bonds to the underlying atoms, edges to the underlying graph. 
+         If the connected atoms are not found, the bonds are silently skipped.
+         
+         Parameters:
+             bonds_from: Vector of atom IDs for bond start points
+             bonds_to: Vector of atom IDs for bond end points
+             bond_types: Vector of bond types
+         )pbdoc",
          py::arg("bonds_from"),
          py::arg("bonds_to"),
          py::arg("bond_types"))
@@ -726,28 +877,49 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("bond_type"))
     .def("add_angles",
          &Universe::addAngles,
-         "Add angles to the Universe. No relation to the underlying graph, "
-         "just a method to preserve read & write capabilities",
+         R"pbdoc(
+         Add angles to the Universe. No relation to the underlying graph, 
+         just a method to preserve read & write capabilities.
+         
+         Parameters:
+             angles_from: Vector of atom IDs for angle start points
+             angles_via: Vector of atom IDs for angle middle points
+             angles_to: Vector of atom IDs for angle end points
+             angle_types: Vector of angle types
+         )pbdoc",
          py::arg("angles_from"),
          py::arg("angles_via"),
          py::arg("angles_to"),
          py::arg("angle_types"))
     .def("add_dihedral_angles",
          &Universe::addDihedralAngles,
-         "Add dihedral angles to the Universe. No relation to the underlying "
-         "graph, "
-         "just a method to preserve read & write capabilities",
+         R"pbdoc(
+         Add dihedral angles to the Universe. No relation to the underlying graph, 
+         just a method to preserve read & write capabilities.
+         
+         Parameters:
+             angles_from: Vector of atom IDs for dihedral start points
+             angles_via1: Vector of atom IDs for first middle points
+             angles_via2: Vector of atom IDs for second middle points
+             angles_to: Vector of atom IDs for dihedral end points
+             angle_types: Vector of dihedral angle types
+         )pbdoc",
          py::arg("angles_from"),
          py::arg("angles_via1"),
          py::arg("angles_via2"),
          py::arg("angles_to"),
          py::arg("angle_types"))
     .def("remove_all_angles", &Universe::removeAllAngles, R"pbdoc(
-
+          Remove all angles from the Universe. 
+          This will not remove the atoms or bonds, just the angles.
+          
+          CAUTION:
+            This will not remove dihedral angles, use :func:`~pylimer_tools_cpp.Universe.removeAllDihedralAngles` for that.
      )pbdoc")
     .def(
       "remove_all_dihedral_angles", &Universe::removeAllDihedralAngles, R"pbdoc(
-          
+          Remove all dihedral angles from the Universe. 
+          This will not remove the atoms or bonds, just the stored dihedral angles.
      )pbdoc")
     .def("hash_angle_type",
          &Universe::hashAngleType,
@@ -770,16 +942,32 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("angle_to"))
     .def("set_masses",
          &Universe::setMasses,
-         "Set the mass per type of atom.",
+         R"pbdoc(
+         Set the mass per type of atom.
+         
+         Parameters:
+             mass_per_type: Map of atom types to their masses
+         )pbdoc",
          py::arg("mass_per_type"))
     .def("set_mass",
          &Universe::setMassForType,
-         "Set the mass for a specific atom type.",
+         R"pbdoc(
+         Set the mass for a specific atom type.
+         
+         Parameters:
+             atom_type: The atom type to set mass for
+             mass: The mass value to assign
+         )pbdoc",
          py::arg("atom_type"),
          py::arg("mass"))
     .def("set_timestep",
          &Universe::setTimestep,
-         "Set the time-step when this Universe was captured.",
+         R"pbdoc(
+         Set the time-step when this Universe was captured.
+         
+         Parameters:
+             timestep: The timestep value
+         )pbdoc",
          py::arg("timestep"))
     .def("set_box_lengths",
          &Universe::setBoxLengths,
@@ -819,6 +1007,9 @@ init_pylimer_bound_entities(py::module_& m)
           Reduces the Universe to a list of molecules. 
           Specify the crosslinker_type to an existing type id, 
           then those atoms will be omitted, and this function returns chains instead.
+
+          Arguments:
+              atom_type_to_omit: The type of atom to omit from the universe to end up with the desired molecules (e.g., the type of the crosslinkers).
           )pbdoc",
          py::arg("atom_type_to_omit"))
     .def("get_atoms_connected_to_vertex",
@@ -858,7 +1049,7 @@ init_pylimer_bound_entities(py::module_& m)
             The primary index specifies the degree of the loop.
 
             CAUTION:
-               There are exponentially many paths between two cross-linkers of a network,
+               There are exponentially many paths between two crosslinkers of a network,
                and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
                You can use the `max_length` parameter to restrict the algorithm to only search for loops up to a certain length.
                Use a negative value to find all loops and paths.
@@ -869,14 +1060,19 @@ init_pylimer_bound_entities(py::module_& m)
     .def("find_minimal_order_loop_from",
          &Universe::findMinimalOrderLoopFrom,
          R"pbdoc(
-            Decompose the Universe into loops.
-            The primary index specifies the degree of the loop.
+            Find the loops in the network starting with one connection
 
             CAUTION:
-               There are exponentially many paths between two cross-linkers of a network,
+               There are exponentially many paths between two crosslinkers of a network,
                and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
                You can use the `max_length` parameter to restrict the algorithm to only search for loops up to a certain length.
                Use a negative value to find all loops and paths.
+
+          Parameters:
+               loop_start: The atom id to start the search from
+               loop_step1: The first step to take, i.e., the first bond to follow
+               max_length: The maximum length of the loop to find, or -1 for no limit
+               skip_self_loops: Whether to skip self-loops (i.e., loops that start and end at the same atom; only relevant if `loop_start` is equal to `loop_step1`).
             )pbdoc",
          py::arg("loop_start"),
          py::arg("loop_step1"),
@@ -902,19 +1098,19 @@ init_pylimer_bound_entities(py::module_& m)
     .def("get_chains_with_crosslinker",
          &Universe::getChainsWithCrosslinker,
          R"pbdoc(
-            Decompose the Universe into strands (molecules, which could be either chains, or even lonely atoms), without omitting the cross-linkers
+            Decompose the Universe into strands (molecules, which could be either chains, or even lonely atoms), without omitting the crosslinkers
             (as in :func:`~pylimer_tools_cpp.Universe.getMolecules(crosslinker_type)`).
-            In turn, e.g. for a tetrafunctional cross-linker, it will be 4 times in the resulting molecules.
+            In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resulting molecules.
             
             NOTE:
-               Cross-linkers without bonds to non-cross-linkers are not returned 
-               (i.e., single cross-linkers, are not counted as strands).
+               Crosslinkers without bonds to non-crosslinkers are not returned 
+               (i.e., single crosslinkers, are not counted as strands).
            )pbdoc",
          py::arg("crosslinker_type"))
     .def("get_network_of_crosslinker",
          &Universe::getNetworkOfCrosslinker,
          R"pbdoc(
-            Reduce the network to contain only cross-linkers, replacing all the strands with a single bond.
+            Reduce the network to contain only crosslinkers, replacing all the strands with a single bond.
             Useful e.g. to reduce the memory useage and runtime of 
             :func:`~pylimer_tools_cpp.Universe.findLoops()` or 
             :func:`~pylimer_tools_cpp.Universe.hasInfiniteStrand()`.
@@ -937,7 +1133,15 @@ init_pylimer_bound_entities(py::module_& m)
           )pbdoc")
     .def("get_atom",
          &Universe::getAtom,
-         "Find an atom by its ID.",
+         R"pbdoc(
+         Find an atom by its ID.
+         
+         Parameters:
+             atom_id: The ID of the atom to find
+             
+         Returns:
+             The atom with the specified ID
+         )pbdoc",
          py::arg("atom_id"))
     .def(
       "get_atom_by_vertex_id",
@@ -955,12 +1159,27 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("atom_type"))
     .def("get_atom_id_by_vertex_idx",
          &Universe::getAtomIdByIdx,
-         "Get the id of the atom by the vertex id of the underlying graph.",
+         R"pbdoc(
+         Get the id of the atom by the vertex id of the underlying graph.
+         
+         Parameters:
+             vertex_id: The vertex index in the underlying graph
+             
+         Returns:
+             The atom ID corresponding to the vertex
+         )pbdoc",
          py::arg("vertex_id"))
     .def("get_vertex_idx_by_atom_id",
          &Universe::getIdxByAtomId,
-         "Get the vertex id of the underlying graph for an atom with a "
-         "specified id.",
+         R"pbdoc(
+         Get the vertex id of the underlying graph for an atom with a specified id.
+         
+         Parameters:
+             atom_id: The atom ID to look up
+             
+         Returns:
+             The vertex index corresponding to the atom
+         )pbdoc",
          py::arg("atom_id"))
     .def("get_edges", &Universe::getEdges, R"pbdoc(
             Get all edges. Returns a dict with three properties: 'edge_from', 'edge_to' and 'edge_type'.
@@ -1046,16 +1265,28 @@ init_pylimer_bound_entities(py::module_& m)
     // computations
     .def("compute_bond_vectors",
          &Universe::computeBondVectors,
-         "Computes the vectors :math:`\\vec{b}` of each bond in the molecule, "
-         "respecting periodic boundaries.")
+         R"pbdoc(
+         Computes the vectors of each bond in the molecule, respecting periodic boundaries.
+         
+         Returns:
+             A list of bond vectors
+         )pbdoc")
     .def("compute_bond_lengths",
          &Universe::computeBondLengths,
-         "Computes the length :math:`b` of each bond in the molecule, "
-         "respecting periodic boundaries.")
+         R"pbdoc(
+         Computes the length of each bond in the molecule, respecting periodic boundaries.
+         
+         Returns:
+             A list of bond lengths
+         )pbdoc")
     .def("compute_angles",
          &Universe::computeAngles,
-         "Computes the angle :math:`\\theta` of each angle in the molecule, "
-         "respecting periodic boundaries.")
+         R"pbdoc(
+         Computes the angle of each angle in the molecule, respecting periodic boundaries.
+         
+         Returns:
+             A list of angle values in radians
+         )pbdoc")
     .def("detect_angles",
          &Universe::detectAngles,
          R"pbdoc(Returns just as
@@ -1079,10 +1310,10 @@ init_pylimer_bound_entities(py::module_& m)
     .def("has_infinite_strand",
          &Universe::hasInfiniteStrand,
          R"pbdoc(
-           Checks whether there is a strand (with cross-linker) in the universe that loops through periodic images without coming back.
+           Checks whether there is a strand (with crosslinker) in the universe that loops through periodic images without coming back.
            
             CAUTION:
-               There are exponentially many paths between two cross-linkers of a network,
+               There are exponentially many paths between two crosslinkers of a network,
                and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
            )pbdoc")
     .def("determine_functionality_per_type",
@@ -1111,7 +1342,7 @@ init_pylimer_bound_entities(py::module_& m)
               Compute the number average molecular weight.
 
               NOTE: 
-                    Cross-linkers are ignored completely.
+                    Crosslinkers are ignored completely.
               )pbdoc",
          py::arg("crosslinker_type"))
     .def("compute_weight_average_molecular_weight",
@@ -1120,7 +1351,7 @@ init_pylimer_bound_entities(py::module_& m)
               Compute the weight average molecular weight.
 
               NOTE: 
-                    Cross-linkers are ignored completely.
+                    Crosslinkers are ignored completely.
               )pbdoc",
          py::arg("crosslinker_type"))
     .def("compute_polydispersity_index",
@@ -1166,7 +1397,7 @@ init_pylimer_bound_entities(py::module_& m)
     .def("compute_mean_squared_end_to_end_distance",
          &Universe::computeMeanSquareEndToEndDistance,
          R"pbdoc(
-          Computes the mean square of the end-to-end distances of each strand (incl. cross-links) in the network.
+          Computes the mean square of the end-to-end distances of each strand (incl. crosslinks) in the network.
 
           NOTE:
                Internally, this uses either :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance` 
@@ -1179,17 +1410,44 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("derive_image_flags") = false)
     .def("compute_dxs",
          &Universe::computeDxs,
-         "Compute the dx distance for certain bonds (length in x direction).",
+         R"pbdoc(
+         Compute the dx distance for certain bonds (length in x direction).
+         
+         Parameters:
+             atomIdsTo: Vector of destination atom IDs
+             atomIdsFrom: Vector of source atom IDs
+             
+         Returns:
+             Vector of x-direction distances
+         )pbdoc",
          py::arg("atomIdsTo"),
          py::arg("atomIdsFrom"))
     .def("compute_dys",
          &Universe::computeDys,
-         "Compute the dy distance for certain bonds (length in y direction).",
+         R"pbdoc(
+         Compute the dy distance for certain bonds (length in y direction).
+         
+         Parameters:
+             atomIdsTo: Vector of destination atom IDs
+             atomIdsFrom: Vector of source atom IDs
+             
+         Returns:
+             Vector of y-direction distances
+         )pbdoc",
          py::arg("atomIdsTo"),
          py::arg("atomIdsFrom"))
     .def("compute_dzs",
          &Universe::computeDzs,
-         "Compute the dz distance for certain bonds (length in z direction).",
+         R"pbdoc(
+         Compute the dz distance for certain bonds (length in z direction).
+         
+         Parameters:
+             atomIdsTo: Vector of destination atom IDs
+             atomIdsFrom: Vector of source atom IDs
+             
+         Returns:
+             Vector of z-direction distances
+         )pbdoc",
          py::arg("atomIdsTo"),
          py::arg("atomIdsFrom"))
     .def(
@@ -1200,8 +1458,13 @@ init_pylimer_bound_entities(py::module_& m)
       py::arg("k_b") = 1.)
     .def("simplify",
          &Universe::simplify,
-         "Remove self links and double bonds. This function is called "
-         "automatically after adding bonds.")
+         R"pbdoc(
+         Remove self links and double bonds. This function is called 
+         automatically after adding bonds.
+         
+         This operation cleans up the graph structure by removing
+         redundant connections.
+         )pbdoc")
     // operators
     //     .def(pybind11::self == pybind11::self)
     .def(
@@ -1233,8 +1496,15 @@ init_pylimer_bound_entities(py::module_& m)
         return u;
       }))
 #endif
-    .def("__copy__",
-         [](const Universe& universe) { return Universe(universe); });
+    .def(
+      "__copy__",
+      [](const Universe& universe) { return Universe(universe); },
+      R"pbdoc(
+         Create a copy of this universe.
+         
+         Returns:
+             A new Universe instance that is a copy of this one
+         )pbdoc");
 
   struct LazyUniverseSequenceIterator
   {
@@ -1285,7 +1555,12 @@ init_pylimer_bound_entities(py::module_& m)
      to have the UniverseSequence forget about already read universes.
      )pbdoc",
                                py::module_local())
-    .def(py::init<>())
+    .def(py::init<>(),
+         R"pbdoc(
+         Construct an empty UniverseSequence.
+         
+         Use initialization methods to populate it with data.
+         )pbdoc")
     .def("initialize_from_dump_file",
          &UniverseSequence::initializeFromDumpFile,
          R"pbdoc(
@@ -1310,11 +1585,24 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("atom_styles"))
     .def("next",
          &UniverseSequence::next,
-         R"pbdoc(Get the Universe that's next in the sequence.)pbdoc")
+         R"pbdoc(
+         Get the Universe that's next in the sequence.
+         
+         Returns:
+             The next Universe in the sequence
+         )pbdoc")
     .def("at_index",
          &UniverseSequence::atIndex,
-         "Get the Universe at the given index (as of in the sequence given "
-         "by the dump file).",
+         R"pbdoc(
+         Get the Universe at the given index (as of in the sequence given 
+         by the dump file).
+         
+         Parameters:
+             index: The index of the universe to retrieve
+             
+         Returns:
+             The Universe at the specified index
+         )pbdoc",
          py::arg("index"))
     .def(
       "forget_at_index",
@@ -1335,10 +1623,12 @@ init_pylimer_bound_entities(py::module_& m)
             Get all universes initialized back in a list.
             For big dump files or lots of data files, this might lead to memory issues.
             Use :func:`~pylimer_tools_cpp.UniverseSequence.__iter__`
-            to have
             or :func:`~pylimer_tools_cpp.UniverseSequence.atIndex`
             and :func:`~pylimer_tools_cpp.UniverseSequence.forgetAtIndex`
             to craft a more memory-efficient retrieval mechanism.
+            
+            Returns:
+                A list of all Universe objects in the sequence
             )pbdoc")
     // computations
     .def("compute_msd_for_atoms",
@@ -1402,8 +1692,21 @@ init_pylimer_bound_entities(py::module_& m)
         }
         return us.atIndex(index);
       },
-      "Get a universe by its index.")
-    .def("__len__", &UniverseSequence::getLength, "Get the number of universes")
+      R"pbdoc(
+      Get a universe by its index.
+      
+      Parameters:
+          index: The index of the universe to retrieve
+          
+      Returns:
+          The Universe at the specified index
+      )pbdoc")
+    .def("__len__", &UniverseSequence::getLength, R"pbdoc(
+         Get the number of universes in this sequence.
+         
+         Returns:
+             The total number of universes available
+         )pbdoc")
     .def(
       "__iter__",
       [](py::object us) {

@@ -201,7 +201,7 @@ the simulation or optimization procedure.)pbdoc")
      Consists usually only of the cross- and slip-links.
 
      Assumed terminology: a spring is approximately a strand/chain,
-     whereas a partial spring is the spring between a cross-link and an entanglement-link (slip-link).
+     whereas a partial spring is the spring between a crosslink and an entanglement-link (slip-link).
  )pbdoc")
     .def_readonly("box_lengths", &mehp::ForceBalanceNetwork::L)
     .def_readonly("volume", &mehp::ForceBalanceNetwork::vol)
@@ -363,7 +363,7 @@ and finally springs will be any number of connected bonds between links.
 
      The force for a certain spring is given by:
      :math:`f = 0.5 \cdot \kappa r`,
-     where :math:`r` is the spring [between cross-linkers] length.
+     where :math:`r` is the spring [between crosslinkers] length.
 
      Recommended optimization algorithm: "LD_LBFGS"
 
@@ -379,7 +379,7 @@ and finally springs will be any number of connected bonds between links.
 
      The force for a certain spring is given by:
      :math:`f = 0.5 \cdot \\frac{1}{l} \scriptL^{-1}(\frac{r}{N\cdot l})`,
-     where :math:`r` is the spring [between cross-linkers] length
+     where :math:`r` is the spring [between crosslinkers] length
      and :math:`\scriptL^{-1}` the inverse langevin function.
 
      Please note that the inverse langevin is only approximated.
@@ -401,7 +401,7 @@ and finally springs will be any number of connected bonds between links.
   py::class_<mehp::MEHPForceRelaxation>(m,
                                         "MEHPForceRelaxation",
                                         R"pbdoc(
-    A small simulation tool for quickly minimizing the force between the cross-linker beads.
+    A small simulation tool for quickly minimizing the force between the crosslinker beads.
 
     This is the first of three force relaxation methods available in this library.
     The relevant feature of this implementation is the configurable spring potential.
@@ -418,7 +418,7 @@ and finally springs will be any number of connected bonds between links.
           Instantiate the simulator for a certain universe.
 
           :param universe: The universe to simulate with
-          :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
+          :param crosslinker_type: The atom type of the crosslinkers. Needed to reduce the network.
           :param is2d: Whether to ignore the z direction.
           :param force_evaluator: The force evaluator to use
           :param kappa: The spring constant
@@ -628,7 +628,7 @@ and finally springs will be any number of connected bonds between links.
     .def("get_active_chains",
          &mehp::MEHPForceRelaxation::getActiveChains,
          R"pbdoc(
-          Get the cross-linker chains that are active.
+          Get the crosslinker chains that are active.
      )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_effective_functionality_of_atoms",
@@ -691,7 +691,7 @@ and finally springs will be any number of connected bonds between links.
     .def("get_crosslinker_universe",
          &mehp::MEHPForceRelaxation::getCrosslinkerVerse,
          R"pbdoc(
-          Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
+          Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
      )pbdoc")
 #ifdef CEREALIZABLE
     .def(py::pickle(
@@ -720,7 +720,7 @@ and finally springs will be any number of connected bonds between links.
   py::enum_<mehp::LinkSwappingMode>(
     m,
     "LinkSwappingMode",
-    "How slip-links may act when they reach each-other or even a cross-link.")
+    "How slip-links may act when they reach each-other or even a crosslink.")
 #define X(e, name) .value(STRINGINFY(e), mehp::LinkSwappingMode::e, name)
     LINK_SWAPPING_MODES;
 #undef X
@@ -736,11 +736,11 @@ and finally springs will be any number of connected bonds between links.
   py::class_<mehp::MEHPForceBalance>(m,
                                      "MEHPForceBalance",
                                      R"pbdoc(
-    A small simulation tool for quickly minimizing the force between the cross-linker beads.
+    A small simulation tool for quickly minimizing the force between the crosslinker beads.
 
     This is the second implementation in the group of MEHP provided by this package.
     The distinct feature here is the slip-links: a form of entanglement,
-    represented as an entanglement link, just like a four-functional cross-link,
+    represented as an entanglement link, just like a four-functional crosslink,
     but with the ability to slip along the two associated strands, therewith
     adjusting the fraction of the contour length on both sides of the link.
      )pbdoc")
@@ -749,7 +749,7 @@ and finally springs will be any number of connected bonds between links.
           Instantiate the simulator for a certain universe.
 
           :param universe: The universe to simulate with
-          :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
+          :param crosslinker_type: The atom type of the crosslinkers. Needed to reduce the network.
           :param is2D: Whether to ignore the z direction.
           :param kappa: The spring constant
           :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
@@ -836,7 +836,7 @@ and finally springs will be any number of connected bonds between links.
           :param allow_sliplinks_to_pass_each_other: Whether slip-links can pass each other.
           :param swapping_frequency: How often slip-links attempt to swap.
           :param one_over_spring_partition_upper_limit: Super-secret parameter. Use 1, gradually increase (and then -1) if you want to publish.
-          :param nr_of_crosslink_swaps_allowed_per_sliplink: Use to steer whether slip-links can cross cross-links when swapping is enabled.
+          :param nr_of_crosslink_swaps_allowed_per_sliplink: Use to steer whether slip-links can cross crosslinks when swapping is enabled.
           :param disable_slipping: Whether slip-links should be prohibited from slipping.
           )pbdoc",
       py::arg("max_nr_of_steps") = 250000,
@@ -889,7 +889,7 @@ and finally springs will be any number of connected bonds between links.
     .def("config_entanglement_type",
          &mehp::MEHPForceBalance::configEntanglementType,
          R"pbdoc(
-         To have certain cross-links behave as entanglements in the removal process,
+         To have certain crosslinks behave as entanglements in the removal process,
          you can specify the here a type, that you have used in the universe to specify:
          - the type of entanglement atoms (expected with functionality f = 3),
          - and the entanglement-bonds between the entanglement atoms.
@@ -1228,7 +1228,7 @@ and finally springs will be any number of connected bonds between links.
          &mehp::MEHPForceBalance::getIdsOfActiveNodes,
          R"pbdoc(
           Get the atom ids of the nodes that are considered active.
-          Only cross-link ids are returned (not e.g. entanglement links).
+          Only crosslink ids are returned (not e.g. entanglement links).
 
           :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
      )pbdoc",
@@ -1318,7 +1318,7 @@ and finally springs will be any number of connected bonds between links.
     .def("get_crosslinker_universe",
          &mehp::MEHPForceBalance::getCrosslinkerVerse,
          R"pbdoc(
-          Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
+          Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
      )pbdoc")
 #ifdef CEREALIZABLE
     .def(py::pickle(
@@ -1337,7 +1337,7 @@ and finally springs will be any number of connected bonds between links.
   py::class_<mehp::MEHPForceBalance2>(m,
                                       "MEHPForceBalance2",
                                       R"pbdoc(
-     A small simulation tool for quickly minimizing the force between the cross-linker beads.
+     A small simulation tool for quickly minimizing the force between the crosslinker beads.
 
      This is the third implementation of the MEHP. 
      It's the fastest implementation by using a simple spring model only, disabling the non-linear
@@ -1350,7 +1350,7 @@ and finally springs will be any number of connected bonds between links.
            Instantiate the simulator for a certain universe.
 
            :param universe: The universe giving the basic connectivity to compute with
-           :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
+           :param crosslinker_type: The atom type of the crosslinkers. Needed to reduce the network.
            :param is_2d: Whether to ignore the z direction.
            :param kappa: The spring constant
            :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
@@ -1370,7 +1370,7 @@ and finally springs will be any number of connected bonds between links.
 
            :param universe: The universe giving the basic connectivity to compute with
            :param entanglements: The entanglements to use in the computation
-           :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
+           :param crosslinker_type: The atom type of the crosslinkers. Needed to reduce the network.
            :param is_2d: Whether to ignore the z direction.
            :param entanglements_as_springs: whether to use the entanglements as springs instead of links
            )pbdoc",
@@ -1695,12 +1695,12 @@ and finally springs will be any number of connected bonds between links.
     .def("get_initial_coordinates",
          &mehp::MEHPForceBalance2::getInitialCoordinates,
          R"pbdoc(
-             Get the initial coordinates of the cross-linkers and entanglement links.
+             Get the initial coordinates of the crosslinkers and entanglement links.
       )pbdoc")
     .def("get_coordinates",
          &mehp::MEHPForceBalance2::getCoordinates,
          R"pbdoc(
-             Get the current coordinates of the cross-linkers and entanglement links.
+             Get the current coordinates of the crosslinkers and entanglement links.
       )pbdoc")
     .def("get_displacements",
          &mehp::MEHPForceBalance2::getCurrentDisplacements,
@@ -1726,7 +1726,7 @@ and finally springs will be any number of connected bonds between links.
          &mehp::MEHPForceBalance2::getIdsOfActiveNodes,
          R"pbdoc(
            Get the atom ids of the nodes that are considered active.
-           Only cross-link ids are returned (not e.g. entanglement links).
+           Only crosslink ids are returned (not e.g. entanglement links).
 
            :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
       )pbdoc",
@@ -1814,7 +1814,7 @@ and finally springs will be any number of connected bonds between links.
     .def("get_crosslinker_universe",
          &mehp::MEHPForceBalance2::getCrosslinkerVerse,
          R"pbdoc(
-           Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
+           Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
       )pbdoc")
 #ifdef CEREALIZABLE
     .def(py::pickle(
@@ -2031,9 +2031,9 @@ and finally springs will be any number of connected bonds between links.
     .def("config_allow_relocation_in_network",
          &dpd::DPDSimulator::configAllowRelocationInNetwork,
          R"pbdoc(
-          Configure whether a relocation step may happen when a slip-spring has ended at a cross-link.
+          Configure whether a relocation step may happen when a slip-spring has ended at a crosslink.
 
-          Side-effect: if true, the relocations may also happen *to* a slip-spring next to a cross-link.
+          Side-effect: if true, the relocations may also happen *to* a slip-spring next to a crosslink.
 
           Arguments:
           - allow_relocation_in_network (bool): Whether to allow relocation in the network or not.

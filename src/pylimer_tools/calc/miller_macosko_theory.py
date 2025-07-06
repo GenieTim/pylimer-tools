@@ -84,7 +84,7 @@ def predict_number_density_of_junction_points(
         )
     else:
         raise NotImplementedError(
-            "Currently, only cross-linker functionalities of 3 and 4 are supported, {} given.".format(
+            "Currently, only crosslinker functionalities of 3 and 4 are supported, {} given.".format(
                 functionality_per_type[crosslinker_type]
             )
         )
@@ -247,7 +247,7 @@ def compute_weight_fraction_of_backbone(
     Compute the weight fraction of the backbone (elastically effective) strands in an infinite network
 
     :param network: The polymer network to do the computation for
-    :param crosslinker_type: The type of the junctions/cross-linkers to select them in the network
+    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network
     :param functionality_per_type: a dictionary with key: atom type, and value: functionality atoms with this type.
     :param weight_fractions: a dictionary with the weight fraction of each type of atom
     :param r: The stoichiometric imbalance
@@ -311,7 +311,7 @@ def compute_weight_fraction_of_soluble_material(
       - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737
 
     :param network: The polymer network to do the computation for
-    :param crosslinker_type: The type of the junctions/cross-linkers to select them in the network
+    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network
     :param weight_fractions: a dictionary with key: type, and value: weight fraction of type.
             Pass if you want to omit the network.
     :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
@@ -385,7 +385,7 @@ def compute_miller_macosko_probabilities(
         r: float, p: float, f: int, b2: float = 1.0):
     """
     Compute Macosko and Miller's probabilities :math:`P(F_A)` and :math:`P(F_B)`
-    i.e., the probability that a randomly chosen A (cross-link) or B (strand-end),
+    i.e., the probability that a randomly chosen A (crosslink) or B (strand-end),
     respectively, is the start of a finite chain.
 
     Sources:
@@ -494,7 +494,7 @@ def compute_modulus_decomposition(
     :param network: The polymer network to do the computation for
     :param ureg: The unit registry to use
     :param unit_style: The unit style to use to have the results in appropriate units
-    :param crosslinker_type: The type of the junctions/cross-linkers to select them in the network
+    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network
     :param r: The stoichiometric imbalance. Optional if network is specified
     :param p: The extent of reaction. Optional if network is specified
     :param f: The functionality of the the crosslinker. Optional if network is specified
@@ -589,7 +589,7 @@ def compute_extracted_modulus(
     """
     Compute MMT's modulus, assuming the solvent is removed
 
-    :param p: The cross-linker conversion
+    :param p: The crosslinker conversion
     :param r: The stoichiometric imbalance
     :param f: The functionality of the crosslinkers
     :param g_e_1: The melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
@@ -644,8 +644,8 @@ def compute_entanglement_modulus(
     :param g_e_1: The melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
     :param temperature: The temperatures; defaults to room temperature (25 °C)
     :param network: The polymer network to do the computation for
-    :param crosslinker_type: The type of the junctions/cross-linkers to select them in the network
-    :param p: The cross-linker conversion
+    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network
+    :param p: The crosslinker conversion
     :param r: The stoichiometric imbalance
     :param f: The functionality of the crosslinkers
     :param beta: :math:`P(F_b^{out})`, optional
@@ -672,7 +672,7 @@ def compute_junction_modulus(
     Compute MMT's junction modulus, given by
     :math:`G_{junctions} = k_B T [A_f]_0 \\sum_{m=3}^{f} \\frac{m-2}{2} P(X_{m,f})`.
 
-    :param p: The cross-linker conversion
+    :param p: The crosslinker conversion
     :param r: The stoichiometric imbalance
     :param xlink_concentration_0: [A_f]_0, in 1/volume units
     :param ureg: The unit registry to use
@@ -721,7 +721,7 @@ def compute_probability_that_crosslink_is_effective(
     functionality_of_monomer: int, expected_degree_of_effect: int, p_f_a_out: float
 ) -> float:
     """
-    Compute the probability that an Af, monomer will be an effective cross-link of exactly degree m
+    Compute the probability that an Af, monomer will be an effective crosslink of exactly degree m
 
     :math:`P(X_m^f) = \\binom{f}{m} [P(F_A^{out})]^{f-m}[1-P(F_A^{out})]^m`
 
@@ -840,14 +840,14 @@ def predict_gelation_point(r: float, f: int, b2: float = 1) -> float:
 
 def predict_maximum_p(r: float, f: int, b2: float = 1) -> Union[float, None]:
     """
-    Compute the maximum cross-linker conversion possible given a stoichiometric inbalance.
+    Compute the maximum crosslinker conversion possible given a stoichiometric inbalance.
 
     :param r: The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
     :param f: functionality of the crosslinkers
     :param b2: The mole fraction of reactive sites in B2 among all reactive sites
         in a mixture of B1 and B2. Since `r` already includes the number of active sites, this argument
         is not necessary.
-    :return: p_max: The maximum cross-linker conversion possible
+    :return: p_max: The maximum crosslinker conversion possible
     """
     n_xlinks = r * 2 / f
     if n_xlinks == 0:
@@ -871,7 +871,7 @@ def predict_p_from_w_sol(
 
     :param w_sol: The weight fraction of soluble material
     :param network: The polymer network to do the computation for
-    :param crosslinker_type: The type of the junctions/cross-linkers to select them in the network
+    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network
     :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type
     :param weight_fractions: a dictionary with the weight fraction of each type of atom
     :param r: The stoichiometric imbalance
@@ -903,21 +903,20 @@ def _validate_r_and_p(r: float, p: float, f: int):
     """
     Validate the parameters used in Miller-Macosko theory calculations.
 
-    This function checks if the stoichiometric imbalance, cross-linker conversion,
-    and cross-linker functionality are within valid ranges. It also verifies that
-    the cross-linker conversion does not exceed the maximum possible value given
+    This function checks if the stoichiometric imbalance, crosslinker conversion,
+    and crosslinker functionality are within valid ranges. It also verifies that
+    the crosslinker conversion does not exceed the maximum possible value given
     the stoichiometric imbalance and functionality.
 
     :param r: The stoichiometric imbalance (ratio of reactive groups)
-    :param p: The cross-linker conversion (extent of reaction)
-    :param f: The functionality of the cross-linker (number of reactive groups)
+    :param p: The crosslinker conversion (extent of reaction)
+    :param f: The functionality of the crosslinker (number of reactive groups)
     :raises ValueError: If any parameter is outside its valid range or if p exceeds
                        the maximum possible conversion
     """
     if p < 0:
         raise ValueError(
-            "The cross-linker conversion `p` must be positive, got {}".format(
-                p)
+            "The crosslinker conversion `p` must be positive, got {}".format(p)
         )
     if r < 0:
         raise ValueError(
@@ -926,7 +925,7 @@ def _validate_r_and_p(r: float, p: float, f: int):
         )
     if f < 2:
         raise ValueError(
-            "The cross-linker functionality `f` must be >= 2, got {}".format(f)
+            "The crosslinker functionality `f` must be >= 2, got {}".format(f)
         )
     # assume:
     p_max = predict_maximum_p(r=r, f=f)

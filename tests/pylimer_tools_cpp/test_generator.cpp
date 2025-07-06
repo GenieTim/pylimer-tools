@@ -322,10 +322,10 @@ TEST_CASE("MCUniverseGenerator can generate without primary loops",
   }
 }
 
-TEST_CASE("Universe can cross-link up to w_sol",
+TEST_CASE("Universe can crosslink up to w_sol",
           "[generator][MCUniverseGenerator]")
 {
-  std::cout << "Running test \"Universe can cross-link up to w_sol\""
+  std::cout << "Running test \"Universe can crosslink up to w_sol\""
             << std::endl;
 
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);
@@ -588,11 +588,11 @@ TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
   CHECK(relaxer.getNrOfSprings() == relaxerFromGenerator.getNrOfSprings());
 }
 
-TEST_CASE("MUniverseGenerator can generate with cross-link chains",
+TEST_CASE("MUniverseGenerator can generate with crosslink chains",
           "[generator][MCUniverseGenerator]")
 {
   std::cout
-    << "Running test \"MUniverseGenerator can generate with cross-link chains\""
+    << "Running test \"MUniverseGenerator can generate with crosslink chains\""
     << std::endl;
 
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
@@ -1089,11 +1089,11 @@ TEST_CASE("Universe generator uses correct w_sol even for strange structures",
              Catch::Matchers::WithinAbs(0.31, 0.05));
 }
 
-TEST_CASE("Universe generator handles structures without cross-links",
+TEST_CASE("Universe generator handles structures without crosslinks",
           "[generator][MCUniverseGenerator]")
 {
   std::cout << "Running test \"Universe generator handles structures without "
-               "cross-links\""
+               "crosslinks\""
             << std::endl;
 
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(

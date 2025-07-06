@@ -406,7 +406,7 @@ Molecule::getAtoms() const
 
 /**
  * @brief Get the atoms at the end of each chain, and/or, in case of a primary
- * loop, two times the cross-link.
+ * loop, two times the crosslink.
  *
  * This method does not handle branched structures.
  *
@@ -442,14 +442,13 @@ Molecule::getChainEnds(const int crossLinkerType,
       return {};
     }
     // otherwise, primary loop,
-    // but with cross-link, which will be the start of the loop.
-    RUNTIME_EXP_IFN(
-      crossLinks.size() == 1 ||
-        (crossLinks.size() == 2 &&
-         crossLinks[0].getId() == crossLinks[1].getId()),
-      "For a primary loop, expected exactly one cross-link, got " +
-        std::to_string(crossLinks.size()) + " in molecule " + this->getKey() +
-        ".");
+    // but with crosslink, which will be the start of the loop.
+    RUNTIME_EXP_IFN(crossLinks.size() == 1 ||
+                      (crossLinks.size() == 2 &&
+                       crossLinks[0].getId() == crossLinks[1].getId()),
+                    "For a primary loop, expected exactly one crosslink, got " +
+                      std::to_string(crossLinks.size()) + " in molecule " +
+                      this->getKey() + ".");
     return closePrimaryLoop
              ? std::vector<Atom>({ crossLinks[0], crossLinks[0] })
              : std::vector<Atom>({ crossLinks[0] });

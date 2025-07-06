@@ -37,7 +37,7 @@ struct AtomPairEntanglements
  * @param sameStrandCutoff the number of beads required between two atoms of
  * the same strand
  * @param seed the random seed
- * @param crossLinkerType the type of the cross-link atoms
+ * @param crossLinkerType the type of the crosslink atoms
  * @param ignoreCrosslinks
  * @param filterDanglingAndSoluble
  * @return AtomPairEntanglements
@@ -68,7 +68,7 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
  * @param sameStrandCutoff the number of beads required between two atoms of
  * the same strand
  * @param seed the random seed
- * @param crossLinkerType the type of the cross-link atoms
+ * @param crossLinkerType the type of the crosslink atoms
  * @param ignoreCrosslinks
  * @param filterDanglingAndSoluble
  * @return AtomPairEntanglements

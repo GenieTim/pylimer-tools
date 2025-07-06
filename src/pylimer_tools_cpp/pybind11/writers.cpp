@@ -104,7 +104,7 @@ init_pylimer_bound_writers(py::module_& m)
     .def("config_crosslinker_type",
          &DataFileWriter::configCrosslinkerType,
          R"pbdoc(
-           Set which atom type represents cross-linkers. 
+           Set which atom type represents crosslinkers. 
            Needed in case the moleculeIdx in the output file should have any meaning.
            (e.g. with :func:`~pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap`).
 

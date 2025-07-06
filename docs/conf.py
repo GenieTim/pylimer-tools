@@ -10,20 +10,22 @@ import os
 import sys
 import sysconfig
 import warnings
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 from datetime import datetime
-import pylimer_tools_cpp
 
+import pylimer_tools_cpp
 
 # -- Project information -----------------------------------------------------
 
-project = "PylimerTools"
+project = "pylimer-tools"
 copyright = "2021-" + datetime.now().strftime("%Y") + ", Tim Bernhard"
 author = "Tim Bernhard"
+
+# The full version, including alpha/beta/rc tags
+version = pylimer_tools_cpp.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -36,18 +38,51 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.githubpages",
     "sphinx_automodapi.automodapi",
-    # "sphinx.ext.jsmath",
     "sphinx.ext.mathjax",
+    "sphinx.ext.todo",
+    "sphinxext.opengraph",
+    'sphinx_copybutton'
 ]
 
-numpydoc_show_class_members = False  # needed to avoid having methods and attributes of classes being shown multiple times.
+# Configuration for specific extensions
+napoleon_google_docstring = True
+napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = False
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = True
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = False
+napoleon_use_ivar = False
+napoleon_use_param = True
+napoleon_use_rtype = True
+napoleon_preprocess_types = False
+napoleon_type_aliases = None
+napoleon_attr_annotations = True
 
+#
+ogp_site_url = "https://genietim.github.io/pylimer-tools"
+ogp_custom_meta_tags = [
+    '<link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />',
+    '<link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />',
+    '<link rel="shortcut icon" href="/_static/favicon/favicon.ico" />',
+    '<link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />',
+    '<meta name="apple-mobile-web-app-title" content="pylimer-tools" />',
+    '<link rel="manifest" href="/_static/favicon/site.webmanifest" />',
+]
+
+# To avoid showing methods and attributes of classes multiple times.
+numpydoc_show_class_members = False
+
+# Enable autosummary
 autosummary_generate = True
 autoclass_content = "both"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["../docs-template"]
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -60,15 +95,15 @@ source_suffix = [".rst", ".md"]
 master_doc = "index"
 
 # Mathjax options
-mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"
-mathjax3_config = {
-    "tex": {
-        # "inlineMath": [['$', '$'], ['\\(', '\\)']]
-    },
-    "extensions": ["jsMath2jax.js"],
-    "jax": ["input/TeX"],
-}
-mathjax_options = {"async": "async"}
+mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+# mathjax3_config = {
+#     "tex": {
+#         # "inlineMath": [['$', '$'], ['\\(', '\\)']]
+#     },
+#     "extensions": ["jsMath2jax.js"],
+#     "jax": ["input/TeX"],
+# }
+# mathjax_options = {"async": "async"}
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -77,25 +112,59 @@ mathjax_options = {"async": "async"}
 #
 html_theme = "furo"
 
+# Theme-specific options
+html_theme_options = {
+    "sidebar_hide_name": True,
+    "navigation_with_keys": True,
+    "top_of_page_buttons": ["view", "edit"],
+    "source_repository": "https://github.com/GenieTim/pylimer-tools",
+    "source_branch": "main",
+    "source_directory": "docs/",
+    
+}
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
-# add custom css files here, absolute URLS or
-# relative to the `html_static_path` directory
+# Custom CSS files
 html_css_files = [
     "css/custom.css",
 ]
+
+# The name for this set of Sphinx documents.
+html_title = f"{project} v{version}"
+
+# A shorter title for the navigation bar.
+html_short_title = f"{project}"
+
+# The name of an image file (relative to this directory) to place at the top
+# of the sidebar.
+# html_logo = None
+
+# The name of an image file (within the static path) to use as favicon of the
+# docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
+# pixels large.
+# html_favicon = None
+
+# If false, no module index is generated.
+html_domain_indices = True
+
+# If false, no index is generated.
+html_use_index = True
+
+# If true, the index is split into individual pages for each letter.
+html_split_index = False
+
+# If true, links to the reST sources are added to the pages.
+html_show_sourcelink = True
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 html_show_sphinx = False
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
-# html_show_copyright = True
-
-# Output file base name for HTML help builder.
-htmlhelp_basename = "python_exampledoc"
+html_show_copyright = True
 
 # -- Options for LaTeX output ---------------------------------------------
 

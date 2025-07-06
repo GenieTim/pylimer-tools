@@ -127,9 +127,9 @@ public:
                           double ftol = 1e-9);
 
   /**
-   * @brief Get the universe consisting of cross-linkers only
+   * @brief Get the universe consisting of crosslinkers only
    *
-   * @param newCrosslinkerType the type to give the cross-linkers
+   * @param newCrosslinkerType the type to give the crosslinkers
    * @return pylimer_tools::entities::Universe
    */
   pylimer_tools::entities::Universe getCrosslinkerVerse() const;
@@ -244,7 +244,7 @@ public:
   }
 
   /**
-   * @brief Get the cross-linker Chains that are active
+   * @brief Get the crosslinker Chains that are active
    *
    * @param tolerance
    * @return std::vector<pylimer_tools::entities::Molecule>
@@ -537,8 +537,8 @@ protected:
 
     if (remove2functionalCrosslinkers) {
       for (pylimer_tools::entities::Atom xlinker : springEndAtoms) {
-        // change type of cross-linkers with a degree <= 2 to "normal",
-        // non-cross-link beads
+        // change type of crosslinkers with a degree <= 2 to "normal",
+        // non-crosslink beads
         size_t vertexId = this->universe.getIdxByAtomId(xlinker.getId());
         if (this->universe.computeFunctionalityForVertex(vertexId) <= 2) {
           this->universe.setPropertyValue(
@@ -574,7 +574,7 @@ protected:
       }
       RUNTIME_EXP_IFN(crossLinkerChains[i].getType() !=
                         pylimer_tools::entities::MoleculeType::UNDEFINED,
-                      "Cross-linker chain's chain type could not be "
+                      "Crosslinker chain's chain type could not be "
                       "detected. Cannot work like that.");
       if (crossLinkerChains[i].getType() ==
             pylimer_tools::entities::MoleculeType::NETWORK_STRAND ||
@@ -647,7 +647,7 @@ protected:
       if (crossLinkerChains[i].getType() ==
           pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
         addChain = true;
-        // spring contour length = nr of bonds between two cross-linkers
+        // spring contour length = nr of bonds between two crosslinkers
         net->springsContourLength[spring_idx] =
           crossLinkerChains[i].getNrOfBonds();
       } else if (crossLinkerChains[i].getType() ==
@@ -660,7 +660,7 @@ protected:
                  pylimer_tools::entities::MoleculeType::DANGLING_CHAIN) {
         if (!removeDanglingChains) {
           // to keep dangling chains, we convert the trailing atom to a
-          // cross-link
+          // crosslink
           net->springsContourLength[spring_idx] =
             crossLinkerChains[i].getNrOfBonds();
           addChain = true;
@@ -859,7 +859,7 @@ protected:
       return 1. - this->computeSolubleWeightFraction(net, tolerance);
     }
     // as of now, the springsContourLength is equal to the number of bonds
-    // from cross-link to cross-link. therefore, the number of atoms of each
+    // from crosslink to crosslink. therefore, the number of atoms of each
     // of these springs is one less
     Eigen::ArrayXd allActiveAtomsPerChains =
       activeSprings.cast<double>() * (net->springsContourLength.array() -
@@ -942,7 +942,7 @@ protected:
     assert(nodeIsActive.size() == net->nrOfNodes);
 
     // as of now, the springsContourLength is equal to the number of bonds
-    // from cross-link to cross-link. therefore, the number of atoms of each
+    // from crosslink to crosslink. therefore, the number of atoms of each
     // of these springs is one less
     Eigen::ArrayXd allActiveAtomsPerChains =
       activeSprings.cast<double>() * (net->springsContourLength.array() -

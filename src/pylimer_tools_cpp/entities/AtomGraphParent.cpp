@@ -942,7 +942,7 @@ void
 AtomGraphParent::writeGraphToFile(const std::string& filename) const
 {
   FILE* fp = fopen(filename.c_str(), "w");
-  igraph_write_graph_gml(&this->graph, fp, 0, NULL, "PylimerTools");
+  igraph_write_graph_gml(&this->graph, fp, 0, NULL, "pylimer-tools");
   fclose(fp);
 };
 }

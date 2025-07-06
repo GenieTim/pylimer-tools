@@ -101,7 +101,7 @@ init_pylimer_bound_generators(py::module_& m)
          &MCUniverseGenerator::setBeadDistance,
          R"pbdoc(
          Set the mean distance between beads when doing MC stepping.
-         Also used for the target cross-linker partner sampling.
+         Also used for the target crosslinker partner sampling.
 
          NOTE: Mainly the mean squared bead distance is effectively used in the Monte-Carlo simulation.
 
@@ -178,7 +178,7 @@ init_pylimer_bound_generators(py::module_& m)
 
          Arguments:
           - std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
-               E.g., 3.29 for 99.9% of all conformations.
+               E.g., 3. for 99.9994% of all conformations.
           - in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
          )pbdoc",
          py::arg("std_multiplier"),
@@ -197,16 +197,16 @@ init_pylimer_bound_generators(py::module_& m)
     //          Note that the neighbour list is initialized when this function
     //          is called. It does respect all :math:`N` that are set at that
     //          point. Therefore, try to call this method after adding strands,
-    //          before doing cross-linking. Before that, it's not relevant for
+    //          before doing crosslinking. Before that, it's not relevant for
     //          performance anyway. )pbdoc", py::arg("provider"))
     .def("add_crosslinkers_at",
          &MCUniverseGenerator::addCrosslinkersAt,
          R"pbdoc(
-          Add cross-linkers at specific coordinates.
+          Add crosslinkers at specific coordinates.
 
-          :param coordinates: Coordinates of the cross-linkers.
-          :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
-          :param crosslinker_type: Atom type of the cross-linkers (default: 2).
+          :param coordinates: Coordinates of the crosslinkers.
+          :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
+          :param crosslinker_type: Atom type of the crosslinkers (default: 2).
          )pbdoc",
          py::arg("coordinates"),
          py::arg("crosslinker_functionality") = 4,
@@ -214,12 +214,12 @@ init_pylimer_bound_generators(py::module_& m)
     .def("add_crosslinkers",
          &MCUniverseGenerator::addCrosslinkers,
          R"pbdoc(
-            Add cross-linkers at random positions.
+            Add crosslinkers at random positions.
 
-            :param nr_of_crosslinkers: Number of cross-linkers to add.
-            :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
-            :param crosslinker_type: Atom type of the cross-linkers (default: 2).
-            :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).
+            :param nr_of_crosslinkers: Number of crosslinkers to add.
+            :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
+            :param crosslinker_type: Atom type of the crosslinkers (default: 2).
+            :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).
             )pbdoc",
          py::arg("nr_of_crosslinkers"),
          py::arg("crosslinker_functionality") = 4,
@@ -228,15 +228,15 @@ init_pylimer_bound_generators(py::module_& m)
     .def("add_randomly_functionalized_strands",
          &MCUniverseGenerator::addRandomlyFunctionalizedStrands,
          R"pbdoc(
-          Add strands with randomly distributed cross-linkers in between.
+          Add strands with randomly distributed crosslinkers in between.
 
           :param nr_of_strands: Number of strands to add.
           :param strand_length: Length of each strand.
-          :param functionalization_probability: Proportion of beads that are made cross-link.
-          :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
-          :param crosslinker_type: Atom type of the cross-linkers (default: 2).
+          :param functionalization_probability: Proportion of beads that are made crosslink.
+          :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
+          :param crosslinker_type: Atom type of the crosslinkers (default: 2).
           :param strand_atom_type: Atom type of the beads that stay (default: 1).
-          :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).     
+          :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).     
      )pbdoc",
          py::arg("nr_of_strands"),
          py::arg("strand_length"),
@@ -248,14 +248,14 @@ init_pylimer_bound_generators(py::module_& m)
     .def("add_end_functionalized_strands",
          &MCUniverseGenerator::addCrosslinkStrands,
          R"pbdoc(
-            Add strands with cross-linkers at the ends.
+            Add strands with crosslinkers at the ends.
 
             :param nr_of_strands: Number of strands to add.
             :param strand_length: Length of each strand.
-            :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
-            :param crosslinker_type: Atom type of the cross-linkers (default: 2).
+            :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
+            :param crosslinker_type: Atom type of the crosslinkers (default: 2).
             :param strand_atom_type: Atom type of the beads that are not at the ends (default: 1).
-            :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).
+            :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).
             )pbdoc",
          py::arg("nr_of_strands"),
          py::arg("strand_length"),
@@ -287,7 +287,7 @@ init_pylimer_bound_generators(py::module_& m)
          R"pbdoc(
             Add strands.
             Adds them unconnected at first.
-            To link them to cross-linkers, use some of the :code:`link_strand_` methods.
+            To link them to crosslinkers, use some of the :code:`link_strand_` methods.
 
             :param nr_of_strands: Number of strands to add.
             :param strand_lengths: A list of integers representing the number of beads of each of the strands.
@@ -299,8 +299,8 @@ init_pylimer_bound_generators(py::module_& m)
     .def("link_strand",
          &MCUniverseGenerator::linkStrand,
          R"pbdoc(
-          Link one particular strand to a cross-linker.
-          This strand will have one bond made, to an appropriate cross-linker, 
+          Link one particular strand to a crosslinker.
+          This strand will have one bond made, to an appropriate crosslinker, 
           as chosen by the parameters associated with the strand.
 
           :param strand_idx: Index of the strand to be linked.
@@ -311,21 +311,21 @@ init_pylimer_bound_generators(py::module_& m)
     .def("link_strand_to",
          &MCUniverseGenerator::linkStrandTo,
          R"pbdoc(
-          Link a strand to a specific cross-linker.
-          This assumes that you keep track of the order in which you added the cross-linkers and strands.
+          Link a strand to a specific crosslinker.
+          This assumes that you keep track of the order in which you added the crosslinkers and strands.
 
           :param strand_idx: Index of the strand to be linked.
-          :param link_idx: Index of the cross-linker to be linked.
+          :param link_idx: Index of the crosslinker to be linked.
       )pbdoc",
          py::arg("strand_idx"),
          py::arg("link_idx"))
     .def("link_strands_to_conversion",
          &MCUniverseGenerator::linkStrandsToConversion,
          R"pbdoc(
-            Actually link the previously added strands to the previously added cross-linkers,
-            until a certain cross-link conversion is reached.
+            Actually link the previously added strands to the previously added crosslinkers,
+            until a certain crosslink conversion is reached.
 
-            :param crosslinker_conversion: Target conversion of cross-linkers (0: no connections to cross-links; 1: all cross-linkers fully connected).
+            :param crosslinker_conversion: Target conversion of crosslinkers (0: no connections to crosslinks; 1: all crosslinkers fully connected).
             :param c_infinity: As needed for the end-to-end distribution, given by :math:`\langle R^2\rangle_0 = C_{\infty} N b^2`.
             )pbdoc",
          py::arg("crosslinker_conversion"),
@@ -334,10 +334,10 @@ init_pylimer_bound_generators(py::module_& m)
          py::overload_cast<double, double>(
            &MCUniverseGenerator::linkStrandsToSolubleFraction),
          R"pbdoc(
-            Actually link the previously added strands to the previously added cross-linkers,
+            Actually link the previously added strands to the previously added crosslinkers,
             until a certain soluble fraction is reached.
 
-            :param soluble_fraction: Target soluble_fraction (0: no connections to cross-links; 1: all cross-linkers fully connected).
+            :param soluble_fraction: Target soluble_fraction (0: no connections to crosslinks; 1: all crosslinkers fully connected).
             :param c_infinity: As needed for the end-to-end distribution, given by :math:`\langle R^2\rangle_0 = C_{\infty} N b^2`.
             )pbdoc",
          py::arg("soluble_fraction"),
@@ -345,14 +345,14 @@ init_pylimer_bound_generators(py::module_& m)
     .def("remove_soluble_fraction",
          &MCUniverseGenerator::removeSolubleFraction,
          R"pbdoc(
-            Remove soluble fraction (as determined by phantom force relaxation) of the strands and cross-links.
+            Remove soluble fraction (as determined by phantom force relaxation) of the strands and crosslinks.
             )pbdoc",
          py::arg("rescale_box") = true)
     .def("relax_crosslinks",
          &MCUniverseGenerator::relaxCrosslinks,
          R"pbdoc(
-         Run force relaxation with the cross-linkers and their strands,
-         to have the cross-links in their statistically most probable position.
+         Run force relaxation with the crosslinkers and their strands,
+         to have the crosslinks in their statistically most probable position.
          )pbdoc")
     .def("get_current_nr_of_atoms", &MCUniverseGenerator::getCurrentNrOfAtoms)
     .def("get_current_nr_of_bonds", &MCUniverseGenerator::getCurrentNrOfBonds)
@@ -366,7 +366,7 @@ init_pylimer_bound_generators(py::module_& m)
     .def("get_universe", &MCUniverseGenerator::getUniverse, R"pbdoc(
             Fetch the current (or final) state of the universe.
 
-            Use this method to actually (MC) place beads between the cross-links and retrieve the generated structure.
+            Use this method to actually (MC) place beads between the crosslinks and retrieve the generated structure.
             )pbdoc")
     .def("get_force_relaxation",
          &MCUniverseGenerator::getForceRelaxation,

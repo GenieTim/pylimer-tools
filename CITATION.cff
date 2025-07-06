@@ -1,0 +1,104 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: pylimer-tools
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Tim
+    family-names: Bernhard
+    email: tim@bernhard.dev
+    orcid: 'https://orcid.org/0009-0002-9227-0173'
+repository-code: 'https://github.com/GenieTim/pylimer-tools'
+url: 'https://genietim.github.io/pylimer-tools/'
+abstract: >-
+  pylimer-tools is a collection of utility python functions
+  for handling handling bead-spring polymers in Python.
+
+
+  This toolbox provides an Monte Carlo (MC) structure
+  generator, 
+
+  simulation methods for Dissipative Particle Dynamics (DPD)
+  with slip-springs,
+
+  implementations of the Maximum Entropy Homogenization
+  Procedure (MEHP), with and without slip-links,
+
+  and various means to read LAMMPS output: be it data, dump
+  or thermodynamic data files.
+
+  Additionally, it provides various methods to calculate
+  properties of the bead-spring networks, such as computing
+  the radius of gyration, mean end to end distance, finding
+  loops, or simply splitting a polymer network back up into
+  its chains.
+keywords:
+  - polymer
+  - Python
+  - polymer networks
+  - LAMMPS
+license: GPL-3.0-or-later
+references:
+   - authors:
+      - family-names: Miller
+        given-names: Douglas R.
+      - family-names: Macosko
+        given-names: Christopher W.
+     title: "A New Derivation of Post Gel Properties of Network Polymers"
+     type: article
+     doi: 10.1021/ma60050a004
+     scope: "Cite this paper if you used the Miller-Macosko Theory (MMT) to predict polymer properties"
+   - authors:
+      - family-names: Macosko
+        given-names: Christopher W.
+      - family-names: Miller
+        given-names: Douglas R.
+     title: "A New Derivation of Average Molecular Weights of Nonlinear Polymers"
+     type: article
+     doi: 10.1021/ma60050a003
+     scope: "Cite this paper if you used the Miller-Macosko Theory (MMT) to predict polymer properties"
+   - authors:
+      - family-names: Gusev
+        given-names: Andrei A.
+      - family-names: Bernhard
+        given-names: Tim
+     title: "Molecular Model for Linear Viscoelastic Properties of Entangled Polymer Networks"
+     type: article
+     doi: 10.1021/acs.macromol.4c01429
+     scope: "Cite this paper if you use the normal mode analysis of pylimer-tools"
+   - authors:
+      - family-names: Gusev
+        given-names: Andrei A.
+     title: "Numerical Estimates of the Topological Effects in the Elasticity of Gaussian Polymer Networks and Their Exact Theoretical Description"
+     type: article
+     doi: 10.1021/acs.macromol.9b00262
+   - authors:
+      - family-names: Ramirez
+        given-names: Jorge
+      - family-names: Sukumaran
+        given-names: Satihish K.
+      - family-names: Vorselaars
+        given-names: Bart
+      - family-names: Likhtman
+        given-names: Alexei E.
+     title: "Efficient on the Fly Calculation of Time Correlation Functions in Computer Simulations."
+     type: article
+     doi: 10.1063/1.3491098
+     scope: "Cite this paper if you used the multiple-tau autocorrelator"
+   - authors:
+      - family-names: Schneider
+        given-names: Jurek
+      - family-names: Fleck
+        given-names: Frank
+      - family-names: Karimini-Varzaneh
+        given-names: Hossein Ali
+      - family-names: Müller-Plathe
+        given-names: Florian
+     title: "Simulation of Elastomers by Slip-Spring Dissipative Particle Dynamics"
+     type: article
+     doi: 10.1021/acs.macromol.1c00567
+     scope: "Cite this paper if you use our DPD simulator with slip-springs"

@@ -1127,7 +1127,7 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
             igraph_vector_int_get(&neighbors, neighIdx);
 
           if (vertexIsJunction[neighbourOriginalId]) {
-            // found a cross-linker neighbour
+            // found a crosslinker neighbour
             long int originalNeighbourAtomId =
               igraph_cattribute_VAN(&graph, "id", neighbourOriginalId);
             atomsToAdd.push_back(neighbourOriginalId);
@@ -2336,11 +2336,11 @@ Universe::detectDihedralAngles() const
 }
 
 /**
- * @brief Reduce the network to cross-linkers only.
+ * @brief Reduce the network to crosslinkers only.
  * Includes self-loops (from primary ones).
  * You can remove them using #simplify
  *
- * @param crossLinkerType the atom type of the cross-linker beads
+ * @param crossLinkerType the atom type of the crosslinker beads
  * @return Universe
  */
 Universe
@@ -2372,7 +2372,7 @@ Universe::getNetworkOfCrosslinker(const int crossLinkerType) const
       while (subConnections.size() > 0) {
         if (this->getPropertyValue<int>("type", currentCenter) ==
             crossLinkerType) {
-          // found cross-linker
+          // found crosslinker
           if (currentCenter >= crossLinker) {
             bondFrom.push_back(
               this->getPropertyValue<int>("id", currentCenter));
@@ -2398,7 +2398,7 @@ Universe::getNetworkOfCrosslinker(const int crossLinkerType) const
   // with the algorithm above, self-loops are counted twice.
   // let's just remove the second (and/or fourth) one where needed
   // NOTE: some assumptions are made here that could be problematic;
-  // for example, that there are not more than 1 self-loops per cross-link
+  // for example, that there are not more than 1 self-loops per crosslink
   // in the beginning
   std::vector<size_t> indicesToRemove;
   std::map<int, int> nrOfSelfLoops;

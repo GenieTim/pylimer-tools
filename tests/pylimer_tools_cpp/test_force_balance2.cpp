@@ -292,7 +292,7 @@ TEST_CASE("MEHP Force Balance2 can randomly add and remove entanglements",
   Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
   size_t numRemoved = forceBalancer.unlinkBifunctionalLinks(net, displacements);
   CHECK_NOTHROW(forceBalancer.validateNetwork());
-  // since we don't even consider f = 2 cross-links,
+  // since we don't even consider f = 2 crosslinks,
   // none will be removed.
   CHECK(numRemoved == 0);
 
@@ -421,7 +421,7 @@ TEST_CASE("MEHP Force Balance2 Free chains collapse",
     pcm::MEHPForceBalance2(universe, 2, false);
   CHECK(forceBalancer.getNrOfStrands() == forceBalancer.getNrOfSprings());
   CHECK(forceBalancer.getNrOfStrands() ==
-        1); // we ignore cross-links, so no "nrOfBeads / nrOfBeadsPerChain"
+        1); // we ignore crosslinks, so no "nrOfBeads / nrOfBeadsPerChain"
 
   CHECK_NOTHROW(forceBalancer.runForceRelaxation());
   CHECK(forceBalancer.getNrOfIterations() > 0);
@@ -489,7 +489,7 @@ TEST_CASE("MEHP Force Balance2 Entanglement Beads Are Removed",
     pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(
       universe, 3, 2.0, 0., 0, 0, "asdflseed", 2, false, false, false);
     CHECK(forceBalancer.getNrOfStrands() < forceBalancer.getNrOfSprings());
-    CHECK(forceBalancer.getNrOfStrands() == 1); // since we ignore cross-links
+    CHECK(forceBalancer.getNrOfStrands() == 1); // since we ignore crosslinks
     CHECK(forceBalancer.getNrOfSprings() == 1 + 3 * 2);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
       pcm::StructureSimplificationMode::ALL_TIM));
@@ -1604,7 +1604,7 @@ TEST_CASE(
     // internal checks, unfortunately testing implementation details
     CHECK_FALSE(net1.springPartBoxOffset.isZero());
     CHECK_FALSE(net2.springBoxOffset.isZero());
-    CHECK(net1.nrOfLinks == 4); // 2x cross-link (0, 2), 2x entanglement link
+    CHECK(net1.nrOfLinks == 4); // 2x crosslink (0, 2), 2x entanglement link
     CHECK(net1.nrOfNodes == 2);
     CHECK(net2.nrOfLinks == 4); // 2x junction-link (0, 2), 2x entanglement link
     CHECK(net2.nrOfNodes == 2);
@@ -2479,7 +2479,7 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
       pcm::MEHPForceBalance::constructWithSlipLinks(
         universe,
         entanglements,
-        2, // by using an incorrect cross-link type, the conversion would be
+        2, // by using an incorrect crosslink type, the conversion would be
            // closer to the new one. However, new issues arise
         false);
     forceBalance.configAssumeBoxLargeEnough(false);
@@ -2512,6 +2512,9 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
         pcm::MEHPForceBalance2(universe,
                                forceBalance.getNetwork(),
                                forceBalance.getSpringPartitions());
+      CHECK(forceBalance210.getNrOfStrands() == forceBalance.getNrOfSprings());
+      CHECK(forceBalance210.getNrOfSprings() ==
+            forceBalance.getNrOfPartialSprings());
       CHECK_THAT_OR_ZERO(forceBalance210.getGammaFactors(1.).sum(),
                          forceBalance.getGammaFactors(1.).sum());
       CHECK_THAT_OR_ZERO(forceBalance210.getStressTensor().trace(),
@@ -2594,6 +2597,15 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
     //   pcm::ForceBalance2Network net1 = forceBalance21.getNetwork();
     //   std::cerr << "DEBUG HERE" << std::endl;
     // }
+
+    // check whether it's the simplification or whether the force balance 2
+    // method is more accurate
+    forceBalance21 = pcm::MEHPForceBalance2(
+      universe, forceBalance.getNetwork(), forceBalance.getSpringPartitions());
+    forceBalance21.runForceRelaxation(
+      pcm::StructureSimplificationMode::NO_SIMPLIFICATION);
+    CHECK_THAT_OR_ZERO(forceBalance21.getGammaFactors(1.).sum(),
+                       forceBalance2.getGammaFactors(1.).sum());
 
 #undef CHECK_THAT_OR_ZERO
   }

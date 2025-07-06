@@ -11,7 +11,7 @@
 namespace pylimer_tools::sim::mehp {
 #define STRUCTURE_SIMPLIFICATION_MODES                                         \
   X(NO_SIMPLIFICATION, "No Simplification")                                    \
-  X(X2F_ONLY, "Two-function cross-links only")                                 \
+  X(X2F_ONLY, "Two-function crosslinks only")                                  \
   X(INACTIVE_ONLY, "Inactive links only")                                      \
   X(ALL_TIM, "All, à la Tim")                                                  \
   X(ALL_ANDREI, "All, à la Andrei")
@@ -291,7 +291,7 @@ struct ForceBalance2Network
   ArrayXArrayXi linkIndicesOfStrand; // maps strands -> links
   ArrayXArrayXi springIndicesOfStrand;
   // map the "local", partial, spring indices to the full-length springs
-  Eigen::ArrayXb linkIsEntanglement; // whether a link is a "cross-link" or an
+  Eigen::ArrayXb linkIsEntanglement; // whether a link is a "crosslink" or an
   // "entanglement-link"
 
   // partial springs

@@ -272,9 +272,9 @@ TEST_CASE("DPD Simulator Restart Files Work", "[analysis][DPDSimulator]")
 }
 #endif
 
-TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator][long]")
+TEST_CASE("DPD Simulator Can Crosslink", "[analysis][DPDSimulator][long]")
 {
-  std::cout << "Running test \"DPD Simulator Can Cross-link\"" << std::endl;
+  std::cout << "Running test \"DPD Simulator Can Crosslink\"" << std::endl;
   const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);
   REQUIRE(std::filesystem::exists(suspectedPath));
 

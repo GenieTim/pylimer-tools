@@ -25,8 +25,8 @@ namespace pylimer_tools::topo::entanglement_detection {
  * @param sameStrandCutoff the number of beads required between two atoms of
  * the same strand
  * @param seed the random seed
- * @param crossLinkerType the type of the cross-link atoms
- * @param ignoreCrosslinks whether to ignore cross-link atoms when sampling.
+ * @param crossLinkerType the type of the crosslink atoms
+ * @param ignoreCrosslinks whether to ignore crosslink atoms when sampling.
  * Careful: if you don't ignore them, the same-strand policy might not work
  * correctly.
  * @param filterDanglingAndSoluble
@@ -254,8 +254,8 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
  * @param sameStrandCutoff the number of beads required between two atoms of
  * the same strand
  * @param seed the random seed
- * @param crossLinkerType the type of the cross-link atoms
- * @param ignoreCrosslinks whether to ignore cross-link atoms when sampling.
+ * @param crossLinkerType the type of the crosslink atoms
+ * @param ignoreCrosslinks whether to ignore crosslink atoms when sampling.
  * Careful: if you don't ignore them, the same-strand policy might not work
  * correctly.
  * @param filterDanglingAndSoluble
@@ -338,7 +338,7 @@ randomlyFindEntanglementsV2(const pylimer_tools::entities::Universe& universe,
         ? universe.identifyObviouslyDanglingAtoms()
         : std::vector({ pylimer_tools::entities::MoleculeType::UNDEFINED });
 
-  // filter out cross-link atoms and soluble atoms
+  // filter out crosslink atoms and soluble atoms
 
   for (size_t i = 0; i < universe.getNrOfAtoms(); ++i) {
     if (ignoreCrosslinks && vertexTypes[i] == crossLinkerType) {
