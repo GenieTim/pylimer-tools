@@ -336,7 +336,7 @@ public:
   void deformTo(const pylimer_tools::entities::Box& newBox);
 
   /**
-   * @brief Get the universe consisting of cross-linkers only
+   * @brief Get the universe consisting of crosslinkers only
    *
    * @return pylimer_tools::entities::Universe
    */
@@ -1183,7 +1183,7 @@ protected:
    *
    * @param net
    * @param u
-   * @param crosslinksOnly whether to only consider cross-links
+   * @param crosslinksOnly whether to only consider crosslinks
    * @return std::array<std::array<double, 3>, 3>
    */
   std::array<std::array<double, 3>, 3> evaluateStressTensorLinkBased(
@@ -1216,7 +1216,7 @@ protected:
     const Eigen::VectorXd& u) const;
 
   /**
-   * @brief Compute the force acting on a slip- or cross-link
+   * @brief Compute the force acting on a slip- or crosslink
    *
    * @param linkIdx
    * @param net
@@ -1231,7 +1231,7 @@ protected:
     Eigen::VectorXi& debugNrSpringsVisited) const;
 
   /**
-   * @brief Compute the stress acting on a slip- or cross-link
+   * @brief Compute the stress acting on a slip- or crosslink
    *
    * @param linkIdx
    * @param net

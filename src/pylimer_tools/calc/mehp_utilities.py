@@ -37,7 +37,7 @@ def predict_shear_modulus(
     :type temperature: float
     :param k_boltzmann: Boltzmann's constant in your unit system
     :type k_boltzmann: float
-    :param crosslinker_type: The type of atoms to ignore (junctions, cross-linkers)
+    :param crosslinker_type: The type of atoms to ignore (junctions, crosslinkers)
     :type crosslinker_type: int
     :param total_mass: The :math:`M` in the respective formula
     :type total_mass: float
@@ -134,7 +134,7 @@ def compute_effective_nr_density_of_network(
     :type abs_tol: float
     :param rel_tol: The relative tolerance to categorize a chain as active (0: all, 1: none)
     :type rel_tol: float
-    :param crosslinker_type: The atom type of the cross-linkers/junctions
+    :param crosslinker_type: The atom type of the crosslinkers/junctions
     :type crosslinker_type: int
 
     :return: The effective number density of network strands in units of 1/Volume
@@ -297,7 +297,7 @@ def compute_topological_factor(
 
     :param networks: The networks to compute the topological factor for
     :type networks: Sequence[Universe]
-    :param crosslinker_type: The type of atoms to ignore (junctions, cross-linkers)
+    :param crosslinker_type: The type of atoms to ignore (junctions, crosslinkers)
     :type crosslinker_type: int
     :param total_mass: The :math:`M` in the respective formula
     :type total_mass: float

@@ -47,7 +47,7 @@ init_pylimer_bound_topo(py::module_& m)
     :param crosslinker_type: The type of crosslinker to consider when finding entanglements. Used for the splitting into strands.
     :param ignore_crosslinks: Whether to ignore crosslinks when finding entanglements. 
       Careful: if you don't ignore them, the same-strand policy might not work correctly, 
-      since each cross-link should actually be associated with more than one strand.
+      since each crosslink should actually be associated with more than one strand.
     :param filter_dangling_and_soluble: Whether to filter out dangling chains and soluble crosslinks when finding entanglements.
       This means, entanglements involving an obviously (1st order) dangling or soluble chain are 
   )pbdoc",

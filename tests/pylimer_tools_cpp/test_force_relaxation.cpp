@@ -573,10 +573,10 @@ TEST_CASE(
   }
 }
 
-TEST_CASE("MEHP Force Relaxation returns the cross-linker universe",
+TEST_CASE("MEHP Force Relaxation returns the crosslinker universe",
           "[analysis][MEHPForceRelaxation][Universe]")
 {
-  std::cout << "Running test \"MEHP Force Relaxation returns the cross-linker "
+  std::cout << "Running test \"MEHP Force Relaxation returns the crosslinker "
                "universe\""
             << std::endl;
   const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);

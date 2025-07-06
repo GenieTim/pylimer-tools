@@ -1,6 +1,6 @@
 """
 
-    PylimerTools Cpp
+    pylimer_tools_cpp
     -----------------
 
     A collection of utility python functions for handling LAMMPS output and polymers in Python.
@@ -29,7 +29,17 @@ class Atom:
         ...
     def __init__(self, id: int, type: int, x: float, y: float, z: float, nx: int, ny: int, nz: int) -> None:
         """
-        Construct this atom
+                 Construct this atom
+        
+                 Parameters:
+                     id: Unique identifier for the atom
+                     type: Type classification of the atom
+                     x: X coordinate position
+                     y: Y coordinate position  
+                     z: Z coordinate position
+                     nx: Periodic image flag in x direction
+                     ny: Periodic image flag in y direction
+                     nz: Periodic image flag in z direction
         """
     def __setstate__(self, arg0: tuple) -> None:
         """
@@ -48,7 +58,12 @@ class Atom:
         Compute the distance to another atom respecting the periodic image flag.
         """
     def get_coordinates(self) -> numpy.ndarray:
-        ...
+        """
+                 Get the coordinates of this atom as a vector.
+                 
+                 Returns:
+                     A vector containing the x, y, z coordinates
+        """
     def get_id(self) -> int:
         """
                     Get the id of the atom.
@@ -70,7 +85,15 @@ class Atom:
                     Get the type of the atom.
         """
     def get_unwrapped_coordinates(self, arg0: Box) -> numpy.ndarray:
-        ...
+        """
+                 Get the unwrapped coordinates of this atom.
+                 
+                 Parameters:
+                     box: The simulation box to use for unwrapping
+                     
+                 Returns:
+                     A vector containing the unwrapped x, y, z coordinates
+        """
     def get_x(self) -> float:
         """
                     Get the x coordinate of the atom.
@@ -540,9 +563,9 @@ class DPDSimulator:
         """
     def config_allow_relocation_in_network(self, allow_relocation_in_network: bool = False) -> None:
         """
-                  Configure whether a relocation step may happen when a slip-spring has ended at a cross-link.
+                  Configure whether a relocation step may happen when a slip-spring has ended at a crosslink.
         
-                  Side-effect: if true, the relocations may also happen *to* a slip-spring next to a cross-link.
+                  Side-effect: if true, the relocations may also happen *to* a slip-spring next to a crosslink.
         
                   Arguments:
                   - allow_relocation_in_network (bool): Whether to allow relocation in the network or not.
@@ -779,7 +802,7 @@ class DataFileWriter:
         """
     def config_crosslinker_type(self, crosslinker_type: int = 2) -> None:
         """
-                   Set which atom type represents cross-linkers. 
+                   Set which atom type represents crosslinkers. 
                    Needed in case the moleculeIdx in the output file should have any meaning.
                    (e.g. with :func:`~pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap`).
         
@@ -976,7 +999,7 @@ class LinearMaxDistanceProvider(MaxDistanceProvider):
         ...
 class LinkSwappingMode:
     """
-    How slip-links may act when they reach each-other or even a cross-link.
+    How slip-links may act when they reach each-other or even a crosslink.
     
     Members:
     
@@ -1041,31 +1064,31 @@ class MCUniverseGenerator:
         ...
     def add_crosslinkers(self, nr_of_crosslinkers: int, crosslinker_functionality: int = 4, crosslinker_type: int = 2, white_noise: bool = True) -> None:
         """
-                    Add cross-linkers at random positions.
+                    Add crosslinkers at random positions.
         
-                    :param nr_of_crosslinkers: Number of cross-linkers to add.
-                    :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
-                    :param crosslinker_type: Atom type of the cross-linkers (default: 2).
-                    :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).
+                    :param nr_of_crosslinkers: Number of crosslinkers to add.
+                    :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
+                    :param crosslinker_type: Atom type of the crosslinkers (default: 2).
+                    :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).
         """
     def add_crosslinkers_at(self, coordinates: numpy.ndarray, crosslinker_functionality: int = 4, crosslinker_type: int = 2) -> None:
         """
-                  Add cross-linkers at specific coordinates.
+                  Add crosslinkers at specific coordinates.
         
-                  :param coordinates: Coordinates of the cross-linkers.
-                  :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
-                  :param crosslinker_type: Atom type of the cross-linkers (default: 2).
+                  :param coordinates: Coordinates of the crosslinkers.
+                  :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
+                  :param crosslinker_type: Atom type of the crosslinkers (default: 2).
         """
     def add_end_functionalized_strands(self, nr_of_strands: int, strand_length: list[int], crosslinker_functionality: int = 4, crosslinker_type: int = 2, strand_atom_type: int = 1, white_noise: bool = True) -> None:
         """
-                    Add strands with cross-linkers at the ends.
+                    Add strands with crosslinkers at the ends.
         
                     :param nr_of_strands: Number of strands to add.
                     :param strand_length: Length of each strand.
-                    :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
-                    :param crosslinker_type: Atom type of the cross-linkers (default: 2).
+                    :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
+                    :param crosslinker_type: Atom type of the crosslinkers (default: 2).
                     :param strand_atom_type: Atom type of the beads that are not at the ends (default: 1).
-                    :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).
+                    :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).
         """
     def add_monofunctional_strands(self, nr_of_monofunctional_strands: int, monofunctional_strand_length: list[int], monofunctional_strand_atom_type: int = 4) -> None:
         """
@@ -1073,15 +1096,15 @@ class MCUniverseGenerator:
         """
     def add_randomly_functionalized_strands(self, nr_of_strands: int, strand_length: list[int], functionalization_probability: float, crosslinker_functionality: int = 4, crosslinker_type: int = 2, strand_atom_type: int = 1, white_noise: bool = True) -> None:
         """
-                  Add strands with randomly distributed cross-linkers in between.
+                  Add strands with randomly distributed crosslinkers in between.
         
                   :param nr_of_strands: Number of strands to add.
                   :param strand_length: Length of each strand.
-                  :param functionalization_probability: Proportion of beads that are made cross-link.
-                  :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
-                  :param crosslinker_type: Atom type of the cross-linkers (default: 2).
+                  :param functionalization_probability: Proportion of beads that are made crosslink.
+                  :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
+                  :param crosslinker_type: Atom type of the crosslinkers (default: 2).
                   :param strand_atom_type: Atom type of the beads that stay (default: 1).
-                  :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).     
+                  :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).     
         """
     def add_solvent_chains(self, nr_of_solvent_chains: int, solvent_chain_length: int, solvent_atom_type: int = 3, white_noise: bool = True) -> None:
         """
@@ -1091,7 +1114,7 @@ class MCUniverseGenerator:
         """
                     Add strands.
                     Adds them unconnected at first.
-                    To link them to cross-linkers, use some of the :code:`link_strand_` methods.
+                    To link them to crosslinkers, use some of the :code:`link_strand_` methods.
         
                     :param nr_of_strands: Number of strands to add.
                     :param strand_lengths: A list of integers representing the number of beads of each of the strands.
@@ -1170,12 +1193,12 @@ class MCUniverseGenerator:
         """
                     Fetch the current (or final) state of the universe.
         
-                    Use this method to actually (MC) place beads between the cross-links and retrieve the generated structure.
+                    Use this method to actually (MC) place beads between the crosslinks and retrieve the generated structure.
         """
     def link_strand(self, strand_idx: int, c_infinity: float = 1.0) -> None:
         """
-                  Link one particular strand to a cross-linker.
-                  This strand will have one bond made, to an appropriate cross-linker, 
+                  Link one particular strand to a crosslinker.
+                  This strand will have one bond made, to an appropriate crosslinker, 
                   as chosen by the parameters associated with the strand.
         
                   :param strand_idx: Index of the strand to be linked.
@@ -1183,41 +1206,41 @@ class MCUniverseGenerator:
         """
     def link_strand_to(self, strand_idx: int, link_idx: int) -> None:
         """
-                  Link a strand to a specific cross-linker.
-                  This assumes that you keep track of the order in which you added the cross-linkers and strands.
+                  Link a strand to a specific crosslinker.
+                  This assumes that you keep track of the order in which you added the crosslinkers and strands.
         
                   :param strand_idx: Index of the strand to be linked.
-                  :param link_idx: Index of the cross-linker to be linked.
+                  :param link_idx: Index of the crosslinker to be linked.
         """
     def link_strands_to_conversion(self, crosslinker_conversion: float, c_infinity: float = 1.0) -> None:
         """
-                    Actually link the previously added strands to the previously added cross-linkers,
-                    until a certain cross-link conversion is reached.
+                    Actually link the previously added strands to the previously added crosslinkers,
+                    until a certain crosslink conversion is reached.
         
-                    :param crosslinker_conversion: Target conversion of cross-linkers (0: no connections to cross-links; 1: all cross-linkers fully connected).
+                    :param crosslinker_conversion: Target conversion of crosslinkers (0: no connections to crosslinks; 1: all crosslinkers fully connected).
                     :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
         """
     def link_strands_to_soluble_fraction(self, soluble_fraction: float, c_infinity: float = 1.0) -> None:
         """
-                    Actually link the previously added strands to the previously added cross-linkers,
+                    Actually link the previously added strands to the previously added crosslinkers,
                     until a certain soluble fraction is reached.
         
-                    :param soluble_fraction: Target soluble_fraction (0: no connections to cross-links; 1: all cross-linkers fully connected).
+                    :param soluble_fraction: Target soluble_fraction (0: no connections to crosslinks; 1: all crosslinkers fully connected).
                     :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
         """
     def relax_crosslinks(self) -> None:
         """
-                 Run force relaxation with the cross-linkers and their strands,
-                 to have the cross-links in their statistically most probable position.
+                 Run force relaxation with the crosslinkers and their strands,
+                 to have the crosslinks in their statistically most probable position.
         """
     def remove_soluble_fraction(self, rescale_box: bool = True) -> None:
         """
-                    Remove soluble fraction (as determined by phantom force relaxation) of the strands and cross-links.
+                    Remove soluble fraction (as determined by phantom force relaxation) of the strands and crosslinks.
         """
     def set_bead_distance(self, distance: float, update_mean_squared: bool = True) -> None:
         """
                  Set the mean distance between beads when doing MC stepping.
-                 Also used for the target cross-linker partner sampling.
+                 Also used for the target crosslinker partner sampling.
         
                  NOTE: Mainly the mean squared bead distance is effectively used in the Monte-Carlo simulation.
         
@@ -1251,7 +1274,7 @@ class MCUniverseGenerator:
         
                  Arguments:
                   - std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
-                       E.g., 3.29 for 99.9% of all conformations.
+                       E.g., 3. for 99.9994% of all conformations.
                   - in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
         """
     def validate(self) -> None:
@@ -1263,11 +1286,11 @@ class MCUniverseGenerator:
 class MEHPForceBalance:
     """
     
-        A small simulation tool for quickly minimizing the force between the cross-linker beads.
+        A small simulation tool for quickly minimizing the force between the crosslinker beads.
     
         This is the second implementation in the group of MEHP provided by this package.
         The distinct feature here is the slip-links: a form of entanglement,
-        represented as an entanglement link, just like a four-functional cross-link,
+        represented as an entanglement link, just like a four-functional crosslink,
         but with the ability to slip along the two associated strands, therewith
         adjusting the fraction of the contour length on both sides of the link.
          
@@ -1289,7 +1312,7 @@ class MEHPForceBalance:
                   Instantiate the simulator for a certain universe.
         
                   :param universe: The universe to simulate with
-                  :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
+                  :param crosslinker_type: The atom type of the crosslinkers. Needed to reduce the network.
                   :param is2D: Whether to ignore the z direction.
                   :param kappa: The spring constant
                   :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
@@ -1317,7 +1340,7 @@ class MEHPForceBalance:
         """
     def config_entanglement_type(self, type: int = -1) -> None:
         """
-                 To have certain cross-links behave as entanglements in the removal process,
+                 To have certain crosslinks behave as entanglements in the removal process,
                  you can specify the here a type, that you have used in the universe to specify:
                  - the type of entanglement atoms (expected with functionality f = 3),
                  - and the entanglement-bonds between the entanglement atoms.
@@ -1375,7 +1398,7 @@ class MEHPForceBalance:
         """
     def get_crosslinker_universe(self) -> Universe:
         """
-                  Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
+                  Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
         """
     def get_current_partial_spring_lengths(self) -> list[float]:
         """
@@ -1454,7 +1477,7 @@ class MEHPForceBalance:
     def get_ids_of_active_nodes(self, tolerance: float = 0.001) -> list[int]:
         """
                   Get the atom ids of the nodes that are considered active.
-                  Only cross-link ids are returned (not e.g. entanglement links).
+                  Only crosslink ids are returned (not e.g. entanglement links).
         
                   :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
         """
@@ -1585,7 +1608,7 @@ class MEHPForceBalance:
                   :param allow_sliplinks_to_pass_each_other: Whether slip-links can pass each other.
                   :param swapping_frequency: How often slip-links attempt to swap.
                   :param one_over_spring_partition_upper_limit: Super-secret parameter. Use 1, gradually increase (and then -1) if you want to publish.
-                  :param nr_of_crosslink_swaps_allowed_per_sliplink: Use to steer whether slip-links can cross cross-links when swapping is enabled.
+                  :param nr_of_crosslink_swaps_allowed_per_sliplink: Use to steer whether slip-links can cross crosslinks when swapping is enabled.
                   :param disable_slipping: Whether slip-links should be prohibited from slipping.
         """
     def set_displacements(self, arg0: numpy.ndarray) -> None:
@@ -1617,7 +1640,7 @@ class MEHPForceBalance:
 class MEHPForceBalance2:
     """
     
-         A small simulation tool for quickly minimizing the force between the cross-linker beads.
+         A small simulation tool for quickly minimizing the force between the crosslinker beads.
     
          This is the third implementation of the MEHP. 
          It's the fastest implementation by using a simple spring model only, disabling the non-linear
@@ -1639,7 +1662,7 @@ class MEHPForceBalance2:
                    Instantiate the simulator for a certain universe.
         
                    :param universe: The universe giving the basic connectivity to compute with
-                   :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
+                   :param crosslinker_type: The atom type of the crosslinkers. Needed to reduce the network.
                    :param is_2d: Whether to ignore the z direction.
                    :param kappa: The spring constant
                    :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
@@ -1652,7 +1675,7 @@ class MEHPForceBalance2:
         
                    :param universe: The universe giving the basic connectivity to compute with
                    :param entanglements: The entanglements to use in the computation
-                   :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
+                   :param crosslinker_type: The atom type of the crosslinkers. Needed to reduce the network.
                    :param is_2d: Whether to ignore the z direction.
                    :param entanglements_as_springs: whether to use the entanglements as springs instead of links
         """
@@ -1714,11 +1737,11 @@ class MEHPForceBalance2:
         """
     def get_coordinates(self) -> numpy.ndarray:
         """
-                     Get the current coordinates of the cross-linkers and entanglement links.
+                     Get the current coordinates of the crosslinkers and entanglement links.
         """
     def get_crosslinker_universe(self) -> Universe:
         """
-                   Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
+                   Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
         """
     def get_current_partial_spring_lengths(self) -> list[float]:
         """
@@ -1795,13 +1818,13 @@ class MEHPForceBalance2:
     def get_ids_of_active_nodes(self, tolerance: float = 0.001) -> list[int]:
         """
                    Get the atom ids of the nodes that are considered active.
-                   Only cross-link ids are returned (not e.g. entanglement links).
+                   Only crosslink ids are returned (not e.g. entanglement links).
         
                    :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
         """
     def get_initial_coordinates(self) -> numpy.ndarray:
         """
-                     Get the initial coordinates of the cross-linkers and entanglement links.
+                     Get the initial coordinates of the crosslinkers and entanglement links.
         """
     def get_nr_of_active_nodes(self, tolerance: float = 0.001) -> int:
         """
@@ -1945,7 +1968,7 @@ class MEHPForceEvaluator:
 class MEHPForceRelaxation:
     """
     
-        A small simulation tool for quickly minimizing the force between the cross-linker beads.
+        A small simulation tool for quickly minimizing the force between the crosslinker beads.
     
         This is the first of three force relaxation methods available in this library.
         The relevant feature of this implementation is the configurable spring potential.
@@ -1959,7 +1982,7 @@ class MEHPForceRelaxation:
                   Instantiate the simulator for a certain universe.
         
                   :param universe: The universe to simulate with
-                  :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
+                  :param crosslinker_type: The atom type of the crosslinkers. Needed to reduce the network.
                   :param is2d: Whether to ignore the z direction.
                   :param force_evaluator: The force evaluator to use
                   :param kappa: The spring constant
@@ -1999,7 +2022,7 @@ class MEHPForceRelaxation:
         """
     def get_active_chains(self, tolerance: float = 0.001) -> list[Molecule]:
         """
-                  Get the cross-linker chains that are active.
+                  Get the crosslinker chains that are active.
         """
     def get_average_spring_length(self) -> float:
         """
@@ -2008,7 +2031,7 @@ class MEHPForceRelaxation:
         """
     def get_crosslinker_universe(self) -> Universe:
         """
-                  Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
+                  Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
         """
     def get_dangling_weight_fraction(self, tolerance: float = 0.001) -> float:
         """
@@ -2196,7 +2219,12 @@ class Molecule:
                   Check whether a particular atom is contained in this molecule.
         """
     def __copy__(self) -> Molecule:
-        ...
+        """
+                 Create a copy of this molecule.
+                 
+                 Returns:
+                     A new Molecule instance that is a copy of this one
+        """
     def __eq__(self, arg0: Molecule) -> bool:
         ...
     def __getitem__(self, arg0: int) -> Atom:
@@ -2204,7 +2232,15 @@ class Molecule:
                Access an atom by its vertex index.
         """
     def __init__(self, arg0: Box, arg1: igraph_s, arg2: MoleculeType, arg3: dict[int, float]) -> None:
-        ...
+        """
+                 Construct a molecule from a graph structure.
+                 
+                 Parameters:
+                     box: The simulation box containing this molecule
+                     graph: Pointer to the igraph structure representing connectivity
+                     type: The type of molecule (see MoleculeType enum)
+                     mass_map: Map of atom types to their masses
+        """
     def __iter__(self) -> MoleculeIterator:
         """
                Iterate through the atoms in this molecule.
@@ -2216,7 +2252,10 @@ class Molecule:
         """
     def compute_bond_lengths(self) -> list[float]:
         """
-        Computes the length :math:`b` of each bond in the molecule, respecting periodic boundaries.
+                 Computes the length of each bond in the molecule, respecting periodic boundaries.
+                 
+                 Returns:
+                     A vector of bond lengths
         """
     def compute_end_to_end_distance(self) -> float:
         """
@@ -2280,12 +2319,18 @@ class Molecule:
         """
     def compute_total_length(self) -> float:
         """
-             Computes the sum of the lengths of all bonds.
-             In most cases, this is equal to the contour length.
+                 Computes the sum of the lengths of all bonds.
+                 In most cases, this is equal to the contour length.
+                 
+                 Returns:
+                     The total contour length of the molecule
         """
     def compute_total_mass(self) -> float:
         """
                     Computes the total mass of this molecule.
+                    
+                    Returns:
+                        The total mass of all atoms in this molecule
         """
     def compute_total_vector(self, crosslinker_type: int = 2, close_loop: bool = True) -> numpy.ndarray:
         """
@@ -2303,13 +2348,22 @@ class Molecule:
         """
                     Get an atom for a specific vertex.
         """
-    def get_atom_id_by_vertex_idx(self, vertex_idx: int) -> int:
+    def get_atom_id_by_vertex_idx(self, vertex_id: int) -> int:
         """
-                    Get the id of the atom by the vertex id of the underlying graph.
+                 Get the id of the atom by the vertex id of the underlying graph.
+                 
+                 Parameters:
+                     vertex_id: The vertex index in the underlying graph
+                     
+                 Returns:
+                     The atom ID corresponding to the vertex
         """
     def get_atom_types(self) -> list[int]:
         """
-        Query all types (each one for each atom) ordered by atom vertex id.
+                 Query all types (each one for each atom) ordered by atom vertex id.
+                 
+                 Returns:
+                     A vector of atom types in vertex order
         """
     def get_atoms(self) -> list[Atom]:
         """
@@ -2342,14 +2396,22 @@ class Molecule:
                     for example because of crosslinkers.
         
                     Use the `crosslinker_type` parameter to force the atoms in a primary loop 
-                    to start with the cross-link.
+                    to start with the crosslink.
         """
     def get_bonds(self) -> dict[str, list[int]]:
         """
                     Get all bonds. Returns a dict with three properties: 'bond_from', 'bond_to' and 'bond_type'.
         """
     def get_edge_ids_from(self, vertex_id: int) -> list[int]:
-        ...
+        """
+                 Get the edge ids incident to a specific vertex.
+                 
+                 Parameters:
+                     vertex_id: The vertex to query
+                     
+                 Returns:
+                     A vector of edge ids connected to the vertex
+        """
     def get_edge_ids_from_to(self, vertex_id_from: int, vertex_id_to: int) -> list[int]:
         """
               Get the edge ids of the edges between two specific vertices
@@ -2367,14 +2429,23 @@ class Molecule:
     def get_key(self) -> str:
         """
                     Get a unique identifier for this molecule.
+                    
+                    Returns:
+                        A unique string identifier for this molecule
         """
     def get_nr_of_atoms(self) -> int:
         """
-        Counts and returns the number of atoms associated with this molecule.
+                 Counts and returns the number of atoms associated with this molecule.
+                 
+                 Returns:
+                     The number of atoms in this molecule
         """
     def get_nr_of_bonds(self) -> int:
         """
-        Counts and returns the number of bonds associated with this molecule.
+                 Counts and returns the number of bonds associated with this molecule.
+                 
+                 Returns:
+                     The number of bonds in this molecule
         """
     def get_nr_of_edges_from_to(self, vertex_id_from: int, vertex_id_to: int, max_length: int = -1) -> int:
         """
@@ -2385,7 +2456,7 @@ class Molecule:
     def get_strand_ends(self, crosslinker_type: int = 2, close_loop: bool = False) -> list[Atom]:
         """
                   Get the ends of the given strand (= molecule).
-                  In case of a primary loop, the cross-link is returned, if there is one.
+                  In case of a primary loop, the crosslink is returned, if there is one.
                   Use the argument `close_loop` to decide, whether this should be returned once or twice.
         
                   NOTE: 
@@ -2400,7 +2471,13 @@ class Molecule:
         """
     def get_vertex_idx_by_atom_id(self, atom_id: int) -> int:
         """
-        Get the vertex index of the underlying graph for an atom with a specified id.
+                 Get the vertex id of the underlying graph for an atom with a specified id.
+                 
+                 Parameters:
+                     atom_id: The atom ID to look up
+                     
+                 Returns:
+                     The vertex index corresponding to the atom
         """
 class MoleculeIterator:
     """
@@ -2425,15 +2502,15 @@ class MoleculeType:
           
     
       PRIMARY_LOOP : 
-               A primary loop is a network strand looping from and to the same cross-linker.
+               A primary loop is a network strand looping from and to the same crosslinker.
           
     
       DANGLING_CHAIN : 
-               A dangling chain is a network strand where only one end is attached to a cross-linker.
+               A dangling chain is a network strand where only one end is attached to a crosslinker.
           
     
       FREE_CHAIN : 
-               A free chain is a strand not connected to any cross-linker.
+               A free chain is a strand not connected to any crosslinker.
           
     """
     DANGLING_CHAIN: typing.ClassVar[MoleculeType]  # value = <MoleculeType.DANGLING_CHAIN: 3>
@@ -2470,11 +2547,21 @@ class MoleculeType:
         ...
 class NeighbourList:
     """
-    Gives access to somewhat fast queries on the neighbourhood of atoms
+    
+        Gives access to somewhat fast queries on the neighbourhood of atoms.
+        
+        This class provides efficient spatial queries for finding atoms within
+        a specified distance of each other.
+        
     """
     def __init__(self, atoms: list[Atom], box: Box, cutoff: float) -> None:
         """
-        Instantiates a new neighbour list
+                 Instantiates a new neighbour list.
+                 
+                 Parameters:
+                     atoms: Vector of atoms to include in the neighbour list
+                     box: The simulation box
+                     cutoff: Maximum distance for neighbour searches
         """
     def get_atoms_close_to(self, atom: Atom, upper_cutoff: float = 1.0, lower_cutoff: float = 0.0, unwrapped: bool = False, expect_self: bool = False) -> list[Atom]:
         """
@@ -2490,9 +2577,13 @@ class NeighbourList:
         """
     def remove_atom(self, atom: Atom, debug_hint: str = '') -> None:
         """
-                  Remove an atom from this neighbour list.
-                  It will not show up when querying for neighbours, 
-                  but its neighbours cannot be queried either.
+                 Remove an atom from this neighbour list.
+                 It will not show up when querying for neighbours, 
+                 but its neighbours cannot be queried either.
+                 
+                 Parameters:
+                     atom: The atom to remove
+                     debug_hint: Optional debug information
         """
 class NoMaxDistanceProvider(MaxDistanceProvider):
     """
@@ -2511,7 +2602,7 @@ class NonGaussianSpringForceEvaluator(MEHPForceEvaluator):
     
          The force for a certain spring is given by:
          :math:`f = 0.5 \\cdot \\\\frac{1}{l} \\scriptL^{-1}(\\frac{r}{N\\cdot l})`,
-         where :math:`r` is the spring [between cross-linkers] length
+         where :math:`r` is the spring [between crosslinkers] length
          and :math:`\\scriptL^{-1}` the inverse langevin function.
     
          Please note that the inverse langevin is only approximated.
@@ -2735,7 +2826,7 @@ class SimpleSpringMEHPForceEvaluator(MEHPForceEvaluator):
     
          The force for a certain spring is given by:
          :math:`f = 0.5 \\cdot \\kappa r`,
-         where :math:`r` is the spring [between cross-linkers] length.
+         where :math:`r` is the spring [between crosslinkers] length.
     
          Recommended optimization algorithm: "LD_LBFGS"
     
@@ -2825,7 +2916,7 @@ class SimplifiedBalanceNetwork:
          Consists usually only of the cross- and slip-links.
     
          Assumed terminology: a spring is approximately a strand/chain,
-         whereas a partial spring is the spring between a cross-link and an entanglement-link (slip-link).
+         whereas a partial spring is the spring between a crosslink and an entanglement-link (slip-link).
      
     """
     @property
@@ -2949,7 +3040,7 @@ class StructureSimplificationMode:
     
       NO_SIMPLIFICATION : No Simplification
     
-      X2F_ONLY : Two-function cross-links only
+      X2F_ONLY : Two-function crosslinks only
     
       INACTIVE_ONLY : Inactive links only
     
@@ -2991,14 +3082,24 @@ class StructureSimplificationMode:
         ...
 class Universe:
     """
-    Represents a full Polymer Network structure, a collection of molecules.
+    
+        Represents a full Polymer Network structure, a collection of molecules.
+        
+        This is the main class for representing molecular systems, containing
+        atoms, bonds, angles, and the simulation box.
+        
     """
     def __contains__(self, arg0: Atom) -> bool:
         """
                   Check whether a particular atom is contained in this universe.
         """
     def __copy__(self) -> Universe:
-        ...
+        """
+                 Create a copy of this universe.
+                 
+                 Returns:
+                     A new Universe instance that is a copy of this one
+        """
     def __getitem__(self, arg0: int) -> Atom:
         """
                Access an atom by its vertex index.
@@ -3007,7 +3108,12 @@ class Universe:
         ...
     def __init__(self, Lx: float, Ly: float, Lz: float) -> None:
         """
-        Instantiate this Universe (Collection of Molecules) providing the box lengths.
+                 Instantiate this Universe (Collection of Molecules) providing the box lengths.
+                 
+                 Parameters:
+                     Lx: Box length in x direction
+                     Ly: Box length in y direction
+                     Lz: Box length in z direction
         """
     def __len__(self) -> int:
         """
@@ -3017,53 +3123,127 @@ class Universe:
         ...
     def add_angles(self, angles_from: list[int], angles_via: list[int], angles_to: list[int], angle_types: list[int]) -> None:
         """
-        Add angles to the Universe. No relation to the underlying graph, just a method to preserve read & write capabilities
+                 Add angles to the Universe. No relation to the underlying graph, 
+                 just a method to preserve read & write capabilities.
+                 
+                 Parameters:
+                     angles_from: Vector of atom IDs for angle start points
+                     angles_via: Vector of atom IDs for angle middle points
+                     angles_to: Vector of atom IDs for angle end points
+                     angle_types: Vector of angle types
         """
     def add_atoms(self, ids: list[int], types: list[int], x: list[float], y: list[float], z: list[float], nx: list[int], ny: list[int], nz: list[int]) -> None:
         """
-        Add atoms to the Universe, vertices to the underlying graph.
+                 Add atoms to the Universe, vertices to the underlying graph.
+                 
+                 Parameters:
+                     ids: Vector of atom IDs
+                     types: Vector of atom types
+                     x: Vector of x coordinates
+                     y: Vector of y coordinates
+                     z: Vector of z coordinates
+                     nx: Vector of periodic image flags in x direction
+                     ny: Vector of periodic image flags in y direction
+                     nz: Vector of periodic image flags in z direction
         """
     @typing.overload
     def add_bonds(self, bonds_from: list[int], bonds_to: list[int]) -> None:
         """
-        Add bonds to the underlying atoms, edges to the underlying graph. If the connected atoms are not found, the bonds are silently skipped.
+                 Add bonds to the underlying atoms, edges to the underlying graph. 
+                 If the connected atoms are not found, the bonds are silently skipped.
+                 
+                 Parameters:
+                     bonds_from: Vector of atom IDs for bond start points
+                     bonds_to: Vector of atom IDs for bond end points
         """
     @typing.overload
     def add_bonds(self, nr_of_bonds: int, bonds_from: list[int], bonds_to: list[int], bond_types: list[int], ignore_non_existent_atoms: bool = False, simplify_universe: bool = True) -> None:
         """
-        Add bonds to the underlying atoms, edges to the underlying graph. 
+                 Add bonds to the underlying atoms, edges to the underlying graph.
+                 
+                 Parameters:
+                     nr_of_bonds: Number of bonds to add
+                     bonds_from: Vector of atom IDs for bond start points
+                     bonds_to: Vector of atom IDs for bond end points
+                     bond_types: Vector of bond types
+                     ignore_non_existent_atoms: Whether to skip bonds to non-existent atoms
+                     simplify_universe: Whether to simplify the universe after adding bonds
         """
     def add_bonds_with_types(self, bonds_from: list[int], bonds_to: list[int], bond_types: list[int]) -> None:
         """
-        Add bonds to the underlying atoms, edges to the underlying graph. If the connected atoms are not found, the bonds are silently skipped.
+                 Add bonds to the underlying atoms, edges to the underlying graph. 
+                 If the connected atoms are not found, the bonds are silently skipped.
+                 
+                 Parameters:
+                     bonds_from: Vector of atom IDs for bond start points
+                     bonds_to: Vector of atom IDs for bond end points
+                     bond_types: Vector of bond types
         """
     def add_dihedral_angles(self, angles_from: list[int], angles_via1: list[int], angles_via2: list[int], angles_to: list[int], angle_types: list[int]) -> None:
         """
-        Add dihedral angles to the Universe. No relation to the underlying graph, just a method to preserve read & write capabilities
+                 Add dihedral angles to the Universe. No relation to the underlying graph, 
+                 just a method to preserve read & write capabilities.
+                 
+                 Parameters:
+                     angles_from: Vector of atom IDs for dihedral start points
+                     angles_via1: Vector of atom IDs for first middle points
+                     angles_via2: Vector of atom IDs for second middle points
+                     angles_to: Vector of atom IDs for dihedral end points
+                     angle_types: Vector of dihedral angle types
         """
     def compute_angles(self) -> list[float]:
         """
-        Computes the angle :math:`\\theta` of each angle in the molecule, respecting periodic boundaries.
+                 Computes the angle of each angle in the molecule, respecting periodic boundaries.
+                 
+                 Returns:
+                     A list of angle values in radians
         """
     def compute_bond_lengths(self) -> list[float]:
         """
-        Computes the length :math:`b` of each bond in the molecule, respecting periodic boundaries.
+                 Computes the length of each bond in the molecule, respecting periodic boundaries.
+                 
+                 Returns:
+                     A list of bond lengths
         """
     def compute_bond_vectors(self) -> list[numpy.ndarray]:
         """
-        Computes the vectors :math:`\\vec{b}` of each bond in the molecule, respecting periodic boundaries.
+                 Computes the vectors of each bond in the molecule, respecting periodic boundaries.
+                 
+                 Returns:
+                     A list of bond vectors
         """
     def compute_dxs(self, atomIdsTo: list[int], atomIdsFrom: list[int]) -> list[float]:
         """
-        Compute the dx distance for certain bonds (length in x direction).
+                 Compute the dx distance for certain bonds (length in x direction).
+                 
+                 Parameters:
+                     atomIdsTo: Vector of destination atom IDs
+                     atomIdsFrom: Vector of source atom IDs
+                     
+                 Returns:
+                     Vector of x-direction distances
         """
     def compute_dys(self, atomIdsTo: list[int], atomIdsFrom: list[int]) -> list[float]:
         """
-        Compute the dy distance for certain bonds (length in y direction).
+                 Compute the dy distance for certain bonds (length in y direction).
+                 
+                 Parameters:
+                     atomIdsTo: Vector of destination atom IDs
+                     atomIdsFrom: Vector of source atom IDs
+                     
+                 Returns:
+                     Vector of y-direction distances
         """
     def compute_dzs(self, atomIdsTo: list[int], atomIdsFrom: list[int]) -> list[float]:
         """
-        Compute the dz distance for certain bonds (length in z direction).
+                 Compute the dz distance for certain bonds (length in z direction).
+                 
+                 Parameters:
+                     atomIdsTo: Vector of destination atom IDs
+                     atomIdsFrom: Vector of source atom IDs
+                     
+                 Returns:
+                     Vector of z-direction distances
         """
     def compute_end_to_end_distances(self, crosslinker_type: int, derive_image_flags: bool = False) -> list[float]:
         """
@@ -3087,7 +3267,7 @@ class Universe:
         """
     def compute_mean_squared_end_to_end_distance(self, crosslinker_type: int, only_those_with_two_crosslinkers: bool = False, derive_image_flags: bool = False) -> float:
         """
-                  Computes the mean square of the end-to-end distances of each strand (incl. cross-links) in the network.
+                  Computes the mean square of the end-to-end distances of each strand (incl. crosslinks) in the network.
         
                   NOTE:
                        Internally, this uses either :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance` 
@@ -3104,7 +3284,7 @@ class Universe:
                       Compute the number average molecular weight.
         
                       NOTE: 
-                            Cross-linkers are ignored completely.
+                            Crosslinkers are ignored completely.
         """
     def compute_polydispersity_index(self, crosslinker_type: int) -> float:
         """
@@ -3125,7 +3305,7 @@ class Universe:
                       Compute the weight average molecular weight.
         
                       NOTE: 
-                            Cross-linkers are ignored completely.
+                            Crosslinkers are ignored completely.
         """
     def compute_weight_fractions(self) -> dict[int, float]:
         """
@@ -3193,21 +3373,26 @@ class Universe:
                     The primary index specifies the degree of the loop.
         
                     CAUTION:
-                       There are exponentially many paths between two cross-linkers of a network,
+                       There are exponentially many paths between two crosslinkers of a network,
                        and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
                        You can use the `max_length` parameter to restrict the algorithm to only search for loops up to a certain length.
                        Use a negative value to find all loops and paths.
         """
     def find_minimal_order_loop_from(self, loop_start: int, loop_step1: int, max_length: int = -1, skip_self_loops: bool = False) -> list[Atom]:
         """
-                    Decompose the Universe into loops.
-                    The primary index specifies the degree of the loop.
+                    Find the loops in the network starting with one connection
         
                     CAUTION:
-                       There are exponentially many paths between two cross-linkers of a network,
+                       There are exponentially many paths between two crosslinkers of a network,
                        and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
                        You can use the `max_length` parameter to restrict the algorithm to only search for loops up to a certain length.
                        Use a negative value to find all loops and paths.
+        
+                  Parameters:
+                       loop_start: The atom id to start the search from
+                       loop_step1: The first step to take, i.e., the first bond to follow
+                       max_length: The maximum length of the loop to find, or -1 for no limit
+                       skip_self_loops: Whether to skip self-loops (i.e., loops that start and end at the same atom; only relevant if `loop_start` is equal to `loop_step1`).
         """
     def get_angles(self) -> dict[str, list[int]]:
         """
@@ -3221,7 +3406,13 @@ class Universe:
         """
     def get_atom(self, atom_id: int) -> Atom:
         """
-        Find an atom by its ID.
+                 Find an atom by its ID.
+                 
+                 Parameters:
+                     atom_id: The ID of the atom to find
+                     
+                 Returns:
+                     The atom with the specified ID
         """
     def get_atom_by_vertex_id(self, vertex_id: int) -> Atom:
         """
@@ -3229,7 +3420,13 @@ class Universe:
         """
     def get_atom_id_by_vertex_idx(self, vertex_id: int) -> int:
         """
-        Get the id of the atom by the vertex id of the underlying graph.
+                 Get the id of the atom by the vertex id of the underlying graph.
+                 
+                 Parameters:
+                     vertex_id: The vertex index in the underlying graph
+                     
+                 Returns:
+                     The atom ID corresponding to the vertex
         """
     def get_atom_types(self) -> list[int]:
         """
@@ -3268,13 +3465,13 @@ class Universe:
         """
     def get_chains_with_crosslinker(self, crosslinker_type: int) -> list[Molecule]:
         """
-                    Decompose the Universe into strands (molecules, which could be either chains, or even lonely atoms), without omitting the cross-linkers
+                    Decompose the Universe into strands (molecules, which could be either chains, or even lonely atoms), without omitting the crosslinkers
                     (as in :func:`~pylimer_tools_cpp.Universe.getMolecules(crosslinker_type)`).
-                    In turn, e.g. for a tetrafunctional cross-linker, it will be 4 times in the resulting molecules.
+                    In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resulting molecules.
                     
                     NOTE:
-                       Cross-linkers without bonds to non-cross-linkers are not returned 
-                       (i.e., single cross-linkers, are not counted as strands).
+                       Crosslinkers without bonds to non-crosslinkers are not returned 
+                       (i.e., single crosslinkers, are not counted as strands).
         """
     def get_clusters(self) -> list[Universe]:
         """
@@ -3309,10 +3506,13 @@ class Universe:
                   Reduces the Universe to a list of molecules. 
                   Specify the crosslinker_type to an existing type id, 
                   then those atoms will be omitted, and this function returns chains instead.
+        
+                  Arguments:
+                      atom_type_to_omit: The type of atom to omit from the universe to end up with the desired molecules (e.g., the type of the crosslinkers).
         """
     def get_network_of_crosslinker(self, crosslinker_type: int) -> Universe:
         """
-                    Reduce the network to contain only cross-linkers, replacing all the strands with a single bond.
+                    Reduce the network to contain only crosslinkers, replacing all the strands with a single bond.
                     Useful e.g. to reduce the memory useage and runtime of 
                     :func:`~pylimer_tools_cpp.Universe.findLoops()` or 
                     :func:`~pylimer_tools_cpp.Universe.hasInfiniteStrand()`.
@@ -3359,7 +3559,13 @@ class Universe:
         """
     def get_vertex_idx_by_atom_id(self, atom_id: int) -> int:
         """
-        Get the vertex id of the underlying graph for an atom with a specified id.
+                 Get the vertex id of the underlying graph for an atom with a specified id.
+                 
+                 Parameters:
+                     atom_id: The atom ID to look up
+                     
+                 Returns:
+                     The vertex index corresponding to the atom
         """
     def get_volume(self) -> float:
         """
@@ -3367,10 +3573,10 @@ class Universe:
         """
     def has_infinite_strand(self, arg0: int, arg1: int) -> bool:
         """
-                   Checks whether there is a strand (with cross-linker) in the universe that loops through periodic images without coming back.
+                   Checks whether there is a strand (with crosslinker) in the universe that loops through periodic images without coming back.
                    
                     CAUTION:
-                       There are exponentially many paths between two cross-linkers of a network,
+                       There are exponentially many paths between two crosslinkers of a network,
                        and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
         """
     def hash_angle_type(self, angle_from: int, angle_via: int, angle_to: int) -> int:
@@ -3388,9 +3594,18 @@ class Universe:
                   Get more or less edges than currently present, interpolating between junctions.
         """
     def remove_all_angles(self) -> None:
-        ...
+        """
+                  Remove all angles from the Universe. 
+                  This will not remove the atoms or bonds, just the angles.
+                  
+                  CAUTION:
+                    This will not remove dihedral angles, use :func:`~pylimer_tools_cpp.Universe.removeAllDihedralAngles` for that.
+        """
     def remove_all_dihedral_angles(self) -> None:
-        ...
+        """
+                  Remove all dihedral angles from the Universe. 
+                  This will not remove the atoms or bonds, just the stored dihedral angles.
+        """
     def remove_atoms(self, atom_ids: list[int]) -> None:
         """
                   Remove atoms and all associated bonds by their atom ids. 
@@ -3423,15 +3638,25 @@ class Universe:
         """
     def set_mass(self, atom_type: int, mass: float) -> None:
         """
-        Set the mass for a specific atom type.
+                 Set the mass for a specific atom type.
+                 
+                 Parameters:
+                     atom_type: The atom type to set mass for
+                     mass: The mass value to assign
         """
     def set_masses(self, mass_per_type: dict[int, float]) -> None:
         """
-        Set the mass per type of atom.
+                 Set the mass per type of atom.
+                 
+                 Parameters:
+                     mass_per_type: Map of atom types to their masses
         """
     def set_timestep(self, timestep: int) -> None:
         """
-        Set the time-step when this Universe was captured.
+                 Set the time-step when this Universe was captured.
+                 
+                 Parameters:
+                     timestep: The timestep value
         """
     def set_vertex_property(self, vertex_id: int, property_name: str, value: float) -> None:
         """
@@ -3439,7 +3664,11 @@ class Universe:
         """
     def simplify(self) -> None:
         """
-        Remove self links and double bonds. This function is called automatically after adding bonds.
+                 Remove self links and double bonds. This function is called 
+                 automatically after adding bonds.
+                 
+                 This operation cleans up the graph structure by removing
+                 redundant connections.
         """
 class UniverseSequence:
     """
@@ -3457,10 +3686,20 @@ class UniverseSequence:
     """
     def __getitem__(self, arg0: int) -> Universe:
         """
-        Get a universe by its index.
+              Get a universe by its index.
+              
+              Parameters:
+                  index: The index of the universe to retrieve
+                  
+              Returns:
+                  The Universe at the specified index
         """
     def __init__(self) -> None:
-        ...
+        """
+                 Construct an empty UniverseSequence.
+                 
+                 Use initialization methods to populate it with data.
+        """
     def __iter__(self) -> LazyUniverseSequenceIterator:
         """
                    Lazily (memory-efficiently) iterate through all the universes in this sequence.
@@ -3482,11 +3721,21 @@ class UniverseSequence:
         """
     def __len__(self) -> int:
         """
-        Get the number of universes
+                 Get the number of universes in this sequence.
+                 
+                 Returns:
+                     The total number of universes available
         """
     def at_index(self, index: int) -> Universe:
         """
-        Get the Universe at the given index (as of in the sequence given by the dump file).
+                 Get the Universe at the given index (as of in the sequence given 
+                 by the dump file).
+                 
+                 Parameters:
+                     index: The index of the universe to retrieve
+                     
+                 Returns:
+                     The Universe at the specified index
         """
     def compute_distance_autocorrelation_from_to(self, atom_ids_from: list[int], atom_ids_to: list[int], nr_of_origins: int = 25, reduce_memory: bool = False) -> dict[int, float]:
         """
@@ -3526,10 +3775,12 @@ class UniverseSequence:
                     Get all universes initialized back in a list.
                     For big dump files or lots of data files, this might lead to memory issues.
                     Use :func:`~pylimer_tools_cpp.UniverseSequence.__iter__`
-                    to have
                     or :func:`~pylimer_tools_cpp.UniverseSequence.atIndex`
                     and :func:`~pylimer_tools_cpp.UniverseSequence.forgetAtIndex`
                     to craft a more memory-efficient retrieval mechanism.
+                    
+                    Returns:
+                        A list of all Universe objects in the sequence
         """
     def get_length(self) -> int:
         """
@@ -3549,7 +3800,10 @@ class UniverseSequence:
         """
     def next(self) -> Universe:
         """
-        Get the Universe that's next in the sequence.
+                 Get the Universe that's next in the sequence.
+                 
+                 Returns:
+                     The next Universe in the sequence
         """
     def reset_iterator(self) -> None:
         """
@@ -3632,7 +3886,7 @@ def randomly_sample_entanglements(universe: Universe, nr_of_samples: int, upper_
         :param crosslinker_type: The type of crosslinker to consider when finding entanglements. Used for the splitting into strands.
         :param ignore_crosslinks: Whether to ignore crosslinks when finding entanglements. 
           Careful: if you don't ignore them, the same-strand policy might not work correctly, 
-          since each cross-link should actually be associated with more than one strand.
+          since each crosslink should actually be associated with more than one strand.
         :param filter_dangling_and_soluble: Whether to filter out dangling chains and soluble crosslinks when finding entanglements.
           This means, entanglements involving an obviously (1st order) dangling or soluble chain are 
     """
@@ -3644,3 +3898,4 @@ def version_information() -> str:
     """
         Returns  a string of the the current version, incl. git hash and date of compilation.
     """
+__version__: str = ''

@@ -675,7 +675,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
             Catch::Approx(((double)(3 + 1 + 1)) / 3.0));
     }
 
-    SECTION("Reduction to Cross-linker-verse works")
+    SECTION("Reduction to Crosslinker-verse works")
     {
       pe::Universe reducedUniverse = universe.getNetworkOfCrosslinker(2);
       REQUIRE(reducedUniverse.getNrOfAtoms() == 3);
@@ -902,8 +902,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
         }
         CHECK(universe2.computePolydispersityIndex(-1) == Catch::Approx(1.0));
       }
-      // add cross-linkers
-      SECTION("With cross-linkers")
+      // add crosslinkers
+      SECTION("With crosslinkers")
       {
         std::vector<int> type2 = getVectorWithOne(2);
         for (size_t i = 0; i < 10; ++i) {

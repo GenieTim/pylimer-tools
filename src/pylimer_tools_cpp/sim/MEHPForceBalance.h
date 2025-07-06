@@ -544,7 +544,7 @@ public:
   }
 
   /**
-   * @brief Remove cross-linkers, springs and associated slip-links with the
+   * @brief Remove crosslinkers, springs and associated slip-links with the
    * scheme suggested by Andrei
    *
    * @param net
@@ -673,7 +673,7 @@ public:
                          const size_t linkIdx);
 
   /**
-   * @brief Merge two springs around a given cross-link
+   * @brief Merge two springs around a given crosslink
    *
    * @param net
    * @param springPartitions
@@ -686,7 +686,7 @@ public:
                     const size_t linkToReduce) const;
 
   /**
-   * @brief Merge two springs around a given cross-link
+   * @brief Merge two springs around a given crosslink
    *
    * This does not require the resulting network to be valid.
    *
@@ -763,7 +763,7 @@ public:
    * @param minimumNrOfSliplinks the minimum number of slip-links to sample
    * @param sameStrandCutoff the number of beads required between two atoms on
    * the same strand
-   * @param excludeCrosslinks whether to exclude cross-link atoms when sampling.
+   * @param excludeCrosslinks whether to exclude crosslink atoms when sampling.
    * @param seed
    * @return size_t the nr of actually added slip-links
    */
@@ -869,9 +869,9 @@ public:
   }
 
   /**
-   * @brief Get the universe consisting of cross-linkers only
+   * @brief Get the universe consisting of crosslinkers only
    *
-   * @param newCrosslinkerType the type to give the cross-linkers
+   * @param newCrosslinkerType the type to give the crosslinkers
    * @return pylimer_tools::entities::Universe
    */
   pylimer_tools::entities::Universe getCrosslinkerVerse() const;
@@ -1104,7 +1104,7 @@ public:
     }
 
     // as of now, the springsContourLength is equal to the number of bonds
-    // from cross-link to cross-link. therefore, the number of atoms of each
+    // from crosslink to crosslink. therefore, the number of atoms of each
     // of these springs is one less
     Eigen::ArrayXd allActiveAtomsPerChains =
       activeSprings.cast<double>() * (net->springsContourLength.array() -
@@ -2404,7 +2404,7 @@ protected:
     const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
   /**
-   * @brief Compute the force acting on a slip- or cross-link
+   * @brief Compute the force acting on a slip- or crosslink
    *
    * TODO: use "global" partial distances
    *
@@ -2424,7 +2424,7 @@ protected:
     const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
   /**
-   * @brief Compute the stress acting on a slip- or cross-link
+   * @brief Compute the stress acting on a slip- or crosslink
    *
    * TODO: use "global" partial distances
    *
@@ -2978,7 +2978,7 @@ protected:
 
   /**
    * @brief Get the partial spring indices of all involved springs
-   * from one cross-link to another cross-link, jumping all entanglement
+   * from one crosslink to another crosslink, jumping all entanglement
    * beads.
    *
    * @return std::vector<size_t>
@@ -3004,7 +3004,7 @@ protected:
 
   /**
    * @brief Get all "full" spring indices (jumping entanglements) of a
-   * particular cross-link.
+   * particular crosslink.
    *
    * @param net
    * @param nodeIdx
@@ -3014,10 +3014,9 @@ protected:
     const ForceBalanceNetwork& net,
     const size_t nodeIdx) const
   {
-    INVALIDARG_EXP_IFN(!net.linkIsSliplink[nodeIdx],
-                       "Link must be cross-link.");
+    INVALIDARG_EXP_IFN(!net.linkIsSliplink[nodeIdx], "Link must be crosslink.");
     INVALIDARG_EXP_IFN(net.oldAtomTypes[nodeIdx] != this->entanglementType,
-                       "Link must be cross-link.");
+                       "Link must be crosslink.");
 
     std::vector<size_t> result;
     for (const size_t springIdx : net.springIndicesOfLinks[nodeIdx]) {
@@ -3033,7 +3032,7 @@ protected:
 
   /**
    * @brief Get the full spring indices of all involved springs
-   * from one cross-link to another cross-link, jumping all entanglement
+   * from one crosslink to another crosslink, jumping all entanglement
    * beads.
    *
    * @return std::vector<size_t>
@@ -3096,7 +3095,7 @@ protected:
 
   /**
    * @brief Get the indices of all involved entanglement beads
-   * from one cross-link to another cross-link, jumping all entanglement
+   * from one crosslink to another crosslink, jumping all entanglement
    * beads.
    *
    * @return std::vector<size_t>
@@ -3167,7 +3166,7 @@ protected:
 #endif
     INVALIDARG_EXP_IFN(sourcePartialSpringIdx != targetPartialSpringIdx,
                        "Source and target must be different when moving "
-                       "from one cross-link branch to another.");
+                       "from one crosslink branch to another.");
 
     const size_t involvedSlipLink =
       net.linkIsSliplink[net.springPartIndexA[sourcePartialSpringIdx]]
@@ -3236,7 +3235,7 @@ protected:
     // ... and add it to another
     // assert(currentPartialSpringTargetIdx >= 0);
     // std::cout << "Handling moving link " << involvedSlipLink
-    //           << " around cross-link " << involvedCrosslink
+    //           << " around crosslink " << involvedCrosslink
     //           << " from partial " << partialSpringIdx << " to "
     //           << targetPartialSpringIdx << std::endl;
 

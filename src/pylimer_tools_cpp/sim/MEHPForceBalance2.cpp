@@ -217,7 +217,7 @@ MEHPForceBalance2::MEHPForceBalance2(
           addSpring = true;
         } else if (vertexDegrees[currentVertex] > 2 ||
                    vertexDegrees[currentVertex] == 1) {
-          // 3. cross-link/end
+          // 3. crosslink/end
           addNewLink = true;
           addSpring = true;
           // close the previous strand, start a new strand
@@ -932,7 +932,7 @@ MEHPForceBalance2::runForceRelaxation(
       if (simplificationMode == StructureSimplificationMode::INACTIVE_ONLY ||
           simplificationMode == StructureSimplificationMode::ALL_TIM) {
 #ifdef DEBUG_REMOVAL
-        std::cout << "Checking and possibly removing inactive cross-links"
+        std::cout << "Checking and possibly removing inactive crosslinks"
                   << std::endl;
 #endif
 
@@ -959,7 +959,7 @@ MEHPForceBalance2::runForceRelaxation(
       if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
           simplificationMode == StructureSimplificationMode::ALL_TIM) {
 #ifdef DEBUG_REMOVAL
-        std::cout << "Checking and possibly removing cross-links with f = 2"
+        std::cout << "Checking and possibly removing crosslinks with f = 2"
                   << std::endl;
 #endif
         nRemovedThisLoop += this->unlinkBifunctionalLinks(
@@ -1603,7 +1603,7 @@ MEHPForceBalance2::mergeSpringsWithoutRemoval(ForceBalance2Network& net,
          net.linkIndicesOfStrand[keptStrandIdx].size());
   assert(!pylimer_tools::utils::contains(
     net.springIndicesOfStrand[keptStrandIdx], removedSpringIdx));
-  // end is relevant, as the unlinked link, in the case of a cross-link,
+  // end is relevant, as the unlinked link, in the case of a crosslink,
   // could have been involved in the same strand twice, as both ends.
   const bool linkIsEnd =
     net.linkIndicesOfStrand[keptStrandIdx].back() == linkToReduce ||
@@ -2664,7 +2664,7 @@ MEHPForceBalance2::computeActiveWeightFraction(ForceBalance2Network& net,
 
   // we re-assign the active links and springs
   // this is due to some topological peculiarities:
-  // for example, if we have an entanglement link a and a cross-link b,
+  // for example, if we have an entanglement link a and a crosslink b,
   // it's possible to have a scenario …-a-b-a-…, in which case these two
   // springs would otherwise be considered inactive,
   // even though they should belong to the active fraction.
@@ -2847,7 +2847,7 @@ MEHPForceBalance2::getIndicesOfActiveNodes(const ForceBalance2Network& net,
 };
 
 /**
- * @brief Get the atom ids of the active cross-links (not entanglement
+ * @brief Get the atom ids of the active crosslinks (not entanglement
  * beads/links)
  *
  * @param tolerance the tolerance: springs under a certain length are
@@ -3393,7 +3393,7 @@ MEHPForceBalance2::validateNetwork(const ForceBalance2Network& net,
       } else {
         RUNTIME_EXP_IFN(net.linkIsEntanglement[link_idx] ==
                           ((j != 0) && (j != (links.size() - 1))),
-                        "Cross-links must be first and last in a spring, "
+                        "Crosslinks must be first and last in a spring, "
                         "entanglements in-between. Found discrepancy at " +
                           std::to_string(j) + "/" +
                           std::to_string(links.size()) + " in spring " +

@@ -12,7 +12,7 @@
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
         //"[MEHPForceBalance2]"
-        "DPD Simulator's restart files are accurate"
+        "All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and Simplification"
       ],
       "env": {
         "MallocNanoZone": "0",

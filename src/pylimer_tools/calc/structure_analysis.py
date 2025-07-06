@@ -23,7 +23,7 @@ def compute_stoichiometric_imbalance(
 ) -> float:
     """
     Compute the stoichiometric imbalance
-    ( nr. of bonds formable of cross-linker / (nr. of bonds formable of precursor chains) )
+    ( nr. of bonds formable of crosslinker / (nr. of bonds formable of precursor chains) )
 
     r > 1 means an excess of crosslinkers, whereas r = 0 implies that there are not crosslinkers in the network.
 
@@ -39,7 +39,7 @@ def compute_stoichiometric_imbalance(
         If `None`: will use max functionality per type.
     :param ignore_types: A list of integers, the types to ignore for the imbalance (e.g. solvent atom types)
     :param effective: Whether to use the effective functionality (if functionality_per_type is not passed)
-        or the maximum functionality of the cross-linkers.
+        or the maximum functionality of the crosslinkers.
     :return: The stoichiometric imbalance. If the network is empty, or no crosslinkers are present 0. is returned.
     :rtype: float
     """
@@ -54,7 +54,7 @@ def compute_stoichiometric_imbalance(
     ):
         functionality_per_type = None
         warnings.warn(
-            "Cross-link's atom type not found in functionality_per_type, "
+            "Crosslink's atom type not found in functionality_per_type, "
             + "will ignore passed argument `functionality_per_type`."
         )
 
@@ -107,8 +107,8 @@ def compute_extent_of_reaction(
         - if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
           this will not be rounded/respected in any way
         - if the system contains solvent or other molecules that should not be binding to
-          cross-linkers, make sure to remove them before calling this function
-        - if you have multiple cross-linker types, be sure to replace them by one type only
+          crosslinkers, make sure to remove them before calling this function
+        - if you have multiple crosslinker types, be sure to replace them by one type only
 
     :param network: The polymer network to do the computation for
     :param crosslinker_type: The atom type of crosslinker beads
@@ -128,7 +128,7 @@ def compute_extent_of_reaction(
     ):
         functionality_per_type = None
         warnings.warn(
-            "Cross-linker type {} not found in passed functionality_per_type, ".format(
+            "Crosslinker type {} not found in passed functionality_per_type, ".format(
                 crosslinker_type
             )
             + "will ignore passed argument `functionality_per_type`."
