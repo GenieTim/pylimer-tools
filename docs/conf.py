@@ -83,6 +83,12 @@ sphinx_gallery_conf = {
     "examples_dirs": "../examples",  # path to your example scripts
     "gallery_dirs": "auto_examples",  # path to where to save gallery generated output
     "show_signature": True,
+    "backreferences_dir": "gen_modules/backreferences",
+    "doc_module": ("pylimer_tools_cpp", "pylimer_tools"),
+    "reference_url": {
+        "pylimer_tools_cpp": None,
+        "pylimer_tools": None,
+    },
 }
 
 intersphinx_mapping = get_intersphinx_mapping(
@@ -134,15 +140,12 @@ html_theme = "furo"
 
 # Theme-specific options
 html_theme_options = {
-    "sidebar_hide_name": True,
+    "sidebar_hide_name": False,
     "navigation_with_keys": True,
     "top_of_page_buttons": ["view", "edit"],
     "source_repository": "https://github.com/GenieTim/pylimer-tools",
     "source_branch": "main",
     "source_directory": "docs/",
-    "logo": {
-        "text": "pylimer-tools",
-    },
     "secondary_sidebar_items": ["page-toc", "sg_download_links", "sg_launcher_links"],
 }
 

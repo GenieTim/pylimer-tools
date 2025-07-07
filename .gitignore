@@ -146,6 +146,7 @@ output*.txt
 
 docs/_autosummary
 docs/auto_examples
+docs/gen_modules
 pylimer_tools_lcoverage.info
 
 # too large input files
