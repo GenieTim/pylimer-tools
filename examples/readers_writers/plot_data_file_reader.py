@@ -37,7 +37,7 @@ sequence.initialize_from_data_sequence(
         ),
         os.path.join(
             base_structure_path,
-            "3d-diamond-lattice_10x10x10_a_3_d_0.85_v_0.V-fixed.structure.outt",
+            "3d-diamond-lattice_10x10x10_a_3_d_0.85_v_0.V-fixed.structure.out",
         ),
     ]
 )

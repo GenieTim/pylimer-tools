@@ -27,7 +27,7 @@ from pylimer_tools.io.read_lammps_output_file import read_log_file
 log_file = os.path.join(
     os.getcwd(),
     "../..",
-    "tests/pylimer_tools/fixtures/trajectory/log.lammps",
+    "tests/pylimer_tools/fixtures/log.lammps",
 )
 thermo_data = read_log_file(log_file)
 

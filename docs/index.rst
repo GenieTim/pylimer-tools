@@ -65,8 +65,6 @@ Basic usage example:
 
    nomenclature
    assumptions
-   readers_writers
-   network_generator
    auto_examples/index
 
 .. toctree::
@@ -96,7 +94,7 @@ Basic usage example:
 - **New to pylimer-tools?** Start with :doc:`installation` and :doc:`usage`
 - **Working with files?** Check out :doc:`readers_writers` 
 - **Generating networks?** See :doc:`network_generator`
-- **Need examples?** Browse :doc:`examples` for practical code samples
+- **Need examples?** Browse :doc:`auto_examples/index` for practical code samples
 - **Understanding limitations?** Review :doc:`assumptions` and :doc:`nomenclature`
 
 ⚠️ **Important Note**
