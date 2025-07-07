@@ -31,3 +31,4 @@ sphinxext-opengraph>=0.10.0
 twine>=6.1.0
 unittest-xml-reporting>=3.2.0
 wheel>=0.45.1
+rstcheck>=6.2.5
