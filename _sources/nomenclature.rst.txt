@@ -85,7 +85,7 @@ Conventions
 ===========
 
 Naming Conventions
------------------
+------------------
 
 **Python Code (PEP 8)**
     - Function names: ``lowercase_with_underscores``
@@ -103,7 +103,7 @@ Naming Conventions
     - Computation functions: ``compute_...`` - perform calculations and return results
 
 Parameter Conventions
---------------------
+---------------------
 
 **Default Values**
     Configuration parameters can be reset to default values by calling the corresponding ``config_...()`` function with no arguments.

@@ -1,0 +1,707 @@
+:orphan:
+
+Examples
+========
+
+The following gallery contains example scripts demonstrating the usage of various features in `pylimer-tools`. 
+Each script is designed to illustrate a specific functionality or analysis method available in the library.
+
+Please be aware that the system sizes and simulation trajectory times are not representative of real-world applications.
+These examples are primarily for educational purposes and to showcase the capabilities and usage of `pylimer-tools`.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+Dissipative Particle Dynamics (DPD) Simulations
+-----------------------------------------------
+
+pylimer-tools provides a powerful framework for simulating coarse-grained polymer systems using Dissipative Particle Dynamics (DPD) with slip-springs. 
+This allows for realistic modeling of polymer behavior at a mesoscopic scale.
+The implementation is based on `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macromol.1c00567>`_.
+
+Refer to the full documentation of the DPD simulator in the :class:`~pylimer_tools_cpp.DPDSimulator` class for more details.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools.">
+
+.. only:: html
+
+  .. image:: /auto_examples/dpd_simulations/images/thumb/sphx_glr_plot_dpd_simulation_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_simulation.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Dissipative Particle Dynamics (DPD) Simulations</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+Force Balance & Maximum Entropy Homogenization Procedures
+---------------------------------------------------------
+
+pylimer-tools provides three implementations of the Maximum Entropy Homogenization Procedure (MEHP) to reduce polymer networks to their minimum energy, maximum entropy homogenized state. 
+This is useful for predicting the equilibrium shear modulus of the network.
+The three implementations are:
+- :class:`~pylimer_tools_cpp.MEHPForceRelaxation`: An MEHP implementation that allows to use non-linear force potentials,
+- :class:`~pylimer_tools_cpp.MEHPForceBalance`: The original Force Balance implementation, which uses just Hookean springs, but allows the use of slip-links to model entanglements,
+- :class:`~pylimer_tools_cpp.MEHPForceBalance2`: The faster implementation of the Force Balance procedure, without allowing for slip-links, but allowing the modelling of entanglements as static links, like tetrafunctional cross-links.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links instead of slip-links.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_2_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MEHP implementation with slip-springs to homogenize a polymer network and predict its equilibrium shear modulus.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Force Balance</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation, the one without slip-links or entanglements.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Maximum Entropy Homogenization Procedure (MEHP)</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+Network Generation
+------------------
+
+pylimer-tools includes a powerful Monte Carlo-based network generator for creating realistic polymer systems. 
+This tools is particularly useful for generating quick initial configurations for molecular dynamics simulations,
+or for doing fast predictions of the viscoelasticity using the :class:`~pylimer_tools_cpp.NormalModeAnalyzer` or the 
+:class:`pylimer_tools_cpp.MEHPForceBalance` and its variants.
+
+For more options, examples and advanced usage, see the `test suite <https://github.com/GenieTim/pylimer-tools/tree/main/tests>`_ 
+and the :doc:`modules` API reference, particularly of the :class:`~pylimer_tools_cpp.MCUniverseGenerator` class.
+
+The network generation system allows you to:
+
+- Create end-linked and vulcanized polymer networks with controllable topology
+- Generate solvent chains and background molecules
+- Control crosslinking degree and functionality
+- Set realistic bead distances and box sizes
+
+The :class:`~pylimer_tools_cpp.MCUniverseGenerator` class is the main interface for network generation.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Save Generated Network">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_save_network_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_network_generator_plot_save_network.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Save Generated Network</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Here&#x27;s a minimal example of creating a crosslinked polymer network:">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_simple_crosslinked_network_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_network_generator_plot_simple_crosslinked_network.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Simple Crosslinked Network</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Fine-tune the Monte Carlo generation process:">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_monte_carlo_configuration_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_network_generator_plot_monte_carlo_configuration.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Monte Carlo Configuration</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The generated networks can include topological information">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_add_angles_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_network_generator_plot_add_angles.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Adding Topology Information</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Create complex systems with multiple components:">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_multi_component_system_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_network_generator_plot_multi_component_system.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Multi-Component System</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+Normal Mode Analysis
+--------------------
+
+pylimer-tools provides a normal mode analysis (NMA) implementation to predict the loss and storage modulus of polymer networks as published in `doi:10.1021/acs.macromol.4c01429 <https://doi.org/10.1021/acs.macromol.4c01429>`_. 
+This is useful for understanding the viscoelastic properties of the network.
+The corresponding class is :class:`~pylimer_tools_cpp.NormalModeAnalyzer`.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks.">
+
+.. only:: html
+
+  .. image:: /auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_normal_mode_analysis_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Normal Mode Analysis (NMA)</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+File I/O: Readers & Writers
+---------------------------
+
+pylimer-tools provides comprehensive support for reading and writing various LAMMPS file formats, enabling seamless integration with molecular dynamics workflows.
+
+Overview
+~~~~~~~~
+
+The library supports four main file I/O operations:
+
+1. **Reading LAMMPS data files** - Complete system configurations
+2. **Reading LAMMPS dump files** - Trajectory and snapshot data  
+3. **Reading LAMMPS output files** - Measurements and simulation results
+4. **Writing LAMMPS data files** - Modified or generated systems
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Read correlation functions from fix ave/correlate and fix ave/correlate/long commands:">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_correlated_averages_reader_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_correlated_averages_reader.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Correlated Averages Reader</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Read output from pylimer-tools&#x27; own simulators.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_pylimer_tools_output_reader_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_pylimer_tools_output_reader.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">pylimer-tools Output Reader</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command:">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_log_thermo_file_reader_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_log_thermo_file_reader.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Process histogram data from fix ave/hist commands:">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_histogram_reader_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_histogram_reader.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Histogram Reader</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Convert LAMMPS units to SI or other unit systems:">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_unit_conversion_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_unit_conversion.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Unit Conversion</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The DumpFileReader processes LAMMPS trajectory files. Is has a practical interface to read frames from a trajectory file and access them as Universe objects in the UniverseSequence class.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_dump_file_reader_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_dump_file_reader.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Dump File Reader</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="All readers support automatic caching for improved performance">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_performance_caching_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_performance_caching.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Performance and Caching</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip=" Take a later entry from a LAMMPS trajectory and save it as a data file:">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_trajectory_to_frame_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_convert_trajectory_to_frame.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame to Data File</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Read output from LAMMPS fix ave/time commands.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_time_averaged_data_reader_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_time_averaged_data_reader.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Time-Averaged Data Reader</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="LAMMPS bond swapping can significantly speed up equilibration for polymer networks. However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly. Here&#x27;s how you could re-set the molecule indices for bond swapping with constant chain lengths:">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_for_bond_swapping_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_convert_for_bond_swapping.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Convert for Bond Swapping</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_data_file_reader_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_reader.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Data File Reader</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The UniverseSequence class provides automatic memory management:">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_memory_efficient_dump_file_reading_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_memory_efficient_dump_file_reading.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Memory-Efficient Dump File Reading</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The DataFileWriter generates LAMMPS-compatible data files:">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_data_file_writer_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_writer.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Data File Writer</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+Structure Analysis
+------------------
+
+pylimer-tools offers various tools to manipulate and analyze the topology of polymer networks.
+
+Here you can find examples of some of the functionality provided by the package.
+
+Decomposing Crosslinked Networks to Chains
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There are a number of ways how a given :class:`~pylimer_tools_cpp.Universe` can be decomposed.
+
+The most common use case is to decompose a crosslinked network into its constituent chains, which can then be used for further analysis or processing.
+
+To find the chains, there are two main approaches:
+- Removing the crosslinkers and analysing the remaining polymer strands using :func:`~pylimer_tools_cpp.Universe.get_molecules()`
+- Decomposing the network to chains, but keeping the crosslinkers in place, possibly being repeated in all the chains it is associated with. This decomposition can be done using the :func:`~pylimer_tools_cpp.Universe.get_chains_with_crosslinker()` method.
+
+pylimer-tools provides two more advanced methods for decomposing networks:
+- If you removed the junctions yourself, you can use :func:`~pylimer_tools_cpp.Universe.get_clusters()`
+
+If you want even more control, you could assemble your own decomposition algorithm using the :class:`~pylimer_tools_cpp.Universe` class and its methods, such as :func:`~pylimer_tools_cpp.Universe.get_atoms_connected_to()`.
+
+Finding Loops
+~~~~~~~~~~~~~
+
+You can also find loops in the network using the :func:`~pylimer_tools_cpp.Universe.find_loops()` method.
+
+If you want to count the number of loops present in the network, as a function of their length, you can use the :func:`~pylimer_tools_cpp.Universe.count_loop_lengths()` method.
+
+Finally, to find the shortest loop a specific atom is involved in, you can use the :func:`~pylimer_tools_cpp.Universe.find_minimal_order_loop_from()` method.
+
+.. caution::
+
+   There are exponentially many paths between two crosslinkers of a network,
+   and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
+   You can use the `max_length` parameter to restrict the algorithm to only search for loops up to a certain length.
+   Use a negative value to find all loops and paths.
+
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to decompose a crosslinked polymer network into chains  and analyze its structure using pylimer-tools.">
+
+.. only:: html
+
+  .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_decompose_structure_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_structure_analysis_plot_decompose_structure.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Example: Structure Analysis with pylimer-tools</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Loop Finding and Analysis">
+
+.. only:: html
+
+  .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_loop_analysis_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_structure_analysis_plot_loop_analysis.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Loop Finding and Analysis</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+Trajectory Analysis
+-------------------
+
+pylimer-tools provides advanced tools for analyzing molecular dynamics trajectories, particularly for polymer systems. 
+This includes reading trajectory data and computing various properties.
+
+For more information, refer to the documentation of the :class:`~pylimer_tools_cpp.UniverseSequence` class and the :class:`~pylimer_tools_cpp.Universe` class for a list of methods available for property computations.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to analyze a polymer trajectory using pylimer-tools, including mean square displacement (MSD) and radius of gyration calculation.">
+
+.. only:: html
+
+  .. image:: /auto_examples/trajectory_analysis/images/thumb/sphx_glr_plot_trajectory_analysis_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_trajectory_analysis_plot_trajectory_analysis.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Trajectory Analysis</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+   :includehidden:
+
+
+   /auto_examples/dpd_simulations/index.rst
+   /auto_examples/force_balance/index.rst
+   /auto_examples/network_generator/index.rst
+   /auto_examples/normal_mode_analysis/index.rst
+   /auto_examples/readers_writers/index.rst
+   /auto_examples/structure_analysis/index.rst
+   /auto_examples/trajectory_analysis/index.rst
+
+
+.. only:: html
+
+  .. container:: sphx-glr-footer sphx-glr-footer-gallery
+
+    .. container:: sphx-glr-download sphx-glr-download-python
+
+      :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
+
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+      :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

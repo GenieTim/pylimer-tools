@@ -11,10 +11,10 @@ DPDSimulator
    .. autosummary::
 
       ~DPDSimulator.assume_box_large_enough
-      ~DPDSimulator.configAutoCorrelatorOutput
-      ~DPDSimulator.configAverageOutput
       ~DPDSimulator.config_a
       ~DPDSimulator.config_allow_relocation_in_network
+      ~DPDSimulator.config_auto_correlator_output
+      ~DPDSimulator.config_average_output
       ~DPDSimulator.config_bond_formation
       ~DPDSimulator.config_box_deformation
       ~DPDSimulator.config_lambda
@@ -60,10 +60,10 @@ DPDSimulator
    .. rubric:: Methods Documentation
 
    .. automethod:: assume_box_large_enough
-   .. automethod:: configAutoCorrelatorOutput
-   .. automethod:: configAverageOutput
    .. automethod:: config_a
    .. automethod:: config_allow_relocation_in_network
+   .. automethod:: config_auto_correlator_output
+   .. automethod:: config_average_output
    .. automethod:: config_bond_formation
    .. automethod:: config_box_deformation
    .. automethod:: config_lambda

@@ -1,0 +1,50 @@
+
+
+.. _sphx_glr_auto_examples_dpd_simulations:
+
+Dissipative Particle Dynamics (DPD) Simulations
+-----------------------------------------------
+
+pylimer-tools provides a powerful framework for simulating coarse-grained polymer systems using Dissipative Particle Dynamics (DPD) with slip-springs. 
+This allows for realistic modeling of polymer behavior at a mesoscopic scale.
+The implementation is based on `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macromol.1c00567>`_.
+
+Refer to the full documentation of the DPD simulator in the :class:`~pylimer_tools_cpp.DPDSimulator` class for more details.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools.">
+
+.. only:: html
+
+  .. image:: /auto_examples/dpd_simulations/images/thumb/sphx_glr_plot_dpd_simulation_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_simulation.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Dissipative Particle Dynamics (DPD) Simulations</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/dpd_simulations/plot_dpd_simulation
+

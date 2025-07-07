@@ -4,7 +4,7 @@ Installation Guide
 pylimer-tools can be installed in several ways depending on your needs and system configuration.
 
 Quick Installation (Recommended)
--------------------------------
+--------------------------------
 
 For most users, the easiest way to install pylimer-tools is via PyPI:
 
@@ -48,7 +48,7 @@ Before installing from source, ensure you have the following development tools:
 3. Install `CMake <https://cmake.org/download/>`_
 
 Installation from Source
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. **Clone the repository:**
 
@@ -73,7 +73,7 @@ Installation from Source
       print(pylimer_tools_cpp.version_information())
 
 Updating Your Installation
--------------------------
+--------------------------
 
 **For PyPI installations:**
 
@@ -102,7 +102,7 @@ If you encounter issues during installation:
    - Steps you've already tried
 
 Virtual Environment Setup (Recommended)
---------------------------------------
+---------------------------------------
 
 For the best experience and to avoid conflicts with other packages, use a virtual environment:
 

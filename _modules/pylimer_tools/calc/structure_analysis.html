@@ -6,12 +6,16 @@
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
         <title>pylimer_tools.calc.structure_analysis - pylimer-tools v</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=ba431049" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=bafda8c6" />
     
     
 
@@ -192,6 +196,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
+  <span class="sidebar-brand-text">pylimer-tools v</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -209,29 +214,67 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../nomenclature.html">Nomenclature</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../nomenclature.html#conventions">Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../assumptions.html">Assumptions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readers_writers.html">File I/O: Readers &amp; Writers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../network_generator.html">Network Generation</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../network_generator.html">Network Generation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../examples/structure_analysis.html">Structure Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../examples/force_balance.html">Force Balance &amp; Maximum Entropy Homogenization Procedures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../examples/normal_mode_analysis.html">Normal Mode Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../examples/dpd_simulations.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../examples/trajectory_analysis.html">Trajectory Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../readers_writers.html">File I/O: Readers &amp; Writers</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/dpd_simulations/index.html">Dissipative Particle Dynamics (DPD) Simulations</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Dissipative Particle Dynamics (DPD) Simulations</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/dpd_simulations/plot_dpd_simulation.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/force_balance/index.html">Force Balance &amp; Maximum Entropy Homogenization Procedures</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Force Balance &amp; Maximum Entropy Homogenization Procedures</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/network_generator/index.html">Network Generation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/network_generator/plot_save_network.html">Save Generated Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/normal_mode_analysis/index.html">Normal Mode Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Normal Mode Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html">Normal Mode Analysis (NMA)</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/readers_writers/index.html">File I/O: Readers &amp; Writers</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of File I/O: Readers &amp; Writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_data_file_reader.html">Data File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_memory_efficient_dump_file_reading.html">Memory-Efficient Dump File Reading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/readers_writers/plot_data_file_writer.html">Data File Writer</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/structure_analysis/index.html">Structure Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Structure Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/structure_analysis/plot_decompose_structure.html">Example: Structure Analysis with pylimer-tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/structure_analysis/plot_loop_analysis.html">Loop Finding and Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/trajectory_analysis/index.html">Trajectory Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle navigation of Trajectory Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/trajectory_analysis/plot_trajectory_analysis.html">Trajectory Analysis</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../modules.html">src</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of src</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../pylimer_tools.html">pylimer_tools package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of pylimer_tools package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../modules.html">src</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle navigation of src</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../pylimer_tools.html">pylimer_tools package</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle navigation of pylimer_tools package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../pylimer_tools.calc.html">pylimer_tools.calc package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../pylimer_tools.io.html">pylimer_tools.io package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../pylimer_tools.utils.html">pylimer_tools.utils package</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.compute_stoichiometric_imbalance.html">compute_stoichiometric_imbalance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_linear_walk_chain_from_to.html">do_linear_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_random_walk.html">do_random_walk</a></li>
@@ -960,7 +1003,8 @@
             <div class="copyright">
                 Copyright &#169; 2021-2025, Tim Bernhard
             </div>
-            Made with 
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
             <a href="https://github.com/pradyunsg/furo">Furo</a>
             
           </div>
