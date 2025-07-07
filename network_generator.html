@@ -3,13 +3,31 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Readers &amp; Writers" href="readers_writers.html" /><link rel="prev" title="Useage" href="usage.html" />
+<meta property="og:title" content="Network Generation" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://genietim.github.io/network_generator.html" />
+<meta property="og:site_name" content="pylimer-tools" />
+<meta property="og:description" content="pylimer-tools includes a powerful Monte Carlo-based network generator for creating realistic polymer systems. This tools is particularly useful for generating quick initial configurations for molec..." />
+<meta property="og:image:width" content="1146" />
+<meta property="og:image:height" content="600" />
+<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_network_generator_d4c27ebf.png" />
+<meta property="og:image:alt" content="pylimer-tools includes a powerful Monte Carlo-based network generator for creating realistic polymer systems. This tools is particularly useful for generating quick initial configurations for molec..." />
+<meta name="description" content="pylimer-tools includes a powerful Monte Carlo-based network generator for creating realistic polymer systems. This tools is particularly useful for generating quick initial configurations for molec..." />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
+<link rel="shortcut icon" href="/_static/favicon/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="pylimer-tools" />
+<link rel="manifest" href="/_static/favicon/site.webmanifest" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Examples" href="examples.html" /><link rel="prev" title="File I/O: Readers &amp; Writers" href="readers_writers.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>Network Generators - PylimerTools documentation</title>
+        <title>Network Generation - pylimer-tools v</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ba431049" />
     
@@ -168,7 +186,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">PylimerTools  documentation</div></a>
+      <a href="index.html"><div class="brand">pylimer-tools v</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -180,7 +198,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -192,7 +210,6 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">PylimerTools  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -200,24 +217,39 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Getting Started Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#manual-compilation">Manual Compilation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="assumptions.html">Assumptions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nomenclature.html">Nomenclature</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nomenclature.html#conventions">Conventions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Useage</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Network Generators</a></li>
-<li class="toctree-l1"><a class="reference internal" href="readers_writers.html">Readers &amp; Writers</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">src</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of src</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="pylimer_tools.html">pylimer_tools package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of pylimer_tools package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1"><a class="reference internal" href="assumptions.html">Assumptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readers_writers.html">File I/O: Readers &amp; Writers</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Network Generation</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="examples.html">Examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Network Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/structure_analysis.html">Structure Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/force_balance.html">Force Balance &amp; Maximum Entropy Homogenization Procedures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/normal_mode_analysis.html">Normal Mode Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/dpd_simulations.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/trajectory_analysis.html">Trajectory Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readers_writers.html">File I/O: Readers &amp; Writers</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">src</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of src</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pylimer_tools.html">pylimer_tools package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of pylimer_tools package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools.calc.html">pylimer_tools.calc package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools.io.html">pylimer_tools.io package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools.utils.html">pylimer_tools.utils package</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.compute_stoichiometric_imbalance.html">compute_stoichiometric_imbalance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.do_linear_walk_chain_from_to.html">do_linear_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.do_random_walk.html">do_random_walk</a></li>
@@ -290,12 +322,16 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/network_generator.rst.txt" title="View this page">
+  <a class="muted-link" href="https://github.com/GenieTim/pylimer-tools/blob/main/docs/network_generator.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
-</div>
-<div class="theme-toggle-container theme-toggle-content">
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/GenieTim/pylimer-tools/edit/main/docs/network_generator.rst" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
@@ -304,68 +340,246 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="network-generators">
-<h1>Network Generators<a class="headerlink" href="#network-generators" title="Link to this heading">¶</a></h1>
-<p>This package also provides a Monte-Carlo type network generator.</p>
-<p>It could be used e.g. like this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+          <section id="network-generation">
+<h1>Network Generation<a class="headerlink" href="#network-generation" title="Link to this heading">¶</a></h1>
+<p>pylimer-tools includes a powerful Monte Carlo-based network generator for creating realistic polymer systems.
+This tools is particularly useful for generating quick initial configurations for molecular dynamics simulations,
+or for doing fast predictions of the viscoelasticity using the <a class="reference internal" href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NormalModeAnalyzer</span></code></a> or the
+<a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><code class="xref py py-class docutils literal notranslate"><span class="pre">pylimer_tools_cpp.MEHPForceBalance</span></code></a> and its variants.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>The network generation system allows you to:</p>
+<ul class="simple">
+<li><p>Create end-linked and vulcanized polymer networks with controllable topology</p></li>
+<li><p>Generate solvent chains and background molecules</p></li>
+<li><p>Control crosslinking degree and functionality</p></li>
+<li><p>Set realistic bead distances and box sizes</p></li>
+</ul>
+<p>The <a class="reference internal" href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">MCUniverseGenerator</span></code></a> class is the main interface for network generation.</p>
+</section>
+<section id="basic-network-generation">
+<h2>Basic Network Generation<a class="headerlink" href="#basic-network-generation" title="Link to this heading">¶</a></h2>
+<section id="simple-crosslinked-network">
+<h3>Simple Crosslinked Network<a class="headerlink" href="#simple-crosslinked-network" title="Link to this heading">¶</a></h3>
+<p>Here’s a minimal example of creating a crosslinked polymer network:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCUniverseGenerator</span><span class="p">,</span> <span class="n">DataFileWriter</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_rng</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.calc</span><span class="w"> </span><span class="kn">import</span> <span class="n">doMMTAnalysis</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">DataFileWriter</span><span class="p">,</span> <span class="n">MCUniverseGenerator</span><span class="p">,)</span>
+<span class="c1"># Create generator for a 50x50x50 simulation box</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">MCUniverseGenerator</span><span class="p">(</span><span class="mf">50.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">)</span>
 
+<span class="c1"># Set random seed for reproducibility</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
 
-<span class="c1"># BEGIN TODO: define the parameters you want to generate the network with</span>
-<span class="n">side_len</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">seed</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">bead_distance</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">nr_of_crosslinkers</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">number_of_chains</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">number_of_solvent_chains</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">beads_per_solvent_chain</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">crosslinker_conversion</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">crosslinker_functionality</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="c1"># END TODO</span>
+<span class="c1"># Set mean bead-to-bead distance</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">set_bead_distance</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 
-<span class="c1"># Start generating the network</span>
-<span class="n">generator</span> <span class="o">=</span> <span class="n">MCUniverseGenerator</span><span class="p">(</span><span class="n">side_len</span><span class="p">,</span> <span class="n">side_len</span><span class="p">,</span> <span class="n">side_len</span><span class="p">)</span>
-<span class="n">generator</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-<span class="n">generator</span><span class="o">.</span><span class="n">set_bead_distance</span><span class="p">(</span><span class="n">bead_distance</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting MC Generator </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">)))</span>
-<span class="n">generator</span><span class="o">.</span><span class="n">add_crosslinkers</span><span class="p">(</span><span class="n">nr_of_crosslinkers</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added cross-linkers </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">)))</span>
-<span class="n">generator</span><span class="o">.</span><span class="n">add_solvent_chains</span><span class="p">(</span><span class="n">numberOfSolventChains</span><span class="p">,</span> <span class="n">beadsPerSolventChain</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added solvent chains </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">)))</span>
-<span class="n">generator</span><span class="o">.</span><span class="n">add_and_link_strands</span><span class="p">(</span><span class="n">number_of_chains</span><span class="p">,</span> <span class="n">nr_of_beads_per_chain</span><span class="p">,</span>
-                            <span class="n">crosslinker_conversion</span><span class="p">,</span> <span class="n">crosslinker_functionality</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added and linked strands </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-    <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">)))</span>
+<span class="c1"># Add crosslinking sites</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">add_crosslinkers</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># 100 crosslinkers of functionality 4</span>
+
+<span class="c1"># Add polymer chains</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">add_strands</span><span class="p">(</span>
+    <span class="n">nr_of_strands</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>                      <span class="c1"># 200 polymer chains</span>
+    <span class="n">strand_lengths</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">200</span><span class="p">)],</span><span class="c1"># 20 beads per chain</span>
+<span class="p">)</span>
+
+<span class="c1"># Crosslink polymer strands</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">link_strands_to_conversion</span><span class="p">(</span>
+   <span class="n">crosslinker_conversion</span><span class="o">=</span><span class="mf">0.925</span><span class="p">,</span>  <span class="c1"># 92.5% of crosslinker sites used</span>
+<span class="p">)</span>
+
+<span class="c1"># Get the generated network</span>
 <span class="n">universe</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">get_universe</span><span class="p">()</span>
-<span class="n">universe</span><span class="o">.</span><span class="n">set_masses</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 
-<span class="n">angles</span> <span class="o">=</span> <span class="n">universe</span><span class="o">.</span><span class="n">detect_angles</span><span class="p">()</span>
-<span class="n">universe</span><span class="o">.</span><span class="n">add_angles</span><span class="p">(</span><span class="n">angles</span><span class="p">[</span><span class="s2">&quot;angle_from&quot;</span><span class="p">],</span>
-                  <span class="n">angles</span><span class="p">[</span><span class="s2">&quot;angle_via&quot;</span><span class="p">],</span> <span class="n">angles</span><span class="p">[</span><span class="s2">&quot;angle_to&quot;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added angles </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">)))</span>
+<span class="c1"># Set masses for LAMMPS</span>
+<span class="n">universe</span><span class="o">.</span><span class="n">set_masses</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">})</span>
 
-<span class="c1"># output new system</span>
-<span class="n">dataWriter</span> <span class="o">=</span> <span class="n">DataFileWriter</span><span class="p">(</span><span class="n">universe</span><span class="p">)</span>
-<span class="n">dataWriter</span><span class="o">.</span><span class="n">config_include_angles</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">dataWriter</span><span class="o">.</span><span class="n">config_molecule_idx_for_swap</span><span class="p">(</span><span class="n">mode_swappable</span><span class="p">)</span>
-<span class="n">dataWriter</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="n">fileToWrite</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated network with </span><span class="si">{</span><span class="n">universe</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span><span class="si">}</span><span class="s2"> atoms&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</section>
+</section>
+<section id="advanced-configuration">
+<h2>Advanced Configuration<a class="headerlink" href="#advanced-configuration" title="Link to this heading">¶</a></h2>
+<section id="multi-component-systems">
+<h3>Multi-Component Systems<a class="headerlink" href="#multi-component-systems" title="Link to this heading">¶</a></h3>
+<p>Create complex systems with multiple components:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCUniverseGenerator</span><span class="p">,</span> <span class="n">DataFileWriter</span>
+
+<span class="c1"># System parameters</span>
+<span class="n">box_size</span> <span class="o">=</span> <span class="mf">60.0</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">bead_distance</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+<span class="c1"># Network parameters</span>
+<span class="n">n_crosslinkers</span> <span class="o">=</span> <span class="mi">150</span>
+
+<span class="n">n_polymer_chains</span> <span class="o">=</span> <span class="mi">80</span>
+<span class="n">beads_per_chain</span> <span class="o">=</span> <span class="mi">25</span>
+
+<span class="n">n_solvent_chains</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">beads_per_solvent</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="n">n_monofunctional_chains</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">beads_per_monofunctional_chain</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">crosslinker_conversion</span> <span class="o">=</span> <span class="mf">0.85</span>
+<span class="n">crosslinker_functionality</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting network generation at </span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Initialize generator</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">MCUniverseGenerator</span><span class="p">(</span><span class="n">box_size</span><span class="p">,</span> <span class="n">box_size</span><span class="p">,</span> <span class="n">box_size</span><span class="p">)</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">set_bead_distance</span><span class="p">(</span><span class="n">bead_distance</span><span class="p">)</span>
+
+<span class="c1"># Add components in order</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Adding crosslinkers...&quot;</span><span class="p">)</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">add_crosslinkers</span><span class="p">(</span>
+ <span class="n">n_crosslinkers</span><span class="p">,</span>
+ <span class="n">crosslinker_functionality</span><span class="o">=</span><span class="n">crosslinker_functionality</span><span class="p">,</span>
+ <span class="n">crosslinker_type</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># Type 2</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Adding solvent chains...&quot;</span><span class="p">)</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">add_solvent_chains</span><span class="p">(</span><span class="n">n_solvent_chains</span><span class="p">,</span> <span class="n">beads_per_solvent</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># Type 3</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Adding and linking polymer strands...&quot;</span><span class="p">)</span>
+<span class="c1"># Add bifunctional polymer chains</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">add_strands</span><span class="p">(</span>
+    <span class="n">nr_of_strands</span><span class="o">=</span><span class="n">n_polymer_chains</span><span class="p">,</span>
+    <span class="n">strand_lengths</span><span class="o">=</span><span class="p">[</span><span class="n">beads_per_chain</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_polymer_chains</span><span class="p">)],</span>
+    <span class="n">strand_atom_type</span><span class="o">=</span><span class="mi">1</span>  <span class="c1"># Type 1 for &quot;normal&quot; beads</span>
+<span class="p">)</span>
+
+<span class="n">generator</span><span class="o">.</span><span class="n">add_monofunctional_strands</span><span class="p">(</span>
+    <span class="n">nr_of_monofunctional_strands</span><span class="o">=</span><span class="n">n_monofunctional_chains</span><span class="p">,</span>
+    <span class="n">monofunctional_strand_length</span><span class="o">=</span><span class="p">[</span><span class="n">beads_per_monofunctional_chain</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_monofunctional_chains</span><span class="p">)],</span>
+    <span class="n">strand_atom_type</span><span class="o">=</span><span class="mi">4</span>  <span class="c1"># Type 4 to recognize these as &quot;monofunctional&quot; strands later</span>
+<span class="p">)</span>
+
+<span class="c1"># Crosslink polymer strands</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">link_strands_to_conversion</span><span class="p">(</span>
+   <span class="n">crosslinker_conversion</span><span class="o">=</span><span class="n">crosslinker_conversion</span><span class="p">,</span>  <span class="c1"># 92.5% of crosslinker sites used</span>
+<span class="p">)</span>
+
+<span class="c1"># Get final system</span>
+<span class="n">universe</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">get_universe</span><span class="p">()</span>
+<span class="n">universe</span><span class="o">.</span><span class="n">set_masses</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mf">1.</span><span class="p">})</span>  <span class="c1"># Different masses</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Network generation completed at </span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="monte-carlo-configuration">
+<h3>Monte Carlo Configuration<a class="headerlink" href="#monte-carlo-configuration" title="Link to this heading">¶</a></h3>
+<p>Fine-tune the Monte Carlo generation process:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configure the main options of the generator</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>  <span class="c1"># Set random seed for reproducibility</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">set_bead_distance</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>  <span class="c1"># Set mean bead-to-bead distance</span>
+
+<span class="c1"># Configure whether to generate loops or not</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">config_primary_loop_probability</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>  <span class="c1"># Primary loops prohibited</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">config_secondary_loop_probability</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>  <span class="c1"># Secondary loops prohibited</span>
+
+<span class="c1"># Improve performance of sampling pairs of cross-links for large systems</span>
+<span class="c1"># Does not sample all pairs of cross-links anymore,</span>
+<span class="c1"># only 99.9994% of those that are selected, but is ca. 60 times faster</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">use_zscore_max_distance</span><span class="p">(</span><span class="mf">3.29</span><span class="p">)</span>
+
+<span class="c1"># Configure MC parameters</span>
+<span class="c1"># If you do not trust the Brownian Bridge process we use,</span>
+<span class="c1"># you can add additional Monte Carlo steps</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">config_nr_of_mc_steps</span><span class="p">(</span><span class="mi">5000</span><span class="p">)</span>  <span class="c1"># More MC steps for better equilibration</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="adding-topology-information">
+<h2>Adding Topology Information<a class="headerlink" href="#adding-topology-information" title="Link to this heading">¶</a></h2>
+<p>The generated networks can include topological information:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate basic network</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">MCUniverseGenerator</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="mi">54321</span><span class="p">)</span>
+
+<span class="c1"># Add crosslinking sites</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">add_crosslinkers</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># 100 crosslinkers of functionality 4</span>
+
+<span class="c1"># Add polymer chains</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">add_strands</span><span class="p">(</span>
+    <span class="n">nr_of_strands</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>                      <span class="c1"># 200 polymer chains</span>
+    <span class="n">strand_lengths</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">200</span><span class="p">)],</span><span class="c1"># 20 beads per chain</span>
+<span class="p">)</span>
+
+<span class="c1"># Crosslink polymer strands</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">link_strands_to_conversion</span><span class="p">(</span>
+   <span class="n">crosslinker_conversion</span><span class="o">=</span><span class="mf">0.925</span><span class="p">,</span>  <span class="c1"># 92.5% of crosslinker sites used</span>
+<span class="p">)</span>
+
+<span class="c1"># Get the generated universe</span>
+<span class="n">universe</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">get_universe</span><span class="p">()</span>
+
+<span class="c1"># Detect and add angles</span>
+<span class="n">angles</span> <span class="o">=</span> <span class="n">universe</span><span class="o">.</span><span class="n">detect_angles</span><span class="p">()</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">angles</span><span class="p">[</span><span class="s2">&quot;angle_from&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">universe</span><span class="o">.</span><span class="n">add_angles</span><span class="p">(</span>
+        <span class="n">angles</span><span class="p">[</span><span class="s2">&quot;angle_from&quot;</span><span class="p">],</span>
+        <span class="n">angles</span><span class="p">[</span><span class="s2">&quot;angle_via&quot;</span><span class="p">],</span>
+        <span class="n">angles</span><span class="p">[</span><span class="s2">&quot;angle_to&quot;</span><span class="p">],</span>
+        <span class="n">angle_types</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">angles</span><span class="p">[</span><span class="s2">&quot;angle_from&quot;</span><span class="p">]))]</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">angles</span><span class="p">[</span><span class="s1">&#39;angle_from&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> angles to the system&quot;</span><span class="p">)</span>
+
+<span class="c1"># Detect dihedral angles (if needed)</span>
+<span class="n">dihedrals</span> <span class="o">=</span> <span class="n">universe</span><span class="o">.</span><span class="n">detect_dihedral_angles</span><span class="p">()</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dihedrals</span><span class="p">[</span><span class="s2">&quot;dihedral_from&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="c1"># Add dihedral information if your force field requires it</span>
+    <span class="n">universe</span><span class="o">.</span><span class="n">add_dihedral_angles</span><span class="p">(</span>
+        <span class="n">dihedrals</span><span class="p">[</span><span class="s2">&quot;dihedral_from&quot;</span><span class="p">],</span>
+        <span class="n">dihedrals</span><span class="p">[</span><span class="s2">&quot;dihedral_via1&quot;</span><span class="p">],</span>
+        <span class="n">dihedrals</span><span class="p">[</span><span class="s2">&quot;dihedral_via2&quot;</span><span class="p">],</span>
+        <span class="n">dihedrals</span><span class="p">[</span><span class="s2">&quot;dihedral_to&quot;</span><span class="p">],</span>
+        <span class="n">angle_types</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dihedrals</span><span class="p">[</span><span class="s2">&quot;dihedral_from&quot;</span><span class="p">]))]</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="output-and-visualization">
+<h2>Output and Visualization<a class="headerlink" href="#output-and-visualization" title="Link to this heading">¶</a></h2>
+<section id="save-generated-networks">
+<h3>Save Generated Networks<a class="headerlink" href="#save-generated-networks" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># Generate network</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">MCUniverseGenerator</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">45</span><span class="p">)</span>
+<span class="c1"># ... configure and generate ...</span>
+<span class="n">universe</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">get_universe</span><span class="p">()</span>
+
+<span class="c1"># Create output directory</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;generated_networks&quot;</span><span class="p">)</span>
+<span class="n">output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Write LAMMPS data file</span>
+<span class="n">writer</span> <span class="o">=</span> <span class="n">DataFileWriter</span><span class="p">(</span><span class="n">universe</span><span class="p">)</span>
+<span class="n">writer</span><span class="o">.</span><span class="n">config_include_angles</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">writer</span><span class="o">.</span><span class="n">config_reindex_atoms</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">writer</span><span class="o">.</span><span class="n">config_atom_style</span><span class="p">(</span><span class="n">pylimer_tools_cpp</span><span class="o">.</span><span class="n">AtomStyle</span><span class="o">.</span><span class="n">ANGLE</span><span class="p">)</span>
+
+<span class="n">output_file</span> <span class="o">=</span> <span class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;polymer_network.data&quot;</span>
+<span class="n">writer</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">output_file</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Network saved to: </span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For more options, examples and advanced usage, see the <a class="reference external" href="https://github.com/GenieTim/pylimer-tools/tree/main/tests">test suite</a>
+and the <a class="reference internal" href="modules.html"><span class="doc">src</span></a> API reference, particularly of the <a class="reference internal" href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">MCUniverseGenerator</span></code></a> class.</p>
+</section>
+</section>
 </section>
 
         </article>
@@ -373,23 +587,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="readers_writers.html">
+          <a class="next-page" href="examples.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Readers &amp; Writers</div>
+                <div class="title">Examples</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="usage.html">
+          <a class="prev-page" href="readers_writers.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Useage</div>
+                <div class="title">File I/O: Readers &amp; Writers</div>
                 
               </div>
             </a>
@@ -410,15 +624,50 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Network Generation</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#basic-network-generation">Basic Network Generation</a><ul>
+<li><a class="reference internal" href="#simple-crosslinked-network">Simple Crosslinked Network</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#advanced-configuration">Advanced Configuration</a><ul>
+<li><a class="reference internal" href="#multi-component-systems">Multi-Component Systems</a></li>
+<li><a class="reference internal" href="#monte-carlo-configuration">Monte Carlo Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adding-topology-information">Adding Topology Information</a></li>
+<li><a class="reference internal" href="#output-and-visualization">Output and Visualization</a><ul>
+<li><a class="reference internal" href="#save-generated-networks">Save Generated Networks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+</div><script src="_static/documentation_options.js?v=8a448e45"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
     </body>
 </html>

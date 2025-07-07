@@ -1,0 +1,987 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>pylimer_tools.calc.structure_analysis - pylimer-tools v</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=ba431049" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">pylimer-tools v</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Getting Started Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../nomenclature.html">Nomenclature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nomenclature.html#conventions">Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../assumptions.html">Assumptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readers_writers.html">File I/O: Readers &amp; Writers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../network_generator.html">Network Generation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../network_generator.html">Network Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/structure_analysis.html">Structure Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/force_balance.html">Force Balance &amp; Maximum Entropy Homogenization Procedures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/normal_mode_analysis.html">Normal Mode Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/dpd_simulations.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/trajectory_analysis.html">Trajectory Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../readers_writers.html">File I/O: Readers &amp; Writers</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../modules.html">src</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of src</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../pylimer_tools.html">pylimer_tools package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of pylimer_tools package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../pylimer_tools.calc.html">pylimer_tools.calc package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../pylimer_tools.io.html">pylimer_tools.io package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../pylimer_tools.utils.html">pylimer_tools.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.compute_stoichiometric_imbalance.html">compute_stoichiometric_imbalance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_linear_walk_chain_from_to.html">do_linear_walk_chain_from_to</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_random_walk.html">do_random_walk</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_random_walk_chain_from_to.html">do_random_walk_chain_from_to</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">do_random_walk_chain_from_to_mc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.predict_gelation_point.html">predict_gelation_point</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.split_csv.html">split_csv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.version_information.html">version_information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.Atom.html">Atom</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.AtomPairEntanglements.html">AtomPairEntanglements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.AtomStyle.html">AtomStyle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.AveFileReader.html">AveFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.Box.html">Box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.DPDSimulator.html">DPDSimulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html">LazyUniverseSequenceIterator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.LinearMaxDistanceProvider.html">LinearMaxDistanceProvider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.LinkSwappingMode.html">LinkSwappingMode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MCUniverseGenerator.html">MCUniverseGenerator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MEHPForceBalance.html">MEHPForceBalance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MEHPForceBalance2.html">MEHPForceBalance2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MEHPForceEvaluator.html">MEHPForceEvaluator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MEHPForceRelaxation.html">MEHPForceRelaxation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MaxDistanceProvider.html">MaxDistanceProvider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.Molecule.html">Molecule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MoleculeIterator.html">MoleculeIterator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MoleculeType.html">MoleculeType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.NeighbourList.html">NeighbourList</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.OutputConfiguration.html">OutputConfiguration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.SLESolver.html">SLESolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">SimpleSpringMEHPForceEvaluator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.Universe.html">Universe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for pylimer_tools.calc.structure_analysis</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides functions to compute various quantities related to polymer networks from their structure.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">MoleculeType</span><span class="p">,</span> <span class="n">Universe</span>
+
+
+<div class="viewcode-block" id="compute_stoichiometric_imbalance">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_stoichiometric_imbalance</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ignore_types</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">effective</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the stoichiometric imbalance</span>
+<span class="sd">    ( nr. of bonds formable of crosslinker / (nr. of bonds formable of precursor chains) )</span>
+
+<span class="sd">    r &gt; 1 means an excess of crosslinkers, whereas r = 0 implies that there are not crosslinkers in the network.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        - if your system has a non-integer number of possible bonds (e.g. one site non-bonded),</span>
+<span class="sd">          this will not be rounded/respected in any way.</span>
+<span class="sd">        - Currently, only g = 2 chains are respected yet, and only one type of crosslinker is supported.</span>
+<span class="sd">        - If you have e.g. solvent chains in the network, use `ignore_types` to not count them.</span>
+
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
+<span class="sd">    :param functionality_per_type: A dictionary with key: type, and value: functionality of this atom type.</span>
+<span class="sd">        If `None`: will use max functionality per type.</span>
+<span class="sd">    :param ignore_types: A list of integers, the types to ignore for the imbalance (e.g. solvent atom types)</span>
+<span class="sd">    :param effective: Whether to use the effective functionality (if functionality_per_type is not passed)</span>
+<span class="sd">        or the maximum functionality of the crosslinkers.</span>
+<span class="sd">    :return: The stoichiometric imbalance. If the network is empty, or no crosslinkers are present 0. is returned.</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">get_atom_types</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
+        <span class="n">crosslinker_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">functionality_per_type</span>
+        <span class="ow">or</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Crosslink&#39;s atom type not found in functionality_per_type, &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;will ignore passed argument `functionality_per_type`.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">network</span><span class="o">.</span><span class="n">determine_effective_functionality_per_type</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">effective</span>
+            <span class="k">else</span> <span class="n">network</span><span class="o">.</span><span class="n">determine_functionality_per_type</span><span class="p">()</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">crosslinker_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">counts</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="c1"># TODO: use the data from the functionality_per_type to determine the</span>
+    <span class="c1"># functionality per strand, maybe?</span>
+    <span class="n">strands</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_molecules</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ignore_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ignore_types</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ignore_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
+    <span class="n">num_relevant_strands</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">m</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">strands</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="ow">in</span> <span class="n">ignore_types</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">get_atoms</span><span class="p">()])</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">crosslinker_formable_bonds</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">counts</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">*</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">other_formable_bonds</span> <span class="o">=</span> <span class="n">num_relevant_strands</span> <span class="o">*</span> <span class="mi">2</span>
+
+    <span class="k">if</span> <span class="n">other_formable_bonds</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+
+    <span class="c1"># division by 2 is implicit</span>
+    <span class="k">return</span> <span class="n">crosslinker_formable_bonds</span> <span class="o">/</span> <span class="p">(</span><span class="n">other_formable_bonds</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_extent_of_reaction">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_extent_of_reaction">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_extent_of_reaction</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the extent of polymerization reaction</span>
+<span class="sd">    (nr. of formed bonds in reaction / max. nr. of bonds formable)</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        - if your system has a non-integer number of possible bonds (e.g. one site non-bonded),</span>
+<span class="sd">          this will not be rounded/respected in any way</span>
+<span class="sd">        - if the system contains solvent or other molecules that should not be binding to</span>
+<span class="sd">          crosslinkers, make sure to remove them before calling this function</span>
+<span class="sd">        - if you have multiple crosslinker types, be sure to replace them by one type only</span>
+
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :param crosslinker_type: The atom type of crosslinker beads</span>
+<span class="sd">    :param functionality_per_type: A dictionary with key: type, and value: functionality of this atom type.</span>
+<span class="sd">        If None: will use max functionality per type.</span>
+<span class="sd">    :return: The extent of reaction</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">get_atoms_by_type</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+        <span class="n">crosslinker_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">functionality_per_type</span>
+    <span class="p">):</span>
+        <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Crosslinker type </span><span class="si">{}</span><span class="s2"> not found in passed functionality_per_type, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">crosslinker_type</span>
+            <span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;will ignore passed argument `functionality_per_type`.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">determine_functionality_per_type</span><span class="p">()</span>
+
+    <span class="n">num_strands</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">get_molecules</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">))</span>
+    <span class="n">crosslinks</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_atoms_by_type</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
+    <span class="n">num_crosslinkers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">crosslinks</span><span class="p">)</span>
+
+    <span class="c1"># assuming strand has functionality 2</span>
+    <span class="n">max_formable_bonds</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+        <span class="n">num_strands</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">num_crosslinkers</span> <span class="o">*</span>
+        <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">max_formable_bonds</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="n">actually_formed_bonds</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">crosslink</span> <span class="ow">in</span> <span class="n">crosslinks</span><span class="p">:</span>
+        <span class="n">connected_to</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_atoms_connected_to</span><span class="p">(</span><span class="n">atom</span><span class="o">=</span><span class="n">crosslink</span><span class="p">)</span>
+        <span class="n">actually_formed_bonds</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">connected_to</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="o">!=</span> <span class="n">crosslinker_type</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">actually_formed_bonds</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_formable_bonds</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_fraction_of_bifunctional_reactive_sites">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_fraction_of_bifunctional_reactive_sites">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_fraction_of_bifunctional_reactive_sites</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the mole fraction of reactive sites in B2</span>
+<span class="sd">    among all reactive sites in a mixture of B1 and B2.</span>
+<span class="sd">    Uses the network to detect what might be monofunctional chains,</span>
+<span class="sd">    and then counts them and the bifunctional ones.</span>
+
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :param crosslinker_type: The atom type of crosslinker beads</span>
+<span class="sd">    :param functionality_per_type: A dictionary with key: type, and value: functionality of this atom type</span>
+<span class="sd">    :return: The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">determine_functionality_per_type</span><span class="p">()</span>
+
+    <span class="n">monofunctional_types</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">functionality_per_type</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">monofunctional_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assume the whole monofunctional chain has the same atom type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chains_with_crosslinks</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_chains_with_crosslinker</span><span class="p">(</span>
+            <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">crosslinker_type</span>
+        <span class="p">)</span>
+        <span class="n">all_atom_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">get_atom_types</span><span class="p">())</span>
+        <span class="n">atom_type_has_only_monofunctional</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">atype</span><span class="p">:</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">atype</span> <span class="ow">in</span> <span class="n">all_atom_types</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains_with_crosslinks</span><span class="p">:</span>
+            <span class="n">n_xlinks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">get_atoms_by_type</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">))</span>
+            <span class="n">atom_types_in_chain</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">get_atom_types</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">n_xlinks</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">atype</span> <span class="ow">in</span> <span class="n">atom_types_in_chain</span><span class="p">:</span>
+                    <span class="n">atom_type_has_only_monofunctional</span><span class="p">[</span><span class="n">atype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># the atom_type_has_only_monofunctional is now a dictionary that indicates</span>
+        <span class="c1"># the atom types belonging to a monofunctional chain</span>
+        <span class="n">monofunctional_types</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">atom_type_has_only_monofunctional</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span>
+        <span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">monofunctional_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">1.0</span>
+
+    <span class="c1"># then, count the number of chains where one end is of the monofunctional</span>
+    <span class="c1"># type</span>
+    <span class="n">chains_with_crosslinks</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_chains_with_crosslinker</span><span class="p">(</span>
+        <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">crosslinker_type</span>
+    <span class="p">)</span>
+
+    <span class="n">n_monofunctional_chains</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains_with_crosslinks</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="ow">in</span> <span class="n">monofunctional_types</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_strand_ends</span><span class="p">(</span>
+                <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">crosslinker_type</span><span class="p">,</span> <span class="n">close_loop</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="ow">and</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span>
+    <span class="p">)</span>
+    <span class="n">n_bifunctional_chains</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">get_molecules</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">))</span> <span class="o">-</span> <span class="n">n_monofunctional_chains</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n_bifunctional_chains</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+        <span class="n">n_monofunctional_chains</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_bifunctional_chains</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_mean_end_to_end_distances">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_distances">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_mean_end_to_end_distances</span><span class="p">(</span>
+    <span class="n">networks</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Universe</span><span class="p">],</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the mean end to end distance between each pair of (indirectly) connected crosslinker</span>
+
+<span class="sd">    :param networks: The different configurations of the polymer network to do the computation for</span>
+<span class="sd">    :type networks: Sequence[Universe]</span>
+<span class="sd">    :param crosslinker_type: The atom type to compute the in-between vectors for</span>
+<span class="sd">    :type crosslinker_type: int</span>
+
+<span class="sd">    :return: a dictionary with key: &quot;{atom1.name}+{atom2.name}&quot; and value: The norm of the mean difference vector</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">r_tau_vectors</span> <span class="o">=</span> <span class="n">compute_mean_end_to_end_vectors</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r_tau_vectors</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+    <span class="n">r_tau_vectors_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">r_tau_vectors</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="n">r_taus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r_tau_vectors_array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">r_tau_vectors</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">r_taus</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="compute_mean_end_to_end_vectors">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_vectors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_mean_end_to_end_vectors</span><span class="p">(</span>
+    <span class="n">networks</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Universe</span><span class="p">],</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the mean end to end vectors between each pair of (indirectly) connected crosslinker</span>
+
+<span class="sd">    :param networks: The different configurations of the polymer network to do the computation for</span>
+<span class="sd">    :type networks: Sequence[Universe]</span>
+<span class="sd">    :param crosslinker_type: The atom type to compute the in-between vectors for</span>
+<span class="sd">    :type crosslinker_type: int</span>
+
+<span class="sd">    :return: a dictionary with key: &quot;{atom1.name}+{atom2.name}&quot; and value: Their mean distance difference vector</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="n">end_to_end_vectors</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">key_counts</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">divider</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
+    <span class="n">iteration</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
+        <span class="n">current_end_to_end_vectors</span> <span class="o">=</span> <span class="n">compute_end_to_end_vectors</span><span class="p">(</span>
+            <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span>
+        <span class="p">)</span>
+        <span class="c1"># the mean calculation in this for loop</span>
+        <span class="c1"># trades some memory for performance</span>
+        <span class="c1"># there are still many performance and memory</span>
+        <span class="c1"># improvements possible</span>
+        <span class="c1"># (e.g. computing connectivity only once, storing it only once, ....)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">current_end_to_end_vectors</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">end_to_end_vectors</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">iteration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;Found molecule </span><span class="si">{}</span><span class="s2"> in network </span><span class="si">{}</span><span class="s2">, but not in previous&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">key</span><span class="p">,</span> <span class="n">iteration</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="n">end_to_end_vectors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+                <span class="n">key_counts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">end_to_end_vectors</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span>
+                    <span class="n">current_end_to_end_vectors</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">divider</span>
+                <span class="p">)</span>
+            <span class="n">key_counts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_counts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">c</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">key_counts</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">key_counts</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The networks contain different molecules.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">end_to_end_vectors</span></div>
+
+
+
+<div class="viewcode-block" id="compute_end_to_end_vectors">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_end_to_end_vectors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_end_to_end_vectors</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the end to end vectors between each pair of (indirectly) connected crosslinker</span>
+
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :type network: Universe</span>
+<span class="sd">    :param crosslinker_type: The atom type to compute the in-between vectors for</span>
+<span class="sd">    :type crosslinker_type: int</span>
+
+<span class="sd">    :return: a dictionary with key: &quot;{atom1.name}+{atom2.name}&quot; and value: Their difference vector</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># while we could do the decomposition again with explicit removal of irrelevant strand atoms,</span>
+    <span class="c1"># this should not be any more expensive</span>
+    <span class="n">end_to_end_vectors</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">molecules</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_chains_with_crosslinker</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">molecules</span><span class="p">:</span>
+        <span class="n">crosslinkers</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">get_atoms_by_type</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">crosslinkers</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span>
+            <span class="ow">or</span> <span class="n">molecule</span><span class="o">.</span><span class="n">get_strand_type</span><span class="p">()</span> <span class="o">==</span> <span class="n">MoleculeType</span><span class="o">.</span><span class="n">PRIMARY_LOOP</span>
+            <span class="ow">or</span> <span class="n">molecule</span><span class="o">.</span><span class="n">get_strand_type</span><span class="p">()</span> <span class="o">==</span> <span class="n">MoleculeType</span><span class="o">.</span><span class="n">DANGLING_CHAIN</span>
+        <span class="p">):</span>
+            <span class="c1"># dangling, free chains and loops are irrelevant for our purposes</span>
+            <span class="k">continue</span>
+        <span class="c1"># igraph.VertexSeq is not sortable -&gt; use a list</span>
+        <span class="n">crosslinkers</span> <span class="o">=</span> <span class="p">[</span><span class="n">crosslinkers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crosslinkers</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="c1"># sort crosslinkers by name as a way to keep the vector directions</span>
+        <span class="c1"># consistent between timesteps</span>
+        <span class="n">crosslinkers</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">get_id</span><span class="p">())</span>
+        <span class="c1">#</span>
+        <span class="n">end_to_end_vectors</span><span class="p">[</span><span class="n">molecule</span><span class="o">.</span><span class="n">get_key</span><span class="p">()]</span> <span class="o">=</span> <span class="n">crosslinkers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">compute_vector_to</span><span class="p">(</span>
+            <span class="n">crosslinkers</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">network</span><span class="o">.</span><span class="n">get_box</span><span class="p">()</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">end_to_end_vectors</span></div>
+
+
+
+<div class="viewcode-block" id="compute_crosslinker_conversion">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_crosslinker_conversion</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">f</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the extent of reaction of the crosslinkers</span>
+<span class="sd">    (actual functionality divided by target functionality)</span>
+
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
+<span class="sd">    :param f: The (target) functionality of the crosslinkers</span>
+<span class="sd">    :param functionality_per_type: A dictionary with key: type, and value: (target) functionality of this atom type</span>
+<span class="sd">    :return: The (mean) crosslinker conversion</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">determine_functionality_per_type</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">crosslinker_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">functionality_per_type</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">f</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Crosslinker functionality = </span><span class="si">{}</span><span class="s2"> is not reasonable.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">compute_effective_crosslinker_functionality</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span></div>
+
+
+
+<div class="viewcode-block" id="compute_effective_crosslinker_functionality">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_effective_crosslinker_functionality">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_effective_crosslinker_functionality</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the mean crosslinker functionality</span>
+
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
+<span class="sd">    :return: The (mean) effective crosslinker functionality</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">junction_degrees</span> <span class="o">=</span> <span class="n">compute_effective_crosslinker_functionalities</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">junction_degrees</span><span class="p">))</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span>
+        <span class="n">junction_degrees</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span></div>
+
+
+
+<div class="viewcode-block" id="compute_effective_crosslinker_functionalities">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_effective_crosslinker_functionalities">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_effective_crosslinker_functionalities</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the functionality of every crosslinker in the network</span>
+
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
+<span class="sd">    :return: The functionality of every crosslinker</span>
+<span class="sd">    :rtype: list[int]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">junctions</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_atoms_by_type</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
+    <span class="n">junction_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">junctions</span><span class="p">]</span>
+    <span class="n">junction_degrees</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_bonds_of_atom</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">junction_ids</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">junction_degrees</span></div>
+
+
+
+<div class="viewcode-block" id="compute_weight_fractions">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_weight_fractions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_weight_fractions</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the weight fractions of each atom type in the network.</span>
+<span class="sd">    Kept for compatibility reasons; just call</span>
+<span class="sd">    :func:`pylimer_tools_cpp.Universe.compute_weight_fractions()` instead.</span>
+
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :return: Using the type i as a key, this dict contains the weight fractions (:math:`\\frac{W_i}{W_{tot}}`)</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">network</span><span class="o">.</span><span class="n">compute_weight_fractions</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="measure_weight_fraction_of_backbone">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">measure_weight_fraction_of_backbone</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the weight fraction of network backbone in infinite network</span>
+
+<span class="sd">    :param network: The network to compute the weight fraction for</span>
+<span class="sd">    :param crosslinker_type: The atom type to use to split the molecules</span>
+<span class="sd">    :return: 1 - weightDangling/weightTotal - weightSoluble/weightTotal</span>
+<span class="sd">    :rtype: float</span>
+
+<span class="sd">    See also:</span>
+<span class="sd">      - :func:`pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains()`</span>
+<span class="sd">      - :func:`pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material()`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="n">weight_fraction_dangling</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">measure_weight_fraction_of_dangling_chains</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span>
+    <span class="p">)</span>
+
+    <span class="n">weight_fraction_soluble</span> <span class="o">=</span> <span class="n">measure_weight_fraction_of_soluble_material</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">weight_fraction_dangling</span> <span class="o">-</span> <span class="n">weight_fraction_soluble</span></div>
+
+
+
+<div class="viewcode-block" id="measure_weight_fraction_of_dangling_chains">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">measure_weight_fraction_of_dangling_chains</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the weight fraction of dangling strands in infinite network</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        Currently, only primary dangling chains are taken into account.</span>
+<span class="sd">        There are other methods that incorporate more.</span>
+
+<span class="sd">    :param network: The network to compute the weight fraction for</span>
+<span class="sd">    :param crosslinker_type: The atom type to use to split the molecules</span>
+<span class="sd">    :return: A tuple containing (weightDangling/weightTotal, numDangling/numTotal)</span>
+<span class="sd">    :rtype: Tuple[float, float]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
+
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_masses</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_weight_of_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">):</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">get_atom_types</span><span class="p">())</span>
+        <span class="n">weight_total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">counts</span><span class="p">:</span>
+            <span class="n">weight_total</span> <span class="o">+=</span> <span class="n">weights</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">*</span> <span class="n">counts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">weight_total</span>
+
+    <span class="n">all_chains</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_chains_with_crosslinker</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
+    <span class="n">num_total</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span>
+    <span class="n">weight_total</span> <span class="o">=</span> <span class="n">get_weight_of_graph</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+
+    <span class="n">num_dangling</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">weight_dangling</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">all_chains</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_strand_type</span><span class="p">()</span> <span class="o">==</span> <span class="n">MoleculeType</span><span class="o">.</span><span class="n">DANGLING_CHAIN</span><span class="p">:</span>
+            <span class="n">num_dangling</span> <span class="o">+=</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span>
+            <span class="n">weight_dangling</span> <span class="o">+=</span> <span class="n">get_weight_of_graph</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">weight_total</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># warnings.warn(&quot;Total weight of network is = 0.&quot;)</span>
+        <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">num_dangling</span> <span class="o">/</span> <span class="n">num_total</span>
+
+    <span class="k">return</span> <span class="n">weight_dangling</span> <span class="o">/</span> <span class="n">weight_total</span><span class="p">,</span> <span class="n">num_dangling</span> <span class="o">/</span> <span class="n">num_total</span></div>
+
+
+
+<div class="viewcode-block" id="measure_weight_fraction_of_soluble_material">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">measure_weight_fraction_of_soluble_material</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">rel_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">abs_tol</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the weight fraction of soluble material by counting.</span>
+<span class="sd">    Effectively, this method counts the weight of clusters</span>
+<span class="sd">    that have a weight less than a certain fraction of the total weight.</span>
+
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :param rel_tol: The fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified</span>
+<span class="sd">    :param abs_tol: The weight from which on a component is not soluble anymore</span>
+<span class="sd">    :return: The weight fraction of soluble material as counted. 0 for an empty network</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="n">fractions</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_clusters</span><span class="p">()</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">compute_total_mass</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fractions</span><span class="p">])</span>
+    <span class="n">total_weight</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">soluble_weight</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">abs_tol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="n">abs_tol</span><span class="p">:</span>
+                <span class="n">soluble_weight</span> <span class="o">+=</span> <span class="n">w</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="n">rel_tol</span> <span class="o">*</span> <span class="n">weights</span><span class="o">.</span><span class="n">max</span><span class="p">():</span>
+                <span class="n">soluble_weight</span> <span class="o">+=</span> <span class="n">w</span>
+
+    <span class="k">if</span> <span class="n">total_weight</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="k">return</span> <span class="n">soluble_weight</span> <span class="o">/</span> <span class="n">total_weight</span></div>
+
+
+
+<div class="viewcode-block" id="measure_lower_bound_weight_fraction_of_soluble_material">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">measure_lower_bound_weight_fraction_of_soluble_material</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">rel_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">,</span>
+    <span class="n">abs_tol</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute a lower bound on the weight fraction of soluble material by counting.</span>
+<span class="sd">    This works as:</span>
+<span class="sd">        - only clusters, which do not contain loops and are smaller than the rel_tol of the biggest,</span>
+<span class="sd">            are counted as soluble</span>
+
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
+<span class="sd">    :param rel_tol: The fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified</span>
+<span class="sd">    :param abs_tol: The weight from which on a component is not soluble anymore</span>
+<span class="sd">    :return: The weight fraction of soluble material as counted. 0 for an empty network</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_soluble_cluster</span><span class="p">(</span><span class="n">cluster</span><span class="p">):</span>
+        <span class="n">chains</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">get_chains_with_crosslinker</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">get_strand_type</span><span class="p">()</span> <span class="o">==</span>
+                  <span class="n">MoleculeType</span><span class="o">.</span><span class="n">PRIMARY_LOOP</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">loops</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">find_loops</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">loops</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+
+    <span class="n">fractions</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_clusters</span><span class="p">()</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">compute_total_mass</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fractions</span><span class="p">])</span>
+    <span class="n">total_weight</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">soluble_weight</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fractions</span><span class="p">)):</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">abs_tol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="n">abs_tol</span> <span class="ow">and</span> <span class="n">is_soluble_cluster</span><span class="p">(</span><span class="n">fractions</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                <span class="n">soluble_weight</span> <span class="o">+=</span> <span class="n">w</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="n">rel_tol</span> <span class="o">*</span> \
+                    <span class="n">weights</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="ow">and</span> <span class="n">is_soluble_cluster</span><span class="p">(</span><span class="n">fractions</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                <span class="n">soluble_weight</span> <span class="o">+=</span> <span class="n">w</span>
+
+    <span class="k">return</span> <span class="n">soluble_weight</span> <span class="o">/</span> <span class="n">total_weight</span></div>
+
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021-2025, Tim Bernhard
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../_static/documentation_options.js?v=8a448e45"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

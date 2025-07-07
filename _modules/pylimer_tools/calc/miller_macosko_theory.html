@@ -1,0 +1,1559 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>pylimer_tools.calc.miller_macosko_theory - pylimer-tools v</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=ba431049" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">pylimer-tools v</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Getting Started Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../nomenclature.html">Nomenclature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nomenclature.html#conventions">Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../assumptions.html">Assumptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readers_writers.html">File I/O: Readers &amp; Writers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../network_generator.html">Network Generation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../network_generator.html">Network Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/structure_analysis.html">Structure Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/force_balance.html">Force Balance &amp; Maximum Entropy Homogenization Procedures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/normal_mode_analysis.html">Normal Mode Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/dpd_simulations.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/trajectory_analysis.html">Trajectory Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../readers_writers.html">File I/O: Readers &amp; Writers</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../modules.html">src</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of src</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../pylimer_tools.html">pylimer_tools package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of pylimer_tools package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../pylimer_tools.calc.html">pylimer_tools.calc package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../pylimer_tools.io.html">pylimer_tools.io package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../pylimer_tools.utils.html">pylimer_tools.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.compute_stoichiometric_imbalance.html">compute_stoichiometric_imbalance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_linear_walk_chain_from_to.html">do_linear_walk_chain_from_to</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_random_walk.html">do_random_walk</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_random_walk_chain_from_to.html">do_random_walk_chain_from_to</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">do_random_walk_chain_from_to_mc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.predict_gelation_point.html">predict_gelation_point</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.split_csv.html">split_csv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.version_information.html">version_information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.Atom.html">Atom</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.AtomPairEntanglements.html">AtomPairEntanglements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.AtomStyle.html">AtomStyle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.AveFileReader.html">AveFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.Box.html">Box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.DPDSimulator.html">DPDSimulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html">LazyUniverseSequenceIterator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.LinearMaxDistanceProvider.html">LinearMaxDistanceProvider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.LinkSwappingMode.html">LinkSwappingMode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MCUniverseGenerator.html">MCUniverseGenerator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MEHPForceBalance.html">MEHPForceBalance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MEHPForceBalance2.html">MEHPForceBalance2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MEHPForceEvaluator.html">MEHPForceEvaluator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MEHPForceRelaxation.html">MEHPForceRelaxation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MaxDistanceProvider.html">MaxDistanceProvider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.Molecule.html">Molecule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MoleculeIterator.html">MoleculeIterator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.MoleculeType.html">MoleculeType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.NeighbourList.html">NeighbourList</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.OutputConfiguration.html">OutputConfiguration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.SLESolver.html">SLESolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">SimpleSpringMEHPForceEvaluator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.Universe.html">Universe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for pylimer_tools.calc.miller_macosko_theory</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides access to various computations introduced in the Miller-Macosko theory.</span>
+
+<span class="sd">Caution:</span>
+<span class="sd">    - not all systems are supported yet.</span>
+<span class="sd">        In particular, for most methods, only A_f and B_2 is supported.</span>
+<span class="sd">        Also, the systems are mostly assumed to be end-linked and monodisperse.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pint</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.special</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.calc.structure_analysis</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">compute_crosslinker_conversion</span><span class="p">,</span>
+    <span class="n">compute_fraction_of_bifunctional_reactive_sites</span><span class="p">,</span>
+    <span class="n">compute_stoichiometric_imbalance</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.io.unit_styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">UnitStyle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Universe</span>
+
+
+<div class="viewcode-block" id="predict_shear_modulus">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.predict_shear_modulus">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict_shear_modulus</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Predict the shear modulus using MMT Analysis.</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</span>
+
+<span class="sd">    :param kwargs: See :func:`~pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition`</span>
+<span class="sd">    :return: G: The predicted shear modulus</span>
+
+<span class="sd">    ToDo:</span>
+<span class="sd">      - Support more than one crosslinker type (as is supported by original formula)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">g_mmt_phantom</span><span class="p">,</span> <span class="n">g_mmt_entanglement</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">compute_modulus_decomposition</span><span class="p">(</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">g_mmt_phantom</span> <span class="o">+</span> <span class="n">g_mmt_entanglement</span>  <span class="c1"># type: ignore</span></div>
+
+
+
+<div class="viewcode-block" id="predict_number_density_of_junction_points">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_junction_points">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict_number_density_of_junction_points</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Universe</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the number density of network strands using MMT</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737 (see supporting information for formulae)</span>
+
+<span class="sd">    :param network: The network to compute the weight fraction for</span>
+<span class="sd">    :param crosslinker_type: The atom type to use to split the molecules</span>
+<span class="sd">    :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.</span>
+<span class="sd">    :return: mu: The predicted number density of junction points</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="n">_compute_validate_parameters</span><span class="p">(</span>
+        <span class="p">{</span><span class="o">**</span><span class="nb">locals</span><span class="p">()},</span>
+        <span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">,</span> <span class="s2">&quot;weight_fractions&quot;</span><span class="p">,</span> <span class="s2">&quot;p_f_a_out&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">functionality_per_type</span><span class="p">,</span> <span class="n">weight_fractions</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;weight_fractions&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;p_f_a_out&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">functionality_per_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weight_fractions</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">alpha</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">weight_fractions</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span>
+    <span class="k">elif</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">weight_fractions</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="mi">4</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">**</span> <span class="mi">4</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">&quot;Currently, only crosslinker functionalities of 3 and 4 are supported, </span><span class="si">{}</span><span class="s2"> given.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="predict_number_density_of_network_strands">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict_number_density_of_network_strands</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Universe</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">r</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">p</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the number density of network strands using MMT</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737 (see supporting information for formulae)</span>
+
+<span class="sd">    :param network: The network to compute the weight fraction for</span>
+<span class="sd">    :param crosslinker_type: The atom type to use to split the molecules</span>
+<span class="sd">    :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.</span>
+<span class="sd">    :param r: The stoichiometric imbalance</span>
+<span class="sd">    :param p: The extent of reaction in terms of the crosslinkers</span>
+<span class="sd">    :return: nu: The predicted number density of network strands</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="n">_compute_validate_parameters</span><span class="p">(</span>
+        <span class="p">{</span><span class="o">**</span><span class="nb">locals</span><span class="p">()},</span>
+        <span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">,</span> <span class="s2">&quot;weight_fractions&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">&quot;crosslinker_type&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">functionality_per_type</span><span class="p">,</span> <span class="n">weight_fractions</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">crosslinker_type</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;weight_fractions&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;p&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;crosslinker_type&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">functionality_per_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weight_fractions</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">crosslinker_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">weight_fractions</span><span class="p">:</span>
+        <span class="n">weight_fractions</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">alpha</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">compute_miller_macosko_probabilities</span><span class="p">(</span>
+        <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">,</span>
+        <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+        <span class="n">f</span><span class="o">=</span><span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">3</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight_fractions</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span>
+    <span class="k">elif</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">weight_fractions</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="mi">6</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">**</span> <span class="mi">4</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">&quot;Currently, only junction functionalities of 3 and 4 are supported, </span><span class="si">{}</span><span class="s2"> given.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_weight_fraction_of_dangling_chains">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_weight_fraction_of_dangling_chains</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Universe</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">weight_fractions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">r</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">p</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">b2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the weight fraction of dangling (pendant) strands in infinite network</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - Eq. 6.4 in https://doi.org/10.1002/pen.760190409</span>
+
+<span class="sd">    :param network: The network to compute the weight fraction for</span>
+<span class="sd">    :param crosslinker_type: The atom type to use to split the molecules</span>
+<span class="sd">    :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.</span>
+<span class="sd">    :param weight_fractions: a dictionary with the weight fraction of each type of atom</span>
+<span class="sd">    :param r: The stoichiometric imbalance</span>
+<span class="sd">    :param p: The extent of reaction in terms of the crosslinkers</span>
+<span class="sd">    :param b2: The mole fraction of reactive sites in B2 among all reactive sites</span>
+<span class="sd">        in a mixture of B1 and B2</span>
+<span class="sd">    :return: weightFraction :math:`$\\Phi_d = w_p$`: weightDangling/weightTotal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">network</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="n">param</span> <span class="o">=</span> <span class="n">_compute_validate_parameters</span><span class="p">(</span>
+        <span class="p">{</span><span class="o">**</span><span class="nb">locals</span><span class="p">()},</span>
+        <span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">,</span> <span class="s2">&quot;weight_fractions&quot;</span><span class="p">,</span> <span class="s2">&quot;p_f_a_out&quot;</span><span class="p">,</span> <span class="s2">&quot;p_f_b_out&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">functionality_per_type</span><span class="p">,</span> <span class="n">weight_fractions</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;weight_fractions&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;p_f_a_out&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;p_f_b_out&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">functionality_per_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weight_fractions</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">alpha</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">beta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">)</span>
+
+    <span class="n">w_dangling</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">atom_type</span><span class="p">,</span> <span class="n">weight_fraction</span> <span class="ow">in</span> <span class="n">weight_fractions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">atom_type</span> <span class="o">==</span> <span class="n">crosslinker_type</span><span class="p">:</span>
+            <span class="n">probabilities</span> <span class="o">=</span> <span class="n">compute_probability_that_crosslink_is_dangling</span><span class="p">(</span>
+                <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">],</span> <span class="n">alpha</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">probabilities</span> <span class="o">+=</span> <span class="p">(</span>
+                    <span class="n">compute_probability_that_crosslink_with_degree_is_dangling</span><span class="p">(</span>
+                        <span class="n">functionality_of_monomer</span><span class="o">=</span><span class="n">functionality_per_type</span><span class="p">[</span>
+                            <span class="n">crosslinker_type</span>
+                        <span class="p">],</span>
+                        <span class="n">degree_of_ineffectiveness</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+                        <span class="n">p_f_a_out</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">])</span>
+                <span class="p">)</span>
+            <span class="n">w_dangling</span> <span class="o">+=</span> <span class="n">probabilities</span> <span class="o">*</span> <span class="n">weight_fraction</span>
+        <span class="k">elif</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">atom_type</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">w_dangling</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="n">weight_fraction</span>
+                <span class="o">*</span> <span class="n">compute_probability_that_bifunctional_monomer_is_dangling</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">atom_type</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># TODO: revise this, check if correct</span>
+            <span class="n">w_dangling</span> <span class="o">+=</span> <span class="n">weight_fraction</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Currently, only monomeric, bifunctional, and junction functionalities are supported, </span><span class="si">{}</span><span class="s2"> given.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">atom_type</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">w_dangling</span></div>
+
+
+
+<div class="viewcode-block" id="compute_weight_fraction_of_backbone">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_weight_fraction_of_backbone</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Universe</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">weight_fractions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">r</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">p</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">b2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the weight fraction of the backbone (elastically effective) strands in an infinite network</span>
+
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
+<span class="sd">    :param functionality_per_type: a dictionary with key: atom type, and value: functionality atoms with this type.</span>
+<span class="sd">    :param weight_fractions: a dictionary with the weight fraction of each type of atom</span>
+<span class="sd">    :param r: The stoichiometric imbalance</span>
+<span class="sd">    :param p: The extent of reaction in terms of the crosslinkers</span>
+<span class="sd">    :param b2: The mole fraction of reactive sites in B2 among all reactive sites</span>
+<span class="sd">        in a mixture of B1 and B2</span>
+<span class="sd">    :return: :math:`\\Phi_{el} = w_e`: weight fraction of network backbone</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">network</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="n">param</span> <span class="o">=</span> <span class="n">_compute_validate_parameters</span><span class="p">(</span>
+        <span class="p">{</span><span class="o">**</span><span class="nb">locals</span><span class="p">()},</span>
+        <span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">,</span> <span class="s2">&quot;weight_fractions&quot;</span><span class="p">,</span> <span class="s2">&quot;p_f_a_out&quot;</span><span class="p">,</span> <span class="s2">&quot;p_f_b_out&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">functionality_per_type</span><span class="p">,</span> <span class="n">weight_fractions</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;weight_fractions&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;p_f_a_out&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;p_f_b_out&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">functionality_per_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
+        <span class="n">weight_fractions</span><span class="p">,</span> <span class="nb">dict</span>
+    <span class="p">)</span>
+
+    <span class="n">w_elastic</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">atom_type</span><span class="p">,</span> <span class="n">weight_fraction</span> <span class="ow">in</span> <span class="n">weight_fractions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">atom_type</span> <span class="o">==</span> <span class="n">crosslinker_type</span><span class="p">:</span>
+            <span class="n">probabilities</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">probabilities</span> <span class="o">+=</span> <span class="n">compute_probability_that_crosslink_is_effective</span><span class="p">(</span>
+                    <span class="n">functionality_of_monomer</span><span class="o">=</span><span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">],</span>
+                    <span class="n">expected_degree_of_effect</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+                    <span class="n">p_f_a_out</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">])</span>
+            <span class="n">w_elastic</span> <span class="o">+=</span> <span class="n">probabilities</span> <span class="o">*</span> <span class="n">weight_fraction</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">w_elastic</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="n">weight_fraction</span>
+                <span class="o">*</span> <span class="n">compute_probability_that_bifunctional_monomer_is_effective</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">w_elastic</span></div>
+
+
+
+<div class="viewcode-block" id="compute_weight_fraction_of_soluble_material">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_weight_fraction_of_soluble_material</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Universe</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">weight_fractions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">r</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">p</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">b2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the weight fraction of soluble material by MMT.</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - https://pubs.acs.org/doi/10.1021/ma00046a021</span>
+<span class="sd">      - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737</span>
+
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
+<span class="sd">    :param weight_fractions: a dictionary with key: type, and value: weight fraction of type.</span>
+<span class="sd">            Pass if you want to omit the network.</span>
+<span class="sd">    :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.</span>
+<span class="sd">          See: :func:`~pylimer_tools_cpp.Universe.determine_functionality_per_type`.</span>
+<span class="sd">    :param r: The stoichiometric imbalance</span>
+<span class="sd">    :param p: The extent of reaction in terms of the crosslinkers</span>
+<span class="sd">    :param b2: The mole fraction of reactive sites in B2 among all reactive sites</span>
+<span class="sd">        in a mixture of B1 and B2</span>
+<span class="sd">    :return: :math:`W_{sol}` (float): The weight fraction of soluble material according to MMT.</span>
+<span class="sd">    :return: weight_fractions (dict): a dictionary with key: type, and value: weight fraction of type</span>
+<span class="sd">    :return: :math:`\\alpha` (float): Macosko &amp; Miller&#39;s :math:`P(F_A)`</span>
+<span class="sd">    :return: :math:`\\beta` (float): Macosko &amp; Miller&#39;s :math:`P(F_B)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">network</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_bonds</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">1.0</span>
+
+    <span class="n">param</span> <span class="o">=</span> <span class="n">_compute_validate_parameters</span><span class="p">(</span>
+        <span class="p">{</span><span class="o">**</span><span class="nb">locals</span><span class="p">()},</span>
+        <span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">,</span> <span class="s2">&quot;weight_fractions&quot;</span><span class="p">,</span> <span class="s2">&quot;p_f_a_out&quot;</span><span class="p">,</span> <span class="s2">&quot;p_f_b_out&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">functionality_per_type</span><span class="p">,</span> <span class="n">weight_fractions</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;weight_fractions&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;p_f_a_out&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;p_f_b_out&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">functionality_per_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weight_fractions</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">alpha</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">beta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">)</span>
+
+    <span class="n">w_sol</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">weight_fractions</span><span class="p">:</span>
+        <span class="n">coefficient</span> <span class="o">=</span> <span class="n">alpha</span> <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="n">crosslinker_type</span> <span class="k">else</span> <span class="n">beta</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">weight_fractions</span> <span class="ow">or</span> <span class="n">math</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>
+            <span class="n">weight_fractions</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-10</span>
+        <span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">w_sol</span> <span class="o">+=</span> <span class="n">weight_fractions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">coefficient</span><span class="p">,</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">w_sol</span></div>
+
+
+
+<div class="viewcode-block" id="compute_weight_fraction_of_soluble_material_from_weight_fractions">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_weight_fraction_of_soluble_material_from_weight_fractions</span><span class="p">(</span>
+    <span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">w_f</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">w_g</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use MMT to compute the weight fraction of soluble material using</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        `W_{sol} = w_A_f P(F_A^{out})^f + w_B_g [rpP(F_A^{out})^{f-1}+1-rp]^g`</span>
+
+<span class="sd">    :param r: The stoichiometric imbalance</span>
+<span class="sd">    :param p: The extent of reaction in terms of the crosslinkers</span>
+<span class="sd">    :param f: The functionality of the the crosslinker</span>
+<span class="sd">    :param w_f: The weight fraction of the crosslinkers</span>
+<span class="sd">    :param w_g: The weight fraction of ordinary chains</span>
+<span class="sd">    :param g: The functionality of the ordinary chains</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">alpha</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">compute_miller_macosko_probabilities</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">w_f</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="n">f</span><span class="p">)</span> <span class="o">+</span> <span class="n">w_g</span> <span class="o">*</span> \
+        <span class="p">((</span><span class="n">r</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="o">**</span> <span class="n">g</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_miller_macosko_probabilities">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_miller_macosko_probabilities</span><span class="p">(</span>
+        <span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute Macosko and Miller&#39;s probabilities :math:`P(F_A)` and :math:`P(F_B)`</span>
+<span class="sd">    i.e., the probability that a randomly chosen A (crosslink) or B (strand-end),</span>
+<span class="sd">    respectively, is the start of a finite chain.</span>
+
+<span class="sd">    Sources:</span>
+<span class="sd">        - https://doi.org/10.1021/ma60050a003</span>
+<span class="sd">        - https://doi.org/10.1021/ma60050a004</span>
+<span class="sd">        - https://doi.org/10.1021/ma00046a021 (with monofunctional chains, f = 4)</span>
+<span class="sd">        - https://doi.org/10.1021/cm0343507 (with monofunctional chains, f = 3)</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        Currently, only systems with B_2, B_1 and A_f are supported.</span>
+<span class="sd">        If you have a system with other functionality distributions,</span>
+<span class="sd">        you would need to implement these formulas yourselves.</span>
+
+<span class="sd">    :param r: The stoichiometric imbalance</span>
+<span class="sd">    :param p: The extent of reaction in terms of the crosslinkers</span>
+<span class="sd">    :param f: The functionality of the the crosslinker</span>
+<span class="sd">    :param b2: The fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.</span>
+<span class="sd">            Can be computed e.g. as :math:`b_2 = \\frac{2 \\cdot [B_2]}{[B_1] + 2 \\cdot [B_2]}`</span>
+<span class="sd">    :return: alpha: :math:`P(F_A)`</span>
+<span class="sd">    :return: beta: :math:`P(F_B)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">f</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span>
+    <span class="k">if</span> <span class="n">b2</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">b2</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;b2 must be in (0, 1), got b2 = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">b2</span><span class="p">))</span>
+
+    <span class="c1"># first, check a few things required by the formulae</span>
+    <span class="c1"># since we want alpha, beta \in [0,1], given they are supposed to be</span>
+    <span class="c1"># probabilities</span>
+    <span class="n">_validate_r_and_p</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">b2</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The resulting P(F_A) is probably unreliable, &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;as the detected root does not fulfill the required conditions.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># End validation.</span>
+    <span class="c1"># actually do the calculations</span>
+    <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">b2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">b2</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">f</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">b2</span><span class="p">))</span> <span class="o">-</span> <span class="mf">3.0</span> <span class="o">/</span>
+                 <span class="mf">4.0</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">f</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;A functionality of </span><span class="si">{}</span><span class="s2"> is not supported.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">fun_to_root_for_alpha</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">r</span> <span class="o">*</span> <span class="n">b2</span> <span class="o">*</span> <span class="n">p</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> \
+                <span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">b2</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">fun_to_root_for_alpha_prime</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">b2</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">fun_to_root_for_alpha_prime2</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">+</span> <span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">b2</span>
+
+        <span class="n">alpha_sol</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">root_scalar</span><span class="p">(</span>
+            <span class="n">fun_to_root_for_alpha</span><span class="p">,</span>
+            <span class="n">bracket</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">method</span><span class="o">=</span><span class="s2">&quot;halley&quot;</span><span class="p">,</span>
+            <span class="n">fprime</span><span class="o">=</span><span class="n">fun_to_root_for_alpha_prime</span><span class="p">,</span>
+            <span class="n">fprime2</span><span class="o">=</span><span class="n">fun_to_root_for_alpha_prime2</span><span class="p">,</span>
+            <span class="n">x0</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha_sol</span><span class="o">.</span><span class="n">root</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">p</span>
+    <span class="k">if</span> <span class="n">alpha</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">alpha</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The resulting P(F_A) from r = </span><span class="si">{}</span><span class="s2">, p = </span><span class="si">{}</span><span class="s2">, b2 = </span><span class="si">{}</span><span class="s2"> for f = </span><span class="si">{}</span><span class="s2"> is probably unreliable, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">r</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">f</span>
+            <span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;as it will be clipped to [0,1] from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">beta</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">beta</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The resulting P(F_B) from r = </span><span class="si">{}</span><span class="s2">, p = </span><span class="si">{}</span><span class="s2"> , b2 = </span><span class="si">{}</span><span class="s2">for f = </span><span class="si">{}</span><span class="s2"> is probably unreliable, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">r</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">f</span>
+            <span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;as it will be clipped to [0,1] from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="c1"># TODO: reconsider clipping.</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_modulus_decomposition">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_modulus_decomposition</span><span class="p">(</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Universe</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ureg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pint</span><span class="o">.</span><span class="n">UnitRegistry</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">unit_style</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">UnitStyle</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">r</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">p</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">f</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nu</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">g_e_1</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.</span>
+
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :param ureg: The unit registry to use</span>
+<span class="sd">    :param unit_style: The unit style to use to have the results in appropriate units</span>
+<span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
+<span class="sd">    :param r: The stoichiometric imbalance. Optional if network is specified</span>
+<span class="sd">    :param p: The extent of reaction. Optional if network is specified</span>
+<span class="sd">    :param f: The functionality of the the crosslinker. Optional if network is specified</span>
+<span class="sd">    :param nu: The strand number density (nr of strands per volume) (ideally with units).</span>
+<span class="sd">        Optional if network is specified</span>
+<span class="sd">    :param temperature: The temperature to compute the modulus at. Default: 298.15 K</span>
+<span class="sd">        Optional, can be passed to improve performance</span>
+<span class="sd">    :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.</span>
+<span class="sd">        Optional, can be passed to improve performance</span>
+<span class="sd">    :param g_e_1: The melt entanglement modulus</span>
+<span class="sd">    :param b2: The mole fraction of reactive sites in B2 among all reactive sites</span>
+<span class="sd">        in a mixture of B1 and B2</span>
+<span class="sd">    :return: G_MMT_phantom: The phantom contribution to the MMT modulus;</span>
+<span class="sd">        see also :func:`pylimer_tools.calc.miller_macosko_theory.computeJunctionModulus`</span>
+<span class="sd">    :return: G_MMT_entanglement: The entanglement contribution to the MMT modulus</span>
+<span class="sd">    :return: g_anm: The ANM estimate of the modulus</span>
+<span class="sd">    :return: g_pnm: The PNM estimate of the modulus</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">ureg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">unit_style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Unit style or unit registry must be specified to compute modulus.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">ureg</span> <span class="o">=</span> <span class="n">unit_style</span><span class="o">.</span><span class="n">get_underlying_unit_registry</span><span class="p">()</span>
+
+    <span class="n">param</span> <span class="o">=</span> <span class="n">_compute_validate_parameters</span><span class="p">(</span>
+        <span class="p">{</span><span class="o">**</span><span class="nb">locals</span><span class="p">()},</span>
+        <span class="p">[</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;nu&quot;</span><span class="p">,</span> <span class="s2">&quot;p_f_a_out&quot;</span><span class="p">,</span> <span class="s2">&quot;p_f_b_out&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">f</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;f&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;nu&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;p_f_a_out&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;p_f_b_out&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;p&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">f</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">nu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">alpha</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">beta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">temperature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">temperature</span> <span class="o">=</span> <span class="p">(</span><span class="mf">273.15</span> <span class="o">+</span> <span class="mi">25</span><span class="p">)</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span>  <span class="c1"># Temperature in Kelvin</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">ureg</span><span class="o">.</span><span class="n">Quantity</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">g_e_1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">g_e_1</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">8.3145</span>  <span class="c1"># gas constant, J/(mol*K)</span>
+            <span class="o">*</span> <span class="n">temperature</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;kelvin&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span>  <span class="c1"># Temperature in Kelvin</span>
+            <span class="o">*</span> <span class="mf">1e-6</span>
+            <span class="o">*</span> <span class="mf">94.79281</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;MPa&quot;</span><span class="p">)</span>
+        <span class="c1"># -&gt; MPa, melt entanglement modulus of PDMS</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g_e_1</span><span class="p">,</span> <span class="n">ureg</span><span class="o">.</span><span class="n">Quantity</span><span class="p">)</span>
+
+    <span class="c1"># Boltzmann constant</span>
+    <span class="n">kb</span> <span class="o">=</span> <span class="mf">1.380649e-23</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">joule</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span>
+    <span class="c1"># affine</span>
+    <span class="n">g_anm</span> <span class="o">=</span> <span class="n">nu</span> <span class="o">*</span> <span class="n">kb</span> <span class="o">*</span> <span class="n">temperature</span>
+    <span class="c1"># phantom</span>
+    <span class="n">g_pnm</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="n">nu</span> <span class="o">*</span> <span class="n">kb</span> <span class="o">*</span> <span class="n">temperature</span> <span class="k">if</span> <span class="n">f</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+    <span class="c1"># MMT:</span>
+    <span class="n">gamma_mmt_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">gamma_mmt_sum</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="n">compute_probability_that_crosslink_is_effective</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+    <span class="n">gamma_mmt</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">b2</span> <span class="o">/</span> <span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="n">gamma_mmt_sum</span> <span class="k">if</span> <span class="n">f</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+    <span class="n">g_mmt_phantom</span> <span class="o">=</span> <span class="n">gamma_mmt</span> <span class="o">*</span> <span class="n">nu</span> <span class="o">*</span> <span class="n">kb</span> <span class="o">*</span> <span class="n">temperature</span>
+    <span class="c1"># fraction of elastically effective strands.</span>
+    <span class="n">g_mmt_entanglement</span> <span class="o">=</span> <span class="n">g_e_1</span> <span class="o">*</span> <span class="n">compute_trapping_factor</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">)</span>
+    <span class="c1"># entanglement part. TODO : check adjustment with r</span>
+    <span class="k">return</span> <span class="n">g_mmt_phantom</span><span class="p">,</span> <span class="n">g_mmt_entanglement</span><span class="p">,</span> <span class="n">g_anm</span><span class="p">,</span> <span class="n">g_pnm</span></div>
+
+
+
+<div class="viewcode-block" id="compute_extracted_modulus">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_extracted_modulus</span><span class="p">(</span>
+    <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">g_e_1</span><span class="p">:</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">w_sol</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">xlink_concentration_0</span><span class="p">:</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">ureg</span><span class="p">:</span> <span class="n">pint</span><span class="o">.</span><span class="n">UnitRegistry</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute MMT&#39;s modulus, assuming the solvent is removed</span>
+
+<span class="sd">    :param p: The crosslinker conversion</span>
+<span class="sd">    :param r: The stoichiometric imbalance</span>
+<span class="sd">    :param f: The functionality of the crosslinkers</span>
+<span class="sd">    :param g_e_1: The melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`</span>
+<span class="sd">    :param xlink_concentration_0: [A_f]_0, in 1/volume units</span>
+<span class="sd">    :param ureg: The unit registry to use</span>
+<span class="sd">    :param alpha: :math:`P(F_a^{out})`, optional</span>
+<span class="sd">    :param temperature: The temperatures; defaults to room temperature</span>
+<span class="sd">    :param w_sol: The soluble fraction (to be removed)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">temperature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ureg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Unit registry must be initialized, or temperature specified.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">temperature</span> <span class="o">=</span> <span class="p">(</span><span class="mf">273.15</span> <span class="o">+</span> <span class="mi">25</span><span class="p">)</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span>
+
+    <span class="n">junction_part</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">w_sol</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">compute_junction_modulus</span><span class="p">(</span>
+        <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+        <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">,</span>
+        <span class="n">xlink_concentration_0</span><span class="o">=</span><span class="n">xlink_concentration_0</span><span class="p">,</span>
+        <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span>
+        <span class="n">ureg</span><span class="o">=</span><span class="n">ureg</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+        <span class="n">b2</span><span class="o">=</span><span class="n">b2</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">entanglement_part</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">w_sol</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">compute_entanglement_modulus</span><span class="p">(</span>
+        <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+        <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">,</span>
+        <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span>
+        <span class="n">g_e_1</span><span class="o">=</span><span class="n">g_e_1</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+        <span class="n">b2</span><span class="o">=</span><span class="n">b2</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">junction_part</span> <span class="o">+</span> <span class="n">entanglement_part</span></div>
+
+
+
+<div class="viewcode-block" id="compute_entanglement_modulus">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_entanglement_modulus</span><span class="p">(</span>
+    <span class="n">g_e_1</span><span class="p">:</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Universe</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">p</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">r</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">f</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">b2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute MMT&#39;s entanglement contribution to the equilibrium shear modulus, given by</span>
+<span class="sd">    :math:`k_B T \\epsilon_e T_e`.</span>
+
+<span class="sd">    :param g_e_1: The melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`</span>
+<span class="sd">    :param temperature: The temperatures; defaults to room temperature (25 °C)</span>
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
+<span class="sd">    :param p: The crosslinker conversion</span>
+<span class="sd">    :param r: The stoichiometric imbalance</span>
+<span class="sd">    :param f: The functionality of the crosslinkers</span>
+<span class="sd">    :param beta: :math:`P(F_b^{out})`, optional</span>
+<span class="sd">    :returns: :math:`T_e \\cdot G_e(1)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="n">_compute_validate_parameters</span><span class="p">(</span>
+        <span class="p">{</span><span class="o">**</span><span class="nb">locals</span><span class="p">()},</span>
+        <span class="p">[</span><span class="s2">&quot;p_f_b_out&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">compute_trapping_factor</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;p_f_b_out&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="n">g_e_1</span></div>
+
+
+
+<div class="viewcode-block" id="compute_junction_modulus">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_junction_modulus</span><span class="p">(</span>
+    <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">xlink_concentration_0</span><span class="p">:</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">ureg</span><span class="p">:</span> <span class="n">pint</span><span class="o">.</span><span class="n">UnitRegistry</span><span class="p">,</span>
+    <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">b2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute MMT&#39;s junction modulus, given by</span>
+<span class="sd">    :math:`G_{junctions} = k_B T [A_f]_0 \\sum_{m=3}^{f} \\frac{m-2}{2} P(X_{m,f})`.</span>
+
+<span class="sd">    :param p: The crosslinker conversion</span>
+<span class="sd">    :param r: The stoichiometric imbalance</span>
+<span class="sd">    :param xlink_concentration_0: [A_f]_0, in 1/volume units</span>
+<span class="sd">    :param ureg: The unit registry to use</span>
+<span class="sd">    :param f: The functionality of the crosslinkers</span>
+<span class="sd">    :param alpha: :math:`P(F_a^{out})`, optional</span>
+<span class="sd">    :param temperature: The temperatures; defaults to room temperature (25 °C)</span>
+<span class="sd">    :return: The junction modulus contribution</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="n">_compute_validate_parameters</span><span class="p">(</span>
+        <span class="p">{</span><span class="o">**</span><span class="nb">locals</span><span class="p">()},</span>
+        <span class="p">[</span><span class="s2">&quot;p_f_a_out&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;p_f_a_out&quot;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">alpha</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">temperature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">ureg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Unit registry must be initialized.&quot;</span>
+        <span class="n">temperature</span> <span class="o">=</span> <span class="p">(</span><span class="mf">273.15</span> <span class="o">+</span> <span class="mi">25</span><span class="p">)</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span>
+    <span class="k">assert</span> <span class="n">alpha</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="n">gamma_mmt_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">gamma_mmt_sum</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="n">compute_probability_that_crosslink_is_effective</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+
+    <span class="n">kb</span> <span class="o">=</span> <span class="mf">1.380649e-23</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">joule</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span>
+    <span class="k">return</span> <span class="n">kb</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">xlink_concentration_0</span> <span class="o">*</span> <span class="n">gamma_mmt_sum</span></div>
+
+
+
+<div class="viewcode-block" id="compute_trapping_factor">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_trapping_factor</span><span class="p">(</span><span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Langley trapping factor :math:`T_e`.</span>
+
+<span class="sd">    Literature: https://doi.org/10.1021/ma60004a015</span>
+
+<span class="sd">    :param beta: :math:`P(F_b^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`</span>
+<span class="sd">    :return: The Langley trapping factor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># for long B2s reacting with small A_fs</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">4</span></div>
+
+    <span class="c1"># pel = ((1 / (p)) * (1 - alpha)) ** 2</span>
+    <span class="c1"># return pel**2</span>
+
+
+<div class="viewcode-block" id="compute_probability_that_crosslink_is_effective">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_effective">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_probability_that_crosslink_is_effective</span><span class="p">(</span>
+    <span class="n">functionality_of_monomer</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">expected_degree_of_effect</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">p_f_a_out</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the probability that an Af, monomer will be an effective crosslink of exactly degree m</span>
+
+<span class="sd">    :math:`P(X_m^f) = \\binom{f}{m} [P(F_A^{out})]^{f-m}[1-P(F_A^{out})]^m`</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">        - Eq. 45 in Miller, Macosko 1976, A New Derivation of Post Gel Properties of Network</span>
+
+<span class="sd">    :param functionality_of_monomer: f</span>
+<span class="sd">    :param expected_degree_of_effect: m</span>
+<span class="sd">    :param p_f_a_out: :math:`P(F_A^{out})`</span>
+<span class="sd">    :return: The probability that a crosslink is effective</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">p_f_a_out</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;p_f_a_out must be between 0 and 1&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">functionality_of_monomer</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">expected_degree_of_effect</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">p_f_a_out</span>
+    <span class="k">return</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">binom</span><span class="p">(</span>
+        <span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="n">m</span><span class="p">))</span> <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">**</span> <span class="n">m</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_probability_that_bifunctional_monomer_is_effective">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_effective">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_probability_that_bifunctional_monomer_is_effective</span><span class="p">(</span>
+    <span class="n">p_f_b_out</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Consider a copolymerization of A_f with B_2.</span>
+<span class="sd">    This function computes the probability that a random B_2 unit will be effective.</span>
+
+<span class="sd">    :param p_f_b_out: :math:`P(F_B^{out})`</span>
+<span class="sd">    :return: The probability that a bifunctional monomer is effective</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">p_f_b_out</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;p_f_b_out must be between 0 and 1&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p_f_b_out</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="compute_probability_that_crosslink_with_degree_is_dangling">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_with_degree_is_dangling">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_probability_that_crosslink_with_degree_is_dangling</span><span class="p">(</span>
+    <span class="n">functionality_of_monomer</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">degree_of_ineffectiveness</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">p_f_a_out</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Consider a copolymerization of A_f with B_2.</span>
+<span class="sd">    This function computes the probability that a random A_f unit will have i pendant arms.</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">        - Eq. 6.3 in https://doi.org/10.1002/pen.760190409</span>
+
+<span class="sd">    :param functionality_of_monomer: f</span>
+<span class="sd">    :param degree_of_ineffectiveness: i</span>
+<span class="sd">    :param p_f_a_out: :math:`P(F_A^{out})`</span>
+<span class="sd">    :return: The probability that a crosslink with degree is dangling</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">p_f_a_out</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;p_f_a_out must be between 0 and 1&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">functionality_of_monomer</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">degree_of_ineffectiveness</span>
+    <span class="k">assert</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">f</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;degree_of_ineffectiveness must be less or equal to f-2&quot;</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">p_f_a_out</span>
+    <span class="c1"># NOTE: verify that the last exponent is f - m, rather than f - 1 as in</span>
+    <span class="c1"># the paper</span>
+    <span class="k">return</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">binom</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="o">*</span> \
+        <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="n">i</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="compute_probability_that_crosslink_is_dangling">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_dangling">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_probability_that_crosslink_is_dangling</span><span class="p">(</span>
+    <span class="n">functionality_of_monomer</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">p_f_a_out</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Consider a copolymerization of A_f with B_2.</span>
+<span class="sd">    This function computes the probability that a random A_f unit will be dangling (pendant).</span>
+<span class="sd">    This is equal to the probability that only one of the arms is attached to the gel.</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">        - Eq. 6.2 in https://doi.org/10.1002/pen.760190409</span>
+
+<span class="sd">    :param functionality_of_monomer: f</span>
+<span class="sd">    :param p_f_a_out: :math:`P(F_A^{out})`</span>
+<span class="sd">    :return: The probability that a crosslink is dangling</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">p_f_a_out</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;p_f_a_out must be between 0 and 1&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">functionality_of_monomer</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">p_f_a_out</span>
+    <span class="k">return</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">binom</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_probability_that_bifunctional_monomer_is_dangling">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_dangling">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_probability_that_bifunctional_monomer_is_dangling</span><span class="p">(</span>
+    <span class="n">p_f_b_out</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Consider a copolymerization of A_f with B_2.</span>
+<span class="sd">    This function computes the probability that a random B_2 unit will be dangling.</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">        - Eq. 6.1 in https://doi.org/10.1002/pen.760190409</span>
+
+<span class="sd">    :param p_f_b_out: :math:`P(F_B^{out})`</span>
+<span class="sd">    :return: The probability that a bifunctional monomer is dangling</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">p_f_b_out</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;p_f_b_out must be between 0 and 1&quot;</span>
+    <span class="k">return</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">binom</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">p_f_b_out</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">p_f_b_out</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="predict_gelation_point">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.predict_gelation_point">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict_gelation_point</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the gelation point :math:`p_{gel}` as theoretically predicted</span>
+<span class="sd">    (gelation point = critical extent of reaction for gelation)</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - https://www.sciencedirect.com/science/article/pii/003238618990253X</span>
+
+<span class="sd">    :param r: The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</span>
+<span class="sd">    :param f: functionality of the crosslinkers</span>
+<span class="sd">    :param b2: The mole fraction of reactive sites in B2 among all reactive sites</span>
+<span class="sd">        in a mixture of B1 and B2</span>
+<span class="sd">    :return: p_gel: critical extent of reaction for gelation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># if (r is None):</span>
+    <span class="c1">#   r = calculateEffectiveCrosslinkerFunctionality(network, crosslinker_type, f)</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">b2</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="predict_maximum_p">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.predict_maximum_p">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict_maximum_p</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the maximum crosslinker conversion possible given a stoichiometric inbalance.</span>
+
+<span class="sd">    :param r: The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</span>
+<span class="sd">    :param f: functionality of the crosslinkers</span>
+<span class="sd">    :param b2: The mole fraction of reactive sites in B2 among all reactive sites</span>
+<span class="sd">        in a mixture of B1 and B2. Since `r` already includes the number of active sites, this argument</span>
+<span class="sd">        is not necessary.</span>
+<span class="sd">    :return: p_max: The maximum crosslinker conversion possible</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_xlinks</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">f</span>
+    <span class="k">if</span> <span class="n">n_xlinks</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">max_possible_bonds</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">f</span> <span class="o">*</span> <span class="n">n_xlinks</span><span class="p">)</span>
+    <span class="n">p_max</span> <span class="o">=</span> <span class="n">max_possible_bonds</span> <span class="o">/</span> <span class="p">(</span><span class="n">n_xlinks</span> <span class="o">*</span> <span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p_max</span></div>
+
+
+
+<div class="viewcode-block" id="predict_p_from_w_sol">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict_p_from_w_sol</span><span class="p">(</span>
+    <span class="n">w_sol</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">network</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Universe</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">weight_fractions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">r</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">b2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the extent of reaction based on the weight fraction of soluble material.</span>
+
+<span class="sd">    :param w_sol: The weight fraction of soluble material</span>
+<span class="sd">    :param network: The polymer network to do the computation for</span>
+<span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
+<span class="sd">    :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type</span>
+<span class="sd">    :param weight_fractions: a dictionary with the weight fraction of each type of atom</span>
+<span class="sd">    :param r: The stoichiometric imbalance</span>
+<span class="sd">    :param b2: The mole fraction of reactive sites in B2 among all reactive sites</span>
+<span class="sd">        in a mixture of B1 and B2</span>
+<span class="sd">    :return: The extent of reaction p</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_wsol</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">compute_weight_fraction_of_soluble_material</span><span class="p">(</span>
+            <span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span>
+            <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">crosslinker_type</span><span class="p">,</span>
+            <span class="n">functionality_per_type</span><span class="o">=</span><span class="n">functionality_per_type</span><span class="p">,</span>
+            <span class="n">weight_fractions</span><span class="o">=</span><span class="n">weight_fractions</span><span class="p">,</span>
+            <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">,</span>
+            <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+            <span class="n">b2</span><span class="o">=</span><span class="n">b2</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize_scalar</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">w_sol</span> <span class="o">-</span> <span class="n">compute_wsol</span><span class="p">(</span><span class="n">p</span><span class="p">)),</span> <span class="n">bounds</span><span class="o">=</span><span class="p">[</span><span class="mf">1e-5</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1e-5</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The p predicted from w_sol might be incorrect&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_r_and_p</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate the parameters used in Miller-Macosko theory calculations.</span>
+
+<span class="sd">    This function checks if the stoichiometric imbalance, crosslinker conversion,</span>
+<span class="sd">    and crosslinker functionality are within valid ranges. It also verifies that</span>
+<span class="sd">    the crosslinker conversion does not exceed the maximum possible value given</span>
+<span class="sd">    the stoichiometric imbalance and functionality.</span>
+
+<span class="sd">    :param r: The stoichiometric imbalance (ratio of reactive groups)</span>
+<span class="sd">    :param p: The crosslinker conversion (extent of reaction)</span>
+<span class="sd">    :param f: The functionality of the crosslinker (number of reactive groups)</span>
+<span class="sd">    :raises ValueError: If any parameter is outside its valid range or if p exceeds</span>
+<span class="sd">                       the maximum possible conversion</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The crosslinker conversion `p` must be positive, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The stoichiometric imbalance `r` must be positive, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">r</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">f</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The crosslinker functionality `f` must be &gt;= 2, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="c1"># assume:</span>
+    <span class="n">p_max</span> <span class="o">=</span> <span class="n">predict_maximum_p</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">p_max</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="n">p_max</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;For a system with r = </span><span class="si">{}</span><span class="s2"> and f = </span><span class="si">{}</span><span class="s2">, p (in terms of crosslinkers) must be &lt; </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> given.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">r</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">p_max</span><span class="p">,</span> <span class="n">p</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_ParamValidatorAssembler</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to compute and validate one parameter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">param_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">param_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">param_validator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">dependencies</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_name</span> <span class="o">=</span> <span class="n">param_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_func</span> <span class="o">=</span> <span class="n">param_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_validator</span> <span class="o">=</span> <span class="n">param_validator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span> <span class="o">=</span> <span class="n">dependencies</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A list of parameter validators and assemblers used to compute and validate</span>
+<span class="sd">parameters for Miller-Macosko theory calculations.</span>
+
+<span class="sd">Each validator assembler contains:</span>
+<span class="sd">- param_name: The name of the parameter to validate</span>
+<span class="sd">- param_func: A function that computes the parameter value from other parameters</span>
+<span class="sd">- param_validator: A function that validates the parameter value</span>
+<span class="sd">- dependencies: A list of parameter names that the parameter depends on</span>
+
+<span class="sd">This list is used by the _compute_validate_parameters function to automatically</span>
+<span class="sd">compute missing parameters and validate existing ones</span>
+<span class="sd">when performing Miller-Macosko theory calculations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_validators_assembler</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">_ParamValidatorAssembler</span><span class="p">(</span>
+        <span class="s2">&quot;functionality_per_type&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">determine_functionality_per_type</span><span class="p">(),</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span>
+        <span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+    <span class="n">_ParamValidatorAssembler</span><span class="p">(</span>
+        <span class="s2">&quot;weight_fractions&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compute_weight_fractions</span><span class="p">(),</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span>
+        <span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+    <span class="n">_ParamValidatorAssembler</span><span class="p">(</span>
+        <span class="s2">&quot;crosslinker_type&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">],</span>
+            <span class="n">key</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">),</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+    <span class="n">_ParamValidatorAssembler</span><span class="p">(</span>
+        <span class="s2">&quot;f&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;crosslinker_type&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
+        <span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">,</span> <span class="s2">&quot;crosslinker_type&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+    <span class="n">_ParamValidatorAssembler</span><span class="p">(</span>
+        <span class="s2">&quot;r&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">compute_stoichiometric_imbalance</span><span class="p">(</span>
+            <span class="n">network</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">],</span>
+            <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;crosslinker_type&quot;</span><span class="p">],</span>
+            <span class="n">functionality_per_type</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">],</span>
+        <span class="p">),</span>
+        <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">r</span><span class="p">),</span>
+        <span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">,</span> <span class="s2">&quot;crosslinker_type&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+    <span class="n">_ParamValidatorAssembler</span><span class="p">(</span>
+        <span class="s2">&quot;p&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">compute_crosslinker_conversion</span><span class="p">(</span>
+            <span class="n">network</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">],</span>
+            <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;crosslinker_type&quot;</span><span class="p">],</span>
+            <span class="n">functionality_per_type</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">],</span>
+        <span class="p">),</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">,</span> <span class="s2">&quot;crosslinker_type&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+    <span class="n">_ParamValidatorAssembler</span><span class="p">(</span>
+        <span class="s2">&quot;nu&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_molecules</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;crosslinker_type&quot;</span><span class="p">]))</span>
+            <span class="o">/</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span> <span class="o">*</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;unit_style&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_base_unit_of</span><span class="p">(</span><span class="s2">&quot;volume&quot;</span><span class="p">))</span>
+        <span class="p">),</span>
+        <span class="k">lambda</span> <span class="n">nu</span><span class="p">:</span> <span class="n">nu</span><span class="o">.</span><span class="n">magnitude</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">nu</span><span class="o">.</span><span class="n">magnitude</span><span class="p">),</span>
+        <span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">,</span> <span class="s2">&quot;crosslinker_type&quot;</span><span class="p">,</span> <span class="s2">&quot;unit_style&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+    <span class="n">_ParamValidatorAssembler</span><span class="p">(</span>
+        <span class="s2">&quot;b2&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">compute_fraction_of_bifunctional_reactive_sites</span><span class="p">(</span>
+            <span class="n">network</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">],</span>
+            <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;crosslinker_type&quot;</span><span class="p">],</span>
+            <span class="n">functionality_per_type</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">],</span>
+        <span class="p">),</span>
+        <span class="k">lambda</span> <span class="n">b2</span><span class="p">:</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">b2</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">,</span> <span class="s2">&quot;crosslinker_type&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+    <span class="n">_ParamValidatorAssembler</span><span class="p">(</span>
+        <span class="s2">&quot;p_f_a_out&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">compute_miller_macosko_probabilities</span><span class="p">(</span>
+            <span class="n">r</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;p&quot;</span><span class="p">],</span> <span class="n">f</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;f&quot;</span><span class="p">],</span> <span class="n">b2</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;b2&quot;</span><span class="p">]</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="k">lambda</span> <span class="n">alpha</span><span class="p">:</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">alpha</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;b2&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+    <span class="n">_ParamValidatorAssembler</span><span class="p">(</span>
+        <span class="s2">&quot;p_f_b_out&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">compute_miller_macosko_probabilities</span><span class="p">(</span>
+            <span class="n">r</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;p&quot;</span><span class="p">],</span> <span class="n">f</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;f&quot;</span><span class="p">],</span> <span class="n">b2</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;b2&quot;</span><span class="p">]</span>
+        <span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="k">lambda</span> <span class="n">beta</span><span class="p">:</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">beta</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;b2&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+    <span class="n">_ParamValidatorAssembler</span><span class="p">(</span>
+        <span class="s2">&quot;network&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">],</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Universe</span><span class="p">),</span>
+        <span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+<span class="n">_validator_per_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="o">.</span><span class="n">param_name</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_validators_assembler</span><span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_validate_parameters</span><span class="p">(</span>
+    <span class="n">given_parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Slightly overengineered function</span>
+<span class="sd">    to compute missing parameters e.g. from the network,</span>
+<span class="sd">    and validate parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_param_is_ready</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">given_parameters</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">given_parameters</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_complete</span><span class="p">(</span><span class="n">dependencies</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">_param_is_ready</span><span class="p">(</span><span class="n">param</span><span class="p">)</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">dependencies</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_can_be_computed</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="n">_ParamValidatorAssembler</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">_param_is_ready</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span> <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">param</span><span class="o">.</span><span class="n">dependencies</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="n">param_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_validator_per_name</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span><span class="o">.</span><span class="n">param_validator</span><span class="p">(</span>
+                <span class="n">given_parameters</span><span class="p">[</span><span class="n">p</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Invalid value for parameter &#39;</span><span class="si">{}</span><span class="s2">&#39; (got </span><span class="si">{}</span><span class="s2">).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">param_name</span><span class="p">,</span> <span class="n">given_parameters</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="c1"># first, validate existing parameters</span>
+    <span class="n">present</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">required_parameters</span> <span class="k">if</span> <span class="n">_param_is_ready</span><span class="p">(</span><span class="n">d</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">present</span><span class="p">:</span>
+        <span class="n">_validate</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="c1"># first, determine all parameters to compute</span>
+    <span class="n">to_compute</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">required_parameters</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_param_is_ready</span><span class="p">(</span><span class="n">d</span><span class="p">)])</span>
+    <span class="c1"># add dependencies</span>
+    <span class="n">found_last_iteration</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">while</span> <span class="n">found_last_iteration</span><span class="p">:</span>
+        <span class="n">found_last_iteration</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">to_compute</span><span class="p">):</span>
+            <span class="n">dependencies</span> <span class="o">=</span> <span class="n">_validator_per_name</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">dependencies</span>
+            <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">dependencies</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dep</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_compute</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_param_is_ready</span><span class="p">(</span><span class="n">dep</span><span class="p">):</span>
+                    <span class="n">to_compute</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span>
+                    <span class="n">found_last_iteration</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">found_last_iteration</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">_is_complete</span><span class="p">(</span><span class="n">required_parameters</span><span class="p">):</span>
+        <span class="c1"># Instead of building a dependency graph,</span>
+        <span class="c1"># we simply iterate over all validators and try to compute</span>
+        <span class="c1"># the required parameters, as often as required.</span>
+        <span class="n">found_last_iteration</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">to_compute</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">_can_be_computed</span><span class="p">(</span><span class="n">_validator_per_name</span><span class="p">[</span><span class="n">p</span><span class="p">]):</span>
+                <span class="n">given_parameters</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">_validator_per_name</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">param_func</span><span class="p">(</span>
+                    <span class="n">given_parameters</span>
+                <span class="p">)</span>
+                <span class="n">to_compute</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                <span class="n">_validate</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                <span class="n">found_last_iteration</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found_last_iteration</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Missing required parameters: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">to_compute</span><span class="p">))</span>
+                <span class="o">+</span> <span class="s2">&quot;.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s2">&quot; Some of them may be computed as dependencies of others.&quot;</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_compute</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+                    <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">given_parameters</span>
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021-2025, Tim Bernhard
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../_static/documentation_options.js?v=8a448e45"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

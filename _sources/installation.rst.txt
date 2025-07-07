@@ -1,58 +1,136 @@
-Installation
-============
+Installation Guide
+==================
 
-You can use PyPip to install this package:
+pylimer-tools can be installed in several ways depending on your needs and system configuration.
 
-.. code:: bash
+Quick Installation (Recommended)
+-------------------------------
 
-  python -m pip install pylimer_tools
+For most users, the easiest way to install pylimer-tools is via PyPI:
 
-NOTE: 
-  depending on your OS and Python environment, you may require an installation of some dependencies.
-  In this case, a custom compilation could be a workaroud.
-  Checkout the following sections for your system. 
+.. code-block:: bash
 
-Manual Compilation
-===================
+   pip install pylimer-tools
 
-MacOS / Unix systems
----------------------
+This will install the latest stable version with pre-compiled binaries for most platforms.
 
-Please make sure to have a current version of `git`_ installed before following the next steps.
-A complete script to install this library including all dependencies could look like this:
+Development Installation
+------------------------
 
-.. code:: bash
+If you want to contribute to pylimer-tools or need the latest development features, you can install from source.
 
-  git clone https://github.com/GenieTim/pylimer-tools pylimer_tools
-  python -m pip install ./pylimer_tools
+Prerequisites
+~~~~~~~~~~~~~
 
-To update the custom installation, follow the steps below:
+Before installing from source, ensure you have the following development tools:
 
-.. code:: bash
-  
-  cd pylimer_tools
-  git pull
-  python -m pip install .
+**On macOS/Linux:**
 
-Windows
---------
+.. code-block:: bash
 
-Please make sure to have a current version of `Visual Studio`_ as well as `git`_ installed before following the next steps.
-A complete PowerShell script to install this library including all dependencies could look like this:
+   # Install git and build tools
+   # On macOS (using Homebrew):
+   brew install git cmake bison flex python3
+   
+   # On Ubuntu/Debian:
+   sudo apt-get update
+   sudo apt-get install git build-essential cmake python3-dev bison flex
 
-.. code:: bash
+   # On CentOS/RHEL/Fedora:
+   sudo yum install git gcc-c++ cmake python3-devel bison flex
+   # or for newer versions:
+   sudo dnf install git gcc-c++ cmake python3-devel bison flex
 
-  git clone https://github.com/GenieTim/pylimer-tools pylimer_tools
-  python -m pip install .\pylimer_tools
+**On Windows:**
 
-To update the custom installation, follow the steps below:
+1. Install `Visual Studio Community <https://visualstudio.microsoft.com/vs/community/>`_ with C++ development tools
+2. Install `Git for Windows <https://git-scm.com/download/win>`_
+3. Install `CMake <https://cmake.org/download/>`_
 
-.. code:: bash
+Installation from Source
+~~~~~~~~~~~~~~~~~~~~~~~
 
-  cd pylimer_tools
-  git pull
-  python -m pip install .
+1. **Clone the repository:**
 
+   .. code-block:: bash
 
-.. _git: https://www.git-scm.com/
-.. _Visual Studio: https://visualstudio.microsoft.com/
+      git clone https://github.com/GenieTim/pylimer-tools.git
+      cd pylimer-tools
+
+2. **Install in development mode:**
+
+   .. code-block:: bash
+
+      pip install -e .
+
+   This installs the package in "editable" mode, so changes to the source code are immediately reflected.
+
+3. **Verify the installation:**
+
+   .. code-block:: python
+
+      import pylimer_tools_cpp
+      print(pylimer_tools_cpp.version_information())
+
+Updating Your Installation
+-------------------------
+
+**For PyPI installations:**
+
+.. code-block:: bash
+
+   pip install --upgrade pylimer-tools
+
+**For development installations:**
+
+.. code-block:: bash
+
+   cd /path/to/pylimer-tools
+   git pull origin main
+   pip install -e .
+
+Getting Help
+------------
+
+If you encounter issues during installation:
+
+1. Check the `GitHub Issues page <https://github.com/GenieTim/pylimer-tools/issues>`_
+2. Review the sections above whether you have all dependencies installed
+3. Create a new issue with:
+   - Your operating system and Python version
+   - The complete error message
+   - Steps you've already tried
+
+Virtual Environment Setup (Recommended)
+--------------------------------------
+
+For the best experience and to avoid conflicts with other packages, use a virtual environment:
+
+.. code-block:: bash
+
+   # Create a new virtual environment
+   python -m venv pylimer_env
+   
+   # Activate the environment
+   # On macOS/Linux:
+   source pylimer_env/bin/activate
+   
+   # On Windows:
+   pylimer_env\Scripts\activate
+   
+   # Install pylimer-tools
+   pip install pylimer-tools
+   
+   # When done, deactivate
+   deactivate
+
+With conda/mamba:
+
+.. code-block:: bash
+
+   # Create a new conda environment
+   conda create -n pylimer_env python=3.13
+   conda activate pylimer_env
+   
+   # Install pylimer-tools
+   pip install pylimer-tools
