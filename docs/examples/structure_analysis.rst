@@ -14,8 +14,7 @@ The most common use case is to decompose a crosslinked network into its constitu
 
 To find the chains, there are two main approaches:
 - Removing the crosslinkers and analysing the remaining polymer strands using :func:`~pylimer_tools_cpp.Universe.get_molecules()`
-- Decomposing the network to chains, but keeping the crosslinkers in place, possibly being repeated in all the chains it is associated with.
-   This decomposition can be done using the :func:`~pylimer_tools_cpp.Universe.get_chains_with_crosslinker()` method.
+- Decomposing the network to chains, but keeping the crosslinkers in place, possibly being repeated in all the chains it is associated with. This decomposition can be done using the :func:`~pylimer_tools_cpp.Universe.get_chains_with_crosslinker()` method.
 
 pylimer-tools provides two more advanced methods for decomposing networks:
 - If you removed the junctions yourself, you can use :func:`~pylimer_tools_cpp.Universe.get_clusters()`
