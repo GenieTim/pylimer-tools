@@ -366,8 +366,8 @@ OutputSupportingSimulation::doOutputValues(
         }
         break;
       default:
-        outputBuffer += "(" + std::to_string(val) + ")" +
-                        std::to_string(doubleValues[val]) + "\t";
+        outputBuffer += //"(" + std::to_string(val) + ")" +
+          std::to_string(doubleValues[val]) + "\t";
     }
   }
   if (!outputBuffer.empty()) {

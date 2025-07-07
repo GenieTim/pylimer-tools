@@ -15,6 +15,8 @@
 #define lapack_complex_double std::complex<double>
 #endif
 
+#define NORMAL_MODE_ZERO_TOLERANCE 1e-12
+
 namespace pylimer_tools::calc {
 NormalModeAnalyzer::NormalModeAnalyzer(const std::vector<size_t> springFrom,
                                        const std::vector<size_t> springTo)
@@ -179,8 +181,8 @@ NormalModeAnalyzer::setEigenvalues(const Eigen::VectorXd newEigenvalues)
 {
   this->eigenvalues = newEigenvalues;
   this
-    ->eigenvalues(this->eigenvalues.array() > -1e-14 &&
-                  this->eigenvalues.array() < 0)
+    ->eigenvalues(this->eigenvalues.array() > -NORMAL_MODE_ZERO_TOLERANCE &&
+                  this->eigenvalues.array() < NORMAL_MODE_ZERO_TOLERANCE)
     .setZero();
   this->isEigenvaluesComputed = true;
   this->clusterCount = this->countSolubleClusters();
@@ -234,8 +236,11 @@ NormalModeAnalyzer::evaluateStressAutocorrelation(const Eigen::ArrayXd& t) const
 {
   Eigen::ArrayXd result = Eigen::ArrayXd::Zero(t.size());
   for (size_t i = 0; i < this->eigenvalues.size(); ++i) {
-    if (this->eigenvalues[i] == 0.0) {
+    if (APPROX_EQUAL(this->eigenvalues[i], 0.0, NORMAL_MODE_ZERO_TOLERANCE)) {
       continue;
+    }
+    if (!std::isfinite(this->eigenvalues[i]) || this->eigenvalues[i] == 0.0) {
+      continue; // skip non-finite eigenvalues
     }
     result += (-2. * this->eigenvalues[i] * t).exp();
     RUNTIME_EXP_IFN(result.allFinite(),
@@ -252,15 +257,26 @@ NormalModeAnalyzer::evaluateStorageModulus(const Eigen::ArrayXd& omega) const
 {
   Eigen::ArrayXd result = Eigen::ArrayXd::Zero(omega.size());
   for (size_t i = 0; i < this->eigenvalues.size(); ++i) {
-    if (this->eigenvalues[i] == 0.0) {
+    if (APPROX_EQUAL(this->eigenvalues[i], 0.0, NORMAL_MODE_ZERO_TOLERANCE)) {
       continue;
+    }
+    if (!std::isfinite(this->eigenvalues[i]) || this->eigenvalues[i] == 0.0) {
+      continue; // skip non-finite eigenvalues
     }
     result += (omega / (2. * this->eigenvalues[i])).square() /
               (1. + (omega / (2. * this->eigenvalues[i])).square());
-    RUNTIME_EXP_IFN(
-      result.allFinite(),
-      "Storage modulus is not fully finite anymore after adding Eigenvalue " +
-        std::to_string(i) + ": " + std::to_string(this->eigenvalues[i]) + ".");
+    if (!result.allFinite()) {
+      std::ostringstream oss;
+      oss << "Storage modulus is not fully finite anymore after adding "
+             "Eigenvalue "
+          << i << ": " << this->eigenvalues[i] << ". Non-finite at indices: ";
+      for (Eigen::Index idx = 0; idx < result.size(); ++idx) {
+        if (!std::isfinite(result[idx])) {
+          oss << idx << " ";
+        }
+      }
+      RUNTIME_EXP_IFN(false, oss.str());
+    }
   }
   return result;
 }
@@ -270,15 +286,25 @@ NormalModeAnalyzer::evaluateLossModulus(const Eigen::ArrayXd& omega) const
 {
   Eigen::ArrayXd result = Eigen::ArrayXd::Zero(omega.size());
   for (size_t i = 0; i < this->eigenvalues.size(); ++i) {
-    if (this->eigenvalues[i] == 0.0) {
+    if (APPROX_EQUAL(this->eigenvalues[i], 0.0, NORMAL_MODE_ZERO_TOLERANCE)) {
       continue;
+    }
+    if (!std::isfinite(this->eigenvalues[i]) || this->eigenvalues[i] == 0.0) {
+      continue; // skip non-finite eigenvalues
     }
     result += (omega / (2. * this->eigenvalues[i])) /
               (1. + (omega / (2. * this->eigenvalues[i])).square());
-    RUNTIME_EXP_IFN(
-      result.allFinite(),
-      "Loss modulus is not fully finite anymore after adding Eigenvalue " +
-        std::to_string(i) + ": " + std::to_string(this->eigenvalues[i]) + ".");
+    if (!result.allFinite()) {
+      std::ostringstream oss;
+      oss << "Loss modulus is not fully finite anymore after adding Eigenvalue "
+          << i << ": " << this->eigenvalues[i] << ". Non-finite at indices: ";
+      for (Eigen::Index idx = 0; idx < result.size(); ++idx) {
+        if (!std::isfinite(result[idx])) {
+          oss << idx << " ";
+        }
+      }
+      RUNTIME_EXP_IFN(false, oss.str());
+    }
   }
   return result;
 }

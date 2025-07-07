@@ -1,12 +1,12 @@
 Structure Analysis
-==================
+------------------
 
 pylimer-tools offers various tools to manipulate and analyze the topology of polymer networks.
 
 Here you can find examples of some of the functionality provided by the package.
 
 Decomposing Crosslinked Networks to Chains
-------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are a number of ways how a given :class:`~pylimer_tools_cpp.Universe` can be decomposed.
 
@@ -22,7 +22,7 @@ pylimer-tools provides two more advanced methods for decomposing networks:
 If you want even more control, you could assemble your own decomposition algorithm using the :class:`~pylimer_tools_cpp.Universe` class and its methods, such as :func:`~pylimer_tools_cpp.Universe.get_atoms_connected_to()`.
 
 Finding Loops
--------------
+~~~~~~~~~~~~~
 
 You can also find loops in the network using the :func:`~pylimer_tools_cpp.Universe.find_loops()` method.
 

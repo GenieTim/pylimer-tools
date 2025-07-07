@@ -35,6 +35,8 @@ jobs:
             ./vendor/nlopt-skbuild
             ./vendor/cereal
             ./vendor/cereal-skbuild
+            ./docs
+            ./docs-html
           key: ${{ runner.os }}-pip-3.12.4-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-3.12.4-

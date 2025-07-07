@@ -145,6 +145,7 @@ _cmake_test_compile
 output*.txt
 
 docs/_autosummary
+docs/auto_examples
 pylimer_tools_lcoverage.info
 
 # too large input files
@@ -154,3 +155,6 @@ tests/pylimer_tools/fixtures/structure/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036
 tests/pylimer_tools/fixtures/structure/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out
 tests/pylimer_tools/fixtures/tmp-test-data-file.out
 test-reports
+
+examples/dpd_simulations/dpd_simulation_output.txt
+examples/network_generator/generated_networks

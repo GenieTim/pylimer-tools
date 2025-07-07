@@ -17,7 +17,7 @@ Readers
 -------
 
 Data File Reader
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 The :class:`~pylimer_tools_cpp.DataFileParser` handles LAMMPS data files containing complete system definitions.
 The :class:`~pylimer_tools_cpp.UniverseSequence` provides a convenient way to have these data files read into the :class:`~pylimer_tools_cpp.Universe` objects.
@@ -54,7 +54,7 @@ If your data files don't hint the atom style, you can specify it manually,
 see :func:`~pylimer_tools_cpp.DataFileParser.read()` and :func:`~pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style()`.
 
 Dump File Reader  
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 The :class:`~pylimer_tools_cpp.DumpFileReader` processes LAMMPS trajectory files:
 
@@ -77,7 +77,7 @@ The :class:`~pylimer_tools_cpp.DumpFileReader` processes LAMMPS trajectory files
 - Compressed files (automatically detected)
 
 Memory-Efficient Reading
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 The :class:`~pylimer_tools_cpp.UniverseSequence` class provides automatic memory management:
 
@@ -162,7 +162,7 @@ and :func:`~pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_fil
 - Multi-section files with varying column structures
 
 Histogram Reader
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 
 Process histogram data from ``fix ave/hist`` commands:
 
@@ -319,7 +319,7 @@ Writers
 -------
 
 Data File Writer
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 The :class:`~pylimer_tools_cpp.DataFileWriter` generates LAMMPS-compatible data files:
 
@@ -396,10 +396,10 @@ Control how molecules are numbered in the output:
    writer.config_molecule_idx_for_swap(True)
 
 Examples and Use Cases
----------------------
+----------------------
 
 Converting Between Formats
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Take a later entry from a LAMMPS trajectory and save it as a data file:
 
@@ -482,7 +482,7 @@ Here's how you could re-set the molecule indices for bond swapping with constant
    print(f"Optimized system written to: {output_file}")
 
 Batch Processing
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 Process multiple files in a workflow:
 
@@ -522,10 +522,10 @@ Process multiple files in a workflow:
        print(f"Processed: {input_file} -> {output_file}")
 
 Performance Considerations
--------------------------
+--------------------------
 
 Large File Handling
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 For very large files:
 

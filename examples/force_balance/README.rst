@@ -1,5 +1,5 @@
 Force Balance & Maximum Entropy Homogenization Procedures
-=========================================================
+---------------------------------------------------------
 
 pylimer-tools provides three implementations of the Maximum Entropy Homogenization Procedure (MEHP) to reduce polymer networks to their minimum energy, maximum entropy homogenized state. 
 This is useful for predicting the equilibrium shear modulus of the network.

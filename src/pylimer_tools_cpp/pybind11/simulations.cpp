@@ -1958,7 +1958,7 @@ and finally springs will be any number of connected bonds between links.
          py::arg("file"),
          py::arg("output_every") = 50000)
 #endif
-    .def("configAverageOutput",
+    .def("config_average_output",
          &dpd::DPDSimulator::configAverageOutput,
          R"pbdoc(
           Set which values to compute averages for.
@@ -1966,7 +1966,7 @@ and finally springs will be any number of connected bonds between links.
           Arguments:
                - values: a list of OutputConfiguration structs
      )pbdoc")
-    .def("configAutoCorrelatorOutput",
+    .def("config_auto_correlator_output",
          &dpd::DPDSimulator::configAutoCorrelatorOutput,
          R"pbdoc(
           Set which values to compute multiple-tau autocorrelation for.

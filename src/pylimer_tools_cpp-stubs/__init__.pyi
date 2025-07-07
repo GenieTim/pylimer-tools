@@ -541,22 +541,6 @@ class DPDSimulator:
                   If your bonds could get larger than half the box length, this must be kept false (default).
                   Otherwise, you can set it to true and therewith get some securities.
         """
-    def configAutoCorrelatorOutput(self, values: list[OutputConfiguration], num_corr_in: int = 32, p: int = 16, m: int = 2) -> None:
-        """
-                  Set which values to compute multiple-tau autocorrelation for.
-                  If you use this, you should cite `doi:10.1063/1.3491098 <https://pubs.aip.org/aip/jcp/article-abstract/133/15/154103/190247/Efficient-on-the-fly-calculation-of-time?redirectedFrom=fulltext>`_
-        
-                  Arguments:
-                       - values: a list of OutputConfiguration structs
-                       - ...
-        """
-    def configAverageOutput(self, arg0: list[OutputConfiguration]) -> None:
-        """
-                  Set which values to compute averages for.
-        
-                  Arguments:
-                       - values: a list of OutputConfiguration structs
-        """
     def config_a(self, A: float = 25.0) -> None:
         """
                   Configure the force-field (pair-style) parameter `A`.
@@ -569,6 +553,22 @@ class DPDSimulator:
         
                   Arguments:
                   - allow_relocation_in_network (bool): Whether to allow relocation in the network or not.
+        """
+    def config_auto_correlator_output(self, values: list[OutputConfiguration], num_corr_in: int = 32, p: int = 16, m: int = 2) -> None:
+        """
+                  Set which values to compute multiple-tau autocorrelation for.
+                  If you use this, you should cite `doi:10.1063/1.3491098 <https://pubs.aip.org/aip/jcp/article-abstract/133/15/154103/190247/Efficient-on-the-fly-calculation-of-time?redirectedFrom=fulltext>`_
+        
+                  Arguments:
+                       - values: a list of OutputConfiguration structs
+                       - ...
+        """
+    def config_average_output(self, arg0: list[OutputConfiguration]) -> None:
+        """
+                  Set which values to compute averages for.
+        
+                  Arguments:
+                       - values: a list of OutputConfiguration structs
         """
     def config_bond_formation(self, num_bonds_to_form: int, max_bonds_per_atom_type: dict[int, int], bond_formation_dist: float = 1.0, attempt_bond_formation_every: int = 50, atom_type_form_from: int = 2, atom_type_form_to: int = 1) -> None:
         """

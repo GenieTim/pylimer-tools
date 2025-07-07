@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd "$(dirname "$0")/.." || exit 10
+cd "$(dirname "$0")/../.." || exit 10
 # ROOT_DIR=$(pwd)
 
 # iterate over all *.rst files in the docs directory
