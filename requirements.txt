@@ -34,3 +34,4 @@ wheel>=0.45.1
 rstcheck>=6.2.5
 sphinx-gallery>=0.19.0
 psutil>=7.0.0
+intersphinx_registry>=0.2501.23
