@@ -5,7 +5,7 @@ Normal Mode Analysis (NMA)
 This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools
 to predict the loss and storage modulus of polymer networks.
 
-Reference: doi:10.1021/acs.macromol.4c01429
+Reference: `doi:10.1021/acs.macromol.4c01429 <https://doi.org/10.1021/acs.macromol.4c01429>`_
 """
 
 import os
@@ -49,4 +49,4 @@ df = pd.DataFrame(
     }
 )
 df.set_index("Frequency", inplace=True)
-df.plot(title="Storage and Loss Modulus vs Frequency", loglog=True)
+_ = df.plot(title="Storage and Loss Modulus vs Frequency", loglog=True)
