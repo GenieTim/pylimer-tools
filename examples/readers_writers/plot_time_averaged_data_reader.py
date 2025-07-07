@@ -46,5 +46,5 @@ vec_averages_file = os.path.join(
 sectioned_data = read_averages_file(vec_averages_file)
 
 # Group by timestep for sectioned data
-for timestep, group in sectioned_data.groupby("Timestep"):
+for timestep, group in sectioned_data.groupby("TimeStep"):
     print(f"Timestep {timestep}: {len(group)} data points")

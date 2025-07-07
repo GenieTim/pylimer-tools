@@ -164,7 +164,7 @@ Next Steps
 - Dive into the :doc:`assumptions` and :doc:`nomenclature` for understanding the underlying concepts and terminology used in pylimer-tools
 - Explore the :doc:`readers_writers` guide for detailed file I/O operations
 - Check out :doc:`network_generator` for creating custom polymer networks
-- See :doc:`examples` for running simulations and computations with pylimer-tools
+- See :doc:`auto_examples/index` for running simulations and computations with pylimer-tools
 - Review the :doc:`modules` for complete API reference
 - Look at the `test suite <https://github.com/GenieTim/pylimer-tools/tree/main/tests>`_ for more examples
 
