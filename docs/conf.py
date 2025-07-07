@@ -10,6 +10,7 @@ import os
 import sys
 import sysconfig
 import warnings
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -34,17 +35,18 @@ version = pylimer_tools_cpp.__version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.autosummary",
-    "sphinx.ext.napoleon",
-    "sphinx.ext.viewcode",
-    "sphinx.ext.githubpages",
     "sphinx_automodapi.automodapi",
+    "sphinx_copybutton",
+    "sphinx_gallery.gen_gallery",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.githubpages",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
     "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
     "sphinxext.opengraph",
-    'sphinx_copybutton'
 ]
 
 # Configuration for specific extensions
@@ -73,6 +75,12 @@ ogp_custom_meta_tags = [
     '<meta name="apple-mobile-web-app-title" content="pylimer-tools" />',
     '<link rel="manifest" href="/_static/favicon/site.webmanifest" />',
 ]
+
+#
+sphinx_gallery_conf = {
+    "examples_dirs": "../examples",  # path to your example scripts
+    "gallery_dirs": "auto_examples",  # path to where to save gallery generated output
+}
 
 # To avoid showing methods and attributes of classes multiple times.
 numpydoc_show_class_members = False
@@ -120,7 +128,6 @@ html_theme_options = {
     "source_repository": "https://github.com/GenieTim/pylimer-tools",
     "source_branch": "main",
     "source_directory": "docs/",
-    
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

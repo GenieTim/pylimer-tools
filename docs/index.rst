@@ -1,5 +1,5 @@
 pylimer-tools Documentation
-==========================
+===========================
 
 .. image:: https://codecov.io/gh/GenieTim/pylimer-tools/branch/main/graph/badge.svg?token=5ZE1VSDXJQ 
    :target: https://codecov.io/gh/GenieTim/pylimer-tools
@@ -67,7 +67,7 @@ Basic usage example:
    assumptions
    readers_writers
    network_generator
-   examples
+   auto_examples/index
 
 .. toctree::
    :maxdepth: 3
