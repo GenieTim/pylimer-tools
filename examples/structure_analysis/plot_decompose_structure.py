@@ -1,6 +1,7 @@
+#!/usr/bin/env python
 """
-Example: Structure Analysis with pylimer-tools
-=============================================
+Decompose/Split Structure
+=========================
 
 This example demonstrates how to decompose a crosslinked polymer network into chains 
 and analyze its structure using pylimer-tools.
@@ -12,7 +13,6 @@ The following approaches are shown:
 
 """
 
-# Import the main Universe class from pylimer_tools_cpp
 import os
 
 import matplotlib.pyplot as plt
@@ -23,7 +23,7 @@ from pylimer_tools_cpp import Universe
 # Replace with your crosslinker type
 crosslinker_type = 2
 
-# Load your network (replace 'network.gml' with your file)
+# Load your network (replace path accordingly)
 universe = read_data_file(
     os.path.join(
         os.getcwd(),
