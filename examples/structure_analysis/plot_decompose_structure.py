@@ -53,3 +53,4 @@ plt.bar(
 )
 plt.xlabel("Type")
 plt.ylabel("Count")
+plt.show()

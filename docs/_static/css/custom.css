@@ -2,3 +2,13 @@
 body:not([data-theme="light"]) img.math {
   filter: invert(1);
 }
+
+a.reference.download.internal {
+  background-color: transparent;
+  color: var(--color-link);
+  background-image: initial;
+  border: 1px solid var(--color-link);
+  font-weight: initial;
+  padding: 0.5em;
+  border-radius: .2rem;
+}

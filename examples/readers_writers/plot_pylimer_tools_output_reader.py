@@ -11,8 +11,9 @@ Relevant documentation: :func:`~pylimer_tools.io.read_pylimer_tools_output_file.
 
 import os
 
-from pylimer_tools.io.read_pylimer_tools_output_file import read_avg_file
 import matplotlib.pyplot as plt
+
+from pylimer_tools.io.read_pylimer_tools_output_file import read_avg_file
 
 example_file = os.path.join(
     os.getcwd(),
@@ -27,8 +28,7 @@ pylimer_data = read_avg_file(example_file)
 print(f"Simulation steps: {pylimer_data['Step'].nunique()}")
 
 # Access specific measurements
-if "Temperature" in pylimer_data.columns:
-    plt.plot(pylimer_data["Step"], pylimer_data["Temperature"])
-    plt.xlabel("Output Step")
-    plt.ylabel("Temperature")
-    plt.show()
+plt.plot(pylimer_data["Step"], pylimer_data["Temperature"])
+plt.xlabel("Output Step")
+plt.ylabel("Temperature")
+plt.show()

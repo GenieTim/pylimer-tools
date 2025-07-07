@@ -24,11 +24,11 @@ sequence.initialize_from_dump_file(
     dump_file=os.path.join(file_path, "lammps_dump_small.lammpstrj"),
 )
 
-print(f"Trajectory contains {sequence.get_length()} frames")
+print(f"Trajectory contains {len(sequence)} frames")
 
 # Access specific frames
 first_frame = sequence.at_index(0)
-last_frame = sequence.at_index(-1)  # Last frame
+last_frame = sequence.at_index(len(sequence) - 1)  # Last frame
 
 dump_file_reader = DumpFileReader(
     os.path.join(file_path, "lammps_dump_small_3step.lammpstrj")

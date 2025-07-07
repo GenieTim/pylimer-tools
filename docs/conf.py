@@ -10,12 +10,13 @@ import os
 import sys
 import sysconfig
 import warnings
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 from datetime import datetime
+
+from intersphinx_registry import get_intersphinx_mapping
 
 import pylimer_tools_cpp
 
@@ -50,6 +51,7 @@ extensions = [
 ]
 
 # Configuration for specific extensions
+# napoleon settings
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
 napoleon_include_init_with_doc = False
@@ -65,7 +67,7 @@ napoleon_preprocess_types = False
 napoleon_type_aliases = None
 napoleon_attr_annotations = True
 
-#
+# opengraph settings
 ogp_site_url = "https://genietim.github.io/pylimer-tools"
 ogp_custom_meta_tags = [
     '<link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />',
@@ -76,11 +78,21 @@ ogp_custom_meta_tags = [
     '<link rel="manifest" href="/_static/favicon/site.webmanifest" />',
 ]
 
-#
+# sphinx-gallery settings
 sphinx_gallery_conf = {
     "examples_dirs": "../examples",  # path to your example scripts
     "gallery_dirs": "auto_examples",  # path to where to save gallery generated output
+    "show_signature": True,
 }
+
+intersphinx_mapping = get_intersphinx_mapping(
+    packages={
+        "matplotlib",
+        "numpy",
+        "pandas",
+        "python",
+    },
+)
 
 # To avoid showing methods and attributes of classes multiple times.
 numpydoc_show_class_members = False
@@ -128,6 +140,10 @@ html_theme_options = {
     "source_repository": "https://github.com/GenieTim/pylimer-tools",
     "source_branch": "main",
     "source_directory": "docs/",
+    "logo": {
+        "text": "pylimer-tools",
+    },
+    "secondary_sidebar_items": ["page-toc", "sg_download_links", "sg_launcher_links"],
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -168,7 +184,7 @@ html_split_index = False
 html_show_sourcelink = True
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-html_show_sphinx = False
+html_show_sphinx = True
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
 html_show_copyright = True

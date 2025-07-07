@@ -40,6 +40,7 @@ print(f"Loop length counts: {loop_length_counts}")
 plt.bar(list(loop_length_counts.keys()), list(loop_length_counts.values()))
 plt.xlabel("Loop Length")
 plt.ylabel("Count")
+plt.show()
 
 # 3. Find shortest loop for a specific atom (e.g., atom 0)
 shortest_loop = universe.find_minimal_order_loop_from(loop_start=1, loop_step1=1)

@@ -12,9 +12,13 @@ import os
 import pandas as pd
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
-from pylimer_tools_cpp import (AtomStyle, ComputedDoubleValues,
-                               ComputedIntValues, DPDSimulator,
-                               OutputConfiguration)
+from pylimer_tools_cpp import (
+    AtomStyle,
+    ComputedDoubleValues,
+    ComputedIntValues,
+    DPDSimulator,
+    OutputConfiguration,
+)
 
 # Load a LAMMPS data file (replace with your file)
 filePath = os.path.join(
@@ -75,8 +79,8 @@ dpd_simulator.run_simulation(
 print("DPD simulation completed.")
 
 # read the output file and actually plot something
-df = pd.read_csv("dpd_simulation_output.txt", delim_whitespace=True)
-df.plot(
+df = pd.read_csv("dpd_simulation_output.txt", sep="\\s+")
+_ = df.plot(
     x="Step",
     y=[
         "Temperature",

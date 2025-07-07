@@ -37,3 +37,4 @@ time_cache = time_end - time_start
 plt.figure()
 plt.bar(["Without Cache", "With Cache"], [time_no_cache, time_cache])
 plt.ylabel("Time [s]")
+plt.show()
