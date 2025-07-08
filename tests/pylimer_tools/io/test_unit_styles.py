@@ -1,9 +1,14 @@
 import unittest
 import warnings
 
-from pint import UnitRegistry
+from pint import Quantity, UnitRegistry
 
 from pylimer_tools.io.unit_styles import UnitStyle, UnitStyleFactory
+from pylimer_tools.io.bead_spring_parameter_provider import (
+    Parameters,
+    get_parameters_for_polymer,
+    get_supported_polymer_names,
+)
 
 
 class UnitStyleTest(unittest.TestCase):
@@ -18,9 +23,7 @@ class UnitStyleTest(unittest.TestCase):
 
     def test_all_styles_are_sensible(self):
         unit_style_factory = UnitStyleFactory()
-        self.assertIsInstance(
-            unit_style_factory.get_unit_registry(),
-            UnitRegistry)
+        self.assertIsInstance(unit_style_factory.get_unit_registry(), UnitRegistry)
         base_style = unit_style_factory.get_unit_style("si")
         other_styles = [
             unit_style_factory.get_unit_style("nano"),
@@ -71,9 +74,7 @@ class UnitStyleTest(unittest.TestCase):
 
     def test_errors_are_thrown(self):
         unit_style_factory = UnitStyleFactory()
-        self.assertRaises(
-            ValueError,
-            lambda: unit_style_factory.get_unit_style("lj"))
+        self.assertRaises(ValueError, lambda: unit_style_factory.get_unit_style("lj"))
 
     def test_get_attr_equivalence(self):
         unit_style_factory = UnitStyleFactory()
@@ -86,5 +87,28 @@ class UnitStyleTest(unittest.TestCase):
             )
             # Assert that the warning has been triggered
             self.assertTrue(len(w) == 1)
-        self.assertEqual(1 * unit_style.mass,
-                         1 * unit_style.get_base_unit_of("mass"))
+        self.assertEqual(1 * unit_style.mass, 1 * unit_style.get_base_unit_of("mass"))
+
+    def test_get_parameters_for_polymer(self):
+        for polymer_name in get_supported_polymer_names():
+            params = get_parameters_for_polymer(polymer_name)
+            self.assertIsInstance(params, Parameters)
+            self.assertEqual(params.get_name(), "si-" + polymer_name)
+            self.assertIsInstance(params.get_unit_registry(), UnitRegistry)
+            self.assertIsInstance(params.get("distance_units"), Quantity)
+            self.assertIsInstance(params.get_bead_density(), float)
+            self.assertIsInstance(params.get_entanglement_density(), float)
+            self.assertIsInstance(params.get_sampling_cutoff(), float)
+            self.assertIsInstance(params.get_fb_stress_conversion(), float)
+            self.assertIsInstance(params.get_kappa(), Quantity)
+            self.assertIsInstance(params.get("T"), Quantity)
+
+    def test_get_polymer_names(self):
+        polymer_names = get_supported_polymer_names()
+        self.assertGreater(len(polymer_names), 0)
+        for name in polymer_names:
+            self.assertIsInstance(name, str)
+            self.assertGreater(len(name), 0)
+            params = get_parameters_for_polymer(name)
+            self.assertIsInstance(params, Parameters)
+            self.assertEqual(params.get_name(), "si-" + name)

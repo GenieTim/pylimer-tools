@@ -11,13 +11,12 @@ import os
 
 import numpy as np
 
+from pylimer_tools.io.bead_spring_parameter_provider import \
+    get_parameters_for_polymer
 from pylimer_tools.io.read_lammps_output_file import read_data_file
-from pylimer_tools_cpp import (
-    MEHPForceRelaxation,
-    NonGaussianSpringForceEvaluator,
-    SimpleSpringMEHPForceEvaluator,
-    Universe,
-)
+from pylimer_tools_cpp import (MEHPForceRelaxation,
+                               NonGaussianSpringForceEvaluator,
+                               SimpleSpringMEHPForceEvaluator, Universe)
 
 # Load your network (replace with your file)
 universe = read_data_file(
@@ -29,22 +28,43 @@ universe = read_data_file(
 )
 assert isinstance(universe, Universe)
 
+# Prepare parameters for conversion factors
+params = get_parameters_for_polymer("PDMS")
+r02_slope = params.get("R02")
+r02_slope_magnitude = r02_slope.to(params.get("distance_units") ** 2).magnitude
+kbt = params.get("T") * params.get("kb")
+gamma_conversion_factor = (
+    (kbt / ((params.get("distance_units")) ** 3)).to("MPa").magnitude
+)
+
 # 1. MEHPForceRelaxation with linear force potential
 mehp_relax = MEHPForceRelaxation(universe)
 force_evaluator = SimpleSpringMEHPForceEvaluator()
 mehp_relax.set_force_evaluator(force_evaluator)
-mehp_relax.run_force_relaxation()
+while mehp_relax.requires_another_run():
+    mehp_relax.run_force_relaxation()
+shear_modulus = (
+    gamma_conversion_factor
+    * np.sum(mehp_relax.get_gamma_factors(r02_slope_magnitude))
+    / universe.get_volume()
+)
 print(
-    "Gamma factor (lacks the conversion factor): ",
-    np.sum(mehp_relax.get_gamma_factors(b0_squared=1.0)),
+    "Phantom Shear Modulus [MPa]: ",
+    shear_modulus.to("MPa").magnitude,
 )
 
 # 2. MEHPForceRelaxation with Langevin force potential
 mehp_relax = MEHPForceRelaxation(universe)
 force_evaluator = NonGaussianSpringForceEvaluator()
 mehp_relax.set_force_evaluator(force_evaluator)
-mehp_relax.run_force_relaxation()
+while mehp_relax.requires_another_run():
+    mehp_relax.run_force_relaxation()
+shear_modulus = (
+    gamma_conversion_factor
+    * np.sum(mehp_relax.get_gamma_factors(r02_slope_magnitude))
+    / universe.get_volume()
+)
 print(
-    "Gamma factor (lacks the conversion factor): ",
-    np.sum(mehp_relax.get_gamma_factors(b0_squared=1.0)),
+    "Phantom Shear Modulus [MPa]: ",
+    shear_modulus.to("MPa").magnitude,
 )
