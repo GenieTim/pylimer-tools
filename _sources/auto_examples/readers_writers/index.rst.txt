@@ -7,9 +7,6 @@ File I/O: Readers & Writers
 
 pylimer-tools provides comprehensive support for reading and writing various LAMMPS file formats, enabling seamless integration with molecular dynamics workflows.
 
-Overview
-~~~~~~~~
-
 The library supports four main file I/O operations:
 
 1. **Reading LAMMPS data files** - Complete system configurations

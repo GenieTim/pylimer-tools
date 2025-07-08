@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.304** total execution time for 28 files **from all galleries**:
+**00:02.135** total execution time for 28 files **from all galleries**:
 
 .. container::
 
@@ -32,25 +32,25 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_end_to_end_distribution.py` (``../examples/structure_analysis/plot_end_to_end_distribution.py``)
-     - 00:00.137
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_decompose_structure.py` (``../examples/structure_analysis/plot_decompose_structure.py``)
-     - 00:00.091
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_structure_analysis.py` (``../examples/structure_analysis/plot_structure_analysis.py``)
-     - 00:00.077
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_simulation.py` (``../examples/dpd_simulations/plot_dpd_simulation.py``)
-     - 00:00.000
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``../examples/force_balance/plot_force_balance_2.py``)
+     - 00:00.675
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py` (``../examples/force_balance/plot_force_balance.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``../examples/force_balance/plot_force_balance_2.py``)
-     - 00:00.000
+     - 00:00.499
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py` (``../examples/force_balance/plot_force_relaxation.py``)
+     - 00:00.488
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_structure_analysis.py` (``../examples/structure_analysis/plot_structure_analysis.py``)
+     - 00:00.260
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_end_to_end_distribution.py` (``../examples/structure_analysis/plot_end_to_end_distribution.py``)
+     - 00:00.133
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_decompose_structure.py` (``../examples/structure_analysis/plot_decompose_structure.py``)
+     - 00:00.081
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_simulation.py` (``../examples/dpd_simulations/plot_dpd_simulation.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_add_angles.py` (``../examples/network_generator/plot_add_angles.py``)

@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/force_balance/plot_force_balance_2.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links instead of slip-links., Total running time of the script:(0 minutes 0.025 seconds) Download Ju..." />
+<meta property="og:description" content="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links instead of slip-links., Total running time of the script:(0 minutes 0.675 seconds) Download Ju..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
 <meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_force_balance_plot_force_balance_2_8430b428.png" />
-<meta property="og:image:alt" content="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links instead of slip-links., Total running time of the script:(0 minutes 0.025 seconds) Download Ju..." />
-<meta name="description" content="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links instead of slip-links., Total running time of the script:(0 minutes 0.025 seconds) Download Ju..." />
+<meta property="og:image:alt" content="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links instead of slip-links., Total running time of the script:(0 minutes 0.675 seconds) Download Ju..." />
+<meta name="description" content="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links instead of slip-links., Total running time of the script:(0 minutes 0.675 seconds) Download Ju..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -400,8 +400,8 @@ to download the full example code.</p>
 <span id="sphx-glr-auto-examples-force-balance-plot-force-balance-2-py"></span><h1>Force Balance 2<a class="headerlink" href="#force-balance-2" title="Link to this heading">¶</a></h1>
 <p>MEHPForceBalance2 is a faster implementation of the MEHP force balance method,
 which uses static links instead of slip-links.</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Final residual (should be close to 0): 1.9268034555169168e-11
-Gamma factor (lacks the conversion factor):  43.39750449443687
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Final residual (should be close to 0): 2.0921789360418703e-11
+Shear Modulus [MPa]:  0.10089932102888653
 </pre></div>
 </div>
 <div class="line-block">
@@ -411,8 +411,14 @@ Gamma factor (lacks the conversion factor):  43.39750449443687
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.io.bead_spring_parameter_provider</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Parameters</span><span class="p">,</span> <span class="n">get_parameters_for_polymer</span><span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.io.read_lammps_output_file</span><span class="w"> </span><span class="kn">import</span> <a href="../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_data_file" title="pylimer_tools.io.read_lammps_output_file.read_data_file" class="sphx-glr-backref-module-pylimer_tools-io-read_lammps_output_file sphx-glr-backref-type-py-function"><span class="n">read_data_file</span></a>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <a href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">MEHPForceBalance2</span></a><span class="p">,</span> <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">Universe</span></a>
+
+<span class="c1"># Get parameters for conversion factors</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">get_parameters_for_polymer</span><span class="p">(</span><span class="s2">&quot;PDMS&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">Parameters</span><span class="p">)</span>
 
 <span class="c1"># Load your network (replace with your file)</span>
 <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">universe</span></a> <span class="o">=</span> <a href="../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_data_file" title="pylimer_tools.io.read_lammps_output_file.read_data_file" class="sphx-glr-backref-module-pylimer_tools-io-read_lammps_output_file sphx-glr-backref-type-py-function"><span class="n">read_data_file</span></a><span class="p">(</span>
@@ -425,21 +431,40 @@ Gamma factor (lacks the conversion factor):  43.39750449443687
 <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">universe</span></a><span class="p">,</span> <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">Universe</span></a><span class="p">)</span>
 
 <span class="c1"># 2. MEHPForceBalance: Hookean springs, allows slip-links</span>
-<a href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mehp_fb</span></a> <span class="o">=</span> <a href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">MEHPForceBalance2</span></a><span class="p">(</span><a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">universe</span></a><span class="p">,</span> <span class="n">nr_of_entanglements_to_sample</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<a href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mehp_fb</span></a> <span class="o">=</span> <a href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">MEHPForceBalance2</span></a><span class="p">(</span>
+    <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">universe</span></a><span class="p">,</span>
+    <span class="n">nr_of_entanglements_to_sample</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">get_entanglement_density</span><span class="p">()</span> <span class="o">*</span> <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_volume" title="pylimer_tools_cpp.Universe.get_volume" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">universe</span><span class="o">.</span><span class="n">get_volume</span></a><span class="p">()</span>
+    <span class="p">),</span>
+    <span class="n">upper_sampling_cutoff</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get_sampling_cutoff</span><span class="p">(),</span>
+    <span class="n">entanglements_as_springs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
 <a href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2.run_force_relaxation" title="pylimer_tools_cpp.MEHPForceBalance2.run_force_relaxation" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">mehp_fb</span><span class="o">.</span><span class="n">run_force_relaxation</span></a><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span>
     <span class="s2">&quot;Final residual (should be close to 0):&quot;</span><span class="p">,</span> <a href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2.get_displacement_residual_norm" title="pylimer_tools_cpp.MEHPForceBalance2.get_displacement_residual_norm" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">mehp_fb</span><span class="o">.</span><span class="n">get_displacement_residual_norm</span></a><span class="p">()</span>
 <span class="p">)</span>
 
-<span class="c1"># TODO: apply conversion factors</span>
+<span class="c1"># apply conversion factors, measure resulting shear modulus</span>
+<span class="n">r02_slope</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;R02&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">r02_slope_magnitude</span></a> <span class="o">=</span> <span class="n">r02_slope</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;distance_units&quot;</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span>
+<span class="n">kbt</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;kb&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gamma_conversion_factor</span></a> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="n">kbt</span> <span class="o">/</span> <span class="p">((</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;distance_units&quot;</span><span class="p">))</span> <span class="o">**</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;MPa&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span>
+<span class="p">)</span>
+
+<a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">shear_modulus</span></a> <span class="o">=</span> <span class="p">(</span>
+    <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gamma_conversion_factor</span></a>
+    <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.sum.html#numpy.sum" title="numpy.sum" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">sum</span></a><span class="p">(</span><a href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2.get_gamma_factors" title="pylimer_tools_cpp.MEHPForceBalance2.get_gamma_factors" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">mehp_fb</span><span class="o">.</span><span class="n">get_gamma_factors</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">r02_slope_magnitude</span></a><span class="p">))</span>
+    <span class="o">/</span> <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_volume" title="pylimer_tools_cpp.Universe.get_volume" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">universe</span><span class="o">.</span><span class="n">get_volume</span></a><span class="p">()</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span>
-    <span class="s2">&quot;Gamma factor (lacks the conversion factor): &quot;</span><span class="p">,</span>
-    <a href="https://numpy.org/doc/stable/reference/generated/numpy.sum.html#numpy.sum" title="numpy.sum" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">sum</span></a><span class="p">(</span><a href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2.get_gamma_factors" title="pylimer_tools_cpp.MEHPForceBalance2.get_gamma_factors" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">mehp_fb</span><span class="o">.</span><span class="n">get_gamma_factors</span></a><span class="p">(</span><span class="n">b02</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)),</span>
+    <span class="s2">&quot;Shear Modulus [MPa]: &quot;</span><span class="p">,</span>
+    <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">shear_modulus</span></a>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.025 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.675 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-2-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/01077d6c84a59ddcb66597da8c21b737/plot_force_balance_2.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_force_balance_2.ipynb</span></code></a></p>
