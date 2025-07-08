@@ -102,6 +102,7 @@ class UnitStyleTest(unittest.TestCase):
             self.assertIsInstance(params.get_fb_stress_conversion(), float)
             self.assertIsInstance(params.get_kappa(), Quantity)
             self.assertIsInstance(params.get("T"), Quantity)
+            self.assertIsInstance(params.get_gamma_conversion_factor(), Quantity)
 
     def test_get_polymer_names(self):
         polymer_names = get_supported_polymer_names()

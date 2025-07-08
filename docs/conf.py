@@ -48,6 +48,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "sphinxext.opengraph",
+    "sphinx_click",
 ]
 
 # Configuration for specific extensions

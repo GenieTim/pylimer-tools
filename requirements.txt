@@ -18,6 +18,7 @@ openpyxl>=3.1.5
 packaging>=25.0
 pandas>=2.3.0
 pdoc>=15.0.4
+sphinx-click>=6.0.0
 pint>=0.24.4
 pybind11-stubgen>=2.5.4
 ruff>=0.11.13

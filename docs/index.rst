@@ -65,6 +65,7 @@ Basic usage example:
 
    nomenclature
    assumptions
+   cli
    auto_examples/index
 
 .. toctree::

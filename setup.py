@@ -273,6 +273,14 @@ setup(
     python_requires=">=3.8",
     ext_modules=[CMakeExtension("pylimer_tools_cpp")],
     cmdclass={"build_ext": CMakeBuild},
+    entry_points={
+        "console_scripts": [
+            "pylimer-generate-network=pylimer_tools.generate_network:cli",
+            "pylimer-analyse-networks=pylimer_tools.analyse_networks:cli",
+            "pylimer-basic-lammps-stats=pylimer_tools.basic_lammps_structure_stats:cli",
+            "pylimer-displace-randomly=pylimer_tools.displace_randomly:cli",
+        ],
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.9",
