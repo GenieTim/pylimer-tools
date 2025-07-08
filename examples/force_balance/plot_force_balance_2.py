@@ -59,5 +59,5 @@ shear_modulus = (
 )
 print(
     "Shear Modulus [MPa]: ",
-    shear_modulus.to("MPa").magnitude,
+    shear_modulus
 )

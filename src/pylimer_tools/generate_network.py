@@ -3,13 +3,14 @@
 Generate MC Network
 ===================
 
-Use and MC procedure to generate a crosslinked polymer network.
+Uses an MC procedure to generate a crosslinked polymer network.
 """
 
 import math
 import time
 from typing import Union
 
+import click
 import numpy as np
 from scipy.stats import anderson, normaltest
 from termcolor import colored
@@ -46,7 +47,7 @@ def prepare_structure_generation(
     params: Parameters,
     target_p: Union[float, None] = None,
     target_wsol: Union[float, None] = None,
-    n_chains_crosslinks: int = 0,
+    n_chains_crosslinkers: int = 0,
     target_f: int = 4,
     n_solvent_chains: int = 0,
     n_beads_per_solvent_chain: int = 0,
@@ -70,7 +71,7 @@ def prepare_structure_generation(
     if target_p is not None and target_wsol is not None:
         raise ValueError("Only one of target_p and target_wsol should be provided")
 
-    n_crosslinks = n_chains_crosslinks
+    n_crosslinks = n_chains_crosslinkers
 
     # the mass is in the segments / bonds
     volume = (
@@ -185,7 +186,7 @@ def is_active_network(
     params: Parameters,
     target_p: Union[float, None] = None,
     target_wsol: Union[float, None] = None,
-    n_chains_crosslinks: int = 0,
+    n_chains_crosslinkers: int = 0,
     target_f: int = 4,
     n_solvent_chains: int = 0,
     n_beads_per_solvent_chain: int = 0,
@@ -211,7 +212,7 @@ def is_active_network(
             params=params,
             target_p=target_p,
             target_wsol=target_wsol,
-            n_chains_crosslinks=n_chains_crosslinks,
+            n_chains_crosslinkers=n_chains_crosslinkers,
             target_f=target_f,
             n_solvent_chains=n_solvent_chains,
             n_beads_per_solvent_chain=n_beads_per_solvent_chain,
@@ -256,7 +257,7 @@ def generate_structure(
     params: Parameters,
     target_p: Union[float, None] = None,
     target_wsol: Union[float, None] = None,
-    n_chains_crosslinks: int = 0,
+    n_chains_crosslinkers: int = 0,
     target_f: int = 4,
     n_solvent_chains: int = 0,
     n_beads_per_solvent_chain: int = 0,
@@ -280,7 +281,7 @@ def generate_structure(
         params=params,
         target_p=target_p,
         target_wsol=target_wsol,
-        n_chains_crosslinks=n_chains_crosslinks,
+        n_chains_crosslinkers=n_chains_crosslinkers,
         target_f=target_f,
         n_solvent_chains=n_solvent_chains,
         n_beads_per_solvent_chain=n_beads_per_solvent_chain,
@@ -374,138 +375,186 @@ def generate_structure(
     return universe
 
 
-def parse_args():
-    import argparse
+@click.command()
+@click.option(
+    "--polymer-name",
+    type=click.Choice(get_supported_polymer_names(), case_sensitive=False),
+    default="PDMS",
+    help="Name of the polymer to generate the network for",
+)
+@click.option(
+    "--target-p",
+    type=float,
+    help="Target crosslinker conversion (p). Mutually exclusive with --target-wsol.",
+)
+@click.option(
+    "--target-wsol",
+    type=float,
+    help="Target soluble fraction (w_sol). Mutually exclusive with --target-p.",
+)
+@click.option(
+    "--n-chains-crosslinkers",
+    type=int,
+    default=0,
+    help="Number of crosslinkers",
+)
+@click.option(
+    "--target-f",
+    type=int,
+    default=4,
+    help="Crosslinker functionality",
+)
+@click.option(
+    "--n-solvent-chains",
+    type=int,
+    default=0,
+    help="Number of solvent chains",
+)
+@click.option(
+    "--n-beads-per-solvent-chain",
+    type=int,
+    default=0,
+    help="Beads per solvent chain",
+)
+@click.option(
+    "--n-chains-1",
+    type=int,
+    default=1000,
+    help="Number of chains",
+)
+@click.option(
+    "--n-beads-per-chain-1",
+    type=int,
+    default=0,
+    help="Beads per chain",
+)
+@click.option(
+    "--n-chains-2",
+    type=int,
+    default=0,
+    help="Number of other chains",
+)
+@click.option(
+    "--n-beads-per-chain-2",
+    type=int,
+    default=0,
+    help="Beads per other chain",
+)
+@click.option(
+    "--n-mono-chains",
+    type=int,
+    default=0,
+    help="Number of monofunctional chains",
+)
+@click.option(
+    "--n-mono-beads-per-chain",
+    type=int,
+    default=0,
+    help="Beads per monofunctional chain",
+)
+@click.option(
+    "--n-beads-per-xlink",
+    type=int,
+    default=1,
+    help="Beads per crosslinker (xlink)",
+)
+@click.option(
+    "--remove-wsol",
+    is_flag=True,
+    help="Remove soluble fraction after generation",
+)
+@click.option(
+    "--functionalize-discrete/--no-functionalize-discrete",
+    default=False,
+    help="Functionalize crosslinks discrete. "
+    + "Applicable to crosslinkers longer than one bead. "
+    + "If enabled, the crosslinker functionality is distributed in discrete chunks. "
+    + "If disabled, the crosslinker functionality is distributed randomly across the crosslinker beads.",
+)
+@click.option(
+    "--disable-primary-loops",
+    is_flag=True,
+    help="Disable primary loops in the network",
+)
+@click.option(
+    "--disable-secondary-loops",
+    is_flag=True,
+    help="Disable secondary loops in the network",
+)
+@click.option(
+    "--z-score-std-mult",
+    type=float,
+    default=3.0,
+    help="Z-score standard deviation multiplier for max distance",
+)
+@click.option(
+    "--target-file",
+    type=click.Path(),
+    required=True,
+    help="Output file for the generated network",
+)
+def cli(
+    polymer_name,
+    target_p,
+    target_wsol,
+    n_chains_crosslinkers,
+    target_f,
+    n_solvent_chains,
+    n_beads_per_solvent_chain,
+    n_chains_1,
+    n_beads_per_chain_1,
+    n_chains_2,
+    n_beads_per_chain_2,
+    n_mono_chains,
+    n_mono_beads_per_chain,
+    n_beads_per_xlink,
+    remove_wsol,
+    functionalize_discrete,
+    disable_primary_loops,
+    disable_secondary_loops,
+    z_score_std_mult,
+    target_file,
+):
+    """
+    Generate a crosslinked polymer network using Monte Carlo procedure.
 
-    parser = argparse.ArgumentParser(
-        description="Generate a crosslinked polymer network."
-    )
-    parser.add_argument(
-        "--polymer_name",
-        type=str,
-        default="PDMS",
-        help="Name of the polymer to generate the network for",
-        choices=get_supported_polymer_names(),
-    )
-    # Mutually exclusive group for target_p and target_wsol
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
-        "--target_p", type=float, help="Target crosslinker conversion (p)"
-    )
-    group.add_argument(
-        "--target_wsol", type=float, help="Target soluble fraction (w_sol)"
-    )
-    parser.add_argument(
-        "--n_chains_crosslinks", type=int, default=0, help="Number of crosslinks"
-    )
-    parser.add_argument(
-        "--target_f", type=int, default=4, help="Crosslinker functionality"
-    )
-    parser.add_argument(
-        "--n_solvent_chains", type=int, default=0, help="Number of solvent chains"
-    )
-    parser.add_argument(
-        "--n_beads_per_solvent_chain",
-        type=int,
-        default=0,
-        help="Beads per solvent chain",
-    )
-    parser.add_argument(
-        "--n_chains_1", type=int, default=1000, help="Number of chains of type 1"
-    )
-    parser.add_argument(
-        "--n_beads_per_chain_1",
-        type=int,
-        default=0,
-        help="Beads per chain of type 1",
-    )
-    parser.add_argument(
-        "--n_chains_2", type=int, default=0, help="Number of chains of type 2"
-    )
-    parser.add_argument(
-        "--n_beads_per_chain_2",
-        type=int,
-        default=0,
-        help="Beads per chain of type 2",
-    )
-    parser.add_argument(
-        "--n_mono_chains", type=int, default=0, help="Number of monofunctional chains"
-    )
-    parser.add_argument(
-        "--n_mono_beads_per_chain",
-        type=int,
-        default=0,
-        help="Beads per monofunctional chain",
-    )
-    parser.add_argument(
-        "--n_beads_per_xlink",
-        type=int,
-        default=1,
-        help="Beads per crosslinker (xlink)",
-    )
-    parser.add_argument(
-        "--remove_wsol",
-        action="store_true",
-        help="Remove soluble fraction after generation",
-    )
-    parser.add_argument(
-        "--functionalize_discrete",
-        action="store_false",
-        help=(
-            "Functionalize crosslinks discrete, i.e., each crosslinker bead is "
-            "functionalized with a single functionality"
-        ),
-    )
-    parser.add_argument(
-        "--disable_primary_loops",
-        action="store_true",
-        help="Disable primary loops in the network",
-    )
-    parser.add_argument(
-        "--disable_secondary_loops",
-        action="store_true",
-        help="Disable secondary loops in the network",
-    )
-    parser.add_argument(
-        "--z_score_std_mult",
-        type=float,
-        default=3.0,
-        help="Z-score standard deviation multiplier for max distance",
-    )
-    parser.add_argument(
-        "--target_file",
-        type=str,
-        help="Output file for the generated network",
-        required=True,
-    )
+    This command generates a crosslinked polymer network with specified parameters.
+    You must specify either --target-p (crosslinker conversion) or --target-wsol
+    (soluble fraction), but not both.
 
-    return parser.parse_args()
+    Example:
+        pylimer-generate-network --polymer-name PDMS --target-p 0.8 --n-chains-crosslinks 100 --target-file network.dat
+    """
+    # Validate mutually exclusive options
+    if target_p is not None and target_wsol is not None:
+        raise click.UsageError(
+            "Only one of --target-p and --target-wsol should be provided"
+        )
+    if target_p is None and target_wsol is None:
+        raise click.UsageError("Either --target-p or --target-wsol must be provided")
 
-
-if __name__ == "__main__":
-    args = parse_args()
-    params = get_parameters_for_polymer(args.polymer_name)
+    params = get_parameters_for_polymer(polymer_name)
 
     universe = generate_structure(
         params=params,
-        target_p=args.target_p,
-        target_wsol=args.target_wsol,
-        n_chains_crosslinks=args.n_chains_crosslinks,
-        target_f=args.target_f,
-        n_solvent_chains=args.n_solvent_chains,
-        n_beads_per_solvent_chain=args.n_beads_per_solvent_chain,
-        n_chains_1=args.n_chains_1,
-        n_beads_per_chain_1=args.n_beads_per_chain_1,
-        n_chains_2=args.n_chains_2,
-        n_beads_per_chain_2=args.n_beads_per_chain_2,
-        n_mono_chains=args.n_mono_chains,
-        n_mono_beads_per_chain=args.n_mono_beads_per_chain,
-        n_beads_per_xlink=args.n_beads_per_xlink,
-        remove_wsol=args.remove_wsol,
-        functionalize_discrete=args.functionalize_discrete,
-        disable_primary_loops=args.disable_primary_loops,
-        disable_secondary_loops=args.disable_secondary_loops,
-        z_score_std_mult=args.z_score_std_mult,
+        target_p=target_p,
+        target_wsol=target_wsol,
+        n_chains_crosslinkers=n_chains_crosslinkers,
+        target_f=target_f,
+        n_solvent_chains=n_solvent_chains,
+        n_beads_per_solvent_chain=n_beads_per_solvent_chain,
+        n_chains_1=n_chains_1,
+        n_beads_per_chain_1=n_beads_per_chain_1,
+        n_chains_2=n_chains_2,
+        n_beads_per_chain_2=n_beads_per_chain_2,
+        n_mono_chains=n_mono_chains,
+        n_mono_beads_per_chain=n_mono_beads_per_chain,
+        n_beads_per_xlink=n_beads_per_xlink,
+        remove_wsol=remove_wsol,
+        functionalize_discrete=functionalize_discrete,
+        disable_primary_loops=disable_primary_loops,
+        disable_secondary_loops=disable_secondary_loops,
+        z_score_std_mult=z_score_std_mult,
     )
 
     print_with_time(colored("Structure generation completed", "green"))
@@ -516,5 +565,9 @@ if __name__ == "__main__":
     writer.config_molecule_idx_for_swap(False)
     writer.config_move_into_box(True)
     writer.config_attempt_image_reset(True)
-    writer.write_to_file(args.target_file)
-    print_with_time(colored(f"Network written to {args.target_file}", "green"))
+    writer.write_to_file(target_file)
+    print_with_time(colored(f"Network written to {target_file}", "green"))
+
+
+if __name__ == "__main__":
+    cli()

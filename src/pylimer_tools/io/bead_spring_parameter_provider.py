@@ -118,6 +118,27 @@ class Parameters:
             nm_to_actual_units**3
         )
 
+    def get_gamma_conversion_factor(self) -> Quantity:
+        """
+        Returns the conversion factor for shear modulus from the gamma factors
+        used in the force balance method to MPa.
+
+        Apply as:
+
+        .. code-block:: python
+
+            shear_modulus = gamma_conversion_factor * np.sum(gamma_factors) / universe.get_volume()
+
+        where `gamma_factors` are the gamma factors calculated from the force balance method,
+        using the appropriate `b02`, which can be obtained from the parameters as such:
+
+        .. code-block:: python
+            b02 = params.get("R02").to(params.get("distance_units") ** 2).magnitude
+        """
+        kbt = self.get("T") * self.get("kb")
+        gamma_conversion_factor = (kbt / ((self.get("distance_units")) ** 3)).to("MPa")
+        return gamma_conversion_factor  # type: ignore
+
     def get_fb_stress_conversion(self) -> float:
         return (self.get_kappa() / (1 * self.get("distance_units"))).to("MPa").magnitude
 
