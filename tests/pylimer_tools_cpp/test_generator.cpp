@@ -781,6 +781,7 @@ TEST_CASE("Randomly functionalized chains collapse",
     pylimer_tools::sim::ComputedDoubleValues::RESIDUAL,
     pylimer_tools::sim::ComputedDoubleValues::GAMMA
   };
+  outputConfig.outputEvery = 100;
   std::vector<pylimer_tools::sim::OutputConfiguration> outputConfigs = {
     outputConfig
   };
@@ -790,7 +791,7 @@ TEST_CASE("Randomly functionalized chains collapse",
   {
     forceBalance.configAssumeBoxLargeEnough(true);
     CHECK(forceBalance.getResidual() > 0.);
-    forceBalance.runForceRelaxation();
+    forceBalance.runForceRelaxation(50000, 1e-12);
 
     CHECK_THAT(forceBalance.getSolubleWeightFraction(),
                Catch::Matchers::WithinAbs(1.0, 0.001));
@@ -801,7 +802,7 @@ TEST_CASE("Randomly functionalized chains collapse",
   {
     forceBalance.configAssumeBoxLargeEnough(false);
     CHECK(forceBalance.getResidual() > 0.);
-    forceBalance.runForceRelaxation();
+    forceBalance.runForceRelaxation(50000, 1e-12);
 
     CHECK_THAT(forceBalance.getSolubleWeightFraction(),
                Catch::Matchers::WithinAbs(1.0, 0.001));
