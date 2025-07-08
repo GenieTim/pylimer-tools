@@ -18,8 +18,8 @@
 .. _sphx_glr_auto_examples_structure_analysis_plot_decompose_structure.py:
 
 
-Example: Structure Analysis with pylimer-tools
-=============================================
+Decompose/Split Structure
+=========================
 
 This example demonstrates how to decompose a crosslinked polymer network into chains 
 and analyze its structure using pylimer-tools.
@@ -29,7 +29,7 @@ The following approaches are shown:
 - Decomposing the network to chains while keeping crosslinkers
 - Finding clusters after manual junction removal
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-57
+.. GENERATED FROM PYTHON SOURCE LINES 15-57
 
 
 
@@ -57,7 +57,6 @@ The following approaches are shown:
 .. code-block:: Python
 
 
-    # Import the main Universe class from pylimer_tools_cpp
     import os
 
     import matplotlib.pyplot as plt
@@ -68,7 +67,7 @@ The following approaches are shown:
     # Replace with your crosslinker type
     crosslinker_type = 2
 
-    # Load your network (replace 'network.gml' with your file)
+    # Load your network (replace path accordingly)
     universe = read_data_file(
         os.path.join(
             os.getcwd(),
@@ -103,7 +102,7 @@ The following approaches are shown:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.066 seconds)
+   **Total running time of the script:** (0 minutes 0.091 seconds)
 
 
 .. _sphx_glr_download_auto_examples_structure_analysis_plot_decompose_structure.py:

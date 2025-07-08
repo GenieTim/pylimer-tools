@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.236** total execution time for 2 files **from auto_examples/structure_analysis**:
+**00:00.304** total execution time for 4 files **from auto_examples/structure_analysis**:
 
 .. container::
 
@@ -32,9 +32,15 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_loop_analysis.py` (``plot_loop_analysis.py``)
-     - 00:00.170
+   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_end_to_end_distribution.py` (``plot_end_to_end_distribution.py``)
+     - 00:00.137
      - 0.0
    * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_decompose_structure.py` (``plot_decompose_structure.py``)
-     - 00:00.066
+     - 00:00.091
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_structure_analysis.py` (``plot_structure_analysis.py``)
+     - 00:00.077
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_structure_analysis_plot_loop_analysis.py` (``plot_loop_analysis.py``)
+     - 00:00.000
      - 0.0

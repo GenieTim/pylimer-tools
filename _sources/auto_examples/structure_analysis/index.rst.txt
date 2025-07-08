@@ -63,7 +63,24 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Example: Structure Analysis with pylimer-tools</div>
+      <div class="sphx-glr-thumbnail-title">Decompose/Split Structure</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to analyze the end-to-end distribution of polymer chains using pylimer-tools. It reads a structure file, computes the end-to-end distances, and plots the distribution of these distances.">
+
+.. only:: html
+
+  .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_end_to_end_distribution_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_structure_analysis_plot_end_to_end_distribution.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">End-to-End Distribution</div>
     </div>
 
 
@@ -84,6 +101,23 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to analyze the structure of a crosslinked polymer network to get the stoichiometric imbalance r, the crosslinker conversion p or the functionality of the crosslinker f.">
+
+.. only:: html
+
+  .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_structure_analysis_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_structure_analysis_plot_structure_analysis.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Extract Synthesis Parameters</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -95,5 +129,7 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
    :hidden:
 
    /auto_examples/structure_analysis/plot_decompose_structure
+   /auto_examples/structure_analysis/plot_end_to_end_distribution
    /auto_examples/structure_analysis/plot_loop_analysis
+   /auto_examples/structure_analysis/plot_structure_analysis
 
