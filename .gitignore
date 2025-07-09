@@ -160,3 +160,6 @@ test-reports
 examples/dpd_simulations/dpd_simulation_output.txt
 examples/network_generator/generated_networks
 examples/readers_writers/generated_structures
+
+examples/dpd_simulations/dpd_simulation_avg_output.txt
+docs/api

@@ -12,13 +12,9 @@ import os
 import pandas as pd
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
-from pylimer_tools_cpp import (
-    AtomStyle,
-    ComputedDoubleValues,
-    ComputedIntValues,
-    DPDSimulator,
-    OutputConfiguration,
-)
+from pylimer_tools_cpp import (AtomStyle, ComputedDoubleValues,
+                               ComputedIntValues, DPDSimulator,
+                               OutputConfiguration)
 
 # Load a LAMMPS data file (replace with your file)
 filePath = os.path.join(
@@ -33,8 +29,11 @@ universe = read_data_file(
 # Create the DPD simulator
 dpd_simulator = DPDSimulator(
     universe=universe,
-    seed="12345",  # Set a random seed for reproducibility
+    seed="12345",  # Set a random seed for reproducibility*
 )
+# Note that the random seed does not guarantee the same results across different runs,
+# as the DPD algorithm is inherently stochastic and will produce different results
+# if you use more than one processor.
 
 # Randomly sample slip-springs
 dpd_simulator.create_slip_springs(num=100)
