@@ -134,8 +134,7 @@ def cli(files, crosslinker_type, polymer_name):
                 params.get_gamma_conversion_factor().to("MPa").magnitude
                 * np.sum(
                     mehp.get_gamma_factors(
-                        params.get("R02").to(params.get("distance_units")).magnitude
-                        ** 2
+                        params.get("R02").to(params.get("distance_units")**2).magnitude
                     )
                 )
                 / universe.get_volume()
