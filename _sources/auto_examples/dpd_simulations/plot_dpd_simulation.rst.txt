@@ -25,7 +25,7 @@ This example demonstrates how to set up and run a DPD simulation with slip-sprin
 
 Reference: `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macromol.1c00567>`_
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-96
+.. GENERATED FROM PYTHON SOURCE LINES 9-95
 
 
 
@@ -56,13 +56,9 @@ Reference: `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macrom
     import pandas as pd
 
     from pylimer_tools.io.read_lammps_output_file import read_data_file
-    from pylimer_tools_cpp import (
-        AtomStyle,
-        ComputedDoubleValues,
-        ComputedIntValues,
-        DPDSimulator,
-        OutputConfiguration,
-    )
+    from pylimer_tools_cpp import (AtomStyle, ComputedDoubleValues,
+                                   ComputedIntValues, DPDSimulator,
+                                   OutputConfiguration)
 
     # Load a LAMMPS data file (replace with your file)
     filePath = os.path.join(
@@ -77,8 +73,11 @@ Reference: `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macrom
     # Create the DPD simulator
     dpd_simulator = DPDSimulator(
         universe=universe,
-        seed="12345",  # Set a random seed for reproducibility
+        seed="12345",  # Set a random seed for reproducibility*
     )
+    # Note that the random seed does not guarantee the same results across different runs,
+    # as the DPD algorithm is inherently stochastic and will produce different results
+    # if you use more than one processor.
 
     # Randomly sample slip-springs
     dpd_simulator.create_slip_springs(num=100)
@@ -141,7 +140,7 @@ Reference: `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macrom
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 7.752 seconds)
+   **Total running time of the script:** (0 minutes 7.703 seconds)
 
 
 .. _sphx_glr_download_auto_examples_dpd_simulations_plot_dpd_simulation.py:
