@@ -1,5 +1,4 @@
 attrs>=25.3.0
-attrs>=25.3.0
 click>=8.2.1
 cmake>=4.0.2
 coverage>=7.9.0
@@ -8,7 +7,6 @@ fs>=2.4.16
 furo>=2024.8.6
 future>=1.0.0
 igraph>=0.11.9
-lazydocs>=0.4.8
 matplotlib>=3.10.3
 mock>=5.2.0
 mypy-extensions>=1.1.0
