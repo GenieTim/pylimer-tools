@@ -15,12 +15,19 @@ import numpy as np
 from scipy.stats import anderson, normaltest
 from termcolor import colored
 
-from pylimer_tools.calc.structure_analysis import \
-    compute_crosslinker_conversion
+from pylimer_tools.calc.structure_analysis import compute_crosslinker_conversion
 from pylimer_tools.io.bead_spring_parameter_provider import (
-    Parameters, get_parameters_for_polymer, get_supported_polymer_names)
-from pylimer_tools_cpp import (DataFileWriter, MCUniverseGenerator,
-                               MEHPForceBalance2, SLESolver, Universe)
+    Parameters,
+    get_parameters_for_polymer,
+    get_supported_polymer_names,
+)
+from pylimer_tools_cpp import (
+    DataFileWriter,
+    MCUniverseGenerator,
+    MEHPForceBalance2,
+    SLESolver,
+    Universe,
+)
 
 ###
 # Configuration
@@ -69,7 +76,8 @@ def prepare_structure_generation(
     if target_p is None and target_wsol is None:
         raise ValueError("target_p or target_wsol must be provided")
     if target_p is not None and target_wsol is not None:
-        raise ValueError("Only one of target_p and target_wsol should be provided")
+        raise ValueError(
+            "Only one of target_p and target_wsol should be provided")
 
     n_crosslinks = n_chains_crosslinkers
 
@@ -230,14 +238,15 @@ def is_active_network(
             z_score_std_mult=z_score_std_mult,
         )
     except Exception as e:
-        print(f"Error during structure generation for network activity assessment: {e}")
+        print(
+            f"Error during structure generation for network activity assessment: {e}")
         return False
 
     try:
         fb = universe_generator.get_force_balance2()
-        assert isinstance(
-            fb, MEHPForceBalance2
-        ), "Expected ForceBalance2, got {}".format(type(fb))
+        assert isinstance(fb, MEHPForceBalance2), (
+            "Expected ForceBalance2, got {}".format(type(fb))
+        )
         fb.run_force_relaxation()
     except Exception as e:
         print_with_time(
@@ -531,7 +540,8 @@ def cli(
             "Only one of --target-p and --target-wsol should be provided"
         )
     if target_p is None and target_wsol is None:
-        raise click.UsageError("Either --target-p or --target-wsol must be provided")
+        raise click.UsageError(
+            "Either --target-p or --target-wsol must be provided")
 
     params = get_parameters_for_polymer(polymer_name)
 

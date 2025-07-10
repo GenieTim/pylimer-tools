@@ -10,6 +10,7 @@ import os
 import sys
 import sysconfig
 import warnings
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -161,7 +162,7 @@ html_css_files = [
 ]
 
 # The name for this set of Sphinx documents.
-html_title = f"{project} v{version}"
+html_title = f"{project}"  # " v{version}"
 
 # A shorter title for the navigation bar.
 html_short_title = f"{project}"

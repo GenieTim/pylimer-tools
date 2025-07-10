@@ -37,9 +37,9 @@ class Parameters:
 
         """
         for key, value in data.items():
-            assert isinstance(
-                value, Quantity
-            ), f"Invalid value for parameter {key}: {value}"
+            assert isinstance(value, Quantity), (
+                f"Invalid value for parameter {key}: {value}"
+            )
 
         # validate parameters
         required_params = ["Mw", "<b>", "<b^2>", "rho"]
@@ -136,11 +136,13 @@ class Parameters:
             b02 = params.get("R02").to(params.get("distance_units") ** 2).magnitude
         """
         kbt = self.get("T") * self.get("kb")
-        gamma_conversion_factor = (kbt / ((self.get("distance_units")) ** 3)).to("MPa")
+        gamma_conversion_factor = (
+            kbt / ((self.get("distance_units")) ** 3)).to("MPa")
         return gamma_conversion_factor  # type: ignore
 
     def get_fb_stress_conversion(self) -> float:
-        return (self.get_kappa() / (1 * self.get("distance_units"))).to("MPa").magnitude
+        return (self.get_kappa() / (1 * self.get("distance_units"))
+                ).to("MPa").magnitude
 
 
 def assemble_parameters_from_kuhn(
@@ -209,7 +211,8 @@ def get_parameters_for_polymer(
             break
 
     if relevant_row is None:
-        raise ValueError(f"Polymer '{polymer_name}' not found in Everaers et al. data.")
+        raise ValueError(
+            f"Polymer '{polymer_name}' not found in Everaers et al. data.")
 
     row = relevant_row
 
