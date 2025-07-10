@@ -61,11 +61,11 @@ init_pylimer_bound_generators(py::module_& m)
     m, "ZScoreMaxDistanceProvider", R"pbdoc(
      For MC generation, converts the :math:`N` to a maximum distance within which to sample.
      The distance will be calculated as :math:`\text{std_multiplier} \times \sqrt{N \times \text{in_sqrt_multiplier}}`.
-         Useful only for performance improvements in large systems.
+     Useful only for performance improvements in large systems.
 
      Arguments:
      - std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
-          E.g., 3.29 for 99.9% of all conformations.
+       E.g., 3.29 for 99.9% of all conformations.
      - in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
     )pbdoc")
     .def(py::init<const double, const double>(),
