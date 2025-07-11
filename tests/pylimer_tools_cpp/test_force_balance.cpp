@@ -465,6 +465,9 @@ TEST_CASE("MEHPForceBalance phantom with and without removal is the same",
   CHECK_THAT(forceBalancerPhantom.getDanglingWeightFraction(),
              Catch::Matchers::WithinRel(
                forceBalancerPhantomRem.getDanglingWeightFraction(), 0.001));
+  CHECK((forceBalancerPhantom.getInitialCoordinates() +
+         forceBalancerPhantom.getCurrentDisplacements())
+          .isApprox(forceBalancerPhantom.getCoordinates()));
 
   // run with and without simplification
   forceBalancerPhantom.runForceRelaxation(

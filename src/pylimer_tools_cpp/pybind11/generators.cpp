@@ -51,11 +51,17 @@ init_pylimer_bound_generators(py::module_& m)
     For MC generation, converts the :math:`N` to a maximum distance within which to sample.
     The distance will be calculated as :math:`N \times \text{max_distance_multiplier}`.
     Useful only for performance improvements in large systems.
+
+    :param max_distance_multiplier: Multiplier for the maximum distance.
     )pbdoc")
     .def(py::init<const double>(), py::arg("max_distance_multiplier"))
     .def("get_max_distance",
          &LinearMaxDistanceProvider::getMaxDistance,
-         "",
+         R"pbdoc(
+         Get the maximum distance for a given N.
+
+         :param N: Number of segments.
+         )pbdoc",
          py::arg("N"));
   py::class_<ZScoreMaxDistanceProvider, MaxDistanceProvider>(
     m, "ZScoreMaxDistanceProvider", R"pbdoc(
@@ -63,22 +69,25 @@ init_pylimer_bound_generators(py::module_& m)
      The distance will be calculated as :math:`\text{std_multiplier} \times \sqrt{N \times \text{in_sqrt_multiplier}}`.
      Useful only for performance improvements in large systems.
 
-     Arguments:
-     - std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
-       E.g., 3.29 for 99.9% of all conformations.
-     - in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
+     :param std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
+         E.g., 3.29 for 99.9% of all conformations.
+     :param in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
     )pbdoc")
     .def(py::init<const double, const double>(),
          py::arg("std_multiplier"),
          py::arg("in_sqrt_multiplier"))
     .def("get_max_distance",
          &ZScoreMaxDistanceProvider::getMaxDistance,
-         "",
+         R"pbdoc(
+         Get the maximum distance for a given N.
+
+         :param N: Number of segments.
+         )pbdoc",
          py::arg("N"));
 
   py::class_<NoMaxDistanceProvider, MaxDistanceProvider>(
     m, "NoMaxDistanceProvider", R"pbdoc(
-    For MC generation, to disable the neighbour list useage.
+    For MC generation, to disable the neighbour list usage.
     )pbdoc")
     .def(py::init<>())
     .def("get_max_distance",
@@ -176,10 +185,9 @@ init_pylimer_bound_generators(py::module_& m)
          The distance will be calculated as :math:`\text{std_multiplier} \times \sqrt{N \times \text{in_sqrt_multiplier}}`.
          Useful only for performance improvements in large systems.
 
-         Arguments:
-          - std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
+         :param std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
                E.g., 3. for 99.9994% of all conformations.
-          - in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
+         :param in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
          )pbdoc",
          py::arg("std_multiplier"),
          py::arg("in_sqrt_multiplier") = 1.)

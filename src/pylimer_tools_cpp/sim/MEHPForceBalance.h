@@ -2267,6 +2267,11 @@ public:
     return this->initialConfig.coordinates + this->currentDisplacements;
   }
 
+  Eigen::VectorXd getInitialCoordinates()
+  {
+    return this->initialConfig.coordinates;
+  }
+
   double getTemperature() override
   {
     std::cerr << "Warning: Temperature is not a reasonable metric for this "

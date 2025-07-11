@@ -7,16 +7,20 @@ def get_tail(data, percentage=0.2, min_n=25, max_percentage=0.5):
     """
     Extract the last few entries of a list
 
-    Arguments:
-        - data (list|pd.DataFrame|pd.Series): The list to extract the last few entries from
-        - percentage: The percentage of entries to extract
-        - min_n: The minimum number of entries to extract
-        - max_percentage: The maximum percentage of entries to extract
+    :param data: The list, DataFrame, or Series to extract the last few entries from
+    :type data: list or pd.DataFrame or pd.Series
+    :param percentage: The percentage of entries to extract (default: 0.2)
+    :type percentage: float
+    :param min_n: The minimum number of entries to extract (default: 25)
+    :type min_n: int
+    :param max_percentage: The maximum percentage of entries to extract (default: 0.5)
+    :type max_percentage: float
+    :return: A subset of the input data containing the last entries according to the specified criteria
+    :rtype: Same type as input data
 
-    Returns:
-        A (list|pd.DataFrame|pd.Series) with at maximum maxPercentage,
-            at least minN entries (assuming the initial data is as large),
-            but ideally `percentage` many percentage of the last entries.
+    The function returns a subset with at maximum max_percentage,
+    at least min_n entries (assuming the initial data is as large),
+    but ideally `percentage` many percentage of the last entries.
     """
     assert percentage <= 1
     assert max_percentage <= 1
@@ -40,17 +44,21 @@ def unify_data_stepsizes(
 ) -> pd.DataFrame:
     """
     Get a DataFrame where all data points have the same step between the values in column given by `key`
-    NOTE: this function is rather unstable, as it has a few dirty assumptions, such as:
+
+    :param data: The DataFrame to unify the step-size for
+    :type data: pd.DataFrame
+    :param key: The column name indicating the column containing the step-nr
+    :type key: str
+    :param step_size: The step size to use for filtering (if None, computed automatically)
+    :type step_size: int, optional
+    :param max_expected_step_size: Used to get a warning if the computed step-size is larger
+    :type max_expected_step_size: int, default=100
+    :return: A DataFrame with a consistent step-size
+    :rtype: pd.DataFrame
+
+    NOTE: this function is rather unstable, as it has a few assumptions:
     - steps are modulo stepsize. Breaks e.g. with steps start with 1 and go up by step_size.
     - ideal step-size is max step difference. Breaks e.g. if there is one big gap
-
-    Arguments:
-        - data: The DataFrame to unify the step-size for
-        - key: The column name indicating the column containing the step-nr.
-        - max_expected_step_size: use to get a warning if the computed step-size is larger
-
-    Returns:
-        - data: a DataFrame with a consistent step-size
     """
     # lenBefore = len(data)
     if step_size is None:
