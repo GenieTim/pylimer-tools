@@ -118,6 +118,18 @@ DataFileParser::read(const std::string& filePath,
       case AtomStyle::CHARGE:
         this->readAtomCharge(line);
         break;
+      case AtomStyle::DIPOLE:
+        this->readAtomDipole(line);
+        break;
+      case AtomStyle::DPD:
+        this->readAtomDpd(line);
+        break;
+      case AtomStyle::MDPD:
+        this->readAtomMdpd(line);
+        break;
+      case AtomStyle::SPHERE:
+        this->readAtomSphere(line);
+        break;
       case AtomStyle::FULL:
         this->readAtomFull(line);
         break;
@@ -289,12 +301,13 @@ DataFileParser::readAtomFull(const std::string& line)
 void
 DataFileParser::readAtomCharge(const std::string& line)
 {
-  size_t atomId, nx, ny, nz;
+  size_t atomId;
+  long int nx, ny, nz;
   int atomType;
   double charge;
   double x, y, z;
   int resFound = sscanf(line.c_str(),
-                        "%zd %d %le %le %le %le %zd %zd %zd",
+                        "%zd %d %le %le %le %le %ld %ld %ld",
                         &atomId,
                         &atomType,
                         &charge,
@@ -314,6 +327,164 @@ DataFileParser::readAtomCharge(const std::string& line)
   this->additionalAtomData["charge"].push_back(charge);
 
   if (resFound > 6) {
+    this->atomNx.push_back(nx);
+    this->atomNy.push_back(ny);
+    this->atomNz.push_back(nz);
+  }
+}
+
+void
+DataFileParser::readAtomDipole(const std::string& line)
+{
+  size_t atomId;
+  long int nx, ny, nz;
+  int atomType;
+  double charge;
+  double x, y, z;
+  double dipoleX, dipoleY, dipoleZ;
+  int resFound = sscanf(line.c_str(),
+                        "%zd %d %le %le %le %le %le %le %le %ld %ld %ld",
+                        &atomId,
+                        &atomType,
+                        &charge,
+                        &x,
+                        &y,
+                        &z,
+                        &dipoleX,
+                        &dipoleY,
+                        &dipoleZ,
+                        &nx,
+                        &ny,
+                        &nz);
+
+  this->atomIds.push_back(atomId);
+  this->moleculeIds.push_back(0);
+  this->atomTypes.push_back(atomType);
+  this->atomX.push_back(x);
+  this->atomY.push_back(y);
+  this->atomZ.push_back(z);
+  this->additionalAtomData["charge"].push_back(charge);
+  this->additionalAtomData["mux"].push_back(dipoleX);
+  this->additionalAtomData["muy"].push_back(dipoleY);
+  this->additionalAtomData["muz"].push_back(dipoleZ);
+
+  if (resFound > 9) {
+    this->atomNx.push_back(nx);
+    this->atomNy.push_back(ny);
+    this->atomNz.push_back(nz);
+  }
+}
+
+void
+DataFileParser::readAtomDpd(const std::string& line)
+{
+  size_t atomId;
+  long int nx, ny, nz;
+  int atomType;
+  double x, y, z;
+  double theta;
+  int resFound = sscanf(line.c_str(),
+                        "%zd %d %le %le %le %le %d %le %le %ld %ld %ld",
+                        &atomId,
+                        &atomType,
+                        &theta,
+                        &x,
+                        &y,
+                        &z,
+                        &nx,
+                        &ny,
+                        &nz);
+
+  RUNTIME_EXP_IFN(resFound >= 8,
+                  "Did not find enough data in line '" + line + "': only " +
+                    std::to_string(resFound) + ".");
+
+  this->atomIds.push_back(atomId);
+  this->atomTypes.push_back(atomType);
+  this->atomX.push_back(x);
+  this->atomY.push_back(y);
+  this->atomZ.push_back(z);
+  this->additionalAtomData["theta"].push_back(theta);
+
+  if (resFound > 6) {
+    this->atomNx.push_back(nx);
+    this->atomNy.push_back(ny);
+    this->atomNz.push_back(nz);
+  }
+}
+
+void
+DataFileParser::readAtomMdpd(const std::string& line)
+{
+  size_t atomId;
+  long int nx, ny, nz;
+  int atomType;
+  double x, y, z;
+  double rho;
+  int resFound = sscanf(line.c_str(),
+                        "%zd %d %le %le %le %le %d %le %le %ld %ld %ld",
+                        &atomId,
+                        &atomType,
+                        &rho,
+                        &x,
+                        &y,
+                        &z,
+                        &nx,
+                        &ny,
+                        &nz);
+
+  RUNTIME_EXP_IFN(resFound >= 8,
+                  "Did not find enough data in line '" + line + "': only " +
+                    std::to_string(resFound) + ".");
+
+  this->atomIds.push_back(atomId);
+  this->atomTypes.push_back(atomType);
+  this->atomX.push_back(x);
+  this->atomY.push_back(y);
+  this->atomZ.push_back(z);
+  this->additionalAtomData["rho"].push_back(rho);
+
+  if (resFound > 6) {
+    this->atomNx.push_back(nx);
+    this->atomNy.push_back(ny);
+    this->atomNz.push_back(nz);
+  }
+}
+
+void
+DataFileParser::readAtomSphere(const std::string& line)
+{
+  size_t atomId;
+  long int nx, ny, nz;
+  int atomType;
+  double x, y, z;
+  double diameter, density;
+  int resFound = sscanf(line.c_str(),
+                        "%zd %d %le %le %le %le %le %d %le %le %ld %ld %ld",
+                        &atomId,
+                        &atomType,
+                        &diameter,
+                        &density,
+                        &x,
+                        &y,
+                        &z,
+                        &nx,
+                        &ny,
+                        &nz);
+
+  RUNTIME_EXP_IFN(resFound >= 8,
+                  "Did not find enough data in line '" + line + "': only " +
+                    std::to_string(resFound) + ".");
+
+  this->atomIds.push_back(atomId);
+  this->atomTypes.push_back(atomType);
+  this->atomX.push_back(x);
+  this->atomY.push_back(y);
+  this->atomZ.push_back(z);
+  this->additionalAtomData["diameter"].push_back(diameter);
+  this->additionalAtomData["density"].push_back(density);
+
+  if (resFound > 7) {
     this->atomNx.push_back(nx);
     this->atomNy.push_back(ny);
     this->atomNz.push_back(nz);
