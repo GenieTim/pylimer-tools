@@ -11,7 +11,9 @@ import os
 import numpy as np
 
 from pylimer_tools.io.bead_spring_parameter_provider import (
-    Parameters, get_parameters_for_polymer)
+    Parameters,
+    get_parameters_for_polymer,
+)
 from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import MEHPForceBalance2, Universe
 
@@ -57,7 +59,4 @@ shear_modulus = (
     * np.sum(mehp_fb.get_gamma_factors(r02_slope_magnitude))
     / universe.get_volume()
 )
-print(
-    "Shear Modulus [MPa]: ",
-    shear_modulus
-)
+print("Shear Modulus [MPa]: ", shear_modulus)

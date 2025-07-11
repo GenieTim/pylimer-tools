@@ -3,15 +3,17 @@
 Extract Trajectory Frame to Data File
 =====================================
 
-
-Take a later entry from a LAMMPS trajectory and save it as a data file:
+Take a later entry from a LAMMPS trajectory and save it as a data file.
 """
+
 import os
+
 from pylimer_tools_cpp import DataFileWriter, UniverseSequence
 
 if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
 
+# %%
 # For large trajectories, frames are loaded on-demand
 # Load a LAMMPS dump trajectory file (replace with your file)
 file_path = os.path.join(

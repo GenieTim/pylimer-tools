@@ -3,7 +3,7 @@
 Adding Topology Information
 ===========================
 
-The generated networks can include topological information
+The generated networks can include topological information.
 """
 
 from pylimer_tools_cpp import MCUniverseGenerator
@@ -53,5 +53,7 @@ if len(dihedrals["dihedral_angle_from"]) > 0:
     )
 
 print(
-    f"Added {universe.get_nr_of_angles()} angles and {universe.get_nr_of_dihedral_angles()} dihedral angles."
+    f"Added {universe.get_nr_of_angles()} angles and {
+        universe.get_nr_of_dihedral_angles()
+    } dihedral angles."
 )

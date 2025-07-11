@@ -3,8 +3,7 @@
 Log & Thermo File Reader
 ========================
 
-Read LAMMPS log files containing thermodynamic output from the ``thermo`` command:
-
+Read LAMMPS log files containing thermodynamic output from the ``thermo`` command.
 
 The log file reader automatically:
 
@@ -13,7 +12,7 @@ The log file reader automatically:
 - Skips non-numeric data
 - Supports multi-run simulations with different ``thermo_style`` commands
 
-Relevant documentation: :func:`~pylimer_tools.io.read_lammps_output_file.read_log_file` 
+Relevant documentation: :func:`~pylimer_tools.io.read_lammps_output_file.read_log_file`
 and :func:`~pylimer_tools.io.extract_thermo_data.extract_thermo_params`
 """
 
@@ -33,13 +32,16 @@ thermo_data = read_log_file(log_file)
 
 # Access thermodynamic properties
 print(
-    f"Temperature range: {thermo_data['Temp'].min():.2f} - {thermo_data['Temp'].max():.2f}"
+    f"Temperature range: {thermo_data['Temp'].min():.2f} - {
+        thermo_data['Temp'].max():.2f
+    }"
 )
 print(f"Final pressure: {thermo_data['Press'].iloc[-1]:.6f}")
 
 # Plot temperature evolution
-
 plt.plot(thermo_data["Step"], thermo_data["Temp"])
 plt.xlabel("Simulation Step")
+plt.ylabel("Temperature [LJ-units]")
+plt.show()
 plt.ylabel("Temperature [LJ-units]")
 plt.show()

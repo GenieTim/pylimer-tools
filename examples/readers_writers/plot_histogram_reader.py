@@ -3,7 +3,7 @@
 Histogram Reader
 ================
 
-Process histogram data from ``fix ave/hist`` commands:
+Process histogram data from ``fix ave/hist`` commands.
 """
 
 import os

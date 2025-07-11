@@ -2,6 +2,8 @@
 """
 Save Generated Network
 ======================
+
+This example shows how to save a generated polymer network to a LAMMPS data file.
 """
 
 from pathlib import Path

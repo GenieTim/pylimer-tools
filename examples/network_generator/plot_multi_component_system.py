@@ -6,7 +6,6 @@ Multi-Component System
 Create complex systems with multiple components:
 """
 
-
 import datetime
 from pylimer_tools_cpp import MCUniverseGenerator
 
@@ -61,7 +60,8 @@ generator.add_monofunctional_strands(
     monofunctional_strand_length=[
         beads_per_monofunctional_chain for _ in range(n_monofunctional_chains)
     ],
-    monofunctional_strand_atom_type=4,  # Type 4 to recognize these as "monofunctional" strands later
+    # Type 4 to recognize these as "monofunctional" strands later
+    monofunctional_strand_atom_type=4,
 )
 
 # Crosslink polymer strands

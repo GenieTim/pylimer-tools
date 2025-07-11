@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 """
 Memory-Efficient Dump File Reading
-================================
+==================================
 
-The :class:`~pylimer_tools_cpp.UniverseSequence` class provides automatic memory management:
-
+The :class:`~pylimer_tools_cpp.UniverseSequence` class provides automatic memory management.
 """
 
 import os
@@ -13,6 +12,7 @@ import psutil
 
 from pylimer_tools_cpp import UniverseSequence
 
+# %%
 # For large trajectories, frames are loaded on-demand
 # Load a LAMMPS dump trajectory file (replace with your file)
 file_path = os.path.join(
@@ -44,7 +44,8 @@ dump_file_path = os.path.join(file_path, "big_dump_file.lammpstrj")
 dump_file_size = os.path.getsize(dump_file_path)
 
 print("\n--- Memory Usage Report ---")
-print(f"Memory before processing: {mem_before / (1024*1024):.2f} MB")
-print(f"Memory after processing:  {mem_after / (1024*1024):.2f} MB")
-print(f"Memory used by script:    {(mem_after - mem_before) / (1024*1024):.2f} MB")
-print(f"Dump file size:           {dump_file_size / (1024*1024):.2f} MB")
+print(f"Memory before processing: {mem_before / (1024 * 1024):.2f} MB")
+print(f"Memory after processing:  {mem_after / (1024 * 1024):.2f} MB")
+print(
+    f"Memory used by script:    {(mem_after - mem_before) / (1024 * 1024):.2f} MB")
+print(f"Dump file size:           {dump_file_size / (1024 * 1024):.2f} MB")

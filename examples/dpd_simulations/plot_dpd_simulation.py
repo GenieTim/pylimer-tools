@@ -12,9 +12,13 @@ import os
 import pandas as pd
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
-from pylimer_tools_cpp import (AtomStyle, ComputedDoubleValues,
-                               ComputedIntValues, DPDSimulator,
-                               OutputConfiguration)
+from pylimer_tools_cpp import (
+    AtomStyle,
+    ComputedDoubleValues,
+    ComputedIntValues,
+    DPDSimulator,
+    OutputConfiguration,
+)
 
 # Load a LAMMPS data file (replace with your file)
 filePath = os.path.join(
@@ -31,6 +35,7 @@ dpd_simulator = DPDSimulator(
     universe=universe,
     seed="12345",  # Set a random seed for reproducibility*
 )
+# %%
 # Note that the random seed does not guarantee the same results across different runs,
 # as the DPD algorithm is inherently stochastic and will produce different results
 # if you use more than one processor.
@@ -77,6 +82,7 @@ dpd_simulator.run_simulation(
 
 print("DPD simulation completed.")
 
+# %%
 # read the output file and actually plot something
 df = pd.read_csv("dpd_simulation_output.txt", sep="\\s+")
 _ = df.plot(
