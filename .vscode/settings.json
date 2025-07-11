@@ -156,10 +156,8 @@
     "print": "cpp",
     "stacktrace": "cpp"
   },
-  "C_Cpp.clang_format_path": "/usr/local/opt/llvm/bin/clang-format",
   "C_Cpp.default.cppStandard": "c++17",
   "C_Cpp.default.cStandard": "c17",
-  "C_Cpp.default.intelliSenseMode": "macos-gcc-x64",
   "C_Cpp.inlayHints.autoDeclarationTypes.showOnLeft": true,
   "C_Cpp.clang_format_sortIncludes": true,
   "c-cpp-flylint.flexelint.enable": false,
@@ -201,10 +199,7 @@
     "xlink",
     "xlinks"
   ],
-  "autopep8.args": [
-    "--ignore",
-    "W690"
-  ],
+  "autopep8.args": ["--ignore", "W690"],
   "C_Cpp.clang_format_fallbackStyle": "Mozilla",
   "clang-format.fallbackStyle": "Mozilla"
 }

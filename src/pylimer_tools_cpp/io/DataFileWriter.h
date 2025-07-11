@@ -334,12 +334,175 @@ namespace utils {
                  << atom.getType() << "\t" << x << "\t" << y << "\t" << z
                  << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
             break;
+          case pylimer_tools::utils::AtomStyle::ATOMIC:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t" << x
+                 << "\t" << y << "\t" << z << "\t" << nx << "\t" << ny << "\t"
+                 << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::BODY:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("bodyflag") << "\t"
+                 << atom.getExtraData().at("mass") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::BPM_SPHERE:
+            file << "\t" << atomId << "\t" << moleculeIdx << "\t"
+                 << atom.getType() << "\t" << atom.getExtraData().at("diameter")
+                 << "\t" << atom.getExtraData().at("density") << "\t" << x
+                 << "\t" << y << "\t" << z << "\t" << nx << "\t" << ny << "\t"
+                 << nz << "\n";
+            break;
           case pylimer_tools::utils::AtomStyle::FULL:
             file << "\t" << atomId << "\t" << moleculeIdx << "\t"
                  << atom.getType() << "\t" << atom.getExtraData().at("charge")
                  << "\t" << x << "\t" << y << "\t" << z << "\t" << nx << "\t"
                  << ny << "\t" << nz << "\n";
             break;
+          case pylimer_tools::utils::AtomStyle::CHARGE:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("charge") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::DIELECTRIC:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("charge") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << atom.getExtraData().at("mux") << "\t"
+                 << atom.getExtraData().at("muy") << "\t"
+                 << atom.getExtraData().at("muz") << "\t"
+                 << atom.getExtraData().at("area") << "\t"
+                 << atom.getExtraData().at("ed") << "\t"
+                 << atom.getExtraData().at("em") << "\t"
+                 << atom.getExtraData().at("epsilon") << "\t"
+                 << atom.getExtraData().at("curvature") << "\t" << nx << "\t"
+                 << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::DIPOLE:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("charge") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << atom.getExtraData().at("mux") << "\t"
+                 << atom.getExtraData().at("muy") << "\t"
+                 << atom.getExtraData().at("muz") << "\t" << nx << "\t" << ny
+                 << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::DPD:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("theta") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::EDPD:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("edpd_temp") << "\t"
+                 << atom.getExtraData().at("edpd_cv") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::ELECTRON:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("charge") << "\t"
+                 << atom.getExtraData().at("espin") << "\t"
+                 << atom.getExtraData().at("eradius") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::ELLIPSOID:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("ellipsoidflag") << "\t"
+                 << atom.getExtraData().at("density") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::LINE:
+            file << "\t" << atomId << "\t" << moleculeIdx << "\t"
+                 << atom.getType() << "\t" << atom.getExtraData().at("lineflag")
+                 << "\t" << atom.getExtraData().at("density") << "\t" << x
+                 << "\t" << y << "\t" << z << "\t" << nx << "\t" << ny << "\t"
+                 << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::MDPD:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("rho") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::PERI:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("volume") << "\t"
+                 << atom.getExtraData().at("density") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::RHEO:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("status") << "\t"
+                 << atom.getExtraData().at("rho") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::RHEO_THERMAL:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("status") << "\t"
+                 << atom.getExtraData().at("rho") << "\t"
+                 << atom.getExtraData().at("energy") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::SMD:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << moleculeIdx << "\t" << atom.getExtraData().at("volume")
+                 << "\t" << atom.getExtraData().at("mass") << "\t"
+                 << atom.getExtraData().at("kradius") << "\t"
+                 << atom.getExtraData().at("cradius") << "\t"
+                 << atom.getExtraData().at("x0") << "\t"
+                 << atom.getExtraData().at("y0") << "\t"
+                 << atom.getExtraData().at("z0") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::SPHERE:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("diameter") << "\t"
+                 << atom.getExtraData().at("density") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::SPH:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("rho") << "\t"
+                 << atom.getExtraData().at("esph") << "\t"
+                 << atom.getExtraData().at("cv") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::SPIN:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t" << x
+                 << "\t" << y << "\t" << z << "\t"
+                 << atom.getExtraData().at("spx") << "\t"
+                 << atom.getExtraData().at("spy") << "\t"
+                 << atom.getExtraData().at("spz") << "\t"
+                 << atom.getExtraData().at("sp") << "\t" << nx << "\t" << ny
+                 << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::TEMPLATE:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << moleculeIdx << "\t"
+                 << atom.getExtraData().at("template_index") << "\t"
+                 << atom.getExtraData().at("template_atom") << "\t" << x << "\t"
+                 << y << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz
+                 << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::TRI:
+            file << "\t" << atomId << "\t" << moleculeIdx << "\t"
+                 << atom.getType() << "\t"
+                 << atom.getExtraData().at("triangleflag") << "\t"
+                 << atom.getExtraData().at("density") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::WAVEPACKET:
+            file << "\t" << atomId << "\t" << atom.getType() << "\t"
+                 << atom.getExtraData().at("charge") << "\t"
+                 << atom.getExtraData().at("espin") << "\t"
+                 << atom.getExtraData().at("eradius") << "\t"
+                 << atom.getExtraData().at("etag") << "\t"
+                 << atom.getExtraData().at("cs_re") << "\t"
+                 << atom.getExtraData().at("cs_im") << "\t" << x << "\t" << y
+                 << "\t" << z << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          case pylimer_tools::utils::AtomStyle::TDPD:
+          case pylimer_tools::utils::AtomStyle::HYBRID:
+            throw std::runtime_error(
+              "This atom style has variable output fields and is not yet "
+              "supported for writing without you supplying a custom atom "
+              "format.");
           default:
             throw std::runtime_error(
               "This atom style is not yet supported for writing without you "

@@ -11,6 +11,7 @@ namespace pylimer_tools::utils {
   X(ATOMIC, "atomic")                                                          \
   X(BODY, "body")                                                              \
   X(BOND, "bond")                                                              \
+  X(BPM_SPHERE, "bpm/sphere")                                                  \
   X(CHARGE, "charge")                                                          \
   X(DIELECTRIC, "dielectric")                                                  \
   X(DIPOLE, "dipole")                                                          \
@@ -23,10 +24,11 @@ namespace pylimer_tools::utils {
   X(MDPD, "mdpd")                                                              \
   X(MOLECULAR, "molecular")                                                    \
   X(PERI, "peri")                                                              \
+  X(RHEO, "rheo")                                                              \
+  X(RHEO_THERMAL, "rheo/thermal")                                              \
   X(SMD, "smd")                                                                \
   X(SPH, "sph")                                                                \
   X(SPHERE, "sphere")                                                          \
-  X(BPM_SPHERE, "bpm_sphere")                                                  \
   X(SPIN, "spin")                                                              \
   X(TDPD, "tdpd")                                                              \
   X(TEMPLATE, "template")                                                      \
