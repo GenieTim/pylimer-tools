@@ -335,6 +335,10 @@ public:
           &this->graph, propertyName, vertexId, value)) {
       throw std::runtime_error("Failed to set property value");
     }
+    if (!this->atomsHaveCustomAttributes) {
+      this->atomsHaveCustomAttributes =
+        this->checkIfAtomsHaveCustomAttributes();
+    }
   }
 
   /**
@@ -651,7 +655,7 @@ protected:
     return indices;
   };
 
-  bool checkIfAtomsHaveCustomAttributes() const;
+  [[nodiscard]] bool checkIfAtomsHaveCustomAttributes() const;
 };
 } // namespace pylimer_tools::entities
 

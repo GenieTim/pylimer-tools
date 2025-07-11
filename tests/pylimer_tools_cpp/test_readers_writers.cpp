@@ -57,7 +57,8 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
     CHECK(atoms[0][2].getId() == 30000);
     std::vector<pe::Box> boxes = parser3.readBoxes();
     CHECK(boxes.size() == 1);
-    CHECK_THAT(boxes[0].getLx(), Catch::Matchers::WithinRel(4.8545999999999999e+01));
+    CHECK_THAT(boxes[0].getLx(),
+               Catch::Matchers::WithinRel(4.8545999999999999e+01));
 
     // test throws
     CHECK_THROWS(pu::DumpFileParser("not-existing-file.out"));
@@ -220,6 +221,150 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     }
 
     // std::filesystem::remove(fileToWrite);
+  }
+}
+
+TEST_CASE("All atom types are supported",
+          "[utils][DataFileWriter][DataFileParser][io]")
+{
+  std::cout << "Running test \"All atom types are supported\"" << std::endl;
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+  CHECK(std::filesystem::exists(suspectedPath));
+
+  std::unordered_map<pylimer_tools::utils::AtomStyle, std::vector<std::string>>
+    atomPropertiesPerType = {
+      { pu::AtomStyle::ANGLE, {} },  // molecule-ID already handled separately
+      { pu::AtomStyle::ATOMIC, {} }, // no additional properties
+      { pu::AtomStyle::BODY, { "bodyflag", "mass" } },
+      { pu::AtomStyle::BOND, {} }, // molecule-ID already handled separately
+      { pu::AtomStyle::BPM_SPHERE, { "diameter", "density" } },
+      { pu::AtomStyle::CHARGE, { "charge" } },
+      { pu::AtomStyle::DIELECTRIC,
+        { "charge",
+          "mux",
+          "muy",
+          "muz",
+          "area",
+          "ed",
+          "em",
+          "epsilon",
+          "curvature" } },
+      { pu::AtomStyle::DIPOLE, { "charge", "mux", "muy", "muz" } },
+      { pu::AtomStyle::DPD, { "theta" } },
+      { pu::AtomStyle::EDPD, { "edpd_temp", "edpd_cv" } },
+      { pu::AtomStyle::ELECTRON, { "charge", "espin", "eradius" } },
+      { pu::AtomStyle::ELLIPSOID, { "ellipsoidflag", "density" } },
+      { pu::AtomStyle::FULL,
+        { "charge" } }, // molecule-ID already handled separately
+      { pu::AtomStyle::LINE, { "lineflag", "density" } },
+      { pu::AtomStyle::MDPD, { "rho" } },
+      { pu::AtomStyle::MOLECULAR,
+        {} }, // molecule-ID already handled separately
+      { pu::AtomStyle::PERI, { "volume", "density" } },
+      { pu::AtomStyle::RHEO, { "status", "rho" } },
+      { pu::AtomStyle::RHEO_THERMAL, { "status", "rho", "energy" } },
+      { pu::AtomStyle::SMD,
+        { "volume", "mass", "kradius", "cradius", "x0", "y0", "z0" } },
+      { pu::AtomStyle::SPH, { "rho", "esph", "cv" } },
+      { pu::AtomStyle::SPHERE, { "diameter", "density" } },
+      { pu::AtomStyle::SPIN, { "spx", "spy", "spz", "sp" } },
+      // TDPD has variable number of arguments, cannot test like this
+      { pu::AtomStyle::TEMPLATE, { "template_index", "template_atom" } },
+      { pu::AtomStyle::TRI, { "triangleflag", "density" } },
+      { pu::AtomStyle::WAVEPACKET,
+        { "charge", "espin", "eradius", "etag", "cs_re", "cs_im" } },
+      // HYBRID is complex and typically not tested in isolation
+    };
+
+  // Test each atom style
+  for (const auto& [atomStyle, properties] : atomPropertiesPerType) {
+    SECTION("Testing atom style: " + pu::getAtomStyleString(atomStyle))
+    {
+      pe::Universe universe = pe::Universe(10., 10., 10.);
+
+      // Add basic atoms
+      universe.addAtoms({ 1, 2, 3, 4, 5 },
+                        { 0, 1, 0, 2, 0 },
+                        { 1., 2., 3., 4., 5. },
+                        { 0., 0., 0., 0., 0. },
+                        { 0., 1., 2., 3., 4. },
+                        { 0, 0, 0, 1, 1 },
+                        { 0, 0, 0, 0, 0 },
+                        { 0, 0, 0, 0, 0 });
+
+      // Add bonds for testing
+      universe.addBonds({ 1, 2, 3, 4 }, { 2, 3, 4, 5 }, { 1, 1, 1, 1 });
+
+      // Add required properties for this atom style
+      std::random_device rd;
+      std::mt19937 gen(rd());
+      std::uniform_real_distribution<double> realDist(0.1, 10.0);
+      std::uniform_int_distribution<int> intDist(0, 5);
+
+      for (const std::string& property : properties) {
+        for (int atomId = 1; atomId <= 5; ++atomId) {
+          if (property.find("flag") != std::string::npos ||
+              property == "status" || property == "template_index" ||
+              property == "template_atom" || property == "etag") {
+            // Integer properties
+            int intVal = intDist(gen);
+            universe.setPropertyValue(atomId - 1, property.c_str(), intVal);
+            CHECK_THAT(universe.getAtom(atomId).getExtraData()[property],
+                       Catch::Matchers::WithinAbs(intVal, 1e-9));
+          } else {
+            // Double properties
+            int doubleVal = realDist(gen);
+            universe.setPropertyValue(atomId - 1, property.c_str(), doubleVal);
+            CHECK_THAT(universe.getAtom(atomId).getExtraData()[property],
+                       Catch::Matchers::WithinRel(doubleVal, 1e-9));
+          }
+        }
+      }
+
+      // Special handling for molecule-based atom styles
+      if (atomStyle == pu::AtomStyle::ANGLE ||
+          atomStyle == pu::AtomStyle::BOND ||
+          atomStyle == pu::AtomStyle::BPM_SPHERE ||
+          atomStyle == pu::AtomStyle::FULL ||
+          atomStyle == pu::AtomStyle::LINE ||
+          atomStyle == pu::AtomStyle::MOLECULAR ||
+          atomStyle == pu::AtomStyle::TEMPLATE ||
+          atomStyle == pu::AtomStyle::TRI) {
+        // These styles include molecule-ID which is handled separately
+        for (int atomId = 1; atomId <= 5; ++atomId) {
+          universe.setPropertyValue(atomId, "molecule_id", atomId % 3);
+        }
+      }
+
+      // Write data file
+      pu::DataFileWriter writer = pu::DataFileWriter(universe);
+      writer.configAtomStyle(atomStyle);
+
+      std::string atomStyleString = pu::getAtomStyleString(atomStyle);
+      std::ranges::replace(atomStyleString, '/', '_');
+      std::string fileToWrite =
+        suspectedPath + "/tmp_data_file_" + atomStyleString + ".structure.out";
+
+      writer.writeToFile(fileToWrite);
+
+      // Read it back
+      pe::UniverseSequence seq = pe::UniverseSequence();
+      seq.setDataFileAtomStyle({ atomStyle });
+      seq.initializeFromDataSequence({ { fileToWrite } });
+
+      pe::Universe readUniverse = seq.atIndex(0);
+
+      // Verify properties were preserved
+      for (size_t i = 1; i <= 5; ++i) {
+        pe::Atom prevAtom = universe.getAtom(i);
+        pe::Atom readAtom = readUniverse.getAtom(i);
+
+        CHECK(prevAtom == readAtom);
+      }
+
+      // Clean up
+      std::filesystem::remove(fileToWrite);
+    }
   }
 }
 

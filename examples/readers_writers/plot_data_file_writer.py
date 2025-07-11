@@ -79,8 +79,7 @@ custom_format = "$atomId $moleculeId $atomType $charge $x $y $z"
 writer.set_custom_atom_format(custom_format)
 
 """
-Note that currently, only the atom styles ``angle``, ``bond``, ``molecular``, and ``full`` 
-are supported without you specifying a custom format.
+Note that currently, the atom styles `tdpd` and `hybrid` are not supported without you specifying this custom format.
 """
 
 """

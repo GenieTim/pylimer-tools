@@ -13,6 +13,7 @@ namespace pylimer_tools::utils {
 
 class DataFileParser
 {
+
 public:
   void read(const std::string& filePath,
             AtomStyle atomStyle = AtomStyle::ANGLE,
@@ -82,6 +83,96 @@ public:
   double getLz() const { return this->zHi - this->zLo; }
 
 private:
+  // Atom style parsing descriptors
+  struct AtomFieldDescriptor
+  {
+    enum FieldType
+    {
+      // Basic atom identifiers
+      ATOM_ID,
+      MOLECULE_ID,
+      ATOM_TYPE,
+
+      // Position coordinates
+      X,
+      Y,
+      Z,
+
+      // Image flags
+      NX,
+      NY,
+      NZ,
+
+      // Physical properties
+      CHARGE,
+      MASS,
+      DENSITY,
+      VOLUME,
+      DIAMETER,
+
+      // Dipole/magnetic properties
+      MUX,
+      MUY,
+      MUZ,
+
+      // Temperature and thermal properties
+      THETA,
+      RHO,
+      EDPD_TEMP,
+      EDPD,
+      EDPD_CV,
+      ESPH,
+      CV,
+      ENERGY,
+
+      // Flags and status
+      BODYFLAG,
+      ELLIPSOIDFLAG,
+      LINEFLAG,
+      TRIANGLEFLAG,
+      STATUS,
+
+      // Radii and geometric properties
+      KRADIUS,
+      CRADIUS,
+      ERADIUS,
+
+      // Initial positions
+      X0,
+      Y0,
+      Z0,
+
+      // Spin properties
+      SPX,
+      SPY,
+      SPZ,
+      SP,
+      ESPIN,
+
+      // Surface and dielectric properties
+      AREA,
+      ED,
+      EM,
+      EPSILON,
+      CURVATURE,
+
+      // Template properties
+      TEMPLATE_INDEX,
+      TEMPLATE_ATOM,
+
+      // Wave packet properties
+      ETAG,
+      CS_RE,
+      CS_IM,
+
+      // Species concentrations (for tdpd)
+      CC1,
+      CC2 // Can be extended for more species as needed
+    };
+    std::vector<FieldType> fields;
+    std::string format;
+  };
+
   void readNs(const std::string& line);
   void readMass(const std::string& line);
   // different atom styles
@@ -95,6 +186,31 @@ private:
   void readAtomHybrid(const std::string& line,
                       AtomStyle style1,
                       AtomStyle style2);
+  void readAtomAtomic(const std::string& line);
+  void readAtomBody(const std::string& line);
+  void readAtomBpmSphere(const std::string& line);
+  void readAtomDielectric(const std::string& line);
+  void readAtomEdpd(const std::string& line);
+  void readAtomElectron(const std::string& line);
+  void readAtomEllipsoid(const std::string& line);
+  void readAtomLine(const std::string& line);
+  void readAtomPeri(const std::string& line);
+  void readAtomRheo(const std::string& line);
+  void readAtomRheoThermal(const std::string& line);
+  void readAtomSmd(const std::string& line);
+  void readAtomSph(const std::string& line);
+  void readAtomSpin(const std::string& line);
+  void readAtomTemplate(const std::string& line);
+  void readAtomTri(const std::string& line);
+  void readAtomWavepacket(const std::string& line);
+
+  template<typename... Args>
+  void readAtomGeneric(const std::string& line,
+                       const AtomFieldDescriptor& descriptor,
+                       Args&... args);
+
+  AtomFieldDescriptor getAtomStyleDescriptor(AtomStyle style) const;
+
   // bonds, angles, etc.
   void readBonds(std::ifstream& file, std::string& line);
   void readBond(const std::string& line);
