@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks. Reference: doi:10.1021/acs.macromol.4c01429 Total running t..." />
+<meta property="og:description" content="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks. Reference: doi:10.1021/acs.macromol.4c01429 TODO: apply con..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
 <meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_normal_mode_analysis_plot_normal_mode_analysis_44e6cad6.png" />
-<meta property="og:image:alt" content="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks. Reference: doi:10.1021/acs.macromol.4c01429 Total running t..." />
-<meta name="description" content="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks. Reference: doi:10.1021/acs.macromol.4c01429 Total running t..." />
+<meta property="og:image:alt" content="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks. Reference: doi:10.1021/acs.macromol.4c01429 TODO: apply con..." />
+<meta name="description" content="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks. Reference: doi:10.1021/acs.macromol.4c01429 TODO: apply con..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -247,6 +247,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 </ul>
@@ -256,14 +257,14 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../readers_writers/index.html">File I/O: Readers &amp; Writers</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of File I/O: Readers &amp; Writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_data_file_reader.html">Data File Reader</a></li>
@@ -401,7 +402,7 @@ to download the full example code.</p>
 <p>This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools
 to predict the loss and storage modulus of polymer networks.</p>
 <p>Reference: <a class="reference external" href="https://doi.org/10.1021/acs.macromol.4c01429">doi:10.1021/acs.macromol.4c01429</a></p>
-<img src="../../_images/sphx_glr_plot_normal_mode_analysis_001.png" srcset="../../_images/sphx_glr_plot_normal_mode_analysis_001.png" alt="Storage and Loss Modulus vs Frequency" class = "sphx-glr-single-img"/><div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -431,10 +432,11 @@ to predict the loss and storage modulus of polymer networks.</p>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">frequencies</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.logspace.html#numpy.logspace" title="numpy.logspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">logspace</span></a><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e3</span><span class="p">))</span>  <span class="c1"># Example frequency range</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">storage_modulus</span></a> <span class="o">=</span> <a href="../../api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus" title="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">nma</span><span class="o">.</span><span class="n">evaluate_storage_modulus</span></a><span class="p">(</span><span class="n">omega</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">frequencies</span></a><span class="p">)</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">loss_modulus</span></a> <span class="o">=</span> <a href="../../api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus" title="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">nma</span><span class="o">.</span><span class="n">evaluate_loss_modulus</span></a><span class="p">(</span><span class="n">omega</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">frequencies</span></a><span class="p">)</span>
-
-<span class="c1"># TODO: apply conversion factors if necessary</span>
-<span class="c1"># plot the results</span>
-<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a> <span class="o">=</span> <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class"><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span></a><span class="p">(</span>
+</pre></div>
+</div>
+<p>TODO: apply conversion factors if necessary
+plot the results</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a> <span class="o">=</span> <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class"><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span></a><span class="p">(</span>
     <span class="p">{</span>
         <span class="s2">&quot;Frequency&quot;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">frequencies</span></a><span class="p">,</span>
         <span class="s2">&quot;Storage Modulus&quot;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">storage_modulus</span></a><span class="p">,</span>
@@ -445,7 +447,7 @@ to predict the loss and storage modulus of polymer networks.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a> <span class="o">=</span> <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Storage and Loss Modulus vs Frequency&quot;</span><span class="p">,</span> <span class="n">loglog</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 17.329 seconds)</p>
+<img src="../../_images/sphx_glr_plot_normal_mode_analysis_001.png" srcset="../../_images/sphx_glr_plot_normal_mode_analysis_001.png" alt="Storage and Loss Modulus vs Frequency" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 17.197 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/fad61465a562c82c11b547553dceb6b1/plot_normal_mode_analysis.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_normal_mode_analysis.ipynb</span></code></a></p>

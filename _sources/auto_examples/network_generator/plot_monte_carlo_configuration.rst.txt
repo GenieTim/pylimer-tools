@@ -23,7 +23,7 @@ Monte Carlo Configuration
 
 Fine-tune the Monte Carlo generation process:
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-31
+.. GENERATED FROM PYTHON SOURCE LINES 8-32
 
 
 
@@ -32,6 +32,7 @@ Fine-tune the Monte Carlo generation process:
 
 
 .. code-block:: Python
+
 
     from pylimer_tools_cpp import MCUniverseGenerator
 

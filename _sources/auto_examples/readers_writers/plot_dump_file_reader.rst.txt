@@ -26,7 +26,7 @@ Is has a practical interface to read frames from a trajectory file
 and access them as :class:`~pylimer_tools_cpp.Universe` objects
 in the :class:`~pylimer_tools_cpp.UniverseSequence` class.
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-37
+.. GENERATED FROM PYTHON SOURCE LINES 11-38
 
 
 
@@ -46,6 +46,7 @@ in the :class:`~pylimer_tools_cpp.UniverseSequence` class.
 |
 
 .. code-block:: Python
+
 
     import os
 

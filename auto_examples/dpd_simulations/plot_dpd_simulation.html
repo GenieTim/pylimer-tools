@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/dpd_simulations/plot_dpd_simulation.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools. Reference: doi:10.1021/acs.macromol.1c00567, Total running time of the script:(0 minutes 7.70..." />
+<meta property="og:description" content="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools. Reference: doi:10.1021/acs.macromol.1c00567 Note that the random seed does not guarantee the ..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
-<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_dpd_simulations_plot_dpd_simulation_49c9d759.png" />
-<meta property="og:image:alt" content="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools. Reference: doi:10.1021/acs.macromol.1c00567, Total running time of the script:(0 minutes 7.70..." />
-<meta name="description" content="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools. Reference: doi:10.1021/acs.macromol.1c00567, Total running time of the script:(0 minutes 7.70..." />
+<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_dpd_simulations_plot_dpd_simulation_c35fe5bb.png" />
+<meta property="og:image:alt" content="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools. Reference: doi:10.1021/acs.macromol.1c00567 Note that the random seed does not guarantee the ..." />
+<meta name="description" content="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools. Reference: doi:10.1021/acs.macromol.1c00567 Note that the random seed does not guarantee the ..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -247,6 +247,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 </ul>
@@ -256,14 +257,14 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../readers_writers/index.html">File I/O: Readers &amp; Writers</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of File I/O: Readers &amp; Writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_data_file_reader.html">Data File Reader</a></li>
@@ -400,20 +401,18 @@ to download the full example code.</p>
 <span id="sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py"></span><h1>Dissipative Particle Dynamics (DPD) Simulations<a class="headerlink" href="#dissipative-particle-dynamics-dpd-simulations" title="Link to this heading">¶</a></h1>
 <p>This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools.</p>
 <p>Reference: <a class="reference external" href="https://doi.org/10.1021/acs.macromol.1c00567">doi:10.1021/acs.macromol.1c00567</a></p>
-<img src="../../_images/sphx_glr_plot_dpd_simulation_001.png" srcset="../../_images/sphx_glr_plot_dpd_simulation_001.png" alt="plot dpd simulation" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>DPD simulation completed.
-</pre></div>
-</div>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.io.read_lammps_output_file</span><span class="w"> </span><span class="kn">import</span> <a href="../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_data_file" title="pylimer_tools.io.read_lammps_output_file.read_data_file" class="sphx-glr-backref-module-pylimer_tools-io-read_lammps_output_file sphx-glr-backref-type-py-function"><span class="n">read_data_file</span></a>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">AtomStyle</span><span class="p">,</span> <span class="n">ComputedDoubleValues</span><span class="p">,</span>
-                               <span class="n">ComputedIntValues</span><span class="p">,</span> <a href="../../api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">DPDSimulator</span></a><span class="p">,</span>
-                               <a href="../../api/pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.OutputConfiguration" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">OutputConfiguration</span></a><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AtomStyle</span><span class="p">,</span>
+    <span class="n">ComputedDoubleValues</span><span class="p">,</span>
+    <span class="n">ComputedIntValues</span><span class="p">,</span>
+    <a href="../../api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">DPDSimulator</span></a><span class="p">,</span>
+    <a href="../../api/pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.OutputConfiguration" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">OutputConfiguration</span></a><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># Load a LAMMPS data file (replace with your file)</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filePath</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span>
@@ -430,11 +429,12 @@ to download the full example code.</p>
     <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">universe</span></a><span class="o">=</span><a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">universe</span></a><span class="p">,</span>
     <span class="n">seed</span><span class="o">=</span><span class="s2">&quot;12345&quot;</span><span class="p">,</span>  <span class="c1"># Set a random seed for reproducibility*</span>
 <span class="p">)</span>
-<span class="c1"># Note that the random seed does not guarantee the same results across different runs,</span>
-<span class="c1"># as the DPD algorithm is inherently stochastic and will produce different results</span>
-<span class="c1"># if you use more than one processor.</span>
-
-<span class="c1"># Randomly sample slip-springs</span>
+</pre></div>
+</div>
+<p>Note that the random seed does not guarantee the same results across different runs,
+as the DPD algorithm is inherently stochastic and will produce different results
+if you use more than one processor.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Randomly sample slip-springs</span>
 <a href="../../api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.create_slip_springs" title="pylimer_tools_cpp.DPDSimulator.create_slip_springs" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">dpd_simulator</span><span class="o">.</span><span class="n">create_slip_springs</span></a><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 
 <span class="c1"># Configure what to output during the simulation on each step</span>
@@ -475,9 +475,13 @@ to download the full example code.</p>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DPD simulation completed.&quot;</span><span class="p">)</span>
-
-<span class="c1"># read the output file and actually plot something</span>
-<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a> <span class="o">=</span> <a href="https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html#pandas.read_csv" title="pandas.read_csv" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-function"><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span></a><span class="p">(</span><span class="s2">&quot;dpd_simulation_output.txt&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">s+&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>DPD simulation completed.
+</pre></div>
+</div>
+<p>read the output file and actually plot something</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a> <span class="o">=</span> <a href="https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html#pandas.read_csv" title="pandas.read_csv" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-function"><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span></a><span class="p">(</span><span class="s2">&quot;dpd_simulation_output.txt&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">s+&quot;</span><span class="p">)</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a> <span class="o">=</span> <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Step&quot;</span><span class="p">,</span>
     <span class="n">y</span><span class="o">=</span><span class="p">[</span>
@@ -493,7 +497,7 @@ to download the full example code.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.703 seconds)</p>
+<img src="../../_images/sphx_glr_plot_dpd_simulation_001.png" srcset="../../_images/sphx_glr_plot_dpd_simulation_001.png" alt="plot dpd simulation" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.775 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-dpd-simulations-plot-dpd-simulation-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7ea8883241a6011e02c758aef99af3f6/plot_dpd_simulation.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_dpd_simulation.ipynb</span></code></a></p>

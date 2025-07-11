@@ -19,11 +19,71 @@
 
 
 Memory-Efficient Dump File Reading
-================================
+==================================
 
-The :class:`~pylimer_tools_cpp.UniverseSequence` class provides automatic memory management:
+The :class:`~pylimer_tools_cpp.UniverseSequence` class provides automatic memory management.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-51
+.. GENERATED FROM PYTHON SOURCE LINES 8-15
+
+.. code-block:: Python
+
+
+    import os
+
+    import psutil
+
+    from pylimer_tools_cpp import UniverseSequence
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 16-18
+
+For large trajectories, frames are loaded on-demand
+Load a LAMMPS dump trajectory file (replace with your file)
+
+.. GENERATED FROM PYTHON SOURCE LINES 18-52
+
+.. code-block:: Python
+
+    file_path = os.path.join(
+        os.getcwd(),
+        "../..",
+        "tests/pylimer_tools/fixtures/",
+    )
+    sequence = UniverseSequence()
+    sequence.initialize_from_dump_file(
+        initial_data_file=os.path.join(file_path, "big_dump_file_data.out"),
+        dump_file=os.path.join(file_path, "big_dump_file.lammpstrj"),
+    )
+
+    # Only the requested frame is loaded into memory
+    process = psutil.Process(os.getpid())
+    mem_before = process.memory_info().rss
+
+    for i in range(0, sequence.get_length(), 10):  # Every 10th frame
+        universe = sequence.at_index(i)
+        # Process universe
+        # …
+        print(f"Processing frame {i} with {universe.get_nr_of_atoms()} atoms")
+        # Then, optional: free memory for the frame
+        sequence.forget_at_index(i)
+
+    mem_after = process.memory_info().rss
+
+    dump_file_path = os.path.join(file_path, "big_dump_file.lammpstrj")
+    dump_file_size = os.path.getsize(dump_file_path)
+
+    print("\n--- Memory Usage Report ---")
+    print(f"Memory before processing: {mem_before / (1024 * 1024):.2f} MB")
+    print(f"Memory after processing:  {mem_after / (1024 * 1024):.2f} MB")
+    print(
+        f"Memory used by script:    {(mem_after - mem_before) / (1024 * 1024):.2f} MB")
+    print(f"Dump file size:           {dump_file_size / (1024 * 1024):.2f} MB")
 
 
 
@@ -7467,8 +7527,8 @@ The :class:`~pylimer_tools_cpp.UniverseSequence` class provides automatic memory
     Processing frame 74320 with 32 atoms
 
     --- Memory Usage Report ---
-    Memory before processing: 222.33 MB
-    Memory after processing:  222.33 MB
+    Memory before processing: 241.91 MB
+    Memory after processing:  241.91 MB
     Memory used by script:    0.00 MB
     Dump file size:           83.32 MB
 
@@ -7476,58 +7536,9 @@ The :class:`~pylimer_tools_cpp.UniverseSequence` class provides automatic memory
 
 
 
-
-|
-
-.. code-block:: Python
-
-
-    import os
-
-    import psutil
-
-    from pylimer_tools_cpp import UniverseSequence
-
-    # For large trajectories, frames are loaded on-demand
-    # Load a LAMMPS dump trajectory file (replace with your file)
-    file_path = os.path.join(
-        os.getcwd(),
-        "../..",
-        "tests/pylimer_tools/fixtures/",
-    )
-    sequence = UniverseSequence()
-    sequence.initialize_from_dump_file(
-        initial_data_file=os.path.join(file_path, "big_dump_file_data.out"),
-        dump_file=os.path.join(file_path, "big_dump_file.lammpstrj"),
-    )
-
-    # Only the requested frame is loaded into memory
-    process = psutil.Process(os.getpid())
-    mem_before = process.memory_info().rss
-
-    for i in range(0, sequence.get_length(), 10):  # Every 10th frame
-        universe = sequence.at_index(i)
-        # Process universe
-        # …
-        print(f"Processing frame {i} with {universe.get_nr_of_atoms()} atoms")
-        # Then, optional: free memory for the frame
-        sequence.forget_at_index(i)
-
-    mem_after = process.memory_info().rss
-
-    dump_file_path = os.path.join(file_path, "big_dump_file.lammpstrj")
-    dump_file_size = os.path.getsize(dump_file_path)
-
-    print("\n--- Memory Usage Report ---")
-    print(f"Memory before processing: {mem_before / (1024*1024):.2f} MB")
-    print(f"Memory after processing:  {mem_after / (1024*1024):.2f} MB")
-    print(f"Memory used by script:    {(mem_after - mem_before) / (1024*1024):.2f} MB")
-    print(f"Dump file size:           {dump_file_size / (1024*1024):.2f} MB")
-
-
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 20.562 seconds)
+   **Total running time of the script:** (0 minutes 20.871 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_memory_efficient_dump_file_reading.py:

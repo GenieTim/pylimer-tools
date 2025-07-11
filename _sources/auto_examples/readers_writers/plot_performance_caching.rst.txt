@@ -21,20 +21,9 @@
 Performance and Caching
 =======================
 
-All readers support automatic caching for improved performance
+All readers support automatic caching for improved performance.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-41
-
-
-
-.. image-sg:: /auto_examples/readers_writers/images/sphx_glr_plot_performance_caching_001.png
-   :alt: plot performance caching
-   :srcset: /auto_examples/readers_writers/images/sphx_glr_plot_performance_caching_001.png
-   :class: sphx-glr-single-img
-
-
-
-
+.. GENERATED FROM PYTHON SOURCE LINES 8-24
 
 .. code-block:: Python
 
@@ -54,8 +43,22 @@ All readers support automatic caching for improved performance
     )
 
     time_start = time.time()
-    # extract_thermo_params is a more elaborate version of
-    # pylimer_tools.io.read_lammps_output_file.read_log_file()
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 25-27
+
+:func:`~pylimer_tools.io.extract_thermo_data.extract_thermo_params` is a more elaborate version of
+:func:`~pylimer_tools.io.read_lammps_output_file.read_log_file`
+
+.. GENERATED FROM PYTHON SOURCE LINES 27-42
+
+.. code-block:: Python
+
     thermo_data = extract_thermo_params(log_file, use_cache=False)
     time_end = time.time()
 
@@ -73,9 +76,20 @@ All readers support automatic caching for improved performance
     plt.show()
 
 
+
+.. image-sg:: /auto_examples/readers_writers/images/sphx_glr_plot_performance_caching_001.png
+   :alt: plot performance caching
+   :srcset: /auto_examples/readers_writers/images/sphx_glr_plot_performance_caching_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.043 seconds)
+   **Total running time of the script:** (0 minutes 0.040 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_performance_caching.py:

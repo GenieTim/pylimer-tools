@@ -21,15 +21,9 @@
 Data File Writer
 ================
 
-The :class:`~pylimer_tools_cpp.DataFileWriter` generates LAMMPS-compatible data files:
+The :class:`~pylimer_tools_cpp.DataFileWriter` generates LAMMPS-compatible data files.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-99
-
-
-
-
-
-
+.. GENERATED FROM PYTHON SOURCE LINES 8-40
 
 .. code-block:: Python
 
@@ -65,11 +59,22 @@ The :class:`~pylimer_tools_cpp.DataFileWriter` generates LAMMPS-compatible data 
     # Basic output
     writer.write_to_file("generated_structures/output.structure.dat")
 
-    """
-    Advanced Configuration
-    ----------------------
 
-    """
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 41-43
+
+Advanced Configuration
+----------------------
+
+.. GENERATED FROM PYTHON SOURCE LINES 43-65
+
+.. code-block:: Python
+
 
     # Configure output options
     writer = DataFileWriter(universe)
@@ -92,13 +97,25 @@ The :class:`~pylimer_tools_cpp.DataFileWriter` generates LAMMPS-compatible data 
     # Write configured output
     writer.write_to_file("generated_structures/configured_output.data")
 
-    """
-    Custom Atom Styles
-    ------------------
 
-    You can specify custom atom styles and formats using the following format:
 
-    """
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 66-70
+
+Custom Atom Styles
+------------------
+
+You can specify custom atom styles and formats using the following format:
+
+.. GENERATED FROM PYTHON SOURCE LINES 70-78
+
+.. code-block:: Python
+
+
     # Set predefined atom style
     writer.config_atom_style(AtomStyle.FULL)
 
@@ -106,29 +123,50 @@ The :class:`~pylimer_tools_cpp.DataFileWriter` generates LAMMPS-compatible data 
     custom_format = "$atomId $moleculeId $atomType $charge $x $y $z"
     writer.set_custom_atom_format(custom_format)
 
-    """
-    Note that currently, only the atom styles ``angle``, ``bond``, ``molecular``, and ``full`` 
-    are supported without you specifying a custom format.
-    """
 
-    """
-    Molecule Indexing Control
-    -------------------------
 
-    Control how molecules are numbered in the output
-    """
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 79-81
+
+Note that currently, the atom styles ``tdpd`` and ``hybrid`` are not supported
+without you specifying this custom format.
+
+.. GENERATED FROM PYTHON SOURCE LINES 83-87
+
+Molecule Indexing Control
+-------------------------
+
+Control how molecules are numbered in the output
+
+.. GENERATED FROM PYTHON SOURCE LINES 87-97
+
+.. code-block:: Python
+
+
     # Standard molecular indexing: sets the molecule index for each atom
     # based on the decomposition at the junctions
     writer.config_molecule_idx_for_swap(False)
 
-    # Optimize for LAMMPS' bond/swap operations
-    # Sets the molecule index for each atom based on the distance from the next junction
+    # Optimize for LAMMPS' ``bond/swap`` operations
+    # Sets the molecule index for each atom based on the distance from the
+    # next junction
     writer.config_molecule_idx_for_swap(True)
+    writer.config_molecule_idx_for_swap(True)
+
+
+
+
+
+
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.004 seconds)
+   **Total running time of the script:** (0 minutes 0.005 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_data_file_writer.py:

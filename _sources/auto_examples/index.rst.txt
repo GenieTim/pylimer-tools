@@ -168,7 +168,7 @@ The :class:`~pylimer_tools_cpp.MCUniverseGenerator` class is the main interface 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Save Generated Network">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to save a generated polymer network to a LAMMPS data file.">
 
 .. only:: html
 
@@ -219,7 +219,24 @@ The :class:`~pylimer_tools_cpp.MCUniverseGenerator` class is the main interface 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The generated networks can include topological information">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we create a vulcanized network using the pylimer-tools library.">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_vulcanized_network_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_network_generator_plot_vulcanized_network.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Generate Vulcanized Networks</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The generated networks can include topological information.">
 
 .. only:: html
 
@@ -317,23 +334,6 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Read correlation functions from fix ave/correlate and fix ave/correlate/long commands:">
-
-.. only:: html
-
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_correlated_averages_reader_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_correlated_averages_reader.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Correlated Averages Reader</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Read output from pylimer-tools&#x27; own simulators.">
 
 .. only:: html
@@ -351,24 +351,24 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command:">
+    <div class="sphx-glr-thumbcontainer" tooltip="Read correlation functions from fix ave/correlate and fix ave/correlate/long commands.">
 
 .. only:: html
 
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_log_thermo_file_reader_thumb.png
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_correlated_averages_reader_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_log_thermo_file_reader.py`
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_correlated_averages_reader.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
+      <div class="sphx-glr-thumbnail-title">Correlated Averages Reader</div>
     </div>
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Process histogram data from fix ave/hist commands:">
+    <div class="sphx-glr-thumbcontainer" tooltip="Process histogram data from fix ave/hist commands.">
 
 .. only:: html
 
@@ -380,6 +380,23 @@ The library supports four main file I/O operations:
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Histogram Reader</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="All readers support automatic caching for improved performance.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_performance_caching_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_performance_caching.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Performance and Caching</div>
     </div>
 
 
@@ -402,6 +419,40 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_log_thermo_file_reader_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_log_thermo_file_reader.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Take a later entry from a LAMMPS trajectory and save it as a data file.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_trajectory_to_frame_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_convert_trajectory_to_frame.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame to Data File</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="The DumpFileReader processes LAMMPS trajectory files. Is has a practical interface to read frames from a trajectory file and access them as Universe objects in the UniverseSequence class.">
 
 .. only:: html
@@ -414,40 +465,6 @@ The library supports four main file I/O operations:
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Dump File Reader</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="All readers support automatic caching for improved performance">
-
-.. only:: html
-
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_performance_caching_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_performance_caching.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Performance and Caching</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip=" Take a later entry from a LAMMPS trajectory and save it as a data file:">
-
-.. only:: html
-
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_trajectory_to_frame_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_convert_trajectory_to_frame.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame to Data File</div>
     </div>
 
 
@@ -470,7 +487,7 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="LAMMPS bond swapping can significantly speed up equilibration for polymer networks. However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly. Here&#x27;s how you could re-set the molecule indices for bond swapping with constant chain lengths:">
+    <div class="sphx-glr-thumbcontainer" tooltip="LAMMPS bond swapping can significantly speed up equilibration for polymer networks. However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly. Here&#x27;s how you could re-set the molecule indices for bond swapping with constant chain lengths.">
 
 .. only:: html
 
@@ -504,7 +521,7 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The UniverseSequence class provides automatic memory management:">
+    <div class="sphx-glr-thumbcontainer" tooltip="The UniverseSequence class provides automatic memory management.">
 
 .. only:: html
 
@@ -521,7 +538,7 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The DataFileWriter generates LAMMPS-compatible data files:">
+    <div class="sphx-glr-thumbcontainer" tooltip="The DataFileWriter generates LAMMPS-compatible data files.">
 
 .. only:: html
 
@@ -592,7 +609,7 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to decompose a crosslinked polymer network into chains  and analyze its structure using pylimer-tools.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to decompose a crosslinked polymer network into chains and analyze its structure using pylimer-tools.">
 
 .. only:: html
 
@@ -626,7 +643,7 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Loop Finding and Analysis">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to find and analyze loops in polymer networks using pylimer-tools.">
 
 .. only:: html
 

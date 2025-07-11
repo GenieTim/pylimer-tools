@@ -8,6 +8,7 @@ Is has a practical interface to read frames from a trajectory file
 and access them as :class:`~pylimer_tools_cpp.Universe` objects
 in the :class:`~pylimer_tools_cpp.UniverseSequence` class.
 """
+
 import os
 
 from pylimer_tools_cpp import DumpFileReader, UniverseSequence

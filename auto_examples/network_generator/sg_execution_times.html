@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/network_generator/sg_execution_times.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="00:01.453 total execution time for 5 files from auto_examples/network_generator:,,, Example, Time, Mem (MB),,, Adding Topology Information( plot_add_angles.py), 00:00.552, 0.0,, Simple Crosslinked ..." />
+<meta property="og:description" content="00:04.091 total execution time for 6 files from auto_examples/network_generator:,,, Example, Time, Mem (MB),,, Generate Vulcanized Networks( plot_vulcanized_network.py), 00:03.137, 0.0,, Adding Top..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
-<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_network_generator_sg_execution_times_fded9db7.png" />
-<meta property="og:image:alt" content="00:01.453 total execution time for 5 files from auto_examples/network_generator:,,, Example, Time, Mem (MB),,, Adding Topology Information( plot_add_angles.py), 00:00.552, 0.0,, Simple Crosslinked ..." />
-<meta name="description" content="00:01.453 total execution time for 5 files from auto_examples/network_generator:,,, Example, Time, Mem (MB),,, Adding Topology Information( plot_add_angles.py), 00:00.552, 0.0,, Simple Crosslinked ..." />
+<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_network_generator_sg_execution_times_a8527b78.png" />
+<meta property="og:image:alt" content="00:04.091 total execution time for 6 files from auto_examples/network_generator:,,, Example, Time, Mem (MB),,, Generate Vulcanized Networks( plot_vulcanized_network.py), 00:03.137, 0.0,, Adding Top..." />
+<meta name="description" content="00:04.091 total execution time for 6 files from auto_examples/network_generator:,,, Example, Time, Mem (MB),,, Generate Vulcanized Networks( plot_vulcanized_network.py), 00:03.137, 0.0,, Adding Top..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -247,6 +247,7 @@
 <li class="toctree-l3"><a class="reference internal" href="plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_multi_component_system.html">Multi-Component System</a></li>
 </ul>
@@ -256,14 +257,14 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../readers_writers/index.html">File I/O: Readers &amp; Writers</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of File I/O: Readers &amp; Writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_data_file_reader.html">Data File Reader</a></li>
@@ -393,7 +394,7 @@
         <article role="main" id="furo-main-content">
           <section id="computation-times">
 <span id="sphx-glr-auto-examples-network-generator-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Link to this heading">¶</a></h1>
-<p><strong>00:01.453</strong> total execution time for 5 files <strong>from auto_examples/network_generator</strong>:</p>
+<p><strong>00:04.091</strong> total execution time for 6 files <strong>from auto_examples/network_generator</strong>:</p>
 <div class="docutils container">
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -415,16 +416,16 @@ $(document).ready( function () {
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_add_angles.html#sphx-glr-auto-examples-network-generator-plot-add-angles-py"><span class="std std-ref">Adding Topology Information</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_add_angles.py</span></code>)</p></td>
-<td><p>00:00.552</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_vulcanized_network.html#sphx-glr-auto-examples-network-generator-plot-vulcanized-network-py"><span class="std std-ref">Generate Vulcanized Networks</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_vulcanized_network.py</span></code>)</p></td>
+<td><p>00:03.137</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_simple_crosslinked_network.html#sphx-glr-auto-examples-network-generator-plot-simple-crosslinked-network-py"><span class="std std-ref">Simple Crosslinked Network</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simple_crosslinked_network.py</span></code>)</p></td>
-<td><p>00:00.497</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_add_angles.html#sphx-glr-auto-examples-network-generator-plot-add-angles-py"><span class="std std-ref">Adding Topology Information</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_add_angles.py</span></code>)</p></td>
+<td><p>00:00.549</p></td>
 <td><p>0.0</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="plot_multi_component_system.html#sphx-glr-auto-examples-network-generator-plot-multi-component-system-py"><span class="std std-ref">Multi-Component System</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_multi_component_system.py</span></code>)</p></td>
-<td><p>00:00.402</p></td>
+<td><p>00:00.404</p></td>
 <td><p>0.0</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="plot_save_network.html#sphx-glr-auto-examples-network-generator-plot-save-network-py"><span class="std std-ref">Save Generated Network</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_save_network.py</span></code>)</p></td>
@@ -433,6 +434,10 @@ $(document).ready( function () {
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="plot_monte_carlo_configuration.html#sphx-glr-auto-examples-network-generator-plot-monte-carlo-configuration-py"><span class="std std-ref">Monte Carlo Configuration</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_monte_carlo_configuration.py</span></code>)</p></td>
 <td><p>00:00.001</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_simple_crosslinked_network.html#sphx-glr-auto-examples-network-generator-plot-simple-crosslinked-network-py"><span class="std std-ref">Simple Crosslinked Network</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simple_crosslinked_network.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
 <td><p>0.0</p></td>
 </tr>
 </tbody>

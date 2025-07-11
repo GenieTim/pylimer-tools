@@ -25,7 +25,7 @@ This example demonstrates how to analyze the end-to-end distribution of polymer 
 using pylimer-tools. It reads a structure file, computes the end-to-end distances,
 and plots the distribution of these distances.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-59
+.. GENERATED FROM PYTHON SOURCE LINES 10-60
 
 
 
@@ -39,6 +39,7 @@ and plots the distribution of these distances.
 
 
 .. code-block:: Python
+
 
     import os
 

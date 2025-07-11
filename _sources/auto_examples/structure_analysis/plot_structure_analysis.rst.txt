@@ -26,7 +26,7 @@ to get the stoichiometric imbalance :math:`r`,
 the crosslinker conversion :math:`p` or
 the functionality of the crosslinker :math:`f`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-66
+.. GENERATED FROM PYTHON SOURCE LINES 11-67
 
 
 
@@ -52,6 +52,7 @@ the functionality of the crosslinker :math:`f`.
 |
 
 .. code-block:: Python
+
 
     import os
     from collections import Counter
@@ -112,7 +113,7 @@ the functionality of the crosslinker :math:`f`.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.260 seconds)
+   **Total running time of the script:** (0 minutes 0.264 seconds)
 
 
 .. _sphx_glr_download_auto_examples_structure_analysis_plot_structure_analysis.py:

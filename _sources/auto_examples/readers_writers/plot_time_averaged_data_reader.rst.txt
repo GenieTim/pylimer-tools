@@ -32,7 +32,7 @@ and :func:`~pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_fil
 - Vector quantities (multiple values per output timestep)
 - Multi-section files with varying column structures
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-51
+.. GENERATED FROM PYTHON SOURCE LINES 17-53
 
 
 
@@ -58,6 +58,7 @@ and :func:`~pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_fil
 |
 
 .. code-block:: Python
+
 
     import os
 
@@ -87,7 +88,8 @@ and :func:`~pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_fil
         "tests/pylimer_tools/fixtures/example_vec_avg_file.out.vec-avg.txt",
     )
 
-    # Read sectioned averages (e.g., from vector quantities from e.g. `fix ave/time ... vector`)
+    # Read sectioned averages
+    # (e.g., from vector quantities from e.g. ``fix ave/time ... vector``)
     sectioned_data = read_averages_file(vec_averages_file)
 
     # Group by timestep for sectioned data
@@ -97,7 +99,7 @@ and :func:`~pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_fil
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.070 seconds)
+   **Total running time of the script:** (0 minutes 0.073 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_time_averaged_data_reader.py:

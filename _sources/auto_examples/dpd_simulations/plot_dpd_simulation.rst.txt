@@ -25,28 +25,7 @@ This example demonstrates how to set up and run a DPD simulation with slip-sprin
 
 Reference: `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macromol.1c00567>`_
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-95
-
-
-
-.. image-sg:: /auto_examples/dpd_simulations/images/sphx_glr_plot_dpd_simulation_001.png
-   :alt: plot dpd simulation
-   :srcset: /auto_examples/dpd_simulations/images/sphx_glr_plot_dpd_simulation_001.png
-   :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    DPD simulation completed.
-
-
-
-
-
-
-|
+.. GENERATED FROM PYTHON SOURCE LINES 9-38
 
 .. code-block:: Python
 
@@ -56,9 +35,13 @@ Reference: `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macrom
     import pandas as pd
 
     from pylimer_tools.io.read_lammps_output_file import read_data_file
-    from pylimer_tools_cpp import (AtomStyle, ComputedDoubleValues,
-                                   ComputedIntValues, DPDSimulator,
-                                   OutputConfiguration)
+    from pylimer_tools_cpp import (
+        AtomStyle,
+        ComputedDoubleValues,
+        ComputedIntValues,
+        DPDSimulator,
+        OutputConfiguration,
+    )
 
     # Load a LAMMPS data file (replace with your file)
     filePath = os.path.join(
@@ -75,9 +58,23 @@ Reference: `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macrom
         universe=universe,
         seed="12345",  # Set a random seed for reproducibility*
     )
-    # Note that the random seed does not guarantee the same results across different runs,
-    # as the DPD algorithm is inherently stochastic and will produce different results
-    # if you use more than one processor.
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 39-42
+
+Note that the random seed does not guarantee the same results across different runs,
+as the DPD algorithm is inherently stochastic and will produce different results
+if you use more than one processor.
+
+.. GENERATED FROM PYTHON SOURCE LINES 42-85
+
+.. code-block:: Python
+
 
     # Randomly sample slip-springs
     dpd_simulator.create_slip_springs(num=100)
@@ -121,7 +118,27 @@ Reference: `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macrom
 
     print("DPD simulation completed.")
 
-    # read the output file and actually plot something
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    DPD simulation completed.
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 86-87
+
+read the output file and actually plot something
+
+.. GENERATED FROM PYTHON SOURCE LINES 87-101
+
+.. code-block:: Python
+
     df = pd.read_csv("dpd_simulation_output.txt", sep="\\s+")
     _ = df.plot(
         x="Step",
@@ -138,9 +155,20 @@ Reference: `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macrom
     )
 
 
+
+.. image-sg:: /auto_examples/dpd_simulations/images/sphx_glr_plot_dpd_simulation_001.png
+   :alt: plot dpd simulation
+   :srcset: /auto_examples/dpd_simulations/images/sphx_glr_plot_dpd_simulation_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 7.703 seconds)
+   **Total running time of the script:** (0 minutes 7.775 seconds)
 
 
 .. _sphx_glr_download_auto_examples_dpd_simulations_plot_dpd_simulation.py:

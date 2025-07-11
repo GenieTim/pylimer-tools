@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/readers_writers/plot_data_file_reader.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects., Total r..." />
+<meta property="og:description" content="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects. Please n..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
 <meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_readers_writers_plot_data_file_reader_3658c015.png" />
-<meta property="og:image:alt" content="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects., Total r..." />
-<meta name="description" content="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects., Total r..." />
+<meta property="og:image:alt" content="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects. Please n..." />
+<meta name="description" content="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects. Please n..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -247,6 +247,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 </ul>
@@ -256,14 +257,14 @@
 </ul>
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">File I/O: Readers &amp; Writers</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of File I/O: Readers &amp; Writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_histogram_reader.html">Histogram Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_performance_caching.html">Performance and Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Data File Reader</a></li>
@@ -401,15 +402,6 @@ to download the full example code.</p>
 <p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFileParser</span></code> handles LAMMPS data files containing complete system definitions.
 The <a class="reference internal" href="../../api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">UniverseSequence</span></code></a> provides a convenient way to have these data files read
 into the <a class="reference internal" href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><code class="xref py py-class docutils literal notranslate"><span class="pre">Universe</span></code></a> objects.</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Loaded universe with 56000 atoms
-Loaded universe with 56000 atoms
-
-&quot;\n**Supported atom styles:**\n\n- ``angle``\n- ``bond``\n- ``molecular``\n- ``charge```\n- ``full``\n- ``hybrid`` of ``bond`` and ``edpd``\n\nIf your data files don&#39;t hint the atom style, you can specify it manually, \nsee :func:`~pylimer_tools_cpp.DataFileParser.read()` \nand :func:`~pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style()`.\n&quot;
-</pre></div>
-</div>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <a href="../../api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">UniverseSequence</span></a>
@@ -445,24 +437,17 @@ Loaded universe with 56000 atoms
 <span class="p">)</span>
 <span class="k">for</span> <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">universe</span></a> <span class="ow">in</span> <a href="../../api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sequence</span></a><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded universe with </span><span class="si">{</span><a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_nr_of_atoms" title="pylimer_tools_cpp.Universe.get_nr_of_atoms" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">universe</span><span class="o">.</span><span class="n">get_nr_of_atoms</span></a><span class="p">()</span><span class="si">}</span><span class="s2"> atoms&quot;</span><span class="p">)</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">**Supported atom styles:**</span>
-
-<span class="sd">- ``angle``</span>
-<span class="sd">- ``bond``</span>
-<span class="sd">- ``molecular``</span>
-<span class="sd">- ``charge```</span>
-<span class="sd">- ``full``</span>
-<span class="sd">- ``hybrid`` of ``bond`` and ``edpd``</span>
-
-<span class="sd">If your data files don&#39;t hint the atom style, you can specify it manually,</span>
-<span class="sd">see :func:`~pylimer_tools_cpp.DataFileParser.read()`</span>
-<span class="sd">and :func:`~pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style()`.</span>
-<span class="sd">&quot;&quot;&quot;</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.242 seconds)</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Loaded universe with 56000 atoms
+Loaded universe with 56000 atoms
+</pre></div>
+</div>
+<p>Please note that the <code class="docutils literal notranslate"><span class="pre">hybrid</span></code> and <code class="docutils literal notranslate"><span class="pre">tdpd</span></code> atom styles are not fully supported.</p>
+<p>If your data files don’t hint the atom style in the line that starts with “Atom”,
+you should specify it manually, see <code class="xref py py-func docutils literal notranslate"><span class="pre">read()</span></code>
+and <a class="reference internal" href="../../api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style" title="pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_data_file_atom_style()</span></code></a>.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.249 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-reader-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/93aa26584f03b408b54ca2c467d7bbdb/plot_data_file_reader.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_data_file_reader.ipynb</span></code></a></p>

@@ -21,27 +21,36 @@
 Extract Trajectory Frame to Data File
 =====================================
 
+Take a later entry from a LAMMPS trajectory and save it as a data file.
 
-Take a later entry from a LAMMPS trajectory and save it as a data file:
-
-.. GENERATED FROM PYTHON SOURCE LINES 9-34
-
-
-
-
-
-
+.. GENERATED FROM PYTHON SOURCE LINES 8-16
 
 .. code-block:: Python
 
+
     import os
+
     from pylimer_tools_cpp import DataFileWriter, UniverseSequence
 
     if not os.path.exists("generated_structures"):
         os.makedirs("generated_structures")
 
-    # For large trajectories, frames are loaded on-demand
-    # Load a LAMMPS dump trajectory file (replace with your file)
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 17-19
+
+For large trajectories, frames are loaded on-demand
+Load a LAMMPS dump trajectory file (replace with your file)
+
+.. GENERATED FROM PYTHON SOURCE LINES 19-36
+
+.. code-block:: Python
+
     file_path = os.path.join(
         os.getcwd(),
         "../..",
@@ -61,9 +70,15 @@ Take a later entry from a LAMMPS trajectory and save it as a data file:
     writer.write_to_file("generated_structures/final_configuration.data")
 
 
+
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.217 seconds)
+   **Total running time of the script:** (0 minutes 0.174 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_convert_trajectory_to_frame.py:

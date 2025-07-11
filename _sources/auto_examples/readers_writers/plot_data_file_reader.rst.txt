@@ -25,25 +25,7 @@ The :class:`~pylimer_tools_cpp.DataFileParser` handles LAMMPS data files contain
 The :class:`~pylimer_tools_cpp.UniverseSequence` provides a convenient way to have these data files read
 into the :class:`~pylimer_tools_cpp.Universe` objects.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-61
-
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Loaded universe with 56000 atoms
-    Loaded universe with 56000 atoms
-
-    "\n**Supported atom styles:**\n\n- ``angle``\n- ``bond``\n- ``molecular``\n- ``charge```\n- ``full``\n- ``hybrid`` of ``bond`` and ``edpd``\n\nIf your data files don't hint the atom style, you can specify it manually, \nsee :func:`~pylimer_tools_cpp.DataFileParser.read()` \nand :func:`~pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style()`.\n"
-
-
-
-
-
-|
+.. GENERATED FROM PYTHON SOURCE LINES 10-47
 
 .. code-block:: Python
 
@@ -84,25 +66,32 @@ into the :class:`~pylimer_tools_cpp.Universe` objects.
     for universe in sequence:
         print(f"Loaded universe with {universe.get_nr_of_atoms()} atoms")
 
-    """
-    **Supported atom styles:**
 
-    - ``angle``
-    - ``bond``
-    - ``molecular``
-    - ``charge```
-    - ``full``
-    - ``hybrid`` of ``bond`` and ``edpd``
 
-    If your data files don't hint the atom style, you can specify it manually, 
-    see :func:`~pylimer_tools_cpp.DataFileParser.read()` 
-    and :func:`~pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style()`.
-    """
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    Loaded universe with 56000 atoms
+    Loaded universe with 56000 atoms
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 48-53
+
+Please note that the ``hybrid`` and ``tdpd`` atom styles are not fully supported.
+
+If your data files don't hint the atom style in the line that starts with "Atom",
+you should specify it manually, see :func:`~pylimer_tools_cpp.DataFileParser.read()`
+and :func:`~pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style()`.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.242 seconds)
+   **Total running time of the script:** (0 minutes 0.249 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_data_file_reader.py:

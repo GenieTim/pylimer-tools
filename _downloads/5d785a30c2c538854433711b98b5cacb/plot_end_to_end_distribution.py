@@ -7,6 +7,7 @@ This example demonstrates how to analyze the end-to-end distribution of polymer 
 using pylimer-tools. It reads a structure file, computes the end-to-end distances,
 and plots the distribution of these distances.
 """
+
 import os
 
 import matplotlib.pyplot as plt

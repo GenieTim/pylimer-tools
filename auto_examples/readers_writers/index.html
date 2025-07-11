@@ -20,7 +20,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="pylimer-tools" />
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Correlated Averages Reader" href="plot_correlated_averages_reader.html" /><link rel="prev" title="Normal Mode Analysis (NMA)" href="../normal_mode_analysis/plot_normal_mode_analysis.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="pylimer-tools Output Reader" href="plot_pylimer_tools_output_reader.html" /><link rel="prev" title="Normal Mode Analysis (NMA)" href="../normal_mode_analysis/plot_normal_mode_analysis.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
         <title>File I/O: Readers &amp; Writers - pylimer-tools v</title>
@@ -247,6 +247,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 </ul>
@@ -256,14 +257,14 @@
 </ul>
 </li>
 <li class="toctree-l2 current has-children current-page"><a class="current reference internal" href="#">File I/O: Readers &amp; Writers</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of File I/O: Readers &amp; Writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_histogram_reader.html">Histogram Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_performance_caching.html">Performance and Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_data_file_reader.html">Data File Reader</a></li>
@@ -401,43 +402,43 @@
 <li><p><strong>Reading LAMMPS output files</strong> - Measurements and simulation results</p></li>
 <li><p><strong>Writing LAMMPS data files</strong> - Modified or generated systems</p></li>
 </ol>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Read correlation functions from fix ave/correlate and fix ave/correlate/long commands:"><img alt="" src="../../_images/sphx_glr_plot_correlated_averages_reader_thumb.png" />
-<p><a class="reference internal" href="plot_correlated_averages_reader.html#sphx-glr-auto-examples-readers-writers-plot-correlated-averages-reader-py"><span class="std std-ref">Correlated Averages Reader</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Correlated Averages Reader</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Read output from pylimer-tools&#x27; own simulators."><img alt="" src="../../_images/sphx_glr_plot_pylimer_tools_output_reader_thumb.png" />
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Read output from pylimer-tools&#x27; own simulators."><img alt="" src="../../_images/sphx_glr_plot_pylimer_tools_output_reader_thumb.png" />
 <p><a class="reference internal" href="plot_pylimer_tools_output_reader.html#sphx-glr-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py"><span class="std std-ref">pylimer-tools Output Reader</span></a></p>
   <div class="sphx-glr-thumbnail-title">pylimer-tools Output Reader</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command:"><img alt="" src="../../_images/sphx_glr_plot_log_thermo_file_reader_thumb.png" />
-<p><a class="reference internal" href="plot_log_thermo_file_reader.html#sphx-glr-auto-examples-readers-writers-plot-log-thermo-file-reader-py"><span class="std std-ref">Log &amp; Thermo File Reader</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Process histogram data from fix ave/hist commands:"><img alt="" src="../../_images/sphx_glr_plot_histogram_reader_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="Read correlation functions from fix ave/correlate and fix ave/correlate/long commands."><img alt="" src="../../_images/sphx_glr_plot_correlated_averages_reader_thumb.png" />
+<p><a class="reference internal" href="plot_correlated_averages_reader.html#sphx-glr-auto-examples-readers-writers-plot-correlated-averages-reader-py"><span class="std std-ref">Correlated Averages Reader</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Correlated Averages Reader</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Process histogram data from fix ave/hist commands."><img alt="" src="../../_images/sphx_glr_plot_histogram_reader_thumb.png" />
 <p><a class="reference internal" href="plot_histogram_reader.html#sphx-glr-auto-examples-readers-writers-plot-histogram-reader-py"><span class="std std-ref">Histogram Reader</span></a></p>
   <div class="sphx-glr-thumbnail-title">Histogram Reader</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="All readers support automatic caching for improved performance."><img alt="" src="../../_images/sphx_glr_plot_performance_caching_thumb.png" />
+<p><a class="reference internal" href="plot_performance_caching.html#sphx-glr-auto-examples-readers-writers-plot-performance-caching-py"><span class="std std-ref">Performance and Caching</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Performance and Caching</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Convert LAMMPS units to SI or other unit systems:"><img alt="" src="../../_images/sphx_glr_plot_unit_conversion_thumb.png" />
 <p><a class="reference internal" href="plot_unit_conversion.html#sphx-glr-auto-examples-readers-writers-plot-unit-conversion-py"><span class="std std-ref">Unit Conversion</span></a></p>
   <div class="sphx-glr-thumbnail-title">Unit Conversion</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command."><img alt="" src="../../_images/sphx_glr_plot_log_thermo_file_reader_thumb.png" />
+<p><a class="reference internal" href="plot_log_thermo_file_reader.html#sphx-glr-auto-examples-readers-writers-plot-log-thermo-file-reader-py"><span class="std std-ref">Log &amp; Thermo File Reader</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Take a later entry from a LAMMPS trajectory and save it as a data file."><img alt="" src="../../_images/sphx_glr_plot_convert_trajectory_to_frame_thumb.png" />
+<p><a class="reference internal" href="plot_convert_trajectory_to_frame.html#sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"><span class="std std-ref">Extract Trajectory Frame to Data File</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame to Data File</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="The DumpFileReader processes LAMMPS trajectory files. Is has a practical interface to read frames from a trajectory file and access them as Universe objects in the UniverseSequence class."><img alt="" src="../../_images/sphx_glr_plot_dump_file_reader_thumb.png" />
 <p><a class="reference internal" href="plot_dump_file_reader.html#sphx-glr-auto-examples-readers-writers-plot-dump-file-reader-py"><span class="std std-ref">Dump File Reader</span></a></p>
   <div class="sphx-glr-thumbnail-title">Dump File Reader</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="All readers support automatic caching for improved performance"><img alt="" src="../../_images/sphx_glr_plot_performance_caching_thumb.png" />
-<p><a class="reference internal" href="plot_performance_caching.html#sphx-glr-auto-examples-readers-writers-plot-performance-caching-py"><span class="std std-ref">Performance and Caching</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Performance and Caching</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip=" Take a later entry from a LAMMPS trajectory and save it as a data file:"><img alt="" src="../../_images/sphx_glr_plot_convert_trajectory_to_frame_thumb.png" />
-<p><a class="reference internal" href="plot_convert_trajectory_to_frame.html#sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"><span class="std std-ref">Extract Trajectory Frame to Data File</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame to Data File</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Read output from LAMMPS fix ave/time commands."><img alt="" src="../../_images/sphx_glr_plot_time_averaged_data_reader_thumb.png" />
 <p><a class="reference internal" href="plot_time_averaged_data_reader.html#sphx-glr-auto-examples-readers-writers-plot-time-averaged-data-reader-py"><span class="std std-ref">Time-Averaged Data Reader</span></a></p>
   <div class="sphx-glr-thumbnail-title">Time-Averaged Data Reader</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="LAMMPS bond swapping can significantly speed up equilibration for polymer networks. However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly. Here&#x27;s how you could re-set the molecule indices for bond swapping with constant chain lengths:"><img alt="" src="../../_images/sphx_glr_plot_convert_for_bond_swapping_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="LAMMPS bond swapping can significantly speed up equilibration for polymer networks. However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly. Here&#x27;s how you could re-set the molecule indices for bond swapping with constant chain lengths."><img alt="" src="../../_images/sphx_glr_plot_convert_for_bond_swapping_thumb.png" />
 <p><a class="reference internal" href="plot_convert_for_bond_swapping.html#sphx-glr-auto-examples-readers-writers-plot-convert-for-bond-swapping-py"><span class="std std-ref">Convert for Bond Swapping</span></a></p>
   <div class="sphx-glr-thumbnail-title">Convert for Bond Swapping</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects."><img alt="" src="../../_images/sphx_glr_plot_data_file_reader_thumb.png" />
 <p><a class="reference internal" href="plot_data_file_reader.html#sphx-glr-auto-examples-readers-writers-plot-data-file-reader-py"><span class="std std-ref">Data File Reader</span></a></p>
   <div class="sphx-glr-thumbnail-title">Data File Reader</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="The UniverseSequence class provides automatic memory management:"><img alt="" src="../../_images/sphx_glr_plot_memory_efficient_dump_file_reading_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="The UniverseSequence class provides automatic memory management."><img alt="" src="../../_images/sphx_glr_plot_memory_efficient_dump_file_reading_thumb.png" />
 <p><a class="reference internal" href="plot_memory_efficient_dump_file_reading.html#sphx-glr-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py"><span class="std std-ref">Memory-Efficient Dump File Reading</span></a></p>
   <div class="sphx-glr-thumbnail-title">Memory-Efficient Dump File Reading</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="The DataFileWriter generates LAMMPS-compatible data files:"><img alt="" src="../../_images/sphx_glr_plot_data_file_writer_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="The DataFileWriter generates LAMMPS-compatible data files."><img alt="" src="../../_images/sphx_glr_plot_data_file_writer_thumb.png" />
 <p><a class="reference internal" href="plot_data_file_writer.html#sphx-glr-auto-examples-readers-writers-plot-data-file-writer-py"><span class="std std-ref">Data File Writer</span></a></p>
   <div class="sphx-glr-thumbnail-title">Data File Writer</div>
 </div></div><div class="toctree-wrapper compound">
@@ -449,12 +450,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="plot_correlated_averages_reader.html">
+          <a class="next-page" href="plot_pylimer_tools_output_reader.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Correlated Averages Reader</div>
+                <div class="title">pylimer-tools Output Reader</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

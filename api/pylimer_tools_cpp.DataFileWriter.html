@@ -245,6 +245,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 </ul>
@@ -254,14 +255,14 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/readers_writers/index.html">File I/O: Readers &amp; Writers</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of File I/O: Readers &amp; Writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_data_file_reader.html">Data File Reader</a></li>
@@ -460,7 +461,7 @@
 <span class="sig-name descname"><span class="pre">config_crosslinker_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileWriter.config_crosslinker_type" title="Link to this definition">¶</a></dt>
 <dd><p>Set which atom type represents crosslinkers.
 Needed in case the moleculeIdx in the output file should have any meaning.
-(e.g. with <code class="xref py py-func docutils literal notranslate"><span class="pre">configMoleculeIdxForSwap()</span></code>).</p>
+(e.g. with <a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap" title="pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap"><code class="xref py py-func docutils literal notranslate"><span class="pre">config_molecule_idx_for_swap()</span></code></a>).</p>
 <p>Default: 2.</p>
 </dd></dl>
 
@@ -514,8 +515,7 @@ Re-indexing leads to atom ids being in the range of 1 to the number of atoms.</p
 <span class="sig-name descname"><span class="pre">set_custom_atom_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'\t$atomId\t$moleculeId\t$atomType\t$x\t$y\t$z\t$nx\t$ny\t$nz'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileWriter.set_custom_atom_format" title="Link to this definition">¶</a></dt>
 <dd><p>Specify a custom format for the atom section.</p>
 <p>Placeholder options are:</p>
-<blockquote>
-<div><ul class="simple">
+<ul class="simple">
 <li><p>$atomId</p></li>
 <li><p>$moleculeId</p></li>
 <li><p>$atomType</p></li>
@@ -526,14 +526,13 @@ Re-indexing leads to atom ids being in the range of 1 to the number of atoms.</p
 <li><p>$ny</p></li>
 <li><p>$nz</p></li>
 </ul>
-</div></blockquote>
 <p>Additionally, you can use the keys used in
-<code class="xref py py-func docutils literal notranslate"><span class="pre">setPropertyValue()</span></code>
+<code class="xref py py-func docutils literal notranslate"><span class="pre">set_property_value()</span></code>
 as placeholders (as long as they are alphanumeric only; prefix in the format with ‘$’ as well).
 Specifically useful if you need a different (or hybrid) atom style in LAMMPS.</p>
-<p>Be sure to still call <code class="xref py py-func docutils literal notranslate"><span class="pre">configAtomStyle()</span></code>,
+<p>Be sure to still call <a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_atom_style" title="pylimer_tools_cpp.DataFileWriter.config_atom_style"><code class="xref py py-func docutils literal notranslate"><span class="pre">config_atom_style()</span></code></a>,
 so that the file can be read correctly again.</p>
-<p>Default: tab-separated LAMMPS angle atom style.</p>
+<p>Default: empty string, in which case the configured atom style will be used.</p>
 </dd></dl>
 
 <dl class="py method">

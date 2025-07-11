@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/readers_writers/plot_data_file_writer.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="The DataFileWriter generates LAMMPS-compatible data files: Total running time of the script:(0 minutes 0.004 seconds) Download Jupyter notebook: plot_data_file_writer.ipynb Download Python source c..." />
+<meta property="og:description" content="The DataFileWriter generates LAMMPS-compatible data files. Advanced Configuration: Custom Atom Styles: You can specify custom atom styles and formats using the following format: Note that currently..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
-<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_readers_writers_plot_data_file_writer_b81e1405.png" />
-<meta property="og:image:alt" content="The DataFileWriter generates LAMMPS-compatible data files: Total running time of the script:(0 minutes 0.004 seconds) Download Jupyter notebook: plot_data_file_writer.ipynb Download Python source c..." />
-<meta name="description" content="The DataFileWriter generates LAMMPS-compatible data files: Total running time of the script:(0 minutes 0.004 seconds) Download Jupyter notebook: plot_data_file_writer.ipynb Download Python source c..." />
+<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_readers_writers_plot_data_file_writer_0ff8dcb0.png" />
+<meta property="og:image:alt" content="The DataFileWriter generates LAMMPS-compatible data files. Advanced Configuration: Custom Atom Styles: You can specify custom atom styles and formats using the following format: Note that currently..." />
+<meta name="description" content="The DataFileWriter generates LAMMPS-compatible data files. Advanced Configuration: Custom Atom Styles: You can specify custom atom styles and formats using the following format: Note that currently..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -202,7 +202,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -247,6 +247,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 </ul>
@@ -256,14 +257,14 @@
 </ul>
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">File I/O: Readers &amp; Writers</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of File I/O: Readers &amp; Writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_histogram_reader.html">Histogram Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_performance_caching.html">Performance and Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_data_file_reader.html">Data File Reader</a></li>
@@ -385,7 +386,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -398,7 +399,7 @@ to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="data-file-writer">
 <span id="sphx-glr-auto-examples-readers-writers-plot-data-file-writer-py"></span><h1>Data File Writer<a class="headerlink" href="#data-file-writer" title="Link to this heading">¶</a></h1>
-<p>The <a class="reference internal" href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFileWriter</span></code></a> generates LAMMPS-compatible data files:</p>
+<p>The <a class="reference internal" href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFileWriter</span></code></a> generates LAMMPS-compatible data files.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
@@ -429,14 +430,11 @@ to download the full example code.</p>
 
 <span class="c1"># Basic output</span>
 <a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.write_to_file" title="pylimer_tools_cpp.DataFileWriter.write_to_file" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">writer</span><span class="o">.</span><span class="n">write_to_file</span></a><span class="p">(</span><span class="s2">&quot;generated_structures/output.structure.dat&quot;</span><span class="p">)</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Advanced Configuration</span>
-<span class="sd">----------------------</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="c1"># Configure output options</span>
+</pre></div>
+</div>
+<section id="advanced-configuration">
+<h2>Advanced Configuration<a class="headerlink" href="#advanced-configuration" title="Link to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configure output options</span>
 <a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">writer</span></a> <span class="o">=</span> <a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">DataFileWriter</span></a><span class="p">(</span><a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">universe</span></a><span class="p">)</span>
 
 <span class="c1"># Include topology information</span>
@@ -456,42 +454,38 @@ to download the full example code.</p>
 
 <span class="c1"># Write configured output</span>
 <a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.write_to_file" title="pylimer_tools_cpp.DataFileWriter.write_to_file" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">writer</span><span class="o">.</span><span class="n">write_to_file</span></a><span class="p">(</span><span class="s2">&quot;generated_structures/configured_output.data&quot;</span><span class="p">)</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Custom Atom Styles</span>
-<span class="sd">------------------</span>
-
-<span class="sd">You can specify custom atom styles and formats using the following format:</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="c1"># Set predefined atom style</span>
+</pre></div>
+</div>
+</section>
+<section id="custom-atom-styles">
+<h2>Custom Atom Styles<a class="headerlink" href="#custom-atom-styles" title="Link to this heading">¶</a></h2>
+<p>You can specify custom atom styles and formats using the following format:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set predefined atom style</span>
 <a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.config_atom_style" title="pylimer_tools_cpp.DataFileWriter.config_atom_style" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">writer</span><span class="o">.</span><span class="n">config_atom_style</span></a><span class="p">(</span><a href="../../api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle" title="pylimer_tools_cpp.AtomStyle" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">AtomStyle</span><span class="o">.</span><span class="n">FULL</span></a><span class="p">)</span>
 
 <span class="c1"># Or define custom format</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">custom_format</span></a> <span class="o">=</span> <span class="s2">&quot;$atomId $moleculeId $atomType $charge $x $y $z&quot;</span>
 <a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.set_custom_atom_format" title="pylimer_tools_cpp.DataFileWriter.set_custom_atom_format" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">writer</span><span class="o">.</span><span class="n">set_custom_atom_format</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">custom_format</span></a><span class="p">)</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Note that currently, only the atom styles ``angle``, ``bond``, ``molecular``, and ``full``</span>
-<span class="sd">are supported without you specifying a custom format.</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Molecule Indexing Control</span>
-<span class="sd">-------------------------</span>
-
-<span class="sd">Control how molecules are numbered in the output</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="c1"># Standard molecular indexing: sets the molecule index for each atom</span>
+</pre></div>
+</div>
+<p>Note that currently, the atom styles <code class="docutils literal notranslate"><span class="pre">tdpd</span></code> and <code class="docutils literal notranslate"><span class="pre">hybrid</span></code> are not supported
+without you specifying this custom format.</p>
+</section>
+<section id="molecule-indexing-control">
+<h2>Molecule Indexing Control<a class="headerlink" href="#molecule-indexing-control" title="Link to this heading">¶</a></h2>
+<p>Control how molecules are numbered in the output</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Standard molecular indexing: sets the molecule index for each atom</span>
 <span class="c1"># based on the decomposition at the junctions</span>
 <a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap" title="pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">writer</span><span class="o">.</span><span class="n">config_molecule_idx_for_swap</span></a><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="c1"># Optimize for LAMMPS&#39; bond/swap operations</span>
-<span class="c1"># Sets the molecule index for each atom based on the distance from the next junction</span>
+<span class="c1"># Optimize for LAMMPS&#39; ``bond/swap`` operations</span>
+<span class="c1"># Sets the molecule index for each atom based on the distance from the</span>
+<span class="c1"># next junction</span>
+<a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap" title="pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">writer</span><span class="o">.</span><span class="n">config_molecule_idx_for_swap</span></a><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
 <a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap" title="pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">writer</span><span class="o">.</span><span class="n">config_molecule_idx_for_swap</span></a><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.004 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.005 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-writer-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/0631f75f6838d78a5faf4611c88f7bcd/plot_data_file_writer.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_data_file_writer.ipynb</span></code></a></p>
@@ -504,6 +498,7 @@ to download the full example code.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
 </section>
 
         </article>
@@ -549,8 +544,29 @@ to download the full example code.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Data File Writer</a><ul>
+<li><a class="reference internal" href="#advanced-configuration">Advanced Configuration</a></li>
+<li><a class="reference internal" href="#custom-atom-styles">Custom Atom Styles</a></li>
+<li><a class="reference internal" href="#molecule-indexing-control">Molecule Indexing Control</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

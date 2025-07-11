@@ -23,32 +23,16 @@ Convert for Bond Swapping
 
 LAMMPS bond swapping can significantly speed up equilibration for polymer networks.
 However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly.
-Here's how you could re-set the molecule indices for bond swapping with constant chain lengths:
+Here's how you could re-set the molecule indices for bond swapping with constant chain lengths.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-43
-
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Optimized system capable of bond swapping written to: /home/runner/work/pylimer-tools/pylimer-tools/examples/readers_writers/generated_structures/for_swap_melt_83_a_100.structure.out
-
-
-
-
-
-
-|
+.. GENERATED FROM PYTHON SOURCE LINES 10-41
 
 .. code-block:: Python
 
 
-
     import os
-    from pylimer_tools_cpp import UniverseSequence, DataFileWriter
+
+    from pylimer_tools_cpp import DataFileWriter, UniverseSequence
 
     if not os.path.exists("generated_structures"):
         os.makedirs("generated_structures")
@@ -76,8 +60,23 @@ Here's how you could re-set the molecule indices for bond swapping with constant
     writer.write_to_file(output_file)
     print(f"Optimized system capable of bond swapping written to: {output_file}")
 
-    # to convert it back to the molecule index relating to their current connectivity,
-    # simply repeat the process with `config_molecule_idx_for_swap(False)`
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    Optimized system capable of bond swapping written to: /home/runner/work/pylimer-tools/pylimer-tools/examples/readers_writers/generated_structures/for_swap_melt_83_a_100.structure.out
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 42-44
+
+To convert it back to the molecule index relating to their current connectivity,
+simply repeat the process with ``config_molecule_idx_for_swap(False)``
 
 
 .. rst-class:: sphx-glr-timing

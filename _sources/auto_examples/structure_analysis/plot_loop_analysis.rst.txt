@@ -21,7 +21,9 @@
 Loop Finding and Analysis
 =========================
 
-.. GENERATED FROM PYTHON SOURCE LINES 6-48
+This example demonstrates how to find and analyze loops in polymer networks using pylimer-tools.
+
+.. GENERATED FROM PYTHON SOURCE LINES 7-50
 
 
 
@@ -88,13 +90,14 @@ Loop Finding and Analysis
     plt.show()
 
     # 3. Find shortest loop for a specific atom (e.g., atom 0)
-    shortest_loop = universe.find_minimal_order_loop_from(loop_start=1, loop_step1=1)
+    shortest_loop = universe.find_minimal_order_loop_from(
+        loop_start=1, loop_step1=1)
     print(f"Shortest loop involving atom 1: {shortest_loop}")
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.170 seconds)
+   **Total running time of the script:** (0 minutes 0.175 seconds)
 
 
 .. _sphx_glr_download_auto_examples_structure_analysis_plot_loop_analysis.py:

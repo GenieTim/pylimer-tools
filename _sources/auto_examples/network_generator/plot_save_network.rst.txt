@@ -21,7 +21,9 @@
 Save Generated Network
 ======================
 
-.. GENERATED FROM PYTHON SOURCE LINES 6-30
+This example shows how to save a generated polymer network to a LAMMPS data file.
+
+.. GENERATED FROM PYTHON SOURCE LINES 8-32
 
 
 

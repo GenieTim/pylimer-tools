@@ -27,12 +27,12 @@ Convert `LAMMPS units <https://docs.lammps.org/units.html>`_ to SI or other unit
 **Supported unit styles:**
 
 - ``real`` - kcal/mol, Angstrom, fs
-- ``metal`` - eV, Angstrom, ps  
+- ``metal`` - eV, Angstrom, ps
 - ``si`` - kg, m, s
 - ``nano`` - attogram, nanometer, nanosecond
 - ``lj`` - Lennard-Jones reduced units (requires polymer specification)
 
-.. GENERATED FROM PYTHON SOURCE LINES 18-38
+.. GENERATED FROM PYTHON SOURCE LINES 18-40
 
 
 
@@ -71,14 +71,16 @@ Convert `LAMMPS units <https://docs.lammps.org/units.html>`_ to SI or other unit
     pressure_si = (1 * real_units.pressure).to("Pa").magnitude  # type: ignore
 
     # Convert temperature (already in Kelvin for 'real' units)
-    temperature_si = (273.15 * real_units.temperature).to("K").magnitude  # type: ignore
+    temperature_si = (
+        273.15 *
+        real_units.temperature).to("K").magnitude  # type: ignore
 
     print(f"LJ 1 Pressure in Pascal: {pressure_si}")
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.317 seconds)
+   **Total running time of the script:** (0 minutes 0.193 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_unit_conversion.py:

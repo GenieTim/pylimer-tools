@@ -2,6 +2,7 @@
 Loop Finding and Analysis
 =========================
 
+This example demonstrates how to find and analyze loops in polymer networks using pylimer-tools.
 """
 
 # Import the main Universe class from pylimer_tools_cpp
@@ -43,5 +44,6 @@ plt.ylabel("Count")
 plt.show()
 
 # 3. Find shortest loop for a specific atom (e.g., atom 0)
-shortest_loop = universe.find_minimal_order_loop_from(loop_start=1, loop_step1=1)
+shortest_loop = universe.find_minimal_order_loop_from(
+    loop_start=1, loop_step1=1)
 print(f"Shortest loop involving atom 1: {shortest_loop}")

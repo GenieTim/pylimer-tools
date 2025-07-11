@@ -26,18 +26,7 @@ to predict the loss and storage modulus of polymer networks.
 
 Reference: `doi:10.1021/acs.macromol.4c01429 <https://doi.org/10.1021/acs.macromol.4c01429>`_
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-53
-
-
-
-.. image-sg:: /auto_examples/normal_mode_analysis/images/sphx_glr_plot_normal_mode_analysis_001.png
-   :alt: Storage and Loss Modulus vs Frequency
-   :srcset: /auto_examples/normal_mode_analysis/images/sphx_glr_plot_normal_mode_analysis_001.png
-   :class: sphx-glr-single-img
-
-
-
-
+.. GENERATED FROM PYTHON SOURCE LINES 10-42
 
 .. code-block:: Python
 
@@ -73,8 +62,22 @@ Reference: `doi:10.1021/acs.macromol.4c01429 <https://doi.org/10.1021/acs.macrom
     storage_modulus = nma.evaluate_storage_modulus(omega=frequencies)
     loss_modulus = nma.evaluate_loss_modulus(omega=frequencies)
 
-    # TODO: apply conversion factors if necessary
-    # plot the results
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 43-45
+
+TODO: apply conversion factors if necessary
+plot the results
+
+.. GENERATED FROM PYTHON SOURCE LINES 45-54
+
+.. code-block:: Python
+
     df = pd.DataFrame(
         {
             "Frequency": frequencies,
@@ -86,9 +89,20 @@ Reference: `doi:10.1021/acs.macromol.4c01429 <https://doi.org/10.1021/acs.macrom
     _ = df.plot(title="Storage and Loss Modulus vs Frequency", loglog=True)
 
 
+
+.. image-sg:: /auto_examples/normal_mode_analysis/images/sphx_glr_plot_normal_mode_analysis_001.png
+   :alt: Storage and Loss Modulus vs Frequency
+   :srcset: /auto_examples/normal_mode_analysis/images/sphx_glr_plot_normal_mode_analysis_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 17.329 seconds)
+   **Total running time of the script:** (0 minutes 17.197 seconds)
 
 
 .. _sphx_glr_download_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py:

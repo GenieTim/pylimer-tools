@@ -52,7 +52,7 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to decompose a crosslinked polymer network into chains  and analyze its structure using pylimer-tools.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to decompose a crosslinked polymer network into chains and analyze its structure using pylimer-tools.">
 
 .. only:: html
 
@@ -86,7 +86,7 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Loop Finding and Analysis">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to find and analyze loops in polymer networks using pylimer-tools.">
 
 .. only:: html
 

@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/network_generator/plot_multi_component_system.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="Create complex systems with multiple components:, Total running time of the script:(0 minutes 0.402 seconds) Download Jupyter notebook: plot_multi_component_system.ipynb Download Python source code..." />
+<meta property="og:description" content="Create complex systems with multiple components:, Total running time of the script:(0 minutes 0.404 seconds) Download Jupyter notebook: plot_multi_component_system.ipynb Download Python source code..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
-<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_network_generator_plot_multi_component_system_4bcdc954.png" />
-<meta property="og:image:alt" content="Create complex systems with multiple components:, Total running time of the script:(0 minutes 0.402 seconds) Download Jupyter notebook: plot_multi_component_system.ipynb Download Python source code..." />
-<meta name="description" content="Create complex systems with multiple components:, Total running time of the script:(0 minutes 0.402 seconds) Download Jupyter notebook: plot_multi_component_system.ipynb Download Python source code..." />
+<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_network_generator_plot_multi_component_system_26897943.png" />
+<meta property="og:image:alt" content="Create complex systems with multiple components:, Total running time of the script:(0 minutes 0.404 seconds) Download Jupyter notebook: plot_multi_component_system.ipynb Download Python source code..." />
+<meta name="description" content="Create complex systems with multiple components:, Total running time of the script:(0 minutes 0.404 seconds) Download Jupyter notebook: plot_multi_component_system.ipynb Download Python source code..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -247,6 +247,7 @@
 <li class="toctree-l3"><a class="reference internal" href="plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Multi-Component System</a></li>
 </ul>
@@ -256,14 +257,14 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../readers_writers/index.html">File I/O: Readers &amp; Writers</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of File I/O: Readers &amp; Writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_data_file_reader.html">Data File Reader</a></li>
@@ -399,11 +400,11 @@ to download the full example code.</p>
 <section class="sphx-glr-example-title" id="multi-component-system">
 <span id="sphx-glr-auto-examples-network-generator-plot-multi-component-system-py"></span><h1>Multi-Component System<a class="headerlink" href="#multi-component-system" title="Link to this heading">¶</a></h1>
 <p>Create complex systems with multiple components:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Starting network generation at 2025-07-07 13:27:45.869298
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Starting network generation at 2025-07-11 15:00:57.701834
 Adding crosslinkers...
 Adding solvent chains...
 Adding and linking polymer strands...
-Network generation completed at 2025-07-07 13:27:46.270505
+Network generation completed at 2025-07-11 15:00:58.104519
 </pre></div>
 </div>
 <div class="line-block">
@@ -463,7 +464,8 @@ Network generation completed at 2025-07-07 13:27:46.270505
     <span class="n">monofunctional_strand_length</span><span class="o">=</span><span class="p">[</span>
         <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">beads_per_monofunctional_chain</span></a> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_monofunctional_chains</span></a><span class="p">)</span>
     <span class="p">],</span>
-    <span class="n">monofunctional_strand_atom_type</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>  <span class="c1"># Type 4 to recognize these as &quot;monofunctional&quot; strands later</span>
+    <span class="c1"># Type 4 to recognize these as &quot;monofunctional&quot; strands later</span>
+    <span class="n">monofunctional_strand_atom_type</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># Crosslink polymer strands</span>
@@ -478,7 +480,7 @@ Network generation completed at 2025-07-07 13:27:46.270505
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Network generation completed at </span><span class="si">{</span><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.now" title="datetime.datetime.now" class="sphx-glr-backref-module-datetime-datetime sphx-glr-backref-type-py-method"><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span></a><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.402 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.404 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-network-generator-plot-multi-component-system-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/6186da34d28e4059753bef023d335004/plot_multi_component_system.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_multi_component_system.ipynb</span></code></a></p>

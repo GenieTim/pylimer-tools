@@ -21,10 +21,11 @@
 Decompose/Split Structure
 =========================
 
-This example demonstrates how to decompose a crosslinked polymer network into chains 
+This example demonstrates how to decompose a crosslinked polymer network into chains
 and analyze its structure using pylimer-tools.
 
 The following approaches are shown:
+
 - Removing crosslinkers and analyzing polymer strands
 - Decomposing the network to chains while keeping crosslinkers
 - Finding clusters after manual junction removal
@@ -102,7 +103,7 @@ The following approaches are shown:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.081 seconds)
+   **Total running time of the script:** (0 minutes 0.068 seconds)
 
 
 .. _sphx_glr_download_auto_examples_structure_analysis_plot_decompose_structure.py:

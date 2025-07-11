@@ -32,7 +32,7 @@ The :class:`~pylimer_tools_cpp.MCUniverseGenerator` class is the main interface 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Save Generated Network">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to save a generated polymer network to a LAMMPS data file.">
 
 .. only:: html
 
@@ -83,7 +83,24 @@ The :class:`~pylimer_tools_cpp.MCUniverseGenerator` class is the main interface 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The generated networks can include topological information">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we create a vulcanized network using the pylimer-tools library.">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_vulcanized_network_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_network_generator_plot_vulcanized_network.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Generate Vulcanized Networks</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The generated networks can include topological information.">
 
 .. only:: html
 
@@ -128,6 +145,7 @@ The :class:`~pylimer_tools_cpp.MCUniverseGenerator` class is the main interface 
    /auto_examples/network_generator/plot_save_network
    /auto_examples/network_generator/plot_simple_crosslinked_network
    /auto_examples/network_generator/plot_monte_carlo_configuration
+   /auto_examples/network_generator/plot_vulcanized_network
    /auto_examples/network_generator/plot_add_angles
    /auto_examples/network_generator/plot_multi_component_system
 

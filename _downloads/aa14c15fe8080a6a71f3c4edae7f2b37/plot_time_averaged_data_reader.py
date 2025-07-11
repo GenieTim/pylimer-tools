@@ -14,6 +14,7 @@ and :func:`~pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_fil
 - Vector quantities (multiple values per output timestep)
 - Multi-section files with varying column structures
 """
+
 import os
 
 from pylimer_tools.io.read_lammps_output_file import read_averages_file
@@ -42,7 +43,8 @@ vec_averages_file = os.path.join(
     "tests/pylimer_tools/fixtures/example_vec_avg_file.out.vec-avg.txt",
 )
 
-# Read sectioned averages (e.g., from vector quantities from e.g. `fix ave/time ... vector`)
+# Read sectioned averages
+# (e.g., from vector quantities from e.g. ``fix ave/time ... vector``)
 sectioned_data = read_averages_file(vec_averages_file)
 
 # Group by timestep for sectioned data

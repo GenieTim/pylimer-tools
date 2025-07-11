@@ -247,6 +247,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 </ul>
@@ -256,14 +257,14 @@
 </ul>
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">File I/O: Readers &amp; Writers</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of File I/O: Readers &amp; Writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_histogram_reader.html">Histogram Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_performance_caching.html">Performance and Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Convert for Bond Swapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_data_file_reader.html">Data File Reader</a></li>
@@ -400,15 +401,10 @@ to download the full example code.</p>
 <span id="sphx-glr-auto-examples-readers-writers-plot-convert-for-bond-swapping-py"></span><h1>Convert for Bond Swapping<a class="headerlink" href="#convert-for-bond-swapping" title="Link to this heading">¶</a></h1>
 <p>LAMMPS bond swapping can significantly speed up equilibration for polymer networks.
 However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly.
-Here’s how you could re-set the molecule indices for bond swapping with constant chain lengths:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Optimized system capable of bond swapping written to: /home/runner/work/pylimer-tools/pylimer-tools/examples/readers_writers/generated_structures/for_swap_melt_83_a_100.structure.out
-</pre></div>
-</div>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
+Here’s how you could re-set the molecule indices for bond swapping with constant chain lengths.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <a href="../../api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">UniverseSequence</span></a><span class="p">,</span> <a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">DataFileWriter</span></a>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">DataFileWriter</span></a><span class="p">,</span> <a href="../../api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">UniverseSequence</span></a>
 
 <span class="k">if</span> <span class="ow">not</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.exists" title="os.path.exists" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span></a><span class="p">(</span><span class="s2">&quot;generated_structures&quot;</span><span class="p">):</span>
     <a href="https://docs.python.org/3/library/os.html#os.makedirs" title="os.makedirs" class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">makedirs</span></a><span class="p">(</span><span class="s2">&quot;generated_structures&quot;</span><span class="p">)</span>
@@ -435,11 +431,13 @@ Here’s how you could re-set the molecule indices for bond swapping with consta
 
 <a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.write_to_file" title="pylimer_tools_cpp.DataFileWriter.write_to_file" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">writer</span><span class="o">.</span><span class="n">write_to_file</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">output_file</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimized system capable of bond swapping written to: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">output_file</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># to convert it back to the molecule index relating to their current connectivity,</span>
-<span class="c1"># simply repeat the process with `config_molecule_idx_for_swap(False)`</span>
 </pre></div>
 </div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Optimized system capable of bond swapping written to: /home/runner/work/pylimer-tools/pylimer-tools/examples/readers_writers/generated_structures/for_swap_melt_83_a_100.structure.out
+</pre></div>
+</div>
+<p>To convert it back to the molecule index relating to their current connectivity,
+simply repeat the process with <code class="docutils literal notranslate"><span class="pre">config_molecule_idx_for_swap(False)</span></code></p>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.057 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-readers-writers-plot-convert-for-bond-swapping-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">

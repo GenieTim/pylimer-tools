@@ -20,7 +20,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="pylimer-tools" />
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Convert for Bond Swapping" href="plot_convert_for_bond_swapping.html" /><link rel="prev" title="Extract Trajectory Frame to Data File" href="plot_convert_trajectory_to_frame.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Convert for Bond Swapping" href="plot_convert_for_bond_swapping.html" /><link rel="prev" title="Dump File Reader" href="plot_dump_file_reader.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
         <title>Time-Averaged Data Reader - pylimer-tools v</title>
@@ -247,6 +247,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 </ul>
@@ -256,14 +257,14 @@
 </ul>
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">File I/O: Readers &amp; Writers</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of File I/O: Readers &amp; Writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_histogram_reader.html">Histogram Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_performance_caching.html">Performance and Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_data_file_reader.html">Data File Reader</a></li>
@@ -443,7 +444,8 @@ Timestep 300: 3 data points
     <span class="s2">&quot;tests/pylimer_tools/fixtures/example_vec_avg_file.out.vec-avg.txt&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="c1"># Read sectioned averages (e.g., from vector quantities from e.g. `fix ave/time ... vector`)</span>
+<span class="c1"># Read sectioned averages</span>
+<span class="c1"># (e.g., from vector quantities from e.g. ``fix ave/time ... vector``)</span>
 <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sectioned_data</span></a> <span class="o">=</span> <a href="../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_averages_file" title="pylimer_tools.io.read_lammps_output_file.read_averages_file" class="sphx-glr-backref-module-pylimer_tools-io-read_lammps_output_file sphx-glr-backref-type-py-function"><span class="n">read_averages_file</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">vec_averages_file</span></a><span class="p">)</span>
 
 <span class="c1"># Group by timestep for sectioned data</span>
@@ -451,7 +453,7 @@ Timestep 300: 3 data points
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Timestep </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timestep</span></a><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">group</span></a><span class="p">)</span><span class="si">}</span><span class="s2"> data points&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.070 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.073 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-readers-writers-plot-time-averaged-data-reader-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/cb3d76a475c6f5dcd93f25df87baef20/plot_time_averaged_data_reader.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_time_averaged_data_reader.ipynb</span></code></a></p>
@@ -480,14 +482,14 @@ Timestep 300: 3 data points
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="plot_convert_trajectory_to_frame.html">
+          <a class="prev-page" href="plot_dump_file_reader.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Extract Trajectory Frame to Data File</div>
+                <div class="title">Dump File Reader</div>
                 
               </div>
             </a>
