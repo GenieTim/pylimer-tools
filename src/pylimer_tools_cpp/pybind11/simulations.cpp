@@ -461,23 +461,26 @@ and finally springs will be any number of connected bonds between links.
          &mehp::MEHPForceRelaxation::setForceEvaluator,
          R"pbdoc(
           Reset the currently used force evaluator.
+          
+          :param force_evaluator: The new force evaluator to use
      )pbdoc",
          py::arg("force_evaluator"))
     .def("config_rerun_epsilon",
          &mehp::MEHPForceRelaxation::configRerunEps,
          R"pbdoc(
-          Configure the offset from the lower and upper bounds for the simulation to suggest another run (
-               See: :func:`~pylimer_tools_cpp.MEHPForceRelaxation.requiresAnotherRun()`
-          ).
+          Configure the offset from the lower and upper bounds for the simulation to suggest another run.
+          
+          :param epsilon: The epsilon value to use for the rerun check
+               (See: :func:`~pylimer_tools_cpp.MEHPForceRelaxation.requiresAnotherRun()`)
          )pbdoc",
          py::arg("epsilon") = 1e-3)
     .def("config_step_output",
          &mehp::MEHPForceRelaxation::configStepOutput,
          R"pbdoc(
-          Set which values to log.
+          Set which values to log during the simulation.
 
-          Arguments:
-               - values: a list of OutputConfiguration structs
+          :param output_configuration: An OutputConfiguration struct or list of OutputConfiguration structs
+                                      specifying what values to log and how often
      )pbdoc",
          py::arg("output_configuration"))
     .def("assume_box_large_enough",
@@ -485,14 +488,17 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
           Configure whether to run PBC on the bonds or not.
 
-          If your bonds could get larger than half the box length, this must be kept false (default).
-          Otherwise, you can set it to true and therewith get some securities.
+          :param box_large_enough: If True, assume the box is large enough and don't apply PBC on bonds.
+                                  If your bonds could get larger than half the box length, 
+                                  this must be kept False (default).
          )pbdoc",
          py::arg("box_large_enough") = false)
     .def("get_force",
          &mehp::MEHPForceRelaxation::getForce,
          R"pbdoc(
           Returns the force at the current state of the simulation.
+          
+          :return: The current force value
      )pbdoc")
     .def("get_residuals",
          &mehp::MEHPForceRelaxation::getResiduals,
@@ -862,35 +868,43 @@ and finally springs will be any number of connected bonds between links.
     .def("config_step_output",
          &mehp::MEHPForceBalance::configStepOutput,
          R"pbdoc(
-          Set which values to log.
+          Set which values to log during the simulation.
 
-          Arguments:
-               - values: a list of OutputConfiguration structs
-     )pbdoc")
+          :param output_configuration: A list of OutputConfiguration structs
+                                      specifying what values to log and how often
+     )pbdoc",
+         py::arg("output_configuration"))
     .def("config_assume_box_large_enough",
          &mehp::MEHPForceBalance::configAssumeBoxLargeEnough,
          R"pbdoc(
           Configure whether to run PBC on the bonds or not.
 
-          If your bonds could get larger than half the box length, this must be kept false (default).
-          Otherwise, you can set it to true and therewith get some securities.
+          :param box_large_enough: If True, assume the box is large enough and don't apply PBC on bonds.
+                                  If your bonds could get larger than half the box length, 
+                                  this must be kept False (default).
          )pbdoc",
          py::arg("box_large_enough") = false)
     .def("config_mean_bond_length",
          &mehp::MEHPForceBalance::configMeanBondLength,
          R"pbdoc(
-     Configure the :math:`b` used e.g. for the topological Gamma-factor.
+          Configure the :math:`b` used e.g. for the topological Gamma-factor.
+
+          :param b: The mean bond length to use.
      )pbdoc",
          py::arg("b") = 1.0)
     .def("config_spring_constant",
          &mehp::MEHPForceBalance::configSpringConstant,
-         R"pbdoc()pbdoc",
+         R"pbdoc(
+          Configure the spring constant used in the simulation.
+
+          :param kappa: The spring constant.
+     )pbdoc",
          py::arg("kappa") = 1.0)
     .def("config_entanglement_type",
          &mehp::MEHPForceBalance::configEntanglementType,
          R"pbdoc(
          To have certain crosslinks behave as entanglements in the removal process,
-         you can specify the here a type, that you have used in the universe to specify:
+         you can specify here a type, that you have used in the universe to specify:
          - the type of entanglement atoms (expected with functionality f = 3),
          - and the entanglement-bonds between the entanglement atoms.
 
@@ -898,7 +912,9 @@ and finally springs will be any number of connected bonds between links.
          bonds between two strand beads resulting in f = 3 beads, for example,
          you can call this method to have the "StructureSimplificationMode" also remove these atoms,
          if they have a functionality of 2 or less while still being connected to its partner bead.
-         )pbdoc",
+
+         :param type: The atom type to treat as entanglement.
+     )pbdoc",
          py::arg("type") = -1)
     .def("config_spring_breaking_distance",
          &mehp::MEHPForceBalance::configSpringBreakingDistance,
@@ -907,13 +923,17 @@ and finally springs will be any number of connected bonds between links.
           Can be used to model the effect of fracture, to reduce the stiffening happening upon deformation.
           Springs breaking will happen before the simplification procedure is run.
           Negative values will disable spring breaking.
-          Default: -1..
+          Default: -1.
+
+          :param distance_over_contour_length: The threshold for breaking springs.
          )pbdoc",
          py::arg("distance_over_contour_length") = -1)
     .def("config_simplification_frequency",
          &mehp::MEHPForceBalance::configSimplificationFrequency,
          R"pbdoc(
-         Config every how many steps to simplify the structure.
+         Configure every how many steps to simplify the structure.
+
+         :param frequency: The number of steps between simplification.
          Default: 10.
          )pbdoc",
          py::arg("frequency") = 10)
@@ -1143,6 +1163,7 @@ and finally springs will be any number of connected bonds between links.
           :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\eta}*b^2$`
           :math:`N_{\eta}` is the number of atoms in this strand :math:`\eta`,
           :math:`b` its mean square bond length,
+          :math:`\nu` the number density of network strands,
           :math:`T` the temperature and
           :math:`k_B` Boltzmann's constant.
 
@@ -1201,28 +1222,33 @@ and finally springs will be any number of connected bonds between links.
     .def("get_coordinates",
          &mehp::MEHPForceBalance::getCoordinates,
          R"pbdoc(
-          Get the current link coordinates.
-     )pbdoc")
+             Get the current coordinates of the crosslinkers and entanglement links.
+      )pbdoc")
+    .def("get_initial_coordinates",
+         &mehp::MEHPForceBalance::getInitialCoordinates,
+         R"pbdoc(
+             Get the initial coordinates of the (remaining) crosslinkers and entanglement links.
+      )pbdoc")
     .def("get_displacements",
          &mehp::MEHPForceBalance::getCurrentDisplacements,
          R"pbdoc(
-          Get the current link displacements.
-     )pbdoc")
+           Get the current link displacements.
+      )pbdoc")
     .def("set_displacements",
          &mehp::MEHPForceBalance::setCurrentDisplacements,
          R"pbdoc(
-          Set the current link displacements.
-     )pbdoc")
+           Set the current link displacements.
+      )pbdoc")
     .def("set_spring_contour_lengths",
          &mehp::MEHPForceBalance::setSpringContourLengths,
          R"pbdoc(
-          Set/overwrite the contour lengths.
-     )pbdoc")
+           Set/overwrite the contour lengths.
+      )pbdoc")
     .def("get_displacement_residual_norm",
          &mehp::MEHPForceBalance::getDisplacementResidualNorm,
          R"pbdoc(
-          Get the current link displacement residual norm.
-     )pbdoc",
+           Get the current link displacement residual norm.
+      )pbdoc",
          py::arg("one_over_spring_partition_upper_limit") = 1.)
     .def("get_ids_of_active_nodes",
          &mehp::MEHPForceBalance::getIdsOfActiveNodes,
@@ -1469,6 +1495,7 @@ and finally springs will be any number of connected bonds between links.
     .def("deform_to",
          &mehp::MEHPForceBalance2::deformTo,
          R"pbdoc(
+
            Perform a deformation of the system box to a different box.
            All coordinates etc. will be scaled as needed.
           )pbdoc",
@@ -1478,18 +1505,24 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
            Set which values to log.
 
-           Arguments:
-                - values: a list of OutputConfiguration structs
-      )pbdoc")
+           :param values: a list of OutputConfiguration structs
+      )pbdoc",
+         py::arg("values"))
     .def("config_mean_bond_length",
          &mehp::MEHPForceBalance2::configMeanBondLength,
          R"pbdoc(
       Configure the :math:`b` used e.g. for the topological Gamma-factor.
+
+      :param b: The mean bond length to use.
       )pbdoc",
          py::arg("b") = 1.0)
     .def("config_spring_constant",
          &mehp::MEHPForceBalance2::configSpringConstant,
-         R"pbdoc()pbdoc",
+         R"pbdoc(
+           Configure the spring constant used in the simulation.
+
+           :param kappa: The spring constant.
+      )pbdoc",
          py::arg("kappa") = 1.0)
     .def("config_spring_breaking_distance",
          &mehp::MEHPForceBalance2::configSpringBreakingDistance,
@@ -1498,10 +1531,11 @@ and finally springs will be any number of connected bonds between links.
            Can be used to model the effect of fracture, to reduce the stiffening happening upon deformation.
            Springs breaking will happen before the simplification procedure is run.
            Negative values will disable spring breaking.
-           Default: -1..
+           Default: -1.
+
+           :param distance_over_contour_length: The threshold for breaking springs.
           )pbdoc",
          py::arg("distance_over_contour_length") = -1)
-
     .def(
       "get_force_on",
       [](mehp::MEHPForceBalance2& sim, const size_t linkIdx) {
@@ -1743,9 +1777,9 @@ and finally springs will be any number of connected bonds between links.
     .def("get_nr_of_active_springs",
          &mehp::MEHPForceBalance2::getNrOfActiveStrands,
          R"pbdoc(
-            Get the number of active springs remaining after running the simulation.
+           Get the number of active springs remaining after running the simulation.
 
-           :param tolerance: springs under this length are considered inactive
+          :param tolerance: springs under this length are considered inactive
       )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_nr_of_active_springs_in_dir",
@@ -1761,9 +1795,9 @@ and finally springs will be any number of connected bonds between links.
     .def("get_nr_of_active_partial_springs",
          &mehp::MEHPForceBalance2::getNrOfActiveSprings,
          R"pbdoc(
-            Get the number of active partial springs remaining after running the simulation.
+           Get the number of active partial springs remaining after running the simulation.
 
-           :param tolerance: springs under this length are considered inactive
+          :param tolerance: springs under this length are considered inactive
       )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_current_partial_spring_vectors",
@@ -1936,12 +1970,15 @@ and finally springs will be any number of connected bonds between links.
                 &dpd::DPDSimulator::readRestartFile,
                 R"pbdoc(
           Read a restart file in order to continue a simulation.
+
+          :param file: The file path to the restart file to read.
+          :type file: str
      )pbdoc",
                 py::arg("file"))
     .def("config_restart_output",
          &dpd::DPDSimulator::configRestartOutput,
          R"pbdoc(
-          Set when to output a restart where.
+          Set when to output a restart file.
 
           Note:
                The filename determines the type of serialization:
@@ -1951,30 +1988,42 @@ and finally springs will be any number of connected bonds between links.
                This method may not be backwards- nor forward-compatible.
                Use the same version of pylimer-tools if you want to be sure that things work.
 
-          Arguments:
-               - file: The file path to the restart file to write
-               - outputEvery: how often to write the restart file
+          :param file: The file path to the restart file to write.
+          :type file: str
+          :param output_every: How often to write the restart file.
+          :type output_every: int
      )pbdoc",
          py::arg("file"),
          py::arg("output_every") = 50000)
+    .def("write_restart_file",
+         &dpd::DPDSimulator::writeRestartFile,
+         R"pbdoc(
+          Explicitly force the writing of a restart file, now!
+
+          :param file: The file path and name of the restart file to be written.
+                       Can end in .xml, .json or anything else (-> binary).
+          :type file: str
+     )pbdoc",
+         py::arg("file"))
 #endif
     .def("config_average_output",
          &dpd::DPDSimulator::configAverageOutput,
          R"pbdoc(
           Set which values to compute averages for.
 
-          Arguments:
-               - values: a list of OutputConfiguration structs
-     )pbdoc")
+          :param values: a list of OutputConfiguration structs
+     )pbdoc",
+         py::arg("values"))
     .def("config_auto_correlator_output",
          &dpd::DPDSimulator::configAutoCorrelatorOutput,
          R"pbdoc(
           Set which values to compute multiple-tau autocorrelation for.
           If you use this, you should cite `doi:10.1063/1.3491098 <https://pubs.aip.org/aip/jcp/article-abstract/133/15/154103/190247/Efficient-on-the-fly-calculation-of-time?redirectedFrom=fulltext>`_
 
-          Arguments:
-               - values: a list of OutputConfiguration structs
-               - ...
+          :param values: a list of OutputConfiguration structs
+          :param num_corr_in: Number of correlations in
+          :param p: Parameter p for the autocorrelator
+          :param m: Parameter m for the autocorrelator
      )pbdoc",
          py::arg("values"),
          py::arg("num_corr_in") = 32,
@@ -1985,9 +2034,9 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
           Set which values to log.
 
-          Arguments:
-               - values: a list of OutputConfiguration structs
-     )pbdoc")
+          :param values: a list of OutputConfiguration structs
+     )pbdoc",
+         py::arg("values"))
     .def("config_shift_possibility_empty",
          &dpd::DPDSimulator::configShiftPossibilityEmpty,
          R"pbdoc()pbdoc")
@@ -2009,13 +2058,12 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
           Configure how to do bond formation during the run.
 
-          Arguments:
-          - num_bonds_to_form (int): The nr of bonds to form in total. Use 0 to stop bond formation.
-          - num_bonds_per_atom_type (dict): The nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)
-          - bond_formation_dist (float): The maximum distance allowed to form bonds
-          - attempt_bond_formation_every (int): attempt to form bonds every this many steps during the simulation run
-          - atom_type_form_from (int): The atom type to start forming bonds from.
-          - atom_type_form_to (int): The atom type to start forming bonds to.
+          :param num_bonds_to_form (int): The nr of bonds to form in total. Use 0 to stop bond formation.
+          :param num_bonds_per_atom_type (dict): The nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)
+          :param bond_formation_dist (float): The maximum distance allowed to form bonds
+          :param attempt_bond_formation_every (int): attempt to form bonds every this many steps during the simulation run
+          :param atom_type_form_from (int): The atom type to start forming bonds from.
+          :param atom_type_form_to (int): The atom type to start forming bonds to.
          )pbdoc",
          py::arg("num_bonds_to_form"),
          py::arg("max_bonds_per_atom_type"),
@@ -2035,8 +2083,7 @@ and finally springs will be any number of connected bonds between links.
 
           Side-effect: if true, the relocations may also happen *to* a slip-spring next to a crosslink.
 
-          Arguments:
-          - allow_relocation_in_network (bool): Whether to allow relocation in the network or not.
+          :param allow_relocation_in_network (bool): Whether to allow relocation in the network or not.
          )pbdoc",
          py::arg("allow_relocation_in_network") = false)
     .def("start_measuring_msd_for_atoms",
@@ -2050,8 +2097,8 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
      Get a universe instance from the current coordinates (and connectivity).
 
-     Arguments:
-          - with_slip_springs (bool): whether to include slip-springs in the returned universe.
+     :param with_slipsprings: Whether to include slip-springs in the returned universe.
+     :type with_slipsprings: bool
     )pbdoc",
          py::arg("with_slipsprings") = true)
     .def("refresh_current_state",
@@ -2085,9 +2132,9 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
           Explicitly force the writing of a restart file, now!
 
-          Arguments:
-          - file (str): The file path and name of the restart file to be written.
-               Can end in xml, json or anything else (-> binary).
+          :param file: The file path and name of the restart file to be written.
+                       Can end in .xml, .json or anything else (-> binary).
+          :type file: str
      )pbdoc",
          py::arg("file"))
 #endif

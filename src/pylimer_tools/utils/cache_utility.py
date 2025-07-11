@@ -10,17 +10,15 @@ from typing import List, Union
 import numpy as np
 
 
-def do_cache(obj, file: str, suffix: str, tmp_dir: str = None):
+def do_cache(obj, file: str, suffix: str, tmp_dir: Union[str, None] = None):
     """
-    Store the object in the cache
+    Store the object in the cache.
 
-    Arguments:
-        - obj: The thing to cache
-        - file: a part of what's use for the cache's name.
-            Ideally the file that is read, such that the filemtime of `file` can be used
-            to check whether cache must be generated anew
-        - suffix: The file name's suffix
-        - tmp_dir: The directory to store the cache in
+    :param obj: The object to cache.
+    :param file: A part of what's used for the cache's name. Ideally the file that is read,
+        such that the filemtime of `file` can be used to check whether cache must be generated anew.
+    :param suffix: The file name's suffix.
+    :param tmp_dir: The directory to store the cache in.
     """
     cache_file_name = get_cache_file_name(file, suffix, tmp_dir)
     with open(cache_file_name, "wb") as cache_file:
@@ -31,23 +29,20 @@ def load_cache(
     file: Union[str, List[str], None],
     suffix: str,
     disable_warnings: bool = False,
-    tmp_dir: str = None,
+    tmp_dir: Union[str, None] = None,
     anyway: bool = False,
 ):
     """
     Load an object from cache, iff the cache is new enough.
 
-    Arguments:
-        - file: a part of what's use for the cache's name. Ideally the file that is read,
-            such that the filemtime of `file` can be used to check whether cache must be generated anew
-        - suffix: The file name's suffix
-        - disable_warnings: whether to disable warnings about missing possibilities to check for filemtime
-        - tmp_dir: The directory to load the cache from
-        - anyway: whether to ignore the cache's modification time, and return the cached data anyway,
-            as if it were current
-
-    Returns:
-        - cache: either the content of the cache, or None if the cache has to be loaded again / is non existent
+    :param file: A part of what's used for the cache's name. Ideally the file that is read,
+        such that the filemtime of `file` can be used to check whether cache must be generated anew.
+    :param suffix: The file name's suffix.
+    :param disable_warnings: Whether to disable warnings about missing possibilities to check for filemtime.
+    :param tmp_dir: The directory to load the cache from.
+    :param anyway: Whether to ignore the cache's modification time, and return the cached data anyway,
+        as if it were current.
+    :return: Either the content of the cache, or None if the cache has to be loaded again / is non existent.
     """
     if file is None:
         file = ""
@@ -94,21 +89,18 @@ def load_cache(
 def get_cache_file_name(
     file: Union[str, List[str], None],
     suffix: str,
-    tmp_dir: str = None,
+    tmp_dir: Union[str, None] = None,
     old: bool = False,
 ):
     """
     Get the name and path of a cache file. Internal method.
 
-    Arguments:
-        - file: a part of what's use for the cache's name.
-            Ideally the file that is read, such that the filemtime of `file` can be used
-            to check whether cache must be generated anew
-        - suffix: The file name's suffix
-        - tmp_dir: The temporary directory
-
-    Returns:
-        - cache_file_name: The path to the cache file
+    :param file: A part of what's used for the cache's name. Ideally the file that is read,
+        such that the filemtime of `file` can be used to check whether cache must be generated anew.
+    :param suffix: The file name's suffix.
+    :param tmp_dir: The temporary directory.
+    :param old: Whether to use the old file naming scheme.
+    :return: The path to the cache file.
     """
     if isinstance(file, list):
         file = "".join(sorted(file) if not old else file)
@@ -126,12 +118,9 @@ def is_current_cache(cache_file: str, dependencies: Union[str, List[str]]):
     """
     Determine whether the provided file is newer than all its dependencies.
 
-    Arguments:
-        - cache_file: The cache file that is required to be newer
-        - dependencies: The list of files (or a single file path) that need to be older
-
-    Returns:
-        - True if the file is newer than all its dependencies, False otherwise
+    :param cache_file: The cache file that is required to be newer.
+    :param dependencies: The list of files (or a single file path) that need to be older.
+    :return: True if the file is newer than all its dependencies, False otherwise.
     """
     if not os.path.exists(cache_file):
         return False

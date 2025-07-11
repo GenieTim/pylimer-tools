@@ -529,6 +529,9 @@ class DPDSimulator:
     def read_restart_file(file: str) -> DPDSimulator:
         """
                   Read a restart file in order to continue a simulation.
+        
+                  :param file: The file path to the restart file to read.
+                  :type file: str
         """
     def __init__(self, universe: Universe, crosslinker_type: int = 2, slipspring_bond_type: int = 9, is_2d: bool = False, seed: str = '') -> None:
         """
@@ -551,36 +554,34 @@ class DPDSimulator:
         
                   Side-effect: if true, the relocations may also happen *to* a slip-spring next to a crosslink.
         
-                  Arguments:
-                  - allow_relocation_in_network (bool): Whether to allow relocation in the network or not.
+                  :param allow_relocation_in_network (bool): Whether to allow relocation in the network or not.
         """
     def config_auto_correlator_output(self, values: list[OutputConfiguration], num_corr_in: int = 32, p: int = 16, m: int = 2) -> None:
         """
                   Set which values to compute multiple-tau autocorrelation for.
                   If you use this, you should cite `doi:10.1063/1.3491098 <https://pubs.aip.org/aip/jcp/article-abstract/133/15/154103/190247/Efficient-on-the-fly-calculation-of-time?redirectedFrom=fulltext>`_
         
-                  Arguments:
-                       - values: a list of OutputConfiguration structs
-                       - ...
+                  :param values: a list of OutputConfiguration structs
+                  :param num_corr_in: Number of correlations in
+                  :param p: Parameter p for the autocorrelator
+                  :param m: Parameter m for the autocorrelator
         """
-    def config_average_output(self, arg0: list[OutputConfiguration]) -> None:
+    def config_average_output(self, values: list[OutputConfiguration]) -> None:
         """
                   Set which values to compute averages for.
         
-                  Arguments:
-                       - values: a list of OutputConfiguration structs
+                  :param values: a list of OutputConfiguration structs
         """
     def config_bond_formation(self, num_bonds_to_form: int, max_bonds_per_atom_type: dict[int, int], bond_formation_dist: float = 1.0, attempt_bond_formation_every: int = 50, atom_type_form_from: int = 2, atom_type_form_to: int = 1) -> None:
         """
                   Configure how to do bond formation during the run.
         
-                  Arguments:
-                  - num_bonds_to_form (int): The nr of bonds to form in total. Use 0 to stop bond formation.
-                  - num_bonds_per_atom_type (dict): The nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)
-                  - bond_formation_dist (float): The maximum distance allowed to form bonds
-                  - attempt_bond_formation_every (int): attempt to form bonds every this many steps during the simulation run
-                  - atom_type_form_from (int): The atom type to start forming bonds from.
-                  - atom_type_form_to (int): The atom type to start forming bonds to.
+                  :param num_bonds_to_form (int): The nr of bonds to form in total. Use 0 to stop bond formation.
+                  :param num_bonds_per_atom_type (dict): The nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)
+                  :param bond_formation_dist (float): The maximum distance allowed to form bonds
+                  :param attempt_bond_formation_every (int): attempt to form bonds every this many steps during the simulation run
+                  :param atom_type_form_from (int): The atom type to start forming bonds from.
+                  :param atom_type_form_to (int): The atom type to start forming bonds to.
         """
     def config_box_deformation(self, target_box: Box) -> None:
         """
@@ -600,7 +601,7 @@ class DPDSimulator:
         """
     def config_restart_output(self, file: str, output_every: int = 50000) -> None:
         """
-                  Set when to output a restart where.
+                  Set when to output a restart file.
         
                   Note:
                        The filename determines the type of serialization:
@@ -610,9 +611,10 @@ class DPDSimulator:
                        This method may not be backwards- nor forward-compatible.
                        Use the same version of pylimer-tools if you want to be sure that things work.
         
-                  Arguments:
-                       - file: The file path to the restart file to write
-                       - outputEvery: how often to write the restart file
+                  :param file: The file path to the restart file to write.
+                  :type file: str
+                  :param output_every: How often to write the restart file.
+                  :type output_every: int
         """
     def config_shift_one_at_a_time(self, arg0: bool) -> None:
         ...
@@ -634,12 +636,11 @@ class DPDSimulator:
         """
                   Configure the force-field (bond-style) parameter `k`, the spring constant.
         """
-    def config_step_output(self, arg0: list[OutputConfiguration]) -> None:
+    def config_step_output(self, values: list[OutputConfiguration]) -> None:
         """
                   Set which values to log.
         
-                  Arguments:
-                       - values: a list of OutputConfiguration structs
+                  :param values: a list of OutputConfiguration structs
         """
     def create_slip_springs(self, num: int, bond_type: int = 9) -> int:
         """
@@ -687,8 +688,8 @@ class DPDSimulator:
         """
              Get a universe instance from the current coordinates (and connectivity).
         
-             Arguments:
-                  - with_slip_springs (bool): whether to include slip-springs in the returned universe.
+             :param with_slipsprings: Whether to include slip-springs in the returned universe.
+             :type with_slipsprings: bool
         """
     def get_volume(self) -> float:
         ...
@@ -707,13 +708,23 @@ class DPDSimulator:
         ...
     def validate_state(self) -> None:
         ...
+    @typing.overload
     def write_restart_file(self, file: str) -> None:
         """
                   Explicitly force the writing of a restart file, now!
         
-                  Arguments:
-                  - file (str): The file path and name of the restart file to be written.
-                       Can end in xml, json or anything else (-> binary).
+                  :param file: The file path and name of the restart file to be written.
+                               Can end in .xml, .json or anything else (-> binary).
+                  :type file: str
+        """
+    @typing.overload
+    def write_restart_file(self, file: str) -> None:
+        """
+                  Explicitly force the writing of a restart file, now!
+        
+                  :param file: The file path and name of the restart file to be written.
+                               Can end in .xml, .json or anything else (-> binary).
+                  :type file: str
         """
 class DataFileReader:
     """
@@ -786,99 +797,108 @@ class DataFileReader:
                   - `atom_style3`: The format of the "Atoms" section if the second to last parameter is equal to AtomStyle::HYBRID
         """
 class DataFileWriter:
+    """
+    A class to write a LAMMPS data file from a universe.
+    """
     def __init__(self, universe: Universe) -> None:
         """
-                   Initialize the writer with the universe to write.
+                Initialize the writer with the universe to write.
         """
-    def config_atom_style(self, arg0: AtomStyle) -> None:
+    def config_atom_style(self, atom_style: AtomStyle = ...) -> None:
         """
-                  Set the (LAMMPS) atom style to use for writing the atoms.
-        """
-    def config_attempt_image_reset(self, attempt_image_reset: bool = True) -> None:
-        """
-                   Set whether to change the outuput coordinates to lie in the box or not.
+                Set the (LAMMPS) atom style to use for writing the atoms.
         
-                   Default: false.
+                Default: AtomStyle.ANGLE.
+        """
+    def config_attempt_image_reset(self, attempt_image_reset: bool = False) -> None:
+        """
+                Set whether to attempt to reset image flags so that output coordinates lie in the box.
+        
+                Default: false.
         """
     def config_crosslinker_type(self, crosslinker_type: int = 2) -> None:
         """
-                   Set which atom type represents crosslinkers. 
-                   Needed in case the moleculeIdx in the output file should have any meaning.
-                   (e.g. with :func:`~pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap`).
+                Set which atom type represents crosslinkers.
+                Needed in case the moleculeIdx in the output file should have any meaning.
+                (e.g. with :func:`~pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap`).
         
-                   Default: 2.
+                Default: 2.
         """
     def config_include_angles(self, include_angles: bool = True) -> None:
         """
-                   Set whether to include the angles from the universe in the file or not.
+                Set whether to include the angles from the universe in the file or not.
         
-                   Default: true.
+                Default: true.
         """
     def config_include_dihedral_angles(self, include_dihedral_angles: bool = True) -> None:
         """
-                   Set whether to include the dihedral angles from the universe in the file or not.
+                Set whether to include the dihedral angles from the universe in the file or not.
         
-                   Default: true.
+                Default: true.
         """
     def config_include_velocities(self, include_velocities: bool = True) -> None:
         """
-                   Set whether to include the velocities from the universe (if any) in the file or not.
+                Set whether to include the velocities from the universe (if any) in the file or not.
         
-                   Default: true.
+                Default: true.
         """
-    def config_molecule_idx_for_swap(self, enableSwappability: bool = True) -> None:
+    def config_molecule_idx_for_swap(self, enable_swappability: bool = False) -> None:
         """
-                        Swappable chains implies that their `moleculeIdx` in the LAMMPS data file is not 
-                        identical per chain, but identical per position in the chain.
-                        That's how you can have bond swapping with constant chain length distribution.
+                Swappable chains implies that their `moleculeIdx` in the LAMMPS data file is not
+                identical per chain, but identical per position in the chain.
+                That's how you can have bond swapping with constant chain length distribution.
         
-                        Default: false.
+                Default: false.
         """
-    def config_move_into_box(self, move_into_box: bool = True) -> None:
+    def config_move_into_box(self, move_into_box: bool = False) -> None:
         """
-                   Set whether to change the outuput coordinates to lie in the box or not.
+                Set whether to change the output coordinates to lie in the box or not.
         
-                   Default: false (used to be true).
+                Default: false (used to be true).
         """
-    def config_reindex_atoms(self, reindex_atoms: bool = True) -> None:
+    def config_reindex_atoms(self, reindex_atoms: bool = False) -> None:
         """
-                   Set whether to reindex the atoms or not. 
-                   Re-indexing leads to atom ids being in the range of 1 to the number of atoms.
+                Set whether to reindex the atoms or not.
+                Re-indexing leads to atom ids being in the range of 1 to the number of atoms.
         
-                   Default: false.
+                Default: false.
         """
     def set_custom_atom_format(self, atom_format: str = '\t$atomId\t$moleculeId\t$atomType\t$x\t$y\t$z\t$nx\t$ny\t$nz') -> None:
         """
-                   Specify a custom format for the atom section.
-                   Placeholder options are:
-                       - $atomId
-                       - $moleculeId
-                       - $atomType
-                       - $x
-                       - $y
-                       - $z
-                       - $nx
-                       - $ny
-                       - $nz
+                Specify a custom format for the atom section.
         
-                  Additionally, you can use the keys used in 
-                  :func:`~pylimer_tools_cpp.Universe.setPropertyValue`
-                  as placeholders (as long as they are alphanumeric only; prefix in the format with '$' as well).
-                  Specifically useful if you need a different (or hybrid) atom style in LAMMPS.
+                Placeholder options are:
         
-                  Be sure to still call :func:`~pylimer_tools_cpp.DataFileWriter.configAtomStyle`,
-                  so that the file can be read correctly again.
+                  - $atomId
+                  - $moleculeId
+                  - $atomType
+                  - $x
+                  - $y
+                  - $z
+                  - $nx
+                  - $ny
+                  - $nz
+        
+                Additionally, you can use the keys used in
+                :func:`~pylimer_tools_cpp.Universe.setPropertyValue`
+                as placeholders (as long as they are alphanumeric only; prefix in the format with '$' as well).
+                Specifically useful if you need a different (or hybrid) atom style in LAMMPS.
+        
+                Be sure to still call :func:`~pylimer_tools_cpp.DataFileWriter.configAtomStyle`,
+                so that the file can be read correctly again.
+        
+                Default: tab-separated LAMMPS angle atom style.
         """
     def set_universe_to_write(self, universe: Universe) -> None:
         """
-                   Re-set the universe to write.
+                Re-set the universe to write.
         """
     def write_to_file(self, file: str) -> None:
         """
-                  Actually do the writing to the disk.
+                Actually do the writing to the disk.
         
-                  Arguments:
-                       - file (str): The path and file name to write to
+                Arguments:
+                    file (str): The path and file name to write to.
         """
 class DumpFileReader:
     """
@@ -991,12 +1011,18 @@ class LinearMaxDistanceProvider(MaxDistanceProvider):
         For MC generation, converts the :math:`N` to a maximum distance within which to sample.
         The distance will be calculated as :math:`N \\times \\text{max_distance_multiplier}`.
         Useful only for performance improvements in large systems.
+    
+        :param max_distance_multiplier: Multiplier for the maximum distance.
         
     """
     def __init__(self, max_distance_multiplier: float) -> None:
         ...
     def get_max_distance(self, N: float) -> float:
-        ...
+        """
+                 Get the maximum distance for a given N.
+        
+                 :param N: Number of segments.
+        """
 class LinkSwappingMode:
     """
     How slip-links may act when they reach each-other or even a crosslink.
@@ -1272,10 +1298,9 @@ class MCUniverseGenerator:
                  The distance will be calculated as :math:`\\text{std_multiplier} \\times \\sqrt{N \\times \\text{in_sqrt_multiplier}}`.
                  Useful only for performance improvements in large systems.
         
-                 Arguments:
-                  - std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
+                 :param std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
                        E.g., 3. for 99.9994% of all conformations.
-                  - in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
+                 :param in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
         """
     def validate(self) -> None:
         """
@@ -1335,13 +1360,14 @@ class MEHPForceBalance:
         """
                   Configure whether to run PBC on the bonds or not.
         
-                  If your bonds could get larger than half the box length, this must be kept false (default).
-                  Otherwise, you can set it to true and therewith get some securities.
+                  :param box_large_enough: If True, assume the box is large enough and don't apply PBC on bonds.
+                                          If your bonds could get larger than half the box length, 
+                                          this must be kept False (default).
         """
     def config_entanglement_type(self, type: int = -1) -> None:
         """
                  To have certain crosslinks behave as entanglements in the removal process,
-                 you can specify the here a type, that you have used in the universe to specify:
+                 you can specify here a type, that you have used in the universe to specify:
                  - the type of entanglement atoms (expected with functionality f = 3),
                  - and the entanglement-bonds between the entanglement atoms.
         
@@ -1349,14 +1375,20 @@ class MEHPForceBalance:
                  bonds between two strand beads resulting in f = 3 beads, for example,
                  you can call this method to have the "StructureSimplificationMode" also remove these atoms,
                  if they have a functionality of 2 or less while still being connected to its partner bead.
+        
+                 :param type: The atom type to treat as entanglement.
         """
     def config_mean_bond_length(self, b: float = 1.0) -> None:
         """
-             Configure the :math:`b` used e.g. for the topological Gamma-factor.
+                  Configure the :math:`b` used e.g. for the topological Gamma-factor.
+        
+                  :param b: The mean bond length to use.
         """
     def config_simplification_frequency(self, frequency: int = 10) -> None:
         """
-                 Config every how many steps to simplify the structure.
+                 Configure every how many steps to simplify the structure.
+        
+                 :param frequency: The number of steps between simplification.
                  Default: 10.
         """
     def config_spring_breaking_distance(self, distance_over_contour_length: float = -1) -> None:
@@ -1365,16 +1397,22 @@ class MEHPForceBalance:
                   Can be used to model the effect of fracture, to reduce the stiffening happening upon deformation.
                   Springs breaking will happen before the simplification procedure is run.
                   Negative values will disable spring breaking.
-                  Default: -1..
+                  Default: -1.
+        
+                  :param distance_over_contour_length: The threshold for breaking springs.
         """
     def config_spring_constant(self, kappa: float = 1.0) -> None:
-        ...
-    def config_step_output(self, arg0: list[OutputConfiguration]) -> None:
         """
-                  Set which values to log.
+                  Configure the spring constant used in the simulation.
         
-                  Arguments:
-                       - values: a list of OutputConfiguration structs
+                  :param kappa: The spring constant.
+        """
+    def config_step_output(self, output_configuration: list[OutputConfiguration]) -> None:
+        """
+                  Set which values to log during the simulation.
+        
+                  :param output_configuration: A list of OutputConfiguration structs
+                                              specifying what values to log and how often
         """
     def deform_to(self, new_box: Box) -> None:
         """
@@ -1394,7 +1432,7 @@ class MEHPForceBalance:
         """
     def get_coordinates(self) -> numpy.ndarray:
         """
-                  Get the current link coordinates.
+                     Get the current coordinates of the crosslinkers and entanglement links.
         """
     def get_crosslinker_universe(self) -> Universe:
         """
@@ -1423,11 +1461,11 @@ class MEHPForceBalance:
         """
     def get_displacement_residual_norm(self, one_over_spring_partition_upper_limit: float = 1.0) -> float:
         """
-                  Get the current link displacement residual norm.
+                   Get the current link displacement residual norm.
         """
     def get_displacements(self) -> numpy.ndarray:
         """
-                  Get the current link displacements.
+                   Get the current link displacements.
         """
     def get_effective_functionality_of_atoms(self, tolerance: float = 0.001) -> dict[int, int]:
         """
@@ -1457,6 +1495,7 @@ class MEHPForceBalance:
                   :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\\eta}*b^2$`
                   :math:`N_{\\eta}` is the number of atoms in this strand :math:`\\eta`,
                   :math:`b` its mean square bond length,
+                  :math:`\\nu` the number density of network strands,
                   :math:`T` the temperature and
                   :math:`k_B` Boltzmann's constant.
         
@@ -1480,6 +1519,10 @@ class MEHPForceBalance:
                   Only crosslink ids are returned (not e.g. entanglement links).
         
                   :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
+        """
+    def get_initial_coordinates(self) -> numpy.ndarray:
+        """
+                     Get the initial coordinates of the (remaining) crosslinkers and entanglement links.
         """
     def get_nr_of_active_nodes(self, tolerance: float = 0.001) -> int:
         """
@@ -1613,11 +1656,11 @@ class MEHPForceBalance:
         """
     def set_displacements(self, arg0: numpy.ndarray) -> None:
         """
-                  Set the current link displacements.
+                   Set the current link displacements.
         """
     def set_spring_contour_lengths(self, arg0: numpy.ndarray) -> None:
         """
-                  Set/overwrite the contour lengths.
+                   Set/overwrite the contour lengths.
         """
     def set_spring_partitions(self, arg0: numpy.ndarray) -> None:
         """
@@ -1701,6 +1744,8 @@ class MEHPForceBalance2:
     def config_mean_bond_length(self, b: float = 1.0) -> None:
         """
               Configure the :math:`b` used e.g. for the topological Gamma-factor.
+        
+              :param b: The mean bond length to use.
         """
     def config_spring_breaking_distance(self, distance_over_contour_length: float = -1) -> None:
         """
@@ -1708,16 +1753,21 @@ class MEHPForceBalance2:
                    Can be used to model the effect of fracture, to reduce the stiffening happening upon deformation.
                    Springs breaking will happen before the simplification procedure is run.
                    Negative values will disable spring breaking.
-                   Default: -1..
+                   Default: -1.
+        
+                   :param distance_over_contour_length: The threshold for breaking springs.
         """
     def config_spring_constant(self, kappa: float = 1.0) -> None:
-        ...
-    def config_step_output(self, arg0: list[OutputConfiguration]) -> None:
+        """
+                   Configure the spring constant used in the simulation.
+        
+                   :param kappa: The spring constant.
+        """
+    def config_step_output(self, values: list[OutputConfiguration]) -> None:
         """
                    Set which values to log.
         
-                   Arguments:
-                        - values: a list of OutputConfiguration structs
+                   :param values: a list of OutputConfiguration structs
         """
     def deform_to(self, new_box: Box) -> None:
         """
@@ -1835,15 +1885,15 @@ class MEHPForceBalance2:
         """
     def get_nr_of_active_partial_springs(self, tolerance: float = 0.001) -> int:
         """
-                    Get the number of active partial springs remaining after running the simulation.
+                   Get the number of active partial springs remaining after running the simulation.
         
-                   :param tolerance: springs under this length are considered inactive
+                  :param tolerance: springs under this length are considered inactive
         """
     def get_nr_of_active_springs(self, tolerance: float = 0.001) -> int:
         """
-                    Get the number of active springs remaining after running the simulation.
+                   Get the number of active springs remaining after running the simulation.
         
-                   :param tolerance: springs under this length are considered inactive
+                  :param tolerance: springs under this length are considered inactive
         """
     def get_nr_of_active_springs_in_dir(self, direction: int, tolerance: float = 0.001) -> int:
         """
@@ -1998,21 +2048,23 @@ class MEHPForceRelaxation:
         """
                   Configure whether to run PBC on the bonds or not.
         
-                  If your bonds could get larger than half the box length, this must be kept false (default).
-                  Otherwise, you can set it to true and therewith get some securities.
+                  :param box_large_enough: If True, assume the box is large enough and don't apply PBC on bonds.
+                                          If your bonds could get larger than half the box length, 
+                                          this must be kept False (default).
         """
     def config_rerun_epsilon(self, epsilon: float = 0.001) -> None:
         """
-                  Configure the offset from the lower and upper bounds for the simulation to suggest another run (
-                       See: :func:`~pylimer_tools_cpp.MEHPForceRelaxation.requiresAnotherRun()`
-                  ).
+                  Configure the offset from the lower and upper bounds for the simulation to suggest another run.
+                  
+                  :param epsilon: The epsilon value to use for the rerun check
+                       (See: :func:`~pylimer_tools_cpp.MEHPForceRelaxation.requiresAnotherRun()`)
         """
     def config_step_output(self, output_configuration: list[OutputConfiguration]) -> None:
         """
-                  Set which values to log.
+                  Set which values to log during the simulation.
         
-                  Arguments:
-                       - values: a list of OutputConfiguration structs
+                  :param output_configuration: An OutputConfiguration struct or list of OutputConfiguration structs
+                                              specifying what values to log and how often
         """
     def count_active_clustered_atoms(self, tolerance: float = 0.001) -> float:
         """
@@ -2056,6 +2108,8 @@ class MEHPForceRelaxation:
     def get_force(self) -> float:
         """
                   Returns the force at the current state of the simulation.
+                  
+                  :return: The current force value
         """
     def get_gamma_factor(self, b0_squared: float = -1.0, nr_of_chains: int = -1) -> float:
         """
@@ -2194,6 +2248,8 @@ class MEHPForceRelaxation:
     def set_force_evaluator(self, force_evaluator: MEHPForceEvaluator) -> None:
         """
                   Reset the currently used force evaluator.
+                  
+                  :param force_evaluator: The new force evaluator to use
         """
 class MaxDistanceProvider:
     """
@@ -2588,7 +2644,7 @@ class NeighbourList:
 class NoMaxDistanceProvider(MaxDistanceProvider):
     """
     
-        For MC generation, to disable the neighbour list useage.
+        For MC generation, to disable the neighbour list usage.
         
     """
     def __init__(self) -> None:
@@ -3507,8 +3563,7 @@ class Universe:
                   Specify the crosslinker_type to an existing type id, 
                   then those atoms will be omitted, and this function returns chains instead.
         
-                  Arguments:
-                      atom_type_to_omit: The type of atom to omit from the universe to end up with the desired molecules (e.g., the type of the crosslinkers).
+                  :param atom_type_to_omit: The type of atom to omit from the universe to end up with the desired molecules (e.g., the type of the crosslinkers).
         """
     def get_network_of_crosslinker(self, crosslinker_type: int) -> Universe:
         """
@@ -3819,18 +3874,21 @@ class ZScoreMaxDistanceProvider(MaxDistanceProvider):
     
          For MC generation, converts the :math:`N` to a maximum distance within which to sample.
          The distance will be calculated as :math:`\\text{std_multiplier} \\times \\sqrt{N \\times \\text{in_sqrt_multiplier}}`.
-             Useful only for performance improvements in large systems.
+         Useful only for performance improvements in large systems.
     
-         Arguments:
-         - std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
-              E.g., 3.29 for 99.9% of all conformations.
-         - in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
+         :param std_multiplier: The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
+             E.g., 3.29 for 99.9% of all conformations.
+         :param in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
         
     """
     def __init__(self, std_multiplier: float, in_sqrt_multiplier: float) -> None:
         ...
     def get_max_distance(self, N: float) -> float:
-        ...
+        """
+                 Get the maximum distance for a given N.
+        
+                 :param N: Number of segments.
+        """
 def compute_stoichiometric_imbalance(arg0: Universe, arg1: int, arg2: int, arg3: dict[int, int]) -> float:
     """
     Compute stoichiometric imbalance
@@ -3875,7 +3933,6 @@ def randomly_sample_entanglements(universe: Universe, nr_of_samples: int, upper_
         Randomly find pairs of atoms that are close together and could be
         entanglements
     
-        Arguments:
         :param universe: The universe of atoms from which to sample entanglements from.
         :param nr_of_samples: The number of pairs of atoms to randomly sample.
         :param upper_cutoff: The maximum distance between atoms for a pair to be considered a potential entanglement.
@@ -3884,9 +3941,7 @@ def randomly_sample_entanglements(universe: Universe, nr_of_samples: int, upper_
         :param same_strand_cutoff: The maximum distance between atoms on the same strand for a pair to be considered a potential entanglement.
         :param seed: A seed for the random number generator.
         :param crosslinker_type: The type of crosslinker to consider when finding entanglements. Used for the splitting into strands.
-        :param ignore_crosslinks: Whether to ignore crosslinks when finding entanglements. 
-          Careful: if you don't ignore them, the same-strand policy might not work correctly, 
-          since each crosslink should actually be associated with more than one strand.
+        :param ignore_crosslinks: Whether to ignore crosslinks when finding entanglements. Careful: if you don't ignore them, the same-strand policy might not work correctly, since each crosslink should actually be associated with more than one strand.
         :param filter_dangling_and_soluble: Whether to filter out dangling chains and soluble crosslinks when finding entanglements.
           This means, entanglements involving an obviously (1st order) dangling or soluble chain are 
     """

@@ -488,6 +488,11 @@ TEST_CASE("MEHP Force Balance2 Entanglement Beads Are Removed",
   {
     pcm::MEHPForceBalance2 forceBalancer = pcm::MEHPForceBalance2(
       universe, 3, 2.0, 0., 0, 0, "asdflseed", 2, false, false, false);
+
+    CHECK((forceBalancer.getInitialCoordinates() +
+           forceBalancer.getCurrentDisplacements())
+            .isApprox(forceBalancer.getCoordinates()));
+
     CHECK(forceBalancer.getNrOfStrands() < forceBalancer.getNrOfSprings());
     CHECK(forceBalancer.getNrOfStrands() == 1); // since we ignore crosslinks
     CHECK(forceBalancer.getNrOfSprings() == 1 + 3 * 2);
@@ -512,6 +517,10 @@ TEST_CASE("MEHP Force Balance2 Entanglement Beads Are Removed",
     CHECK(forceBalancer.getNrOfActiveStrands() == 0);
     CHECK(forceBalancer.getNrOfStrands() == 0);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
+
+    CHECK((forceBalancer.getInitialCoordinates() +
+           forceBalancer.getCurrentDisplacements())
+            .isApprox(forceBalancer.getCoordinates()));
   }
 }
 

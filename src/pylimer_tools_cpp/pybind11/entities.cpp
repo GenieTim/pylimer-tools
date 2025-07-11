@@ -1008,8 +1008,7 @@ init_pylimer_bound_entities(py::module_& m)
           Specify the crosslinker_type to an existing type id, 
           then those atoms will be omitted, and this function returns chains instead.
 
-          Arguments:
-              atom_type_to_omit: The type of atom to omit from the universe to end up with the desired molecules (e.g., the type of the crosslinkers).
+          :param atom_type_to_omit: The type of atom to omit from the universe to end up with the desired molecules (e.g., the type of the crosslinkers).
           )pbdoc",
          py::arg("atom_type_to_omit"))
     .def("get_atoms_connected_to_vertex",
