@@ -3,7 +3,7 @@
 Performance and Caching
 =======================
 
-All readers support automatic caching for improved performance
+All readers support automatic caching for improved performance.
 """
 
 import os
@@ -21,8 +21,9 @@ log_file = os.path.join(
 )
 
 time_start = time.time()
-# extract_thermo_params is a more elaborate version of
-# pylimer_tools.io.read_lammps_output_file.read_log_file()
+# %%
+# :func:`~pylimer_tools.io.extract_thermo_data.extract_thermo_params` is a more elaborate version of
+# :func:`~pylimer_tools.io.read_lammps_output_file.read_log_file`
 thermo_data = extract_thermo_params(log_file, use_cache=False)
 time_end = time.time()
 

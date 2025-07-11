@@ -3,14 +3,14 @@
 Decompose/Split Structure
 =========================
 
-This example demonstrates how to decompose a crosslinked polymer network into chains 
+This example demonstrates how to decompose a crosslinked polymer network into chains
 and analyze its structure using pylimer-tools.
 
 The following approaches are shown:
+
 - Removing crosslinkers and analyzing polymer strands
 - Decomposing the network to chains while keeping crosslinkers
 - Finding clusters after manual junction removal
-
 """
 
 import os

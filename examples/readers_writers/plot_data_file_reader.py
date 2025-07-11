@@ -44,10 +44,9 @@ sequence.initialize_from_data_sequence(
 for universe in sequence:
     print(f"Loaded universe with {universe.get_nr_of_atoms()} atoms")
 
-"""
-Please note that the `hybrid` and `tdpd` atom styles are not fully supported.
-
-If your data files don't hint the atom style in the line that starts with "Atom", you should specify it manually, 
-see :func:`~pylimer_tools_cpp.DataFileParser.read()` 
-and :func:`~pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style()`.
-"""
+# %%
+# Please note that the ``hybrid`` and ``tdpd`` atom styles are not fully supported.
+#
+# If your data files don't hint the atom style in the line that starts with "Atom",
+# you should specify it manually, see :func:`~pylimer_tools_cpp.DataFileParser.read()`
+# and :func:`~pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style()`.

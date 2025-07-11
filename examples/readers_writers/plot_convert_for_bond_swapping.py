@@ -5,12 +5,12 @@ Convert for Bond Swapping
 
 LAMMPS bond swapping can significantly speed up equilibration for polymer networks.
 However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly.
-Here's how you could re-set the molecule indices for bond swapping with constant chain lengths:
+Here's how you could re-set the molecule indices for bond swapping with constant chain lengths.
 """
 
-
 import os
-from pylimer_tools_cpp import UniverseSequence, DataFileWriter
+
+from pylimer_tools_cpp import DataFileWriter, UniverseSequence
 
 if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
@@ -38,5 +38,6 @@ writer.config_molecule_idx_for_swap(True)  # Key setting
 writer.write_to_file(output_file)
 print(f"Optimized system capable of bond swapping written to: {output_file}")
 
-# to convert it back to the molecule index relating to their current connectivity,
-# simply repeat the process with `config_molecule_idx_for_swap(False)`
+# %%
+# To convert it back to the molecule index relating to their current connectivity,
+# simply repeat the process with ``config_molecule_idx_for_swap(False)``

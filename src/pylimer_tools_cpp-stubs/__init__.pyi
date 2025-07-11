@@ -152,6 +152,8 @@ class AtomStyle:
     
       BOND : LAMMPS atom style 'bond'
     
+      BPM_SPHERE : LAMMPS atom style 'bpm/sphere'
+    
       CHARGE : LAMMPS atom style 'charge'
     
       DIELECTRIC : LAMMPS atom style 'dielectric'
@@ -176,13 +178,15 @@ class AtomStyle:
     
       PERI : LAMMPS atom style 'peri'
     
+      RHEO : LAMMPS atom style 'rheo'
+    
+      RHEO_THERMAL : LAMMPS atom style 'rheo/thermal'
+    
       SMD : LAMMPS atom style 'smd'
     
       SPH : LAMMPS atom style 'sph'
     
       SPHERE : LAMMPS atom style 'sphere'
-    
-      BPM_SPHERE : LAMMPS atom style 'bpm_sphere'
     
       SPIN : LAMMPS atom style 'spin'
     
@@ -200,30 +204,32 @@ class AtomStyle:
     ATOMIC: typing.ClassVar[AtomStyle]  # value = <AtomStyle.ATOMIC: 2>
     BODY: typing.ClassVar[AtomStyle]  # value = <AtomStyle.BODY: 3>
     BOND: typing.ClassVar[AtomStyle]  # value = <AtomStyle.BOND: 4>
-    BPM_SPHERE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.BPM_SPHERE: 20>
-    CHARGE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.CHARGE: 5>
-    DIELECTRIC: typing.ClassVar[AtomStyle]  # value = <AtomStyle.DIELECTRIC: 6>
-    DIPOLE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.DIPOLE: 7>
-    DPD: typing.ClassVar[AtomStyle]  # value = <AtomStyle.DPD: 8>
-    EDPD: typing.ClassVar[AtomStyle]  # value = <AtomStyle.EDPD: 9>
-    ELECTRON: typing.ClassVar[AtomStyle]  # value = <AtomStyle.ELECTRON: 10>
-    ELLIPSOID: typing.ClassVar[AtomStyle]  # value = <AtomStyle.ELLIPSOID: 11>
-    FULL: typing.ClassVar[AtomStyle]  # value = <AtomStyle.FULL: 12>
-    HYBRID: typing.ClassVar[AtomStyle]  # value = <AtomStyle.HYBRID: 26>
-    LINE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.LINE: 13>
-    MDPD: typing.ClassVar[AtomStyle]  # value = <AtomStyle.MDPD: 14>
-    MOLECULAR: typing.ClassVar[AtomStyle]  # value = <AtomStyle.MOLECULAR: 15>
+    BPM_SPHERE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.BPM_SPHERE: 5>
+    CHARGE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.CHARGE: 6>
+    DIELECTRIC: typing.ClassVar[AtomStyle]  # value = <AtomStyle.DIELECTRIC: 7>
+    DIPOLE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.DIPOLE: 8>
+    DPD: typing.ClassVar[AtomStyle]  # value = <AtomStyle.DPD: 9>
+    EDPD: typing.ClassVar[AtomStyle]  # value = <AtomStyle.EDPD: 10>
+    ELECTRON: typing.ClassVar[AtomStyle]  # value = <AtomStyle.ELECTRON: 11>
+    ELLIPSOID: typing.ClassVar[AtomStyle]  # value = <AtomStyle.ELLIPSOID: 12>
+    FULL: typing.ClassVar[AtomStyle]  # value = <AtomStyle.FULL: 13>
+    HYBRID: typing.ClassVar[AtomStyle]  # value = <AtomStyle.HYBRID: 28>
+    LINE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.LINE: 14>
+    MDPD: typing.ClassVar[AtomStyle]  # value = <AtomStyle.MDPD: 15>
+    MOLECULAR: typing.ClassVar[AtomStyle]  # value = <AtomStyle.MOLECULAR: 16>
     NONE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.NONE: 0>
-    PERI: typing.ClassVar[AtomStyle]  # value = <AtomStyle.PERI: 16>
-    SMD: typing.ClassVar[AtomStyle]  # value = <AtomStyle.SMD: 17>
-    SPH: typing.ClassVar[AtomStyle]  # value = <AtomStyle.SPH: 18>
-    SPHERE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.SPHERE: 19>
-    SPIN: typing.ClassVar[AtomStyle]  # value = <AtomStyle.SPIN: 21>
-    TDPD: typing.ClassVar[AtomStyle]  # value = <AtomStyle.TDPD: 22>
-    TEMPLATE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.TEMPLATE: 23>
-    TRI: typing.ClassVar[AtomStyle]  # value = <AtomStyle.TRI: 24>
-    WAVEPACKET: typing.ClassVar[AtomStyle]  # value = <AtomStyle.WAVEPACKET: 25>
-    __members__: typing.ClassVar[dict[str, AtomStyle]]  # value = {'NONE': <AtomStyle.NONE: 0>, 'ANGLE': <AtomStyle.ANGLE: 1>, 'ATOMIC': <AtomStyle.ATOMIC: 2>, 'BODY': <AtomStyle.BODY: 3>, 'BOND': <AtomStyle.BOND: 4>, 'CHARGE': <AtomStyle.CHARGE: 5>, 'DIELECTRIC': <AtomStyle.DIELECTRIC: 6>, 'DIPOLE': <AtomStyle.DIPOLE: 7>, 'DPD': <AtomStyle.DPD: 8>, 'EDPD': <AtomStyle.EDPD: 9>, 'ELECTRON': <AtomStyle.ELECTRON: 10>, 'ELLIPSOID': <AtomStyle.ELLIPSOID: 11>, 'FULL': <AtomStyle.FULL: 12>, 'LINE': <AtomStyle.LINE: 13>, 'MDPD': <AtomStyle.MDPD: 14>, 'MOLECULAR': <AtomStyle.MOLECULAR: 15>, 'PERI': <AtomStyle.PERI: 16>, 'SMD': <AtomStyle.SMD: 17>, 'SPH': <AtomStyle.SPH: 18>, 'SPHERE': <AtomStyle.SPHERE: 19>, 'BPM_SPHERE': <AtomStyle.BPM_SPHERE: 20>, 'SPIN': <AtomStyle.SPIN: 21>, 'TDPD': <AtomStyle.TDPD: 22>, 'TEMPLATE': <AtomStyle.TEMPLATE: 23>, 'TRI': <AtomStyle.TRI: 24>, 'WAVEPACKET': <AtomStyle.WAVEPACKET: 25>, 'HYBRID': <AtomStyle.HYBRID: 26>}
+    PERI: typing.ClassVar[AtomStyle]  # value = <AtomStyle.PERI: 17>
+    RHEO: typing.ClassVar[AtomStyle]  # value = <AtomStyle.RHEO: 18>
+    RHEO_THERMAL: typing.ClassVar[AtomStyle]  # value = <AtomStyle.RHEO_THERMAL: 19>
+    SMD: typing.ClassVar[AtomStyle]  # value = <AtomStyle.SMD: 20>
+    SPH: typing.ClassVar[AtomStyle]  # value = <AtomStyle.SPH: 21>
+    SPHERE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.SPHERE: 22>
+    SPIN: typing.ClassVar[AtomStyle]  # value = <AtomStyle.SPIN: 23>
+    TDPD: typing.ClassVar[AtomStyle]  # value = <AtomStyle.TDPD: 24>
+    TEMPLATE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.TEMPLATE: 25>
+    TRI: typing.ClassVar[AtomStyle]  # value = <AtomStyle.TRI: 26>
+    WAVEPACKET: typing.ClassVar[AtomStyle]  # value = <AtomStyle.WAVEPACKET: 27>
+    __members__: typing.ClassVar[dict[str, AtomStyle]]  # value = {'NONE': <AtomStyle.NONE: 0>, 'ANGLE': <AtomStyle.ANGLE: 1>, 'ATOMIC': <AtomStyle.ATOMIC: 2>, 'BODY': <AtomStyle.BODY: 3>, 'BOND': <AtomStyle.BOND: 4>, 'BPM_SPHERE': <AtomStyle.BPM_SPHERE: 5>, 'CHARGE': <AtomStyle.CHARGE: 6>, 'DIELECTRIC': <AtomStyle.DIELECTRIC: 7>, 'DIPOLE': <AtomStyle.DIPOLE: 8>, 'DPD': <AtomStyle.DPD: 9>, 'EDPD': <AtomStyle.EDPD: 10>, 'ELECTRON': <AtomStyle.ELECTRON: 11>, 'ELLIPSOID': <AtomStyle.ELLIPSOID: 12>, 'FULL': <AtomStyle.FULL: 13>, 'LINE': <AtomStyle.LINE: 14>, 'MDPD': <AtomStyle.MDPD: 15>, 'MOLECULAR': <AtomStyle.MOLECULAR: 16>, 'PERI': <AtomStyle.PERI: 17>, 'RHEO': <AtomStyle.RHEO: 18>, 'RHEO_THERMAL': <AtomStyle.RHEO_THERMAL: 19>, 'SMD': <AtomStyle.SMD: 20>, 'SPH': <AtomStyle.SPH: 21>, 'SPHERE': <AtomStyle.SPHERE: 22>, 'SPIN': <AtomStyle.SPIN: 23>, 'TDPD': <AtomStyle.TDPD: 24>, 'TEMPLATE': <AtomStyle.TEMPLATE: 25>, 'TRI': <AtomStyle.TRI: 26>, 'WAVEPACKET': <AtomStyle.WAVEPACKET: 27>, 'HYBRID': <AtomStyle.HYBRID: 28>}
     def __eq__(self, other: typing.Any) -> bool:
         ...
     def __getstate__(self) -> int:
@@ -820,7 +826,7 @@ class DataFileWriter:
         """
                 Set which atom type represents crosslinkers.
                 Needed in case the moleculeIdx in the output file should have any meaning.
-                (e.g. with :func:`~pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap`).
+                (e.g. with :func:`~pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap`).
         
                 Default: 2.
         """
@@ -869,25 +875,25 @@ class DataFileWriter:
         
                 Placeholder options are:
         
-                  - $atomId
-                  - $moleculeId
-                  - $atomType
-                  - $x
-                  - $y
-                  - $z
-                  - $nx
-                  - $ny
-                  - $nz
+                - $atomId
+                - $moleculeId
+                - $atomType
+                - $x
+                - $y
+                - $z
+                - $nx
+                - $ny
+                - $nz
         
                 Additionally, you can use the keys used in
-                :func:`~pylimer_tools_cpp.Universe.setPropertyValue`
+                :func:`~pylimer_tools_cpp.Universe.set_property_value`
                 as placeholders (as long as they are alphanumeric only; prefix in the format with '$' as well).
                 Specifically useful if you need a different (or hybrid) atom style in LAMMPS.
         
-                Be sure to still call :func:`~pylimer_tools_cpp.DataFileWriter.configAtomStyle`,
+                Be sure to still call :func:`~pylimer_tools_cpp.DataFileWriter.config_atom_style`,
                 so that the file can be read correctly again.
         
-                Default: tab-separated LAMMPS angle atom style.
+                Default: empty string, in which case the configured atom style will be used.
         """
     def set_universe_to_write(self, universe: Universe) -> None:
         """

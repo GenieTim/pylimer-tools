@@ -39,6 +39,7 @@ frequencies = np.logspace(-4, 3, num=int(1e3))  # Example frequency range
 storage_modulus = nma.evaluate_storage_modulus(omega=frequencies)
 loss_modulus = nma.evaluate_loss_modulus(omega=frequencies)
 
+# %%
 # TODO: apply conversion factors if necessary
 # plot the results
 df = pd.DataFrame(

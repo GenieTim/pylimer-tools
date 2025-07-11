@@ -8,6 +8,8 @@ find ./tests/pylimer_tools \( -name "*.cpp" -o -name "*.h" \) -exec clang-format
 
 # Format Python code
 python -m ruff format ./src/pylimer_tools
+python -m ruff format ./examples
 python -m ruff format ./tests
 find ./src/pylimer_tools \( -name "*.py" -o -name "*.pyi" \) -exec python -m autopep8 --in-place --aggressive {} \;
 find ./tests \( -name "*.py" -o -name "*.pyi" \) -exec python -m autopep8 --in-place --aggressive {} \;
+find ./examples \( -name "*.py" -o -name "*.pyi" \) -exec python -m autopep8 --in-place --aggressive {} \;
