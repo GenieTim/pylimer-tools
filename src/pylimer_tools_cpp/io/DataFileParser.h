@@ -88,6 +88,10 @@ private:
   void readAtom(const std::string& line);
   void readAtomFull(const std::string& line);
   void readAtomCharge(const std::string& line);
+  void readAtomDipole(const std::string& line);
+  void readAtomDpd(const std::string& line);
+  void readAtomMdpd(const std::string& line);
+  void readAtomSphere(const std::string& line);
   void readAtomHybrid(const std::string& line,
                       AtomStyle style1,
                       AtomStyle style2);

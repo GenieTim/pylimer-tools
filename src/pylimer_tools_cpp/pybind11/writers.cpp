@@ -93,25 +93,25 @@ init_pylimer_bound_writers(py::module_& m)
 
         Placeholder options are:
 
-          - $atomId
-          - $moleculeId
-          - $atomType
-          - $x
-          - $y
-          - $z
-          - $nx
-          - $ny
-          - $nz
+        - $atomId
+        - $moleculeId
+        - $atomType
+        - $x
+        - $y
+        - $z
+        - $nx
+        - $ny
+        - $nz
 
         Additionally, you can use the keys used in
-        :func:`~pylimer_tools_cpp.Universe.setPropertyValue`
+        :func:`~pylimer_tools_cpp.Universe.set_property_value`
         as placeholders (as long as they are alphanumeric only; prefix in the format with '$' as well).
         Specifically useful if you need a different (or hybrid) atom style in LAMMPS.
 
-        Be sure to still call :func:`~pylimer_tools_cpp.DataFileWriter.configAtomStyle`,
+        Be sure to still call :func:`~pylimer_tools_cpp.DataFileWriter.config_atom_style`,
         so that the file can be read correctly again.
 
-        Default: tab-separated LAMMPS angle atom style.
+        Default: empty string, in which case the configured atom style will be used.
     )pbdoc")
     .def("config_crosslinker_type",
          &DataFileWriter::configCrosslinkerType,
@@ -119,7 +119,7 @@ init_pylimer_bound_writers(py::module_& m)
          R"pbdoc(
         Set which atom type represents crosslinkers.
         Needed in case the moleculeIdx in the output file should have any meaning.
-        (e.g. with :func:`~pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap`).
+        (e.g. with :func:`~pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap`).
 
         Default: 2.
     )pbdoc")
