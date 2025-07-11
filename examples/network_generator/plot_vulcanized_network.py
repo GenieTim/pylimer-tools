@@ -34,12 +34,13 @@ n_sampled_crosslinks = len(sampled_crosslinks.pairs_of_atoms)
 # Add sampled cross-links to the universe
 universe.add_bonds(
     n_sampled_crosslinks,
-    [sampled_crosslinks.pairs_of_atoms[i][0]
-        for i in range(n_sampled_crosslinks)],
-    [sampled_crosslinks.pairs_of_atoms[i][1]
-        for i in range(n_sampled_crosslinks)],
+    [sampled_crosslinks.pairs_of_atoms[i][0] for i in range(n_sampled_crosslinks)],
+    [sampled_crosslinks.pairs_of_atoms[i][1] for i in range(n_sampled_crosslinks)],
     [2 for _ in range(n_sampled_crosslinks)],  # Bond type 2
 )
 
 print("Generated vulcanized network with {} cross-links".format(n_sampled_crosslinks))
+
 # if you want, you can collapse the cross-links to be a single atom
+# as such:
+universe.contract_vertices_along_bond_type(2)
