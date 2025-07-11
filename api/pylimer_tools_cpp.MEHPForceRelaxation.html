@@ -424,10 +424,10 @@ Consequently, it offers a variety of configurable non-linear solvers using NLopt
 <td><p>Configure whether to run PBC on the bonds or not.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon" title="pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_rerun_epsilon</span></code></a>(self[, epsilon])</p></td>
-<td><p>Configure the offset from the lower and upper bounds for the simulation to suggest another run (</p></td>
+<td><p>Configure the offset from the lower and upper bounds for the simulation to suggest another run.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_step_output" title="pylimer_tools_cpp.MEHPForceRelaxation.config_step_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_step_output</span></code></a>(self, output_configuration)</p></td>
-<td><p>Set which values to log.</p></td>
+<td><p>Set which values to log during the simulation.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.count_active_clustered_atoms" title="pylimer_tools_cpp.MEHPForceRelaxation.count_active_clustered_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_active_clustered_atoms</span></code></a>(self[, tolerance])</p></td>
 <td><p>Counts the active clustered atoms in the system.</p></td>
@@ -518,27 +518,35 @@ Consequently, it offers a variety of configurable non-linear solvers using NLopt
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough">
 <span class="sig-name descname"><span class="pre">assume_box_large_enough</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_large_enough</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough" title="Link to this definition">¶</a></dt>
 <dd><p>Configure whether to run PBC on the bonds or not.</p>
-<p>If your bonds could get larger than half the box length, this must be kept false (default).
-Otherwise, you can set it to true and therewith get some securities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>box_large_enough</strong> – If True, assume the box is large enough and don’t apply PBC on bonds.
+If your bonds could get larger than half the box length,
+this must be kept False (default).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon">
 <span class="sig-name descname"><span class="pre">config_rerun_epsilon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon" title="Link to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Configure the offset from the lower and upper bounds for the simulation to suggest another run (</dt><dd><p>See: <code class="xref py py-func docutils literal notranslate"><span class="pre">requiresAnotherRun()</span></code></p>
+<dd><p>Configure the offset from the lower and upper bounds for the simulation to suggest another run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>epsilon</strong> – The epsilon value to use for the rerun check
+(See: <code class="xref py py-func docutils literal notranslate"><span class="pre">requiresAnotherRun()</span></code>)</p>
 </dd>
 </dl>
-<p>).</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.config_step_output">
 <span class="sig-name descname"><span class="pre">config_step_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.OutputConfiguration"><span class="pre">pylimer_tools_cpp.OutputConfiguration</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_step_output" title="Link to this definition">¶</a></dt>
-<dd><p>Set which values to log.</p>
+<dd><p>Set which values to log during the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>values</strong> (<em>-</em>) – a list of OutputConfiguration structs</p>
+<dd class="field-odd"><p><strong>output_configuration</strong> – An OutputConfiguration struct or list of OutputConfiguration structs
+specifying what values to log and how often</p>
 </dd>
 </dl>
 </dd></dl>
@@ -607,6 +615,11 @@ this value is normalized by the number of springs rather than the number of chai
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.get_force">
 <span class="sig-name descname"><span class="pre">get_force</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_force" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the force at the current state of the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current force value</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -822,6 +835,11 @@ As a consequence though, you cannot simply benchmark only this method; you must 
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.set_force_evaluator">
 <span class="sig-name descname"><span class="pre">set_force_evaluator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_evaluator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.MEHPForceEvaluator"><span class="pre">pylimer_tools_cpp.MEHPForceEvaluator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.set_force_evaluator" title="Link to this definition">¶</a></dt>
 <dd><p>Reset the currently used force evaluator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>force_evaluator</strong> – The new force evaluator to use</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

@@ -375,16 +375,20 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract the last few entries of a list</span>
 
-<span class="sd">    Arguments:</span>
-<span class="sd">        - data (list|pd.DataFrame|pd.Series): The list to extract the last few entries from</span>
-<span class="sd">        - percentage: The percentage of entries to extract</span>
-<span class="sd">        - min_n: The minimum number of entries to extract</span>
-<span class="sd">        - max_percentage: The maximum percentage of entries to extract</span>
+<span class="sd">    :param data: The list, DataFrame, or Series to extract the last few entries from</span>
+<span class="sd">    :type data: list or pd.DataFrame or pd.Series</span>
+<span class="sd">    :param percentage: The percentage of entries to extract (default: 0.2)</span>
+<span class="sd">    :type percentage: float</span>
+<span class="sd">    :param min_n: The minimum number of entries to extract (default: 25)</span>
+<span class="sd">    :type min_n: int</span>
+<span class="sd">    :param max_percentage: The maximum percentage of entries to extract (default: 0.5)</span>
+<span class="sd">    :type max_percentage: float</span>
+<span class="sd">    :return: A subset of the input data containing the last entries according to the specified criteria</span>
+<span class="sd">    :rtype: Same type as input data</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        A (list|pd.DataFrame|pd.Series) with at maximum maxPercentage,</span>
-<span class="sd">            at least minN entries (assuming the initial data is as large),</span>
-<span class="sd">            but ideally `percentage` many percentage of the last entries.</span>
+<span class="sd">    The function returns a subset with at maximum max_percentage,</span>
+<span class="sd">    at least min_n entries (assuming the initial data is as large),</span>
+<span class="sd">    but ideally `percentage` many percentage of the last entries.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">percentage</span> <span class="o">&lt;=</span> <span class="mi">1</span>
     <span class="k">assert</span> <span class="n">max_percentage</span> <span class="o">&lt;=</span> <span class="mi">1</span>
@@ -411,17 +415,21 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get a DataFrame where all data points have the same step between the values in column given by `key`</span>
-<span class="sd">    NOTE: this function is rather unstable, as it has a few dirty assumptions, such as:</span>
+
+<span class="sd">    :param data: The DataFrame to unify the step-size for</span>
+<span class="sd">    :type data: pd.DataFrame</span>
+<span class="sd">    :param key: The column name indicating the column containing the step-nr</span>
+<span class="sd">    :type key: str</span>
+<span class="sd">    :param step_size: The step size to use for filtering (if None, computed automatically)</span>
+<span class="sd">    :type step_size: int, optional</span>
+<span class="sd">    :param max_expected_step_size: Used to get a warning if the computed step-size is larger</span>
+<span class="sd">    :type max_expected_step_size: int, default=100</span>
+<span class="sd">    :return: A DataFrame with a consistent step-size</span>
+<span class="sd">    :rtype: pd.DataFrame</span>
+
+<span class="sd">    NOTE: this function is rather unstable, as it has a few assumptions:</span>
 <span class="sd">    - steps are modulo stepsize. Breaks e.g. with steps start with 1 and go up by step_size.</span>
 <span class="sd">    - ideal step-size is max step difference. Breaks e.g. if there is one big gap</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">        - data: The DataFrame to unify the step-size for</span>
-<span class="sd">        - key: The column name indicating the column containing the step-nr.</span>
-<span class="sd">        - max_expected_step_size: use to get a warning if the computed step-size is larger</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        - data: a DataFrame with a consistent step-size</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># lenBefore = len(data)</span>
     <span class="k">if</span> <span class="n">step_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

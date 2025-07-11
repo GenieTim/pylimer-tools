@@ -509,9 +509,9 @@ although without slipping along the chain.</p>
 <td><p>Configure the &quot;force&quot; (distance over contour length) at which the bonds break.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_spring_constant" title="pylimer_tools_cpp.MEHPForceBalance2.config_spring_constant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_spring_constant</span></code></a>(self[, kappa])</p></td>
-<td><p></p></td>
+<td><p>Configure the spring constant used in the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_step_output" title="pylimer_tools_cpp.MEHPForceBalance2.config_step_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_step_output</span></code></a>(self, arg0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_step_output" title="pylimer_tools_cpp.MEHPForceBalance2.config_step_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_step_output</span></code></a>(self, values)</p></td>
 <td><p>Set which values to log.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.deform_to" title="pylimer_tools_cpp.MEHPForceBalance2.deform_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deform_to</span></code></a>(self, new_box)</p></td>
@@ -669,6 +669,11 @@ although without slipping along the chain.</p>
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.config_mean_bond_length">
 <span class="sig-name descname"><span class="pre">config_mean_bond_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.config_mean_bond_length" title="Link to this definition">¶</a></dt>
 <dd><p>Configure the <span class="math notranslate nohighlight">\(b\)</span> used e.g. for the topological Gamma-factor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>b</strong> – The mean bond length to use.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -678,21 +683,32 @@ although without slipping along the chain.</p>
 Can be used to model the effect of fracture, to reduce the stiffening happening upon deformation.
 Springs breaking will happen before the simplification procedure is run.
 Negative values will disable spring breaking.
-Default: -1..</p>
+Default: -1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>distance_over_contour_length</strong> – The threshold for breaking springs.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.config_spring_constant">
 <span class="sig-name descname"><span class="pre">config_spring_constant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.config_spring_constant" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Configure the spring constant used in the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kappa</strong> – The spring constant.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.config_step_output">
-<span class="sig-name descname"><span class="pre">config_step_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.OutputConfiguration"><span class="pre">pylimer_tools_cpp.OutputConfiguration</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.config_step_output" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">config_step_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.OutputConfiguration"><span class="pre">pylimer_tools_cpp.OutputConfiguration</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.config_step_output" title="Link to this definition">¶</a></dt>
 <dd><p>Set which values to log.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>values</strong> (<em>-</em>) – a list of OutputConfiguration structs</p>
+<dd class="field-odd"><p><strong>values</strong> – a list of OutputConfiguration structs</p>
 </dd>
 </dl>
 </dd></dl>

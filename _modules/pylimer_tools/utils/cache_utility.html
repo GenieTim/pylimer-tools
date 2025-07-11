@@ -378,17 +378,15 @@
 
 <div class="viewcode-block" id="do_cache">
 <a class="viewcode-back" href="../../../pylimer_tools.utils.html#pylimer_tools.utils.cache_utility.do_cache">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">do_cache</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">do_cache</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Store the object in the cache</span>
+<span class="sd">    Store the object in the cache.</span>
 
-<span class="sd">    Arguments:</span>
-<span class="sd">        - obj: The thing to cache</span>
-<span class="sd">        - file: a part of what&#39;s use for the cache&#39;s name.</span>
-<span class="sd">            Ideally the file that is read, such that the filemtime of `file` can be used</span>
-<span class="sd">            to check whether cache must be generated anew</span>
-<span class="sd">        - suffix: The file name&#39;s suffix</span>
-<span class="sd">        - tmp_dir: The directory to store the cache in</span>
+<span class="sd">    :param obj: The object to cache.</span>
+<span class="sd">    :param file: A part of what&#39;s used for the cache&#39;s name. Ideally the file that is read,</span>
+<span class="sd">        such that the filemtime of `file` can be used to check whether cache must be generated anew.</span>
+<span class="sd">    :param suffix: The file name&#39;s suffix.</span>
+<span class="sd">    :param tmp_dir: The directory to store the cache in.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cache_file_name</span> <span class="o">=</span> <span class="n">get_cache_file_name</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file_name</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cache_file</span><span class="p">:</span>
@@ -402,23 +400,20 @@
     <span class="n">file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
     <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">disable_warnings</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">tmp_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">tmp_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">anyway</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load an object from cache, iff the cache is new enough.</span>
 
-<span class="sd">    Arguments:</span>
-<span class="sd">        - file: a part of what&#39;s use for the cache&#39;s name. Ideally the file that is read,</span>
-<span class="sd">            such that the filemtime of `file` can be used to check whether cache must be generated anew</span>
-<span class="sd">        - suffix: The file name&#39;s suffix</span>
-<span class="sd">        - disable_warnings: whether to disable warnings about missing possibilities to check for filemtime</span>
-<span class="sd">        - tmp_dir: The directory to load the cache from</span>
-<span class="sd">        - anyway: whether to ignore the cache&#39;s modification time, and return the cached data anyway,</span>
-<span class="sd">            as if it were current</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        - cache: either the content of the cache, or None if the cache has to be loaded again / is non existent</span>
+<span class="sd">    :param file: A part of what&#39;s used for the cache&#39;s name. Ideally the file that is read,</span>
+<span class="sd">        such that the filemtime of `file` can be used to check whether cache must be generated anew.</span>
+<span class="sd">    :param suffix: The file name&#39;s suffix.</span>
+<span class="sd">    :param disable_warnings: Whether to disable warnings about missing possibilities to check for filemtime.</span>
+<span class="sd">    :param tmp_dir: The directory to load the cache from.</span>
+<span class="sd">    :param anyway: Whether to ignore the cache&#39;s modification time, and return the cached data anyway,</span>
+<span class="sd">        as if it were current.</span>
+<span class="sd">    :return: Either the content of the cache, or None if the cache has to be loaded again / is non existent.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -468,21 +463,18 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">get_cache_file_name</span><span class="p">(</span>
     <span class="n">file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
     <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">tmp_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">tmp_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">old</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the name and path of a cache file. Internal method.</span>
 
-<span class="sd">    Arguments:</span>
-<span class="sd">        - file: a part of what&#39;s use for the cache&#39;s name.</span>
-<span class="sd">            Ideally the file that is read, such that the filemtime of `file` can be used</span>
-<span class="sd">            to check whether cache must be generated anew</span>
-<span class="sd">        - suffix: The file name&#39;s suffix</span>
-<span class="sd">        - tmp_dir: The temporary directory</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        - cache_file_name: The path to the cache file</span>
+<span class="sd">    :param file: A part of what&#39;s used for the cache&#39;s name. Ideally the file that is read,</span>
+<span class="sd">        such that the filemtime of `file` can be used to check whether cache must be generated anew.</span>
+<span class="sd">    :param suffix: The file name&#39;s suffix.</span>
+<span class="sd">    :param tmp_dir: The temporary directory.</span>
+<span class="sd">    :param old: Whether to use the old file naming scheme.</span>
+<span class="sd">    :return: The path to the cache file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">old</span> <span class="k">else</span> <span class="n">file</span><span class="p">)</span>
@@ -503,12 +495,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determine whether the provided file is newer than all its dependencies.</span>
 
-<span class="sd">    Arguments:</span>
-<span class="sd">        - cache_file: The cache file that is required to be newer</span>
-<span class="sd">        - dependencies: The list of files (or a single file path) that need to be older</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        - True if the file is newer than all its dependencies, False otherwise</span>
+<span class="sd">    :param cache_file: The cache file that is required to be newer.</span>
+<span class="sd">    :param dependencies: The list of files (or a single file path) that need to be older.</span>
+<span class="sd">    :return: True if the file is newer than all its dependencies, False otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_file</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
