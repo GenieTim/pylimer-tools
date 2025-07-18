@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.703** total execution time for 3 files **from auto_examples/force_balance**:
+**00:00.656** total execution time for 3 files **from auto_examples/force_balance**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``plot_force_balance_2.py``)
-     - 00:00.703
+     - 00:00.656
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py` (``plot_force_balance.py``)
      - 00:00.000

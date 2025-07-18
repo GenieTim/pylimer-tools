@@ -94,7 +94,7 @@ and plots the distribution of these distances.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.133 seconds)
+   **Total running time of the script:** (0 minutes 0.131 seconds)
 
 
 .. _sphx_glr_download_auto_examples_structure_analysis_plot_end_to_end_distribution.py:
