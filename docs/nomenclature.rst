@@ -1,7 +1,8 @@
 Nomenclature
 ============
 
-This section defines key terms used throughout pylimer-tools documentation and the library itself. Understanding these terms is crucial for effective use of the library.
+This section defines key terms used throughout pylimer-tools documentation and the library itself. 
+Understanding these terms is crucial for effective use of the library.
 
 Core Entities
 -------------
@@ -37,8 +38,9 @@ Graph Theory Terms
 Polymer-Specific Terms
 ----------------------
 
-**Junction/Crosslinker**
-    Used interchangeably to describe beads that connect different strands or molecules in a polymer network. These are critical for decomposing network topology.
+**Junction/Crosslink(er)**
+    Used interchangeably to describe beads that connect different strands or molecules in a polymer network. 
+    These are critical for decomposing network topology.
 
 **Strand/Chain**
     A linear sequence of connected atoms, typically between junction points or chain ends.
@@ -47,7 +49,7 @@ Polymer-Specific Terms
 **Network**
     A collection of polymer strands connected by crosslinks, possibly also involving free chains and crosslinks.
 
-**Radius of Gyration (Rg)**
+**Radius of Gyration**
     A measure of the spatial extent of a polymer chain, calculated as the root-mean-square distance from the center of mass.
 
 **End-to-End Distance**
