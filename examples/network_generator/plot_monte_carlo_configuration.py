@@ -20,8 +20,8 @@ generator.set_bead_distance(1.0)  # Set mean bead-to-bead distance
 generator.config_primary_loop_probability(0.0)  # Primary loops prohibited
 generator.config_secondary_loop_probability(0.0)  # Secondary loops prohibited
 
-# Improve performance of sampling pairs of cross-links for large systems
-# Does not sample all pairs of cross-links anymore,
+# Improve performance of sampling pairs of crosslinks for large systems
+# Does not sample all pairs of crosslinks anymore,
 # only 99.9994% of those that are selected, but is ca. 60 times faster
 generator.use_zscore_max_distance(3.29)
 

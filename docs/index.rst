@@ -93,8 +93,8 @@ Basic usage example:
 -----------------------
 
 - **New to pylimer-tools?** Start with :doc:`installation` and :doc:`usage`
-- **Working with files?** Check out :doc:`readers_writers` 
-- **Generating networks?** See :doc:`network_generator`
+- **Working with files?** Check out :doc:`auto_examples/readers_writers`
+- **Generating networks?** See :doc:`auto_examples/network_generator`
 - **Need examples?** Browse :doc:`auto_examples/index` for practical code samples
 - **Understanding limitations?** Review :doc:`assumptions` and :doc:`nomenclature`
 
@@ -121,7 +121,7 @@ Please refer to the latest documentation for current function signatures and usa
 
 
 🙏🏼 **Acknowledgements**
------------------------
+--------------------------
 
 Please refer to the `CITATION.cff <https://github.com/GenieTim/pylimer-tools/blob/main/CITATION.cff>`_ file for citation information.
 
