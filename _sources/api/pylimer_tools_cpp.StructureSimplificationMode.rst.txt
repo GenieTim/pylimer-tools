@@ -10,20 +10,20 @@ StructureSimplificationMode
 
    .. autosummary::
 
-      ~StructureSimplificationMode.ALL_ANDREI
-      ~StructureSimplificationMode.ALL_TIM
       ~StructureSimplificationMode.INACTIVE_ONLY
+      ~StructureSimplificationMode.INACTIVE_THEN_X2F
       ~StructureSimplificationMode.NO_SIMPLIFICATION
+      ~StructureSimplificationMode.X1F_X2F_THEN_INACTIVE
       ~StructureSimplificationMode.X2F_ONLY
       ~StructureSimplificationMode.name
       ~StructureSimplificationMode.value
 
    .. rubric:: Attributes Documentation
 
-   .. autoattribute:: ALL_ANDREI
-   .. autoattribute:: ALL_TIM
    .. autoattribute:: INACTIVE_ONLY
+   .. autoattribute:: INACTIVE_THEN_X2F
    .. autoattribute:: NO_SIMPLIFICATION
+   .. autoattribute:: X1F_X2F_THEN_INACTIVE
    .. autoattribute:: X2F_ONLY
    .. autoattribute:: name
    .. autoattribute:: value

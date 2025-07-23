@@ -1,6 +1,0 @@
-predict_gelation_point
-======================
-
-.. currentmodule:: pylimer_tools_cpp
-
-.. autofunction:: predict_gelation_point

@@ -27,15 +27,15 @@ MEHPForceBalance
       ~MEHPForceBalance.config_step_output
       ~MEHPForceBalance.construct_with_random_sliplinks
       ~MEHPForceBalance.deform_to
-      ~MEHPForceBalance.evaluate_partial_spring_distance
-      ~MEHPForceBalance.evaluate_partial_spring_distance_from
-      ~MEHPForceBalance.evaluate_partial_spring_distance_to
-      ~MEHPForceBalance.get_average_spring_length
+      ~MEHPForceBalance.evaluate_spring_distance
+      ~MEHPForceBalance.evaluate_spring_distance_from
+      ~MEHPForceBalance.evaluate_spring_distance_to
+      ~MEHPForceBalance.get_average_strand_length
       ~MEHPForceBalance.get_coordinates
       ~MEHPForceBalance.get_crosslinker_universe
-      ~MEHPForceBalance.get_current_partial_spring_lengths
-      ~MEHPForceBalance.get_current_partial_spring_vectors
+      ~MEHPForceBalance.get_current_spring_lengths
       ~MEHPForceBalance.get_current_spring_vectors
+      ~MEHPForceBalance.get_current_strand_vectors
       ~MEHPForceBalance.get_dangling_weight_fraction
       ~MEHPForceBalance.get_default_mean_bond_length
       ~MEHPForceBalance.get_displacement_residual_norm
@@ -48,11 +48,12 @@ MEHPForceBalance
       ~MEHPForceBalance.get_gamma_factors
       ~MEHPForceBalance.get_gamma_factors_in_dir
       ~MEHPForceBalance.get_ids_of_active_nodes
+      ~MEHPForceBalance.get_initial_coordinates
       ~MEHPForceBalance.get_neighbour_link_indices
       ~MEHPForceBalance.get_nr_of_active_nodes
-      ~MEHPForceBalance.get_nr_of_active_partial_springs
       ~MEHPForceBalance.get_nr_of_active_springs
-      ~MEHPForceBalance.get_nr_of_active_springs_in_dir
+      ~MEHPForceBalance.get_nr_of_active_strands
+      ~MEHPForceBalance.get_nr_of_active_strands_in_dir
       ~MEHPForceBalance.get_nr_of_atoms
       ~MEHPForceBalance.get_nr_of_bonds
       ~MEHPForceBalance.get_nr_of_extra_atoms
@@ -60,25 +61,25 @@ MEHPForceBalance
       ~MEHPForceBalance.get_nr_of_intra_chain_sliplinks
       ~MEHPForceBalance.get_nr_of_iterations
       ~MEHPForceBalance.get_nr_of_nodes
-      ~MEHPForceBalance.get_nr_of_springs
-      ~MEHPForceBalance.get_overall_spring_lengths
+      ~MEHPForceBalance.get_nr_of_strands
+      ~MEHPForceBalance.get_overall_strand_lengths
       ~MEHPForceBalance.get_pressure
       ~MEHPForceBalance.get_soluble_weight_fraction
-      ~MEHPForceBalance.get_spring_partitions
-      ~MEHPForceBalance.get_springpartition_indices_of_sliplink
+      ~MEHPForceBalance.get_strand_partition_indices_of_sliplink
+      ~MEHPForceBalance.get_strand_partitions
       ~MEHPForceBalance.get_stress_on
       ~MEHPForceBalance.get_stress_tensor
       ~MEHPForceBalance.get_stress_tensor_link_based
-      ~MEHPForceBalance.get_weighted_partial_spring_lengths
+      ~MEHPForceBalance.get_weighted_spring_lengths
       ~MEHPForceBalance.inspect_displacement_to_mean_position_update
       ~MEHPForceBalance.inspect_parametrisation_optimsation_for_link
-      ~MEHPForceBalance.inspect_spring_partition_update
+      ~MEHPForceBalance.inspect_strand_partition_update
       ~MEHPForceBalance.move_sliplinks_to_their_best_branch
       ~MEHPForceBalance.randomly_add_sliplinks
       ~MEHPForceBalance.run_force_relaxation
       ~MEHPForceBalance.set_displacements
-      ~MEHPForceBalance.set_spring_contour_lengths
-      ~MEHPForceBalance.set_spring_partitions
+      ~MEHPForceBalance.set_strand_contour_lengths
+      ~MEHPForceBalance.set_strand_partitions
       ~MEHPForceBalance.swap_sliplinks_incl_xlinks
       ~MEHPForceBalance.validate_network
 
@@ -99,15 +100,15 @@ MEHPForceBalance
    .. automethod:: config_step_output
    .. automethod:: construct_with_random_sliplinks
    .. automethod:: deform_to
-   .. automethod:: evaluate_partial_spring_distance
-   .. automethod:: evaluate_partial_spring_distance_from
-   .. automethod:: evaluate_partial_spring_distance_to
-   .. automethod:: get_average_spring_length
+   .. automethod:: evaluate_spring_distance
+   .. automethod:: evaluate_spring_distance_from
+   .. automethod:: evaluate_spring_distance_to
+   .. automethod:: get_average_strand_length
    .. automethod:: get_coordinates
    .. automethod:: get_crosslinker_universe
-   .. automethod:: get_current_partial_spring_lengths
-   .. automethod:: get_current_partial_spring_vectors
+   .. automethod:: get_current_spring_lengths
    .. automethod:: get_current_spring_vectors
+   .. automethod:: get_current_strand_vectors
    .. automethod:: get_dangling_weight_fraction
    .. automethod:: get_default_mean_bond_length
    .. automethod:: get_displacement_residual_norm
@@ -120,11 +121,12 @@ MEHPForceBalance
    .. automethod:: get_gamma_factors
    .. automethod:: get_gamma_factors_in_dir
    .. automethod:: get_ids_of_active_nodes
+   .. automethod:: get_initial_coordinates
    .. automethod:: get_neighbour_link_indices
    .. automethod:: get_nr_of_active_nodes
-   .. automethod:: get_nr_of_active_partial_springs
    .. automethod:: get_nr_of_active_springs
-   .. automethod:: get_nr_of_active_springs_in_dir
+   .. automethod:: get_nr_of_active_strands
+   .. automethod:: get_nr_of_active_strands_in_dir
    .. automethod:: get_nr_of_atoms
    .. automethod:: get_nr_of_bonds
    .. automethod:: get_nr_of_extra_atoms
@@ -132,24 +134,24 @@ MEHPForceBalance
    .. automethod:: get_nr_of_intra_chain_sliplinks
    .. automethod:: get_nr_of_iterations
    .. automethod:: get_nr_of_nodes
-   .. automethod:: get_nr_of_springs
-   .. automethod:: get_overall_spring_lengths
+   .. automethod:: get_nr_of_strands
+   .. automethod:: get_overall_strand_lengths
    .. automethod:: get_pressure
    .. automethod:: get_soluble_weight_fraction
-   .. automethod:: get_spring_partitions
-   .. automethod:: get_springpartition_indices_of_sliplink
+   .. automethod:: get_strand_partition_indices_of_sliplink
+   .. automethod:: get_strand_partitions
    .. automethod:: get_stress_on
    .. automethod:: get_stress_tensor
    .. automethod:: get_stress_tensor_link_based
-   .. automethod:: get_weighted_partial_spring_lengths
+   .. automethod:: get_weighted_spring_lengths
    .. automethod:: inspect_displacement_to_mean_position_update
    .. automethod:: inspect_parametrisation_optimsation_for_link
-   .. automethod:: inspect_spring_partition_update
+   .. automethod:: inspect_strand_partition_update
    .. automethod:: move_sliplinks_to_their_best_branch
    .. automethod:: randomly_add_sliplinks
    .. automethod:: run_force_relaxation
    .. automethod:: set_displacements
-   .. automethod:: set_spring_contour_lengths
-   .. automethod:: set_spring_partitions
+   .. automethod:: set_strand_contour_lengths
+   .. automethod:: set_strand_partitions
    .. automethod:: swap_sliplinks_incl_xlinks
    .. automethod:: validate_network

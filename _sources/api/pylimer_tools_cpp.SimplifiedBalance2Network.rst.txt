@@ -12,8 +12,8 @@ SimplifiedBalance2Network
 
       ~SimplifiedBalance2Network.box_lengths
       ~SimplifiedBalance2Network.coordinates
-      ~SimplifiedBalance2Network.link_indices_of_strand
       ~SimplifiedBalance2Network.link_is_entanglement
+      ~SimplifiedBalance2Network.links_of_strand
       ~SimplifiedBalance2Network.nr_of_crosslinks
       ~SimplifiedBalance2Network.nr_of_links
       ~SimplifiedBalance2Network.nr_of_springs
@@ -26,17 +26,17 @@ SimplifiedBalance2Network
       ~SimplifiedBalance2Network.spring_coordinate_index_b
       ~SimplifiedBalance2Network.spring_index_a
       ~SimplifiedBalance2Network.spring_index_b
-      ~SimplifiedBalance2Network.spring_indices_of_strand
       ~SimplifiedBalance2Network.spring_is_entanglement
-      ~SimplifiedBalance2Network.strand_index_of_spring
-      ~SimplifiedBalance2Network.strand_indices_of_link
+      ~SimplifiedBalance2Network.springs_of_strand
+      ~SimplifiedBalance2Network.strand_of_spring
+      ~SimplifiedBalance2Network.strands_of_link
 
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: box_lengths
    .. autoattribute:: coordinates
-   .. autoattribute:: link_indices_of_strand
    .. autoattribute:: link_is_entanglement
+   .. autoattribute:: links_of_strand
    .. autoattribute:: nr_of_crosslinks
    .. autoattribute:: nr_of_links
    .. autoattribute:: nr_of_springs
@@ -49,7 +49,7 @@ SimplifiedBalance2Network
    .. autoattribute:: spring_coordinate_index_b
    .. autoattribute:: spring_index_a
    .. autoattribute:: spring_index_b
-   .. autoattribute:: spring_indices_of_strand
    .. autoattribute:: spring_is_entanglement
-   .. autoattribute:: strand_index_of_spring
-   .. autoattribute:: strand_indices_of_link
+   .. autoattribute:: springs_of_strand
+   .. autoattribute:: strand_of_spring
+   .. autoattribute:: strands_of_link

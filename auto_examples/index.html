@@ -20,10 +20,10 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="pylimer-tools" />
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Dissipative Particle Dynamics (DPD) Simulations" href="dpd_simulations/index.html" /><link rel="prev" title="Assumptions" href="../assumptions.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Dissipative Particle Dynamics (DPD) Simulations" href="dpd_simulations/index.html" /><link rel="prev" title="Command Line Interface" href="../cli.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>Examples - pylimer-tools v</title>
+        <title>Examples - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -190,7 +190,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">pylimer-tools v</div></a>
+      <a href="../index.html"><div class="brand">pylimer-tools</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -213,7 +213,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
-  <span class="sidebar-brand-text">pylimer-tools v</span>
+  <span class="sidebar-brand-text">pylimer-tools</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -231,6 +231,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../nomenclature.html">Nomenclature</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomenclature.html#conventions">Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../assumptions.html">Assumptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a></li>
 <li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="dpd_simulations/index.html">Dissipative Particle Dynamics (DPD) Simulations</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Dissipative Particle Dynamics (DPD) Simulations</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="dpd_simulations/plot_dpd_simulation.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
@@ -412,7 +413,7 @@ Then, run the script directly from there.</p>
 <h2>Dissipative Particle Dynamics (DPD) Simulations<a class="headerlink" href="#dissipative-particle-dynamics-dpd-simulations" title="Link to this heading">¶</a></h2>
 <p>pylimer-tools provides a powerful framework for simulating coarse-grained polymer systems using Dissipative Particle Dynamics (DPD) with slip-springs.
 This allows for realistic modeling of polymer behavior at a mesoscopic scale.
-The implementation is based on <a href="#id1"><span class="problematic" id="id2">:cite:t:`langeloth_recovering_2013`</span></a>, <a href="#id3"><span class="problematic" id="id4">:cite:t:`schneider_simulation_2021`</span></a> and <a href="#id5"><span class="problematic" id="id6">:cite:t:`schneider_entanglements_2023`</span></a>.</p>
+The implementation is based on <span id="id1"></span>, <span id="id2"></span> and <span id="id3"></span>.</p>
 <p>Refer to the full documentation of the DPD simulator in the <a class="reference internal" href="../api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><code class="xref py py-class docutils literal notranslate"><span class="pre">DPDSimulator</span></code></a> class for more details.</p>
 <div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools."><img alt="" src="../_images/sphx_glr_plot_dpd_simulation_thumb.png" />
 <p><a class="reference internal" href="dpd_simulations/plot_dpd_simulation.html#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py"><span class="std std-ref">Dissipative Particle Dynamics (DPD) Simulations</span></a></p>
@@ -457,8 +458,8 @@ and the <span class="xref std std-doc">modules</span> API reference, particularl
 <li><p>Set realistic bead distances and box sizes</p></li>
 </ul>
 <p>The <a class="reference internal" href="../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">MCUniverseGenerator</span></code></a> class is the main interface for network generation.
-The initial method was introduced in <a href="#id7"><span class="problematic" id="id8">:cite:t:`gusev_numerical_2019`</span></a>,
-the current implementation is more powerful, as needed for <a href="#id9"><span class="problematic" id="id10">:cite:t:`bernhard_phantom_2025`</span></a>.</p>
+The initial method was introduced in <span id="id4"></span>,
+the current implementation is more powerful, as needed for <span id="id5"></span>.</p>
 <div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to save a generated polymer network to a LAMMPS data file."><img alt="" src="../_images/sphx_glr_plot_save_network_thumb.png" />
 <p><a class="reference internal" href="network_generator/plot_save_network.html#sphx-glr-auto-examples-network-generator-plot-save-network-py"><span class="std std-ref">Save Generated Network</span></a></p>
   <div class="sphx-glr-thumbnail-title">Save Generated Network</div>
@@ -614,14 +615,14 @@ This includes reading trajectory data and computing various properties.</p>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../assumptions.html">
+          <a class="prev-page" href="../cli.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Assumptions</div>
+                <div class="title">Command Line Interface</div>
                 
               </div>
             </a>

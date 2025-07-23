@@ -20,10 +20,10 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="pylimer-tools" />
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Examples" href="auto_examples/index.html" /><link rel="prev" title="Nomenclature" href="nomenclature.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Command Line Interface" href="cli.html" /><link rel="prev" title="Nomenclature" href="nomenclature.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>Assumptions - pylimer-tools v</title>
+        <title>Assumptions - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
@@ -190,7 +190,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">pylimer-tools v</div></a>
+      <a href="index.html"><div class="brand">pylimer-tools</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -202,7 +202,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -213,7 +213,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
-  <span class="sidebar-brand-text">pylimer-tools v</span>
+  <span class="sidebar-brand-text">pylimer-tools</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -231,6 +231,7 @@
 <li class="toctree-l1"><a class="reference internal" href="nomenclature.html">Nomenclature</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nomenclature.html#conventions">Conventions</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Assumptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="auto_examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="auto_examples/dpd_simulations/index.html">Dissipative Particle Dynamics (DPD) Simulations</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Dissipative Particle Dynamics (DPD) Simulations</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/dpd_simulations/plot_dpd_simulation.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
@@ -384,7 +385,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -403,6 +404,24 @@ you may want to check whether your system violates one of these assumptions.</p>
 <li><p>Network strands and their atoms are at maximum bifunctional</p></li>
 <li><p>There is only ever one atom type that is a crosslink</p></li>
 </ol>
+<section id="periodic-boundary-conditions">
+<h2>Periodic Boundary Conditions<a class="headerlink" href="#periodic-boundary-conditions" title="Link to this heading">¶</a></h2>
+<p>This is a heads-up regarding the handling of periodic boundary conditions (PBC).
+In most of the simulators and MEHP implementations of pylimer-tools, there are two implementations of the PBC.</p>
+<p>When working with molecular dynamics simulations, especially those involving polymer networks, it is crucial to ensure that the simulation box is large enough to accommodate the periodic boundary conditions.
+If the box is too small, it can lead to artifacts in the simulation results, such as unphysical interactions between atoms that are supposed to be separated by the periodic boundaries, or bonds that are shorter than they should be and flip directions due to the minimum image convention.</p>
+<p>Particularly the latter can happen in the Force Balance, Maximum Entropy Homogenization Procedure (MEHP), where springs represent entire polymer chains.
+In those cases, it is the periodic boundary conditions that prevent chains from collapsing.
+If the conventional implementations of PBC are used (such as the one provided in LAMMPS), an exemplaric chain that spans the whole box would collapse, rather than staying elastically effective.
+To avoid these issues, pylimer-tools provides a configuration option to assume that the simulation box is large enough to handle periodic boundary conditions correctly. This is particularly important when using the DPDSimulator or other simulation classes that rely on accurate PBC handling.</p>
+<p>When initializing your simulation, make sure to set the <cite>assume_box_large_enough</cite> configuration option to <cite>False</cite> if you are not confident that your simulation box is sufficiently large.
+This will enable the correct handling of periodic boundaries and hopefully prevent any artifacts related to PBC.
+Note, however, that it assumes that the initial configuration of the structure has bonds that are all shorter than half the box length, since those are used to determine the initial offsets imposed by the PBC.</p>
+<p>Relevant methods:
+- <a class="reference internal" href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.assume_box_large_enough" title="pylimer_tools_cpp.DPDSimulator.assume_box_large_enough"><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools_cpp.DPDSimulator.assume_box_large_enough()</span></code></a>
+- <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough" title="pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough"><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough()</span></code></a>
+- <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough" title="pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough"><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough()</span></code></a></p>
+</section>
 </section>
 
         </article>
@@ -410,12 +429,12 @@ you may want to check whether your system violates one of these assumptions.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="auto_examples/index.html">
+          <a class="next-page" href="cli.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Examples</div>
+                <div class="title">Command Line Interface</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -448,8 +467,27 @@ you may want to check whether your system violates one of these assumptions.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Assumptions</a><ul>
+<li><a class="reference internal" href="#periodic-boundary-conditions">Periodic Boundary Conditions</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

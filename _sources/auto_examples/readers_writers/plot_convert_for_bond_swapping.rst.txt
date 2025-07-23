@@ -81,7 +81,7 @@ simply repeat the process with ``config_molecule_idx_for_swap(False)``
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.055 seconds)
+   **Total running time of the script:** (0 minutes 0.056 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_convert_for_bond_swapping.py:

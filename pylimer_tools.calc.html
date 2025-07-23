@@ -23,7 +23,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="pylimer_tools.io package" href="pylimer_tools.io.html" /><link rel="prev" title="pylimer_tools package" href="pylimer_tools.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>pylimer_tools.calc package - pylimer-tools v</title>
+        <title>pylimer_tools.calc package - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
@@ -190,7 +190,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">pylimer-tools v</div></a>
+      <a href="index.html"><div class="brand">pylimer-tools</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -213,7 +213,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
-  <span class="sidebar-brand-text">pylimer-tools v</span>
+  <span class="sidebar-brand-text">pylimer-tools</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -231,6 +231,7 @@
 <li class="toctree-l1"><a class="reference internal" href="nomenclature.html">Nomenclature</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nomenclature.html#conventions">Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="assumptions.html">Assumptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="auto_examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="auto_examples/dpd_simulations/index.html">Dissipative Particle Dynamics (DPD) Simulations</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Dissipative Particle Dynamics (DPD) Simulations</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/dpd_simulations/plot_dpd_simulation.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
@@ -590,13 +591,13 @@ Set to None to use only rel_tol</p></li>
 <section id="module-pylimer_tools.calc.miller_macosko_theory">
 <span id="pylimer-tools-calc-miller-macosko-theory-module"></span><h2>pylimer_tools.calc.miller_macosko_theory module<a class="headerlink" href="#module-pylimer_tools.calc.miller_macosko_theory" title="Link to this heading">¶</a></h2>
 <p>This module provides access to various computations introduced in the Miller-Macosko theory.
-See <a href="#id1"><span class="problematic" id="id2">:cite:t:`miller_new_1976a`</span></a> and <a href="#id3"><span class="problematic" id="id4">:cite:t:`macosko_new_1976`</span></a>.</p>
+See <span id="id1"></span> and <span id="id2"></span>.</p>
 <p>Additional references used in the development of this module include
-<a href="#id5"><span class="problematic" id="id6">:cite:t:`langley_elastically_1968`</span></a>, <a href="#id7"><span class="problematic" id="id8">:cite:t:`miller_average_1978`</span></a>,
-<a href="#id9"><span class="problematic" id="id10">:cite:t:`valles_properties_1979`</span></a>, <a href="#id11"><span class="problematic" id="id12">:cite:t:`miller_calculation_1979`</span></a>,
-<a href="#id13"><span class="problematic" id="id14">:cite:t:`venkataraman_critical_1989`</span></a>, <a href="#id15"><span class="problematic" id="id16">:cite:t:`patel_elastic_1992`</span></a>,
-<a href="#id17"><span class="problematic" id="id18">:cite:t:`aoyama_nonlinear_2021a`</span></a>, <a href="#id19"><span class="problematic" id="id20">:cite:t:`gusev_molecular_2022`</span></a>,
-and <a href="#id21"><span class="problematic" id="id22">:cite:t:`tsimouri_comparison_2024`</span></a>.</p>
+<span id="id3"></span>, <span id="id4"></span>,
+<span id="id5"></span>, <span id="id6"></span>,
+<span id="id7"></span>, <span id="id8"></span>,
+<span id="id9"></span>, <span id="id10"></span>,
+and <span id="id11"></span>.</p>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
 <p>Not all systems are supported yet.
@@ -679,10 +680,10 @@ i.e., the probability that a randomly chosen A (crosslink) or B (strand-end),
 respectively, is the start of a finite chain.</p>
 <dl class="simple">
 <dt>Sources:</dt><dd><ul class="simple">
-<li><p><a href="#id23"><span class="problematic" id="id24">:cite:t:`macosko_new_1976`</span></a></p></li>
-<li><p><a href="#id25"><span class="problematic" id="id26">:cite:t:`miller_new_1976a`</span></a></p></li>
-<li><p><a href="#id27"><span class="problematic" id="id28">:cite:t:`patel_elastic_1992`</span></a> (with monofunctional chains, f = 4)</p></li>
-<li><p><a href="#id29"><span class="problematic" id="id30">:cite:t:`urayama_damping_2004`</span></a> (with monofunctional chains, f = 3)</p></li>
+<li><p><span id="id12"></span></p></li>
+<li><p><span id="id13"></span></p></li>
+<li><p><span id="id14"></span> (with monofunctional chains, f = 4)</p></li>
+<li><p><span id="id15"></span> (with monofunctional chains, f = 3)</p></li>
 </ul>
 </dd>
 </dl>
@@ -759,7 +760,7 @@ see also <code class="xref py py-func docutils literal notranslate"><span class=
 This function computes the probability that a random B_2 unit will be dangling.</p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
-<li><p>Eq. 6.1 in <a href="#id31"><span class="problematic" id="id32">:cite:t:`miller_calculation_1979`</span></a></p></li>
+<li><p>Eq. 6.1 in <span id="id16"></span></p></li>
 </ul>
 </dd>
 </dl>
@@ -796,7 +797,7 @@ This function computes the probability that a random A_f unit will be dangling (
 This is equal to the probability that only one of the arms is attached to the gel.</p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
-<li><p>Eq. 6.2 in <a href="#id33"><span class="problematic" id="id34">:cite:t:`miller_calculation_1979`</span></a></p></li>
+<li><p>Eq. 6.2 in <span id="id17"></span></p></li>
 </ul>
 </dd>
 </dl>
@@ -820,7 +821,7 @@ This is equal to the probability that only one of the arms is attached to the ge
 <p><span class="math notranslate nohighlight">\(P(X_m^f) = \binom{f}{m} [P(F_A^{out})]^{f-m}[1-P(F_A^{out})]^m\)</span></p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
-<li><p>Eq. 45 in <a href="#id35"><span class="problematic" id="id36">:cite:t:`miller_new_1976a`</span></a></p></li>
+<li><p>Eq. 45 in <span id="id18"></span></p></li>
 </ul>
 </dd>
 </dl>
@@ -845,7 +846,7 @@ This is equal to the probability that only one of the arms is attached to the ge
 This function computes the probability that a random A_f unit will have i pendant arms.</p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
-<li><p>Eq. 6.3 in <a href="#id37"><span class="problematic" id="id38">:cite:t:`miller_calculation_1979`</span></a></p></li>
+<li><p>Eq. 6.3 in <span id="id19"></span></p></li>
 </ul>
 </dd>
 </dl>
@@ -867,7 +868,7 @@ This function computes the probability that a random A_f unit will have i pendan
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_trapping_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/calc/miller_macosko_theory.html#compute_trapping_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the Langley trapping factor <span class="math notranslate nohighlight">\(T_e\)</span>.</p>
-<p>Literature: <a href="#id39"><span class="problematic" id="id40">:cite:t:`langley_elastically_1968`</span></a></p>
+<p>Literature: <span id="id20"></span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>beta</strong> – <span class="math notranslate nohighlight">\(P(F_b^{out})\)</span>, see <code class="xref py py-func docutils literal notranslate"><span class="pre">compute_mms_probabilities()</span></code></p>
@@ -907,7 +908,7 @@ in a mixture of B1 and B2</p></li>
 <dd><p>Compute the weight fraction of dangling (pendant) strands in infinite network</p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
-<li><p>Eq. 6.4 in <a href="#id41"><span class="problematic" id="id42">:cite:t:`miller_calculation_1979`</span></a></p></li>
+<li><p>Eq. 6.4 in <span id="id21"></span></p></li>
 </ul>
 </dd>
 </dl>
@@ -936,8 +937,8 @@ in a mixture of B1 and B2</p></li>
 <dd><p>Compute the weight fraction of soluble material by MMT.</p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
-<li><p><a href="#id43"><span class="problematic" id="id44">:cite:t:`patel_elastic_1992`</span></a></p></li>
-<li><p><a href="#id45"><span class="problematic" id="id46">:cite:t:`aoyama_nonlinear_2021a`</span></a></p></li>
+<li><p><span id="id22"></span></p></li>
+<li><p><span id="id23"></span></p></li>
 </ul>
 </dd>
 </dl>
@@ -1000,7 +1001,7 @@ in a mixture of B1 and B2</p></li>
 (gelation point = critical extent of reaction for gelation)</p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
-<li><p><a href="#id47"><span class="problematic" id="id48">:cite:t:`venkataraman_critical_1989`</span></a></p></li>
+<li><p><span id="id24"></span></p></li>
 </ul>
 </dd>
 </dl>
@@ -1045,7 +1046,7 @@ is not necessary.</p></li>
 <dd><p>Compute the number density of network strands using MMT</p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
-<li><p><a href="#id49"><span class="problematic" id="id50">:cite:t:`aoyama_nonlinear_2021a`</span></a> (see supporting information for formulae)</p></li>
+<li><p><span id="id25"></span> (see supporting information for formulae)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1069,7 +1070,7 @@ is not necessary.</p></li>
 <dd><p>Compute the number density of network strands using MMT</p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
-<li><p><a href="#id51"><span class="problematic" id="id52">:cite:t:`aoyama_nonlinear_2021a`</span></a> (see supporting information for formulae)</p></li>
+<li><p><span id="id26"></span> (see supporting information for formulae)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1118,7 +1119,7 @@ in a mixture of B1 and B2</p></li>
 <dd><p>Predict the shear modulus using MMT Analysis.</p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
-<li><p><a href="#id53"><span class="problematic" id="id54">:cite:t:`gusev_molecular_2022`</span></a></p></li>
+<li><p><span id="id27"></span></p></li>
 </ul>
 </dd>
 </dl>

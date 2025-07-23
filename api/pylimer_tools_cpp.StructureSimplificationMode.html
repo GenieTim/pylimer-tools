@@ -21,7 +21,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Universe" href="pylimer_tools_cpp.Universe.html" /><link rel="prev" title="SimplifiedNetwork" href="pylimer_tools_cpp.SimplifiedNetwork.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>StructureSimplificationMode - pylimer-tools v</title>
+        <title>StructureSimplificationMode - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -188,7 +188,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">pylimer-tools v</div></a>
+      <a href="../index.html"><div class="brand">pylimer-tools</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -211,7 +211,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
-  <span class="sidebar-brand-text">pylimer-tools v</span>
+  <span class="sidebar-brand-text">pylimer-tools</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -229,6 +229,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../nomenclature.html">Nomenclature</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomenclature.html#conventions">Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../assumptions.html">Assumptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../auto_examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/dpd_simulations/index.html">Dissipative Particle Dynamics (DPD) Simulations</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Dissipative Particle Dynamics (DPD) Simulations</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/dpd_simulations/plot_dpd_simulation.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
@@ -410,7 +411,13 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_ONLY" title="pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_ONLY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">INACTIVE_ONLY</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.NO_SIMPLIFICATION" title="pylimer_tools_cpp.StructureSimplificationMode.NO_SIMPLIFICATION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NO_SIMPLIFICATION</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_THEN_X2F" title="pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_THEN_X2F"><code class="xref py py-obj docutils literal notranslate"><span class="pre">INACTIVE_THEN_X2F</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.NO_SIMPLIFICATION" title="pylimer_tools_cpp.StructureSimplificationMode.NO_SIMPLIFICATION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NO_SIMPLIFICATION</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.X1F_X2F_THEN_INACTIVE" title="pylimer_tools_cpp.StructureSimplificationMode.X1F_X2F_THEN_INACTIVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">X1F_X2F_THEN_INACTIVE</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.X2F_ONLY" title="pylimer_tools_cpp.StructureSimplificationMode.X2F_ONLY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">X2F_ONLY</span></code></a></p></td>
@@ -432,8 +439,18 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_THEN_X2F">
+<span class="sig-name descname"><span class="pre">INACTIVE_THEN_X2F</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;StructureSimplificationMode.INACTIVE_THEN_X2F:</span> <span class="pre">3&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_THEN_X2F" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.StructureSimplificationMode.NO_SIMPLIFICATION">
 <span class="sig-name descname"><span class="pre">NO_SIMPLIFICATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;StructureSimplificationMode.NO_SIMPLIFICATION:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.StructureSimplificationMode.NO_SIMPLIFICATION" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.StructureSimplificationMode.X1F_X2F_THEN_INACTIVE">
+<span class="sig-name descname"><span class="pre">X1F_X2F_THEN_INACTIVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;StructureSimplificationMode.X1F_X2F_THEN_INACTIVE:</span> <span class="pre">4&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.StructureSimplificationMode.X1F_X2F_THEN_INACTIVE" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -513,7 +530,9 @@
 <li><a class="reference internal" href="#">StructureSimplificationMode</a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode</span></code></a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_ONLY"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.INACTIVE_ONLY</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_THEN_X2F"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.INACTIVE_THEN_X2F</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.NO_SIMPLIFICATION"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.NO_SIMPLIFICATION</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.X1F_X2F_THEN_INACTIVE"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.X1F_X2F_THEN_INACTIVE</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.X2F_ONLY"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.X2F_ONLY</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.name"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.name</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.value"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.value</span></code></a></li>

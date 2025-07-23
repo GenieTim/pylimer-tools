@@ -29,6 +29,8 @@ AtomStyle
       ~AtomStyle.MOLECULAR
       ~AtomStyle.NONE
       ~AtomStyle.PERI
+      ~AtomStyle.RHEO
+      ~AtomStyle.RHEO_THERMAL
       ~AtomStyle.SMD
       ~AtomStyle.SPH
       ~AtomStyle.SPHERE
@@ -61,6 +63,8 @@ AtomStyle
    .. autoattribute:: MOLECULAR
    .. autoattribute:: NONE
    .. autoattribute:: PERI
+   .. autoattribute:: RHEO
+   .. autoattribute:: RHEO_THERMAL
    .. autoattribute:: SMD
    .. autoattribute:: SPH
    .. autoattribute:: SPHERE

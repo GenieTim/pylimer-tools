@@ -21,7 +21,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="SimplifiedNetwork" href="pylimer_tools_cpp.SimplifiedNetwork.html" /><link rel="prev" title="SimplifiedBalance2Network" href="pylimer_tools_cpp.SimplifiedBalance2Network.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>SimplifiedBalanceNetwork - pylimer-tools v</title>
+        <title>SimplifiedBalanceNetwork - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -188,7 +188,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">pylimer-tools v</div></a>
+      <a href="../index.html"><div class="brand">pylimer-tools</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -211,7 +211,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
-  <span class="sidebar-brand-text">pylimer-tools v</span>
+  <span class="sidebar-brand-text">pylimer-tools</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -229,6 +229,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../nomenclature.html">Nomenclature</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nomenclature.html#conventions">Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../assumptions.html">Assumptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../auto_examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/dpd_simulations/index.html">Dissipative Particle Dynamics (DPD) Simulations</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Dissipative Particle Dynamics (DPD) Simulations</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/dpd_simulations/plot_dpd_simulation.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
@@ -415,34 +416,67 @@ A strand is a chain of connected links between two crosslinks.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.link_is_sliplink" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.link_is_sliplink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_is_sliplink</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_crosslink_swaps_endured" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_crosslink_swaps_endured"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nr_of_crosslink_swaps_endured</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.links_of_strand" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.links_of_strand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">links_of_strand</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_crosslinks" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_crosslinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nr_of_crosslinks</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_crosslink_swaps_endured" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_crosslink_swaps_endured"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nr_of_crosslink_swaps_endured</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_links" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_links"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nr_of_links</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_crosslinks" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_crosslinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nr_of_crosslinks</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_springs" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_springs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nr_of_springs</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_links" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_links"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nr_of_links</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_springs" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_springs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nr_of_springs</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_strands" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_strands"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nr_of_strands</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.old_atom_ids" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.old_atom_ids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">old_atom_ids</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_coordinate_index_a" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_coordinate_index_a"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_coordinate_index_a</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_box_offset" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_box_offset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_box_offset</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_coordinate_index_b" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_coordinate_index_b"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_coordinate_index_b</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_coordinate_index_a" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_coordinate_index_a"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_coordinate_index_a</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_a" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_a"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_index_a</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_coordinate_index_b" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_coordinate_index_b"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_coordinate_index_b</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_b" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_b"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_index_b</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_a" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_a"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_index_a</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.volume" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.volume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">volume</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_b" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_b"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spring_index_b</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.springs_of_strand" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.springs_of_strand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springs_of_strand</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_contour_length" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_contour_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strand_contour_length</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_coordinate_index_a" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_coordinate_index_a"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strand_coordinate_index_a</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_coordinate_index_b" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_coordinate_index_b"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strand_coordinate_index_b</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_index_a" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_index_a"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strand_index_a</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_index_b" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_index_b"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strand_index_b</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_of_spring" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_of_spring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strand_of_spring</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strands_of_link" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.strands_of_link"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strands_of_link</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.volume" title="pylimer_tools_cpp.SimplifiedBalanceNetwork.volume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">volume</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -462,6 +496,11 @@ A strand is a chain of connected links between two crosslinks.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.link_is_sliplink">
 <span class="sig-name descname"><span class="pre">link_is_sliplink</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.link_is_sliplink" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.links_of_strand">
+<span class="sig-name descname"><span class="pre">links_of_strand</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.links_of_strand" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -485,8 +524,18 @@ A strand is a chain of connected links between two crosslinks.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_strands">
+<span class="sig-name descname"><span class="pre">nr_of_strands</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_strands" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.old_atom_ids">
 <span class="sig-name descname"><span class="pre">old_atom_ids</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.old_atom_ids" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_box_offset">
+<span class="sig-name descname"><span class="pre">spring_box_offset</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_box_offset" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -507,6 +556,46 @@ A strand is a chain of connected links between two crosslinks.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_b">
 <span class="sig-name descname"><span class="pre">spring_index_b</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_b" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.springs_of_strand">
+<span class="sig-name descname"><span class="pre">springs_of_strand</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.springs_of_strand" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_contour_length">
+<span class="sig-name descname"><span class="pre">strand_contour_length</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_contour_length" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_coordinate_index_a">
+<span class="sig-name descname"><span class="pre">strand_coordinate_index_a</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_coordinate_index_a" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_coordinate_index_b">
+<span class="sig-name descname"><span class="pre">strand_coordinate_index_b</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_coordinate_index_b" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_index_a">
+<span class="sig-name descname"><span class="pre">strand_index_a</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_index_a" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_index_b">
+<span class="sig-name descname"><span class="pre">strand_index_b</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_index_b" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_of_spring">
+<span class="sig-name descname"><span class="pre">strand_of_spring</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_of_spring" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.SimplifiedBalanceNetwork.strands_of_link">
+<span class="sig-name descname"><span class="pre">strands_of_link</span></span><a class="headerlink" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strands_of_link" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -578,15 +667,26 @@ A strand is a chain of connected links between two crosslinks.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.box_lengths"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.box_lengths</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.coordinates"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.coordinates</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.link_is_sliplink"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.link_is_sliplink</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.links_of_strand"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.links_of_strand</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_crosslink_swaps_endured"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.nr_of_crosslink_swaps_endured</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_crosslinks"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.nr_of_crosslinks</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_links"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.nr_of_links</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_springs"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.nr_of_springs</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_strands"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.nr_of_strands</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.old_atom_ids"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.old_atom_ids</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_box_offset"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.spring_box_offset</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_coordinate_index_a"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.spring_coordinate_index_a</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_coordinate_index_b"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.spring_coordinate_index_b</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_a"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.spring_index_a</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_index_b"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.spring_index_b</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.springs_of_strand"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.springs_of_strand</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_contour_length"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.strand_contour_length</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_coordinate_index_a"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.strand_coordinate_index_a</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_coordinate_index_b"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.strand_coordinate_index_b</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_index_a"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.strand_index_a</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_index_b"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.strand_index_b</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strand_of_spring"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.strand_of_spring</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.strands_of_link"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.strands_of_link</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SimplifiedBalanceNetwork.volume"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.volume</span></code></a></li>
 </ul>
 </li>

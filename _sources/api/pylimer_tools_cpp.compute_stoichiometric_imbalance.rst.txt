@@ -1,6 +1,0 @@
-compute_stoichiometric_imbalance
-================================
-
-.. currentmodule:: pylimer_tools_cpp
-
-.. autofunction:: compute_stoichiometric_imbalance
