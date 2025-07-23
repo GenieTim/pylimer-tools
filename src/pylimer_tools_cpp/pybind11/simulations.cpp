@@ -121,7 +121,7 @@ init_pylimer_bound_sim(py::module_& m)
      For autocorrelation and averaging, how often to include values.
 
      Use a value of 1 to take average of or autocorrelate, respectively,
-    all values encountered during the simulation or optimization procedure.
+     all values encountered during the simulation or optimization procedure.
      )pbdoc")
     .def_readwrite("append",
                    &OutputConfiguration::append,
@@ -408,7 +408,7 @@ A strand is a chain of connected links between two crosslinks.
     This is the first of three force relaxation methods available in this library.
     The relevant feature of this implementation is the configurable spring potential.
     Consequently, it offers a variety of configurable non-linear solvers using NLoptLib.
-     )pbdoc")
+    )pbdoc")
     .def(py::init<pe::Universe,
                   int,
                   bool,
@@ -426,7 +426,7 @@ A strand is a chain of connected links between two crosslinks.
           :param kappa: The spring constant
           :param remove_2functional_crosslinkers: Whether to replace two-functional crosslinkers with a "normal" chain bead
           :param remove_dangling_chains: Whether to remove dangling chains before running the simulation.
-               **Caution*: Removing the dangling chains will result in incorrect results fo the computation of
+               **Caution**: Removing the dangling chains will result in incorrect results fo the computation of
                :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction()` and
                :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getDanglingWeightFraction()`
           )pbdoc",

@@ -271,7 +271,8 @@ MEHPForceBalance::runForceRelaxation(
 #endif
         nRemovedThisLoop = 0;
         if (simplificationMode == StructureSimplificationMode::INACTIVE_ONLY ||
-            simplificationMode == StructureSimplificationMode::ALL_TIM) {
+            simplificationMode ==
+              StructureSimplificationMode::INACTIVE_THEN_X2F) {
 #ifdef DEBUG_REMOVAL
           std::cout << "Checking and possibly removing inactive crosslinks"
                     << std::endl;
@@ -287,7 +288,8 @@ MEHPForceBalance::runForceRelaxation(
               : 0.;
         }
         if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
-            simplificationMode == StructureSimplificationMode::ALL_TIM) {
+            simplificationMode ==
+              StructureSimplificationMode::INACTIVE_THEN_X2F) {
 #ifdef DEBUG_REMOVAL
           std::cout << "Checking and possibly removing crosslinks with f = 2"
                     << std::endl;
@@ -301,7 +303,8 @@ MEHPForceBalance::runForceRelaxation(
               ? this->initialConfig.springsContourLength.mean()
               : 0.;
         }
-        if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
+        if (simplificationMode ==
+            StructureSimplificationMode::ALL_LINKS_WITH_SPRINGS) {
 #ifdef DEBUG_REMOVAL
           std::cout << "Checking and possibly removing crosslinks and "
                        "springs, Andrei's way"

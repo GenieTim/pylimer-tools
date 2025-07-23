@@ -99,8 +99,7 @@ def read_averages_file(filepath, use_cache: bool = True,
     Important assumption: The first 2 or 3 lines in the file are:
         - comment,
         - then one header indicating the columns,
-        - and then either data or potentially a second header, if it is a sectioned file
-        (e.g., from a `fix ave/time ... vector`)
+        - and then either data or potentially a second header, if it is a sectioned file (e.g., from a `fix ave/time ... vector`)
 
     :param filepath: Path to the averages file
     :type filepath: str

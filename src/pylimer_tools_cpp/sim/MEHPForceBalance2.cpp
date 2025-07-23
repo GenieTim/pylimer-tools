@@ -930,7 +930,8 @@ MEHPForceBalance2::runForceRelaxation(
 #endif
       nRemovedThisLoop = 0;
       if (simplificationMode == StructureSimplificationMode::INACTIVE_ONLY ||
-          simplificationMode == StructureSimplificationMode::ALL_TIM) {
+          simplificationMode ==
+            StructureSimplificationMode::INACTIVE_THEN_X2F) {
 #ifdef DEBUG_REMOVAL
         std::cout << "Checking and possibly removing inactive crosslinks"
                   << std::endl;
@@ -957,7 +958,8 @@ MEHPForceBalance2::runForceRelaxation(
         }
       }
       if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
-          simplificationMode == StructureSimplificationMode::ALL_TIM) {
+          simplificationMode ==
+            StructureSimplificationMode::INACTIVE_THEN_X2F) {
 #ifdef DEBUG_REMOVAL
         std::cout << "Checking and possibly removing crosslinks with f = 2"
                   << std::endl;
@@ -965,7 +967,8 @@ MEHPForceBalance2::runForceRelaxation(
         nRemovedThisLoop += this->unlinkBifunctionalLinks(
           this->initialConfig, this->currentDisplacements);
       }
-      if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
+      if (simplificationMode ==
+          StructureSimplificationMode::ALL_LINKS_WITH_SPRINGS) {
         RUNTIME_EXP("This mode is not implemented.");
       }
 

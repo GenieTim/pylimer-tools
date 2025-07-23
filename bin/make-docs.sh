@@ -9,6 +9,11 @@ python -c "import pylimer_tools_cpp" 2>/dev/null ||
   exit 7
 }
 
+python ./docs/generate-thumbnails.py || {
+  echo "Failed to generate thumbnails. Please check the output above."
+  exit 6
+}
+
 # make sure you have sphinx installed:
 # pip3 install sphinx
 # and the template:

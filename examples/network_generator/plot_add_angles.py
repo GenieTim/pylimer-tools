@@ -6,7 +6,8 @@ Adding Topology Information
 The generated networks can include topological information.
 """
 
-from pylimer_tools_cpp import MCUniverseGenerator
+# sphinx_gallery_thumbnail_path = '_static/thumbnails/network_generator/plot_add_angles.png'
+from pylimer_tools_cpp import DataFileWriter, MCUniverseGenerator
 
 # Generate basic network
 generator = MCUniverseGenerator(40, 40, 40)
@@ -57,3 +58,9 @@ print(
         universe.get_nr_of_dihedral_angles()
     } dihedral angles."
 )
+
+# Save the universe to a file
+writer = DataFileWriter(universe)
+writer.config_include_angles(True)
+writer.config_include_dihedral_angles(True)
+writer.write_to_file("generated_networks/polymer_network_with_angles.data")
