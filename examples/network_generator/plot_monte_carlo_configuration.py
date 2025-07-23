@@ -8,8 +8,10 @@ Fine-tune the Monte Carlo generation process:
 
 import copy
 import time
-from pylimer_tools_cpp import MCUniverseGenerator
+
 import matplotlib.pyplot as plt
+
+from pylimer_tools_cpp import MCUniverseGenerator
 
 generator = MCUniverseGenerator(
     50.0, 50.0, 50.0
@@ -40,8 +42,9 @@ generator_without_zscore = MCUniverseGenerator(50.0, 50.0, 50.0)
 generator_without_zscore.set_seed(12345)
 generator_without_zscore.set_bead_distance(1.0)
 
-generator_without_zscore.add_crosslinkers(5000, 4)
-generator_without_zscore.add_strands(10000, [50 for _ in range(10000)])
+generator_without_zscore.add_crosslinkers(25000, 4)
+generator_without_zscore.add_strands(50000, [50 for _ in range(50000)])
+generator_without_zscore.disable_max_distance()
 
 generator_with_zscore = copy.copy(generator_without_zscore)
 
@@ -50,10 +53,9 @@ generator_without_zscore.link_strands_to_conversion(
     crosslinker_conversion=0.925)
 end_time_without = time.time()
 print(
-    f"Time without z-score max distance: {
-        end_time_without - start_time_without:.2f
-    } seconds"
-)
+    f"Time without max distance: {
+        end_time_without -
+        start_time_without:.2f} seconds")
 
 generator_with_zscore.use_zscore_max_distance(3.0)
 start_time_with = time.time()
@@ -65,7 +67,7 @@ print(
 # plot the difference for the thumbnail
 plt.figure()
 plt.bar(
-    ["Without Z-Score", "With Z-Score"],
+    ["Without Limit", "With Z-Score"],
     [end_time_without - start_time_without, end_time_with - start_time_with],
     color=["blue", "orange"],
 )

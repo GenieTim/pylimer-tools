@@ -17,3 +17,5 @@ The network generation system allows you to:
 - Set realistic bead distances and box sizes
 
 The :class:`~pylimer_tools_cpp.MCUniverseGenerator` class is the main interface for network generation.
+The initial method was introduced in :cite:t:`gusev_numerical_2019`,
+the current implementation is more powerful, as needed for :cite:t:`bernhard_phantom_2025`.

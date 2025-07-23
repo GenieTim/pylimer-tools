@@ -968,7 +968,7 @@ MEHPForceBalance2::runForceRelaxation(
           this->initialConfig, this->currentDisplacements);
       }
       if (simplificationMode ==
-          StructureSimplificationMode::ALL_LINKS_WITH_SPRINGS) {
+          StructureSimplificationMode::X1F_X2F_THEN_INACTIVE) {
         RUNTIME_EXP("This mode is not implemented.");
       }
 

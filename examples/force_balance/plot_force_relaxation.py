@@ -2,8 +2,9 @@
 Maximum Entropy Homogenization Procedure (MEHP)
 ===============================================
 
-This example demonstrates how to use the "original" MEHP implementation,
-the one without slip-links or entanglements.
+This example demonstrates how to use
+the "original" MEHP implementation (see :cite:t:`gusev_numerical_2019`)
+without slip-links or entanglements.
 
 """
 

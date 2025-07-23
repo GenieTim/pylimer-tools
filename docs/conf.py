@@ -50,7 +50,10 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinxext.opengraph",
     "sphinx_click",
+    "sphinxcontrib.bibtex",
 ]
+
+bibtex_bibfiles = ["references.bib"]
 
 # Configuration for specific extensions
 # napoleon settings
