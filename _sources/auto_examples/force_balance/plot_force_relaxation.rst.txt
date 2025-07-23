@@ -21,10 +21,11 @@
 Maximum Entropy Homogenization Procedure (MEHP)
 ===============================================
 
-This example demonstrates how to use the "original" MEHP implementation,
-the one without slip-links or entanglements.
+This example demonstrates how to use
+the "original" MEHP implementation (see :cite:t:`gusev_numerical_2019`)
+without slip-links or entanglements.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-73
+.. GENERATED FROM PYTHON SOURCE LINES 10-74
 
 
 
@@ -113,7 +114,7 @@ the one without slip-links or entanglements.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.488 seconds)
+   **Total running time of the script:** (0 minutes 0.484 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_force_relaxation.py:

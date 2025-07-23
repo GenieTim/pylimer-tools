@@ -23,27 +23,12 @@ Generate Vulcanized Networks
 
 In this example, we create a vulcanized network using the `pylimer-tools` library.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-49
-
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Generated vulcanized network with 200 crosslinks
-
-    <pylimer_tools_cpp.Universe object at 0x7f7d5e2b58b0>
-
-
-
-
-
-|
+.. GENERATED FROM PYTHON SOURCE LINES 8-52
 
 .. code-block:: Python
 
+
+    import matplotlib.pyplot as plt
 
     from pylimer_tools_cpp import MCUniverseGenerator, randomly_sample_entanglements
 
@@ -87,9 +72,57 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
     universe.contract_vertices_along_bond_type(2)
 
 
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    Generated vulcanized network with 200 crosslinks
+
+    <pylimer_tools_cpp.Universe object at 0x7f830c4ad2b0>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 53-57
+
+Refer to :doc:`auto_examples/readers_writers/index` for how you can save the universe to a file.
+
+For now, we will show that this produces a variety of different strand
+lengths:
+
+.. GENERATED FROM PYTHON SOURCE LINES 57-68
+
+.. code-block:: Python
+
+
+    strand_lengths = [m.get_nr_of_atoms()
+                      for m in universe.get_chains_with_crosslinker(2)]
+
+    # Plot the distribution of strand lengths
+    plt.figure()
+    plt.hist(strand_lengths, bins=50, alpha=0.5, label="Strand Lengths")
+    plt.xlabel("Strand Length")
+    plt.ylabel("Frequency")
+    plt.title("Distribution of Strand Lengths in Vulcanized Network")
+    plt.show()
+
+
+
+.. image-sg:: /auto_examples/network_generator/images/sphx_glr_plot_vulcanized_network_001.png
+   :alt: Distribution of Strand Lengths in Vulcanized Network
+   :srcset: /auto_examples/network_generator/images/sphx_glr_plot_vulcanized_network_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.133 seconds)
+   **Total running time of the script:** (0 minutes 3.243 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_vulcanized_network.py:

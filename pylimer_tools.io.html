@@ -236,7 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/dpd_simulations/plot_dpd_simulation.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="auto_examples/force_balance/index.html">Force Balance &amp; Maximum Entropy Homogenization Procedures</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Force Balance &amp; Maximum Entropy Homogenization Procedures</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="auto_examples/force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
@@ -246,10 +246,10 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="auto_examples/network_generator/index.html">Network Generation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
-<li class="toctree-l3"><a class="reference internal" href="auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="auto_examples/normal_mode_analysis/index.html">Normal Mode Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Normal Mode Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -296,13 +296,11 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.compute_stoichiometric_imbalance.html">compute_stoichiometric_imbalance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.do_linear_walk_chain_from_to.html">do_linear_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.do_random_walk.html">do_random_walk</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.do_random_walk_chain_from_to.html">do_random_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">do_random_walk_chain_from_to_mc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.predict_gelation_point.html">predict_gelation_point</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.version_information.html">version_information</a></li>
@@ -581,13 +579,12 @@ entry for each step.</p>
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.read_lammps_output_file.</span></span><span class="sig-name descname"><span class="pre">read_averages_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.1)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/read_lammps_output_file.html#read_averages_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.read_lammps_output_file.read_averages_file" title="Link to this definition">¶</a></dt>
 <dd><p>Read a file written by a <cite>fix ave/time</cite> command.</p>
 <p>Uses pandas’ read_csv after detecting the columns.</p>
-<dl>
+<dl class="simple">
 <dt>Important assumption: The first 2 or 3 lines in the file are:</dt><dd><ul class="simple">
 <li><p>comment,</p></li>
 <li><p>then one header indicating the columns,</p></li>
-<li><p>and then either data or potentially a second header, if it is a sectioned file</p></li>
+<li><p>and then either data or potentially a second header, if it is a sectioned file (e.g., from a <cite>fix ave/time … vector</cite>)</p></li>
 </ul>
-<p>(e.g., from a <cite>fix ave/time … vector</cite>)</p>
 </dd>
 </dl>
 <dl class="field-list simple">

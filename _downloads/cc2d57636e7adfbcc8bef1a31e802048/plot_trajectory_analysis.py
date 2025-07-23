@@ -55,7 +55,7 @@ axs[0].plot(
     list(
         msd.keys()), list(
             msd.values()), label="Mean Square Displacement")
-axs[0].set_xlabel("Timestep")
+axs[0].set_xlabel("$\\tau$")
 axs[0].set_ylabel("MSD")
 axs[0].set_title("Mean Square Displacement")
 axs[0].legend()
@@ -69,3 +69,31 @@ axs[1].legend()
 
 plt.tight_layout()
 plt.show()
+
+# %%
+# Please beware that the MSD is computed in an :math:`N^2` manner, which can be slow for large systems,
+# many origins and long trajectories.
+#
+# If you want more origins or otherwise better performance,
+# consider using the :py:mod:`tidynamics` package instead like so:
+#
+# .. code-block:: python
+#
+#    import tidynamics
+#
+#    # using sorted atom ids to make sure the order is consistent
+#    # across all timesteps, which is important for MSD calculation
+#    sorted_atom_ids = sorted([a.get_id() for a in sequence[0].get_atoms()])
+#    msd_result = tidynamics.msd(
+#          np.array(
+#              [
+#                  [
+#                      coord
+#                      for id in sorted_atom_ids
+#                      for coord in u.get_atom_by_vertex_id(id).get_coordinates()
+#                  ]
+#                  for u in sequence
+#              ]
+#        )
+#     )
+#

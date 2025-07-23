@@ -164,8 +164,8 @@ deformation is an equivalent method to obtain the modulus.
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 2.813310282252253e-11
-    Shear Modulus from Equilibrium [MPa]:  0.09767125566386207
+    Final residual (should be close to 0): 1.0252745615454857e-11
+    Shear Modulus from Equilibrium [MPa]:  0.0980669577046458
 
 
 
@@ -179,7 +179,7 @@ Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.488 seconds)
+   **Total running time of the script:** (0 minutes 0.480 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_fb_deformation_exp.py:

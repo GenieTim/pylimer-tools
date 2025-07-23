@@ -23,7 +23,7 @@ Adding Topology Information
 
 The generated networks can include topological information.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-60
+.. GENERATED FROM PYTHON SOURCE LINES 8-67
 
 
 
@@ -45,7 +45,8 @@ The generated networks can include topological information.
 .. code-block:: Python
 
 
-    from pylimer_tools_cpp import MCUniverseGenerator
+    # sphinx_gallery_thumbnail_path = '_static/thumbnails/network_generator/plot_add_angles.png'
+    from pylimer_tools_cpp import DataFileWriter, MCUniverseGenerator
 
     # Generate basic network
     generator = MCUniverseGenerator(40, 40, 40)
@@ -97,10 +98,16 @@ The generated networks can include topological information.
         } dihedral angles."
     )
 
+    # Save the universe to a file
+    writer = DataFileWriter(universe)
+    writer.config_include_angles(True)
+    writer.config_include_dihedral_angles(True)
+    writer.write_to_file("generated_networks/polymer_network_with_angles.data")
+
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.547 seconds)
+   **Total running time of the script:** (0 minutes 0.568 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_add_angles.py:

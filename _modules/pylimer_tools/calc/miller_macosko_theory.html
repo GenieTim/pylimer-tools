@@ -218,7 +218,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/dpd_simulations/plot_dpd_simulation.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/force_balance/index.html">Force Balance &amp; Maximum Entropy Homogenization Procedures</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Force Balance &amp; Maximum Entropy Homogenization Procedures</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
@@ -228,10 +228,10 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/network_generator/index.html">Network Generation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../auto_examples/normal_mode_analysis/index.html">Normal Mode Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Normal Mode Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -278,13 +278,11 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.compute_stoichiometric_imbalance.html">compute_stoichiometric_imbalance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_linear_walk_chain_from_to.html">do_linear_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_random_walk.html">do_random_walk</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_random_walk_chain_from_to.html">do_random_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">do_random_walk_chain_from_to_mc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.predict_gelation_point.html">predict_gelation_point</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pylimer_tools_cpp.version_information.html">version_information</a></li>
@@ -367,11 +365,19 @@
           <h1>Source code for pylimer_tools.calc.miller_macosko_theory</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module provides access to various computations introduced in the Miller-Macosko theory.</span>
+<span class="sd">See :cite:t:`miller_new_1976a` and :cite:t:`macosko_new_1976`.</span>
+
+<span class="sd">Additional references used in the development of this module include</span>
+<span class="sd">:cite:t:`langley_elastically_1968`, :cite:t:`miller_average_1978`,</span>
+<span class="sd">:cite:t:`valles_properties_1979`, :cite:t:`miller_calculation_1979`,</span>
+<span class="sd">:cite:t:`venkataraman_critical_1989`, :cite:t:`patel_elastic_1992`,</span>
+<span class="sd">:cite:t:`aoyama_nonlinear_2021a`, :cite:t:`gusev_molecular_2022`,</span>
+<span class="sd">and :cite:t:`tsimouri_comparison_2024`.</span>
 
 <span class="sd">Caution:</span>
-<span class="sd">    - not all systems are supported yet.</span>
-<span class="sd">        In particular, for most methods, only A_f and B_2 is supported.</span>
-<span class="sd">        Also, the systems are mostly assumed to be end-linked and monodisperse.</span>
+<span class="sd">      Not all systems are supported yet.</span>
+<span class="sd">      In particular, for most methods, only A_f and B_2 is supported.</span>
+<span class="sd">      Also, the systems are mostly assumed to be end-linked and monodisperse.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -400,7 +406,7 @@
 <span class="sd">    Predict the shear modulus using MMT Analysis.</span>
 
 <span class="sd">    Source:</span>
-<span class="sd">      - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</span>
+<span class="sd">      - :cite:t:`gusev_molecular_2022`</span>
 
 <span class="sd">    :param kwargs: See :func:`~pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition`</span>
 <span class="sd">    :return: G: The predicted shear modulus</span>
@@ -425,7 +431,7 @@
 <span class="sd">    Compute the number density of network strands using MMT</span>
 
 <span class="sd">    Source:</span>
-<span class="sd">      - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737 (see supporting information for formulae)</span>
+<span class="sd">      - :cite:t:`aoyama_nonlinear_2021a` (see supporting information for formulae)</span>
 
 <span class="sd">    :param network: The network to compute the weight fraction for</span>
 <span class="sd">    :param crosslinker_type: The atom type to use to split the molecules</span>
@@ -476,7 +482,7 @@
 <span class="sd">    Compute the number density of network strands using MMT</span>
 
 <span class="sd">    Source:</span>
-<span class="sd">      - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737 (see supporting information for formulae)</span>
+<span class="sd">      - :cite:t:`aoyama_nonlinear_2021a` (see supporting information for formulae)</span>
 
 <span class="sd">    :param network: The network to compute the weight fraction for</span>
 <span class="sd">    :param crosslinker_type: The atom type to use to split the molecules</span>
@@ -543,7 +549,7 @@
 <span class="sd">    Compute the weight fraction of dangling (pendant) strands in infinite network</span>
 
 <span class="sd">    Source:</span>
-<span class="sd">      - Eq. 6.4 in https://doi.org/10.1002/pen.760190409</span>
+<span class="sd">      - Eq. 6.4 in :cite:t:`miller_calculation_1979`</span>
 
 <span class="sd">    :param network: The network to compute the weight fraction for</span>
 <span class="sd">    :param crosslinker_type: The atom type to use to split the molecules</span>
@@ -691,8 +697,8 @@
 <span class="sd">    Compute the weight fraction of soluble material by MMT.</span>
 
 <span class="sd">    Source:</span>
-<span class="sd">      - https://pubs.acs.org/doi/10.1021/ma00046a021</span>
-<span class="sd">      - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737</span>
+<span class="sd">      - :cite:t:`patel_elastic_1992`</span>
+<span class="sd">      - :cite:t:`aoyama_nonlinear_2021a`</span>
 
 <span class="sd">    :param network: The polymer network to do the computation for</span>
 <span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
@@ -779,10 +785,10 @@
 <span class="sd">    respectively, is the start of a finite chain.</span>
 
 <span class="sd">    Sources:</span>
-<span class="sd">        - https://doi.org/10.1021/ma60050a003</span>
-<span class="sd">        - https://doi.org/10.1021/ma60050a004</span>
-<span class="sd">        - https://doi.org/10.1021/ma00046a021 (with monofunctional chains, f = 4)</span>
-<span class="sd">        - https://doi.org/10.1021/cm0343507 (with monofunctional chains, f = 3)</span>
+<span class="sd">        - :cite:t:`macosko_new_1976`</span>
+<span class="sd">        - :cite:t:`miller_new_1976a`</span>
+<span class="sd">        - :cite:t:`patel_elastic_1992` (with monofunctional chains, f = 4)</span>
+<span class="sd">        - :cite:t:`urayama_damping_2004` (with monofunctional chains, f = 3)</span>
 
 <span class="sd">    .. note::</span>
 <span class="sd">        Currently, only systems with B_2, B_1 and A_f are supported.</span>
@@ -1111,7 +1117,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the Langley trapping factor :math:`T_e`.</span>
 
-<span class="sd">    Literature: https://doi.org/10.1021/ma60004a015</span>
+<span class="sd">    Literature: :cite:t:`langley_elastically_1968`</span>
 
 <span class="sd">    :param beta: :math:`P(F_b^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`</span>
 <span class="sd">    :return: The Langley trapping factor</span>
@@ -1134,7 +1140,7 @@
 <span class="sd">    :math:`P(X_m^f) = \\binom{f}{m} [P(F_A^{out})]^{f-m}[1-P(F_A^{out})]^m`</span>
 
 <span class="sd">    Source:</span>
-<span class="sd">        - Eq. 45 in Miller, Macosko 1976, A New Derivation of Post Gel Properties of Network</span>
+<span class="sd">        - Eq. 45 in :cite:t:`miller_new_1976a`</span>
 
 <span class="sd">    :param functionality_of_monomer: f</span>
 <span class="sd">    :param expected_degree_of_effect: m</span>
@@ -1177,7 +1183,7 @@
 <span class="sd">    This function computes the probability that a random A_f unit will have i pendant arms.</span>
 
 <span class="sd">    Source:</span>
-<span class="sd">        - Eq. 6.3 in https://doi.org/10.1002/pen.760190409</span>
+<span class="sd">        - Eq. 6.3 in :cite:t:`miller_calculation_1979`</span>
 
 <span class="sd">    :param functionality_of_monomer: f</span>
 <span class="sd">    :param degree_of_ineffectiveness: i</span>
@@ -1207,7 +1213,7 @@
 <span class="sd">    This is equal to the probability that only one of the arms is attached to the gel.</span>
 
 <span class="sd">    Source:</span>
-<span class="sd">        - Eq. 6.2 in https://doi.org/10.1002/pen.760190409</span>
+<span class="sd">        - Eq. 6.2 in :cite:t:`miller_calculation_1979`</span>
 
 <span class="sd">    :param functionality_of_monomer: f</span>
 <span class="sd">    :param p_f_a_out: :math:`P(F_A^{out})`</span>
@@ -1230,7 +1236,7 @@
 <span class="sd">    This function computes the probability that a random B_2 unit will be dangling.</span>
 
 <span class="sd">    Source:</span>
-<span class="sd">        - Eq. 6.1 in https://doi.org/10.1002/pen.760190409</span>
+<span class="sd">        - Eq. 6.1 in :cite:t:`miller_calculation_1979`</span>
 
 <span class="sd">    :param p_f_b_out: :math:`P(F_B^{out})`</span>
 <span class="sd">    :return: The probability that a bifunctional monomer is dangling</span>
@@ -1248,7 +1254,7 @@
 <span class="sd">    (gelation point = critical extent of reaction for gelation)</span>
 
 <span class="sd">    Source:</span>
-<span class="sd">      - https://www.sciencedirect.com/science/article/pii/003238618990253X</span>
+<span class="sd">      - :cite:t:`venkataraman_critical_1989`</span>
 
 <span class="sd">    :param r: The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</span>
 <span class="sd">    :param f: functionality of the crosslinkers</span>

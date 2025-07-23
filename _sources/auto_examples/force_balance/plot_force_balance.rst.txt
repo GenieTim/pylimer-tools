@@ -24,7 +24,7 @@ Force Balance
 This example demonstrates how to use the MEHP implementation with slip-springs
 to homogenize a polymer network and predict its equilibrium shear modulus.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-68
+.. GENERATED FROM PYTHON SOURCE LINES 9-69
 
 
 
@@ -33,8 +33,8 @@ to homogenize a polymer network and predict its equilibrium shear modulus.
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 6.849144792452002e-08
-    Shear Modulus [MPa]:  0.0626138474835814
+    Final residual (should be close to 0): 2.424859200119625e-07
+    Shear Modulus [MPa]:  0.06881967651029781
 
 
 
@@ -109,7 +109,7 @@ to homogenize a polymer network and predict its equilibrium shear modulus.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.499 seconds)
+   **Total running time of the script:** (0 minutes 0.496 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_force_balance.py:

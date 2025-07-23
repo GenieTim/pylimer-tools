@@ -23,16 +23,15 @@ Monte Carlo Configuration
 
 Fine-tune the Monte Carlo generation process:
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-32
-
-
-
-
-
-
+.. GENERATED FROM PYTHON SOURCE LINES 8-38
 
 .. code-block:: Python
 
+
+    import copy
+    import time
+
+    import matplotlib.pyplot as plt
 
     from pylimer_tools_cpp import MCUniverseGenerator
 
@@ -59,9 +58,79 @@ Fine-tune the Monte Carlo generation process:
     generator.config_nr_of_mc_steps(5000)  # More MC steps for better equilibration
 
 
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 39-41
+
+Here's a performance comparison of using the z_score max distance or not:
+for a relatively small system.
+
+.. GENERATED FROM PYTHON SOURCE LINES 41-76
+
+.. code-block:: Python
+
+    generator_without_zscore = MCUniverseGenerator(50.0, 50.0, 50.0)
+    generator_without_zscore.set_seed(12345)
+    generator_without_zscore.set_bead_distance(1.0)
+
+    generator_without_zscore.add_crosslinkers(25000, 4)
+    generator_without_zscore.add_strands(50000, [50 for _ in range(50000)])
+    generator_without_zscore.disable_max_distance()
+
+    generator_with_zscore = copy.copy(generator_without_zscore)
+
+    start_time_without = time.time()
+    generator_without_zscore.link_strands_to_conversion(
+        crosslinker_conversion=0.925)
+    end_time_without = time.time()
+    print(
+        f"Time without max distance: {
+            end_time_without -
+            start_time_without:.2f} seconds")
+
+    generator_with_zscore.use_zscore_max_distance(3.0)
+    start_time_with = time.time()
+    generator_with_zscore.link_strands_to_conversion(crosslinker_conversion=0.925)
+    end_time_with = time.time()
+    print(
+        f"Time with z-score max distance: {end_time_with - start_time_with:.2f} seconds")
+
+    # plot the difference for the thumbnail
+    plt.figure()
+    plt.bar(
+        ["Without Limit", "With Z-Score"],
+        [end_time_without - start_time_without, end_time_with - start_time_with],
+        color=["blue", "orange"],
+    )
+    plt.ylabel("Time (seconds)")
+    plt.show()
+
+
+
+.. image-sg:: /auto_examples/network_generator/images/sphx_glr_plot_monte_carlo_configuration_001.png
+   :alt: plot monte carlo configuration
+   :srcset: /auto_examples/network_generator/images/sphx_glr_plot_monte_carlo_configuration_001.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    Time without max distance: 30.72 seconds
+    Time with z-score max distance: 94.75 seconds
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.001 seconds)
+   **Total running time of the script:** (2 minutes 5.505 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_monte_carlo_configuration.py:

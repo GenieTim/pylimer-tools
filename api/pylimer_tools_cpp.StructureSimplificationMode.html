@@ -234,7 +234,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/dpd_simulations/plot_dpd_simulation.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/force_balance/index.html">Force Balance &amp; Maximum Entropy Homogenization Procedures</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Force Balance &amp; Maximum Entropy Homogenization Procedures</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
@@ -244,10 +244,10 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/network_generator/index.html">Network Generation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/normal_mode_analysis/index.html">Normal Mode Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Normal Mode Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -294,13 +294,11 @@
 </ul>
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.compute_stoichiometric_imbalance.html">compute_stoichiometric_imbalance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.do_linear_walk_chain_from_to.html">do_linear_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.do_random_walk.html">do_random_walk</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.do_random_walk_chain_from_to.html">do_random_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">do_random_walk_chain_from_to_mc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.predict_gelation_point.html">predict_gelation_point</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.version_information.html">version_information</a></li>
@@ -400,21 +398,15 @@
 <p>Members:</p>
 <blockquote>
 <div><p>NO_SIMPLIFICATION : No Simplification</p>
-<p>X2F_ONLY : Two-function crosslinks only</p>
-<p>INACTIVE_ONLY : Inactive links only</p>
-<p>ALL_TIM : All, à la Tim</p>
-<p>ALL_ANDREI : All, à la Andrei</p>
+<p>X2F_ONLY : Removal of two-functional crosslinks only</p>
+<p>INACTIVE_ONLY : Removal of inactive entanglement- and crosslinks only</p>
+<p>INACTIVE_THEN_X2F : Removal of inactive, and then two-functional entanglement- and crosslinks, one after the other</p>
+<p>X1F_X2F_THEN_INACTIVE : Removal of one- and twofunctional crosslinks, and then inactive entanglements and crosslinks. Deprecated, use INACTIVE_THEN_X2F instead</p>
 </div></blockquote>
 <p class="rubric">Attributes Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.ALL_ANDREI" title="pylimer_tools_cpp.StructureSimplificationMode.ALL_ANDREI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ALL_ANDREI</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.ALL_TIM" title="pylimer_tools_cpp.StructureSimplificationMode.ALL_TIM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ALL_TIM</span></code></a></p></td>
-<td><p></p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_ONLY" title="pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_ONLY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">INACTIVE_ONLY</span></code></a></p></td>
 <td><p></p></td>
 </tr>
@@ -434,16 +426,6 @@
 </table>
 </div>
 <p class="rubric">Attributes Documentation</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.StructureSimplificationMode.ALL_ANDREI">
-<span class="sig-name descname"><span class="pre">ALL_ANDREI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;StructureSimplificationMode.ALL_ANDREI:</span> <span class="pre">4&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.StructureSimplificationMode.ALL_ANDREI" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.StructureSimplificationMode.ALL_TIM">
-<span class="sig-name descname"><span class="pre">ALL_TIM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;StructureSimplificationMode.ALL_TIM:</span> <span class="pre">3&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.StructureSimplificationMode.ALL_TIM" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_ONLY">
 <span class="sig-name descname"><span class="pre">INACTIVE_ONLY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;StructureSimplificationMode.INACTIVE_ONLY:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_ONLY" title="Link to this definition">¶</a></dt>
@@ -530,8 +512,6 @@
             <ul>
 <li><a class="reference internal" href="#">StructureSimplificationMode</a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode</span></code></a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.ALL_ANDREI"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.ALL_ANDREI</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.ALL_TIM"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.ALL_TIM</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_ONLY"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.INACTIVE_ONLY</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.NO_SIMPLIFICATION"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.NO_SIMPLIFICATION</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.StructureSimplificationMode.X2F_ONLY"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.X2F_ONLY</span></code></a></li>

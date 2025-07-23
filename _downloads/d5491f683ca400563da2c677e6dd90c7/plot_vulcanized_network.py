@@ -6,6 +6,8 @@ Generate Vulcanized Networks
 In this example, we create a vulcanized network using the `pylimer-tools` library.
 """
 
+import matplotlib.pyplot as plt
+
 from pylimer_tools_cpp import MCUniverseGenerator, randomly_sample_entanglements
 
 # Create generator for a 50x50x50 simulation box
@@ -46,3 +48,20 @@ print("Generated vulcanized network with {} crosslinks".format(n_sampled_crossli
 # if you want, you can collapse the crosslinks to be a single atom
 # as such:
 universe.contract_vertices_along_bond_type(2)
+
+# %%
+# Refer to :doc:`auto_examples/readers_writers/index` for how you can save the universe to a file.
+#
+# For now, we will show that this produces a variety of different strand
+# lengths:
+
+strand_lengths = [m.get_nr_of_atoms()
+                  for m in universe.get_chains_with_crosslinker(2)]
+
+# Plot the distribution of strand lengths
+plt.figure()
+plt.hist(strand_lengths, bins=50, alpha=0.5, label="Strand Lengths")
+plt.xlabel("Strand Length")
+plt.ylabel("Frequency")
+plt.title("Distribution of Strand Lengths in Vulcanized Network")
+plt.show()
