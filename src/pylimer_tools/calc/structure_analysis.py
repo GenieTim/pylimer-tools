@@ -546,9 +546,8 @@ def measure_lower_bound_weight_fraction_of_soluble_material(
 ) -> float:
     """
     Compute a lower bound on the weight fraction of soluble material by counting.
-    This works as:
-        - only clusters, which do not contain loops and are smaller than the rel_tol of the biggest,
-            are counted as soluble
+    This is ones as such: only clusters, which do not contain loops and are smaller than the rel_tol of the biggest,
+    are counted as soluble
 
     :param network: The polymer network to do the computation for
     :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network

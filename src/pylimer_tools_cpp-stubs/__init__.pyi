@@ -1392,10 +1392,9 @@ class MEHPForceBalance:
         """
     def config_simplification_frequency(self, frequency: int = 10) -> None:
         """
-                 Configure every how many steps to simplify the structure.
+                  Configure every how many steps to simplify the structure.
         
-                 :param frequency: The number of steps between simplification.
-                 Default: 10.
+                  :param frequency: The number of steps between simplification. Default: 10.
         """
     def config_spring_breaking_distance(self, distance_over_contour_length: float = -1) -> None:
         """
@@ -1425,16 +1424,16 @@ class MEHPForceBalance:
                   Perform a deformation of the system box to a different box.
                   All coordinates etc. will be scaled as needed.
         """
-    def evaluate_partial_spring_distance(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray, spring_idx: int) -> numpy.ndarray:
+    def evaluate_spring_distance(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray, spring_idx: int) -> numpy.ndarray:
         ...
-    def evaluate_partial_spring_distance_from(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray, spring_idx: int, link_idx: int) -> numpy.ndarray:
+    def evaluate_spring_distance_from(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray, spring_idx: int, link_idx: int) -> numpy.ndarray:
         ...
-    def evaluate_partial_spring_distance_to(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray, spring_idx: int, link_idx: int) -> numpy.ndarray:
+    def evaluate_spring_distance_to(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray, spring_idx: int, link_idx: int) -> numpy.ndarray:
         ...
-    def get_average_spring_length(self) -> float:
+    def get_average_strand_length(self) -> float:
         """
-                   Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()`,
-                   this value is normalized by the number of springs rather than the number of chains.
+                   Get the average length of the strands. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()`,
+                   this value is normalized by the number of strands rather than the number of chains.
         """
     def get_coordinates(self) -> numpy.ndarray:
         """
@@ -1444,19 +1443,19 @@ class MEHPForceBalance:
         """
                   Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
         """
-    def get_current_partial_spring_lengths(self) -> list[float]:
+    def get_current_spring_lengths(self) -> list[float]:
         """
-                  Get the partial spring distances.
-        """
-    def get_current_partial_spring_vectors(self) -> numpy.ndarray:
-        """
-                  Get the partial spring vectors.
+                  Get the spring distances.
         """
     def get_current_spring_vectors(self) -> numpy.ndarray:
+        """
+                  Get the spring vectors.
+        """
+    def get_current_strand_vectors(self) -> numpy.ndarray:
         ...
     def get_dangling_weight_fraction(self, tolerance: float = 0.001) -> float:
         """
-                  Compute the weight fraction of non-active springs
+                  Compute the weight fraction of non-active strands
         
                   Caution: ignores atom masses.
         """
@@ -1465,7 +1464,7 @@ class MEHPForceBalance:
                    Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for
                    :math:`b` in :math:`\\langle R_{0,\\eta}^2 = N_{\\eta} b^2\\rangle`.
         """
-    def get_displacement_residual_norm(self, one_over_spring_partition_upper_limit: float = 1.0) -> float:
+    def get_displacement_residual_norm(self, one_over_strand_partition_upper_limit: float = 1.0) -> float:
         """
                    Get the current link displacement residual norm.
         """
@@ -1475,9 +1474,9 @@ class MEHPForceBalance:
         """
     def get_effective_functionality_of_atoms(self, tolerance: float = 0.001) -> dict[int, int]:
         """
-                  Returns the number of active springs connected to each atom, atomId used as index
+                  Returns the number of active strands connected to each atom, atomId used as index
         
-                  :param tolerance: springs under this length are considered inactive
+                  :param tolerance: strands under this length are considered inactive
         """
     def get_exit_reason(self) -> ExitReason:
         """
@@ -1487,11 +1486,11 @@ class MEHPForceBalance:
         """
                   Evaluate the norm of the force on each (slip- or cross-) link.
         """
-    def get_force_on(self, link_idx: int, one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
+    def get_force_on(self, link_idx: int, one_over_strand_partition_upper_limit: float = 1.0) -> numpy.ndarray:
         """
                   Evaluate the force on a particular (slip- or cross-) link.
         """
-    def get_gamma_factor(self, b02: float = -1.0, nr_of_chains: int = -1, one_over_spring_partition_upper_limit: float = 1.0) -> float:
+    def get_gamma_factor(self, b02: float = -1.0, nr_of_chains: int = -1, one_over_strand_partition_upper_limit: float = 1.0) -> float:
         """
                   Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
         
@@ -1508,11 +1507,11 @@ class MEHPForceBalance:
                   :param b02: The melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
                   :param nr_of_chains: The value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs.
         """
-    def get_gamma_factors(self, b02: float, one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
+    def get_gamma_factors(self, b02: float, one_over_strand_partition_upper_limit: float = 1.0) -> numpy.ndarray:
         """
                   Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
         """
-    def get_gamma_factors_in_dir(self, b02: float, direction: int, one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
+    def get_gamma_factors_in_dir(self, b02: float, direction: int, one_over_strand_partition_upper_limit: float = 1.0) -> numpy.ndarray:
         """
                        Evaluates the gamma factor for each strand in the specified direction (i.e., the squared distance divided by the contour length multiplied by b02)
         
@@ -1524,7 +1523,7 @@ class MEHPForceBalance:
                   Get the atom ids of the nodes that are considered active.
                   Only crosslink ids are returned (not e.g. entanglement links).
         
-                  :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
+                  :param tolerance: strands under this length are considered inactive. A node is active if it has > 1 active strands.
         """
     def get_initial_coordinates(self) -> numpy.ndarray:
         """
@@ -1535,13 +1534,7 @@ class MEHPForceBalance:
                   Get the number of active nodes (incl. entanglement nodes [atoms with type = entanglementType, present in the universe when creating this simulator],
                   excl. entanglement links [the slip-links created internally when e.g. constructing the simulator with random slip-links]).
         
-                  :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
-        """
-    def get_nr_of_active_partial_springs(self, tolerance: float = 0.001) -> int:
-        """
-                   Get the number of active partial springs remaining after running the simulation.
-        
-                  :param tolerance: springs under this length are considered inactive
+                  :param tolerance: strands under this length are considered inactive. A node is active if it has > 1 active strands.
         """
     def get_nr_of_active_springs(self, tolerance: float = 0.001) -> int:
         """
@@ -1549,12 +1542,18 @@ class MEHPForceBalance:
         
                   :param tolerance: springs under this length are considered inactive
         """
-    def get_nr_of_active_springs_in_dir(self, direction: int, tolerance: float = 0.001) -> int:
+    def get_nr_of_active_strands(self, tolerance: float = 0.001) -> int:
         """
-                        Get the number of active springs remaining after running the simulation.
+                   Get the number of active strands remaining after running the simulation.
         
-                       :param direction: The direction in which to compute the active springs (0: x, 1: y, 2: z)
-                       :param tolerance: springs under this length are considered inactive
+                  :param tolerance: strands under this length are considered inactive
+        """
+    def get_nr_of_active_strands_in_dir(self, direction: int, tolerance: float = 0.001) -> int:
+        """
+                        Get the number of active strands remaining after running the simulation.
+        
+                       :param direction: The direction in which to compute the active strands (0: x, 1: y, 2: z)
+                       :param tolerance: strands under this length are considered inactive
         """
     def get_nr_of_atoms(self) -> int:
         ...
@@ -1574,15 +1573,13 @@ class MEHPForceBalance:
         """
                    Get the number of nodes (crosslinkers) considered in this simulation.
         """
-    def get_nr_of_springs(self) -> int:
+    def get_nr_of_strands(self) -> int:
         """
-                  Get the number of springs considered in this simulation.
-        
-                  :param tolerance: springs under this length are considered inactive
+                  Get the number of strands considered in this simulation.
         """
-    def get_overall_spring_lengths(self) -> list[float]:
+    def get_overall_strand_lengths(self) -> list[float]:
         """
-                  Get the sum of the lengths of the partial springs of each spring.
+                  Get the sum of the lengths of the springs of each strand.
         """
     def get_pressure(self) -> float:
         """
@@ -1590,22 +1587,22 @@ class MEHPForceBalance:
         """
     def get_soluble_weight_fraction(self, tolerance: float = 0.001) -> float:
         """
-                  Compute the weight fraction of springs connected to active
-                  springs (any depth).
+                  Compute the weight fraction of strands connected to active
+                  strands (any depth).
         
                   Caution: ignores atom masses.
         """
-    def get_spring_partitions(self) -> numpy.ndarray:
-        """
-                  Get the current spring partitions (the fraction of the contour length associated with each partial spring).
-        """
-    def get_springpartition_indices_of_sliplink(self, network: SimplifiedBalanceNetwork, link_idx: int) -> list[int]:
+    def get_strand_partition_indices_of_sliplink(self, network: SimplifiedBalanceNetwork, link_idx: int) -> list[int]:
         ...
-    def get_stress_on(self, link_idx: int, one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
+    def get_strand_partitions(self) -> numpy.ndarray:
+        """
+                  Get the current strand partitions (the fraction of the contour length associated with each spring).
+        """
+    def get_stress_on(self, link_idx: int, one_over_strand_partition_upper_limit: float = 1.0) -> numpy.ndarray:
         """
                   Evaluate the stress on a particular (slip- or cross-) link.
         """
-    def get_stress_tensor(self, one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
+    def get_stress_tensor(self, one_over_strand_partition_upper_limit: float = 1.0) -> numpy.ndarray:
         """
                   Returns the stress tensor at the current state of the simulation.
         
@@ -1613,27 +1610,27 @@ class MEHPForceBalance:
                   where the units of :math:`\\kappa` should be :math:`[\\text{force}]/[\\text{distance units}]^2`.
                   Make sure to multiply by :math:`\\kappa` or configure it appropriately.
         """
-    def get_stress_tensor_link_based(self, one_over_spring_partition_upper_limit: float = 1.0, xlinks_only: bool = False) -> numpy.ndarray:
+    def get_stress_tensor_link_based(self, one_over_strand_partition_upper_limit: float = 1.0, xlinks_only: bool = False) -> numpy.ndarray:
         """
                   Returns the stress tensor at the current state of the simulation.
         """
-    def get_weighted_partial_spring_lengths(self, one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
+    def get_weighted_spring_lengths(self, one_over_strand_partition_upper_limit: float = 1.0) -> numpy.ndarray:
         """
-                  Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
+                  Get the current spring lengths (norm of vector) divided by the strand partition times the contour length.
         """
-    def inspect_displacement_to_mean_position_update(self, link_idx: int, one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
+    def inspect_displacement_to_mean_position_update(self, link_idx: int, one_over_strand_partition_upper_limit: float = 1.0) -> numpy.ndarray:
         """
                   Helper method to debug and/or understand what happens to certain links when being displaced.
         """
-    def inspect_parametrisation_optimsation_for_link(self, link_idx: int, displacements: numpy.ndarray, spring_partitions: numpy.ndarray, max_nr_of_steps: int = 100, alpha_tol: float = 1e-09, min_nr_of_steps: int = 1, one_over_spring_partition_upper_limit: float = 1.0) -> tuple[numpy.ndarray, numpy.ndarray, int, float, float, float, float]:
+    def inspect_parametrisation_optimsation_for_link(self, link_idx: int, displacements: numpy.ndarray, strand_partitions: numpy.ndarray, max_nr_of_steps: int = 100, alpha_tol: float = 1e-09, min_nr_of_steps: int = 1, one_over_strand_partition_upper_limit: float = 1.0) -> tuple[numpy.ndarray, numpy.ndarray, int, float, float, float, float]:
         """
                   Helper method to debug and/or understand what happens to certain links
                   when being displaced and their partition updated.
         """
-    def inspect_spring_partition_update(self, link_idx: int) -> numpy.ndarray:
+    def inspect_strand_partition_update(self, link_idx: int) -> numpy.ndarray:
         """
                   Helper method to debug and/or understand what happens to certain links
-                  when the spring partition is being updated.
+                  when the strand partition is being updated.
         """
     def move_sliplinks_to_their_best_branch(self, arg0: SimplifiedBalanceNetwork, arg1: numpy.ndarray, arg2: numpy.ndarray, arg3: float, arg4: int, arg5: bool, arg6: bool) -> None:
         ...
@@ -1641,7 +1638,7 @@ class MEHPForceBalance:
         """
                   Randomly sample and add slip-links based on certain criteria.
         """
-    def run_force_relaxation(self, max_nr_of_steps: int = 250000, x_tolerance: float = 1e-12, initial_residual_norm: float = -1.0, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: float = 0.001, do_inner_iterations: bool = False, allow_sliplinks_to_pass_each_other: LinkSwappingMode = ..., swapping_frequency: int = 10, one_over_spring_partition_upper_limit: float = 1.0, nr_of_crosslink_swaps_allowed_per_sliplink: int = -1, disable_slipping: bool = False) -> None:
+    def run_force_relaxation(self, max_nr_of_steps: int = 250000, x_tolerance: float = 1e-12, initial_residual_norm: float = -1.0, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: float = 0.001, do_inner_iterations: bool = False, allow_sliplinks_to_pass_each_other: LinkSwappingMode = ..., swapping_frequency: int = 10, one_over_strand_partition_upper_limit: float = 1.0, nr_of_crosslink_swaps_allowed_per_sliplink: int = -1, disable_slipping: bool = False) -> None:
         """
                   Run the simulation.
                   Note that the final state of the minimization is persisted and reused if you use this method again.
@@ -1656,7 +1653,7 @@ class MEHPForceBalance:
                   :param do_inner_iterations: Whether to do inner iterations; usually, they are not helpful.
                   :param allow_sliplinks_to_pass_each_other: Whether slip-links can pass each other.
                   :param swapping_frequency: How often slip-links attempt to swap.
-                  :param one_over_spring_partition_upper_limit: Super-secret parameter. Use 1, gradually increase (and then -1) if you want to publish.
+                  :param one_over_strand_partition_upper_limit: Super-secret parameter. Use 1, gradually increase (and then -1) if you want to publish.
                   :param nr_of_crosslink_swaps_allowed_per_sliplink: Use to steer whether slip-links can cross crosslinks when swapping is enabled.
                   :param disable_slipping: Whether slip-links should be prohibited from slipping.
         """
@@ -1664,13 +1661,13 @@ class MEHPForceBalance:
         """
                    Set the current link displacements.
         """
-    def set_spring_contour_lengths(self, arg0: numpy.ndarray) -> None:
+    def set_strand_contour_lengths(self, arg0: numpy.ndarray) -> None:
         """
                    Set/overwrite the contour lengths.
         """
-    def set_spring_partitions(self, arg0: numpy.ndarray) -> None:
+    def set_strand_partitions(self, arg0: numpy.ndarray) -> None:
         """
-                  Set the current spring partitions.
+                  Set the current strand partitions.
         """
     def swap_sliplinks_incl_xlinks(self, arg0: SimplifiedBalanceNetwork, arg1: numpy.ndarray, arg2: numpy.ndarray, arg3: float, arg4: bool) -> None:
         ...
@@ -2902,12 +2899,12 @@ class SimplifiedBalance2Network:
     
     A more efficient structure of the network for use in
     :obj:`~pylimer_tools_cpp.MEHPForceBalance2`.
-    Consists usually only of the cross- and entanglement-links.
+    Consists usually only of the cross- and slip-links (and their connectivity),
+    i.e., no "normal strand beads" in between, in order to reduce the degrees of freedom
+    and therewith improve performance of the solver.
     
-    The terminology is a bit more consistent here:
-    the strands are the chains between two junctions ("nodes"), whereas the 
-    links will be both these nodes as well as entanglement-links, 
-    and finally springs will be any number of connected bonds between links.
+    A note on the terminology: a spring is the connection between two links (crosslink, entanglement-link/slip-link).
+    A strand is a chain of connected links between two crosslinks.
     """
     @property
     def box_lengths(self) -> typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)]:
@@ -2916,10 +2913,10 @@ class SimplifiedBalance2Network:
     def coordinates(self) -> numpy.ndarray:
         ...
     @property
-    def link_indices_of_strand(self) -> list[list[int]]:
+    def link_is_entanglement(self) -> numpy.ndarray:
         ...
     @property
-    def link_is_entanglement(self) -> numpy.ndarray:
+    def links_of_strand(self) -> list[list[int]]:
         ...
     @property
     def nr_of_crosslinks(self) -> int:
@@ -2958,16 +2955,16 @@ class SimplifiedBalance2Network:
     def spring_index_b(self) -> numpy.ndarray:
         ...
     @property
-    def spring_indices_of_strand(self) -> list[list[int]]:
-        ...
-    @property
     def spring_is_entanglement(self) -> numpy.ndarray:
         ...
     @property
-    def strand_index_of_spring(self) -> numpy.ndarray:
+    def springs_of_strand(self) -> list[list[int]]:
         ...
     @property
-    def strand_indices_of_link(self) -> list[list[int]]:
+    def strand_of_spring(self) -> numpy.ndarray:
+        ...
+    @property
+    def strands_of_link(self) -> list[list[int]]:
         ...
 class SimplifiedBalanceNetwork:
     """
@@ -2975,10 +2972,12 @@ class SimplifiedBalanceNetwork:
          A more efficient structure of the network for use in MEHP force balance,
          namely :obj:`~pylimer_tools_cpp.MEHPForceBalance`, though also passable to
          namely :obj:`~pylimer_tools_cpp.MEHPForceBalance2`.
-         Consists usually only of the cross- and slip-links.
+         Consists usually only of the cross- and slip-links (and their connectivity),
+         i.e., no "normal strand beads" in between, in order to reduce the degrees of freedom
+         and therewith improve performance of the solver.
     
-         Assumed terminology: a spring is approximately a strand/chain,
-         whereas a partial spring is the spring between a crosslink and an entanglement-link (slip-link).
+         A note on the terminology: a spring is the connection between two links (crosslink, entanglement-link/slip-link).
+         A strand is a chain of connected links between two crosslinks.
      
     """
     @property
@@ -2988,13 +2987,10 @@ class SimplifiedBalanceNetwork:
     def coordinates(self) -> numpy.ndarray:
         ...
     @property
-    def link_indices_of_springs(self) -> list[list[int]]:
-        ...
-    @property
     def link_is_sliplink(self) -> numpy.ndarray:
         ...
     @property
-    def local_to_global_spring_index(self) -> list[list[int]]:
+    def links_of_strand(self) -> list[list[int]]:
         ...
     @property
     def nr_of_crosslink_swaps_endured(self) -> numpy.ndarray:
@@ -3006,19 +3002,16 @@ class SimplifiedBalanceNetwork:
     def nr_of_links(self) -> int:
         ...
     @property
-    def nr_of_partial_springs(self) -> int:
+    def nr_of_springs(self) -> int:
         ...
     @property
-    def nr_of_springs(self) -> int:
+    def nr_of_strands(self) -> int:
         ...
     @property
     def old_atom_ids(self) -> numpy.ndarray:
         ...
     @property
-    def partial_to_full_spring_index(self) -> numpy.ndarray:
-        ...
-    @property
-    def spring_contour_length(self) -> numpy.ndarray:
+    def spring_box_offset(self) -> numpy.ndarray:
         ...
     @property
     def spring_coordinate_index_a(self) -> numpy.ndarray:
@@ -3033,22 +3026,28 @@ class SimplifiedBalanceNetwork:
     def spring_index_b(self) -> numpy.ndarray:
         ...
     @property
-    def spring_indices_of_links(self) -> list[list[int]]:
+    def springs_of_strand(self) -> list[list[int]]:
         ...
     @property
-    def spring_part_box_offset(self) -> numpy.ndarray:
+    def strand_contour_length(self) -> numpy.ndarray:
         ...
     @property
-    def spring_part_coordinate_index_a(self) -> numpy.ndarray:
+    def strand_coordinate_index_a(self) -> numpy.ndarray:
         ...
     @property
-    def spring_part_coordinate_index_b(self) -> numpy.ndarray:
+    def strand_coordinate_index_b(self) -> numpy.ndarray:
         ...
     @property
-    def spring_part_index_a(self) -> numpy.ndarray:
+    def strand_index_a(self) -> numpy.ndarray:
         ...
     @property
-    def spring_part_index_b(self) -> numpy.ndarray:
+    def strand_index_b(self) -> numpy.ndarray:
+        ...
+    @property
+    def strand_of_spring(self) -> numpy.ndarray:
+        ...
+    @property
+    def strands_of_link(self) -> list[list[int]]:
         ...
     @property
     def volume(self) -> float:

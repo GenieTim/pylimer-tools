@@ -126,7 +126,7 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
     << std::endl;
 
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
-  generator.setSeed(457564875e2);
+  generator.setSeed(45756487500);
   generator.setBeadDistance(0.75);
   generator.configNrOfMCSteps(0);
 

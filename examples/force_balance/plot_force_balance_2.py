@@ -3,7 +3,7 @@ Force Balance 2
 ===============
 
 MEHPForceBalance2 is a faster implementation of the MEHP force balance method,
-which uses static links instead of slip-links.
+which uses static links to model entanglements instead of slip-links.
 """
 
 import os

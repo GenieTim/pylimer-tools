@@ -16,7 +16,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pylimer_tools.io.bead_spring_parameter_provider import (
-    Parameters, get_parameters_for_polymer)
+    Parameters,
+    get_parameters_for_polymer,
+)
 from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import Box, MEHPForceBalance2, Universe
 
@@ -27,7 +29,7 @@ assert isinstance(params, Parameters)
 # Load your network (replace with your file)
 universe = read_data_file(
     os.path.join(
-        os.getcwd() if not __file__ else os.path.dirname(__file__),
+        os.getcwd(),
         "../..",
         "tests/pylimer_tools/fixtures/structure/network_100_a_46.structure.out",
     )
@@ -93,7 +95,7 @@ for lmbda in lmbdas:
 
         stress_tensor = mehp_fb.get_stress_tensor()
 
-        # remove the pressure contribution
+        # remove the pressure contribution using the nominal stress
         sigma_n = (
             stress_tensor[dir][dir]
             - (
@@ -103,6 +105,7 @@ for lmbda in lmbdas:
             / 2
         )
 
+        # compute the shear modulus from the nominal stress
         this_moduli_deformed.append(sigma_n / (lmbda**2 - 1 / lmbda))
 
     assert len(this_moduli_deformed) == 3
@@ -113,10 +116,19 @@ for lmbda in lmbdas:
 # plot deformation results
 plt.figure()
 plt.plot(lmbdas, moduli_deformed, marker="o", label="From Deformation")
-plt.axhline(y=shear_modulus, color="r", linestyle="--", label="From Equilibrium")
+plt.axhline(
+    y=shear_modulus,
+    color="r",
+    linestyle="--",
+    label="From Equilibrium")
 plt.xlabel("Deformation Ratio (λ)")
 plt.ylabel("Shear Modulus [MPa]")
 plt.ylim(0, max(moduli_deformed) * 1.1)
 plt.xlim(1, max(lmbdas) * 1.1)
 plt.legend()
 plt.show()
+
+# %%
+# Rather than using the nominal stress, you can also use the
+# stress tensor directly to compute the shear modulus.
+# Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
