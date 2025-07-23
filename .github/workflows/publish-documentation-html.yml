@@ -47,6 +47,9 @@ jobs:
       - name: Install dev dependencies
         run: sudo apt-get install bison flex
 
+      - name: Install pylimer-tools
+        run: python -m pip install .
+
       - name: Generate Documentation
         run: ./bin/make-docs.sh
 
