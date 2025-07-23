@@ -23,7 +23,7 @@ Generate Vulcanized Networks
 
 In this example, we create a vulcanized network using the `pylimer-tools` library.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-48
+.. GENERATED FROM PYTHON SOURCE LINES 8-49
 
 
 
@@ -34,7 +34,7 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
 
     Generated vulcanized network with 200 crosslinks
 
-    <pylimer_tools_cpp.Universe object at 0x7f36d28f93b0>
+    <pylimer_tools_cpp.Universe object at 0x7f7d5e2b58b0>
 
 
 
@@ -45,8 +45,7 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
 .. code-block:: Python
 
 
-    from pylimer_tools_cpp import (MCUniverseGenerator,
-                                   randomly_sample_entanglements)
+    from pylimer_tools_cpp import MCUniverseGenerator, randomly_sample_entanglements
 
     # Create generator for a 50x50x50 simulation box
     generator = MCUniverseGenerator(50.0, 50.0, 50.0)
@@ -74,8 +73,10 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
     # Add sampled crosslinks to the universe
     universe.add_bonds(
         n_sampled_crosslinks,
-        [sampled_crosslinks.pairs_of_atoms[i][0] for i in range(n_sampled_crosslinks)],
-        [sampled_crosslinks.pairs_of_atoms[i][1] for i in range(n_sampled_crosslinks)],
+        [sampled_crosslinks.pairs_of_atoms[i][0]
+            for i in range(n_sampled_crosslinks)],
+        [sampled_crosslinks.pairs_of_atoms[i][1]
+            for i in range(n_sampled_crosslinks)],
         [2 for _ in range(n_sampled_crosslinks)],  # Bond type 2
     )
 
@@ -88,7 +89,7 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.143 seconds)
+   **Total running time of the script:** (0 minutes 3.133 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_vulcanized_network.py:

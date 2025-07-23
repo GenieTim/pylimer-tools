@@ -7527,8 +7527,8 @@ Load a LAMMPS dump trajectory file (replace with your file)
     Processing frame 74320 with 32 atoms
 
     --- Memory Usage Report ---
-    Memory before processing: 236.34 MB
-    Memory after processing:  236.34 MB
+    Memory before processing: 236.64 MB
+    Memory after processing:  236.64 MB
     Memory used by script:    0.00 MB
     Dump file size:           83.32 MB
 
@@ -7538,7 +7538,7 @@ Load a LAMMPS dump trajectory file (replace with your file)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 20.631 seconds)
+   **Total running time of the script:** (0 minutes 20.427 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_memory_efficient_dump_file_reading.py:

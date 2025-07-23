@@ -22,17 +22,17 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="pylimer_tools.io package" href="pylimer_tools.io.html" /><link rel="prev" title="pylimer_tools package" href="pylimer_tools.html" />
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>pylimer_tools.calc package - pylimer-tools v</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=30c0293a" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=bafda8c6" />
     
     
@@ -40,20 +40,20 @@
 
 <style>
   body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
   
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -213,7 +213,6 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
-  
   <span class="sidebar-brand-text">pylimer-tools v</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
@@ -241,6 +240,7 @@
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="auto_examples/network_generator/index.html">Network Generation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -373,7 +373,7 @@
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/GenieTim/pylimer-tools/edit/main/docs/pylimer_tools.calc.rst" title="Edit this page">
+  <a class="muted-link" href="https://github.com/GenieTim/pylimer-tools/edit/main/docs/pylimer_tools.calc.rst" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -1375,16 +1375,8 @@ Kept for compatibility reasons; just call
 <dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">measure_lower_bound_weight_fraction_of_soluble_material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/calc/structure_analysis.html#measure_lower_bound_weight_fraction_of_soluble_material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material" title="Link to this definition">¶</a></dt>
 <dd><p>Compute a lower bound on the weight fraction of soluble material by counting.
-This works as:</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt>only clusters, which do not contain loops and are smaller than the rel_tol of the biggest,</dt><dd><p>are counted as soluble</p>
-</dd>
-</dl>
-</li>
-</ul>
-</div></blockquote>
+This is ones as such: only clusters, which do not contain loops and are smaller than the rel_tol of the biggest,
+are counted as soluble</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1606,7 +1598,7 @@ that have a weight less than a certain fraction of the total weight.</p>
 </div><script src="_static/documentation_options.js?v=8a448e45"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>

@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/readers_writers/plot_performance_caching.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="All readers support automatic caching for improved performance. extract_thermo_params() is a more elaborate version of read_log_file() Total running time of the script:(0 minutes 0.043 seconds) Dow..." />
+<meta property="og:description" content="All readers support automatic caching for improved performance. extract_thermo_params() is a more elaborate version of read_log_file() Total running time of the script:(0 minutes 0.038 seconds) Dow..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
 <meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_readers_writers_plot_performance_caching_c697d6ba.png" />
-<meta property="og:image:alt" content="All readers support automatic caching for improved performance. extract_thermo_params() is a more elaborate version of read_log_file() Total running time of the script:(0 minutes 0.043 seconds) Dow..." />
-<meta name="description" content="All readers support automatic caching for improved performance. extract_thermo_params() is a more elaborate version of read_log_file() Total running time of the script:(0 minutes 0.043 seconds) Dow..." />
+<meta property="og:image:alt" content="All readers support automatic caching for improved performance. extract_thermo_params() is a more elaborate version of read_log_file() Total running time of the script:(0 minutes 0.038 seconds) Dow..." />
+<meta name="description" content="All readers support automatic caching for improved performance. extract_thermo_params() is a more elaborate version of read_log_file() Total running time of the script:(0 minutes 0.038 seconds) Dow..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -22,17 +22,17 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 <link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Unit Conversion" href="plot_unit_conversion.html" /><link rel="prev" title="Histogram Reader" href="plot_histogram_reader.html" />
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>Performance and Caching - pylimer-tools v</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=30c0293a" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=bafda8c6" />
     
     
@@ -40,20 +40,20 @@
 
 <style>
   body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
   
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -213,7 +213,6 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  
   <span class="sidebar-brand-text">pylimer-tools v</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
@@ -241,6 +240,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../network_generator/index.html">Network Generation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -373,7 +373,7 @@
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/GenieTim/pylimer-tools/edit/main/docs/auto_examples/readers_writers/plot_performance_caching.rst" title="Edit this page">
+  <a class="muted-link" href="https://github.com/GenieTim/pylimer-tools/edit/main/docs/auto_examples/readers_writers/plot_performance_caching.rst" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -436,7 +436,7 @@ to download the full example code.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_performance_caching_001.png" srcset="../../_images/sphx_glr_plot_performance_caching_001.png" alt="plot performance caching" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.043 seconds)</p>
+<img src="../../_images/sphx_glr_plot_performance_caching_001.png" srcset="../../_images/sphx_glr_plot_performance_caching_001.png" alt="plot performance caching" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.038 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-readers-writers-plot-performance-caching-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/769a5fd3e1ade99dbc7d472abe413793/plot_performance_caching.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_performance_caching.ipynb</span></code></a></p>
@@ -503,7 +503,7 @@ to download the full example code.</p>
 </div><script src="../../_static/documentation_options.js?v=8a448e45"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     </body>

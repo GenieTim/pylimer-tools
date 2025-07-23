@@ -83,7 +83,7 @@ The three implementations are:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links instead of slip-links.">
+    <div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links to model entanglements instead of slip-links.">
 
 .. only:: html
 
@@ -129,6 +129,23 @@ The three implementations are:
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Maximum Entropy Homogenization Procedure (MEHP)</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPForceBalance2 class in a deformation experiment.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_fb_deformation_exp_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Deformation Experiment</div>
     </div>
 
 

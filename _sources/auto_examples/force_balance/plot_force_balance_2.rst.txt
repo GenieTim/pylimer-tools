@@ -22,7 +22,7 @@ Force Balance 2
 ===============
 
 MEHPForceBalance2 is a faster implementation of the MEHP force balance method,
-which uses static links instead of slip-links.
+which uses static links to model entanglements instead of slip-links.
 
 .. GENERATED FROM PYTHON SOURCE LINES 8-63
 
@@ -33,8 +33,8 @@ which uses static links instead of slip-links.
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 2.489249070419325e-11
-    Shear Modulus [MPa]:  0.08947358555543446
+    Final residual (should be close to 0): 2.633125367781202e-11
+    Shear Modulus [MPa]:  0.11999155666680045
 
 
 
@@ -104,7 +104,7 @@ which uses static links instead of slip-links.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.656 seconds)
+   **Total running time of the script:** (0 minutes 0.686 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_force_balance_2.py:
