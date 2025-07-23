@@ -3,9 +3,11 @@ This module provides access to various computations introduced in the Miller-Mac
 See :cite:t:`miller_new_1976a` and :cite:t:`macosko_new_1976`.
 
 Additional references used in the development of this module include
-:cite:t:`aoyama_nonlinear_2021a`, :cite:t:`valles_properties_1979`,
-:cite:t:`patel_elastic_1992`, :cite:t:`miller_average_1978`, :cite:t:`miller_calculation_1979` and
-:cite:t:`gusev_numerical_2019`.
+:cite:t:`langley_elastically_1968`, :cite:t:`miller_average_1978`,
+:cite:t:`valles_properties_1979`, :cite:t:`miller_calculation_1979`,
+:cite:t:`venkataraman_critical_1989`, :cite:t:`patel_elastic_1992`,
+:cite:t:`aoyama_nonlinear_2021a`, :cite:t:`gusev_molecular_2022`,
+and :cite:t:`tsimouri_comparison_2024`.
 
 Caution:
       Not all systems are supported yet.
@@ -37,7 +39,7 @@ def predict_shear_modulus(**kwargs) -> pint.Quantity:
     Predict the shear modulus using MMT Analysis.
 
     Source:
-      - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
+      - :cite:t:`gusev_molecular_2022`
 
     :param kwargs: See :func:`~pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition`
     :return: G: The predicted shear modulus
@@ -59,7 +61,7 @@ def predict_number_density_of_junction_points(
     Compute the number density of network strands using MMT
 
     Source:
-      - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737 (see supporting information for formulae)
+      - :cite:t:`aoyama_nonlinear_2021a` (see supporting information for formulae)
 
     :param network: The network to compute the weight fraction for
     :param crosslinker_type: The atom type to use to split the molecules
@@ -107,7 +109,7 @@ def predict_number_density_of_network_strands(
     Compute the number density of network strands using MMT
 
     Source:
-      - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737 (see supporting information for formulae)
+      - :cite:t:`aoyama_nonlinear_2021a` (see supporting information for formulae)
 
     :param network: The network to compute the weight fraction for
     :param crosslinker_type: The atom type to use to split the molecules
@@ -171,7 +173,7 @@ def compute_weight_fraction_of_dangling_chains(
     Compute the weight fraction of dangling (pendant) strands in infinite network
 
     Source:
-      - Eq. 6.4 in https://doi.org/10.1002/pen.760190409
+      - Eq. 6.4 in :cite:t:`miller_calculation_1979`
 
     :param network: The network to compute the weight fraction for
     :param crosslinker_type: The atom type to use to split the molecules
@@ -313,8 +315,8 @@ def compute_weight_fraction_of_soluble_material(
     Compute the weight fraction of soluble material by MMT.
 
     Source:
-      - https://pubs.acs.org/doi/10.1021/ma00046a021
-      - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737
+      - :cite:t:`patel_elastic_1992`
+      - :cite:t:`aoyama_nonlinear_2021a`
 
     :param network: The polymer network to do the computation for
     :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network
@@ -395,10 +397,10 @@ def compute_miller_macosko_probabilities(
     respectively, is the start of a finite chain.
 
     Sources:
-        - https://doi.org/10.1021/ma60050a003
-        - https://doi.org/10.1021/ma60050a004
-        - https://doi.org/10.1021/ma00046a021 (with monofunctional chains, f = 4)
-        - https://doi.org/10.1021/cm0343507 (with monofunctional chains, f = 3)
+        - :cite:t:`macosko_new_1976`
+        - :cite:t:`miller_new_1976a`
+        - :cite:t:`patel_elastic_1992` (with monofunctional chains, f = 4)
+        - :cite:t:`urayama_damping_2004` (with monofunctional chains, f = 3)
 
     .. note::
         Currently, only systems with B_2, B_1 and A_f are supported.
@@ -712,7 +714,7 @@ def compute_trapping_factor(beta: float) -> float:
     """
     Compute the Langley trapping factor :math:`T_e`.
 
-    Literature: https://doi.org/10.1021/ma60004a015
+    Literature: :cite:t:`langley_elastically_1968`
 
     :param beta: :math:`P(F_b^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`
     :return: The Langley trapping factor
@@ -732,7 +734,7 @@ def compute_probability_that_crosslink_is_effective(
     :math:`P(X_m^f) = \\binom{f}{m} [P(F_A^{out})]^{f-m}[1-P(F_A^{out})]^m`
 
     Source:
-        - Eq. 45 in Miller, Macosko 1976, A New Derivation of Post Gel Properties of Network
+        - Eq. 45 in :cite:t:`miller_new_1976a`
 
     :param functionality_of_monomer: f
     :param expected_degree_of_effect: m
@@ -769,7 +771,7 @@ def compute_probability_that_crosslink_with_degree_is_dangling(
     This function computes the probability that a random A_f unit will have i pendant arms.
 
     Source:
-        - Eq. 6.3 in https://doi.org/10.1002/pen.760190409
+        - Eq. 6.3 in :cite:t:`miller_calculation_1979`
 
     :param functionality_of_monomer: f
     :param degree_of_ineffectiveness: i
@@ -796,7 +798,7 @@ def compute_probability_that_crosslink_is_dangling(
     This is equal to the probability that only one of the arms is attached to the gel.
 
     Source:
-        - Eq. 6.2 in https://doi.org/10.1002/pen.760190409
+        - Eq. 6.2 in :cite:t:`miller_calculation_1979`
 
     :param functionality_of_monomer: f
     :param p_f_a_out: :math:`P(F_A^{out})`
@@ -816,7 +818,7 @@ def compute_probability_that_bifunctional_monomer_is_dangling(
     This function computes the probability that a random B_2 unit will be dangling.
 
     Source:
-        - Eq. 6.1 in https://doi.org/10.1002/pen.760190409
+        - Eq. 6.1 in :cite:t:`miller_calculation_1979`
 
     :param p_f_b_out: :math:`P(F_B^{out})`
     :return: The probability that a bifunctional monomer is dangling
@@ -831,7 +833,7 @@ def predict_gelation_point(r: float, f: int, b2: float = 1) -> float:
     (gelation point = critical extent of reaction for gelation)
 
     Source:
-      - https://www.sciencedirect.com/science/article/pii/003238618990253X
+      - :cite:t:`venkataraman_critical_1989`
 
     :param r: The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
     :param f: functionality of the crosslinkers
