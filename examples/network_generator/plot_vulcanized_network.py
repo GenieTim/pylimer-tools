@@ -6,8 +6,7 @@ Generate Vulcanized Networks
 In this example, we create a vulcanized network using the `pylimer-tools` library.
 """
 
-from pylimer_tools_cpp import (MCUniverseGenerator,
-                               randomly_sample_entanglements)
+from pylimer_tools_cpp import MCUniverseGenerator, randomly_sample_entanglements
 
 # Create generator for a 50x50x50 simulation box
 generator = MCUniverseGenerator(50.0, 50.0, 50.0)
@@ -35,8 +34,10 @@ n_sampled_crosslinks = len(sampled_crosslinks.pairs_of_atoms)
 # Add sampled crosslinks to the universe
 universe.add_bonds(
     n_sampled_crosslinks,
-    [sampled_crosslinks.pairs_of_atoms[i][0] for i in range(n_sampled_crosslinks)],
-    [sampled_crosslinks.pairs_of_atoms[i][1] for i in range(n_sampled_crosslinks)],
+    [sampled_crosslinks.pairs_of_atoms[i][0]
+        for i in range(n_sampled_crosslinks)],
+    [sampled_crosslinks.pairs_of_atoms[i][1]
+        for i in range(n_sampled_crosslinks)],
     [2 for _ in range(n_sampled_crosslinks)],  # Bond type 2
 )
 

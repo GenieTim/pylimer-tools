@@ -198,50 +198,52 @@ the simulation or optimization procedure.)pbdoc")
      A more efficient structure of the network for use in MEHP force balance,
      namely :obj:`~pylimer_tools_cpp.MEHPForceBalance`, though also passable to
      namely :obj:`~pylimer_tools_cpp.MEHPForceBalance2`.
-     Consists usually only of the cross- and slip-links.
+     Consists usually only of the cross- and slip-links (and their connectivity),
+     i.e., no "normal strand beads" in between, in order to reduce the degrees of freedom
+     and therewith improve performance of the solver.
 
-     Assumed terminology: a spring is approximately a strand/chain,
-     whereas a partial spring is the spring between a crosslink and an entanglement-link (slip-link).
+     A note on the terminology: a spring is the connection between two links (crosslink, entanglement-link/slip-link).
+     A strand is a chain of connected links between two crosslinks.
  )pbdoc")
     .def_readonly("box_lengths", &mehp::ForceBalanceNetwork::L)
     .def_readonly("volume", &mehp::ForceBalanceNetwork::vol)
     .def_readonly("nr_of_crosslinks", &mehp::ForceBalanceNetwork::nrOfNodes)
     .def_readonly("nr_of_links", &mehp::ForceBalanceNetwork::nrOfLinks)
-    .def_readonly("nr_of_springs", &mehp::ForceBalanceNetwork::nrOfSprings)
-    .def_readonly("nr_of_partial_springs",
+    .def_readonly("nr_of_strands", &mehp::ForceBalanceNetwork::nrOfSprings)
+    .def_readonly("nr_of_springs",
                   &mehp::ForceBalanceNetwork::nrOfPartialSprings)
     // .def_readonly("nrOfLoops", &mehp::Network::nrOfLoops)
     .def_readonly("coordinates", &mehp::ForceBalanceNetwork::coordinates)
     .def_readonly("old_atom_ids", &mehp::ForceBalanceNetwork::oldAtomIds)
-    .def_readonly("spring_coordinate_index_a",
+    .def_readonly("strand_coordinate_index_a",
                   &mehp::ForceBalanceNetwork::springCoordinateIndexA)
-    .def_readonly("spring_coordinate_index_b",
+    .def_readonly("strand_coordinate_index_b",
                   &mehp::ForceBalanceNetwork::springCoordinateIndexB)
-    .def_readonly("spring_part_coordinate_index_a",
+    .def_readonly("spring_coordinate_index_a",
                   &mehp::ForceBalanceNetwork::springPartCoordinateIndexA)
-    .def_readonly("spring_part_coordinate_index_b",
+    .def_readonly("spring_coordinate_index_b",
                   &mehp::ForceBalanceNetwork::springPartCoordinateIndexB)
-    .def_readonly("spring_index_a", &mehp::ForceBalanceNetwork::springIndexA)
-    .def_readonly("spring_index_b", &mehp::ForceBalanceNetwork::springIndexB)
-    .def_readonly("spring_part_index_a",
+    .def_readonly("strand_index_a", &mehp::ForceBalanceNetwork::springIndexA)
+    .def_readonly("strand_index_b", &mehp::ForceBalanceNetwork::springIndexB)
+    .def_readonly("spring_index_a",
                   &mehp::ForceBalanceNetwork::springPartIndexA)
-    .def_readonly("spring_part_index_b",
+    .def_readonly("spring_index_b",
                   &mehp::ForceBalanceNetwork::springPartIndexB)
     .def_readonly("link_is_sliplink",
                   &mehp::ForceBalanceNetwork::linkIsSliplink)
-    .def_readonly("local_to_global_spring_index",
+    .def_readonly("springs_of_strand",
                   &mehp::ForceBalanceNetwork::localToGlobalSpringIndex)
-    .def_readonly("spring_indices_of_links",
+    .def_readonly("strands_of_link",
                   &mehp::ForceBalanceNetwork::springIndicesOfLinks)
-    .def_readonly("link_indices_of_springs",
+    .def_readonly("links_of_strand",
                   &mehp::ForceBalanceNetwork::linkIndicesOfSprings)
     .def_readonly("nr_of_crosslink_swaps_endured",
                   &mehp::ForceBalanceNetwork::nrOfCrosslinkSwapsEndured)
-    .def_readonly("spring_contour_length",
+    .def_readonly("strand_contour_length",
                   &mehp::ForceBalanceNetwork::springsContourLength)
-    .def_readonly("partial_to_full_spring_index",
+    .def_readonly("strand_of_spring",
                   &mehp::ForceBalanceNetwork::partialToFullSpringIndex)
-    .def_readonly("spring_part_box_offset",
+    .def_readonly("spring_box_offset",
                   &mehp::ForceBalanceNetwork::springPartBoxOffset)
     // .def_readonly("springIsActive", &mehp::Network::springIsActive)
     ;
@@ -251,12 +253,12 @@ the simulation or optimization procedure.)pbdoc")
                                          R"pbdoc(
 A more efficient structure of the network for use in
 :obj:`~pylimer_tools_cpp.MEHPForceBalance2`.
-Consists usually only of the cross- and entanglement-links.
+Consists usually only of the cross- and slip-links (and their connectivity),
+i.e., no "normal strand beads" in between, in order to reduce the degrees of freedom
+and therewith improve performance of the solver.
 
-The terminology is a bit more consistent here:
-the strands are the chains between two junctions ("nodes"), whereas the 
-links will be both these nodes as well as entanglement-links, 
-and finally springs will be any number of connected bonds between links.
+A note on the terminology: a spring is the connection between two links (crosslink, entanglement-link/slip-link).
+A strand is a chain of connected links between two crosslinks.
 )pbdoc")
     .def_readonly("box_lengths", &mehp::ForceBalance2Network::L)
     .def_readonly("nr_of_crosslinks", &mehp::ForceBalance2Network::nrOfNodes)
@@ -279,13 +281,13 @@ and finally springs will be any number of connected bonds between links.
     .def_readonly("spring_index_b", &mehp::ForceBalance2Network::springIndexB)
     .def_readonly("spring_contour_length",
                   &mehp::ForceBalance2Network::springContourLength)
-    .def_readonly("spring_indices_of_strand",
+    .def_readonly("springs_of_strand",
                   &mehp::ForceBalance2Network::springIndicesOfStrand)
-    .def_readonly("strand_indices_of_link",
+    .def_readonly("strands_of_link",
                   &mehp::ForceBalance2Network::strandIndicesOfLink)
-    .def_readonly("link_indices_of_strand",
+    .def_readonly("links_of_strand",
                   &mehp::ForceBalance2Network::linkIndicesOfStrand)
-    .def_readonly("strand_index_of_spring",
+    .def_readonly("strand_of_spring",
                   &mehp::ForceBalance2Network::strandIndexOfSpring)
     .def_readonly("spring_box_offset",
                   &mehp::ForceBalance2Network::springBoxOffset);
@@ -841,7 +843,7 @@ and finally springs will be any number of connected bonds between links.
           :param do_inner_iterations: Whether to do inner iterations; usually, they are not helpful.
           :param allow_sliplinks_to_pass_each_other: Whether slip-links can pass each other.
           :param swapping_frequency: How often slip-links attempt to swap.
-          :param one_over_spring_partition_upper_limit: Super-secret parameter. Use 1, gradually increase (and then -1) if you want to publish.
+          :param one_over_strand_partition_upper_limit: Super-secret parameter. Use 1, gradually increase (and then -1) if you want to publish.
           :param nr_of_crosslink_swaps_allowed_per_sliplink: Use to steer whether slip-links can cross crosslinks when swapping is enabled.
           :param disable_slipping: Whether slip-links should be prohibited from slipping.
           )pbdoc",
@@ -855,7 +857,7 @@ and finally springs will be any number of connected bonds between links.
       py::arg("allow_sliplinks_to_pass_each_other") =
         mehp::LinkSwappingMode::NO_SWAPPING,
       py::arg("swapping_frequency") = 10,
-      py::arg("one_over_spring_partition_upper_limit") = 1.0,
+      py::arg("one_over_strand_partition_upper_limit") = 1.0,
       py::arg("nr_of_crosslink_swaps_allowed_per_sliplink") = -1,
       py::arg("disable_slipping") = false)
     .def("deform_to",
@@ -931,11 +933,10 @@ and finally springs will be any number of connected bonds between links.
     .def("config_simplification_frequency",
          &mehp::MEHPForceBalance::configSimplificationFrequency,
          R"pbdoc(
-         Configure every how many steps to simplify the structure.
+          Configure every how many steps to simplify the structure.
 
-         :param frequency: The number of steps between simplification.
-         Default: 10.
-         )pbdoc",
+          :param frequency: The number of steps between simplification. Default: 10.
+          )pbdoc",
          py::arg("frequency") = 10)
     .def("swap_sliplinks_incl_xlinks",
          &mehp::MEHPForceBalance::swapSlipLinksInclXlinks)
@@ -950,7 +951,7 @@ and finally springs will be any number of connected bonds between links.
           Evaluate the force on a particular (slip- or cross-) link.
       )pbdoc",
       py::arg("link_idx"),
-      py::arg("one_over_spring_partition_upper_limit") = 1.0)
+      py::arg("one_over_strand_partition_upper_limit") = 1.0)
     .def("get_force_magnitude_vector",
          &mehp::MEHPForceBalance::getForceMagnitudeVector,
          R"pbdoc(
@@ -965,19 +966,19 @@ and finally springs will be any number of connected bonds between links.
           Evaluate the stress on a particular (slip- or cross-) link.
       )pbdoc",
       py::arg("link_idx"),
-      py::arg("one_over_spring_partition_upper_limit") = 1.0)
+      py::arg("one_over_strand_partition_upper_limit") = 1.0)
     .def("inspect_displacement_to_mean_position_update",
          &mehp::MEHPForceBalance::inspectDisplacementToMeanPositionUpdate,
          R"pbdoc(
           Helper method to debug and/or understand what happens to certain links when being displaced.
          )pbdoc",
          py::arg("link_idx"),
-         py::arg("one_over_spring_partition_upper_limit") = 1.0)
-    .def("inspect_spring_partition_update",
+         py::arg("one_over_strand_partition_upper_limit") = 1.0)
+    .def("inspect_strand_partition_update",
          &mehp::MEHPForceBalance::inspectSpringPartitionUpdate,
          R"pbdoc(
           Helper method to debug and/or understand what happens to certain links
-          when the spring partition is being updated.
+          when the strand partition is being updated.
          )pbdoc",
          py::arg("link_idx"))
     .def("inspect_parametrisation_optimsation_for_link",
@@ -988,12 +989,12 @@ and finally springs will be any number of connected bonds between links.
          )pbdoc",
          py::arg("link_idx"),
          py::arg("displacements"),
-         py::arg("spring_partitions"),
+         py::arg("strand_partitions"),
          py::arg("max_nr_of_steps") = 100,
          py::arg("alpha_tol") = 1e-9,
          py::arg("min_nr_of_steps") = 1,
-         py::arg("one_over_spring_partition_upper_limit") = 1.0)
-    .def("get_springpartition_indices_of_sliplink",
+         py::arg("one_over_strand_partition_upper_limit") = 1.0)
+    .def("get_strand_partition_indices_of_sliplink",
          &mehp::MEHPForceBalance::getSpringpartitionIndicesOfSliplink,
          R"pbdoc()pbdoc",
          py::arg("network"),
@@ -1004,7 +1005,7 @@ and finally springs will be any number of connected bonds between links.
                 py::arg("network"),
                 py::arg("link_idx"))
     .def(
-      "evaluate_partial_spring_distance",
+      "evaluate_spring_distance",
       [](const mehp::MEHPForceBalance& sim,
          const mehp::ForceBalanceNetwork& net,
          const Eigen::VectorXd& u,
@@ -1016,7 +1017,7 @@ and finally springs will be any number of connected bonds between links.
       py::arg("displacements"),
       py::arg("spring_idx"))
     .def(
-      "evaluate_partial_spring_distance_from",
+      "evaluate_spring_distance_from",
       [](const mehp::MEHPForceBalance& sim,
          const mehp::ForceBalanceNetwork& net,
          const Eigen::VectorXd& u,
@@ -1031,7 +1032,7 @@ and finally springs will be any number of connected bonds between links.
       py::arg("spring_idx"),
       py::arg("link_idx"))
     .def(
-      "evaluate_partial_spring_distance_to",
+      "evaluate_spring_distance_to",
       [](const mehp::MEHPForceBalance& sim,
          const mehp::ForceBalanceNetwork& net,
          const Eigen::VectorXd& u,
@@ -1078,8 +1079,8 @@ and finally springs will be any number of connected bonds between links.
     .def("get_soluble_weight_fraction",
          &mehp::MEHPForceBalance::getSolubleWeightFraction,
          R"pbdoc(
-          Compute the weight fraction of springs connected to active
-          springs (any depth).
+          Compute the weight fraction of strands connected to active
+          strands (any depth).
 
           Caution: ignores atom masses.
      )pbdoc",
@@ -1087,7 +1088,7 @@ and finally springs will be any number of connected bonds between links.
     .def("get_dangling_weight_fraction",
          &mehp::MEHPForceBalance::getDanglingWeightFraction,
          R"pbdoc(
-          Compute the weight fraction of non-active springs
+          Compute the weight fraction of non-active strands
 
           Caution: ignores atom masses.
      )pbdoc",
@@ -1144,13 +1145,13 @@ and finally springs will be any number of connected bonds between links.
           where the units of :math:`\kappa` should be :math:`[\text{force}]/[\text{distance units}]^2`.
           Make sure to multiply by :math:`\kappa` or configure it appropriately.
      )pbdoc",
-      py::arg("one_over_spring_partition_upper_limit") = 1.)
+      py::arg("one_over_strand_partition_upper_limit") = 1.)
     .def("get_stress_tensor_link_based",
          &mehp::MEHPForceBalance::getStressTensorLinkBased,
          R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
      )pbdoc",
-         py::arg("one_over_spring_partition_upper_limit") = 1.,
+         py::arg("one_over_strand_partition_upper_limit") = 1.,
          py::arg("xlinks_only") = false)
     .def("get_gamma_factor",
          &mehp::MEHPForceBalance::getGammaFactor,
@@ -1172,14 +1173,14 @@ and finally springs will be any number of connected bonds between links.
      )pbdoc",
          py::arg("b02") = -1.0,
          py::arg("nr_of_chains") = -1,
-         py::arg("one_over_spring_partition_upper_limit") = 1.)
+         py::arg("one_over_strand_partition_upper_limit") = 1.)
     .def("get_gamma_factors",
          &mehp::MEHPForceBalance::getGammaFactors,
          R"pbdoc(
           Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
      )pbdoc",
          py::arg("b02"),
-         py::arg("one_over_spring_partition_upper_limit") = 1.)
+         py::arg("one_over_strand_partition_upper_limit") = 1.)
     .def("get_gamma_factors_in_dir",
          &mehp::MEHPForceBalance::getGammaFactorsInDir,
          R"pbdoc(
@@ -1190,34 +1191,32 @@ and finally springs will be any number of connected bonds between links.
           )pbdoc",
          py::arg("b02"),
          py::arg("direction"),
-         py::arg("one_over_spring_partition_upper_limit") = 1.)
+         py::arg("one_over_strand_partition_upper_limit") = 1.)
     .def("get_nr_of_nodes",
          &mehp::MEHPForceBalance::getNrOfNodes,
          R"pbdoc(
            Get the number of nodes (crosslinkers) considered in this simulation.
      )pbdoc")
-    .def("get_nr_of_springs",
+    .def("get_nr_of_strands",
          &mehp::MEHPForceBalance::getNrOfSprings,
          R"pbdoc(
-          Get the number of springs considered in this simulation.
-
-          :param tolerance: springs under this length are considered inactive
+          Get the number of strands considered in this simulation.
      )pbdoc")
-    .def("get_spring_partitions",
+    .def("get_strand_partitions",
          &mehp::MEHPForceBalance::getSpringPartitions,
          R"pbdoc(
-          Get the current spring partitions (the fraction of the contour length associated with each partial spring).
+          Get the current strand partitions (the fraction of the contour length associated with each spring).
      )pbdoc")
-    .def("get_weighted_partial_spring_lengths",
+    .def("get_weighted_spring_lengths",
          &mehp::MEHPForceBalance::getWeightedPartialSpringLengths,
          R"pbdoc(
-          Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
+          Get the current spring lengths (norm of vector) divided by the strand partition times the contour length.
           )pbdoc",
-         py::arg("one_over_spring_partition_upper_limit") = 1.)
-    .def("set_spring_partitions",
+         py::arg("one_over_strand_partition_upper_limit") = 1.)
+    .def("set_strand_partitions",
          &mehp::MEHPForceBalance::setSpringPartitions,
          R"pbdoc(
-          Set the current spring partitions.
+          Set the current strand partitions.
      )pbdoc")
     .def("get_coordinates",
          &mehp::MEHPForceBalance::getCoordinates,
@@ -1239,7 +1238,7 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
            Set the current link displacements.
       )pbdoc")
-    .def("set_spring_contour_lengths",
+    .def("set_strand_contour_lengths",
          &mehp::MEHPForceBalance::setSpringContourLengths,
          R"pbdoc(
            Set/overwrite the contour lengths.
@@ -1249,14 +1248,14 @@ and finally springs will be any number of connected bonds between links.
          R"pbdoc(
            Get the current link displacement residual norm.
       )pbdoc",
-         py::arg("one_over_spring_partition_upper_limit") = 1.)
+         py::arg("one_over_strand_partition_upper_limit") = 1.)
     .def("get_ids_of_active_nodes",
          &mehp::MEHPForceBalance::getIdsOfActiveNodes,
          R"pbdoc(
           Get the atom ids of the nodes that are considered active.
           Only crosslink ids are returned (not e.g. entanglement links).
 
-          :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
+          :param tolerance: strands under this length are considered inactive. A node is active if it has > 1 active strands.
      )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_nr_of_active_nodes",
@@ -1265,65 +1264,65 @@ and finally springs will be any number of connected bonds between links.
           Get the number of active nodes (incl. entanglement nodes [atoms with type = entanglementType, present in the universe when creating this simulator],
           excl. entanglement links [the slip-links created internally when e.g. constructing the simulator with random slip-links]).
 
-          :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
+          :param tolerance: strands under this length are considered inactive. A node is active if it has > 1 active strands.
      )pbdoc",
          py::arg("tolerance") = 1e-3)
-    .def("get_nr_of_active_springs",
+    .def("get_nr_of_active_strands",
          &mehp::MEHPForceBalance::getNrOfActiveSprings,
+         R"pbdoc(
+           Get the number of active strands remaining after running the simulation.
+
+          :param tolerance: strands under this length are considered inactive
+     )pbdoc",
+         py::arg("tolerance") = 1e-3)
+    .def("get_nr_of_active_strands_in_dir",
+         &mehp::MEHPForceBalance::getNrOfActiveSpringsInDir,
+         R"pbdoc(
+                Get the number of active strands remaining after running the simulation.
+
+               :param direction: The direction in which to compute the active strands (0: x, 1: y, 2: z)
+               :param tolerance: strands under this length are considered inactive
+          )pbdoc",
+         py::arg("direction"),
+         py::arg("tolerance") = 1e-3)
+    .def("get_nr_of_active_springs",
+         &mehp::MEHPForceBalance::getNrOfActivePartialSprings,
          R"pbdoc(
            Get the number of active springs remaining after running the simulation.
 
           :param tolerance: springs under this length are considered inactive
      )pbdoc",
          py::arg("tolerance") = 1e-3)
-    .def("get_nr_of_active_springs_in_dir",
-         &mehp::MEHPForceBalance::getNrOfActiveSpringsInDir,
-         R"pbdoc(
-                Get the number of active springs remaining after running the simulation.
-
-               :param direction: The direction in which to compute the active springs (0: x, 1: y, 2: z)
-               :param tolerance: springs under this length are considered inactive
-          )pbdoc",
-         py::arg("direction"),
-         py::arg("tolerance") = 1e-3)
-    .def("get_nr_of_active_partial_springs",
-         &mehp::MEHPForceBalance::getNrOfActivePartialSprings,
-         R"pbdoc(
-           Get the number of active partial springs remaining after running the simulation.
-
-          :param tolerance: springs under this length are considered inactive
-     )pbdoc",
-         py::arg("tolerance") = 1e-3)
-    .def("get_current_partial_spring_vectors",
+    .def("get_current_spring_vectors",
          &mehp::MEHPForceBalance::getCurrentPartialSpringDistances,
          R"pbdoc(
-          Get the partial spring vectors.
+          Get the spring vectors.
      )pbdoc")
-    .def("get_current_partial_spring_lengths",
+    .def("get_current_spring_lengths",
          &mehp::MEHPForceBalance::getCurrentPartialSpringLengths,
          R"pbdoc(
-          Get the partial spring distances.
+          Get the spring distances.
      )pbdoc")
-    .def("get_current_spring_vectors",
+    .def("get_current_strand_vectors",
          &mehp::MEHPForceBalance::getCurrentSpringDistances)
-    .def("get_overall_spring_lengths",
+    .def("get_overall_strand_lengths",
          &mehp::MEHPForceBalance::getOverallSpringLengths,
          R"pbdoc(
-          Get the sum of the lengths of the partial springs of each spring.
+          Get the sum of the lengths of the springs of each strand.
      )pbdoc")
     .def("get_effective_functionality_of_atoms",
          &mehp::MEHPForceBalance::getEffectiveFunctionalityOfAtoms,
          R"pbdoc(
-          Returns the number of active springs connected to each atom, atomId used as index
+          Returns the number of active strands connected to each atom, atomId used as index
 
-          :param tolerance: springs under this length are considered inactive
+          :param tolerance: strands under this length are considered inactive
      )pbdoc",
          py::arg("tolerance") = 1e-3)
-    .def("get_average_spring_length",
+    .def("get_average_strand_length",
          &mehp::MEHPForceBalance::getAverageSpringLength,
          R"pbdoc(
-           Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()`,
-           this value is normalized by the number of springs rather than the number of chains.
+           Get the average length of the strands. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()`,
+           this value is normalized by the number of strands rather than the number of chains.
      )pbdoc")
     .def("get_default_mean_bond_length",
          &mehp::MEHPForceBalance::getDefaultMeanBondLength,

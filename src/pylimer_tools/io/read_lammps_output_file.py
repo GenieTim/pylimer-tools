@@ -6,6 +6,7 @@ This module provides a few functions to read LAMMPS' output files, including:
 - data files (the LAMMPS structure)
 - averaged data (from :code:`fix ave/time...` or :code:`fix ave/hist...`)
 - correlation data (from :code:`fix ave/correlate/...`)
+
 """
 
 import os

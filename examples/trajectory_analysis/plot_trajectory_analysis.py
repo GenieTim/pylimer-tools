@@ -31,6 +31,7 @@ msd = sequence.compute_msd_for_atoms(
     nr_of_origins=10,  # Number of origins to use for MSD calculation
 )
 
+# %%
 # You can also compute other properties like radius of gyration, end-to-end distance, etc.
 # by using the "lazy" iterator over the sequence
 # This allows you to process large trajectories without loading everything
