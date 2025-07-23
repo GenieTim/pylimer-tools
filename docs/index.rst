@@ -93,8 +93,8 @@ Basic usage example:
 -----------------------
 
 - **New to pylimer-tools?** Start with :doc:`installation` and :doc:`usage`
-- **Working with files?** Check out :doc:`auto_examples/readers_writers`
-- **Generating networks?** See :doc:`auto_examples/network_generator`
+- **Working with files?** Check out :doc:`auto_examples/readers_writers/index`
+- **Generating networks?** See :doc:`auto_examples/network_generator/index`
 - **Need examples?** Browse :doc:`auto_examples/index` for practical code samples
 - **Understanding limitations?** Review :doc:`assumptions` and :doc:`nomenclature`
 

@@ -11,10 +11,16 @@
 namespace pylimer_tools::sim::mehp {
 #define STRUCTURE_SIMPLIFICATION_MODES                                         \
   X(NO_SIMPLIFICATION, "No Simplification")                                    \
-  X(X2F_ONLY, "Two-function crosslinks only")                                  \
-  X(INACTIVE_ONLY, "Inactive links only")                                      \
-  X(ALL_TIM, "All, à la Tim")                                                  \
-  X(ALL_ANDREI, "All, à la Andrei")
+  X(X2F_ONLY, "Removal of two-functional crosslinks only")                     \
+  X(INACTIVE_ONLY, "Removal of inactive entanglement- and crosslinks only")    \
+  X(INACTIVE_THEN_X2F,                                                         \
+    "Removal of inactive, and then two-functional entanglement- and "          \
+    "crosslinks, "                                                             \
+    "one after the other")                                                     \
+  X(X1F_X2F_THEN_INACTIVE,                                                     \
+    "Removal of one- and twofunctional crosslinks, and then inactive "         \
+    "entanglements and crosslinks. Deprecated, use "                           \
+    "INACTIVE_THEN_X2F instead")
 
 enum StructureSimplificationMode
 {

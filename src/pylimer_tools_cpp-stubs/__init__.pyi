@@ -1092,7 +1092,13 @@ class MCUniverseGenerator:
            A :obj:`pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
       
     """
-    def __init__(self, lx: float, ly: float, lz: float) -> None:
+    def __copy__(self) -> MCUniverseGenerator:
+        ...
+    def __getstate__(self) -> tuple:
+        ...
+    def __init__(self, lx: float = 10.0, ly: float = 10.0, lz: float = 10.0) -> None:
+        ...
+    def __setstate__(self, arg0: tuple) -> None:
         ...
     def add_crosslinkers(self, nr_of_crosslinkers: int, crosslinker_functionality: int = 4, crosslinker_type: int = 2, white_noise: bool = True) -> None:
         """
@@ -2026,7 +2032,7 @@ class MEHPForceRelaxation:
         This is the first of three force relaxation methods available in this library.
         The relevant feature of this implementation is the configurable spring potential.
         Consequently, it offers a variety of configurable non-linear solvers using NLoptLib.
-         
+        
     """
     def __getstate__(self) -> tuple:
         ...
@@ -2041,7 +2047,7 @@ class MEHPForceRelaxation:
                   :param kappa: The spring constant
                   :param remove_2functional_crosslinkers: Whether to replace two-functional crosslinkers with a "normal" chain bead
                   :param remove_dangling_chains: Whether to remove dangling chains before running the simulation.
-                       **Caution*: Removing the dangling chains will result in incorrect results fo the computation of
+                       **Caution**: Removing the dangling chains will result in incorrect results fo the computation of
                        :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction()` and
                        :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getDanglingWeightFraction()`
         """
@@ -2260,8 +2266,6 @@ class MaxDistanceProvider:
          A generic implementation of a class, that shall provide a maximum distance for the MC sampling.
          
     """
-    def __init__(self) -> None:
-        ...
     def get_max_distance(self, N: float) -> float:
         """
         N
@@ -2780,7 +2784,7 @@ class OutputConfiguration:
              For autocorrelation and averaging, how often to include values.
         
              Use a value of 1 to take average of or autocorrelate, respectively,
-            all values encountered during the simulation or optimization procedure.
+             all values encountered during the simulation or optimization procedure.
         """
     @use_every.setter
     def use_every(self, arg0: int) -> None:

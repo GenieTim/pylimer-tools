@@ -18,35 +18,18 @@ using namespace pylimer_tools::utils;
 void
 init_pylimer_bound_generators(py::module_& m)
 {
-  class PyMaxDistanceProvider : public MaxDistanceProvider
-  {
-  public:
-    /* Inherit the constructors */
-    using MaxDistanceProvider::MaxDistanceProvider;
-
-    /* Trampoline (need one for each virtual function) */
-    double getMaxDistance(const double N) override
-    {
-      PYBIND11_OVERRIDE_PURE(
-        double,              /* Return type */
-        MaxDistanceProvider, /* Parent class */
-        getMaxDistance, /* Name of function in C++ (must match Python name) */
-        N               /* Argument(s) */
-      );
-    }
-  };
-
-  py::class_<MaxDistanceProvider, PyMaxDistanceProvider>(
+  py::class_<MaxDistanceProvider, std::shared_ptr<MaxDistanceProvider>>(
     m, "MaxDistanceProvider", R"pbdoc(
      A generic implementation of a class, that shall provide a maximum distance for the MC sampling.
      )pbdoc")
-    .def(py::init<>())
     .def("get_max_distance",
          &MaxDistanceProvider::getMaxDistance,
          "N",
          py::arg("N"));
 
-  py::class_<LinearMaxDistanceProvider, MaxDistanceProvider>(
+  py::class_<LinearMaxDistanceProvider,
+             MaxDistanceProvider,
+             std::shared_ptr<LinearMaxDistanceProvider>>(
     m, "LinearMaxDistanceProvider", R"pbdoc(
     For MC generation, converts the :math:`N` to a maximum distance within which to sample.
     The distance will be calculated as :math:`N \times \text{max_distance_multiplier}`.
@@ -63,7 +46,10 @@ init_pylimer_bound_generators(py::module_& m)
          :param N: Number of segments.
          )pbdoc",
          py::arg("N"));
-  py::class_<ZScoreMaxDistanceProvider, MaxDistanceProvider>(
+
+  py::class_<ZScoreMaxDistanceProvider,
+             MaxDistanceProvider,
+             std::shared_ptr<ZScoreMaxDistanceProvider>>(
     m, "ZScoreMaxDistanceProvider", R"pbdoc(
      For MC generation, converts the :math:`N` to a maximum distance within which to sample.
      The distance will be calculated as :math:`\text{std_multiplier} \times \sqrt{N \times \text{in_sqrt_multiplier}}`.
@@ -85,7 +71,9 @@ init_pylimer_bound_generators(py::module_& m)
          )pbdoc",
          py::arg("N"));
 
-  py::class_<NoMaxDistanceProvider, MaxDistanceProvider>(
+  py::class_<NoMaxDistanceProvider,
+             MaxDistanceProvider,
+             std::shared_ptr<NoMaxDistanceProvider>>(
     m, "NoMaxDistanceProvider", R"pbdoc(
     For MC generation, to disable the neighbour list usage.
     )pbdoc")
@@ -99,9 +87,9 @@ init_pylimer_bound_generators(py::module_& m)
        A :obj:`pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
   )pbdoc")
     .def(py::init<const double, const double, const double>(),
-         py::arg("lx"),
-         py::arg("ly"),
-         py::arg("lz"))
+         py::arg("lx") = 10.,
+         py::arg("ly") = 10.,
+         py::arg("lz") = 10.)
     .def("set_seed",
          &MCUniverseGenerator::setSeed,
          "Set the seed for the random generator.",
@@ -401,7 +389,22 @@ init_pylimer_bound_generators(py::module_& m)
               Note: 
                     due to the universe missing, some methods will not work;
                     you won't be able to query the fraction of active and dangling and soluble structures, for example.
-              )pbdoc");
+              )pbdoc")
+#ifdef CEREALIZABLE
+    .def(py::pickle(
+      [](const MCUniverseGenerator& gen) {
+        return py::make_tuple(pylimer_tools::utils::serializeToString(gen));
+      },
+      [](py::tuple t) {
+        std::string in = t[0].cast<std::string>();
+        MCUniverseGenerator gen;
+        pylimer_tools::utils::deserializeFromString(gen, in);
+        return gen;
+      }))
+#endif
+    .def("__copy__", [](const MCUniverseGenerator& gen) {
+      return MCUniverseGenerator(gen);
+    });
 
   m.def("do_random_walk",
         py::overload_cast<int, double, double, std::string>(&doRandomWalkChain),

@@ -497,7 +497,7 @@ TEST_CASE("MEHP Force Balance2 Entanglement Beads Are Removed",
     CHECK(forceBalancer.getNrOfStrands() == 1); // since we ignore crosslinks
     CHECK(forceBalancer.getNrOfSprings() == 1 + 3 * 2);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM));
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getNrOfActiveStrands() == 0);
     CHECK(forceBalancer.getNrOfStrands() == 0);
@@ -512,7 +512,7 @@ TEST_CASE("MEHP Force Balance2 Entanglement Beads Are Removed",
           1 + 3); // 1 for the strand, 3 per entanglement spring
 
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM));
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getNrOfActiveStrands() == 0);
     CHECK(forceBalancer.getNrOfStrands() == 0);
@@ -564,7 +564,7 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
       double initialResidual = forceBalancer.getDisplacementResidualNorm();
       CHECK(std::isfinite(initialResidual));
       REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-        pcm::StructureSimplificationMode::ALL_TIM));
+        pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
       CHECK(forceBalancer.getNrOfIterations() > 0);
       CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
       CHECK(forceBalancer.getNrOfActiveStrands() ==
@@ -587,7 +587,7 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
       double initialResidual = forceBalancer.getDisplacementResidualNorm();
       CHECK(std::isfinite(initialResidual));
       REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-        pcm::StructureSimplificationMode::ALL_TIM));
+        pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
       CHECK(forceBalancer.getNrOfIterations() > 0);
       CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
       CHECK(forceBalancer.getNrOfActiveStrands() ==
@@ -609,7 +609,7 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
       double initialResidual = forceBalancer.getDisplacementResidualNorm();
       CHECK(std::isfinite(initialResidual));
       REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-        pcm::StructureSimplificationMode::ALL_TIM));
+        pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
       CHECK(forceBalancer.getNrOfIterations() > 0);
       CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
       CHECK(forceBalancer.getNrOfActiveStrands() ==
@@ -678,9 +678,9 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
         forceBalanceSprings.getNrOfSprings());
 
   forceBalanceLinks.runForceRelaxation(
-    pcm::StructureSimplificationMode::ALL_TIM, 0.01);
+    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F, 0.01);
   forceBalanceSprings.runForceRelaxation(
-    pcm::StructureSimplificationMode::ALL_TIM, 0.01);
+    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F, 0.01);
 
   CHECK_THAT(forceBalanceLinks.getStressTensor().trace(),
              Catch::Matchers::WithinRel(
@@ -697,9 +697,9 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
         forceBalanceSprings.getNrOfSprings());
 
   forceBalanceLinks.runForceRelaxation(
-    pcm::StructureSimplificationMode::ALL_TIM, 0.01);
+    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F, 0.01);
   forceBalanceSprings.runForceRelaxation(
-    pcm::StructureSimplificationMode::ALL_TIM, 0.01);
+    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F, 0.01);
 
   CHECK(forceBalanceLinks.getNrOfSprings() <
         forceBalanceSprings.getNrOfSprings());
@@ -771,9 +771,9 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
                forceBalanceSprings.getActiveWeightFraction(), 1e-3));
 
   forceBalanceLinks.runForceRelaxation(
-    pcm::StructureSimplificationMode::ALL_TIM, 0.01);
+    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F, 0.01);
   forceBalanceSprings.runForceRelaxation(
-    pcm::StructureSimplificationMode::ALL_TIM, 0.01);
+    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F, 0.01);
 
   CHECK_THAT(forceBalanceLinks.getStressTensor().trace(),
              Catch::Matchers::WithinRel(
@@ -845,7 +845,7 @@ TEST_CASE("MEHP Force Balance2 does not collapse",
   pcm::MEHPForceBalance2 forceBalanceNew =
     pcm::MEHPForceBalance2(universe, 2, true);
   CHECK_NOTHROW(forceBalanceNew.runForceRelaxation(
-    pcm::StructureSimplificationMode::ALL_TIM));
+    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
   CHECK(forceBalanceNew.getNrOfIterations() > 0);
   CHECK(forceBalanceNew.getExitReason() == pcm::ExitReason::X_TOLERANCE);
   CHECK(forceBalanceNew.getNrOfActiveStrands() ==
@@ -913,7 +913,7 @@ TEST_CASE("MEHP Force Balance2 correctly collapses melts even with random "
     CHECK(forceBalancer.getNetwork().nrOfSprings ==
           forceBalancer.getNetwork().nrOfStrands);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM));
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
     pcm::ForceBalance2Network net = forceBalancer.getNetwork();
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
@@ -950,7 +950,7 @@ TEST_CASE("MEHP Force Balance2 correctly collapses melts even with random "
     CHECK(forceBalancer.getNetwork().nrOfSprings >
           forceBalancer.getNetwork().nrOfStrands);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM));
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
     pcm::ForceBalance2Network net = forceBalancer.getNetwork();
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
@@ -978,7 +978,7 @@ TEST_CASE("MEHP Force Balance2 correctly collapses melts even with random "
     CHECK(forceBalancer.getNetwork().nrOfSprings >
           forceBalancer.getNetwork().nrOfStrands);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM));
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
     pcm::ForceBalance2Network net = forceBalancer.getNetwork();
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
@@ -1130,9 +1130,9 @@ TEST_CASE(
   SECTION("With removal of inactive springs")
   {
     forceBalancerEntanglementSprings.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM);
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F);
     forceBalancerEntanglementLinks.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM);
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F);
 
     CHECK(forceBalancerEntanglementSprings.getNrOfStrands() >
           forceBalancerEntanglementLinks.getNrOfStrands());
@@ -1255,9 +1255,9 @@ TEST_CASE(
         forceBalancerPhantom.getActiveWeightFraction());
 
   forceBalancerEntanglements.runForceRelaxation(
-    pcm::StructureSimplificationMode::ALL_TIM);
+    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F);
   forceBalancerPhantom.runForceRelaxation(
-    pcm::StructureSimplificationMode::ALL_TIM);
+    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F);
 
   CHECK(forceBalancerEntanglements.getNrOfStrands() >
         forceBalancerPhantom.getNrOfStrands());
@@ -1313,7 +1313,7 @@ TEST_CASE("MEHPForceBalance2 phantom with and without removal is the same",
     1e-9,
     pcm::SLESolver::CONJUGATE_GRADIENT);
   forceBalancerPhantomRem.runForceRelaxation(
-    pcm::StructureSimplificationMode::ALL_TIM,
+    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
     1e-9,
     pcm::SLESolver::CONJUGATE_GRADIENT);
 
@@ -2553,7 +2553,7 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
     forceBalance.runForceRelaxation(5000,
                                     1e-9 / forceBalance.getResidual(),
                                     -1.,
-                                    pcm::StructureSimplificationMode::ALL_TIM,
+                                    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
                                     1e-5,
                                     false,
                                     pcm::LinkSwappingMode::NO_SWAPPING,
@@ -2568,7 +2568,7 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
               << std::duration_to_string(duration_fr) << " " << std::endl;
 
     auto start_fb2 = std::chrono::high_resolution_clock::now();
-    forceBalance2.runForceRelaxation(pcm::StructureSimplificationMode::ALL_TIM);
+    forceBalance2.runForceRelaxation(pcm::StructureSimplificationMode::INACTIVE_THEN_X2F);
     auto end_fb2 = std::chrono::high_resolution_clock::now();
     auto duration_fb2 = std::chrono::duration_cast<std::chrono::microseconds>(
       end_fb2 - start_fb2);
@@ -2597,7 +2597,7 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
     pcm::MEHPForceBalance2 forceBalance21 = pcm::MEHPForceBalance2(
       universe, forceBalance.getNetwork(), forceBalance.getSpringPartitions());
     forceBalance21.runForceRelaxation(
-      pcm::StructureSimplificationMode::ALL_TIM);
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F);
     CHECK_THAT_OR_ZERO(forceBalance21.getGammaFactors(1.).sum(),
                        forceBalance2.getGammaFactors(1.).sum());
     // CHECK(forceBalance2.getNrOfStrands() == forceBalance21.getNrOfStrands());

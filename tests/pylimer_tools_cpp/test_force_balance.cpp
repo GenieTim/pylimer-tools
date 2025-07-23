@@ -473,7 +473,7 @@ TEST_CASE("MEHPForceBalance phantom with and without removal is the same",
   forceBalancerPhantom.runForceRelaxation(
     5000, 1e-12, -1, pcm::StructureSimplificationMode::NO_SIMPLIFICATION);
   forceBalancerPhantomRem.runForceRelaxation(
-    5000, 1e-12, -1, pcm::StructureSimplificationMode::ALL_TIM, 1e-6);
+    5000, 1e-12, -1, pcm::StructureSimplificationMode::INACTIVE_THEN_X2F, 1e-6);
 
   // compare results
   CHECK(forceBalancerPhantom.getNrOfSprings() >
@@ -1035,7 +1035,7 @@ TEST_CASE("MEHP Force Balance can be interrupted",
     1000,
     1e-12,
     -1,
-    pcm::StructureSimplificationMode::ALL_ANDREI,
+    pcm::StructureSimplificationMode::ALL_LINKS_WITH_SPRINGS,
     1e-3,
     true,
     pcm::LinkSwappingMode::SLIPLINKS_ONLY,
@@ -1089,7 +1089,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
         100,
         1e-7,
         -1.0,
-        pcm::StructureSimplificationMode::ALL_TIM,
+        pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
         0.01,
         false,
         pcm::LinkSwappingMode::ALL_MC));
@@ -1097,7 +1097,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
         100,
         1e-8,
         -1.0,
-        pcm::StructureSimplificationMode::ALL_TIM,
+        pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
         0.01,
         false,
         pcm::LinkSwappingMode::SLIPLINKS_ONLY));
@@ -1105,7 +1105,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
         100,
         1e-9,
         -1.0,
-        pcm::StructureSimplificationMode::ALL_TIM,
+        pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
         0.01,
         false,
         pcm::LinkSwappingMode::ALL));
@@ -1118,7 +1118,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
         100,
         1e-7,
         -1.0,
-        pcm::StructureSimplificationMode::ALL_TIM,
+        pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
         0.01,
         false,
         pcm::LinkSwappingMode::ALL_MC));
@@ -1126,7 +1126,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
         100,
         1e-8,
         -1.0,
-        pcm::StructureSimplificationMode::ALL_TIM,
+        pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
         0.01,
         false,
         pcm::LinkSwappingMode::SLIPLINKS_ONLY));
@@ -1134,7 +1134,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
         100,
         1e-9,
         -1.0,
-        pcm::StructureSimplificationMode::ALL_TIM,
+        pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
         0.01,
         false,
         pcm::LinkSwappingMode::ALL));
@@ -1713,7 +1713,7 @@ TEST_CASE("MEHP Force Balance Entanglement Beads Are Removed",
       20000,
       1e-12,
       initialResidual,
-      pcm::StructureSimplificationMode::ALL_TIM));
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
     CHECK(forceBalancer.getNrOfSprings() == 0);
@@ -1727,7 +1727,7 @@ TEST_CASE("MEHP Force Balance Entanglement Beads Are Removed",
       20000,
       1e-12,
       initialResidual,
-      pcm::StructureSimplificationMode::ALL_TIM));
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
     CHECK(forceBalancer.getNrOfSprings() == 0);
@@ -1782,7 +1782,7 @@ TEST_CASE("MEHP Force Balance fully active chains are fully active",
             10000,
             1e-10,
             initialResidual,
-            pcm::StructureSimplificationMode::ALL_TIM));
+            pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
           CHECK(forceBalancer.getNrOfIterations() > 0);
           CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
           CHECK(forceBalancer.getNrOfActiveSprings() ==
@@ -1806,7 +1806,7 @@ TEST_CASE("MEHP Force Balance fully active chains are fully active",
             10000,
             1e-10,
             initialResidual,
-            pcm::StructureSimplificationMode::ALL_TIM));
+            pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
           CHECK(forceBalancer.getNrOfIterations() > 0);
           CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
           CHECK(forceBalancer.getNrOfActiveSprings() ==
@@ -1834,7 +1834,7 @@ TEST_CASE("MEHP Force Balance fully active chains are fully active",
           10000,
           1e-10,
           initialResidual,
-          pcm::StructureSimplificationMode::ALL_TIM));
+          pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
         CHECK(forceBalancer.getNrOfIterations() > 0);
         CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
         CHECK(forceBalancer.getNrOfActiveSprings() ==
@@ -1905,7 +1905,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC "
       250,
       1e-8,
       initialResidual,
-      pcm::StructureSimplificationMode::ALL_TIM,
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
       0.01,
       false,
       pcm::LinkSwappingMode::NO_SWAPPING,
@@ -1916,7 +1916,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC "
       250,
       1e-8,
       initialResidual,
-      pcm::StructureSimplificationMode::ALL_TIM,
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
       0.01,
       false,
       pcm::LinkSwappingMode::NO_SWAPPING,
@@ -2029,7 +2029,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
       250,
       1e-8,
       initialResidual,
-      pcm::StructureSimplificationMode::ALL_TIM,
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
       0.01,
       false,
       pcm::LinkSwappingMode::NO_SWAPPING,
@@ -2040,7 +2040,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
       250,
       1e-8,
       initialResidual,
-      pcm::StructureSimplificationMode::ALL_TIM,
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
       0.01,
       false,
       pcm::LinkSwappingMode::NO_SWAPPING,
@@ -2059,7 +2059,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
       250,
       1e-8,
       initialResidual,
-      pcm::StructureSimplificationMode::ALL_TIM,
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
       0.01,
       false,
       pcm::LinkSwappingMode::ALL_MC,
@@ -2070,7 +2070,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
       250,
       1e-8,
       initialResidual,
-      pcm::StructureSimplificationMode::ALL_TIM,
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
       0.01,
       false,
       pcm::LinkSwappingMode::ALL_MC,
@@ -2131,7 +2131,7 @@ TEST_CASE("MEHP Force Balance does not collapse",
       pcm::MEHPForceBalance(universe, 2, true);
     forceBalanceConventional.configAssumeBoxLargeEnough(true);
     CHECK_NOTHROW(forceBalanceConventional.runForceRelaxation(
-      10000, 1e-15, -1, pcm::StructureSimplificationMode::ALL_TIM));
+      10000, 1e-15, -1, pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
     CHECK(forceBalanceConventional.getNrOfIterations() > 0);
     CHECK(forceBalanceConventional.getExitReason() ==
           pcm::ExitReason::X_TOLERANCE);
@@ -2156,7 +2156,7 @@ TEST_CASE("MEHP Force Balance does not collapse",
       pcm::MEHPForceBalance(universe, 2, true);
     forceBalanceNew.configAssumeBoxLargeEnough(false);
     CHECK_NOTHROW(forceBalanceNew.runForceRelaxation(
-      10000, 1e-15, -1, pcm::StructureSimplificationMode::ALL_TIM));
+      10000, 1e-15, -1, pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
     CHECK(forceBalanceNew.getNrOfIterations() > 0);
     CHECK(forceBalanceNew.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalanceNew.getNrOfActiveSprings() ==
@@ -2215,7 +2215,7 @@ TEST_CASE(
     CHECK(forceBalancer.getNetwork().nrOfPartialSprings >
           forceBalancer.getNetwork().nrOfSprings);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      50000, 1e-9, -1., pcm::StructureSimplificationMode::ALL_TIM));
+      50000, 1e-9, -1., pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
@@ -2988,7 +2988,7 @@ TEST_CASE(
       5000,
       1e-15,
       -1,
-      pcm::StructureSimplificationMode::ALL_TIM,
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
       1e-3,
       false,
       pcm::LinkSwappingMode::NO_SWAPPING,
@@ -3000,7 +3000,7 @@ TEST_CASE(
       5000,
       1e-15,
       -1,
-      pcm::StructureSimplificationMode::ALL_TIM,
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
       1e-3,
       false,
       pcm::LinkSwappingMode::NO_SWAPPING,
@@ -3163,7 +3163,7 @@ TEST_CASE(
     5000,
     1e-10,
     initialResidualE,
-    pcm::StructureSimplificationMode::ALL_TIM,
+    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
     1e-3,
     false,
     pcm::LinkSwappingMode::NO_SWAPPING,
@@ -3175,7 +3175,7 @@ TEST_CASE(
     5000,
     1e-10,
     initialResidualP,
-    pcm::StructureSimplificationMode::ALL_TIM,
+    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
     1e-3,
     false,
     pcm::LinkSwappingMode::NO_SWAPPING,
