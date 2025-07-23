@@ -15,7 +15,7 @@ import numpy
 import pybind11_stubgen.typing_ext
 import scipy.sparse
 import typing
-__all__ = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NeighbourList', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'OutputConfiguration', 'SLESolver', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'compute_stoichiometric_imbalance', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'predict_gelation_point', 'randomly_sample_entanglements', 'split_csv', 'version_information']
+__all__ = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NeighbourList', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'OutputConfiguration', 'SLESolver', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'randomly_sample_entanglements', 'split_csv', 'version_information']
 class Atom:
     """
     
@@ -527,8 +527,9 @@ class ComputedIntValues:
 class DPDSimulator:
     """
     
-              A quick-and-dirty implementation of the DPD simulation
-              with slip-springs as presented by Langeloth et al.
+         A quick-and-dirty implementation of the dissipative particle dynamics (DPD) simulation
+         with slip-springs as presented by :cite:t:`langeloth_recovering_2013` 
+         and :cite:t:`schneider_simulation_2021`.
          
     """
     @staticmethod
@@ -565,7 +566,7 @@ class DPDSimulator:
     def config_auto_correlator_output(self, values: list[OutputConfiguration], num_corr_in: int = 32, p: int = 16, m: int = 2) -> None:
         """
                   Set which values to compute multiple-tau autocorrelation for.
-                  If you use this, you should cite `doi:10.1063/1.3491098 <https://pubs.aip.org/aip/jcp/article-abstract/133/15/154103/190247/Efficient-on-the-fly-calculation-of-time?redirectedFrom=fulltext>`_
+                  If you use this, you should cite :cite:t:`ramirez_efficient_2010`.
         
                   :param values: a list of OutputConfiguration structs
                   :param num_corr_in: Number of correlations in
@@ -1090,6 +1091,8 @@ class MCUniverseGenerator:
     """
     
            A :obj:`pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
+    
+           Please cite :cite:t:`gusev_molecular_2024` and/or :cite:t:`bernhard_phantom_2025` if you use this method in your work.
       
     """
     def __copy__(self) -> MCUniverseGenerator:
@@ -1330,7 +1333,9 @@ class MEHPForceBalance:
         represented as an entanglement link, just like a four-functional crosslink,
         but with the ability to slip along the two associated strands, therewith
         adjusting the fraction of the contour length on both sides of the link.
-         
+    
+        Please cite :cite:t:`bernhard_phantom_2025` if you use this method.
+        
     """
     @staticmethod
     def construct_with_random_sliplinks(universe: Universe, nr_of_sliplinks_to_sample: int, upper_sampling_cutoff: float = 1.2, lower_sampling_cutoff: float = 0.0, minimum_nr_of_sliplinks: int = 0, same_strand_cutoff: float = 3, seed: str = '', crosslinker_type: int = 2, is_2d: bool = False, skip_dangling_soluble_entanglements: bool = True) -> MEHPForceBalance:
@@ -1699,6 +1704,8 @@ class MEHPForceBalance2:
          periodic boundary conditions, and instead builds a sparse linear system of equations that's readily solved.
          However, it allows entanglements to be represented as additional links or/and springs,
          although without slipping along the chain.
+    
+         Please cite :cite:t:`bernhard_phantom_2025` if you use this method.
           
     """
     @staticmethod
@@ -2032,6 +2039,8 @@ class MEHPForceRelaxation:
         This is the first of three force relaxation methods available in this library.
         The relevant feature of this implementation is the configurable spring potential.
         Consequently, it offers a variety of configurable non-linear solvers using NLoptLib.
+    
+        Please cite :cite:t:`gusev_numerical_2019` if you use this method in your work.
         
     """
     def __getstate__(self) -> tuple:
@@ -2683,13 +2692,19 @@ class NonGaussianSpringForceEvaluator(MEHPForceEvaluator):
         """
 class NormalModeAnalyzer:
     """
-    Compute the normal modes and loss/storage moduli.
+    
+        Compute the normal modes and predict the loss/storage moduli.
+    
+        Please cite :cite:t:`gusev_molecular_2024` if you use this method in your work.
+        
     """
     def __getstate__(self) -> tuple:
         ...
     def __init__(self, spring_from: list[int], spring_to: list[int]) -> None:
         """
-        Initialize NormalModeAnalyzer
+                 Initialize the NormalModeAnalyzer with the bonds (edges).
+        
+                 Constructs the connectivity matrix from the given edges.
         """
     def __setstate__(self, arg0: tuple) -> None:
         ...
@@ -3105,20 +3120,20 @@ class StructureSimplificationMode:
     
       NO_SIMPLIFICATION : No Simplification
     
-      X2F_ONLY : Two-function crosslinks only
+      X2F_ONLY : Removal of two-functional crosslinks only
     
-      INACTIVE_ONLY : Inactive links only
+      INACTIVE_ONLY : Removal of inactive entanglement- and crosslinks only
     
-      ALL_TIM : All, à la Tim
+      INACTIVE_THEN_X2F : Removal of inactive, and then two-functional entanglement- and crosslinks, one after the other
     
-      ALL_ANDREI : All, à la Andrei
+      X1F_X2F_THEN_INACTIVE : Removal of one- and twofunctional crosslinks, and then inactive entanglements and crosslinks. Deprecated, use INACTIVE_THEN_X2F instead
     """
-    ALL_ANDREI: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.ALL_ANDREI: 4>
-    ALL_TIM: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.ALL_TIM: 3>
     INACTIVE_ONLY: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.INACTIVE_ONLY: 2>
+    INACTIVE_THEN_X2F: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.INACTIVE_THEN_X2F: 3>
     NO_SIMPLIFICATION: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.NO_SIMPLIFICATION: 0>
+    X1F_X2F_THEN_INACTIVE: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.X1F_X2F_THEN_INACTIVE: 4>
     X2F_ONLY: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.X2F_ONLY: 1>
-    __members__: typing.ClassVar[dict[str, StructureSimplificationMode]]  # value = {'NO_SIMPLIFICATION': <StructureSimplificationMode.NO_SIMPLIFICATION: 0>, 'X2F_ONLY': <StructureSimplificationMode.X2F_ONLY: 1>, 'INACTIVE_ONLY': <StructureSimplificationMode.INACTIVE_ONLY: 2>, 'ALL_TIM': <StructureSimplificationMode.ALL_TIM: 3>, 'ALL_ANDREI': <StructureSimplificationMode.ALL_ANDREI: 4>}
+    __members__: typing.ClassVar[dict[str, StructureSimplificationMode]]  # value = {'NO_SIMPLIFICATION': <StructureSimplificationMode.NO_SIMPLIFICATION: 0>, 'X2F_ONLY': <StructureSimplificationMode.X2F_ONLY: 1>, 'INACTIVE_ONLY': <StructureSimplificationMode.INACTIVE_ONLY: 2>, 'INACTIVE_THEN_X2F': <StructureSimplificationMode.INACTIVE_THEN_X2F: 3>, 'X1F_X2F_THEN_INACTIVE': <StructureSimplificationMode.X1F_X2F_THEN_INACTIVE: 4>}
     def __eq__(self, other: typing.Any) -> bool:
         ...
     def __getstate__(self) -> int:
@@ -3898,10 +3913,6 @@ class ZScoreMaxDistanceProvider(MaxDistanceProvider):
         
                  :param N: Number of segments.
         """
-def compute_stoichiometric_imbalance(arg0: Universe, arg1: int, arg2: int, arg3: dict[int, int]) -> float:
-    """
-    Compute stoichiometric imbalance
-    """
 def do_linear_walk_chain_from_to(box: Box, from_coordinates: numpy.ndarray, to_coordinates: numpy.ndarray, chain_len: int, include_ends: bool = False) -> numpy.ndarray:
     """
                 Get coordinates linearly interpolated from one point to another (both exclusive).
@@ -3932,10 +3943,6 @@ def inverse_langevin(x: float) -> float:
          A somewhat accurate (for :math:`x \\in (-1, 1)`) implementation of the inverse Langevin.
     
          Source: https://scicomp.stackexchange.com/a/30251
-    """
-def predict_gelation_point(arg0: float, arg1: int, arg2: int) -> float:
-    """
-    Predict the gelation point of a Universe
     """
 def randomly_sample_entanglements(universe: Universe, nr_of_samples: int, upper_cutoff: float, lower_cutoff: float = 0, minimum_nr_of_samples: int = 0, same_strand_cutoff: float = 3.0, seed: str = '', crosslinker_type: int = 2, ignore_crosslinks: bool = True, filter_dangling_and_soluble: bool = False) -> AtomPairEntanglements:
     """

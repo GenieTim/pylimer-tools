@@ -304,7 +304,7 @@ MEHPForceBalance::runForceRelaxation(
               : 0.;
         }
         if (simplificationMode ==
-            StructureSimplificationMode::ALL_LINKS_WITH_SPRINGS) {
+            StructureSimplificationMode::X1F_X2F_THEN_INACTIVE) {
 #ifdef DEBUG_REMOVAL
           std::cout << "Checking and possibly removing crosslinks and "
                        "springs, Andrei's way"

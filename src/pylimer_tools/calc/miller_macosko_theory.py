@@ -1,10 +1,16 @@
 """
 This module provides access to various computations introduced in the Miller-Macosko theory.
+See :cite:t:`miller_new_1976a` and :cite:t:`macosko_new_1976`.
+
+Additional references used in the development of this module include
+:cite:t:`aoyama_nonlinear_2021a`, :cite:t:`valles_properties_1979`,
+:cite:t:`patel_elastic_1992`, :cite:t:`miller_average_1978`, :cite:t:`miller_calculation_1979` and
+:cite:t:`gusev_numerical_2019`.
 
 Caution:
-    - not all systems are supported yet.
-        In particular, for most methods, only A_f and B_2 is supported.
-        Also, the systems are mostly assumed to be end-linked and monodisperse.
+      Not all systems are supported yet.
+      In particular, for most methods, only A_f and B_2 is supported.
+      Also, the systems are mostly assumed to be end-linked and monodisperse.
 
 """
 

@@ -85,6 +85,8 @@ init_pylimer_bound_generators(py::module_& m)
 
   py::class_<MCUniverseGenerator>(m, "MCUniverseGenerator", R"pbdoc(
        A :obj:`pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
+
+       Please cite :cite:t:`gusev_molecular_2024` and/or :cite:t:`bernhard_phantom_2025` if you use this method in your work.
   )pbdoc")
     .def(py::init<const double, const double, const double>(),
          py::arg("lx") = 10.,

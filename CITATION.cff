@@ -76,6 +76,7 @@ references:
      title: "Numerical Estimates of the Topological Effects in the Elasticity of Gaussian Polymer Networks and Their Exact Theoretical Description"
      type: article
      doi: 10.1021/acs.macromol.9b00262
+     scope: "Cite this paper if you use the Maximum Entropy Homogenization Procedure or the Monte-Carlo Universe Generator of pylimer-tools"
    - authors:
       - family-names: Ramirez
         given-names: Jorge

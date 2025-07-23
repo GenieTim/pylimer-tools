@@ -408,6 +408,8 @@ A strand is a chain of connected links between two crosslinks.
     This is the first of three force relaxation methods available in this library.
     The relevant feature of this implementation is the configurable spring potential.
     Consequently, it offers a variety of configurable non-linear solvers using NLoptLib.
+
+    Please cite :cite:t:`gusev_numerical_2019` if you use this method in your work.
     )pbdoc")
     .def(py::init<pe::Universe,
                   int,
@@ -751,7 +753,9 @@ A strand is a chain of connected links between two crosslinks.
     represented as an entanglement link, just like a four-functional crosslink,
     but with the ability to slip along the two associated strands, therewith
     adjusting the fraction of the contour length on both sides of the link.
-     )pbdoc")
+
+    Please cite :cite:t:`bernhard_phantom_2025` if you use this method.
+    )pbdoc")
     .def(py::init<pe::Universe, int, bool, bool, bool>(),
          R"pbdoc(
           Instantiate the simulator for a certain universe.
@@ -1369,6 +1373,8 @@ A strand is a chain of connected links between two crosslinks.
      periodic boundary conditions, and instead builds a sparse linear system of equations that's readily solved.
      However, it allows entanglements to be represented as additional links or/and springs,
      although without slipping along the chain.
+
+     Please cite :cite:t:`bernhard_phantom_2025` if you use this method.
       )pbdoc")
     .def(py::init<pe::Universe, int, bool>(),
          R"pbdoc(
@@ -1869,8 +1875,9 @@ A strand is a chain of connected links between two crosslinks.
   py::class_<dpd::DPDSimulator>(m,
                                 "DPDSimulator",
                                 R"pbdoc(
-          A quick-and-dirty implementation of the DPD simulation
-          with slip-springs as presented by Langeloth et al.
+     A quick-and-dirty implementation of the dissipative particle dynamics (DPD) simulation
+     with slip-springs as presented by :cite:t:`langeloth_recovering_2013` 
+     and :cite:t:`schneider_simulation_2021`.
      )pbdoc")
     .def(py::init<const pe::Universe,
                   const int,
@@ -2017,7 +2024,7 @@ A strand is a chain of connected links between two crosslinks.
          &dpd::DPDSimulator::configAutoCorrelatorOutput,
          R"pbdoc(
           Set which values to compute multiple-tau autocorrelation for.
-          If you use this, you should cite `doi:10.1063/1.3491098 <https://pubs.aip.org/aip/jcp/article-abstract/133/15/154103/190247/Efficient-on-the-fly-calculation-of-time?redirectedFrom=fulltext>`_
+          If you use this, you should cite :cite:t:`ramirez_efficient_2010`.
 
           :param values: a list of OutputConfiguration structs
           :param num_corr_in: Number of correlations in

@@ -16,22 +16,29 @@ using namespace pylimer_tools::calc;
 void
 init_pylimer_bound_calc(py::module_& m)
 {
-  m.def("predict_gelation_point",
-        &mmt::predictGelationPoint,
-        "Predict the gelation point of a Universe");
+  //   m.def("predict_gelation_point",
+  //         &mmt::predictGelationPoint,
+  //         "Predict the gelation point of a Universe");
   // m.def("computeExtentOfReaction", &mmt::computeExtentOfReaction, "Compute
   // extent of reaction");
-  m.def("compute_stoichiometric_imbalance",
-        &mmt::computeStoichiometricInbalance,
-        "Compute stoichiometric imbalance");
+  //   m.def("compute_stoichiometric_imbalance",
+  //         &mmt::computeStoichiometricInbalance,
+  //         "Compute stoichiometric imbalance");
 
-  py::class_<NormalModeAnalyzer>(
-    m,
-    "NormalModeAnalyzer",
-    py::module_local(),
-    "Compute the normal modes and loss/storage moduli.")
+  py::class_<NormalModeAnalyzer>(m,
+                                 "NormalModeAnalyzer",
+                                 py::module_local(),
+                                 R"pbdoc(
+    Compute the normal modes and predict the loss/storage moduli.
+
+    Please cite :cite:t:`gusev_molecular_2024` if you use this method in your work.
+    )pbdoc")
     .def(py::init<const std::vector<size_t>, const std::vector<size_t>>(),
-         "Initialize NormalModeAnalyzer",
+         R"pbdoc(
+         Initialize the NormalModeAnalyzer with the bonds (edges).
+
+         Constructs the connectivity matrix from the given edges.
+  )pbdoc",
          py::arg("spring_from"),
          py::arg("spring_to"))
     .def("get_matrix_size",

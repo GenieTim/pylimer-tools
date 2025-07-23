@@ -67,6 +67,7 @@ Basic usage example:
    assumptions
    cli
    auto_examples/index
+   acknowledgements
 
 .. toctree::
    :maxdepth: 3
@@ -118,13 +119,4 @@ Please refer to the latest documentation for current function signatures and usa
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-
-🙏🏼 **Acknowledgements**
---------------------------
-
-Please refer to the `CITATION.cff <https://github.com/GenieTim/pylimer-tools/blob/main/CITATION.cff>`_ file for citation information.
-
-The authors gratefully acknowledge financial support from the
-Swiss National Science Foundation (SNSF project 200021_204196).
-
+* :ref:`references`
