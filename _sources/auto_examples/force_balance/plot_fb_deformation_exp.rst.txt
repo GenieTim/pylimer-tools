@@ -164,8 +164,8 @@ deformation is an equivalent method to obtain the modulus.
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 6.9110326655422715e-12
-    Shear Modulus from Equilibrium [MPa]:  0.09174102493674426
+    Final residual (should be close to 0): 6.183402644677766e-12
+    Shear Modulus from Equilibrium [MPa]:  0.08478691793779163
 
 
 

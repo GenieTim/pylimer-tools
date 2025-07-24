@@ -101,7 +101,7 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
 
     Generated vulcanized network with 750 crosslinks
 
-    <pylimer_tools_cpp.Universe object at 0x7f33f02ab4b0>
+    <pylimer_tools_cpp.Universe object at 0x7f5dba8289f0>
 
 
 
@@ -142,7 +142,7 @@ lengths:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 13.071 seconds)
+   **Total running time of the script:** (0 minutes 13.029 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_vulcanized_network.py:

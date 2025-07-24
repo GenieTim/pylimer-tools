@@ -114,7 +114,7 @@ without slip-links or entanglements.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.486 seconds)
+   **Total running time of the script:** (0 minutes 0.524 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_force_relaxation.py:
