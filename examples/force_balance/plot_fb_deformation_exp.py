@@ -116,11 +116,7 @@ for lmbda in lmbdas:
 # plot deformation results
 plt.figure()
 plt.plot(lmbdas, moduli_deformed, marker="o", label="From Deformation")
-plt.axhline(
-    y=shear_modulus,
-    color="r",
-    linestyle="--",
-    label="From Equilibrium")
+plt.axhline(y=shear_modulus, color="r", linestyle="--", label="From Equilibrium")
 plt.xlabel("Deformation Ratio (λ)")
 plt.ylabel("Shear Modulus [MPa]")
 plt.ylim(0, max(moduli_deformed) * 1.1)

@@ -49,20 +49,15 @@ generator_without_zscore.disable_max_distance()
 generator_with_zscore = copy.copy(generator_without_zscore)
 
 start_time_without = time.time()
-generator_without_zscore.link_strands_to_conversion(
-    crosslinker_conversion=0.925)
+generator_without_zscore.link_strands_to_conversion(crosslinker_conversion=0.925)
 end_time_without = time.time()
-print(
-    f"Time without max distance: {
-        end_time_without -
-        start_time_without:.2f} seconds")
+print(f"Time without max distance: {end_time_without - start_time_without:.2f} seconds")
 
 generator_with_zscore.use_zscore_max_distance(3.0)
 start_time_with = time.time()
 generator_with_zscore.link_strands_to_conversion(crosslinker_conversion=0.925)
 end_time_with = time.time()
-print(
-    f"Time with z-score max distance: {end_time_with - start_time_with:.2f} seconds")
+print(f"Time with z-score max distance: {end_time_with - start_time_with:.2f} seconds")
 
 # plot the difference for the thumbnail
 plt.figure()

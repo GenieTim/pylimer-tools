@@ -42,8 +42,7 @@ rgs = []
 timesteps = []
 for universe in sequence:
     rgs.append(
-        np.mean([m.compute_radius_of_gyration()
-                for m in universe.get_molecules(2)])
+        np.mean([m.compute_radius_of_gyration() for m in universe.get_molecules(2)])
     )
     timesteps.append(universe.get_timestep())
 
@@ -51,10 +50,7 @@ for universe in sequence:
 fig, axs = plt.subplots(2, 1, figsize=(10, 10), sharex=False)
 
 # Panel 1: MSD
-axs[0].plot(
-    list(
-        msd.keys()), list(
-            msd.values()), label="Mean Square Displacement")
+axs[0].plot(list(msd.keys()), list(msd.values()), label="Mean Square Displacement")
 axs[0].set_xlabel("$\\tau$")
 axs[0].set_ylabel("MSD")
 axs[0].set_title("Mean Square Displacement")
