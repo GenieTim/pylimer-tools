@@ -56,8 +56,10 @@ n_sampled_crosslinks = len(sampled_crosslinks.pairs_of_atoms)
 # Add sampled crosslinks to the universe
 universe.add_bonds(
     n_sampled_crosslinks,
-    [sampled_crosslinks.pairs_of_atoms[i][0] for i in range(n_sampled_crosslinks)],
-    [sampled_crosslinks.pairs_of_atoms[i][1] for i in range(n_sampled_crosslinks)],
+    [sampled_crosslinks.pairs_of_atoms[i][0]
+        for i in range(n_sampled_crosslinks)],
+    [sampled_crosslinks.pairs_of_atoms[i][1]
+        for i in range(n_sampled_crosslinks)],
     [2 for _ in range(n_sampled_crosslinks)],  # Bond type 2
 )
 
@@ -73,7 +75,8 @@ universe.contract_vertices_along_bond_type(2)
 # For now, we will show that this produces a variety of different strand
 # lengths:
 
-strand_lengths = [m.get_nr_of_atoms() for m in universe.get_chains_with_crosslinker(2)]
+strand_lengths = [m.get_nr_of_atoms()
+                  for m in universe.get_chains_with_crosslinker(2)]
 
 # Plot the distribution of strand lengths
 plt.figure()
