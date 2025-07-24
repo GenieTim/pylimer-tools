@@ -62,7 +62,8 @@ universe = generator.get_universe()
 # For now, we will show that this produces a variety of different strand
 # lengths:
 
-strand_lengths = [m.get_nr_of_atoms() for m in universe.get_chains_with_crosslinker(2)]
+strand_lengths = [m.get_nr_of_atoms()
+                  for m in universe.get_chains_with_crosslinker(2)]
 
 # Plot the distribution of strand lengths
 plt.figure()

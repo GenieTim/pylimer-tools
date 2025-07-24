@@ -32,6 +32,8 @@ lj_units = unit_factory.get_unit_style("lj", polymer="pdms")
 pressure_si = (1 * real_units.pressure).to("Pa").magnitude  # type: ignore
 
 # Convert temperature (already in Kelvin for 'real' units)
-temperature_si = (273.15 * real_units.temperature).to("K").magnitude  # type: ignore
+temperature_si = (
+    273.15 *
+    real_units.temperature).to("K").magnitude  # type: ignore
 
 print(f"LJ 1 Pressure in Pascal: {pressure_si}")
