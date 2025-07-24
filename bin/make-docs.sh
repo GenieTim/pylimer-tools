@@ -23,6 +23,9 @@ sphinx-apidoc -o ./docs ./src || {
   exit 8
 }
 
-sphinx-build -b html ./docs ./docs-html
+sphinx-build -b html ./docs ./docs-html || {
+  echo "Failed to build Sphinx documentation. Please check the output above."
+  exit 9
+}
 
 touch ./docs-html/.nojekyll
