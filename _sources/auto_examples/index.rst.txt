@@ -236,18 +236,18 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we create a vulcanized network using the pylimer-tools library.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MCUniverseGenerator to create a polydisperse end-linked polymer network with varying strand lengths.">
 
 .. only:: html
 
-  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_vulcanized_network_thumb.png
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_polydisperse_system_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_network_generator_plot_vulcanized_network.py`
+  :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Generate Vulcanized Networks</div>
+      <div class="sphx-glr-thumbnail-title">Generate a Polydisperse Polymer Network</div>
     </div>
 
 
@@ -287,7 +287,24 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Fine-tune the Monte Carlo generation process:">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we create a vulcanized network using the pylimer-tools library.">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_vulcanized_network_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_network_generator_plot_vulcanized_network.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Generate Vulcanized Networks</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In the following, there are a few calls showing how to fine-tune the Monte Carlo network generation process:">
 
 .. only:: html
 
