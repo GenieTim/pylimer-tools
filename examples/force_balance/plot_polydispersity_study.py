@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 Polydispersity Study
-===================
+====================
 
 In this example, we study the effect of polydispersity on the shear modulus
 of end-linked polymer networks.
