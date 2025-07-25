@@ -5,7 +5,7 @@ Normal Mode Analysis (NMA)
 This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools
 to predict the loss and storage modulus of polymer networks.
 
-Reference: `doi:10.1021/acs.macromol.4c01429 <https://doi.org/10.1021/acs.macromol.4c01429>`_
+Reference: :cite:t:`gusev_molecular_2024`
 """
 
 import os
