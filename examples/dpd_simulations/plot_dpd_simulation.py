@@ -4,7 +4,7 @@ Dissipative Particle Dynamics (DPD) Simulations
 
 This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools.
 
-Reference: `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macromol.1c00567>`_
+References: :cite:t:`langeloth_recovering_2013` and :cite:t:`schneider_simulation_2021`.
 """
 
 import os
@@ -12,13 +12,9 @@ import os
 import pandas as pd
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
-from pylimer_tools_cpp import (
-    AtomStyle,
-    ComputedDoubleValues,
-    ComputedIntValues,
-    DPDSimulator,
-    OutputConfiguration,
-)
+from pylimer_tools_cpp import (AtomStyle, ComputedDoubleValues,
+                               ComputedIntValues, DPDSimulator,
+                               OutputConfiguration)
 
 # Load a LAMMPS data file (replace with your file)
 filePath = os.path.join(
