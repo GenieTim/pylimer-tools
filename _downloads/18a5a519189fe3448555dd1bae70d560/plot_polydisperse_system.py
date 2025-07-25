@@ -49,12 +49,21 @@ generator.set_bead_distance(
 )
 generator.add_strands(nr_of_strands=n_strands, strand_lengths=strand_lengths)
 # 4-functional crosslinkers
-generator.add_crosslinkers(int(0.5 * n_strands), 4)
+generator.add_crosslinkers(
+    int(0.5 * n_strands), crosslinker_functionality=4, crosslinker_type=2
+)
 generator.link_strands_to_conversion(
     crosslinker_conversion=0.925,  # 92.5% of crosslinker sites used
 )
 
 universe = generator.get_universe()
+universe.set_masses({1: 1.0, 2: 1.0})  # Set masses for LAMMPS
+
+assert math.isclose(
+    universe.compute_polydispersity_index(2),
+    polydispersity,
+    rel_tol=0.1,
+)
 
 # %%
 # Refer to :ref:`sphx_glr_auto_examples_readers_writers` for how you can save the universe to a file.
@@ -62,8 +71,7 @@ universe = generator.get_universe()
 # For now, we will show that this produces a variety of different strand
 # lengths:
 
-strand_lengths = [m.get_nr_of_atoms()
-                  for m in universe.get_chains_with_crosslinker(2)]
+strand_lengths = [m.get_nr_of_atoms() for m in universe.get_chains_with_crosslinker(2)]
 
 # Plot the distribution of strand lengths
 plt.figure()

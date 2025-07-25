@@ -23,9 +23,9 @@ Dissipative Particle Dynamics (DPD) Simulations
 
 This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools.
 
-Reference: `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macromol.1c00567>`_
+References: :cite:t:`langeloth_recovering_2013` and :cite:t:`schneider_simulation_2021`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-38
+.. GENERATED FROM PYTHON SOURCE LINES 9-34
 
 .. code-block:: Python
 
@@ -35,13 +35,9 @@ Reference: `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macrom
     import pandas as pd
 
     from pylimer_tools.io.read_lammps_output_file import read_data_file
-    from pylimer_tools_cpp import (
-        AtomStyle,
-        ComputedDoubleValues,
-        ComputedIntValues,
-        DPDSimulator,
-        OutputConfiguration,
-    )
+    from pylimer_tools_cpp import (AtomStyle, ComputedDoubleValues,
+                                   ComputedIntValues, DPDSimulator,
+                                   OutputConfiguration)
 
     # Load a LAMMPS data file (replace with your file)
     filePath = os.path.join(
@@ -65,13 +61,13 @@ Reference: `doi:10.1021/acs.macromol.1c00567 <https://doi.org/10.1021/acs.macrom
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-42
+.. GENERATED FROM PYTHON SOURCE LINES 35-38
 
 Note that the random seed does not guarantee the same results across different runs,
 as the DPD algorithm is inherently stochastic and will produce different results
 if you use more than one processor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-85
+.. GENERATED FROM PYTHON SOURCE LINES 38-81
 
 .. code-block:: Python
 
@@ -131,11 +127,11 @@ if you use more than one processor.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-87
+.. GENERATED FROM PYTHON SOURCE LINES 82-83
 
 read the output file and actually plot something
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-101
+.. GENERATED FROM PYTHON SOURCE LINES 83-97
 
 .. code-block:: Python
 
@@ -168,7 +164,7 @@ read the output file and actually plot something
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 7.696 seconds)
+   **Total running time of the script:** (0 minutes 7.700 seconds)
 
 
 .. _sphx_glr_download_auto_examples_dpd_simulations_plot_dpd_simulation.py:

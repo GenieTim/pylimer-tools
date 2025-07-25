@@ -28,7 +28,7 @@ For strand length distribution, in this example,
 we show how to use the log-normal distribution as proposed by :cite:t:`tsimouri_monte_2021`.
 Alternatives were proposed as well, such as the inverse Gaussian or a ternary distribution.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-59
+.. GENERATED FROM PYTHON SOURCE LINES 13-68
 
 .. code-block:: Python
 
@@ -71,12 +71,21 @@ Alternatives were proposed as well, such as the inverse Gaussian or a ternary di
     )
     generator.add_strands(nr_of_strands=n_strands, strand_lengths=strand_lengths)
     # 4-functional crosslinkers
-    generator.add_crosslinkers(int(0.5 * n_strands), 4)
+    generator.add_crosslinkers(
+        int(0.5 * n_strands), crosslinker_functionality=4, crosslinker_type=2
+    )
     generator.link_strands_to_conversion(
         crosslinker_conversion=0.925,  # 92.5% of crosslinker sites used
     )
 
     universe = generator.get_universe()
+    universe.set_masses({1: 1.0, 2: 1.0})  # Set masses for LAMMPS
+
+    assert math.isclose(
+        universe.compute_polydispersity_index(2),
+        polydispersity,
+        rel_tol=0.1,
+    )
 
 
 
@@ -85,20 +94,19 @@ Alternatives were proposed as well, such as the inverse Gaussian or a ternary di
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-64
+.. GENERATED FROM PYTHON SOURCE LINES 69-73
 
 Refer to :ref:`sphx_glr_auto_examples_readers_writers` for how you can save the universe to a file.
 
 For now, we will show that this produces a variety of different strand
 lengths:
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-75
+.. GENERATED FROM PYTHON SOURCE LINES 73-83
 
 .. code-block:: Python
 
 
-    strand_lengths = [m.get_nr_of_atoms()
-                      for m in universe.get_chains_with_crosslinker(2)]
+    strand_lengths = [m.get_nr_of_atoms() for m in universe.get_chains_with_crosslinker(2)]
 
     # Plot the distribution of strand lengths
     plt.figure()
@@ -122,7 +130,7 @@ lengths:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 6.739 seconds)
+   **Total running time of the script:** (0 minutes 6.737 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_polydisperse_system.py:

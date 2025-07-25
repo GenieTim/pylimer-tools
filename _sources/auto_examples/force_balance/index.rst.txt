@@ -75,6 +75,23 @@ Here, we distinguish the following three different implementations:
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of polydispersity on the shear modulus of end-linked polymer networks.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Polydispersity Study</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPForceBalance2 class in a deformation experiment.">
 
 .. only:: html
@@ -103,5 +120,6 @@ Here, we distinguish the following three different implementations:
    /auto_examples/force_balance/plot_force_balance_2
    /auto_examples/force_balance/plot_force_balance
    /auto_examples/force_balance/plot_force_relaxation
+   /auto_examples/force_balance/plot_polydispersity_study
    /auto_examples/force_balance/plot_fb_deformation_exp
 
