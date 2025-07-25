@@ -57,6 +57,7 @@ generator.link_strands_to_conversion(
 )
 
 universe = generator.get_universe()
+universe.set_masses({1: 1.0, 2: 1.0})  # Set masses for LAMMPS
 
 assert math.isclose(
     universe.compute_polydispersity_index(2),
