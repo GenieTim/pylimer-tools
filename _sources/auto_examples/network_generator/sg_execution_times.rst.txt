@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:06.737** total execution time for 7 files **from auto_examples/network_generator**:
+**00:06.588** total execution time for 7 files **from auto_examples/network_generator**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py` (``plot_polydisperse_system.py``)
-     - 00:06.737
+     - 00:06.588
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_add_angles.py` (``plot_add_angles.py``)
      - 00:00.000

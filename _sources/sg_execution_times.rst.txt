@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**06:06.942** total execution time for 32 files **from all galleries**:
+**06:06.930** total execution time for 32 files **from all galleries**:
 
 .. container::
 
@@ -33,16 +33,16 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py` (``../examples/force_balance/plot_polydispersity_study.py``)
-     - 05:36.962
+     - 05:36.810
      - 0.0
    * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py` (``../examples/normal_mode_analysis/plot_normal_mode_analysis.py``)
-     - 00:15.543
+     - 00:15.828
      - 0.0
    * - :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_simulation.py` (``../examples/dpd_simulations/plot_dpd_simulation.py``)
-     - 00:07.700
+     - 00:07.704
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py` (``../examples/network_generator/plot_polydisperse_system.py``)
-     - 00:06.737
+     - 00:06.588
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py` (``../examples/force_balance/plot_fb_deformation_exp.py``)
      - 00:00.000
