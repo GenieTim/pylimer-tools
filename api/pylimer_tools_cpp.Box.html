@@ -246,11 +246,11 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/network_generator/index.html">Network Generation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/normal_mode_analysis/index.html">Normal Mode Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Normal Mode Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -402,7 +402,7 @@
 <p>The box that the simulation is run in.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>currently, only rectangular boxes are supported.</p>
+<p>Currently, only rectangular boxes are supported.</p>
 </div>
 <p>Overloaded function.</p>
 <ol class="arabic simple">
@@ -423,25 +423,25 @@
 <td><p>Get an orthogonal box that encloses this box.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Box.get_high_x" title="pylimer_tools_cpp.Box.get_high_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_high_x</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the upper bound of the box in x direction.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Box.get_high_y" title="pylimer_tools_cpp.Box.get_high_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_high_y</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the upper bound of the box in y direction.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Box.get_high_z" title="pylimer_tools_cpp.Box.get_high_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_high_z</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the upper bound of the box in z direction.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Box.get_l" title="pylimer_tools_cpp.Box.get_l"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_l</span></code></a>(self)</p></td>
 <td><p>Get the three lengths of the box in an array/list.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Box.get_low_x" title="pylimer_tools_cpp.Box.get_low_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_low_x</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the lower bound of the box in x direction.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Box.get_low_y" title="pylimer_tools_cpp.Box.get_low_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_low_y</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the lower bound of the box in y direction.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Box.get_low_z" title="pylimer_tools_cpp.Box.get_low_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_low_z</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the lower bound of the box in z direction.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Box.get_lx" title="pylimer_tools_cpp.Box.get_lx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lx</span></code></a>(self)</p></td>
 <td><p>Get the length of the box in x direction.</p></td>
@@ -459,7 +459,7 @@
 <td><p>Compute the volume of the box.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Box.is_valid_offset" title="pylimer_tools_cpp.Box.is_valid_offset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid_offset</span></code></a>(self, potential_offset[, ...])</p></td>
-<td><p>Check whether the passed offest is a valid one in this box.</p></td>
+<td><p>Check whether the passed offset is a valid one in this box.</p></td>
 </tr>
 </tbody>
 </table>
@@ -469,19 +469,34 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Box.apply_pbc">
 <span class="sig-name descname"><span class="pre">apply_pbc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">distances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Box.apply_pbc" title="Link to this definition">¶</a></dt>
 <dd><p>Apply periodic boundary conditions (PBC): adjust the specified distances to fit into this box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>distances</strong> – The distances to adjust</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The adjusted distances</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Box.apply_simple_shear">
 <span class="sig-name descname"><span class="pre">apply_simple_shear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">shear_magnitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">shear_direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Box.apply_simple_shear" title="Link to this definition">¶</a></dt>
 <dd><p>Apply a simple shear to the box.</p>
-<div class="admonition caution">
-<p class="admonition-title">Caution</p>
-<p>currently, this is not supported for all operations.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Currently, this is not supported for all operations.</p>
 </div>
 <p>For shear magnitude, you specify the angle <span class="math notranslate nohighlight">\(\gamma\)</span>.</p>
-<p>For the shearDirection parameter, you can specify <cite>0</cite> for x, <cite>1</cite> for y and <cite>2</cite> for z, respectively.
-Specify another integer to disable the shear.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shear_magnitude</strong> – The shear magnitude (angle <span class="math notranslate nohighlight">\(\gamma\)</span>)</p></li>
+<li><p><strong>shear_direction</strong> – Direction of shear: 0 for x, 1 for y, 2 for z.
+Use any other integer to disable shear.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -494,17 +509,20 @@ For non-sheared boxes, the resulting box is identical to the current box.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Box.get_high_x">
 <span class="sig-name descname"><span class="pre">get_high_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Box.get_high_x" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the upper bound of the box in x direction.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Box.get_high_y">
 <span class="sig-name descname"><span class="pre">get_high_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Box.get_high_y" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the upper bound of the box in y direction.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Box.get_high_z">
 <span class="sig-name descname"><span class="pre">get_high_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Box.get_high_z" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the upper bound of the box in z direction.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Box.get_l">
@@ -515,17 +533,20 @@ For non-sheared boxes, the resulting box is identical to the current box.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Box.get_low_x">
 <span class="sig-name descname"><span class="pre">get_low_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Box.get_low_x" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the lower bound of the box in x direction.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Box.get_low_y">
 <span class="sig-name descname"><span class="pre">get_low_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Box.get_low_y" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the lower bound of the box in y direction.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Box.get_low_z">
 <span class="sig-name descname"><span class="pre">get_low_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Box.get_low_z" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the lower bound of the box in z direction.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Box.get_lx">
@@ -552,6 +573,14 @@ For non-sheared boxes, the resulting box is identical to the current box.</p>
 <p>Useful e.g. if you are using absolute coordinates for distances, but
 still need an infinite network,
 e.g., if the bonds need to be able to get longer than half the box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>distances</strong> – The distances to compute offset for</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The computed offset</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -564,7 +593,18 @@ e.g., if the bonds need to be able to get longer than half the box.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Box.is_valid_offset">
 <span class="sig-name descname"><span class="pre">is_valid_offset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential_offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_precision</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Box.is_valid_offset" title="Link to this definition">¶</a></dt>
-<dd><p>Check whether the passed offest is a valid one in this box.</p>
+<dd><p>Check whether the passed offset is a valid one in this box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>potential_offset</strong> – The offset to validate</p></li>
+<li><p><strong>abs_precision</strong> – Absolute precision for the validation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the offset is valid, False otherwise</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

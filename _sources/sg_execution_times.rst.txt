@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**06:57.696** total execution time for 32 files **from all galleries**:
+**08:09.739** total execution time for 32 files **from all galleries**:
 
 .. container::
 
@@ -33,46 +33,49 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py` (``../examples/force_balance/plot_polydispersity_study.py``)
-     - 05:40.440
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_network_generator_plot_monte_carlo_configuration.py` (``../examples/network_generator/plot_monte_carlo_configuration.py``)
-     - 00:32.177
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py` (``../examples/normal_mode_analysis/plot_normal_mode_analysis.py``)
-     - 00:15.513
+     - 05:37.235
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_vulcanized_network.py` (``../examples/network_generator/plot_vulcanized_network.py``)
-     - 00:12.920
+     - 01:25.509
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_network_generator_plot_monte_carlo_configuration.py` (``../examples/network_generator/plot_monte_carlo_configuration.py``)
+     - 00:32.334
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py` (``../examples/normal_mode_analysis/plot_normal_mode_analysis.py``)
+     - 00:16.423
      - 0.0
    * - :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_simulation.py` (``../examples/dpd_simulations/plot_dpd_simulation.py``)
-     - 00:07.733
+     - 00:07.652
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py` (``../examples/network_generator/plot_polydisperse_system.py``)
-     - 00:06.789
+     - 00:06.710
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``../examples/force_balance/plot_force_balance_2.py``)
      - 00:00.674
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_network_generator_plot_add_angles.py` (``../examples/network_generator/plot_add_angles.py``)
+     - 00:00.568
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_network_generator_plot_simple_crosslinked_network.py` (``../examples/network_generator/plot_simple_crosslinked_network.py``)
+     - 00:00.514
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py` (``../examples/force_balance/plot_force_balance.py``)
      - 00:00.497
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py` (``../examples/force_balance/plot_force_relaxation.py``)
-     - 00:00.482
+     - 00:00.487
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py` (``../examples/force_balance/plot_fb_deformation_exp.py``)
-     - 00:00.471
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_network_generator_plot_add_angles.py` (``../examples/network_generator/plot_add_angles.py``)
-     - 00:00.000
+     - 00:00.481
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_multi_component_system.py` (``../examples/network_generator/plot_multi_component_system.py``)
-     - 00:00.000
+     - 00:00.420
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_reader.py` (``../examples/readers_writers/plot_data_file_reader.py``)
+     - 00:00.234
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_save_network.py` (``../examples/network_generator/plot_save_network.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_network_generator_plot_simple_crosslinked_network.py` (``../examples/network_generator/plot_simple_crosslinked_network.py``)
-     - 00:00.000
+     - 00:00.001
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_convert_for_bond_swapping.py` (``../examples/readers_writers/plot_convert_for_bond_swapping.py``)
      - 00:00.000
@@ -81,9 +84,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_correlated_averages_reader.py` (``../examples/readers_writers/plot_correlated_averages_reader.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_reader.py` (``../examples/readers_writers/plot_data_file_reader.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_writer.py` (``../examples/readers_writers/plot_data_file_writer.py``)

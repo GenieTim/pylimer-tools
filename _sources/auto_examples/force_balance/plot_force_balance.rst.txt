@@ -24,7 +24,7 @@ Force Balance
 This example demonstrates how to use the MEHP implementation with slip-springs
 to homogenize a polymer network and predict its equilibrium shear modulus.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-64
+.. GENERATED FROM PYTHON SOURCE LINES 9-68
 
 
 
@@ -33,8 +33,8 @@ to homogenize a polymer network and predict its equilibrium shear modulus.
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 1.125584923678746e-07
-    Shear Modulus [MPa]:  0.07095360117547166
+    Final residual (should be close to 0): 9.845622272759823e-07
+    Shear Modulus [MPa]:  0.05461319628019622
 
 
 
@@ -51,12 +51,16 @@ to homogenize a polymer network and predict its equilibrium shear modulus.
     import numpy as np
 
     from pylimer_tools.io.bead_spring_parameter_provider import (
-        ParameterType, Parameters, get_parameters_for_polymer)
+        ParameterType,
+        Parameters,
+        get_parameters_for_polymer,
+    )
     from pylimer_tools.io.read_lammps_output_file import read_data_file
     from pylimer_tools_cpp import MEHPForceBalance, Universe
 
     # Get parameters for conversion factors
-    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer(
+        "PDMS", parameter_type=ParameterType.GAUSSIAN)
     assert isinstance(params, Parameters)
 
     # Load your network (replace with your file)

@@ -246,11 +246,11 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/network_generator/index.html">Network Generation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/normal_mode_analysis/index.html">Normal Mode Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Normal Mode Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -416,8 +416,8 @@ Consequently, it offers a variety of configurable non-linear solvers using NLopt
 <li><p><strong>remove_2functional_crosslinkers</strong> – Whether to replace two-functional crosslinkers with a “normal” chain bead</p></li>
 <li><p><strong>remove_dangling_chains</strong> – Whether to remove dangling chains before running the simulation.
 <strong>Caution</strong>: Removing the dangling chains will result in incorrect results fo the computation of
-<code class="xref py py-func docutils literal notranslate"><span class="pre">getSolubleWeightFraction()</span></code> and
-<code class="xref py py-func docutils literal notranslate"><span class="pre">getDanglingWeightFraction()</span></code></p></li>
+<a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction" title="pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_soluble_weight_fraction()</span></code></a> and
+<a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction" title="pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_dangling_weight_fraction()</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
@@ -450,7 +450,7 @@ Consequently, it offers a variety of configurable non-linear solvers using NLopt
 <td><p>Compute the weight fraction of non-active springs</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_default_r0_square" title="pylimer_tools_cpp.MEHPForceRelaxation.get_default_r0_square"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_default_r0_square</span></code></a>(self)</p></td>
-<td><p>Returns the value effectively used in <code class="xref py py-func docutils literal notranslate"><span class="pre">getGammaFactor()</span></code> for <span class="math notranslate nohighlight">\(\langle R_{0,\eta}^2\rangle\)</span>.</p></td>
+<td><p>Returns the value effectively used in <a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor" title="pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_gamma_factor()</span></code></a> for <span class="math notranslate nohighlight">\(\langle R_{0,\eta}^2\rangle\)</span>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_effective_functionality_of_atoms" title="pylimer_tools_cpp.MEHPForceRelaxation.get_effective_functionality_of_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_effective_functionality_of_atoms</span></code></a>(self[, ...])</p></td>
 <td><p>Returns the number of active springs connected to each atom, atomId used as index</p></td>
@@ -539,7 +539,7 @@ this must be kept False (default).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>epsilon</strong> – The epsilon value to use for the rerun check
-(See: <code class="xref py py-func docutils literal notranslate"><span class="pre">requiresAnotherRun()</span></code>)</p>
+(See: <a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.requires_another_run" title="pylimer_tools_cpp.MEHPForceRelaxation.requires_another_run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">requires_another_run()</span></code></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -576,7 +576,7 @@ specifying what values to log and how often</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.get_average_spring_length">
 <span class="sig-name descname"><span class="pre">get_average_spring_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_average_spring_length" title="Link to this definition">¶</a></dt>
-<dd><p>Get the average length of the springs. Note that in contrast to <code class="xref py py-func docutils literal notranslate"><span class="pre">getGammaFactor()</span></code>,
+<dd><p>Get the average length of the springs. Note that in contrast to <a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor" title="pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_gamma_factor()</span></code></a>,
 this value is normalized by the number of springs rather than the number of chains.</p>
 </dd></dl>
 
@@ -596,7 +596,7 @@ this value is normalized by the number of springs rather than the number of chai
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.get_default_r0_square">
 <span class="sig-name descname"><span class="pre">get_default_r0_square</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_default_r0_square" title="Link to this definition">¶</a></dt>
-<dd><p>Returns the value effectively used in <code class="xref py py-func docutils literal notranslate"><span class="pre">getGammaFactor()</span></code> for <span class="math notranslate nohighlight">\(\langle R_{0,\eta}^2\rangle\)</span>.</p>
+<dd><p>Returns the value effectively used in <a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor" title="pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_gamma_factor()</span></code></a> for <span class="math notranslate nohighlight">\(\langle R_{0,\eta}^2\rangle\)</span>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -669,7 +669,7 @@ For real systems, the value could be determined by <a class="reference internal"
 on the melt system, with subsequent division by the nr of bonds in the chain.</p>
 </dd>
 </dl>
-<p>See also <a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor" title="pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_gamma_factor()</span></code></a> for the mean of these.</p>
+<p>See also <a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor" title="pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_gamma_factor()</span></code></a> for the mean of these.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -770,13 +770,7 @@ springs (any depth).</p>
 <dd><p>Get the current coordinate differences for all the springs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>a vector of size 3*nrOfSprings, with each x, y, z values of the springs</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p>distances</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>A vector of size 3*nrOfSprings, with each x, y, z values of the springs</p>
 </dd>
 </dl>
 </dd></dl>
@@ -787,13 +781,7 @@ springs (any depth).</p>
 <dd><p>Get the current lengths for all the springs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>a vector of size nrOfSprings, with each the norm of the distances</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p>distances</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>A vector of size nrOfSprings, with each the norm of the distances</p>
 </dd>
 </dl>
 </dd></dl>
@@ -811,7 +799,7 @@ springs (any depth).</p>
 This means, that there is a possibility, e.g. for a single strand longer than two boxes,
 that it would not be globally minimised.</p>
 <p>If the final displacement of one of the atoms is close
-(1e-3, configurable via <code class="xref py py-func docutils literal notranslate"><span class="pre">configRerunEpsilon()</span></code>)
+(1e-3, configurable via <a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon" title="pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon"><code class="xref py py-meth docutils literal notranslate"><span class="pre">config_rerun_epsilon()</span></code></a>)
 to the imposed min/max, after minimizing,
 this method would return true.</p>
 </dd></dl>

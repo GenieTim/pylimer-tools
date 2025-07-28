@@ -248,11 +248,11 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../network_generator/index.html">Network Generation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_add_angles.html">Adding Topology Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../normal_mode_analysis/index.html">Normal Mode Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Normal Mode Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -404,8 +404,8 @@ to download the full example code.</p>
 <span id="sphx-glr-auto-examples-force-balance-plot-force-balance-py"></span><h1>Force Balance<a class="headerlink" href="#force-balance" title="Link to this heading">¶</a></h1>
 <p>This example demonstrates how to use the MEHP implementation with slip-springs
 to homogenize a polymer network and predict its equilibrium shear modulus.</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Final residual (should be close to 0): 1.125584923678746e-07
-Shear Modulus [MPa]:  0.07095360117547166
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Final residual (should be close to 0): 9.845622272759823e-07
+Shear Modulus [MPa]:  0.05461319628019622
 </pre></div>
 </div>
 <div class="line-block">
@@ -416,12 +416,16 @@ Shear Modulus [MPa]:  0.07095360117547166
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.io.bead_spring_parameter_provider</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ParameterType</span><span class="p">,</span> <span class="n">Parameters</span><span class="p">,</span> <span class="n">get_parameters_for_polymer</span><span class="p">)</span>
+    <span class="n">ParameterType</span><span class="p">,</span>
+    <span class="n">Parameters</span><span class="p">,</span>
+    <span class="n">get_parameters_for_polymer</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.io.read_lammps_output_file</span><span class="w"> </span><span class="kn">import</span> <a href="../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_data_file" title="pylimer_tools.io.read_lammps_output_file.read_data_file" class="sphx-glr-backref-module-pylimer_tools-io-read_lammps_output_file sphx-glr-backref-type-py-function"><span class="n">read_data_file</span></a>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">MEHPForceBalance</span><span class="p">,</span> <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">Universe</span></a>
 
 <span class="c1"># Get parameters for conversion factors</span>
-<span class="n">params</span> <span class="o">=</span> <span class="n">get_parameters_for_polymer</span><span class="p">(</span><span class="s2">&quot;PDMS&quot;</span><span class="p">,</span> <span class="n">parameter_type</span><span class="o">=</span><span class="n">ParameterType</span><span class="o">.</span><span class="n">GAUSSIAN</span><span class="p">)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">get_parameters_for_polymer</span><span class="p">(</span>
+    <span class="s2">&quot;PDMS&quot;</span><span class="p">,</span> <span class="n">parameter_type</span><span class="o">=</span><span class="n">ParameterType</span><span class="o">.</span><span class="n">GAUSSIAN</span><span class="p">)</span>
 <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">Parameters</span><span class="p">)</span>
 
 <span class="c1"># Load your network (replace with your file)</span>

@@ -32,7 +32,7 @@ This example shows how to save a generated polymer network to a LAMMPS data file
 
  .. code-block:: none
 
-    Network saved to: generated_networks/polymer_network.data
+    Network saved to: generated_structures/polymer_network.data
 
 
 
@@ -54,7 +54,7 @@ This example shows how to save a generated polymer network to a LAMMPS data file
     universe = generator.get_universe()
 
     # Create output directory
-    output_dir = Path("generated_networks")
+    output_dir = Path("generated_structures")
     output_dir.mkdir(exist_ok=True)
 
     # Write LAMMPS data file

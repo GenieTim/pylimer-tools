@@ -246,11 +246,11 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/network_generator/index.html">Network Generation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/normal_mode_analysis/index.html">Normal Mode Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Normal Mode Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -400,6 +400,16 @@
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">DataFileWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">universe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.DataFileWriter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A class to write a LAMMPS data file from a universe.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>The resulting file is not guaranteed to be a completely valid LAMMPS file.
+In particular, this writer does not force you to set masses for all atom types,
+and it does not have limits on the image flags.
+You can use <a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.set_masses" title="pylimer_tools_cpp.Universe.set_masses"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_masses()</span></code></a> to set the masses for all atom types,
+and either <a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.set_vertex_property" title="pylimer_tools_cpp.Universe.set_vertex_property"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_vertex_property()</span></code></a> or
+<a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_attempt_image_reset" title="pylimer_tools_cpp.DataFileWriter.config_attempt_image_reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">config_attempt_image_reset()</span></code></a> and
+<a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_move_into_box" title="pylimer_tools_cpp.DataFileWriter.config_move_into_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">config_move_into_box()</span></code></a> to ensure that the image flags are correct.</p>
+</div>
 <p>Initialize the writer with the universe to write.</p>
 <p class="rubric">Methods Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
@@ -464,7 +474,7 @@
 <span class="sig-name descname"><span class="pre">config_crosslinker_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileWriter.config_crosslinker_type" title="Link to this definition">¶</a></dt>
 <dd><p>Set which atom type represents crosslinkers.
 Needed in case the moleculeIdx in the output file should have any meaning.
-(e.g. with <a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap" title="pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap"><code class="xref py py-func docutils literal notranslate"><span class="pre">config_molecule_idx_for_swap()</span></code></a>).</p>
+(e.g. with <a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap" title="pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">config_molecule_idx_for_swap()</span></code></a>).</p>
 <p>Default: 2.</p>
 </dd></dl>
 
@@ -530,10 +540,12 @@ Re-indexing leads to atom ids being in the range of 1 to the number of atoms.</p
 <li><p>$nz</p></li>
 </ul>
 <p>Additionally, you can use the keys used in
-<code class="xref py py-func docutils literal notranslate"><span class="pre">set_property_value()</span></code>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">set_property_value()</span></code>
 as placeholders (as long as they are alphanumeric only; prefix in the format with ‘$’ as well).
-Specifically useful if you need a different (or hybrid) atom style in LAMMPS.</p>
-<p>Be sure to still call <a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_atom_style" title="pylimer_tools_cpp.DataFileWriter.config_atom_style"><code class="xref py py-func docutils literal notranslate"><span class="pre">config_atom_style()</span></code></a>,
+Other placeholders are available if the universe was read from a LAMMPS data file with an
+atom style with additional data.</p>
+<p>This method is specifically useful if you need a different (or hybrid) atom style in LAMMPS.</p>
+<p>Be sure to still call <a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_atom_style" title="pylimer_tools_cpp.DataFileWriter.config_atom_style"><code class="xref py py-meth docutils literal notranslate"><span class="pre">config_atom_style()</span></code></a>,
 so that the file can be read correctly again.</p>
 <p>Default: empty string, in which case the configured atom style will be used.</p>
 </dd></dl>

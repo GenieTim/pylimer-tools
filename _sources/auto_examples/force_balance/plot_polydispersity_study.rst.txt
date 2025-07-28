@@ -28,7 +28,7 @@ Again, please be aware that this is a minimal example, and the results
 are not statistically significant, because of the small system size
 and no repeated sampling of the polydispersity distribution nor entanglements.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-105
+.. GENERATED FROM PYTHON SOURCE LINES 13-109
 
 .. code-block:: Python
 
@@ -46,7 +46,8 @@ and no repeated sampling of the polydispersity distribution nor entanglements.
     from pylimer_tools_cpp import MCUniverseGenerator, MEHPForceBalance2
 
     # Get parameters for PDMS polymer density and bead distance
-    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer(
+        "PDMS", parameter_type=ParameterType.GAUSSIAN)
 
     # setup strand lengths
     n_strands = 10000
@@ -80,7 +81,9 @@ and no repeated sampling of the polydispersity distribution nor entanglements.
         generator.set_bead_distance(
             params.get("<b>").to(params.get("distance_units")).magnitude
         )
-        generator.add_strands(nr_of_strands=n_strands, strand_lengths=strand_lengths)
+        generator.add_strands(
+            nr_of_strands=n_strands,
+            strand_lengths=strand_lengths)
         # 4-functional crosslinkers
         generator.add_crosslinkers(int(0.5 * n_strands), 4)
         generator.link_strands_to_conversion(
@@ -102,7 +105,8 @@ and no repeated sampling of the polydispersity distribution nor entanglements.
 
         # apply conversion factors, measure resulting shear modulus
         r02_slope = params.get("R02")
-        r02_slope_magnitude = r02_slope.to(params.get("distance_units") ** 2).magnitude
+        r02_slope_magnitude = r02_slope.to(
+            params.get("distance_units") ** 2).magnitude
         kbt = params.get("T") * params.get("kb")
         gamma_conversion_factor = (
             (kbt / ((params.get("distance_units")) ** 3)).to("MPa").magnitude
@@ -136,7 +140,7 @@ and no repeated sampling of the polydispersity distribution nor entanglements.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-113
+.. GENERATED FROM PYTHON SOURCE LINES 110-117
 
 There are many things you would want to do differently in a real study, for example:
 
@@ -149,7 +153,7 @@ There are many things you would want to do differently in a real study, for exam
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (5 minutes 40.440 seconds)
+   **Total running time of the script:** (5 minutes 37.235 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_polydispersity_study.py:

@@ -246,11 +246,11 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/network_generator/index.html">Network Generation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/normal_mode_analysis/index.html">Normal Mode Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Normal Mode Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -406,7 +406,7 @@ to know how many timesteps/universes are available in total
 This, while it can lead to two (or more) reads of the whole file,
 is a measure in order to enable low memory useage if needed (i.e. for large dump files).
 Use Python’s iterator to have this UniverseSequence only ever retain one universe in memory.
-Alternatively, use <code class="xref py py-func docutils literal notranslate"><span class="pre">forgetAtIndex()</span></code>
+Alternatively, use <a class="reference internal" href="#pylimer_tools_cpp.UniverseSequence.forget_at_index" title="pylimer_tools_cpp.UniverseSequence.forget_at_index"><code class="xref py py-meth docutils literal notranslate"><span class="pre">forget_at_index()</span></code></a>
 to have the UniverseSequence forget about already read universes.</p>
 <p>Construct an empty UniverseSequence.</p>
 <p>Use initialization methods to populate it with data.</p>
@@ -451,7 +451,7 @@ to have the UniverseSequence forget about already read universes.</p>
 <td><p>Get the Universe that's next in the sequence.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.UniverseSequence.reset_iterator" title="pylimer_tools_cpp.UniverseSequence.reset_iterator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_iterator</span></code></a>(self)</p></td>
-<td><p>Reset the internal iterator, such that a subsequent call to <a class="reference internal" href="#pylimer_tools_cpp.UniverseSequence.next" title="pylimer_tools_cpp.UniverseSequence.next"><code class="xref py py-func docutils literal notranslate"><span class="pre">next()</span></code></a> returns the first one again.</p></td>
+<td><p>Reset the internal iterator, such that a subsequent call to <a class="reference internal" href="#pylimer_tools_cpp.UniverseSequence.next" title="pylimer_tools_cpp.UniverseSequence.next"><code class="xref py py-meth docutils literal notranslate"><span class="pre">next()</span></code></a> returns the first one again.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style" title="pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_data_file_atom_style</span></code></a>(self, atom_styles)</p></td>
 <td><p>Set the format of the data files to be read.</p></td>
@@ -524,9 +524,9 @@ Pay attention that the image flags are correct, otherwise, this data may not be 
 <span class="sig-name descname"><span class="pre">get_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><span class="pre">pylimer_tools_cpp.UniverseSequence</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.UniverseSequence.get_all" title="Link to this definition">¶</a></dt>
 <dd><p>Get all universes initialized back in a list.
 For big dump files or lots of data files, this might lead to memory issues.
-Use <code class="xref py py-func docutils literal notranslate"><span class="pre">__iter__()</span></code>
-or <code class="xref py py-func docutils literal notranslate"><span class="pre">atIndex()</span></code>
-and <code class="xref py py-func docutils literal notranslate"><span class="pre">forgetAtIndex()</span></code>
+Use <code class="xref py py-meth docutils literal notranslate"><span class="pre">__iter__()</span></code>
+or <a class="reference internal" href="#pylimer_tools_cpp.UniverseSequence.at_index" title="pylimer_tools_cpp.UniverseSequence.at_index"><code class="xref py py-meth docutils literal notranslate"><span class="pre">at_index()</span></code></a>
+and <a class="reference internal" href="#pylimer_tools_cpp.UniverseSequence.forget_at_index" title="pylimer_tools_cpp.UniverseSequence.forget_at_index"><code class="xref py py-meth docutils literal notranslate"><span class="pre">forget_at_index()</span></code></a>
 to craft a more memory-efficient retrieval mechanism.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -573,7 +573,7 @@ If you have not output the type of the atoms in the dump file, they will be set 
 <dt class="sig sig-object py" id="pylimer_tools_cpp.UniverseSequence.reset_iterator">
 <span class="sig-name descname"><span class="pre">reset_iterator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><span class="pre">pylimer_tools_cpp.UniverseSequence</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.UniverseSequence.reset_iterator" title="Link to this definition">¶</a></dt>
 <dd><p>Reset the internal iterator, such that a subsequent call to
-<a class="reference internal" href="#pylimer_tools_cpp.UniverseSequence.next" title="pylimer_tools_cpp.UniverseSequence.next"><code class="xref py py-func docutils literal notranslate"><span class="pre">next()</span></code></a> returns the first one again.</p>
+<a class="reference internal" href="#pylimer_tools_cpp.UniverseSequence.next" title="pylimer_tools_cpp.UniverseSequence.next"><code class="xref py py-meth docutils literal notranslate"><span class="pre">next()</span></code></a> returns the first one again.</p>
 </dd></dl>
 
 <dl class="py method">

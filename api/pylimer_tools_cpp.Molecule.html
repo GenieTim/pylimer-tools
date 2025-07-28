@@ -246,11 +246,11 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/network_generator/index.html">Network Generation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/normal_mode_analysis/index.html">Normal Mode Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Normal Mode Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -416,7 +416,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_bond_lengths" title="pylimer_tools_cpp.Molecule.compute_bond_lengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_bond_lengths</span></code></a>(self)</p></td>
-<td><p>Computes the length of each bond in the molecule, respecting periodic boundaries.</p></td>
+<td><p>Compute the length of each bond in the molecule, respecting periodic boundaries.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_end_to_end_distance" title="pylimer_tools_cpp.Molecule.compute_end_to_end_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_end_to_end_distance</span></code></a>(self)</p></td>
 <td><p>Compute the end-to-end distance (<span class="math notranslate nohighlight">\(R_{ee}\)</span>) of this molecule.</p></td>
@@ -431,22 +431,22 @@
 <td><p>Compute the end-to-end vector (<span class="math notranslate nohighlight">\(\overrightarrow{R}_{ee}\)</span>) of this molecule, but ignoring the image flags attached to the atoms.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_radius_of_gyration" title="pylimer_tools_cpp.Molecule.compute_radius_of_gyration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_radius_of_gyration</span></code></a>(self)</p></td>
-<td><p>Computes the radius of gyration, <span class="math notranslate nohighlight">\(R_g^2\)</span> of this molecule.</p></td>
+<td><p>Compute the radius of gyration, <span class="math notranslate nohighlight">\(R_g^2\)</span> of this molecule.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_radius_of_gyration_with_derived_image_flags" title="pylimer_tools_cpp.Molecule.compute_radius_of_gyration_with_derived_image_flags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_radius_of_gyration_with_derived_image_flags</span></code></a>(self)</p></td>
-<td><p>Computes the radius of gyration, <span class="math notranslate nohighlight">\(R_g^2\)</span> of this molecule, but ignoring the image flags attached to the atoms.</p></td>
+<td><p>Compute the radius of gyration, <span class="math notranslate nohighlight">\(R_g^2\)</span> of this molecule, but ignoring the image flags attached to the atoms.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_total_length" title="pylimer_tools_cpp.Molecule.compute_total_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_total_length</span></code></a>(self)</p></td>
-<td><p>Computes the sum of the lengths of all bonds.</p></td>
+<td><p>Compute the sum of the lengths of all bonds.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_total_mass" title="pylimer_tools_cpp.Molecule.compute_total_mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_total_mass</span></code></a>(self)</p></td>
-<td><p>Computes the total mass of this molecule.</p></td>
+<td><p>Compute the total mass of this molecule.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_total_vector" title="pylimer_tools_cpp.Molecule.compute_total_vector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_total_vector</span></code></a>(self[, ...])</p></td>
-<td><p>Computes the sum of all bond vectors.</p></td>
+<td><p>Compute the sum of all bond vectors.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_vector_from_to" title="pylimer_tools_cpp.Molecule.compute_vector_from_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_vector_from_to</span></code></a>(self, atom_id_from, ...)</p></td>
-<td><p>Computes the sum of all bond vectors between two specified atoms.</p></td>
+<td><p>Compute the sum of all bond vectors between two specified atoms.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_atom_by_id" title="pylimer_tools_cpp.Molecule.get_atom_by_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atom_by_id</span></code></a>(self, atom_id)</p></td>
 <td><p>Get an atom by its id.</p></td>
@@ -455,13 +455,13 @@
 <td><p>Get an atom for a specific vertex.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_atom_id_by_vertex_idx" title="pylimer_tools_cpp.Molecule.get_atom_id_by_vertex_idx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atom_id_by_vertex_idx</span></code></a>(self, vertex_id)</p></td>
-<td><p>Get the id of the atom by the vertex id of the underlying graph.</p></td>
+<td><p>Get the ID of the atom by the vertex ID of the underlying graph.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_atom_types" title="pylimer_tools_cpp.Molecule.get_atom_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atom_types</span></code></a>(self)</p></td>
 <td><p>Query all types (each one for each atom) ordered by atom vertex id.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms" title="pylimer_tools_cpp.Molecule.get_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atoms</span></code></a>(self)</p></td>
-<td><p>Returns all atom objects enclosed in this molecule, ordered by vertex id.</p></td>
+<td><p>Return all atom objects enclosed in this molecule, ordered by vertex id.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_by_degree" title="pylimer_tools_cpp.Molecule.get_atoms_by_degree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atoms_by_degree</span></code></a>(self, degree)</p></td>
 <td><p>Get the atoms that have the specified number of bonds.</p></td>
@@ -476,7 +476,7 @@
 <td><p>Get the atoms connected to a specified vertex id.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_lined_up" title="pylimer_tools_cpp.Molecule.get_atoms_lined_up"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atoms_lined_up</span></code></a>(self[, crosslinker_type, ...])</p></td>
-<td><p>Returns all atom objects enclosed in this molecule based on the connectivity.</p></td>
+<td><p>Return all atom objects enclosed in this molecule based on the connectivity.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_bonds" title="pylimer_tools_cpp.Molecule.get_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bonds</span></code></a>(self)</p></td>
 <td><p>Get all bonds.</p></td>
@@ -494,10 +494,10 @@
 <td><p>Get a unique identifier for this molecule.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_nr_of_atoms" title="pylimer_tools_cpp.Molecule.get_nr_of_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_atoms</span></code></a>(self)</p></td>
-<td><p>Counts and returns the number of atoms associated with this molecule.</p></td>
+<td><p>Count and return the number of atoms associated with this molecule.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_nr_of_bonds" title="pylimer_tools_cpp.Molecule.get_nr_of_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_bonds</span></code></a>(self)</p></td>
-<td><p>Counts and returns the number of bonds associated with this molecule.</p></td>
+<td><p>Count and return the number of bonds associated with this molecule.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_nr_of_edges_from_to" title="pylimer_tools_cpp.Molecule.get_nr_of_edges_from_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_edges_from_to</span></code></a>(self, ...[, max_length])</p></td>
 <td><p>Get the number of edges in the shortest path between two specific vertices.</p></td>
@@ -506,10 +506,10 @@
 <td><p>Get the ends of the given strand (= molecule).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_strand_type" title="pylimer_tools_cpp.Molecule.get_strand_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_strand_type</span></code></a>(self)</p></td>
-<td><p>Get the type of this molecule (see <a class="reference internal" href="pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType" title="pylimer_tools_cpp.MoleculeType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoleculeType</span></code></a> enum).</p></td>
+<td><p>Get the type of this molecule (see <a class="reference internal" href="pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType" title="pylimer_tools_cpp.MoleculeType"><code class="xref py py-class docutils literal notranslate"><span class="pre">MoleculeType</span></code></a> enum).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_vertex_idx_by_atom_id" title="pylimer_tools_cpp.Molecule.get_vertex_idx_by_atom_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_vertex_idx_by_atom_id</span></code></a>(self, atom_id)</p></td>
-<td><p>Get the vertex id of the underlying graph for an atom with a specified id.</p></td>
+<td><p>Get the vertex ID of the underlying graph for an atom with a specified ID.</p></td>
 </tr>
 </tbody>
 </table>
@@ -518,7 +518,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.compute_bond_lengths">
 <span class="sig-name descname"><span class="pre">compute_bond_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.compute_bond_lengths" title="Link to this definition">¶</a></dt>
-<dd><p>Computes the length of each bond in the molecule, respecting periodic boundaries.</p>
+<dd><p>Compute the length of each bond in the molecule, respecting periodic boundaries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A vector of bond lengths</p>
@@ -530,10 +530,15 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.compute_end_to_end_distance">
 <span class="sig-name descname"><span class="pre">compute_end_to_end_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.compute_end_to_end_distance" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the end-to-end distance (<span class="math notranslate nohighlight">\(R_{ee}\)</span>) of this molecule.</p>
-<div class="admonition caution">
-<p class="admonition-title">Caution</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
 <p>Returns 0.0 if the molecule does not have two or more atoms.</p>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The end-to-end distance</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -542,23 +547,33 @@
 <dd><p>Compute the end-to-end distance (<span class="math notranslate nohighlight">\(R_{ee}\)</span>) of this molecule,
 but ignoring the image flags attached to the atoms.
 This only works for Molecules that can be lined up with
-<code class="xref py py-func docutils literal notranslate"><span class="pre">getAtomsLinedUp()</span></code>,
+<a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_lined_up" title="pylimer_tools_cpp.Molecule.get_atoms_lined_up"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_atoms_lined_up()</span></code></a>,
 as it needs the atoms sorted such that the periodic box can still be respected somewhat.</p>
-<div class="admonition caution">
-<p class="admonition-title">Caution</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
 <p>Returns 0.0 if the molecule does not have two or more atoms.
 Requires bonds to be shorter than half the box length.</p>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The end-to-end distance with derived image flags</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.compute_end_to_end_vector">
 <span class="sig-name descname"><span class="pre">compute_end_to_end_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.compute_end_to_end_vector" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the end-to-end vector (<span class="math notranslate nohighlight">\(\overrightarrow{R}_{ee}\)</span>) of this molecule.</p>
-<div class="admonition caution">
-<p class="admonition-title">Caution</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
 <p>Returns 0.0 if the molecule does not have two or more atoms.</p>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The end-to-end vector</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -567,43 +582,58 @@ Requires bonds to be shorter than half the box length.</p>
 <dd><p>Compute the end-to-end vector (<span class="math notranslate nohighlight">\(\overrightarrow{R}_{ee}\)</span>) of this molecule,
 but ignoring the image flags attached to the atoms.
 This only works for Molecules that can be lined up with
-<code class="xref py py-func docutils literal notranslate"><span class="pre">getAtomsLinedUp()</span></code>,
+<a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_lined_up" title="pylimer_tools_cpp.Molecule.get_atoms_lined_up"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_atoms_lined_up()</span></code></a>,
 as it needs the atoms sorted such that the periodic box can still be respected somewhat.</p>
-<div class="admonition caution">
-<p class="admonition-title">Caution</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
 <p>Returns 0.0 if the molecule does not have two or more atoms.
 Requires bonds to be shorter than half the box length.</p>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The end-to-end vector with derived image flags</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.compute_radius_of_gyration">
 <span class="sig-name descname"><span class="pre">compute_radius_of_gyration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.compute_radius_of_gyration" title="Link to this definition">¶</a></dt>
-<dd><p>Computes the radius of gyration, <span class="math notranslate nohighlight">\(R_g^2\)</span> of this molecule.</p>
+<dd><p>Compute the radius of gyration, <span class="math notranslate nohighlight">\(R_g^2\)</span> of this molecule.</p>
 <p><span class="math notranslate nohighlight">\({R_g}^2 = \\frac{1}{M} \sum_i m_i (r_i - r_{cm})^2\)</span>,
 where <span class="math notranslate nohighlight">\(M\)</span> is the total mass of the molecule, <span class="math notranslate nohighlight">\(r_{cm}\)</span>
 are the coordinates of the center of mass of the molecule and the
 sum is over all contained atoms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The radius of gyration squared</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.compute_radius_of_gyration_with_derived_image_flags">
 <span class="sig-name descname"><span class="pre">compute_radius_of_gyration_with_derived_image_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.compute_radius_of_gyration_with_derived_image_flags" title="Link to this definition">¶</a></dt>
-<dd><p>Computes the radius of gyration, <span class="math notranslate nohighlight">\(R_g^2\)</span> of this molecule,
+<dd><p>Compute the radius of gyration, <span class="math notranslate nohighlight">\(R_g^2\)</span> of this molecule,
 but ignoring the image flags attached to the atoms.
 This only works for Molecules that can be lined up with
-<code class="xref py py-func docutils literal notranslate"><span class="pre">getAtomsLinedUp()</span></code>,
+<a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_lined_up" title="pylimer_tools_cpp.Molecule.get_atoms_lined_up"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_atoms_lined_up()</span></code></a>,
 as it needs the atoms sorted such that the periodic box can still be respected somewhat.
 In other words, this function computes the radius of gyration
 assuming the distance between two lined-up beads
 is smaller than half the periodic box in each direction.</p>
-<p>See also: <code class="xref py py-func docutils literal notranslate"><span class="pre">computeRadiusOfGyration()</span></code>.</p>
+<p>See also: <a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_radius_of_gyration" title="pylimer_tools_cpp.Molecule.compute_radius_of_gyration"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_radius_of_gyration()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The radius of gyration squared with derived image flags</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.compute_total_length">
 <span class="sig-name descname"><span class="pre">compute_total_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.compute_total_length" title="Link to this definition">¶</a></dt>
-<dd><p>Computes the sum of the lengths of all bonds.
+<dd><p>Compute the sum of the lengths of all bonds.
 In most cases, this is equal to the contour length.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -615,7 +645,7 @@ In most cases, this is equal to the contour length.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.compute_total_mass">
 <span class="sig-name descname"><span class="pre">compute_total_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.compute_total_mass" title="Link to this definition">¶</a></dt>
-<dd><p>Computes the total mass of this molecule.</p>
+<dd><p>Compute the total mass of this molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The total mass of all atoms in this molecule</p>
@@ -626,31 +656,71 @@ In most cases, this is equal to the contour length.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.compute_total_vector">
 <span class="sig-name descname"><span class="pre">compute_total_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_loop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.compute_total_vector" title="Link to this definition">¶</a></dt>
-<dd><p>Computes the sum of all bond vectors.</p>
+<dd><p>Compute the sum of all bond vectors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p></li>
+<li><p><strong>close_loop</strong> – Whether to close the loop for calculations</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The vector sum of all bonds</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.compute_vector_from_to">
 <span class="sig-name descname"><span class="pre">compute_vector_from_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_id_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_id_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.compute_vector_from_to" title="Link to this definition">¶</a></dt>
-<dd><p>Computes the sum of all bond vectors between two specified atoms.</p>
+<dd><p>Compute the sum of all bond vectors between two specified atoms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>atom_id_from</strong> – ID of the starting atom</p></li>
+<li><p><strong>atom_id_to</strong> – ID of the ending atom</p></li>
+<li><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p></li>
+<li><p><strong>require_order</strong> – Whether to require specific ordering</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The vector sum from start to end atom</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_atom_by_id">
 <span class="sig-name descname"><span class="pre">get_atom_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_atom_by_id" title="Link to this definition">¶</a></dt>
 <dd><p>Get an atom by its id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>atom_id</strong> – The atom ID to search for</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The atom with the specified ID</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_atom_by_vertex_idx">
 <span class="sig-name descname"><span class="pre">get_atom_by_vertex_idx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_atom_by_vertex_idx" title="Link to this definition">¶</a></dt>
 <dd><p>Get an atom for a specific vertex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vertex_idx</strong> – The vertex index to query</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The atom at the specified vertex</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_atom_id_by_vertex_idx">
 <span class="sig-name descname"><span class="pre">get_atom_id_by_vertex_idx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_atom_id_by_vertex_idx" title="Link to this definition">¶</a></dt>
-<dd><p>Get the id of the atom by the vertex id of the underlying graph.</p>
+<dd><p>Get the ID of the atom by the vertex ID of the underlying graph.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>vertex_id</strong> – The vertex index in the underlying graph</p>
@@ -675,49 +745,103 @@ In most cases, this is equal to the contour length.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_atoms">
 <span class="sig-name descname"><span class="pre">get_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_atoms" title="Link to this definition">¶</a></dt>
-<dd><p>Returns all atom objects enclosed in this molecule, ordered by vertex id.</p>
+<dd><p>Return all atom objects enclosed in this molecule, ordered by vertex id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of atoms in vertex order</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_atoms_by_degree">
 <span class="sig-name descname"><span class="pre">get_atoms_by_degree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_atoms_by_degree" title="Link to this definition">¶</a></dt>
 <dd><p>Get the atoms that have the specified number of bonds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>degree</strong> – The number of bonds (degree/functionality)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of atoms with the specified degree</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_atoms_by_type">
 <span class="sig-name descname"><span class="pre">get_atoms_by_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_atoms_by_type" title="Link to this definition">¶</a></dt>
 <dd><p>Get the atoms with the specified type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>type</strong> – The atom type to search for</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of atoms with the specified type</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_atoms_connected_to">
 <span class="sig-name descname"><span class="pre">get_atoms_connected_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_atoms_connected_to" title="Link to this definition">¶</a></dt>
 <dd><p>Get the atoms connected to a specified atom.</p>
-<p>Internally uses <code class="xref py py-func docutils literal notranslate"><span class="pre">getAtomsConnectedTo()</span></code></p>
+<p>Internally uses <a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_connected_to" title="pylimer_tools_cpp.Molecule.get_atoms_connected_to"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_atoms_connected_to()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>atom</strong> – The atom to query connections for</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of connected atoms</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_atoms_connected_to_vertex">
 <span class="sig-name descname"><span class="pre">get_atoms_connected_to_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_atoms_connected_to_vertex" title="Link to this definition">¶</a></dt>
 <dd><p>Get the atoms connected to a specified vertex id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vertex_idx</strong> – The vertex index to query</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of connected atoms</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_atoms_lined_up">
 <span class="sig-name descname"><span class="pre">get_atoms_lined_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assumed_coordinates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_loop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_atoms_lined_up" title="Link to this definition">¶</a></dt>
-<dd><p>Returns all atom objects enclosed in this molecule based on the connectivity.</p>
+<dd><p>Return all atom objects enclosed in this molecule based on the connectivity.</p>
 <p>This method works only for lone chains, atoms and loops,
 as it throws an error if the molecule does not allow such a “line-up”,
 for example because of crosslinkers.</p>
 <p>Use the <cite>crosslinker_type</cite> parameter to force the atoms in a primary loop
 to start with the crosslink.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p></li>
+<li><p><strong>assumed_coordinates</strong> – Whether to assume coordinates are valid</p></li>
+<li><p><strong>close_loop</strong> – Whether to close loops</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of atoms in connected order</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_bonds">
 <span class="sig-name descname"><span class="pre">get_bonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_bonds" title="Link to this definition">¶</a></dt>
 <dd><p>Get all bonds. Returns a dict with three properties: ‘bond_from’, ‘bond_to’ and ‘bond_type’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with bond information</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -748,9 +872,14 @@ The order is not necessarily related to any structural property.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The integer values returned refer to the vertex ids, not the atom ids.
-Use <code class="xref py py-func docutils literal notranslate"><span class="pre">getAtomIdByIdx()</span></code> to translate them to atom ids, or
-<code class="xref py py-func docutils literal notranslate"><span class="pre">getBonds()</span></code> to have that done for you.</p>
+Use <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_atom_id_by_idx()</span></code> to translate them to atom ids, or
+<a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_bonds" title="pylimer_tools_cpp.Molecule.get_bonds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_bonds()</span></code></a> to have that done for you.</p>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with edge information</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -767,7 +896,7 @@ Use <code class="xref py py-func docutils literal notranslate"><span class="pre"
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_nr_of_atoms">
 <span class="sig-name descname"><span class="pre">get_nr_of_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_nr_of_atoms" title="Link to this definition">¶</a></dt>
-<dd><p>Counts and returns the number of atoms associated with this molecule.</p>
+<dd><p>Count and return the number of atoms associated with this molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The number of atoms in this molecule</p>
@@ -778,7 +907,7 @@ Use <code class="xref py py-func docutils literal notranslate"><span class="pre"
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_nr_of_bonds">
 <span class="sig-name descname"><span class="pre">get_nr_of_bonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_nr_of_bonds" title="Link to this definition">¶</a></dt>
-<dd><p>Counts and returns the number of bonds associated with this molecule.</p>
+<dd><p>Count and return the number of bonds associated with this molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The number of bonds in this molecule</p>
@@ -803,20 +932,34 @@ Use the argument <cite>close_loop</cite> to decide, whether this should be retur
 <p class="admonition-title">Note</p>
 <p>Currently only works for linear strands.</p>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p></li>
+<li><p><strong>close_loop</strong> – Whether to return the crosslinker twice for loops</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of end atoms</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_strand_type">
 <span class="sig-name descname"><span class="pre">get_strand_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType" title="pylimer_tools_cpp.MoleculeType"><span class="pre">pylimer_tools_cpp.MoleculeType</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_strand_type" title="Link to this definition">¶</a></dt>
-<dd><p>Get the type of this molecule (see <a class="reference internal" href="pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType" title="pylimer_tools_cpp.MoleculeType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoleculeType</span></code></a> enum).</p>
-<p>Note that this type might be unset; currently, only
-<a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_chains_with_crosslinker" title="pylimer_tools_cpp.Universe.get_chains_with_crosslinker"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_chains_with_crosslinker()</span></code></a> assigns them automatically.</p>
+<dd><p>Get the type of this molecule (see <a class="reference internal" href="pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType" title="pylimer_tools_cpp.MoleculeType"><code class="xref py py-class docutils literal notranslate"><span class="pre">MoleculeType</span></code></a> enum).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This type might be unset; currently, only
+<a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_chains_with_crosslinker" title="pylimer_tools_cpp.Universe.get_chains_with_crosslinker"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_chains_with_crosslinker()</span></code></a> assigns them automatically.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.get_vertex_idx_by_atom_id">
 <span class="sig-name descname"><span class="pre">get_vertex_idx_by_atom_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.get_vertex_idx_by_atom_id" title="Link to this definition">¶</a></dt>
-<dd><p>Get the vertex id of the underlying graph for an atom with a specified id.</p>
+<dd><p>Get the vertex ID of the underlying graph for an atom with a specified ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>atom_id</strong> – The atom ID to look up</p>

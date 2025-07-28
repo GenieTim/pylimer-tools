@@ -25,7 +25,7 @@ This example demonstrates how to use
 the "original" MEHP implementation (see :cite:t:`gusev_numerical_2019`)
 without slip-links or entanglements.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-77
+.. GENERATED FROM PYTHON SOURCE LINES 10-78
 
 
 
@@ -74,7 +74,8 @@ without slip-links or entanglements.
     assert isinstance(universe, Universe)
 
     # Prepare parameters for conversion factors
-    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer(
+        "PDMS", parameter_type=ParameterType.GAUSSIAN)
     r02_slope = params.get("R02")
     r02_slope_magnitude = r02_slope.to(params.get("distance_units") ** 2).magnitude
     kbt = params.get("T") * params.get("kb")
@@ -117,7 +118,7 @@ without slip-links or entanglements.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.482 seconds)
+   **Total running time of the script:** (0 minutes 0.487 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_force_relaxation.py:

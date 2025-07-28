@@ -246,11 +246,11 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/network_generator/index.html">Network Generation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/normal_mode_analysis/index.html">Normal Mode Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Normal Mode Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -397,24 +397,59 @@
 <h1>Atom<a class="headerlink" href="#atom" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">Atom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.Atom" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">Atom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.Atom" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
-<p>A single bead or atom</p>
-<p>Construct this atom</p>
+<p>A single bead or atom.</p>
+<p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>__init__(self: pylimer_tools_cpp.Atom, id: int, type: int, x: float, y: float, z: float, nx: int, ny: int, nz: int) -&gt; None</p>
+<blockquote>
+<div><p>Construct this atom.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> – Unique identifier for the atom</p></li>
-<li><p><strong>type</strong> – Type classification of the atom</p></li>
-<li><p><strong>x</strong> – X coordinate position</p></li>
-<li><p><strong>y</strong> – Y coordinate position</p></li>
-<li><p><strong>z</strong> – Z coordinate position</p></li>
-<li><p><strong>nx</strong> – Periodic image flag in x direction</p></li>
-<li><p><strong>ny</strong> – Periodic image flag in y direction</p></li>
-<li><p><strong>nz</strong> – Periodic image flag in z direction</p></li>
-</ul>
+<dt class="field-odd">param id<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Unique identifier for the atom</p>
+</dd>
+<dt class="field-even">param type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Type classification of the atom</p>
+</dd>
+<dt class="field-odd">param x<span class="colon">:</span></dt>
+<dd class="field-odd"><p>X coordinate position</p>
+</dd>
+<dt class="field-even">param y<span class="colon">:</span></dt>
+<dd class="field-even"><p>Y coordinate position</p>
+</dd>
+<dt class="field-odd">param z<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Z coordinate position</p>
+</dd>
+<dt class="field-even">param nx<span class="colon">:</span></dt>
+<dd class="field-even"><p>Periodic image flag in x direction</p>
+</dd>
+<dt class="field-odd">param ny<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Periodic image flag in y direction</p>
+</dd>
+<dt class="field-even">param nz<span class="colon">:</span></dt>
+<dd class="field-even"><p>Periodic image flag in z direction</p>
 </dd>
 </dl>
+</div></blockquote>
+</li>
+<li><p>__init__(self: pylimer_tools_cpp.Atom, properties: dict[str, float]) -&gt; None</p>
+<blockquote>
+<div><p>Construct this atom from a properties dictionary.</p>
+<p>The dictionary should contain at least the following keys:
+- “id”: Unique identifier for the atom
+- “type”: Type classification of the atom
+- “x”, “y”, “z”: Coordinate positions
+- “nx”, “ny”, “nz”: Periodic image flags</p>
+<p>Any additional properties will be stored as extra data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">param properties<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing atom properties</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+</ol>
 <p class="rubric">Methods Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -426,13 +461,13 @@
 <td><p>Compute the distance to another atom.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.distance_to_unwrapped" title="pylimer_tools_cpp.Atom.distance_to_unwrapped"><code class="xref py py-obj docutils literal notranslate"><span class="pre">distance_to_unwrapped</span></code></a>(self, arg0, arg1)</p></td>
-<td><p>Compute the distance to another atom respecting the periodic image flag.</p></td>
+<td><p>Compute the distance to another atom respecting the periodic image flags.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_coordinates" title="pylimer_tools_cpp.Atom.get_coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_coordinates</span></code></a>(self)</p></td>
 <td><p>Get the coordinates of this atom as a vector.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_id" title="pylimer_tools_cpp.Atom.get_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_id</span></code></a>(self)</p></td>
-<td><p>Get the id of the atom.</p></td>
+<td><p>Get the ID of the atom.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_nx" title="pylimer_tools_cpp.Atom.get_nx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nx</span></code></a>(self)</p></td>
 <td><p>Get the box image that the atom is in in x direction (also known as <cite>ix</cite> or <cite>nx</cite>).</p></td>
@@ -469,18 +504,48 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.compute_vector_to">
 <span class="sig-name descname"><span class="pre">compute_vector_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_atom</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc_box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.compute_vector_to" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the vector to another atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>to_atom</strong> – The target atom</p></li>
+<li><p><strong>pbc_box</strong> – The periodic boundary conditions box</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector pointing from this atom to the target atom</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.distance_to">
 <span class="sig-name descname"><span class="pre">distance_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_atom</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc_box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.distance_to" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the distance to another atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>to_atom</strong> – The target atom</p></li>
+<li><p><strong>pbc_box</strong> – The periodic boundary conditions box</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Distance to the target atom</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.distance_to_unwrapped">
 <span class="sig-name descname"><span class="pre">distance_to_unwrapped</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.distance_to_unwrapped" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the distance to another atom respecting the periodic image flag.</p>
+<dd><p>Compute the distance to another atom respecting the periodic image flags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>to_atom</strong> – The target atom</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Unwrapped distance to the target atom</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -497,31 +562,56 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_id">
 <span class="sig-name descname"><span class="pre">get_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_id" title="Link to this definition">¶</a></dt>
-<dd><p>Get the id of the atom.</p>
+<dd><p>Get the ID of the atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The atom’s unique identifier</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_nx">
 <span class="sig-name descname"><span class="pre">get_nx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_nx" title="Link to this definition">¶</a></dt>
 <dd><p>Get the box image that the atom is in in x direction (also known as <cite>ix</cite> or <cite>nx</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The periodic image flag in x direction</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_ny">
 <span class="sig-name descname"><span class="pre">get_ny</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_ny" title="Link to this definition">¶</a></dt>
 <dd><p>Get the box image that the atom is in in y direction (also known as <cite>iy</cite> or <cite>ny</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The periodic image flag in y direction</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_nz">
 <span class="sig-name descname"><span class="pre">get_nz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_nz" title="Link to this definition">¶</a></dt>
 <dd><p>Get the box image that the atom is in in z direction (also known as <cite>iz</cite> or <cite>nz</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The periodic image flag in z direction</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_type">
 <span class="sig-name descname"><span class="pre">get_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_type" title="Link to this definition">¶</a></dt>
 <dd><p>Get the type of the atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The atom’s type classification</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -542,24 +632,47 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_x">
 <span class="sig-name descname"><span class="pre">get_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_x" title="Link to this definition">¶</a></dt>
 <dd><p>Get the x coordinate of the atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The x coordinate</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_y">
 <span class="sig-name descname"><span class="pre">get_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_y" title="Link to this definition">¶</a></dt>
 <dd><p>Get the y coordinate of the atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The y coordinate</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_z">
 <span class="sig-name descname"><span class="pre">get_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_z" title="Link to this definition">¶</a></dt>
 <dd><p>Get the z coordinate of the atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The z coordinate</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.vector_to_unwrapped">
 <span class="sig-name descname"><span class="pre">vector_to_unwrapped</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.vector_to_unwrapped" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the vector to another atom respecting the periodic image flags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>to_atom</strong> – The target atom</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Unwrapped vector to the target atom</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

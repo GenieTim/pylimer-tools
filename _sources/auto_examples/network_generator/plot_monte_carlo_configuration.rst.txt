@@ -24,7 +24,7 @@ Monte Carlo Configuration
 In the following, there are a few calls showing how to
 fine-tune the Monte Carlo network generation process:
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-40
+.. GENERATED FROM PYTHON SOURCE LINES 9-43
 
 .. code-block:: Python
 
@@ -34,7 +34,10 @@ fine-tune the Monte Carlo network generation process:
 
     import matplotlib.pyplot as plt
 
-    from pylimer_tools.io.bead_spring_parameter_provider import ParameterType, get_parameters_for_polymer
+    from pylimer_tools.io.bead_spring_parameter_provider import (
+        ParameterType,
+        get_parameters_for_polymer,
+    )
     from pylimer_tools_cpp import MCUniverseGenerator
 
     generator = MCUniverseGenerator(
@@ -66,7 +69,7 @@ fine-tune the Monte Carlo network generation process:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-49
+.. GENERATED FROM PYTHON SOURCE LINES 44-52
 
 In the following, we plot a performance comparison of using the z_score max distance or not,
 for a relatively small system. Please note that this always also depends on your system size,
@@ -74,16 +77,17 @@ and even the density and length of the strands. If most distances have to be che
 the overhead of the limit check would be apparent, for example.
 
 Apart from the z-score, there are two more methods to configure the limit used:
-- :meth:`~pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance()`
-- :meth:`~pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance()`
+- :meth:`~pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance`
+- :meth:`~pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance`
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-99
+.. GENERATED FROM PYTHON SOURCE LINES 52-103
 
 .. code-block:: Python
 
 
     # Get parameters for PDMS polymer density and bead distance
-    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer(
+        "PDMS", parameter_type=ParameterType.GAUSSIAN)
 
     n_strands = 50000
     n_atoms_per_strand = 50
@@ -144,7 +148,7 @@ Apart from the z-score, there are two more methods to configure the limit used:
 
  .. code-block:: none
 
-    Time without max distance: 30.30 seconds
+    Time without max distance: 30.47 seconds
     Time with z-score max distance: 1.47 seconds
 
 
@@ -153,7 +157,7 @@ Apart from the z-score, there are two more methods to configure the limit used:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 32.177 seconds)
+   **Total running time of the script:** (0 minutes 32.334 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_monte_carlo_configuration.py:

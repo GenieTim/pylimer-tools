@@ -23,7 +23,7 @@ Multi-Component System
 
 Create complex systems with multiple components:
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-77
+.. GENERATED FROM PYTHON SOURCE LINES 8-87
 
 
 
@@ -32,11 +32,11 @@ Create complex systems with multiple components:
 
  .. code-block:: none
 
-    Starting network generation at 2025-07-24 15:53:58.203732
+    Starting network generation at 2025-07-28 19:36:39.453704
     Adding crosslinkers...
     Adding solvent chains...
     Adding and linking polymer strands...
-    Network generation completed at 2025-07-24 15:53:58.604429
+    Network generation completed at 2025-07-28 19:36:39.855567
 
 
 
@@ -49,7 +49,9 @@ Create complex systems with multiple components:
 
 
     import datetime
-    from pylimer_tools_cpp import MCUniverseGenerator
+    import os
+
+    from pylimer_tools_cpp import DataFileWriter, MCUniverseGenerator
 
     # System parameters
     box_size = 60.0
@@ -117,10 +119,18 @@ Create complex systems with multiple components:
 
     print(f"Network generation completed at {datetime.datetime.now()}")
 
+    # Save the universe to a file
+    writer = DataFileWriter(universe)
+
+    if not os.path.exists("generated_structures"):
+        os.makedirs("generated_structures")
+
+    writer.write_to_file("generated_structures/multi_component_polymer_network.data")
+
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.402 seconds)
+   **Total running time of the script:** (0 minutes 0.420 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_multi_component_system.py:
