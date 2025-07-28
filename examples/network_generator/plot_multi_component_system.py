@@ -7,6 +7,7 @@ Create complex systems with multiple components:
 """
 
 import datetime
+import os
 
 from pylimer_tools_cpp import DataFileWriter, MCUniverseGenerator
 
@@ -78,4 +79,8 @@ print(f"Network generation completed at {datetime.datetime.now()}")
 
 # Save the universe to a file
 writer = DataFileWriter(universe)
-writer.write_to_file("generated_networks/multi_component_polymer_network.data")
+
+if not os.path.exists("generated_structures"):
+    os.makedirs("generated_structures")
+
+writer.write_to_file("generated_structures/multi_component_polymer_network.data")
