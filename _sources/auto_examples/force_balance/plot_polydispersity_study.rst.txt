@@ -28,22 +28,25 @@ Again, please be aware that this is a minimal example, and the results
 are not statistically significant, because of the small system size
 and no repeated sampling of the polydispersity distribution nor entanglements.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-102
+.. GENERATED FROM PYTHON SOURCE LINES 13-105
 
 .. code-block:: Python
 
 
     import math
     import random
+
     import matplotlib.pyplot as plt
-    from pylimer_tools_cpp import MCUniverseGenerator, MEHPForceBalance2
     import numpy as np
 
-    from pylimer_tools.io.bead_spring_parameter_provider import get_parameters_for_polymer
-    from pylimer_tools_cpp import MCUniverseGenerator
+    from pylimer_tools.io.bead_spring_parameter_provider import (
+        ParameterType,
+        get_parameters_for_polymer,
+    )
+    from pylimer_tools_cpp import MCUniverseGenerator, MEHPForceBalance2
 
     # Get parameters for PDMS polymer density and bead distance
-    params = get_parameters_for_polymer("PDMS")
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 
     # setup strand lengths
     n_strands = 10000
@@ -133,7 +136,7 @@ and no repeated sampling of the polydispersity distribution nor entanglements.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-110
+.. GENERATED FROM PYTHON SOURCE LINES 106-113
 
 There are many things you would want to do differently in a real study, for example:
 
@@ -146,7 +149,7 @@ There are many things you would want to do differently in a real study, for exam
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (5 minutes 36.810 seconds)
+   **Total running time of the script:** (5 minutes 40.440 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_polydispersity_study.py:

@@ -25,7 +25,11 @@ This example demonstrates how to set up and run a DPD simulation with slip-sprin
 
 References: :cite:t:`langeloth_recovering_2013` and :cite:t:`schneider_simulation_2021`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-34
+Assuming your ``pylimer_tools`` version was compiled with OpenMP,
+to run this in parallel, you can use the typical OpenMP environment variables,
+e.g., in the terminal before running your script: :code:`export OMP_NUM_THREADS=4` to use 4 threads.
+
+.. GENERATED FROM PYTHON SOURCE LINES 13-42
 
 .. code-block:: Python
 
@@ -35,9 +39,13 @@ References: :cite:t:`langeloth_recovering_2013` and :cite:t:`schneider_simulatio
     import pandas as pd
 
     from pylimer_tools.io.read_lammps_output_file import read_data_file
-    from pylimer_tools_cpp import (AtomStyle, ComputedDoubleValues,
-                                   ComputedIntValues, DPDSimulator,
-                                   OutputConfiguration)
+    from pylimer_tools_cpp import (
+        AtomStyle,
+        ComputedDoubleValues,
+        ComputedIntValues,
+        DPDSimulator,
+        OutputConfiguration,
+    )
 
     # Load a LAMMPS data file (replace with your file)
     filePath = os.path.join(
@@ -61,13 +69,13 @@ References: :cite:t:`langeloth_recovering_2013` and :cite:t:`schneider_simulatio
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-38
+.. GENERATED FROM PYTHON SOURCE LINES 43-46
 
 Note that the random seed does not guarantee the same results across different runs,
 as the DPD algorithm is inherently stochastic and will produce different results
 if you use more than one processor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-81
+.. GENERATED FROM PYTHON SOURCE LINES 46-89
 
 .. code-block:: Python
 
@@ -127,11 +135,11 @@ if you use more than one processor.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-83
+.. GENERATED FROM PYTHON SOURCE LINES 90-91
 
 read the output file and actually plot something
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-97
+.. GENERATED FROM PYTHON SOURCE LINES 91-105
 
 .. code-block:: Python
 
@@ -164,7 +172,7 @@ read the output file and actually plot something
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 7.704 seconds)
+   **Total running time of the script:** (0 minutes 7.733 seconds)
 
 
 .. _sphx_glr_download_auto_examples_dpd_simulations_plot_dpd_simulation.py:

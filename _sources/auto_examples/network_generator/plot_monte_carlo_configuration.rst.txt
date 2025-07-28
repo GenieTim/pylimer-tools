@@ -34,7 +34,7 @@ fine-tune the Monte Carlo network generation process:
 
     import matplotlib.pyplot as plt
 
-    from pylimer_tools.io.bead_spring_parameter_provider import get_parameters_for_polymer
+    from pylimer_tools.io.bead_spring_parameter_provider import ParameterType, get_parameters_for_polymer
     from pylimer_tools_cpp import MCUniverseGenerator
 
     generator = MCUniverseGenerator(
@@ -83,7 +83,7 @@ Apart from the z-score, there are two more methods to configure the limit used:
 
 
     # Get parameters for PDMS polymer density and bead distance
-    params = get_parameters_for_polymer("PDMS")
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 
     n_strands = 50000
     n_atoms_per_strand = 50
@@ -144,8 +144,8 @@ Apart from the z-score, there are two more methods to configure the limit used:
 
  .. code-block:: none
 
-    Time without max distance: 30.28 seconds
-    Time with z-score max distance: 1.46 seconds
+    Time without max distance: 30.30 seconds
+    Time with z-score max distance: 1.47 seconds
 
 
 
@@ -153,7 +153,7 @@ Apart from the z-score, there are two more methods to configure the limit used:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 32.138 seconds)
+   **Total running time of the script:** (0 minutes 32.177 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_monte_carlo_configuration.py:

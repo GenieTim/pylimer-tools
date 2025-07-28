@@ -68,23 +68,6 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MCUniverseGenerator to create a polydisperse end-linked polymer network with varying strand lengths.">
-
-.. only:: html
-
-  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_polydisperse_system_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Generate a Polydisperse Polymer Network</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Create complex systems with multiple components:">
 
 .. only:: html
@@ -114,6 +97,23 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Adding Topology Information</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MCUniverseGenerator to create a polydisperse end-linked polymer network with varying strand lengths.">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_polydisperse_system_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Generate a Polydisperse Polymer Network</div>
     </div>
 
 
@@ -163,9 +163,9 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 
    /auto_examples/network_generator/plot_save_network
    /auto_examples/network_generator/plot_simple_crosslinked_network
-   /auto_examples/network_generator/plot_polydisperse_system
    /auto_examples/network_generator/plot_multi_component_system
    /auto_examples/network_generator/plot_add_angles
+   /auto_examples/network_generator/plot_polydisperse_system
    /auto_examples/network_generator/plot_vulcanized_network
    /auto_examples/network_generator/plot_monte_carlo_configuration
 

@@ -38,11 +38,11 @@ Alternatives were proposed as well, such as the inverse Gaussian or a ternary di
 
     import matplotlib.pyplot as plt
 
-    from pylimer_tools.io.bead_spring_parameter_provider import get_parameters_for_polymer
+    from pylimer_tools.io.bead_spring_parameter_provider import ParameterType, get_parameters_for_polymer
     from pylimer_tools_cpp import MCUniverseGenerator
 
     # Get parameters for PDMS polymer density and bead distance
-    params = get_parameters_for_polymer("PDMS")
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 
     # setup strand lengths
     n_strands = 1000
@@ -130,7 +130,7 @@ lengths:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 6.588 seconds)
+   **Total running time of the script:** (0 minutes 6.789 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_polydisperse_system.py:

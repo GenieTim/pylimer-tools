@@ -20,7 +20,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="pylimer-tools" />
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Monte Carlo Configuration" href="plot_monte_carlo_configuration.html" /><link rel="prev" title="Adding Topology Information" href="plot_add_angles.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Monte Carlo Configuration" href="plot_monte_carlo_configuration.html" /><link rel="prev" title="Generate a Polydisperse Polymer Network" href="plot_polydisperse_system.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>Generate Vulcanized Networks - pylimer-tools</title>
@@ -248,9 +248,9 @@
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Network Generation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Network Generation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="plot_save_network.html">Save Generated Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_add_angles.html">Adding Topology Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Generate Vulcanized Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
 </ul>
@@ -405,11 +405,14 @@ to download the full example code.</p>
 <p>In this example, we create a vulcanized network using the <cite>pylimer-tools</cite> library.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.io.bead_spring_parameter_provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_parameters_for_polymer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.io.bead_spring_parameter_provider</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ParameterType</span><span class="p">,</span>
+    <span class="n">get_parameters_for_polymer</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">MCUniverseGenerator</span></a><span class="p">,</span> <a href="../../api/pylimer_tools_cpp.randomly_sample_entanglements.html#pylimer_tools_cpp.randomly_sample_entanglements" title="pylimer_tools_cpp.randomly_sample_entanglements" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-function"><span class="n">randomly_sample_entanglements</span></a>
 
 <span class="c1"># Get parameters for PDMS polymer density and bead distance</span>
-<span class="n">params</span> <span class="o">=</span> <span class="n">get_parameters_for_polymer</span><span class="p">(</span><span class="s2">&quot;PDMS&quot;</span><span class="p">)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">get_parameters_for_polymer</span><span class="p">(</span><span class="s2">&quot;PDMS&quot;</span><span class="p">,</span> <span class="n">parameter_type</span><span class="o">=</span><span class="n">ParameterType</span><span class="o">.</span><span class="n">GAUSSIAN</span><span class="p">)</span>
 
 <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_strands</span></a> <span class="o">=</span> <span class="mi">1000</span>
 <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_atoms_per_strand</span></a> <span class="o">=</span> <span class="mi">50</span>
@@ -453,10 +456,8 @@ to download the full example code.</p>
 <span class="c1"># Add sampled crosslinks to the universe</span>
 <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.add_bonds" title="pylimer_tools_cpp.Universe.add_bonds" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">universe</span><span class="o">.</span><span class="n">add_bonds</span></a><span class="p">(</span>
     <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_sampled_crosslinks</span></a><span class="p">,</span>
-    <span class="p">[</span><a href="../../api/pylimer_tools_cpp.AtomPairEntanglements.html#pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms" title="pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-attribute"><span class="n">sampled_crosslinks</span><span class="o">.</span><span class="n">pairs_of_atoms</span></a><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_sampled_crosslinks</span></a><span class="p">)],</span>
-    <span class="p">[</span><a href="../../api/pylimer_tools_cpp.AtomPairEntanglements.html#pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms" title="pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-attribute"><span class="n">sampled_crosslinks</span><span class="o">.</span><span class="n">pairs_of_atoms</span></a><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_sampled_crosslinks</span></a><span class="p">)],</span>
+    <span class="p">[</span><a href="../../api/pylimer_tools_cpp.AtomPairEntanglements.html#pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms" title="pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-attribute"><span class="n">sampled_crosslinks</span><span class="o">.</span><span class="n">pairs_of_atoms</span></a><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_sampled_crosslinks</span></a><span class="p">)],</span>
+    <span class="p">[</span><a href="../../api/pylimer_tools_cpp.AtomPairEntanglements.html#pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms" title="pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-attribute"><span class="n">sampled_crosslinks</span><span class="o">.</span><span class="n">pairs_of_atoms</span></a><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_sampled_crosslinks</span></a><span class="p">)],</span>
     <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_sampled_crosslinks</span></a><span class="p">)],</span>  <span class="c1"># Bond type 2</span>
 <span class="p">)</span>
 
@@ -469,14 +470,13 @@ to download the full example code.</p>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Generated vulcanized network with 750 crosslinks
 
-&lt;pylimer_tools_cpp.Universe object at 0x7f5dba8289f0&gt;
+&lt;pylimer_tools_cpp.Universe object at 0x7f7e8534d4b0&gt;
 </pre></div>
 </div>
 <p>Refer to <a class="reference internal" href="../readers_writers/index.html#sphx-glr-auto-examples-readers-writers"><span class="std std-ref">File I/O: Readers &amp; Writers</span></a> for how you can save the universe to a file.</p>
 <p>For now, we will show that this produces a variety of different strand
 lengths:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">strand_lengths</span></a> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span>
-                  <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_chains_with_crosslinker" title="pylimer_tools_cpp.Universe.get_chains_with_crosslinker" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">universe</span><span class="o">.</span><span class="n">get_chains_with_crosslinker</span></a><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">strand_lengths</span></a> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_chains_with_crosslinker" title="pylimer_tools_cpp.Universe.get_chains_with_crosslinker" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">universe</span><span class="o">.</span><span class="n">get_chains_with_crosslinker</span></a><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
 
 <span class="c1"># Plot the distribution of strand lengths</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="matplotlib.pyplot.figure" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">()</span>
@@ -487,7 +487,7 @@ lengths:</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_vulcanized_network_001.png" srcset="../../_images/sphx_glr_plot_vulcanized_network_001.png" alt="Distribution of Strand Lengths in Vulcanized Network" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 13.029 seconds)</p>
+<img src="../../_images/sphx_glr_plot_vulcanized_network_001.png" srcset="../../_images/sphx_glr_plot_vulcanized_network_001.png" alt="Distribution of Strand Lengths in Vulcanized Network" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 12.920 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-network-generator-plot-vulcanized-network-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/1efcbba60d1141451ef0292fecab3bae/plot_vulcanized_network.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_vulcanized_network.ipynb</span></code></a></p>
@@ -516,14 +516,14 @@ lengths:</p>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="plot_add_angles.html">
+          <a class="prev-page" href="plot_polydisperse_system.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Adding Topology Information</div>
+                <div class="title">Generate a Polydisperse Polymer Network</div>
                 
               </div>
             </a>

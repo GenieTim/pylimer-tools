@@ -23,18 +23,21 @@ Generate Vulcanized Networks
 
 In this example, we create a vulcanized network using the `pylimer-tools` library.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-72
+.. GENERATED FROM PYTHON SOURCE LINES 8-73
 
 .. code-block:: Python
 
 
     import matplotlib.pyplot as plt
 
-    from pylimer_tools.io.bead_spring_parameter_provider import get_parameters_for_polymer
+    from pylimer_tools.io.bead_spring_parameter_provider import (
+        ParameterType,
+        get_parameters_for_polymer,
+    )
     from pylimer_tools_cpp import MCUniverseGenerator, randomly_sample_entanglements
 
     # Get parameters for PDMS polymer density and bead distance
-    params = get_parameters_for_polymer("PDMS")
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 
     n_strands = 1000
     n_atoms_per_strand = 50
@@ -78,10 +81,8 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
     # Add sampled crosslinks to the universe
     universe.add_bonds(
         n_sampled_crosslinks,
-        [sampled_crosslinks.pairs_of_atoms[i][0]
-            for i in range(n_sampled_crosslinks)],
-        [sampled_crosslinks.pairs_of_atoms[i][1]
-            for i in range(n_sampled_crosslinks)],
+        [sampled_crosslinks.pairs_of_atoms[i][0] for i in range(n_sampled_crosslinks)],
+        [sampled_crosslinks.pairs_of_atoms[i][1] for i in range(n_sampled_crosslinks)],
         [2 for _ in range(n_sampled_crosslinks)],  # Bond type 2
     )
 
@@ -101,24 +102,23 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
 
     Generated vulcanized network with 750 crosslinks
 
-    <pylimer_tools_cpp.Universe object at 0x7f5dba8289f0>
+    <pylimer_tools_cpp.Universe object at 0x7f7e8534d4b0>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-77
+.. GENERATED FROM PYTHON SOURCE LINES 74-78
 
 Refer to :ref:`sphx_glr_auto_examples_readers_writers` for how you can save the universe to a file.
 
 For now, we will show that this produces a variety of different strand
 lengths:
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-88
+.. GENERATED FROM PYTHON SOURCE LINES 78-88
 
 .. code-block:: Python
 
 
-    strand_lengths = [m.get_nr_of_atoms()
-                      for m in universe.get_chains_with_crosslinker(2)]
+    strand_lengths = [m.get_nr_of_atoms() for m in universe.get_chains_with_crosslinker(2)]
 
     # Plot the distribution of strand lengths
     plt.figure()
@@ -142,7 +142,7 @@ lengths:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 13.029 seconds)
+   **Total running time of the script:** (0 minutes 12.920 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_vulcanized_network.py:
