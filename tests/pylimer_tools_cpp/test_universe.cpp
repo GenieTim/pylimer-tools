@@ -1482,6 +1482,14 @@ TEST_CASE("Universe can contract vertices", "[Universe][entity]")
                     pylimer_tools::utils::initializeWithValue(ids.size(), 0),
                     pylimer_tools::utils::initializeWithValue(ids.size(), 0),
                     pylimer_tools::utils::initializeWithValue(ids.size(), 0));
+  /**
+   * Coordinates don't mattter.
+   * Connectivity:
+   *
+   * 0-1-2-3-4-5-6-7-8-9
+   * where the first and last bond are of type 5, the rest of type 1.
+   */
+
   universe.addBonds({ 0, 1, 2, 3, 4, 5, 6, 7, 8 },
                     { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                     { 5, 1, 1, 1, 1, 1, 1, 1, 5 });
@@ -1495,9 +1503,20 @@ TEST_CASE("Universe can contract vertices", "[Universe][entity]")
   }
   pe::Universe contractedUniverse = universe.contractVerticesAlongBondType(1);
   CHECK(contractedUniverse.getNrOfAtoms() == 3);
+  // should be left with the bonds 0-(1,2,3,4,5,6,7,8)-9
   CHECK(contractedUniverse.getNrOfBonds() == 2);
+  // we definitely have the first and last atom
+  CHECK_NOTHROW(contractedUniverse.getAtom(0));
+  CHECK_NOTHROW(contractedUniverse.getAtom(9));
+  // plus a third one whose ID is not guaranteed
 
   CHECK(contractedUniverse.validate());
+
+  // validate that all edges have now only type 5
+  auto edges = contractedUniverse.getEdges();
+  for (size_t i = 0; i < edges["edge_from"].size(); ++i) {
+    CHECK(edges["edge_type"][i] == 5);
+  }
 
   strandAffiliationInfo = contractedUniverse.getStrandAffiliation(2);
   CHECK(strandAffiliationInfo.strandIdOfVertex.size() == 3);

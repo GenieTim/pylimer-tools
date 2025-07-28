@@ -12,7 +12,10 @@ import time
 
 import matplotlib.pyplot as plt
 
-from pylimer_tools.io.bead_spring_parameter_provider import ParameterType, get_parameters_for_polymer
+from pylimer_tools.io.bead_spring_parameter_provider import (
+    ParameterType,
+    get_parameters_for_polymer,
+)
 from pylimer_tools_cpp import MCUniverseGenerator
 
 generator = MCUniverseGenerator(
@@ -44,11 +47,12 @@ generator.config_nr_of_mc_steps(5000)  # More MC steps for better equilibration
 # the overhead of the limit check would be apparent, for example.
 #
 # Apart from the z-score, there are two more methods to configure the limit used:
-# - :meth:`~pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance()`
-# - :meth:`~pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance()`
+# - :meth:`~pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance`
+# - :meth:`~pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance`
 
 # Get parameters for PDMS polymer density and bead distance
-params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer(
+    "PDMS", parameter_type=ParameterType.GAUSSIAN)
 
 n_strands = 50000
 n_atoms_per_strand = 50

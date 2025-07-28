@@ -12,12 +12,16 @@ import os
 import numpy as np
 
 from pylimer_tools.io.bead_spring_parameter_provider import (
-    ParameterType, Parameters, get_parameters_for_polymer)
+    ParameterType,
+    Parameters,
+    get_parameters_for_polymer,
+)
 from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import MEHPForceBalance, Universe
 
 # Get parameters for conversion factors
-params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer(
+    "PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
 
 # Load your network (replace with your file)

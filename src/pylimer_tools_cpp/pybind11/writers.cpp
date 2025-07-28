@@ -13,11 +13,21 @@ using namespace pylimer_tools::utils;
 void
 init_pylimer_bound_writers(py::module_& m)
 {
-  py::class_<DataFileWriter>(
-    m,
-    "DataFileWriter",
-    py::module_local(),
-    R"pbdoc(A class to write a LAMMPS data file from a universe.)pbdoc")
+  py::class_<DataFileWriter>(m,
+                             "DataFileWriter",
+                             py::module_local(),
+                             R"pbdoc(
+    A class to write a LAMMPS data file from a universe.
+    
+    .. attention::
+        The resulting file is not guaranteed to be a completely valid LAMMPS file.
+        In particular, this writer does not force you to set masses for all atom types,
+        and it does not have limits on the image flags.
+        You can use :meth:`~pylimer_tools_cpp.Universe.set_masses` to set the masses for all atom types,
+        and either :meth:`~pylimer_tools_cpp.Universe.set_vertex_property` or 
+        :meth:`~pylimer_tools_cpp.DataFileWriter.config_attempt_image_reset` and
+        :meth:`~pylimer_tools_cpp.DataFileWriter.config_move_into_box` to ensure that the image flags are correct.
+    )pbdoc")
     .def(py::init<pe::Universe>(), py::arg("universe"), R"pbdoc(
         Initialize the writer with the universe to write.
     )pbdoc")
@@ -104,11 +114,14 @@ init_pylimer_bound_writers(py::module_& m)
         - $nz
 
         Additionally, you can use the keys used in
-        :func:`~pylimer_tools_cpp.Universe.set_property_value`
+        :meth:`~pylimer_tools_cpp.Universe.set_property_value`
         as placeholders (as long as they are alphanumeric only; prefix in the format with '$' as well).
-        Specifically useful if you need a different (or hybrid) atom style in LAMMPS.
+        Other placeholders are available if the universe was read from a LAMMPS data file with an
+        atom style with additional data.
 
-        Be sure to still call :func:`~pylimer_tools_cpp.DataFileWriter.config_atom_style`,
+        This method is specifically useful if you need a different (or hybrid) atom style in LAMMPS.
+
+        Be sure to still call :meth:`~pylimer_tools_cpp.DataFileWriter.config_atom_style`,
         so that the file can be read correctly again.
 
         Default: empty string, in which case the configured atom style will be used.
@@ -119,7 +132,7 @@ init_pylimer_bound_writers(py::module_& m)
          R"pbdoc(
         Set which atom type represents crosslinkers.
         Needed in case the moleculeIdx in the output file should have any meaning.
-        (e.g. with :func:`~pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap`).
+        (e.g. with :meth:`~pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap`).
 
         Default: 2.
     )pbdoc")

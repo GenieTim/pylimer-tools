@@ -578,6 +578,12 @@ TEST_CASE("New PBC computation is correct", "[analysis][DPDSimulator][1proc]")
                     "crosslinked_p_0.98_melt_100_a_3_50_xlinks_v_14.converted."
                     "structure.out-equilibration_do_crosslink.structure.out";
   if (std::filesystem::exists(inputFile)) {
+#ifdef OPENMP_FOUND
+    // we cannot have more than 1 thread, otherwise the random number generator
+    // will not play nicely.
+    omp_set_num_threads(1);
+#endif
+
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
     universeSequence.initializeFromDataSequence({ { inputFile } });
@@ -587,16 +593,18 @@ TEST_CASE("New PBC computation is correct", "[analysis][DPDSimulator][1proc]")
     pcd::DPDSimulator simulator =
       pcd::DPDSimulator(universe, 2, 9, false, "15th_seed");
 
-    simulator.createSlipSprings(100, 2);
-
 #ifdef OPENMP_FOUND
-    // we cannot have more than 1 thread, otherwise the random number generator
-    // will not play nicely.
-    omp_set_num_threads(1);
+    simulator.setNumOmpThreads(1);
 #endif
+    REQUIRE(simulator.getNumOmpThreads() == 1);
+    simulator.createSlipSprings(100, 2);
 
     // invoke copy-constructor
     pcd::DPDSimulator simulator2 = simulator;
+#ifdef OPENMP_FOUND
+    simulator2.setNumOmpThreads(1);
+#endif
+    REQUIRE(simulator.getNumOmpThreads() == 1);
 
     // switch to "common" PBC
     simulator2.configAssumeBoxLargeEnough();
@@ -619,6 +627,12 @@ TEST_CASE("New PBC computation is correct", "[analysis][DPDSimulator][1proc]")
 TEST_CASE("For large systems the PBC method does not matter",
           "[analysis][DPDSimulator][1proc][long]")
 {
+  /**
+   * @brief Currently, this test fails.
+   * 
+   * This might be ok, 
+   * demonstrating that the PBC method *does* matter.
+   */
   std::cout
     << "Running test \"For large systems the PBC method does not matter\""
     << std::endl;
@@ -645,7 +659,11 @@ TEST_CASE("For large systems the PBC method does not matter",
 
     pcd::DPDSimulator simulator =
       pcd::DPDSimulator(universe, 2, 9, false, "19th_seed");
+#ifdef OPENMP_FOUND
+    simulator.setNumOmpThreads(1);
+#endif
 
+    REQUIRE(simulator.getNumOmpThreads() == 1);
     simulator.createSlipSprings(static_cast<int>(0.1 * universe.getNrOfAtoms()),
                                 2);
 
@@ -667,7 +685,13 @@ TEST_CASE("For large systems the PBC method does not matter",
 
     // invoke copy-constructor
     pcd::DPDSimulator simulator2 = pcd::DPDSimulator(simulator);
+#ifdef OPENMP_FOUND
+    simulator.setNumOmpThreads(1);
+    simulator2.setNumOmpThreads(1);
+#endif
 
+    REQUIRE(simulator.getNumOmpThreads() == 1);
+    REQUIRE(simulator2.getNumOmpThreads() == 1);
     // switch to "common" PBC
     simulator2.configAssumeBoxLargeEnough();
 
@@ -679,16 +703,21 @@ TEST_CASE("For large systems the PBC method does not matter",
     simulator2.reseedRandomness("20th_seed");
     simulator2.refreshCurrentState();
 
-    CHECK(simulator.getUniformRandBetween0And1() ==
+    REQUIRE(simulator.getUniformRandBetween0And1() ==
           simulator2.getUniformRandBetween0And1());
     CHECK_THAT(simulator.getTemperature(),
                Catch::Matchers::WithinRel(simulator2.getTemperature()));
-    CHECK(simulator.getBondLengths().isApprox(simulator2.getBondLengths()));
-    CHECK(simulator.getStressTensor().isApprox(simulator2.getStressTensor()));
+    REQUIRE(simulator.getBondLengths().isApprox(simulator2.getBondLengths()));
+    REQUIRE(simulator.getStressTensor().isApprox(simulator2.getStressTensor()));
+    REQUIRE(simulator.getUniformRandBetween0And1() ==
+          simulator2.getUniformRandBetween0And1());
 
     // not sure what value is sensible here...
     simulator.runSimulation(50, true);
     simulator2.runSimulation(50, true);
+
+    REQUIRE(simulator.getNumOmpThreads() == 1);
+    REQUIRE(simulator2.getNumOmpThreads() == 1);
 
     CHECK(simulator.getUniformRandBetween0And1() ==
           simulator2.getUniformRandBetween0And1());
@@ -737,7 +766,11 @@ TEST_CASE("DPD Simulator's restart files are accurate",
     // we cannot have more than 1 thread, otherwise the random number generator
     // will not play nicely.
     omp_set_num_threads(1);
+    simulator.setNumOmpThreads(1);
+    sim2.setNumOmpThreads(1);
 #endif
+
+
     CHECK(simulator.getCoordinates().isApprox(sim2.getCoordinates()));
     CHECK(simulator.getBondLengths().isApprox(sim2.getBondLengths()));
     CHECK(simulator.getStressTensor().isApprox(sim2.getStressTensor()));

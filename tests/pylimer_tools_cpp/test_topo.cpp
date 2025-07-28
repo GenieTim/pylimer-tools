@@ -83,8 +83,8 @@ TEST_CASE("Entanglement Detector respects distance cut-off",
 {
   std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
   std::vector<std::string> files = {
-    // "3d-diamond-lattice_10x10x10_a_3_d_0.85_imperfect.structure.out",
-    // "crosslinked_M10000_N39_p_0.9.out",
+    "3d-diamond-lattice_10x10x10_a_3_d_0.85_imperfect.structure.out",
+    "crosslinked_M10000_N39_p_0.9.out",
     "crosslinked_p_0.98_melt_100_a_38_50_xlinks_v_22.structure.out-equilibration_do_crosslink.structure.out",
     "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out"
   };
