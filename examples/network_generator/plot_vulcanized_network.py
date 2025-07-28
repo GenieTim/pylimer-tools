@@ -8,11 +8,14 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
 
 import matplotlib.pyplot as plt
 
-from pylimer_tools.io.bead_spring_parameter_provider import get_parameters_for_polymer
+from pylimer_tools.io.bead_spring_parameter_provider import (
+    ParameterType,
+    get_parameters_for_polymer,
+)
 from pylimer_tools_cpp import MCUniverseGenerator, randomly_sample_entanglements
 
 # Get parameters for PDMS polymer density and bead distance
-params = get_parameters_for_polymer("PDMS")
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 
 n_strands = 1000
 n_atoms_per_strand = 50
@@ -56,10 +59,8 @@ n_sampled_crosslinks = len(sampled_crosslinks.pairs_of_atoms)
 # Add sampled crosslinks to the universe
 universe.add_bonds(
     n_sampled_crosslinks,
-    [sampled_crosslinks.pairs_of_atoms[i][0]
-        for i in range(n_sampled_crosslinks)],
-    [sampled_crosslinks.pairs_of_atoms[i][1]
-        for i in range(n_sampled_crosslinks)],
+    [sampled_crosslinks.pairs_of_atoms[i][0] for i in range(n_sampled_crosslinks)],
+    [sampled_crosslinks.pairs_of_atoms[i][1] for i in range(n_sampled_crosslinks)],
     [2 for _ in range(n_sampled_crosslinks)],  # Bond type 2
 )
 
@@ -75,8 +76,7 @@ universe.contract_vertices_along_bond_type(2)
 # For now, we will show that this produces a variety of different strand
 # lengths:
 
-strand_lengths = [m.get_nr_of_atoms()
-                  for m in universe.get_chains_with_crosslinker(2)]
+strand_lengths = [m.get_nr_of_atoms() for m in universe.get_chains_with_crosslinker(2)]
 
 # Plot the distribution of strand lengths
 plt.figure()

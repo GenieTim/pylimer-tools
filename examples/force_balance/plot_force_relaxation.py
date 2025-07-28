@@ -12,7 +12,10 @@ import os
 
 import numpy as np
 
-from pylimer_tools.io.bead_spring_parameter_provider import get_parameters_for_polymer
+from pylimer_tools.io.bead_spring_parameter_provider import (
+    ParameterType,
+    get_parameters_for_polymer,
+)
 from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import (
     MEHPForceRelaxation,
@@ -32,7 +35,7 @@ universe = read_data_file(
 assert isinstance(universe, Universe)
 
 # Prepare parameters for conversion factors
-params = get_parameters_for_polymer("PDMS")
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 r02_slope = params.get("R02")
 r02_slope_magnitude = r02_slope.to(params.get("distance_units") ** 2).magnitude
 kbt = params.get("T") * params.get("kb")

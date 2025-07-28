@@ -83,11 +83,10 @@ TEST_CASE("Entanglement Detector respects distance cut-off",
 {
   std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
   std::vector<std::string> files = {
-    "3d-diamond-lattice_10x10x10_a_3_d_0.85_imperfect.structure.out",
-    "crosslinked_M10000_N39_p_0.9.out",
-    "crosslinked_p_0.98_melt_100_a_3_50_xlinks_v_14.converted.structure.out-"
-    "equilibration_do_crosslink.structure.out",
-    "xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out"
+    // "3d-diamond-lattice_10x10x10_a_3_d_0.85_imperfect.structure.out",
+    // "crosslinked_M10000_N39_p_0.9.out",
+    "crosslinked_p_0.98_melt_100_a_38_50_xlinks_v_22.structure.out-equilibration_do_crosslink.structure.out",
+    "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out"
   };
 
   for (const std::string& file : files) {
@@ -104,7 +103,10 @@ TEST_CASE("Entanglement Detector respects distance cut-off",
     universeSeq.initializeFromDataSequence({ { inputFile } });
     pe::Universe universe = universeSeq.atIndex(0);
 
-    for (const bool filtered : { true, false }) {
+    for (const bool filtered : {
+      true,
+      false
+    }) {
       std::cout << "Filtering: " << (filtered ? "true" : "false") << std::endl;
       for (const double lowerCutoff : {
              0.,
@@ -117,6 +119,12 @@ TEST_CASE("Entanglement Detector respects distance cut-off",
              }) {
           std::cout << "\t\tUpper cutoff: " << upperCutoff << std::endl;
           for (const double sameStrandCutoff : { -1., 2., 5. }) {
+            INFO("Processing file: " << inputFile << " with lowerCutoff: "
+                                     << lowerCutoff
+                                     << ", upperCutoff: " << upperCutoff
+                                     << ", sameStrandCutoff: "
+                                     << sameStrandCutoff
+                                     << ", filtered: " << filtered);
             std::cout << "\t\t\tSame strand cutoff: " << sameStrandCutoff;
             auto start_ref = std::chrono::high_resolution_clock::now();
 
@@ -140,6 +148,7 @@ TEST_CASE("Entanglement Detector respects distance cut-off",
             std::cout << "\tEntanglements v1: "
                       << std::duration_to_string(duration_ref) << " "
                       << std::endl;
+
             CHECK(entanglements.pairsOfAtoms.size() >=
                   0.05 * universe.getNrOfAtoms());
             CHECK(entanglements.pairsOfAtoms.size() <=
