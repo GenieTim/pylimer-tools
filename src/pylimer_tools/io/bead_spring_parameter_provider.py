@@ -1,11 +1,27 @@
 import math
-from typing import Union
+from enum import Enum
+from typing import Optional, Union
 
 import numpy as np
 import pint
 from pint import Quantity, UnitRegistry
 
 from pylimer_tools.io.unit_styles import UnitStyleFactory
+
+
+class ParameterType(Enum):
+    """
+    Enum for parameter types used in the Parameters class.
+
+    Attributes:
+        GAUSSIAN: Gaussian chain model parameters for ideal bead-spring polymer chains
+        KG_LJ: Kremer-Grest model parameters with Lennard-Jones units
+        KUHN: Kuhn segment model parameters
+    """
+
+    GAUSSIAN = "Gaussian"
+    KG_LJ = "Kremer-Grest, Lennard-Jones"
+    KUHN = "Kuhn"
 
 
 class Parameters:
@@ -37,14 +53,27 @@ class Parameters:
 
         """
         for key, value in data.items():
-            assert isinstance(value, Quantity), (
-                f"Invalid value for parameter {key}: {value}"
-            )
+            assert isinstance(
+                value, Quantity
+            ), f"Invalid value for parameter {key}: {value}"
 
         # validate parameters
         required_params = ["Mw", "<b>", "<b^2>", "rho"]
         for param in required_params:
             assert param in data, f"Missing required parameter: {param}"
+
+        assert data["Mw"].check("[mass]/[substance]") or data["Mw"].check("[mass]")
+        assert data["<b>"].check("[length]")
+        assert data["<b^2>"].check("[length] ** 2")
+        assert data["rho"].check("[mass]/[volume]") or data["rho"].check(
+            "[substance]/[volume]"
+        )
+
+        if "R02" not in data:
+            data["R02"] = data["<b^2>"]
+
+        if "kb" not in data:
+            data["kb"] = 1.380649e-23 * ureg.joule / ureg.kelvin
 
         self.data = data
         self.name = name
@@ -94,13 +123,19 @@ class Parameters:
         """
         density = self.get("rho") / self.get("Mw")
         density *= self.get("distance_units") ** 3
-        density = density.to("mol")
-        return density.magnitude * 6.02214076e23
+        density = density.to_reduced_units()
+        # if the density unit involves a mole, convert to number of beads
+        if density.check("[substance]"):
+            return density.to("mol").magnitude * 6.02214076e23
+        else:
+            # assert dimensionless density
+            assert density.check("[dimensionless]")
+            return density.magnitude
 
     def get_base_distance_units(self) -> pint.Quantity:
         return self.get("distance_units")
 
-    def get_entanglement_density(self, Ge: pint.Quantity = None) -> float:
+    def get_entanglement_density(self, Ge: Optional[pint.Quantity] = None) -> float:
         """
         Returns the number of entanglements per unit volume of this particular parameter set.
 
@@ -136,16 +171,14 @@ class Parameters:
             b02 = params.get("R02").to(params.get("distance_units") ** 2).magnitude
         """
         kbt = self.get("T") * self.get("kb")
-        gamma_conversion_factor = (
-            kbt / ((self.get("distance_units")) ** 3)).to("MPa")
+        gamma_conversion_factor = (kbt / ((self.get("distance_units")) ** 3)).to("MPa")
         return gamma_conversion_factor  # type: ignore
 
     def get_fb_stress_conversion(self) -> float:
-        return (self.get_kappa() / (1 * self.get("distance_units"))
-                ).to("MPa").magnitude
+        return (self.get_kappa() / (1 * self.get("distance_units"))).to("MPa").magnitude
 
 
-def assemble_parameters_from_kuhn(
+def assemble_gaussian_parameters_from_kuhn(
     ureg: UnitRegistry,
     kuhn_length: Quantity,
     kuhn_mass: Quantity,
@@ -192,45 +225,112 @@ def assemble_parameters_from_kuhn(
 
 
 def get_parameters_for_polymer(
-    polymer_name: str,
+    polymer_name: str, parameter_type: ParameterType
 ) -> Parameters:
     """
-    Returns a Parameters object for the specified polymer name."""
+    Returns a Parameters object for the specified polymer and parameter type.
+    """
+    if parameter_type == ParameterType.GAUSSIAN:
+        return get_gaussian_parameters_for_polymer(polymer_name)
+    elif parameter_type == ParameterType.KG_LJ:
+        return get_kg_lj_parameters_for_polymer(polymer_name)
+    elif parameter_type == ParameterType.KUHN:
+        return get_kuhn_parameters_for_polymer(polymer_name)
+    else:
+        raise ValueError(f"Unsupported parameter type: {parameter_type}")
+
+
+def get_kg_lj_parameters_for_polymer(polymer_name: str) -> Parameters:
+    """
+    Returns a Parameters object containing
+    the parameters for a Kremer-Grest model with Lennard-Jones units
+    for the specified polymer.
+    """
     unit_style_factory = UnitStyleFactory()
+    unit_style = unit_style_factory.get_unit_style("lj", polymer=polymer_name)
+    ureg = unit_style.get_underlying_unit_registry()
 
+    row = _get_relevant_everaers_row(polymer_name)
+
+    bead_mass = row["Mb"] * ureg("g/mol")
+
+    return Parameters(
+        {
+            "distance_units": 1 * unit_style.distance,
+            "Mw": bead_mass,
+            "<b>": 0.975 * ureg.sigma,
+            "<b^2>": (
+                row["R_to_2_over_M_c"] * ureg("angstrom^2 * mol / g") * bead_mass
+            ).to(unit_style.distance**2),
+            "rho": unit_style.density,
+            "T": row["T_ref"] * ureg.kelvin,
+            "kb": unit_style.kb,
+            "Ge": row["G_e"] * ureg.megapascal,
+        },
+        ureg,
+        name="kg-lj-{}".format(polymer_name),
+    )
+
+
+def get_kuhn_parameters_for_polymer(polymer_name: str) -> Parameters:
+    """
+    Returns a Parameters object containing
+    the parameters for a Kuhn segment model
+    for the specified polymer.
+    """
     ureg = UnitRegistry()
-    everaers_data = unit_style_factory.get_everares_et_al_data()
 
-    relevant_row = None
-    for row in everaers_data.itertuples():
-        if (
-            "".join(filter(str.isalnum, polymer_name)).lower()
-            == "".join(filter(str.isalnum, str(row.name))).lower()
-        ):
-            relevant_row = row
-            break
+    row = _get_relevant_everaers_row(polymer_name)
 
-    if relevant_row is None:
-        raise ValueError(
-            f"Polymer '{polymer_name}' not found in Everaers et al. data.")
+    density = row["rho_bulk"] * ureg("g/cm^3")  # kg/cm^3
+    temperature = row["T_ref"] * ureg("K")  # Kelvin
+    ge_1 = row["G_e"] * ureg("MPa")  # MPa
+    kuhn_length = row["l_K"] * ureg("angstrom")  # °A
+    kuhn_bead_mass = row["M_k"] * ureg("g/mol")  # kg/mol
 
-    row = relevant_row
+    return Parameters(
+        {
+            "Mw": kuhn_bead_mass,
+            "<b>": kuhn_length.to("nm"),
+            "<b^2>": (
+                row["R_to_2_over_M_c"] * ureg("angstrom^2 * mol / g") * kuhn_bead_mass
+            ).to("nm^2"),
+            "rho": density,
+            "T": temperature,
+            "Ge": ge_1,
+            "distance_units": 1 * ureg.nanometer,
+        },
+        ureg,
+        name="kuhn-si-{}".format(polymer_name),
+    )
 
-    density = row.rho_bulk * ureg("g/cm^3")  # kg/cm^3
+
+def get_gaussian_parameters_for_polymer(polymer_name: str) -> Parameters:
+    """
+    Returns a Parameters object containing
+    the parameters for a Gaussian chain model,
+    (the ideal bead-spring polymer chain model)
+    for the specified polymer.
+    """
+    ureg = UnitRegistry()
+
+    row = _get_relevant_everaers_row(polymer_name)
+
+    density = row["rho_bulk"] * ureg("g/cm^3")  # kg/cm^3
     # rng.uniform(0.7, 1.5, 1)[0] * ureg("kg/cm^3")  # kg/cm^3
-    temperature = row.T_ref * ureg("K")  # Kelvin
-    ge_1 = row.G_e * ureg("MPa")  # MPa
-    kuhn_length = row.l_K * ureg("angstrom")  # °A
-    kuhn_bead_mass = row.M_k * ureg("g/mol")  # kg/mol
+    temperature = row["T_ref"] * ureg("K")  # Kelvin
+    ge_1 = row["G_e"] * ureg("MPa")  # MPa
+    kuhn_length = row["l_K"] * ureg("angstrom")  # °A
+    kuhn_bead_mass = row["M_k"] * ureg("g/mol")  # kg/mol
 
-    return assemble_parameters_from_kuhn(
+    return assemble_gaussian_parameters_from_kuhn(
         ureg,
         kuhn_length=kuhn_length.to("nm"),  # type: ignore
         kuhn_mass=kuhn_bead_mass,
         density=density,
         entanglement_modulus=ge_1,
         temperature=temperature,
-        name="si-{}".format(row.name),  # type: ignore
+        name="si-{}".format(polymer_name),
     )
 
 
@@ -244,3 +344,21 @@ def get_supported_polymer_names() -> list[str]:
         "".join(filter(str.isalnum, str(row.name))).lower()
         for row in everaers_data.itertuples()
     ]
+
+
+def _get_relevant_everaers_row(polymer_name: str) -> dict:
+    """
+    Returns the relevant row from the Everaers et al. data for the specified polymer name.
+    """
+    unit_style_factory = UnitStyleFactory()
+
+    everaers_data = unit_style_factory.get_everares_et_al_data()
+
+    for _, row in everaers_data.iterrows():
+        if (
+            "".join(filter(str.isalnum, polymer_name)).lower()
+            == "".join(filter(str.isalnum, str(row["name"]))).lower()
+        ):
+            return row.to_dict()
+
+    raise ValueError(f"Polymer '{polymer_name}' not found in Everaers et al. data.")

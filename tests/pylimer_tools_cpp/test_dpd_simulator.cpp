@@ -628,6 +628,14 @@ TEST_CASE("For large systems the PBC method does not matter",
   std::string inputFile = suspectedPath +
                           "/structure/"
                           "3d-diamond-lattice_3x3x3_a_23_d_3_v_0.structure.out";
+
+#ifdef OPENMP_FOUND
+  // we cannot have more than 1 thread, otherwise the random number generator
+  // will not play nicely.
+  omp_set_dynamic(0);
+  omp_set_num_threads(1);
+#endif
+
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
@@ -656,12 +664,6 @@ TEST_CASE("For large systems the PBC method does not matter",
 
     std::vector<ps::OutputConfiguration> configs = { config };
     REQUIRE_NOTHROW(simulator.configStepOutput(configs));
-
-#ifdef OPENMP_FOUND
-    // we cannot have more than 1 thread, otherwise the random number generator
-    // will not play nicely.
-    omp_set_num_threads(1);
-#endif
 
     // invoke copy-constructor
     pcd::DPDSimulator simulator2 = pcd::DPDSimulator(simulator);
