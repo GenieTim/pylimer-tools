@@ -472,6 +472,23 @@ namespace dpd {
     {
       return this->uniform_rand_between_0_1(this->e2);
     }
+    int getNumOmpThreads() const
+    {
+#ifdef OPENMP_FOUND
+      return omp_get_max_threads();
+#endif
+      return 1; // no OpenMP found, so only one thread
+    }
+
+    void setNumOmpThreads(int numThreads)
+    {
+#ifdef OPENMP_FOUND
+      omp_set_num_threads(numThreads);
+#else
+      RUNTIME_EXP_IFN(numThreads == 1,
+                      "Cannot set number of OpenMP threads, OpenMP not found.");
+#endif
+    }
 
     ////////////////////////////////////////////////////////////////
     // serialization

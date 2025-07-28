@@ -4,8 +4,11 @@ import warnings
 from pint import Quantity, UnitRegistry
 
 from pylimer_tools.io.bead_spring_parameter_provider import (
-    Parameters, ParameterType, get_parameters_for_polymer,
-    get_supported_polymer_names)
+    Parameters,
+    ParameterType,
+    get_parameters_for_polymer,
+    get_supported_polymer_names,
+)
 from pylimer_tools.io.unit_styles import UnitStyle, UnitStyleFactory
 
 
@@ -21,7 +24,9 @@ class UnitStyleTest(unittest.TestCase):
 
     def test_all_styles_are_sensible(self):
         unit_style_factory = UnitStyleFactory()
-        self.assertIsInstance(unit_style_factory.get_unit_registry(), UnitRegistry)
+        self.assertIsInstance(
+            unit_style_factory.get_unit_registry(),
+            UnitRegistry)
         base_style = unit_style_factory.get_unit_style("si")
         other_styles = [
             unit_style_factory.get_unit_style("nano"),
@@ -72,7 +77,9 @@ class UnitStyleTest(unittest.TestCase):
 
     def test_errors_are_thrown(self):
         unit_style_factory = UnitStyleFactory()
-        self.assertRaises(ValueError, lambda: unit_style_factory.get_unit_style("lj"))
+        self.assertRaises(
+            ValueError,
+            lambda: unit_style_factory.get_unit_style("lj"))
 
     def test_get_attr_equivalence(self):
         unit_style_factory = UnitStyleFactory()
@@ -85,7 +92,8 @@ class UnitStyleTest(unittest.TestCase):
             )
             # Assert that the warning has been triggered
             self.assertTrue(len(w) == 1)
-        self.assertEqual(1 * unit_style.mass, 1 * unit_style.get_base_unit_of("mass"))
+        self.assertEqual(1 * unit_style.mass,
+                         1 * unit_style.get_base_unit_of("mass"))
 
     def test_get_parameters_for_polymer(self):
         self.assertTrue(len(get_supported_polymer_names()) > 10)
@@ -99,7 +107,8 @@ class UnitStyleTest(unittest.TestCase):
             self.assertIsInstance(params.get_fb_stress_conversion(), float)
             self.assertIsInstance(params.get_kappa(), Quantity)
             self.assertIsInstance(params.get("T"), Quantity)
-            self.assertIsInstance(params.get_gamma_conversion_factor(), Quantity)
+            self.assertIsInstance(
+                params.get_gamma_conversion_factor(), Quantity)
 
         # test the Kremer-Grest/Lennard-Jones parameters
         for polymer_name in get_supported_polymer_names():
@@ -127,7 +136,6 @@ class UnitStyleTest(unittest.TestCase):
             self.assertIsInstance(params, Parameters)
             self.assertEqual(params.get_name(), "si-" + polymer_name)
             check_parameter_types(params)
-
 
     def test_get_polymer_names(self):
         polymer_names = get_supported_polymer_names()

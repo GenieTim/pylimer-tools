@@ -7,7 +7,8 @@ Create complex systems with multiple components:
 """
 
 import datetime
-from pylimer_tools_cpp import MCUniverseGenerator
+
+from pylimer_tools_cpp import DataFileWriter, MCUniverseGenerator
 
 # System parameters
 box_size = 60.0
@@ -74,3 +75,7 @@ universe = generator.get_universe()
 universe.set_masses({1: 1.0, 2: 2.0, 3: 0.5, 4: 1.0})  # Different masses
 
 print(f"Network generation completed at {datetime.datetime.now()}")
+
+# Save the universe to a file
+writer = DataFileWriter(universe)
+writer.write_to_file("generated_networks/multi_component_polymer_network.data")

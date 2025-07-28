@@ -53,16 +53,17 @@ class Parameters:
 
         """
         for key, value in data.items():
-            assert isinstance(
-                value, Quantity
-            ), f"Invalid value for parameter {key}: {value}"
+            assert isinstance(value, Quantity), (
+                f"Invalid value for parameter {key}: {value}"
+            )
 
         # validate parameters
         required_params = ["Mw", "<b>", "<b^2>", "rho"]
         for param in required_params:
             assert param in data, f"Missing required parameter: {param}"
 
-        assert data["Mw"].check("[mass]/[substance]") or data["Mw"].check("[mass]")
+        assert data["Mw"].check(
+            "[mass]/[substance]") or data["Mw"].check("[mass]")
         assert data["<b>"].check("[length]")
         assert data["<b^2>"].check("[length] ** 2")
         assert data["rho"].check("[mass]/[volume]") or data["rho"].check(
@@ -135,7 +136,8 @@ class Parameters:
     def get_base_distance_units(self) -> pint.Quantity:
         return self.get("distance_units")
 
-    def get_entanglement_density(self, Ge: Optional[pint.Quantity] = None) -> float:
+    def get_entanglement_density(
+            self, Ge: Optional[pint.Quantity] = None) -> float:
         """
         Returns the number of entanglements per unit volume of this particular parameter set.
 
@@ -171,11 +173,13 @@ class Parameters:
             b02 = params.get("R02").to(params.get("distance_units") ** 2).magnitude
         """
         kbt = self.get("T") * self.get("kb")
-        gamma_conversion_factor = (kbt / ((self.get("distance_units")) ** 3)).to("MPa")
+        gamma_conversion_factor = (
+            kbt / ((self.get("distance_units")) ** 3)).to("MPa")
         return gamma_conversion_factor  # type: ignore
 
     def get_fb_stress_conversion(self) -> float:
-        return (self.get_kappa() / (1 * self.get("distance_units"))).to("MPa").magnitude
+        return (self.get_kappa() / (1 * self.get("distance_units"))
+                ).to("MPa").magnitude
 
 
 def assemble_gaussian_parameters_from_kuhn(
@@ -260,7 +264,8 @@ def get_kg_lj_parameters_for_polymer(polymer_name: str) -> Parameters:
             "Mw": bead_mass,
             "<b>": 0.975 * ureg.sigma,
             "<b^2>": (
-                row["R_to_2_over_M_c"] * ureg("angstrom^2 * mol / g") * bead_mass
+                row["R_to_2_over_M_c"] *
+                ureg("angstrom^2 * mol / g") * bead_mass
             ).to(unit_style.distance**2),
             "rho": unit_style.density,
             "T": row["T_ref"] * ureg.kelvin,
@@ -293,7 +298,8 @@ def get_kuhn_parameters_for_polymer(polymer_name: str) -> Parameters:
             "Mw": kuhn_bead_mass,
             "<b>": kuhn_length.to("nm"),
             "<b^2>": (
-                row["R_to_2_over_M_c"] * ureg("angstrom^2 * mol / g") * kuhn_bead_mass
+                row["R_to_2_over_M_c"] *
+                ureg("angstrom^2 * mol / g") * kuhn_bead_mass
             ).to("nm^2"),
             "rho": density,
             "T": temperature,
@@ -361,4 +367,5 @@ def _get_relevant_everaers_row(polymer_name: str) -> dict:
         ):
             return row.to_dict()
 
-    raise ValueError(f"Polymer '{polymer_name}' not found in Everaers et al. data.")
+    raise ValueError(
+        f"Polymer '{polymer_name}' not found in Everaers et al. data.")

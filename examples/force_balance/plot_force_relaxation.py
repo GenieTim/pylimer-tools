@@ -35,7 +35,8 @@ universe = read_data_file(
 assert isinstance(universe, Universe)
 
 # Prepare parameters for conversion factors
-params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer(
+    "PDMS", parameter_type=ParameterType.GAUSSIAN)
 r02_slope = params.get("R02")
 r02_slope_magnitude = r02_slope.to(params.get("distance_units") ** 2).magnitude
 kbt = params.get("T") * params.get("kb")

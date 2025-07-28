@@ -335,7 +335,7 @@ A strand is a chain of connected links between two crosslinks.
   //          &mehp::PyMEHPForceEvaluator::evaluateForceAndGradient,
   //          R"pbdoc(
   //      One of the two functions to override, the other being
-  //      :func:`~pylimer_tools_cpp.MEHPForceEvaluator.evaluateStressContribution`.
+  //      :meth:`~pylimer_tools_cpp.MEHPForceEvaluator.evaluate_stress_contribution`.
 
   //      :param n: The dimensionality of the problem (the nr. of spring
   //      coordinates) :param springDistances: The sequential (x, y, z) spring
@@ -429,8 +429,8 @@ A strand is a chain of connected links between two crosslinks.
           :param remove_2functional_crosslinkers: Whether to replace two-functional crosslinkers with a "normal" chain bead
           :param remove_dangling_chains: Whether to remove dangling chains before running the simulation.
                **Caution**: Removing the dangling chains will result in incorrect results fo the computation of
-               :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction()` and
-               :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getDanglingWeightFraction()`
+               :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction` and
+               :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction`
           )pbdoc",
          py::arg("universe"),
          py::arg("crosslinker_type") = 2,
@@ -475,7 +475,7 @@ A strand is a chain of connected links between two crosslinks.
           Configure the offset from the lower and upper bounds for the simulation to suggest another run.
           
           :param epsilon: The epsilon value to use for the rerun check
-               (See: :func:`~pylimer_tools_cpp.MEHPForceRelaxation.requiresAnotherRun()`)
+               (See: :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.requires_another_run`)
          )pbdoc",
          py::arg("epsilon") = 1e-3)
     .def("config_step_output",
@@ -539,7 +539,7 @@ A strand is a chain of connected links between two crosslinks.
                For real systems, the value could be determined by :func:`~pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance()`
                on the melt system, with subsequent division by the nr of bonds in the chain.
 
-          See also :func:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor` for the mean of these.
+          See also :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor` for the mean of these.
          )pbdoc",
          py::arg("b0_squared") = -1.0)
     .def("get_gamma_factor",
@@ -654,27 +654,25 @@ A strand is a chain of connected links between two crosslinks.
          R"pbdoc(
           Get the current lengths for all the springs.
 
-          Returns:
-               - distances: a vector of size nrOfSprings, with each the norm of the distances
+          :returns: A vector of size nrOfSprings, with each the norm of the distances
      )pbdoc")
     .def("get_spring_distances",
          &mehp::MEHPForceRelaxation::getSpringDistances,
          R"pbdoc(
           Get the current coordinate differences for all the springs.
 
-          Returns:
-               - distances: a vector of size 3*nrOfSprings, with each x, y, z values of the springs
+          :returns: A vector of size 3*nrOfSprings, with each x, y, z values of the springs
      )pbdoc")
     .def("get_average_spring_length",
          &mehp::MEHPForceRelaxation::getAverageSpringLength,
          R"pbdoc(
-           Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()`,
+           Get the average length of the springs. Note that in contrast to :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor`,
            this value is normalized by the number of springs rather than the number of chains.
      )pbdoc")
     .def("get_default_r0_square",
          &mehp::MEHPForceRelaxation::getDefaultR0Square,
          R"pbdoc(
-           Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
+           Returns the value effectively used in :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor` for :math:`\langle R_{0,\eta}^2\rangle`.
      )pbdoc")
     .def("get_nr_of_iterations",
          &mehp::MEHPForceRelaxation::getNrOfIterations,
@@ -694,7 +692,7 @@ A strand is a chain of connected links between two crosslinks.
           that it would not be globally minimised.
 
           If the final displacement of one of the atoms is close
-          (1e-3, configurable via :func:`~pylimer_tools_cpp.MEHPForceRelaxation.configRerunEpsilon()`)
+          (1e-3, configurable via :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon`)
           to the imposed min/max, after minimizing,
           this method would return true.
      )pbdoc")
@@ -1325,13 +1323,13 @@ A strand is a chain of connected links between two crosslinks.
     .def("get_average_strand_length",
          &mehp::MEHPForceBalance::getAverageSpringLength,
          R"pbdoc(
-           Get the average length of the strands. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()`,
+           Get the average length of the strands. Note that in contrast to :meth:`~pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor`,
            this value is normalized by the number of strands rather than the number of chains.
      )pbdoc")
     .def("get_default_mean_bond_length",
          &mehp::MEHPForceBalance::getDefaultMeanBondLength,
          R"pbdoc(
-           Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for
+           Returns the value effectively used in :meth:`~pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor` for
            :math:`b` in :math:`\langle R_{0,\eta}^2 = N_{\eta} b^2\rangle`.
      )pbdoc")
     .def("get_nr_of_iterations",
