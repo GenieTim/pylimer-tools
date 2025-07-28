@@ -6,19 +6,15 @@ Generate Vulcanized Networks
 In this example, we create a vulcanized network using the `pylimer-tools` library.
 """
 
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import chisquare, kstest
 
 from pylimer_tools.io.bead_spring_parameter_provider import (
-    ParameterType,
-    get_parameters_for_polymer,
-)
-from pylimer_tools_cpp import (
-    DataFileWriter,
-    MCUniverseGenerator,
-    randomly_sample_entanglements,
-)
+    ParameterType, get_parameters_for_polymer)
+from pylimer_tools_cpp import (DataFileWriter, MCUniverseGenerator,
+                               randomly_sample_entanglements)
 
 # Get parameters for PDMS polymer density and bead distance
 params = get_parameters_for_polymer(
@@ -88,7 +84,11 @@ universe = universe.contract_vertices_along_bond_type(2)
 
 # Save the universe to a file
 writer = DataFileWriter(universe)
-writer.write_to_file("generated_networks/vulcanized_network.data")
+
+if not os.path.exists("generated_structures"):
+    os.makedirs("generated_structures")
+    
+writer.write_to_file("generated_structures/vulcanized_network.data")
 
 # %%
 # Refer to :ref:`sphx_glr_auto_examples_readers_writers` for more details on how you can save the universe to a file.

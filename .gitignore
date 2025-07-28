@@ -158,7 +158,7 @@ tests/pylimer_tools/fixtures/tmp-test-data-file.out
 test-reports
 
 examples/dpd_simulations/dpd_simulation_output.txt
-examples/network_generator/generated_networks
+examples/network_generator/generated_structures
 examples/readers_writers/generated_structures
 
 examples/dpd_simulations/dpd_simulation_avg_output.txt
