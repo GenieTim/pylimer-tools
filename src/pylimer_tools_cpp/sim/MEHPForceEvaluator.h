@@ -29,7 +29,7 @@ public:
                                   void* f_data) const
   {
     const Eigen::Map<const Eigen::VectorXd> u =
-      Eigen::Map<const Eigen::VectorXd>(x, n);
+      Eigen::Map<const Eigen::VectorXd>(x, static_cast<Eigen::Index>(n));
     return evaluateForceSetGradient(n, u, grad, f_data);
   }
 
@@ -45,9 +45,9 @@ public:
     double* grad) const = 0;
 
   virtual double evaluateStressContribution(double springDistances[3],
-                                            size_t i,
-                                            size_t j,
-                                            size_t spring_index) const = 0;
+                                           size_t i,
+                                           size_t j,
+                                           size_t spring_index) const = 0;
 };
 
 // example implementation of MEHPForceRelaxation for simple spring (phantom
@@ -76,7 +76,7 @@ public:
                                     const size_t spring_index) const override
   {
     return this->kappa * springDistances[i] * springDistances[j] /
-           this->net.springsContourLength[spring_index];
+           this->net.springsContourLength[static_cast<Eigen::Index>(spring_index)];
   }
 
   void prepareForEvaluations() override {};
@@ -115,7 +115,7 @@ public:
                                     const size_t spring_index) const override
   {
     return this->kappa * springDistances[i] * springDistances[j] /
-           this->net.springsContourLength[spring_index];
+           this->net.springsContourLength[static_cast<Eigen::Index>(spring_index)];
   }
 
   void prepareForEvaluations() override

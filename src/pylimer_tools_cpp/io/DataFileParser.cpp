@@ -47,20 +47,20 @@ DataFileParser::read(const std::string& filePath,
 
   // reserve space
   // for atom data
-  this->atomIds.reserve(this->nAtoms);
-  this->atomTypes.reserve(this->nAtoms);
-  this->moleculeIds.reserve(this->nAtoms);
-  this->atomX.reserve(this->nAtoms);
-  this->atomY.reserve(this->nAtoms);
-  this->atomZ.reserve(this->nAtoms);
-  this->atomNx.reserve(this->nAtoms);
-  this->atomNy.reserve(this->nAtoms);
-  this->atomNz.reserve(this->nAtoms);
+  this->atomIds.reserve(static_cast<size_t>(this->nAtoms));
+  this->atomTypes.reserve(static_cast<size_t>(this->nAtoms));
+  this->moleculeIds.reserve(static_cast<size_t>(this->nAtoms));
+  this->atomX.reserve(static_cast<size_t>(this->nAtoms));
+  this->atomY.reserve(static_cast<size_t>(this->nAtoms));
+  this->atomZ.reserve(static_cast<size_t>(this->nAtoms));
+  this->atomNx.reserve(static_cast<size_t>(this->nAtoms));
+  this->atomNy.reserve(static_cast<size_t>(this->nAtoms));
+  this->atomNz.reserve(static_cast<size_t>(this->nAtoms));
   // and bond data
-  this->bondIds.reserve(this->nBonds);
-  this->bondTypes.reserve(this->nBonds);
-  this->bondFrom.reserve(this->nBonds);
-  this->bondTo.reserve(this->nBonds);
+  this->bondIds.reserve(static_cast<size_t>(this->nBonds));
+  this->bondTypes.reserve(static_cast<size_t>(this->nBonds));
+  this->bondFrom.reserve(static_cast<size_t>(this->nBonds));
+  this->bondTo.reserve(static_cast<size_t>(this->nBonds));
 
   // skip empty lines plus the line with "Masses"
   while (getline(file, line)) {
@@ -375,7 +375,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
     case AtomStyle::CHARGE:
       return { { FT::ATOM_ID,
                  FT::ATOM_TYPE,
-                 FT::CHARGE,
+                 FT::ATOM_CHARGE,
                  FT::X,
                  FT::Y,
                  FT::Z,
@@ -388,7 +388,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
       return {
         { FT::ATOM_ID,
           FT::ATOM_TYPE,
-          FT::CHARGE,
+          FT::ATOM_CHARGE,
           FT::X,
           FT::Y,
           FT::Z,
@@ -409,7 +409,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
     case AtomStyle::DIPOLE:
       return { { FT::ATOM_ID,
                  FT::ATOM_TYPE,
-                 FT::CHARGE,
+                 FT::ATOM_CHARGE,
                  FT::X,
                  FT::Y,
                  FT::Z,
@@ -449,7 +449,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
     case AtomStyle::ELECTRON:
       return { { FT::ATOM_ID,
                  FT::ATOM_TYPE,
-                 FT::CHARGE,
+                 FT::ATOM_CHARGE,
                  FT::ESPIN,
                  FT::ERADIUS,
                  FT::X,
@@ -646,7 +646,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
     case AtomStyle::WAVEPACKET:
       return { { FT::ATOM_ID,
                  FT::ATOM_TYPE,
-                 FT::CHARGE,
+                 FT::ATOM_CHARGE,
                  FT::ESPIN,
                  FT::ERADIUS,
                  FT::ETAG,
@@ -664,7 +664,7 @@ DataFileParser::getAtomStyleDescriptor(AtomStyle style) const
       return { { FT::ATOM_ID,
                  FT::MOLECULE_ID,
                  FT::ATOM_TYPE,
-                 FT::CHARGE,
+                 FT::ATOM_CHARGE,
                  FT::X,
                  FT::Y,
                  FT::Z,
@@ -687,7 +687,7 @@ DataFileParser::readAtomGeneric(const std::string& line,
   const int resFound =
     sscanf(line.c_str(), descriptor.format.c_str(), &args...);
 
-  RUNTIME_EXP_IFN(resFound >= descriptor.fields.size() - 3,
+  RUNTIME_EXP_IFN(resFound >= static_cast<int>(descriptor.fields.size()) - 3,
                   "Did not find enough data in line '" + line + "': only " +
                     std::to_string(resFound) + ".");
 
@@ -698,13 +698,13 @@ DataFileParser::readAtomGeneric(const std::string& line,
       using FT = AtomFieldDescriptor::FieldType;
       switch (descriptor.fields[argIdx]) {
         case FT::ATOM_ID:
-          this->atomIds.push_back(arg);
+          this->atomIds.push_back(static_cast<long int>(arg));
           break;
         case FT::MOLECULE_ID:
-          this->moleculeIds.push_back(arg);
+          this->moleculeIds.push_back(static_cast<int>(arg));
           break;
         case FT::ATOM_TYPE:
-          this->atomTypes.push_back(arg);
+          this->atomTypes.push_back(static_cast<int>(arg));
           break;
         case FT::X:
           this->atomX.push_back(arg);
@@ -716,18 +716,18 @@ DataFileParser::readAtomGeneric(const std::string& line,
           this->atomZ.push_back(arg);
           break;
         case FT::NX:
-          if (resFound >= descriptor.fields.size() - 3)
-            this->atomNx.push_back(arg);
+          if (resFound >= static_cast<int>(descriptor.fields.size()) - 3)
+            this->atomNx.push_back(static_cast<int>(arg));
           break;
         case FT::NY:
-          if (resFound >= descriptor.fields.size() - 2)
-            this->atomNy.push_back(arg);
+          if (resFound >= static_cast<int>(descriptor.fields.size()) - 2)
+            this->atomNy.push_back(static_cast<int>(arg));
           break;
         case FT::NZ:
-          if (resFound >= descriptor.fields.size() - 1)
-            this->atomNz.push_back(arg);
+          if (resFound >= static_cast<int>(descriptor.fields.size()) - 1)
+            this->atomNz.push_back(static_cast<int>(arg));
           break;
-        case FT::CHARGE:
+        case FT::ATOM_CHARGE:
           this->additionalAtomData["charge"].push_back(arg);
           break;
         case FT::MUX:
@@ -738,6 +738,9 @@ DataFileParser::readAtomGeneric(const std::string& line,
           break;
         case FT::MUZ:
           this->additionalAtomData["muz"].push_back(arg);
+          break;
+        case FT::ATOM_EDPD:
+          this->additionalAtomData["edpd"].push_back(arg);
           break;
         case FT::THETA:
           this->additionalAtomData["theta"].push_back(arg);
@@ -855,6 +858,11 @@ DataFileParser::readAtomGeneric(const std::string& line,
           break;
         case FT::CC2:
           this->additionalAtomData["cc2"].push_back(arg);
+          break;
+        default:
+          throw std::invalid_argument(
+            "Unknown field type in AtomFieldDescriptor: " +
+            std::to_string(static_cast<int>(descriptor.fields[argIdx])));
           break;
       }
     }
@@ -1522,11 +1530,11 @@ DataFileParser::readVelocities(std::ifstream& file, std::string& line)
   this->skipEmptyLines(line, file);
   std::unordered_map<size_t, size_t> atomIdToIdx;
   std::vector<double> unorderedVx, unorderedVy, unorderedVz;
-  unorderedVx.reserve(this->nAtoms);
-  unorderedVy.reserve(this->nAtoms);
-  unorderedVz.reserve(this->nAtoms);
+  unorderedVx.reserve(static_cast<size_t>(this->nAtoms));
+  unorderedVy.reserve(static_cast<size_t>(this->nAtoms));
+  unorderedVz.reserve(static_cast<size_t>(this->nAtoms));
   // start reading, assuming as many as atoms
-  for (size_t i = 0; i < this->nAtoms; ++i) {
+  for (size_t i = 0; i < static_cast<size_t>(this->nAtoms); ++i) {
     size_t atomId;
     double vx, vy, vz;
     sscanf(line.c_str(), "%zu %le %le %le", &atomId, &vx, &vy, &vz);
@@ -1547,12 +1555,12 @@ DataFileParser::readVelocities(std::ifstream& file, std::string& line)
 
   // re-order for the other stuff
   std::vector<double> orderedVx, orderedVy, orderedVz;
-  orderedVx.reserve(this->nAtoms);
-  orderedVy.reserve(this->nAtoms);
-  orderedVz.reserve(this->nAtoms);
+  orderedVx.reserve(static_cast<size_t>(this->nAtoms));
+  orderedVy.reserve(static_cast<size_t>(this->nAtoms));
+  orderedVz.reserve(static_cast<size_t>(this->nAtoms));
 
-  for (size_t i = 0; i < this->nAtoms; ++i) {
-    size_t realIdx = atomIdToIdx.at(this->atomIds[i]);
+  for (size_t i = 0; i < static_cast<size_t>(this->nAtoms); ++i) {
+    size_t realIdx = atomIdToIdx.at(static_cast<size_t>(this->atomIds[i]));
     orderedVx.push_back(unorderedVx[realIdx]);
     orderedVy.push_back(unorderedVy[realIdx]);
     orderedVz.push_back(unorderedVz[realIdx]);

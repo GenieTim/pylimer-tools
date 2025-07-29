@@ -82,7 +82,7 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar, Eigen::PlainObjectBase<Derived> const& m)
   if (ArrT::ColsAtCompileTime == Eigen::Dynamic) {
     ar(m.cols());
   }
-  ar(binary_data(m.data(), m.size() * sizeof(typename Derived::Scalar)));
+  ar(binary_data(m.data(), static_cast<std::size_t>(m.size()) * sizeof(typename Derived::Scalar)));
 }
 
 template<class Archive, class Derived>
@@ -115,9 +115,9 @@ inline typename std::enable_if<
 CEREAL_SAVE_FUNCTION_NAME(Archive& ar, Eigen::PlainObjectBase<Derived> const& m)
 {
   make_size_tag(m.rows());
-  for (size_type i = 0; i < m.rows(); ++i) {
+  for (Eigen::Index i = 0; i < m.rows(); ++i) {
     make_size_tag(m.cols());
-    for (size_type j = 0; j < m.cols(); ++j) {
+    for (Eigen::Index j = 0; j < m.cols(); ++j) {
       ar(m(i, j));
     }
   }
@@ -134,14 +134,14 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, Eigen::PlainObjectBase<Derived>& m)
   ar(make_size_tag(rows));
   size_type cols;
   ar(make_size_tag(cols));
-  m.resize(rows, cols);
-  for (size_type i = 0; i < rows; ++i) {
+  m.resize(static_cast<Eigen::Index>(rows), static_cast<Eigen::Index>(cols));
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(rows); ++i) {
     if (i != 0) {
       size_type cols2;
       ar(make_size_tag(cols2));
       assert(cols2 == cols);
     }
-    for (size_type j = 0; j < cols; ++j) {
+    for (Eigen::Index j = 0; j < static_cast<Eigen::Index>(cols); ++j) {
       ar(m(i, j));
     }
   }
@@ -155,8 +155,8 @@ template<class Archive>
 inline void
 CEREAL_SAVE_FUNCTION_NAME(Archive& ar, igraph_vector_int_t const& vec)
 {
-  size_type n = igraph_vector_int_size(&vec);
-  ar(make_size_tag(n));
+  igraph_integer_t n = igraph_vector_int_size(&vec);
+  ar(make_size_tag(static_cast<size_type>(n)));
   for (igraph_integer_t i = 0; i < n; ++i) {
     ar(igraph_vector_int_get(&vec, i));
   }
@@ -168,8 +168,8 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_vector_int_t& vec)
 {
   size_type n;
   ar(make_size_tag(n));
-  igraph_vector_int_resize(&vec, n);
-  for (igraph_integer_t i = 0; i < n; ++i) {
+  igraph_vector_int_resize(&vec, static_cast<igraph_integer_t>(n));
+  for (igraph_integer_t i = 0; i < static_cast<igraph_integer_t>(n); ++i) {
     long int val;
     ar(val);
     igraph_vector_int_set(&vec, i, val);
@@ -180,8 +180,8 @@ template<class Archive>
 inline void
 CEREAL_SAVE_FUNCTION_NAME(Archive& ar, igraph_vector_t const& vec)
 {
-  size_type n = igraph_vector_size(&vec);
-  ar(make_size_tag(n));
+  igraph_integer_t n = igraph_vector_size(&vec);
+  ar(make_size_tag(static_cast<size_type>(n)));
   for (igraph_integer_t i = 0; i < n; ++i) {
     ar(igraph_vector_get(&vec, i));
   }
@@ -193,8 +193,8 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_vector_t& vec)
 {
   size_type n;
   ar(make_size_tag(n));
-  igraph_vector_resize(&vec, n);
-  for (igraph_integer_t i = 0; i < n; ++i) {
+  igraph_vector_resize(&vec, static_cast<igraph_integer_t>(n));
+  for (igraph_integer_t i = 0; i < static_cast<igraph_integer_t>(n); ++i) {
     double val;
     ar(val);
     igraph_vector_set(&vec, i, val);
@@ -205,9 +205,9 @@ template<class Archive>
 inline void
 CEREAL_SAVE_FUNCTION_NAME(Archive& ar, igraph_strvector_t const& vec)
 {
-  size_type n = igraph_strvector_size(&vec);
-  ar(make_size_tag(n));
-  for (igraph_integer_t i = 0; i < static_cast<igraph_integer_t>(n); ++i) {
+  igraph_integer_t n = igraph_strvector_size(&vec);
+  ar(make_size_tag(static_cast<size_type>(n)));
+  for (igraph_integer_t i = 0; i < n; ++i) {
     std::string val = igraph_strvector_get(&vec, i);
     ar(val);
   }
@@ -219,10 +219,10 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_strvector_t& vec)
 {
   size_type n;
   ar(make_size_tag(n));
-  igraph_strvector_resize(&vec, n);
+  igraph_strvector_resize(&vec, static_cast<igraph_integer_t>(n));
   std::string val;
   val.reserve(50);
-  for (igraph_integer_t i = 0; i < n; ++i) {
+  for (igraph_integer_t i = 0; i < static_cast<igraph_integer_t>(n); ++i) {
     val.clear();
     ar(val);
     igraph_strvector_set(&vec, i, val.c_str());
@@ -236,10 +236,10 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar,
                           igraph_t const& graph,
                           std::uint32_t const version)
 {
-  size_t numVertices = igraph_vcount(&graph);
-  ar(make_nvp("num_vertices", numVertices));
-  size_t numEdges = igraph_ecount(&graph);
-  ar(make_nvp("num_edges", numEdges));
+  igraph_integer_t numVertices = igraph_vcount(&graph);
+  ar(make_nvp("num_vertices", static_cast<size_t>(numVertices)));
+  igraph_integer_t numEdges = igraph_ecount(&graph);
+  ar(make_nvp("num_edges", static_cast<size_t>(numEdges)));
 
   igraph_vector_int_t allEdges;
   igraph_vector_int_init(&allEdges, numEdges);
@@ -368,10 +368,10 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar,
   size_t numEdges;
   ar(make_nvp("num_edges", numEdges));
   igraph_vector_int_t allEdges;
-  igraph_vector_int_init(&allEdges, numEdges);
+  igraph_vector_int_init(&allEdges, static_cast<igraph_integer_t>(numEdges));
   ar(make_nvp("edges", allEdges));
 
-  igraph_add_vertices(&graph, numVertices, nullptr);
+  igraph_add_vertices(&graph, static_cast<igraph_integer_t>(numVertices), nullptr);
   igraph_add_edges(&graph, &allEdges, nullptr);
   igraph_vector_int_destroy(&allEdges);
 
@@ -391,14 +391,14 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar,
       // case IGRAPH_ATTRIBUTE_DEFAULT:
       case IGRAPH_ATTRIBUTE_NUMERIC: {
         igraph_vector_t results;
-        igraph_vector_init(&results, numVertices);
+        igraph_vector_init(&results, static_cast<igraph_integer_t>(numVertices));
         ar(make_nvp("vertex_attr_" + attributeName, results));
         igraph_cattribute_VAN_setv(&graph, attributeName.c_str(), &results);
         igraph_vector_destroy(&results);
       }; break;
       case IGRAPH_ATTRIBUTE_STRING: {
         igraph_strvector_t strresults;
-        igraph_strvector_init(&strresults, numVertices);
+        igraph_strvector_init(&strresults, static_cast<igraph_integer_t>(numVertices));
         ar(make_nvp("vertex_attr_" + attributeName, strresults));
         igraph_cattribute_VAS_setv(&graph, attributeName.c_str(), &strresults);
         igraph_strvector_destroy(&strresults);
@@ -420,8 +420,8 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar,
   igraph_vector_int_init(&etypes, 1);
   ar(make_nvp("edge_attr_types", etypes));
 
-  size_t numEdgeAttributes = igraph_vector_int_size(&etypes);
-  for (size_t i = 0; i < numEdgeAttributes; ++i) {
+  igraph_integer_t numEdgeAttributes = igraph_vector_int_size(&etypes);
+  for (igraph_integer_t i = 0; i < numEdgeAttributes; ++i) {
     std::string attributeName = std::string(igraph_strvector_get(&enames, i));
     ;
     int attributeType = igraph_vector_int_get(&etypes, i);

@@ -8,6 +8,7 @@
 #include <cassert>
 #include <iterator>
 #include <map>
+#include <type_traits>
 #include <vector>
 
 extern "C"
@@ -225,7 +226,7 @@ segmentwise_norm(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
   std::vector<double> results;
   results.reserve(vecSize / segmentSize);
   for (size_t i = 0; i < vecSize / segmentSize; i++) {
-    results.push_back(vecs.segment(segmentSize * i, segmentSize).norm());
+    results.push_back(vecs.segment(static_cast<Eigen::Index>(segmentSize * i), static_cast<Eigen::Index>(segmentSize)).norm());
   }
   return results;
 }
@@ -249,16 +250,17 @@ static inline double
 segmentwise_norm_max(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
 {
   INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
-  INVALIDARG_EXP_IFN(vecs.size() % segmentSize == 0,
+  size_t vecSize = static_cast<size_t>(vecs.size());
+  INVALIDARG_EXP_IFN(vecSize % segmentSize == 0,
                      "The size of the supplied vector, " +
-                       std::to_string(vecs.size()) +
+                       std::to_string(vecSize) +
                        " is not a multiple of the segment size, " +
                        std::to_string(segmentSize) + ".");
   double result = 0.; //-DBL_MAX;
 
-  for (size_t i = 0; i < vecs.size() / segmentSize; i++) {
+  for (size_t i = 0; i < vecSize / segmentSize; i++) {
     result =
-      std::max(vecs.segment(segmentSize * i, segmentSize).norm(), result);
+      std::max(vecs.segment(static_cast<Eigen::Index>(segmentSize * i), static_cast<Eigen::Index>(segmentSize)).norm(), result);
   }
   return result;
 }
@@ -281,16 +283,17 @@ static inline double
 segmentwise_norm_mean(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
 {
   INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
-  INVALIDARG_EXP_IFN(vecs.size() % segmentSize == 0,
+  size_t vecSize = static_cast<size_t>(vecs.size());
+  INVALIDARG_EXP_IFN(vecSize % segmentSize == 0,
                      "The size of the supplied vector, " +
-                       std::to_string(vecs.size()) +
+                       std::to_string(vecSize) +
                        " is not a multiple of the segment size, " +
                        std::to_string(segmentSize) + ".");
   double result = 0.; //-DBL_MAX;
-  double denominator = 1. / static_cast<double>(vecs.size() / segmentSize);
+  double denominator = 1. / static_cast<double>(vecSize / segmentSize);
 
-  for (size_t i = 0; i < vecs.size() / segmentSize; i++) {
-    const double norm = vecs.segment(segmentSize * i, segmentSize).norm();
+  for (size_t i = 0; i < vecSize / segmentSize; i++) {
+    const double norm = vecs.segment(static_cast<Eigen::Index>(segmentSize * i), static_cast<Eigen::Index>(segmentSize)).norm();
     result += (norm * denominator);
   }
   return result;
@@ -308,12 +311,32 @@ segmentwise_norm_mean(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
  * @return true If all elements in the vector are finite numbers.
  * @return false If at least one element in the vector is not a finite number.
  */
+
+// For Eigen types - using a simpler SFINAE approach
 template<typename IN>
-static inline bool
+static inline typename std::enable_if<
+  std::is_class<IN>::value && 
+  !std::is_same<IN, std::vector<typename IN::value_type>>::value,
+  bool>::type 
 all_components_finite(const IN& vec)
 {
-  for (size_t i = 0; i < static_cast<size_t>(vec.size()); ++i) {
-    if (!std::isfinite(vec[static_cast<typename IN::Index>(i)])) {
+  for (typename IN::Index i = 0; i < vec.size(); ++i) {
+    if (!std::isfinite(vec[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// For std::vector types
+template<typename IN>
+static inline typename std::enable_if<
+  std::is_same<IN, std::vector<typename IN::value_type>>::value,
+  bool>::type
+all_components_finite(const IN& vec)
+{
+  for (size_t i = 0; i < vec.size(); ++i) {
+    if (!std::isfinite(vec[i])) {
       return false;
     }
   }
@@ -411,21 +434,21 @@ MAKE_REMOVE_ROWS(Eigen::ArrayXb);
                             indicesToRemove.end());                            \
     }                                                                          \
     /* Check if the largest index is valid */                                  \
-    if (indicesToRemove[0] >= vec.size()) {                                    \
+    if (indicesToRemove[0] >= static_cast<size_t>(vec.size())) {               \
       throw std::out_of_range("Index out of range");                           \
     }                                                                          \
                                                                                \
     size_t j = 0;                                                              \
-    for (size_t i = 0; i < vec.size(); ++i) {                                  \
+    for (size_t i = 0; i < static_cast<size_t>(vec.size()); ++i) {             \
       if (j < indicesToRemove.size() &&                                        \
           i == indicesToRemove[indicesToRemove.size() - j - 1]) {              \
         ++j;                                                                   \
       } else {                                                                 \
-        vec[i - j] = vec[i];                                                   \
+        vec[static_cast<Eigen::Index>(i - j)] = vec[static_cast<Eigen::Index>(i)]; \
       }                                                                        \
     }                                                                          \
                                                                                \
-    vec.conservativeResize(vec.size() - indicesToRemove.size());               \
+    vec.conservativeResize(static_cast<Eigen::Index>(static_cast<size_t>(vec.size()) - indicesToRemove.size())); \
   }
 
 MAKE_REMOVE_ROWS(Eigen::VectorXd);
@@ -490,26 +513,26 @@ getMappingForRenumbering(const std::vector<size_t>& removedValues,
                          const size_t nRemovableValues)
 {
   // make sure things are sorted
-  for (long int i = removedValues.size() - 2; i >= 0; --i) {
+  for (long int i = static_cast<long int>(removedValues.size()) - 2; i >= 0; --i) {
     INVALIDARG_EXP_IFN(
-      removedValues[i + 1] < removedValues[i],
+      removedValues[static_cast<size_t>(i + 1)] < removedValues[static_cast<size_t>(i)],
       "Values to remove must be sorted descending and unique, got values " +
-        std::to_string(removedValues[i]) + "@" + std::to_string(i) + " and " +
-        std::to_string(removedValues[i + 1]) + "@" + std::to_string(i + 1) +
+        std::to_string(removedValues[static_cast<size_t>(i)]) + "@" + std::to_string(i) + " and " +
+        std::to_string(removedValues[static_cast<size_t>(i + 1)]) + "@" + std::to_string(i + 1) +
         ".");
   }
 
   // for performance reasons, first assemble a new mapping
   std::vector<long int> newMapping =
     initializeWithValue<long int>(nRemovableValues, -1);
-  long int idxInDeletedStrands = removedValues.size() - 1;
+  long int idxInDeletedStrands = static_cast<long int>(removedValues.size()) - 1;
   long int nDeletedSoFar = 0;
   for (size_t i = 0; i < nRemovableValues; ++i) {
-    if (idxInDeletedStrands >= 0 && i == removedValues[idxInDeletedStrands]) {
+    if (idxInDeletedStrands >= 0 && i == removedValues[static_cast<size_t>(idxInDeletedStrands)]) {
       idxInDeletedStrands -= 1;
       nDeletedSoFar += 1;
     } else {
-      newMapping[i] = i - nDeletedSoFar;
+      newMapping[i] = static_cast<long int>(i) - nDeletedSoFar;
     }
   }
 
@@ -534,7 +557,7 @@ renumberWithMapping(std::vector<std::vector<size_t>>& v,
     for (size_t& strandIdx : v[linkI]) {
       assert(strandIdx < newMapping.size());
       assert(newMapping[strandIdx] >= 0);
-      strandIdx = newMapping[strandIdx];
+      strandIdx = static_cast<size_t>(newMapping[strandIdx]);
     }
   }
 }
@@ -700,8 +723,8 @@ static inline size_t
 first_occuring_index(const std::vector<T>& v, const T value, size_t start = 0)
 {
   if (v[start] == value) {
-    for (long int i = start; i >= 0; i--) {
-      if (v[i] != value) {
+    for (long int i = static_cast<long int>(start); i >= 0; i--) {
+      if (v[static_cast<size_t>(i)] != value) {
         return static_cast<size_t>(i + 1);
       }
     }
@@ -832,7 +855,7 @@ static inline void
 eraseIndices(std::vector<IN> from, std::vector<long int>& indices)
 {
   for (auto index : indices) {
-    from.erase(index);
+    from.erase(static_cast<size_t>(index));
   }
 }
 
@@ -840,14 +863,10 @@ eraseIndices(std::vector<IN> from, std::vector<long int>& indices)
   template<typename IN1>                                                       \
   static inline void StdVectorToIgraphVectorT(IN1& vectR, IGRAPH_VEC##_t* v)   \
   {                                                                            \
-    size_t n = vectR.size();                                                   \
-                                                                               \
-    /* Make sure that there is enough space for the items in v */              \
+    igraph_integer_t n = static_cast<igraph_integer_t>(vectR.size());          \
     IGRAPH_VEC##_resize(v, n);                                                 \
-                                                                               \
-    /* Copy all the items */                                                   \
     for (igraph_integer_t i = 0; i < n; ++i) {                                 \
-      IGRAPH_VEC##_set(v, i, vectR[i]);                                        \
+      IGRAPH_VEC##_set(v, i, vectR[static_cast<size_t>(i)]);                   \
     }                                                                          \
   }
 
@@ -857,10 +876,10 @@ MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(igraph_vector_int);
 static inline void
 StdVectorToIgraphVectorT(std::vector<std::string>& vectR, igraph_strvector_t* v)
 {
-  size_t n = vectR.size();
+  igraph_integer_t n = static_cast<igraph_integer_t>(vectR.size());
   igraph_strvector_resize(v, n);
   for (igraph_integer_t i = 0; i < n; ++i) {
-    igraph_strvector_set(v, i, vectR[i].c_str());
+    igraph_strvector_set(v, i, vectR[static_cast<size_t>(i)].c_str());
   }
 }
 
@@ -875,7 +894,7 @@ StdVectorToIgraphVectorT(std::vector<std::string>& vectR, igraph_strvector_t* v)
                                                                                \
     /* Make sure that there is enough space for the items in v */              \
     vectL.clear();                                                             \
-    vectL.reserve(n);                                                          \
+    vectL.reserve(static_cast<size_t>(n));                                     \
                                                                                \
     /* Copy all the items */                                                   \
     for (igraph_integer_t i = 0; i < n; ++i) {                                 \

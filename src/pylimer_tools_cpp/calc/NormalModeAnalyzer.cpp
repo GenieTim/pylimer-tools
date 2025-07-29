@@ -36,21 +36,21 @@ NormalModeAnalyzer::NormalModeAnalyzer(const std::vector<size_t> springFrom,
 
   Eigen::VectorXd diagonal = Eigen::VectorXd::Zero(nRows);
   for (size_t i = 0; i < springFrom.size(); i++) {
-    // triplets will be summed up -> we can use the same indices multiple
-    // times
-    triplets.push_back(
-      Eigen::Triplet<double>(springFrom[i], springTo[i], -1.0));
-    triplets.push_back(
-      Eigen::Triplet<double>(springTo[i], springFrom[i], -1.0));
-    // it is a bit more efficient to sum up the diagonal elements manually
-    diagonal[springFrom[i]] += 1.0;
-    diagonal[springTo[i]] += 1.0;
     // some sanity checks
     assert(springFrom[i] < nRows);
     assert(springTo[i] < nRows);
+    // triplets will be summed up -> we can use the same indices multiple
+    // times
+    triplets.push_back(Eigen::Triplet<double>(
+      static_cast<int>(springFrom[i]), static_cast<int>(springTo[i]), -1.0));
+    triplets.push_back(Eigen::Triplet<double>(
+      static_cast<int>(springTo[i]), static_cast<int>(springFrom[i]), -1.0));
+    // it is a bit more efficient to sum up the diagonal elements manually
+    diagonal[static_cast<Eigen::Index>(springFrom[i])] += 1.0;
+    diagonal[static_cast<Eigen::Index>(springTo[i])] += 1.0;
   }
   // the summed up diagonal can be translated to triplets as well
-  for (size_t i = 0; i < diagonal.size(); i++) {
+  for (Eigen::Index i = 0; i < diagonal.size(); i++) {
     if (diagonal[i] != 0.) {
       triplets.push_back(Eigen::Triplet<double>(i, i, diagonal[i]));
     }
@@ -91,7 +91,7 @@ NormalModeAnalyzer::computeAllEigenvalues(const bool includeEigenvectors)
                     this->assembledConnectivityMatrix.cols(),
                   "Expected square matrix");
 
-  size_t nRows = this->assembledConnectivityMatrix.rows();
+  Eigen::Index nRows = this->assembledConnectivityMatrix.rows();
   if (nRows == 0) {
     return;
   }
@@ -235,7 +235,7 @@ Eigen::ArrayXd
 NormalModeAnalyzer::evaluateStressAutocorrelation(const Eigen::ArrayXd& t) const
 {
   Eigen::ArrayXd result = Eigen::ArrayXd::Zero(t.size());
-  for (size_t i = 0; i < this->eigenvalues.size(); ++i) {
+  for (Eigen::Index i = 0; i < this->eigenvalues.size(); ++i) {
     if (APPROX_EQUAL(this->eigenvalues[i], 0.0, NORMAL_MODE_ZERO_TOLERANCE)) {
       continue;
     }
@@ -256,7 +256,7 @@ Eigen::ArrayXd
 NormalModeAnalyzer::evaluateStorageModulus(const Eigen::ArrayXd& omega) const
 {
   Eigen::ArrayXd result = Eigen::ArrayXd::Zero(omega.size());
-  for (size_t i = 0; i < this->eigenvalues.size(); ++i) {
+  for (Eigen::Index i = 0; i < this->eigenvalues.size(); ++i) {
     if (APPROX_EQUAL(this->eigenvalues[i], 0.0, NORMAL_MODE_ZERO_TOLERANCE)) {
       continue;
     }
@@ -285,7 +285,7 @@ Eigen::ArrayXd
 NormalModeAnalyzer::evaluateLossModulus(const Eigen::ArrayXd& omega) const
 {
   Eigen::ArrayXd result = Eigen::ArrayXd::Zero(omega.size());
-  for (size_t i = 0; i < this->eigenvalues.size(); ++i) {
+  for (Eigen::Index i = 0; i < this->eigenvalues.size(); ++i) {
     if (APPROX_EQUAL(this->eigenvalues[i], 0.0, NORMAL_MODE_ZERO_TOLERANCE)) {
       continue;
     }

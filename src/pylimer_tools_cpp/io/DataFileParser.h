@@ -104,7 +104,7 @@ private:
       NZ,
 
       // Physical properties
-      CHARGE,
+      ATOM_CHARGE,
       MASS,
       DENSITY,
       VOLUME,
@@ -119,7 +119,7 @@ private:
       THETA,
       RHO,
       EDPD_TEMP,
-      EDPD,
+      ATOM_EDPD,
       EDPD_CV,
       ESPH,
       CV,
@@ -235,7 +235,7 @@ private:
                                            const int nToRead)
   {
     std::vector<OUT> resultnumbers;
-    pylimer_tools::utils::CsvTokenizer tokenizer(line, nToRead);
+    pylimer_tools::utils::CsvTokenizer tokenizer(line, static_cast<size_t>(nToRead));
     resultnumbers.reserve(tokenizer.getLength());
     for (size_t i = 0; i < tokenizer.getLength(); ++i) {
       resultnumbers.push_back(tokenizer.get<OUT>(i));

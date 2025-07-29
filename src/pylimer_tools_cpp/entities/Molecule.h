@@ -125,7 +125,7 @@ public:
   // operators
   Atom operator[](const size_t index) const
   {
-    return this->getAtomByVertexIdx(index);
+    return this->getAtomByVertexIdx(static_cast<igraph_integer_t>(index));
   }
 
 private:

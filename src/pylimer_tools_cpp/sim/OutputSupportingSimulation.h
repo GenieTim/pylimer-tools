@@ -161,7 +161,7 @@ protected:
 
   int openFilesOutputHeader(const std::vector<OutputConfiguration>& configs,
                             const std::string& prefix = "",
-                            int streamIdx = 0);
+                            size_t streamIdx = 0);
 
   inline bool requiresDEvaluation(const ComputedDoubleValues val,
                                   const long int currentStep) const
@@ -209,7 +209,7 @@ protected:
     const OutputConfiguration& oc,
     const std::array<long int, NUM_COMPUTABLE_INT_VALUES>& intValues,
     const std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES>& doubleValues,
-    const int streamIdx = 0);
+    const size_t streamIdx = 0);
 
   /**
    * @brief Remember how often a particular value is needed to be computed for

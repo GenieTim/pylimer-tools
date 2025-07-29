@@ -138,9 +138,9 @@ public:
 
   double getVolume() override { return this->forceRelaxationNetwork.vol; }
 
-  int getNrOfNodes() const { return this->forceRelaxationNetwork.nrOfNodes; }
+  size_t getNrOfNodes() const { return this->forceRelaxationNetwork.nrOfNodes; }
 
-  int getNrOfSprings() const
+  size_t getNrOfSprings() const
   {
     return this->forceRelaxationNetwork.nrOfSprings;
   }
@@ -405,10 +405,11 @@ public:
   Eigen::VectorXd getSpringLengths() const
   {
     Eigen::VectorXd springDistances = this->getSpringDistances();
-    Eigen::VectorXd springLengths =
-      Eigen::VectorXd::Zero(this->forceRelaxationNetwork.nrOfSprings);
-    for (int i = 0; i < this->forceRelaxationNetwork.nrOfSprings; ++i) {
-      springLengths[i] = springDistances.segment(3 * i, 3).norm();
+    Eigen::VectorXd springLengths = Eigen::VectorXd::Zero(
+      static_cast<Eigen::Index>(this->forceRelaxationNetwork.nrOfSprings));
+    for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfSprings; ++i) {
+      springLengths[static_cast<Eigen::Index>(i)] =
+        springDistances.segment(3 * static_cast<Eigen::Index>(i), 3).norm();
     }
     return springLengths;
   }
@@ -464,7 +465,8 @@ public:
     Eigen::Matrix3d result = Eigen::Matrix3d::Zero();
     for (size_t i = 0; i < 3; ++i) {
       for (size_t j = 0; j < 3; ++j) {
-        result(i, j) = stressTensor[i][j];
+        result(static_cast<Eigen::Index>(i), static_cast<Eigen::Index>(j)) =
+          stressTensor[i][j];
       }
     }
     return result;
@@ -493,8 +495,8 @@ public:
       Eigen::VectorXd::Zero(this->currentSpringDistances.size() / 3);
 
     for (size_t i = 0; i < this->currentSpringDistances.size() / 3; ++i) {
-      const double b = lens.segment(3 * i, 3).norm();
-      lens[i] = b;
+      const double b = lens.segment(3 * static_cast<Eigen::Index>(i), 3).norm();
+      lens[static_cast<Eigen::Index>(i)] = b;
     }
 
     return lens;
@@ -556,16 +558,15 @@ protected:
     // need to include all but dangling and free chains in order to
     // model entanglement
     size_t nrOfSprings = 0;
-    size_t omittedChainsAtoms = 0;
-    size_t omittedChainsBonds = 0;
+
     std::vector<bool> vertexAdded = pylimer_tools::utils::initializeWithValue(
       this->universe.getNrOfAtoms(), false);
     for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
       std::vector<pylimer_tools::entities::Atom> endAtoms =
         crossLinkerChains[i].getChainEnds(crossLinkerType, true);
       for (pylimer_tools::entities::Atom endAtom : endAtoms) {
-        long int endAtomVertexId =
-          this->universe.getIdxByAtomId(endAtom.getId());
+        size_t endAtomVertexId =
+          static_cast<size_t>(this->universe.getIdxByAtomId(endAtom.getId()));
         if (endAtom.getType() != crossLinkerType &&
             !vertexAdded[endAtomVertexId]) {
           springEndAtoms.push_back(endAtom);
@@ -583,13 +584,8 @@ protected:
           (!removeDanglingChains &&
            crossLinkerChains[i].getType() ==
              pylimer_tools::entities::MoleculeType::DANGLING_CHAIN)) {
-        net->moleculeIdxToSpring[i] = nrOfSprings;
+        net->moleculeIdxToSpring[i] = static_cast<int>(nrOfSprings);
         nrOfSprings += 1;
-      } else {
-        // assert(endAtoms.size() == 0); // can also be
-        omittedChainsAtoms +=
-          (crossLinkerChains[i].getNrOfAtoms() - endAtoms.size());
-        omittedChainsBonds += crossLinkerChains[i].getNrOfBonds();
       }
     }
 
@@ -620,14 +616,14 @@ protected:
     }
 
     // convert beads
-    std::map<int, int> atomIdToNode;
-    for (size_t i = 0; i < springEndAtoms.size(); ++i) {
+    std::map<long int, long int> atomIdToNode;
+    for (long int i = 0; i < springEndAtoms.size(); ++i) {
       pylimer_tools::entities::Atom atom = springEndAtoms[i];
       atomIdToNode[atom.getId()] = i;
-      net->oldAtomIds[i] = atom.getId();
-      net->coordinates[3 * i + 0] = atom.getX();
-      net->coordinates[3 * i + 1] = atom.getY();
-      net->coordinates[3 * i + 2] = atom.getZ();
+      net->oldAtomIds[static_cast<Eigen::Index>(i)] = atom.getId();
+      net->coordinates[3 * static_cast<Eigen::Index>(i) + 0] = atom.getX();
+      net->coordinates[3 * static_cast<Eigen::Index>(i) + 1] = atom.getY();
+      net->coordinates[3 * static_cast<Eigen::Index>(i) + 2] = atom.getZ();
     }
 
     // convert springs
@@ -641,8 +637,10 @@ protected:
       std::vector<pylimer_tools::entities::Atom> endsOfChain =
         crossLinkerChains[i].getChainEnds(crossLinkerType, true);
       assert(endsOfChain.size() == 2);
-      long int nodeIdxFrom = atomIdToNode.at(endsOfChain[0].getId());
-      long int nodeIdxTo = atomIdToNode.at(endsOfChain[1].getId());
+      long int nodeIdxFrom =
+        atomIdToNode.at(endsOfChain[0].getId());
+      long int nodeIdxTo =
+        atomIdToNode.at(endsOfChain[1].getId());
       bool addChain = false;
       if (crossLinkerChains[i].getType() ==
           pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
@@ -691,8 +689,10 @@ protected:
         net->springIndexA[spring_idx] = nodeIdxFrom;
         net->springIndexB[spring_idx] = nodeIdxTo;
         for (size_t j = 0; j < 3; j++) {
-          net->springCoordinateIndexA[3 * spring_idx + j] = nodeIdxFrom * 3 + j;
-          net->springCoordinateIndexB[3 * spring_idx + j] = nodeIdxTo * 3 + j;
+          net->springCoordinateIndexA[3 * spring_idx + j] =
+            static_cast<int>(nodeIdxFrom * 3 + j);
+          net->springCoordinateIndexB[3 * spring_idx + j] =
+            static_cast<int>(nodeIdxTo * 3 + j);
         }
 
         spring_idx += 1;

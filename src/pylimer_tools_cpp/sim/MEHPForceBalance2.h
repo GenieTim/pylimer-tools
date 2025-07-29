@@ -128,18 +128,18 @@ public:
     net2.strandIndicesOfLink = net1.springIndicesOfLinks;
 
     // what needs a bit more translation
-    net2.springIsEntanglement = Eigen::ArrayXb::Zero(net2.nrOfSprings);
-    net2.springContourLength = Eigen::VectorXd::Zero(net2.nrOfSprings);
+    net2.springIsEntanglement = Eigen::ArrayXb::Zero(static_cast<Eigen::Index>(net2.nrOfSprings));
+    net2.springContourLength = Eigen::VectorXd::Zero(static_cast<Eigen::Index>(net2.nrOfSprings));
     for (size_t i = 0; i < net2.nrOfSprings; ++i) {
-      net2.springContourLength[i] =
-        net1.springsContourLength[net1.partialToFullSpringIndex[i]] *
-        springPartitions[i];
+      net2.springContourLength[static_cast<Eigen::Index>(i)] =
+        net1.springsContourLength[net1.partialToFullSpringIndex[static_cast<Eigen::Index>(i)]] *
+        springPartitions[static_cast<Eigen::Index>(i)];
     }
-    net2.oldAtomTypes = Eigen::VectorXi::Zero(net2.nrOfLinks);
-    net2.oldAtomIds = Eigen::VectorXi::Constant(net2.nrOfLinks, -1);
+    net2.oldAtomTypes = Eigen::VectorXi::Zero(static_cast<Eigen::Index>(net2.nrOfLinks));
+    net2.oldAtomIds = Eigen::VectorXi::Constant(static_cast<Eigen::Index>(net2.nrOfLinks), -1);
     for (size_t i = 0; i < net2.nrOfNodes; ++i) {
-      net2.oldAtomIds[i] = net1.oldAtomIds[i];
-      net2.oldAtomTypes[i] = net1.oldAtomTypes[i];
+      net2.oldAtomIds[static_cast<Eigen::Index>(i)] = net1.oldAtomIds[static_cast<Eigen::Index>(i)];
+      net2.oldAtomTypes[static_cast<Eigen::Index>(i)] = net1.oldAtomTypes[static_cast<Eigen::Index>(i)];
     }
 
     this->initialConfig = net2;
@@ -354,20 +354,20 @@ public:
 
   int getNrOfLinks() const { return this->initialConfig.nrOfLinks; }
 
-  size_t getNumBonds() override { return this->getNrOfStrands(); }
+  size_t getNumBonds() override { return static_cast<size_t>(this->getNrOfStrands()); }
 
   size_t getNumExtraBonds() override
   {
-    return this->initialConfig.springIsEntanglement.count();
+    return static_cast<size_t>(this->initialConfig.springIsEntanglement.count());
   }
 
   long int getNumBondsToForm() override { return 0; }
 
-  size_t getNumAtoms() override { return this->getNrOfNodes(); }
+  size_t getNumAtoms() override { return static_cast<size_t>(this->getNrOfNodes()); }
 
   size_t getNumExtraAtoms() override
   {
-    return this->getNrOfLinks() - this->getNrOfNodes();
+    return static_cast<size_t>(this->getNrOfLinks() - this->getNrOfNodes());
   }
 
   int getNrOfStrands() const { return this->initialConfig.nrOfStrands; }
