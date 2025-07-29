@@ -32,11 +32,13 @@ public:
     std::string y,
     std::string z,
     int nrOfOrigins = 10,
-    bool reduceMemory = false);
+    bool reduceMemory = false,
+    int max_tau = -1);
   std::unordered_map<long int, double> computeMsdForAtoms(
     const std::vector<long int>& atomIds,
     int nrOfOrigins = 10,
-    bool reduceMemory = false);
+    bool reduceMemory = false,
+    int max_tau = -1);
   std::unordered_map<long int, double>
   computeDistanceAutocorrelationFromToAtoms(
     const std::vector<long int>& atomIdsFrom,
@@ -71,11 +73,13 @@ protected:
   std::unordered_map<long int, double> computeMsdForAtomsFromDataFiles(
     const std::vector<long int>& atomIds,
     int nrOfOrigins = 10,
-    bool reduceMemory = false);
+    bool reduceMemory = false,
+    int max_tau = -1);
   std::unordered_map<long int, double> computeMsdForAtomsFromDumpFile(
     const std::vector<long int>& atomIds,
     int nrOfOrigins = 10,
-    bool reduceMemory = false);
+    bool reduceMemory = false,
+    int max_tau = -1);
 };
 }
 
