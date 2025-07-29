@@ -103,7 +103,7 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, Eigen::PlainObjectBase<Derived>& m)
   m.resize(rows, cols);
   ar(binary_data(
     m.data(),
-    static_cast<std::size_t>(rows * cols * sizeof(typename Derived::Scalar))));
+    static_cast<std::size_t>(static_cast<std::size_t>(rows) * static_cast<std::size_t>(cols) * sizeof(typename Derived::Scalar))));
 }
 
 // if we cannot store binary data

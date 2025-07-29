@@ -12,13 +12,13 @@
 #include <vector>
 
 namespace std {
-static std::string
+inline static std::string
 to_string(std::string input)
 {
   return input;
 }
 
-static std::string
+inline static std::string
 to_string(Eigen::Vector3d input)
 {
   return std::to_string(input[0]) + ", " + std::to_string(input[1]) + ", " +
@@ -58,7 +58,7 @@ duration_to_string(Duration duration)
 
 namespace pylimer_tools::utils {
 
-static bool
+inline static bool
 isUpper(const std::string& str)
 {
   for (size_t i = 0; i < str.length(); ++i) {

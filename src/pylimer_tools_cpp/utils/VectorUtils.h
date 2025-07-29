@@ -216,14 +216,15 @@ static inline std::vector<double>
 segmentwise_norm(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
 {
   INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
-  INVALIDARG_EXP_IFN(vecs.size() % segmentSize == 0,
+  size_t vecSize = static_cast<size_t>(vecs.size());
+  INVALIDARG_EXP_IFN(vecSize % segmentSize == 0,
                      "The size of the supplied vector, " +
-                       std::to_string(vecs.size()) +
+                       std::to_string(vecSize) +
                        " is not a multiple of the segment size, " +
                        std::to_string(segmentSize) + ".");
   std::vector<double> results;
-  results.reserve(vecs.size() / segmentSize);
-  for (size_t i = 0; i < vecs.size() / segmentSize; i++) {
+  results.reserve(vecSize / segmentSize);
+  for (size_t i = 0; i < vecSize / segmentSize; i++) {
     results.push_back(vecs.segment(segmentSize * i, segmentSize).norm());
   }
   return results;
@@ -311,8 +312,8 @@ template<typename IN>
 static inline bool
 all_components_finite(const IN& vec)
 {
-  for (size_t i = 0; i < vec.size(); ++i) {
-    if (!std::isfinite(vec[i])) {
+  for (size_t i = 0; i < static_cast<size_t>(vec.size()); ++i) {
+    if (!std::isfinite(vec[static_cast<typename IN::Index>(i)])) {
       return false;
     }
   }
@@ -542,12 +543,14 @@ template<typename VecType>
 static inline void
 renumberWithMapping(VecType& v, const std::vector<long int>& newMapping)
 {
-  for (size_t i = 0; i < v.size(); ++i) {
-    assert(v[i] >= 0 && v[i] < newMapping.size());
+  for (size_t i = 0; i < static_cast<size_t>(v.size()); ++i) {
+    auto idx = static_cast<typename VecType::Index>(i);
+    assert(v[idx] >= 0 && static_cast<size_t>(v[idx]) < newMapping.size());
     // the following assertion fails if the mapping is < 0,
     // which may happen if the value is one that should have been removed
-    assert(newMapping[v[i]] >= 0);
-    v[i] = newMapping[v[i]];
+    assert(newMapping[static_cast<size_t>(v[idx])] >= 0);
+    v[idx] = static_cast<typename VecType::Scalar>(
+      newMapping[static_cast<size_t>(v[idx])]);
   }
 }
 
