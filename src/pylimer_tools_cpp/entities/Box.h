@@ -147,6 +147,18 @@ public:
     this->recomputeBoxProperties();
   }
 
+  Box& operator=(const Box& other)
+  {
+    if (this != &other) {
+      this->loCoords = other.loCoords;
+      this->hiCoords = other.hiCoords;
+      this->shearDirection = other.shearDirection;
+      this->simpleShearMagnitude = other.simpleShearMagnitude;
+      this->recomputeBoxProperties();
+    }
+    return *this;
+  }
+
   inline bool operator==(const Box& rhs) const
   {
     const Box& lhs = *this;

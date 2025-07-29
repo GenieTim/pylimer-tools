@@ -259,7 +259,7 @@ class CMakeBuild(build_ext):
             if hasattr(self, "parallel") and self.parallel:
                 parallel_level = self.parallel
             else:
-                parallel_level = min(1, multiprocessing.cpu_count())
+                parallel_level = min(1, multiprocessing.cpu_count()-1)
             if parallel_level > 1:
                 # Set the CMake variable for parallel builds
                 cmake_args.append(f"-DCMAKE_BUILD_PARALLEL_LEVEL={parallel_level}")

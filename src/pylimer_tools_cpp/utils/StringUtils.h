@@ -190,7 +190,7 @@ split(std::vector<std::string>& res,
   size_t pos_start = 0, pos_end, delim_len = delimiter.length();
   std::string token;
 
-  int res_idx = 0;
+  size_t res_idx = 0;
   while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
     token = s.substr(pos_start, pos_end - pos_start);
     pos_start = pos_end + delim_len;
@@ -209,7 +209,7 @@ split(std::vector<std::string>& res,
     res[res_idx] = s.substr(pos_start);
   }
   res_idx += 1;
-  return res_idx;
+  return static_cast<int>(res_idx);
 }
 
 class CsvTokenizer

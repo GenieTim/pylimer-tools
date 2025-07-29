@@ -405,7 +405,8 @@ MEHPForceBalance::getDisplacementResidualNorm(
  *
  * @param net
  * @param u
- * @param oneOverSpringPartitions
+ * @param springPartitions
+ * @param oneOverSpringPartitionUpperLimit
  * @return double
  */
 double
@@ -2651,7 +2652,7 @@ MEHPForceBalance::doRemovalAndreisWay(ForceBalanceNetwork& net,
  * @param springPartitions
  * @param splitPartialSpringIdx
  * @param slipLinkIdx
- * @param alpha
+ * @param oneOverSpringPartitionUpperLimit
  */
 size_t
 MEHPForceBalance::addSlipLinkToPartialSpring(
@@ -3783,8 +3784,8 @@ MEHPForceBalance::swapSlipLinksReversibly(
  *
  * @param net the network to adjust
  * @param slipLinkIdx the slip-link around which to adjust the two springs
- * @param spring1 one of the two partial spring idx
- * @param spring2 the partial spring idx of the other spring
+ * @param partialSpringIdx1 one of the two partial spring idx
+ * @param partialSpringIdx2 the partial spring idx of the other spring
  */
 void
 MEHPForceBalance::reAlignSlipLinkToImages(ForceBalanceNetwork& net,
@@ -4321,7 +4322,7 @@ MEHPForceBalance::swapSlipLinks(ForceBalanceNetwork& net,
  * @param net the force balance network
  * @param u the current displacements, wherein the resulting coordinates
  * shall be stored
- * @param linkIdx the idx of the link to displace
+ * @param oneOverSpringPartitions the inverse of the spring partitions
  * @return double, the distance (squared norm) displaced
  */
 double
@@ -4398,7 +4399,7 @@ MEHPForceBalance::displaceToMeanPosition(
   const Eigen::VectorXd finalDisplacement =
     (remainingDisplacement + backForthDisplacement).matrix();
   RUNTIME_EXP_IFN(
-    pylimer_tools::utils::all_components_finite(finalDisplacement),
+    pylimer_tools::utils::all_components_finite<Eigen::VectorXd>(finalDisplacement),
     "Some displacements are not finite");
   // this->box.handlePBC(finalDisplacement);
   u += finalDisplacement;
@@ -6158,7 +6159,7 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
   /**
    * Test spring partition assumptions
    */
-  for (size_t i = 0; i < springPartitions.size(); i++) {
+  for (Eigen::Index i = 0; i < springPartitions.size(); i++) {
     RUNTIME_EXP_IFN(APPROX_WITHIN(springPartitions[i], 0.0, 1.0, 1e-9),
                     "Spring partitions must be between 0. & 1., got " +
                       std::to_string(springPartitions[i]) +
@@ -6168,7 +6169,9 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
   /**
    * Test reversibility of link <-> spring mapping
    */
-  for (size_t link_idx = 0; link_idx < net.nrOfLinks; ++link_idx) {
+  for (Eigen::Index link_idx = 0;
+       link_idx < static_cast<Eigen::Index>(net.nrOfLinks);
+       ++link_idx) {
     RUNTIME_EXP_IFN(
       net.linkIsSliplink[link_idx] == (link_idx >= net.nrOfNodes),
       "Expected slip-links to come sequentially after crosslinkers.");
@@ -6198,7 +6201,8 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
   /**
    * Test the assumptions on slip-links
    */
-  for (size_t slipLinkIdx = net.nrOfNodes; slipLinkIdx < net.nrOfLinks;
+  for (Eigen::Index slipLinkIdx = static_cast<Eigen::Index>(net.nrOfNodes);
+       slipLinkIdx < static_cast<Eigen::Index>(net.nrOfLinks);
        ++slipLinkIdx) {
     RUNTIME_EXP_IFN(
       net.springIndicesOfLinks[slipLinkIdx].size() == 2 ||
@@ -6215,7 +6219,8 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
    * Test the validitiy of springs and their mapping
    */
   Eigen::ArrayXi nrOfMentions = Eigen::ArrayXi::Zero(net.nrOfLinks);
-  for (size_t i = 0; i < net.nrOfSprings; ++i) {
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(net.nrOfSprings);
+       ++i) {
     RUNTIME_EXP_IFN(net.linkIndicesOfSprings[i].size() >= 2,
                     "Each spring requires at least two links, got " +
                       std::to_string(net.linkIndicesOfSprings[i].size()) +
@@ -6293,7 +6298,9 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
                       std::to_string(sum) + " for spring " + std::to_string(i) +
                       ".");
   }
-  for (size_t i = net.nrOfNodes; i < net.nrOfLinks; ++i) {
+  for (Eigen::Index i = static_cast<Eigen::Index>(net.nrOfNodes);
+       i < static_cast<Eigen::Index>(net.nrOfLinks);
+       ++i) {
     RUNTIME_EXP_IFN(nrOfMentions[i] == 2,
                     "Expect each slip-link to be mentioned twice in the "
                     "links-of-springs mapping, but " +
@@ -6304,7 +6311,9 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
   /**
    * Test the validity of partial springs and their mapping
    */
-  for (size_t i = 0; i < net.nrOfPartialSprings; i++) {
+  for (Eigen::Index i = 0;
+       i < static_cast<Eigen::Index>(net.nrOfPartialSprings);
+       i++) {
     const size_t fullIdx = net.partialToFullSpringIndex[i];
     const size_t partialEndA = net.springPartIndexA[i];
     const size_t partialEndB = net.springPartIndexB[i];
@@ -6373,7 +6382,7 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
   /**
    * Check that we do not have any nan or inf values in our vectors
    */
-  for (long int coordI = 0; coordI < net.coordinates.size(); coordI++) {
+  for (Eigen::Index coordI = 0; coordI < net.coordinates.size(); coordI++) {
     RUNTIME_EXP_IFN(std::isfinite(net.coordinates[coordI]),
                     "Coordinate component " + std::to_string(coordI) +
                       " must be finite, got " +
@@ -6424,7 +6433,9 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
    * Validate additional entanglement-atom specific data that might not
    * apply
    */
-  for (size_t linkIdx = 0; linkIdx < net.nrOfNodes; ++linkIdx) {
+  for (Eigen::Index linkIdx = 0;
+       linkIdx < static_cast<Eigen::Index>(net.nrOfNodes);
+       ++linkIdx) {
     if (net.oldAtomTypes[linkIdx] == this->entanglementType) {
       RUNTIME_EXP_IFN(
         net.springIndicesOfLinks[linkIdx].size() <= 3,
@@ -6465,7 +6476,9 @@ MEHPForceBalance::validateNetwork(const ForceBalanceNetwork& net,
       }
     }
   }
-  for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
+  for (Eigen::Index springIdx = 0;
+       springIdx < static_cast<Eigen::Index>(net.nrOfSprings);
+       ++springIdx) {
     if (net.springsType[springIdx] == this->entanglementType) {
       RUNTIME_EXP_IFN(net.springsContourLength[springIdx] == 1,
                       "Entanglement springs must have contour length 1. Got " +

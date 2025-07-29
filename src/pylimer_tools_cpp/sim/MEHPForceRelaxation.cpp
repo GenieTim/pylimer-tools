@@ -63,10 +63,8 @@ MEHPForceRelaxation::runForceRelaxation(
   lowerBounds.reserve(3 * net.nrOfNodes);
   for (size_t i = 0; i < net.nrOfNodes; ++i) {
     for (size_t dir = 0; dir < 3; ++dir) {
-      lowerBounds.push_back(
-        -net.L[dir]); //  * 0.5 -> lead to some few atoms not being where
-      //  they should. Maybe one box is still not enough?!?
-      upperBounds.push_back(net.L[dir]); //  * 0.5
+      lowerBounds.push_back(-net.L[dir]);
+      upperBounds.push_back(net.L[dir]);
     }
   }
   opt.set_upper_bounds(upperBounds);
@@ -90,7 +88,7 @@ MEHPForceRelaxation::runForceRelaxation(
   // query solution & exit reason
   assert(u0.size() == 3 * net.nrOfNodes);
   bool require_rerun = false;
-  for (size_t i = 0; i < u0.size(); ++i) {
+  for (Eigen::Index i = 0; i < u0.size(); ++i) {
     this->forceRelaxationNetwork.coordinates[i] += u0[i];
     if (!(u0[i] < upperBounds[i] - this->suggestRerunEps) ||
         !(u0[i] > lowerBounds[i] + this->suggestRerunEps)) {
@@ -150,7 +148,7 @@ MEHPForceRelaxation::evaluateSpringDistances(const Network* net,
     // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
     //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
     for (size_t i = 2; i < 3 * net->nrOfSprings; i += 3) {
-      springDistances[i] = 0.0;
+      springDistances[static_cast<Eigen::Index>(i)] = 0.0;
     }
   }
   assert(springDistances.size() == net->nrOfSprings * 3);
@@ -179,7 +177,7 @@ MEHPForceRelaxation::getCrosslinkerVerse() const
   x.reserve(this->forceRelaxationNetwork.nrOfNodes);
   y.reserve(this->forceRelaxationNetwork.nrOfNodes);
   z.reserve(this->forceRelaxationNetwork.nrOfNodes);
-  for (int i = 0; i < this->forceRelaxationNetwork.nrOfNodes; ++i) {
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->forceRelaxationNetwork.nrOfNodes); ++i) {
     x.push_back(this->forceRelaxationNetwork.coordinates[3 * i + 0]);
     y.push_back(this->forceRelaxationNetwork.coordinates[3 * i + 1]);
     z.push_back(this->forceRelaxationNetwork.coordinates[3 * i + 2]);
@@ -199,10 +197,10 @@ MEHPForceRelaxation::getCrosslinkerVerse() const
   for (int i = 0; i < this->forceRelaxationNetwork.nrOfSprings; ++i) {
     bondFrom.push_back(
       this->forceRelaxationNetwork
-        .oldAtomIds[this->forceRelaxationNetwork.springIndexA[i]]);
+        .oldAtomIds[static_cast<Eigen::Index>(this->forceRelaxationNetwork.springIndexA[i])]);
     bondTo.push_back(
       this->forceRelaxationNetwork
-        .oldAtomIds[this->forceRelaxationNetwork.springIndexB[i]]);
+        .oldAtomIds[static_cast<Eigen::Index>(this->forceRelaxationNetwork.springIndexB[i])]);
   }
   xlinkUniverse.addBonds(
     bondFrom.size(),
@@ -226,8 +224,8 @@ MEHPForceRelaxation::getAverageSpringLength() const
   for (int i = 0; i < this->forceRelaxationNetwork.nrOfSprings; i++) {
     double r2local = 0.0;
     for (int j = 0; j < 3; ++j) {
-      r2local += this->currentSpringDistances[i * 3 + j] *
-                 this->currentSpringDistances[i * 3 + j];
+      r2local += this->currentSpringDistances[static_cast<Eigen::Index>(i * 3 + j)] *
+                 this->currentSpringDistances[static_cast<Eigen::Index>(i * 3 + j)];
     }
     r2 += sqrt(r2local);
   }
@@ -254,10 +252,9 @@ MEHPForceRelaxation::evaluateStressTensor(
   }
 
   for (size_t i = 0; i < springDistances.size() / 3; ++i) {
-    double s[3] = { springDistances[3 * i + 0],
-                    springDistances[3 * i + 1],
-                    springDistances[3 * i + 2] };
-    /* spring contribution to the overall stress tensor */
+    double s[3] = { springDistances[static_cast<Eigen::Index>(3 * i + 0)],
+                    springDistances[static_cast<Eigen::Index>(3 * i + 1)],
+                    springDistances[static_cast<Eigen::Index>(3 * i + 2)] };
     for (size_t j = 0; j < 3; j++) {
       for (size_t k = 0; k < 3; k++) {
         const double contribution =
@@ -315,8 +312,8 @@ MEHPForceRelaxation::getEffectiveFunctionalityOfAtoms(
   Eigen::VectorXi nrOfActiveSpringsConnected =
     this->getNrOfActiveSpringsConnected(tolerance);
   for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfNodes; i++) {
-    results.emplace(this->forceRelaxationNetwork.oldAtomIds[i],
-                    nrOfActiveSpringsConnected[i]);
+    results.emplace(this->forceRelaxationNetwork.oldAtomIds[static_cast<Eigen::Index>(i)],
+                    nrOfActiveSpringsConnected[static_cast<Eigen::Index>(i)]);
   }
   return results;
 }
@@ -341,7 +338,7 @@ MEHPForceRelaxation::getIdsOfActiveNodes(
 
   Eigen::VectorXi nrOfActiveSpringsConnected =
     this->getNrOfActiveSpringsConnected(tolerance);
-  for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfNodes; i++) {
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->forceRelaxationNetwork.nrOfNodes); i++) {
     if (nrOfActiveSpringsConnected[i] >= minimumNrOfActiveConnections &&
         (maximumNrOfActiveConnections < 0 ||
          maximumNrOfActiveConnections >= nrOfActiveSpringsConnected[i])) {
@@ -366,10 +363,10 @@ MEHPForceRelaxation::getNrOfActiveSpringsConnected(const double tolerance) const
     Eigen::VectorXi::Zero(this->forceRelaxationNetwork.nrOfNodes);
   Eigen::ArrayXb springIsActive =
     this->findActiveSprings(&this->forceRelaxationNetwork, tolerance);
-  for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfSprings; i++) {
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(this->forceRelaxationNetwork.nrOfSprings); i++) {
     if (springIsActive[i] == true) { /* active spring */
-      const int a = this->forceRelaxationNetwork.springIndexA[i];
-      const int b = this->forceRelaxationNetwork.springIndexB[i];
+      const Eigen::Index a = static_cast<Eigen::Index>(this->forceRelaxationNetwork.springIndexA[i]);
+      const Eigen::Index b = static_cast<Eigen::Index>(this->forceRelaxationNetwork.springIndexB[i]);
       ++(nrOfActiveSpringsConnected[a]);
       ++(nrOfActiveSpringsConnected[b]);
     }
@@ -401,7 +398,7 @@ MEHPForceRelaxation::getResiduals() const
 
   Eigen::VectorXd results =
     Eigen::VectorXd::Zero(this->forceRelaxationNetwork.nrOfNodes * 3);
-  for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfNodes * 3; ++i) {
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>( this->forceRelaxationNetwork.nrOfNodes * 3); ++i) {
     results[i] = r[i];
   }
   delete[] (r);

@@ -48,12 +48,12 @@ int
 OutputSupportingSimulation::openFilesOutputHeader(
   const std::vector<OutputConfiguration>& configs,
   const std::string& prefix,
-  int streamIdx)
+  size_t streamIdx)
 {
   INVALIDARG_EXP_IFN(streamIdx == this->outputStreams.size(),
                      "The stream idx " + std::to_string(streamIdx) +
                        " hints at an invalid state.");
-  int numComputes = 0;
+  size_t numComputes = 0;
   this->outputStreams.reserve(streamIdx + configs.size());
   std::string thisFileOutputBuffer = "";
   thisFileOutputBuffer.reserve(80 * 20);
@@ -188,7 +188,7 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
         : 0.0,
       0. }
   };
-  int streamIdx = 0;
+  size_t streamIdx = 0;
   for (streamIdx = 0; streamIdx < this->outputConfigs.size(); ++streamIdx) {
     if (currentStep % this->outputConfigs[streamIdx].outputEvery == 0) {
       this->doOutputValues(
@@ -275,7 +275,7 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
       const unsigned int npcorr =
         this->autocorrelators[autocorrelator_idx_before].npcorr;
       RUNTIME_EXP_IFN(npcorr > 0, "Expected more than 0 correlator results.");
-      for (int autocorr_idx_offset = 1;
+      for (size_t autocorr_idx_offset = 1;
            autocorr_idx_offset < oc.doubleValues.size();
            ++autocorr_idx_offset) {
         const size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
@@ -284,10 +284,10 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
                         "Autocorrelation states are inconsistent.");
       }
 
-      for (size_t output_idx = 0; output_idx < npcorr; output_idx += 1) {
+      for (size_t output_idx = 0; output_idx < static_cast<size_t>(npcorr); output_idx += 1) {
         outputBuffer += std::to_string(
           this->autocorrelators[autocorrelator_idx_before].t[output_idx]);
-        for (int autocorr_idx_offset = 0;
+        for (size_t autocorr_idx_offset = 0;
              autocorr_idx_offset < oc.doubleValues.size();
              ++autocorr_idx_offset) {
           const size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
@@ -321,7 +321,7 @@ OutputSupportingSimulation::doOutputValues(
   const OutputConfiguration& oc,
   const std::array<long int, 8>& intValues,
   const std::array<double, 19>& doubleValues,
-  const int streamIdx)
+  const size_t streamIdx)
 {
   assert(streamIdx <= this->outputStreams.size());
   assert(doubleValues.size() == NUM_COMPUTABLE_DOUBLE_VALUES);
@@ -444,7 +444,7 @@ OutputSupportingSimulation::configAutoCorrelatorOutput(
   const unsigned int pin,
   const unsigned int min)
 {
-  int num_values_to_correlate = 0;
+  size_t num_values_to_correlate = 0;
   for (size_t i = 0; i < vals.size(); ++i) {
     INVALIDARG_EXP_IFN(vals[i].intValues.size() == 0,
                        "Correlation of integer values is not supported yet.");
@@ -470,7 +470,7 @@ OutputSupportingSimulation::configAverageOutput(
   this->outputAverageConfigs = configs;
   this->updateValuesRequiredEvery(configs);
 
-  int numAverages = 0;
+  size_t numAverages = 0;
   for (const OutputConfiguration& c : configs) {
     numAverages += c.doubleValues.size();
     numAverages += c.intValues.size();
