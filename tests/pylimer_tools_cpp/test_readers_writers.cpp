@@ -13,6 +13,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <random>
 extern "C"
 {
 #include <igraph/igraph.h>
