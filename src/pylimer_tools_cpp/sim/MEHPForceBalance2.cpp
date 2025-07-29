@@ -773,6 +773,38 @@ MEHPForceBalance2::runForceRelaxation(
   this->exitReason = ExitReason::X_TOLERANCE;                                  \
   break;
 
+    // Common parameters for gradient descent solvers
+    constexpr double gradientDescentLearningRate = 0.01;
+
+    // Define common callback for gradient descent solvers to handle output and interrupts
+    auto createGradientDescentCallback = [&](size_t& iterationsDone) {
+      return [&](int currentIteration, const Eigen::VectorXd& currentSolution) -> bool {
+        // Temporarily update the current displacements for handleOutput
+        Eigen::VectorXd oldDisplacements = this->currentDisplacements;
+        this->currentDisplacements = currentSolution - this->initialConfig.coordinates;
+        
+        this->handleOutput(iterationsDone + currentIteration);
+        bool shouldStop = shouldInterrupt();
+        
+        // Restore the previous displacements if not stopping
+        if (!shouldStop) {
+          this->currentDisplacements = oldDisplacements;
+        }
+        
+        return shouldStop;
+      };
+    };
+
+    // Helper function to handle gradient descent solver results
+    auto handleGradientDescentResult = [&](int solverIterations) {
+      if (solverIterations >= maxIterations) {
+        this->exitReason = ExitReason::MAX_STEPS;
+      } else {
+        this->exitReason = ExitReason::X_TOLERANCE;
+      }
+      iterationsDone += solverIterations;
+    };
+
     switch (solverChoice) {
       // iterative solvers
       case SLESolver::CONJUGATE_GRADIENT:
@@ -833,57 +865,59 @@ MEHPForceBalance2::runForceRelaxation(
       }
       case SLESolver::GRADIENT_DESCENT: {
         int solverIterations = 0;
-        finalCoordinates = Eigen::gradientDescent(sysMatrix,
-                                                  constants,
-                                                  0.01,
-                                                  residualReduction,
-                                                  maxIterations,
-                                                  solverIterations);
-        if (solverIterations >= maxIterations) {
-          this->exitReason = ExitReason::MAX_STEPS;
-        } else {
-          this->exitReason = ExitReason::X_TOLERANCE;
-        }
-        iterationsDone += solverIterations;
+        auto callback = createGradientDescentCallback(iterationsDone);
+        
+        finalCoordinates = Eigen::gradientDescent(
+          sysMatrix,
+          constants,
+          gradientDescentLearningRate,
+          residualReduction,
+          maxIterations,
+          solverIterations,
+          this->currentDisplacements + this->initialConfig.coordinates, // initial solution
+          currentResidual, // initial residual
+          callback);
+        
+        handleGradientDescentResult(solverIterations);
         break;
       }
       case SLESolver::DEFAULT:
       case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT:
       case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG: {
         int solverIterations = 0;
+        auto callback = createGradientDescentCallback(iterationsDone);
+        
         finalCoordinates = Eigen::gradientDescentBarzilaiBorwein(
           sysMatrix,
           constants,
-          0.01,
+          gradientDescentLearningRate,
           residualReduction,
           maxIterations,
           solverIterations,
-          solverChoice == SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT
-
-        );
-        if (solverIterations >= maxIterations) {
-          this->exitReason = ExitReason::MAX_STEPS;
-        } else {
-          this->exitReason = ExitReason::X_TOLERANCE;
-        }
-        iterationsDone += solverIterations;
+          solverChoice == SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT,
+          this->currentDisplacements + this->initialConfig.coordinates, // initial solution
+          currentResidual, // initial residual
+          callback);
+        
+        handleGradientDescentResult(solverIterations);
         break;
       }
       case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM: {
         int solverIterations = 0;
-        finalCoordinates =
-          Eigen::gradientDescentHeavyBallBarzilaiBorwein(sysMatrix,
-                                                         constants,
-                                                         0.01,
-                                                         residualReduction,
-                                                         maxIterations,
-                                                         solverIterations);
-        if (solverIterations >= maxIterations) {
-          this->exitReason = ExitReason::MAX_STEPS;
-        } else {
-          this->exitReason = ExitReason::X_TOLERANCE;
-        }
-        iterationsDone += solverIterations;
+        auto callback = createGradientDescentCallback(iterationsDone);
+        
+        finalCoordinates = Eigen::gradientDescentHeavyBallBarzilaiBorwein(
+          sysMatrix,
+          constants,
+          gradientDescentLearningRate,
+          residualReduction,
+          maxIterations,
+          solverIterations,
+          this->currentDisplacements + this->initialConfig.coordinates, // initial solution
+          currentResidual, // initial residual
+          callback);
+        
+        handleGradientDescentResult(solverIterations);
         break;
       }
       // direct solvers
