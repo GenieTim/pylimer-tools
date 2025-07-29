@@ -16,7 +16,7 @@ from pylimer_tools_cpp import UniverseSequence
 # Load a LAMMPS dump trajectory file (replace with your file)
 file_path = os.path.join(
     os.getcwd(),
-    "../..",
+    # "../..",
     "tests/pylimer_tools/fixtures/",
 )
 sequence = UniverseSequence()
@@ -28,7 +28,7 @@ sequence.initialize_from_dump_file(
 # Compute the mean square displacement for all atoms
 msd = sequence.compute_msd_for_atoms(
     atom_ids=[a.get_id() for a in sequence[0].get_atoms()],
-    nr_of_origins=10,  # Number of origins to use for MSD calculation
+    nr_of_origins=50,  # Number of origins to use for MSD calculation
 )
 
 # %%
@@ -42,8 +42,14 @@ rgs = []
 timesteps = []
 for universe in sequence:
     rgs.append(
-        np.mean([m.compute_radius_of_gyration()
-                for m in universe.get_molecules(2)])
+        np.mean(
+            [
+                m.compute_radius_of_gyration()
+                for m in universe.get_molecules(
+                    -1
+                )  # -1 because we don't have any crosslinks to filter out
+            ]
+        )
     )
     timesteps.append(universe.get_timestep())
 
@@ -51,14 +57,22 @@ for universe in sequence:
 fig, axs = plt.subplots(2, 1, figsize=(10, 10), sharex=False)
 
 # Panel 1: MSD
+axs[0].plot(list(msd.keys()), list(msd.values()), label="Mean Square Displacement")
+axs[0].axhline(
+    np.mean(list(msd.values())), color="black", linestyle="--", label="Mean MSD"
+)
+# add cumulative mean
 axs[0].plot(
-    list(
-        msd.keys()), list(
-            msd.values()), label="Mean Square Displacement")
+    list(msd.keys()),
+    [np.mean(list(msd.values())[: i + 1]) for i in range(len(msd))],
+    label="Cumulative Mean",
+    color="red",
+)
 axs[0].set_xlabel("$\\tau$")
 axs[0].set_ylabel("MSD")
 axs[0].set_title("Mean Square Displacement")
 axs[0].legend()
+axs[0].set(xscale="log", yscale="log")
 
 # Panel 2: Radius of Gyration
 axs[1].plot(timesteps, rgs, label="Radius of Gyration", color="orange")
