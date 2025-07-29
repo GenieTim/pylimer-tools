@@ -106,15 +106,38 @@ init_pylimer_bound_sim(py::module_& m)
 #undef X
     ;
 
-  py::class_<OutputConfiguration>(
-    m,
-    "OutputConfiguration",
-    py::module_local(),
-    R"pbdoc(A configuration object to configure the output,
-    as supported by most "simulation-like" classes in this package.)pbdoc")
-    .def(py::init<>(), "Get an instance of this struct")
-    .def_readwrite("int_values", &OutputConfiguration::intValues)
-    .def_readwrite("double_values", &OutputConfiguration::doubleValues)
+  py::class_<OutputConfiguration>(m,
+                                  "OutputConfiguration",
+                                  py::module_local(),
+                                  R"pbdoc(
+     A configuration object to configure the output values and frequency
+     for simulation classes in this package.
+
+     This class specifies which quantities to output and how often to write them
+     during simulations.
+    )pbdoc")
+    .def(py::init<>(),
+         R"pbdoc(
+          Create a new OutputConfiguration instance.
+
+          :return: A new OutputConfiguration object with default settings
+         )pbdoc")
+    .def_readwrite("int_values",
+                   &OutputConfiguration::intValues,
+                   R"pbdoc(
+                    List of integer-valued quantities to output.
+                    
+                    Use ComputedIntValues enum to specify which integer quantities
+                    should be computed and written to output.
+                   )pbdoc")
+    .def_readwrite("double_values",
+                   &OutputConfiguration::doubleValues,
+                   R"pbdoc(
+                    List of double-valued quantities to output.
+                    
+                    Use ComputedDoubleValues enum to specify which floating-point quantities
+                    should be computed and written to output.
+                   )pbdoc")
     .def_readwrite("use_every",
                    &OutputConfiguration::useEvery,
                    R"pbdoc(
@@ -160,9 +183,12 @@ the simulation or optimization procedure.)pbdoc")
   m.def("inverse_langevin",
         &mehp::langevin_inv,
         R"pbdoc(
-     A somewhat accurate (for :math:`x \in (-1, 1)`) implementation of the inverse Langevin.
+     A somewhat accurate (for :math:`x \in (-1, 1)`) implementation of the inverse Langevin function.
 
      Source: https://scicomp.stackexchange.com/a/30251
+
+     :param x: Input value in the range (-1, 1)
+     :return: Inverse Langevin function value
   )pbdoc",
         py::arg("x"));
 
@@ -335,7 +361,7 @@ A strand is a chain of connected links between two crosslinks.
   //          &mehp::PyMEHPForceEvaluator::evaluateForceAndGradient,
   //          R"pbdoc(
   //      One of the two functions to override, the other being
-  //      :func:`~pylimer_tools_cpp.MEHPForceEvaluator.evaluateStressContribution`.
+  //      :meth:`~pylimer_tools_cpp.MEHPForceEvaluator.evaluate_stress_contribution`.
 
   //      :param n: The dimensionality of the problem (the nr. of spring
   //      coordinates) :param springDistances: The sequential (x, y, z) spring
@@ -429,8 +455,8 @@ A strand is a chain of connected links between two crosslinks.
           :param remove_2functional_crosslinkers: Whether to replace two-functional crosslinkers with a "normal" chain bead
           :param remove_dangling_chains: Whether to remove dangling chains before running the simulation.
                **Caution**: Removing the dangling chains will result in incorrect results fo the computation of
-               :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction()` and
-               :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getDanglingWeightFraction()`
+               :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction` and
+               :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction`
           )pbdoc",
          py::arg("universe"),
          py::arg("crosslinker_type") = 2,
@@ -475,7 +501,7 @@ A strand is a chain of connected links between two crosslinks.
           Configure the offset from the lower and upper bounds for the simulation to suggest another run.
           
           :param epsilon: The epsilon value to use for the rerun check
-               (See: :func:`~pylimer_tools_cpp.MEHPForceRelaxation.requiresAnotherRun()`)
+               (See: :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.requires_another_run`)
          )pbdoc",
          py::arg("epsilon") = 1e-3)
     .def("config_step_output",
@@ -508,21 +534,29 @@ A strand is a chain of connected links between two crosslinks.
          &mehp::MEHPForceRelaxation::getResiduals,
          R"pbdoc(
           Returns the residuals at the current state of the simulation.
+
+          :return: The current residual vector
      )pbdoc")
     .def("get_residual_norm",
          &mehp::MEHPForceRelaxation::getResidualNorm,
          R"pbdoc(
           Returns the residual norm at the current state of the simulation.
+
+          :return: The current residual norm value
      )pbdoc")
     .def("get_pressure",
          &mehp::MEHPForceRelaxation::getPressure,
          R"pbdoc(
           Returns the pressure at the current state of the simulation.
+
+          :return: The current pressure value
      )pbdoc")
     .def("get_stress_tensor",
          &mehp::MEHPForceRelaxation::getStressTensor,
          R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
+
+          :return: The current stress tensor matrix
      )pbdoc")
     .def("get_gamma_factors",
          &mehp::MEHPForceRelaxation::getGammaFactors,
@@ -539,7 +573,7 @@ A strand is a chain of connected links between two crosslinks.
                For real systems, the value could be determined by :func:`~pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance()`
                on the melt system, with subsequent division by the nr of bonds in the chain.
 
-          See also :func:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor` for the mean of these.
+          See also :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor` for the mean of these.
          )pbdoc",
          py::arg("b0_squared") = -1.0)
     .def("get_gamma_factor",
@@ -568,22 +602,27 @@ A strand is a chain of connected links between two crosslinks.
     .def("get_nr_of_nodes",
          &mehp::MEHPForceRelaxation::getNrOfNodes,
          R"pbdoc(
-           Get the number of nodes considered in this simulation.
+          Get the number of nodes considered in this simulation.
+
+          :return: The number of nodes in the simulation
      )pbdoc")
     .def("get_nr_of_springs",
          &mehp::MEHPForceRelaxation::getNrOfSprings,
          R"pbdoc(
           Get the number of springs considered in this simulation.
 
-          :param tolerance: springs under this length are considered inactive
+          :param tolerance: Springs under this length are considered inactive
+          :return: The number of springs in the simulation
      )pbdoc")
     .def("get_ids_of_active_nodes",
          &mehp::MEHPForceRelaxation::getIdsOfActiveNodes,
          R"pbdoc(
           Get the atom ids of the nodes that are considered active.
 
-          Arguments:
-           - :param tolerance: springs under this length are considered inactive. A node is active if it has > 2 active springs.
+          :param tolerance: Springs under this length are considered inactive. A node is active if it has > 2 active springs.
+          :param minimum_nr_of_active_connections: Minimum number of active connections required for a node to be considered active
+          :param maximum_nr_of_active_connections: Maximum number of active connections allowed for a node to be considered active
+          :return: List of atom IDs for active nodes
      )pbdoc",
          py::arg("tolerance") = 1e-3,
          py::arg("minimum_nr_of_active_connections") = 2,
@@ -591,13 +630,13 @@ A strand is a chain of connected links between two crosslinks.
     .def("get_nr_of_active_nodes",
          &mehp::MEHPForceRelaxation::getNrOfActiveNodes,
          R"pbdoc(
-           Get the number of active nodes remaining after running the simulation.
+          Get the number of active nodes remaining after running the simulation.
 
-          :param tolerance: springs under this length are considered inactive.
-          :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
-          :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
-               Use a value < 0 to indicate that there is no maximum number of active connections.
-          :param usePartial: Whether to use the partial spring distances rather than the total (set to true if you want primary loop contributors)
+          :param tolerance: Springs under this length are considered inactive
+          :param minimumNrOfActiveConnections: A node is active if it has equal or more than this number of active springs
+          :param maximumNrOfActiveConnections: A node is active if it has equal or less than this number of active springs.
+               Use a value < 0 to indicate that there is no maximum number of active connections
+          :return: The number of active nodes
      )pbdoc",
          py::arg("tolerance") = 1e-3,
          py::arg("minimumNrOfActiveConnections") = 2,
@@ -605,9 +644,10 @@ A strand is a chain of connected links between two crosslinks.
     .def("get_nr_of_active_springs",
          &mehp::MEHPForceRelaxation::getNrOfActiveSprings,
          R"pbdoc(
-           Get the number of active springs remaining after running the simulation.
+          Get the number of active springs remaining after running the simulation.
 
-          :param tolerance: springs under this length are considered inactive
+          :param tolerance: Springs under this length are considered inactive
+          :return: The number of active springs
      )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("count_active_clustered_atoms",
@@ -616,7 +656,9 @@ A strand is a chain of connected links between two crosslinks.
          R"pbdoc(
           Counts the active clustered atoms in the system.
 
-          :param tolerance: springs under this length are considered inactive.)pbdoc",
+          :param tolerance: Springs under this length are considered inactive
+          :return: The number of active clustered atoms
+     )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_soluble_weight_fraction",
          &mehp::MEHPForceRelaxation::getSolubleWeightFraction,
@@ -625,28 +667,38 @@ A strand is a chain of connected links between two crosslinks.
           springs (any depth).
 
           Caution: ignores atom masses.
+
+          :param tolerance: Springs under this length are considered inactive
+          :return: The soluble weight fraction
      )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_dangling_weight_fraction",
          &mehp::MEHPForceRelaxation::getDanglingWeightFraction,
          R"pbdoc(
-          Compute the weight fraction of non-active springs
+          Compute the weight fraction of non-active springs.
 
           Caution: ignores atom masses.
+
+          :param tolerance: Springs under this length are considered inactive
+          :return: The dangling weight fraction
      )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_active_chains",
          &mehp::MEHPForceRelaxation::getActiveChains,
          R"pbdoc(
           Get the crosslinker chains that are active.
+
+          :param tolerance: Springs under this length are considered inactive
+          :return: List of active crosslinker chains
      )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_effective_functionality_of_atoms",
          &mehp::MEHPForceRelaxation::getEffectiveFunctionalityOfAtoms,
          R"pbdoc(
-          Returns the number of active springs connected to each atom, atomId used as index
+          Returns the number of active springs connected to each atom, atomId used as index.
 
-          :param tolerance: springs under this length are considered inactive
+          :param tolerance: Springs under this length are considered inactive
+          :return: Vector with effective functionality for each atom (indexed by atom ID)
      )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_spring_lengths",
@@ -654,37 +706,43 @@ A strand is a chain of connected links between two crosslinks.
          R"pbdoc(
           Get the current lengths for all the springs.
 
-          Returns:
-               - distances: a vector of size nrOfSprings, with each the norm of the distances
+          :return: A vector of size nrOfSprings, with each the norm of the distances
      )pbdoc")
     .def("get_spring_distances",
          &mehp::MEHPForceRelaxation::getSpringDistances,
          R"pbdoc(
           Get the current coordinate differences for all the springs.
 
-          Returns:
-               - distances: a vector of size 3*nrOfSprings, with each x, y, z values of the springs
+          :return: A vector of size 3*nrOfSprings, with each x, y, z values of the springs
      )pbdoc")
     .def("get_average_spring_length",
          &mehp::MEHPForceRelaxation::getAverageSpringLength,
          R"pbdoc(
-           Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()`,
-           this value is normalized by the number of springs rather than the number of chains.
+          Get the average length of the springs. Note that in contrast to :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor`,
+          this value is normalized by the number of springs rather than the number of chains.
+
+          :return: The average spring length
      )pbdoc")
     .def("get_default_r0_square",
          &mehp::MEHPForceRelaxation::getDefaultR0Square,
          R"pbdoc(
-           Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
+          Returns the value effectively used in :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor` for :math:`\langle R_{0,\eta}^2\rangle`.
+
+          :return: The default R0 squared value used in gamma factor calculations
      )pbdoc")
     .def("get_nr_of_iterations",
          &mehp::MEHPForceRelaxation::getNrOfIterations,
          R"pbdoc(
           Returns the number of iterations used for force relaxation.
+
+          :return: The number of iterations performed during force relaxation
      )pbdoc")
     .def("get_exit_reason",
          &mehp::MEHPForceRelaxation::getExitReason,
          R"pbdoc(
-           Returns the reason for termination of the simulation
+          Returns the reason for termination of the simulation.
+
+          :return: The exit reason enum value indicating why the simulation ended
      )pbdoc")
     .def("requires_another_run",
          &mehp::MEHPForceRelaxation::suggestsRerun,
@@ -694,14 +752,18 @@ A strand is a chain of connected links between two crosslinks.
           that it would not be globally minimised.
 
           If the final displacement of one of the atoms is close
-          (1e-3, configurable via :func:`~pylimer_tools_cpp.MEHPForceRelaxation.configRerunEpsilon()`)
+          (1e-3, configurable via :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon`)
           to the imposed min/max, after minimizing,
           this method would return true.
+
+          :return: True if another run is suggested, False otherwise
      )pbdoc")
     .def("get_crosslinker_universe",
          &mehp::MEHPForceRelaxation::getCrosslinkerVerse,
          R"pbdoc(
           Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
+
+          :return: A Universe object containing the crosslinkers with updated positions
      )pbdoc")
 #ifdef CEREALIZABLE
     .def(py::pickle(
@@ -802,6 +864,8 @@ A strand is a chain of connected links between two crosslinks.
           Otherwise, it returns true.
 
           Can be used e.g. as :code:`assert fb.validate_network()`.
+
+          :return: True if validation passes, raises exception otherwise
      )pbdoc")
     .def(
       "run_force_relaxation",
@@ -1000,12 +1064,24 @@ A strand is a chain of connected links between two crosslinks.
          py::arg("one_over_strand_partition_upper_limit") = 1.0)
     .def("get_strand_partition_indices_of_sliplink",
          &mehp::MEHPForceBalance::getSpringpartitionIndicesOfSliplink,
-         R"pbdoc()pbdoc",
+         R"pbdoc(
+          Get the indices of strand partitions associated with a slip-link.
+
+          :param network: The force balance network
+          :param link_idx: Index of the slip-link
+          :return: Vector of strand partition indices
+         )pbdoc",
          py::arg("network"),
          py::arg("link_idx"))
     .def_static("get_neighbour_link_indices",
                 &mehp::MEHPForceBalance::getNeighbourLinkIndices,
-                R"pbdoc()pbdoc",
+                R"pbdoc(
+                 Get the indices of neighboring links for a given link.
+
+                 :param network: The force balance network
+                 :param link_idx: Index of the link to find neighbors for
+                 :return: Vector of connected link indices
+                )pbdoc",
                 py::arg("network"),
                 py::arg("link_idx"))
     .def(
@@ -1016,7 +1092,14 @@ A strand is a chain of connected links between two crosslinks.
          const size_t springIdx) {
         return sim.evaluatePartialSpringDistance(net, u, springIdx);
       },
-      R"pbdoc()pbdoc",
+      R"pbdoc(
+       Evaluate the distance vector for a specific spring.
+
+       :param network: The force balance network
+       :param displacements: Current displacement vector
+       :param spring_idx: Index of the spring to evaluate
+       :return: 3D distance vector for the spring
+      )pbdoc",
       py::arg("network"),
       py::arg("displacements"),
       py::arg("spring_idx"))
@@ -1030,7 +1113,15 @@ A strand is a chain of connected links between two crosslinks.
         return sim.evaluatePartialSpringDistanceFrom(
           net, u, springIdx, linkIdx);
       },
-      R"pbdoc()pbdoc",
+      R"pbdoc(
+       Evaluate the spring distance from a specific link.
+
+       :param network: The force balance network
+       :param displacements: Current displacement vector
+       :param spring_idx: Index of the spring to evaluate
+       :param link_idx: Index of the starting link
+       :return: 3D distance vector from the specified link
+      )pbdoc",
       py::arg("network"),
       py::arg("displacements"),
       py::arg("spring_idx"),
@@ -1044,7 +1135,15 @@ A strand is a chain of connected links between two crosslinks.
          const size_t linkIdx) {
         return sim.evaluatePartialSpringDistanceTo(net, u, springIdx, linkIdx);
       },
-      R"pbdoc()pbdoc",
+      R"pbdoc(
+       Evaluate the spring distance to a specific link.
+
+       :param network: The force balance network
+       :param displacements: Current displacement vector
+       :param spring_idx: Index of the spring to evaluate
+       :param link_idx: Index of the target link
+       :return: 3D distance vector to the specified link
+      )pbdoc",
       py::arg("network"),
       py::arg("displacements"),
       py::arg("spring_idx"),
@@ -1325,13 +1424,13 @@ A strand is a chain of connected links between two crosslinks.
     .def("get_average_strand_length",
          &mehp::MEHPForceBalance::getAverageSpringLength,
          R"pbdoc(
-           Get the average length of the strands. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()`,
+           Get the average length of the strands. Note that in contrast to :meth:`~pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor`,
            this value is normalized by the number of strands rather than the number of chains.
      )pbdoc")
     .def("get_default_mean_bond_length",
          &mehp::MEHPForceBalance::getDefaultMeanBondLength,
          R"pbdoc(
-           Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for
+           Returns the value effectively used in :meth:`~pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor` for
            :math:`b` in :math:`\langle R_{0,\eta}^2 = N_{\eta} b^2\rangle`.
      )pbdoc")
     .def("get_nr_of_iterations",
@@ -1572,23 +1671,36 @@ A strand is a chain of connected links between two crosslinks.
          py::arg("link_idx"))
     .def_static("get_neighbour_link_indices",
                 &mehp::MEHPForceBalance2::getNeighbourLinkIndices,
-                R"pbdoc()pbdoc",
+                R"pbdoc(
+                 Get the indices of neighboring links for a given link.
+
+                 :param network: The force balance 2 network
+                 :param link_idx: Index of the link to find neighbors for
+                 :return: Vector of connected link indices
+                )pbdoc",
                 py::arg("network"),
                 py::arg("link_idx"))
     .def(
-      "evaluate_partial_spring_distance",
+      "evaluate_spring_vector",
       [](const mehp::MEHPForceBalance2& sim,
          const mehp::ForceBalance2Network& net,
          const Eigen::VectorXd& u,
          const size_t springIdx) {
         return sim.evaluateSpringVector(net, u, springIdx);
       },
-      R"pbdoc()pbdoc",
+      R"pbdoc(
+       Evaluate the distance vector for a specific spring.
+
+       :param network: The force balance 2 network
+       :param displacements: Current displacement vector
+       :param spring_idx: Index of the spring to evaluate
+       :return: 3D distance vector for the spring
+      )pbdoc",
       py::arg("network"),
       py::arg("displacements"),
       py::arg("spring_idx"))
     .def(
-      "evaluate_partial_spring_distance_from",
+      "evaluate_spring_vector_from",
       [](const mehp::MEHPForceBalance2& sim,
          const mehp::ForceBalance2Network& net,
          const Eigen::VectorXd& u,
@@ -1596,13 +1708,21 @@ A strand is a chain of connected links between two crosslinks.
          const size_t linkIdx) {
         return sim.evaluateSpringVectorFrom(net, u, springIdx, linkIdx);
       },
-      R"pbdoc()pbdoc",
+      R"pbdoc(
+       Evaluate the spring vector in the direction from a specific link.
+
+       :param network: The force balance 2 network
+       :param displacements: Current displacement vector
+       :param spring_idx: Index of the spring to evaluate
+       :param link_idx: Index of the starting link
+       :return: 3D distance vector from the specified link
+      )pbdoc",
       py::arg("network"),
       py::arg("displacements"),
       py::arg("spring_idx"),
       py::arg("link_idx"))
     .def(
-      "evaluate_partial_spring_distance_to",
+      "evaluate_spring_vector_to",
       [](const mehp::MEHPForceBalance2& sim,
          const mehp::ForceBalance2Network& net,
          const Eigen::VectorXd& u,
@@ -1610,7 +1730,15 @@ A strand is a chain of connected links between two crosslinks.
          const size_t linkIdx) {
         return sim.evaluateSpringVectorTo(net, u, springIdx, linkIdx);
       },
-      R"pbdoc()pbdoc",
+      R"pbdoc(
+       Evaluate the spring vector in the direction to a specific link.
+
+       :param network: The force balance 2 network
+       :param displacements: Current displacement vector
+       :param spring_idx: Index of the spring to evaluate
+       :param link_idx: Index of the target link
+       :return: 3D distance vector to the specified link
+      )pbdoc",
       py::arg("network"),
       py::arg("displacements"),
       py::arg("spring_idx"),
@@ -1726,10 +1854,10 @@ A strand is a chain of connected links between two crosslinks.
 
            :param tolerance: springs under this length are considered inactive
       )pbdoc")
-    .def("get_weighted_partial_spring_lengths",
+    .def("get_weighted_spring_lengths",
          &mehp::MEHPForceBalance2::getWeightedSpringLengths,
          R"pbdoc(
-           Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
+           Get the current spring lengths (norm of vector) divided by the spring partition times the contour length.
            )pbdoc")
     .def("get_initial_coordinates",
          &mehp::MEHPForceBalance2::getInitialCoordinates,
@@ -1797,28 +1925,28 @@ A strand is a chain of connected links between two crosslinks.
            )pbdoc",
          py::arg("direction"),
          py::arg("tolerance") = 1e-3)
-    .def("get_nr_of_active_partial_springs",
+    .def("get_nr_of_active_spring",
          &mehp::MEHPForceBalance2::getNrOfActiveSprings,
          R"pbdoc(
-           Get the number of active partial springs remaining after running the simulation.
+           Get the number of active springs remaining after running the simulation.
 
           :param tolerance: springs under this length are considered inactive
       )pbdoc",
          py::arg("tolerance") = 1e-3)
-    .def("get_current_partial_spring_vectors",
+    .def("get_current_spring_vectors",
          &mehp::MEHPForceBalance2::getCurrentSpringDistances,
          R"pbdoc(
-           Get the partial spring vectors.
+           Get the spring vectors.
       )pbdoc")
-    .def("get_current_partial_spring_lengths",
+    .def("get_current_spring_lengths",
          &mehp::MEHPForceBalance2::getCurrentSpringLengths,
          R"pbdoc(
-           Get the partial spring distances.
+           Get the spring lengths (Euclidean distances of the spring vectors).
       )pbdoc")
-    .def("get_overall_spring_lengths",
+    .def("get_overall_strand_lengths",
          &mehp::MEHPForceBalance2::getOverallSpringLengths,
          R"pbdoc(
-           Get the sum of the lengths of the partial springs of each spring.
+           Get the sum of the lengths of the springs of each strand.
       )pbdoc")
     .def("get_effective_functionality_of_atoms",
          &mehp::MEHPForceBalance2::getEffectiveFunctionalityOfAtoms,
@@ -1977,8 +2105,7 @@ A strand is a chain of connected links between two crosslinks.
                 R"pbdoc(
           Read a restart file in order to continue a simulation.
 
-          :param file: The file path to the restart file to read.
-          :type file: str
+          :param file: The file path to the restart file to read
      )pbdoc",
                 py::arg("file"))
     .def("config_restart_output",
@@ -1994,10 +2121,8 @@ A strand is a chain of connected links between two crosslinks.
                This method may not be backwards- nor forward-compatible.
                Use the same version of pylimer-tools if you want to be sure that things work.
 
-          :param file: The file path to the restart file to write.
-          :type file: str
-          :param output_every: How often to write the restart file.
-          :type output_every: int
+          :param file: The file path to the restart file to write
+          :param output_every: How often to write the restart file (default: 50000)
      )pbdoc",
          py::arg("file"),
          py::arg("output_every") = 50000)
@@ -2007,8 +2132,7 @@ A strand is a chain of connected links between two crosslinks.
           Explicitly force the writing of a restart file, now!
 
           :param file: The file path and name of the restart file to be written.
-                       Can end in .xml, .json or anything else (-> binary).
-          :type file: str
+                       Can end in .xml, .json or anything else (-> binary)
      )pbdoc",
          py::arg("file"))
 #endif
@@ -2017,7 +2141,7 @@ A strand is a chain of connected links between two crosslinks.
          R"pbdoc(
           Set which values to compute averages for.
 
-          :param values: a list of OutputConfiguration structs
+          :param values: A list of OutputConfiguration structs specifying what to average
      )pbdoc",
          py::arg("values"))
     .def("config_auto_correlator_output",
@@ -2045,20 +2169,36 @@ A strand is a chain of connected links between two crosslinks.
          py::arg("values"))
     .def("config_shift_possibility_empty",
          &dpd::DPDSimulator::configShiftPossibilityEmpty,
-         R"pbdoc()pbdoc")
+         R"pbdoc(
+          Configure the possibility of shifting to empty positions.
+
+          This setting affects Monte Carlo moves in the simulation.
+         )pbdoc",
+         py::arg("shift_possibility_empty") = true)
     .def("config_shift_one_at_a_time",
          &dpd::DPDSimulator::configShiftOneAtATime,
-         R"pbdoc()pbdoc")
+         R"pbdoc(
+          Configure whether to shift atoms one at a time.
+
+          This setting affects Monte Carlo move behavior in the simulation.
+         )pbdoc",
+         py::arg("shift_one_at_a_time") = false)
     .def("config_num_steps_mc",
          &dpd::DPDSimulator::configNumStepsMC,
          R"pbdoc(
           Configure the number of steps to do in one MC sequence.
-     )pbdoc")
+
+          :param num_steps: Number of Monte Carlo steps per sequence
+     )pbdoc",
+         py::arg("num_steps") = 500)
     .def("config_num_steps_dpd",
          &dpd::DPDSimulator::configNumStepsDPD,
          R"pbdoc(
           Configure the number of steps to do in one DPD sequence.
-     )pbdoc")
+
+          :param num_steps: Number of DPD steps per sequence
+     )pbdoc",
+         py::arg("num_steps") = 500)
     .def("config_bond_formation",
          &dpd::DPDSimulator::configBondFormation,
          R"pbdoc(
@@ -2103,8 +2243,7 @@ A strand is a chain of connected links between two crosslinks.
          R"pbdoc(
      Get a universe instance from the current coordinates (and connectivity).
 
-     :param with_slipsprings: Whether to include slip-springs in the returned universe.
-     :type with_slipsprings: bool
+     :param with_slipsprings: Whether to include slip-springs in the returned universe (default: True)
     )pbdoc",
          py::arg("with_slipsprings") = true)
     .def("refresh_current_state",
@@ -2113,8 +2252,20 @@ A strand is a chain of connected links between two crosslinks.
           After re-configuring the force-field parameters,
           this method should be called to update the current stress tensor etc.
      )pbdoc")
-    .def("get_timestep", &dpd::DPDSimulator::getTimestep)
-    .def("get_current_timestep", &dpd::DPDSimulator::getCurrentTimestep)
+    .def("get_timestep",
+         &dpd::DPDSimulator::getTimestep,
+         R"pbdoc(
+          Get the timestep used in the simulation.
+
+          :return: The simulation timestep value
+         )pbdoc")
+    .def("get_current_timestep",
+         &dpd::DPDSimulator::getCurrentTimestep,
+         R"pbdoc(
+          Get the current timestep number.
+
+          :return: The current timestep index
+         )pbdoc")
     .def("get_temperature", &dpd::DPDSimulator::getTemperature)
     .def("get_bond_lengths", &dpd::DPDSimulator::getBondLengths)
     .def("get_coordinates", &dpd::DPDSimulator::getCoordinates)
@@ -2139,13 +2290,24 @@ A strand is a chain of connected links between two crosslinks.
           Explicitly force the writing of a restart file, now!
 
           :param file: The file path and name of the restart file to be written.
-                       Can end in .xml, .json or anything else (-> binary).
-          :type file: str
+                       Can end in .xml, .json or anything else (-> binary)
      )pbdoc",
          py::arg("file"))
 #endif
-    .def("validate_neighbour_list", &dpd::DPDSimulator::validateNeighbourlist)
-    .def("validate_state", &dpd::DPDSimulator::validateState);
+    .def("validate_neighbour_list",
+         &dpd::DPDSimulator::validateNeighbourlist,
+         R"pbdoc(
+          Validate the neighbor list consistency.
+
+          :return: True if the neighbor list is valid
+         )pbdoc")
+    .def("validate_state",
+         &dpd::DPDSimulator::validateState,
+         R"pbdoc(
+          Validate the current simulation state.
+
+          :return: True if the simulation state is valid
+         )pbdoc");
 }
 
 #endif /* PYBIND_CALC_H */

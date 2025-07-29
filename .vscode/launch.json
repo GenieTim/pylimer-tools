@@ -63,9 +63,10 @@
       "request": "launch",
       "program": "${file}",
       "args": [
-        "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/tests/pylimer_tools/fixtures/tmp/mc_own-si_pdms_crosslinked_melt_2590_a_221_2410_monoa_271_r_1.44_wsol_0.278_f_4_v_1.structure.out"
+        // "/Users/timbernhard/Privat/Programming/OpenSource-Contributions/pylimer-tools/tests/pylimer_tools/fixtures/tmp/mc_own-si_pdms_crosslinked_melt_2590_a_221_2410_monoa_271_r_1.44_wsol_0.278_f_4_v_1.structure.out"
       ],
       "console": "integratedTerminal",
+      "justMyCode": false,
       "env": {
         "PYTHONDONTWRITEBYTECODE": "1",
         "PYTHONUNBUFFERED": "1"

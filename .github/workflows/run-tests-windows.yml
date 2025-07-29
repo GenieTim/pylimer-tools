@@ -51,6 +51,11 @@ jobs:
 
       - name: Build
         run: pip install . --verbose
+        env:
+          CI: true
+          CMAKE_BUILD_TYPE: Release
 
       - name: Run Tests
         run: python -m coverage run -m unittest discover -v
+        env:
+          CI: true

@@ -54,11 +54,14 @@ jobs:
 
       - name: Build
         run: python -m build --wheel
+        env:
+          CI: true
+          CMAKE_BUILD_TYPE: Release
 
       - name: Store the build
         uses: actions/upload-artifact@v4
         with:
-          name: python-package-distributions
+          name: python-package-distributions-windows-${{ matrix.python-version }}
           path: dist
           retention-days: 3
 
@@ -69,6 +72,8 @@ jobs:
       matrix:
         python-version:
           # NOTE: https://github.com/MacPython/wiki/wiki/Spinning-wheels
+          - "3.12"
+          - "3.11"
           - "3.10"
           - 3.9
           - 3.8
@@ -107,11 +112,14 @@ jobs:
 
       - name: Build
         run: ./bin/build-wheel.sh
+        env:
+          CI: true
+          CMAKE_BUILD_TYPE: Release
 
       - name: Store the build
         uses: actions/upload-artifact@v4
         with:
-          name: python-package-distributions
+          name: python-package-distributions-macos-${{ matrix.python-version }}
           path: dist
           retention-days: 3
 
@@ -147,6 +155,9 @@ jobs:
           pip install pyodide-build==0.26.2
           python3 bin/fix_pyodide_build.py
           pyodide build
+        env:
+          CI: true
+          CMAKE_BUILD_TYPE: Release
 
       - name: Setup upterm session
         uses: lhotari/action-upterm@v1
@@ -187,9 +198,9 @@ jobs:
             ./vendor/cereal
             ./vendor/cereal-skbuild
             ./_skbuild
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-3.10-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+            ${{ runner.os }}-pip-3.10-
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
@@ -200,11 +211,14 @@ jobs:
           python-versions: "cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311 cp312-cp312"
           build-requirements: "cython numpy scikit-build pybind11 cmake ninja wheel"
           system-packages: "cmake bison flex libomp libopenblas-dev"
+        env:
+          CI: true
+          CMAKE_BUILD_TYPE: Release
 
       - name: Store the build
         uses: actions/upload-artifact@v4
         with:
-          name: python-package-distributions
+          name: python-package-distributions-linux
           path: dist
           retention-days: 3
 
@@ -228,11 +242,14 @@ jobs:
 
       - name: Build Sdist
         run: ./bin/build-sdist.sh
+        env:
+          CI: true
+          CMAKE_BUILD_TYPE: Release
 
       - name: Store the build
         uses: actions/upload-artifact@v4
         with:
-          name: python-package-distributions
+          name: python-package-distributions-sdist
           path: dist
           retention-days: 3
 
@@ -242,13 +259,34 @@ jobs:
     needs:
       - build-windows
       - build-osx
+      # - build_wheel_wasm
       - build-linux
       - build-sdist
     steps:
-      - name: Download all the dists
+      - name: Download Windows artifacts
         uses: actions/download-artifact@v4.1.7
         with:
-          name: python-package-distributions
+          pattern: python-package-distributions-windows-*
+          path: dist/
+          merge-multiple: true
+          
+      - name: Download macOS artifacts  
+        uses: actions/download-artifact@v4.1.7
+        with:
+          pattern: python-package-distributions-macos-*
+          path: dist/
+          merge-multiple: true
+          
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: python-package-distributions-linux
+          path: dist/
+          
+      - name: Download sdist artifacts
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: python-package-distributions-sdist
           path: dist/
       - name: List and delete invalid packages
         run: |
@@ -267,6 +305,7 @@ jobs:
     needs:
       - build-windows
       - build-osx
+      # - build_wheel_wasm
       - build-linux
       - build-sdist
 
@@ -297,10 +336,36 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Download all the dists
+      - name: Download Windows artifacts
         uses: actions/download-artifact@v4.1.7
         with:
-          name: python-package-distributions
+          pattern: python-package-distributions-windows-*
+          path: dist/
+          merge-multiple: true
+          
+      - name: Download macOS artifacts  
+        uses: actions/download-artifact@v4.1.7
+        with:
+          pattern: python-package-distributions-macos-*
+          path: dist/
+          merge-multiple: true
+          
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: python-package-distributions-linux
+          path: dist/
+          
+      # - name: Download WASM artifacts
+      #   uses: actions/download-artifact@v4.1.7
+      #   with:
+      #     name: wheels-wasm
+      #     path: dist/
+          
+      - name: Download sdist artifacts
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: python-package-distributions-sdist
           path: dist/
 
       - name: Upload Release

@@ -13,15 +13,19 @@ and no repeated sampling of the polydispersity distribution nor entanglements.
 
 import math
 import random
+
 import matplotlib.pyplot as plt
-from pylimer_tools_cpp import MCUniverseGenerator, MEHPForceBalance2
 import numpy as np
 
-from pylimer_tools.io.bead_spring_parameter_provider import get_parameters_for_polymer
-from pylimer_tools_cpp import MCUniverseGenerator
+from pylimer_tools.io.bead_spring_parameter_provider import (
+    ParameterType,
+    get_parameters_for_polymer,
+)
+from pylimer_tools_cpp import MCUniverseGenerator, MEHPForceBalance2
 
 # Get parameters for PDMS polymer density and bead distance
-params = get_parameters_for_polymer("PDMS")
+params = get_parameters_for_polymer(
+    "PDMS", parameter_type=ParameterType.GAUSSIAN)
 
 # setup strand lengths
 n_strands = 10000
@@ -55,7 +59,9 @@ for d in polydispersity:
     generator.set_bead_distance(
         params.get("<b>").to(params.get("distance_units")).magnitude
     )
-    generator.add_strands(nr_of_strands=n_strands, strand_lengths=strand_lengths)
+    generator.add_strands(
+        nr_of_strands=n_strands,
+        strand_lengths=strand_lengths)
     # 4-functional crosslinkers
     generator.add_crosslinkers(int(0.5 * n_strands), 4)
     generator.link_strands_to_conversion(
@@ -77,7 +83,8 @@ for d in polydispersity:
 
     # apply conversion factors, measure resulting shear modulus
     r02_slope = params.get("R02")
-    r02_slope_magnitude = r02_slope.to(params.get("distance_units") ** 2).magnitude
+    r02_slope_magnitude = r02_slope.to(
+        params.get("distance_units") ** 2).magnitude
     kbt = params.get("T") * params.get("kb")
     gamma_conversion_factor = (
         (kbt / ((params.get("distance_units")) ** 3)).to("MPa").magnitude

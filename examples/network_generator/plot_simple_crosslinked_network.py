@@ -6,7 +6,8 @@ Simple Crosslinked Network
 Here's a minimal example of creating a crosslinked polymer network:
 """
 
-from pylimer_tools_cpp import MCUniverseGenerator
+import os
+from pylimer_tools_cpp import DataFileWriter, MCUniverseGenerator
 
 # Create generator for a 50x50x50 simulation box
 generator = MCUniverseGenerator(50.0, 50.0, 50.0)
@@ -38,3 +39,11 @@ universe = generator.get_universe()
 universe.set_masses({1: 1.0, 2: 2.0})
 
 print(f"Generated network with {universe.get_nr_of_atoms()} atoms")
+
+# Save the universe to a file
+writer = DataFileWriter(universe)
+
+if not os.path.exists("generated_structures"):
+    os.makedirs("generated_structures")
+
+writer.write_to_file("generated_structures/simple_crosslinked_network.data")

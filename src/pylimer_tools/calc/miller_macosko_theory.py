@@ -322,7 +322,7 @@ def compute_weight_fraction_of_soluble_material(
     :param weight_fractions: a dictionary with key: type, and value: weight fraction of type.
             Pass if you want to omit the network.
     :param functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
-          See: :func:`~pylimer_tools_cpp.Universe.determine_functionality_per_type`.
+          See: :meth:`~pylimer_tools_cpp.Universe.determine_functionality_per_type`.
     :param r: The stoichiometric imbalance
     :param p: The extent of reaction in terms of the crosslinkers
     :param b2: The mole fraction of reactive sites in B2 among all reactive sites

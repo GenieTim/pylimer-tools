@@ -38,56 +38,110 @@ init_pylimer_bound_calc(py::module_& m)
          Initialize the NormalModeAnalyzer with the bonds (edges).
 
          Constructs the connectivity matrix from the given edges.
-  )pbdoc",
+         
+         :param spring_from: Vector of starting node indices for springs/bonds
+         :param spring_to: Vector of ending node indices for springs/bonds
+         )pbdoc",
          py::arg("spring_from"),
          py::arg("spring_to"))
     .def("get_matrix_size",
          &NormalModeAnalyzer::getMatrixSize,
-         "Get the size of the matrix (the maximum of eigenvalues that could be "
-         "queried)")
+         R"pbdoc(
+         Get the size of the matrix (the maximum number of eigenvalues that could be queried).
+         
+         :return: Size of the connectivity matrix
+         )pbdoc")
     .def("get_matrix",
          &NormalModeAnalyzer::getAssembledConnectivityMatrix,
-         "Get the assembled connectivity matrix.")
+         R"pbdoc(
+         Get the assembled connectivity matrix.
+         
+         :return: The connectivity matrix
+         )pbdoc")
     .def("find_sparse_eigenvalues",
          &NormalModeAnalyzer::findSparseEigenvalues,
-         "Find the `k` smallest eigenvalues using a sparse solver",
+         R"pbdoc(
+         Find the k smallest eigenvalues using a sparse solver.
+         
+         :param nr_of_eigenvalues: Number of smallest eigenvalues to find
+         :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
+         :return: True if computation was successful
+         )pbdoc",
          py::arg("nr_of_eigenvalues"),
          py::arg("compute_eigenvectors") = false)
     .def("find_all_eigenvalues",
          &NormalModeAnalyzer::computeAllEigenvalues,
-         "Find all eigenvalues using a dense solver",
+         R"pbdoc(
+         Find all eigenvalues using a dense solver.
+         
+         :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
+         :return: True if computation was successful
+         )pbdoc",
          py::arg("compute_eigenvectors") = false)
     .def("get_eigenvalues",
          &NormalModeAnalyzer::getEigenvalues,
-         "Get the eigenvalues")
+         R"pbdoc(
+         Get the eigenvalues.
+         
+         :return: Vector of eigenvalues
+         )pbdoc")
     .def("set_eigenvalues",
          &NormalModeAnalyzer::setEigenvalues,
-         "Set the eigenvalues, e.g. if you use an external solver",
+         R"pbdoc(
+         Set the eigenvalues, e.g. if you use an external solver.
+         
+         :param eigenvalues: Vector of eigenvalues to set
+         )pbdoc",
          py::arg("eigenvalues"))
     .def("get_eigenvectors",
          &NormalModeAnalyzer::getEigenvectors,
-         "Get eigenvectors")
+         R"pbdoc(
+         Get eigenvectors.
+         
+         :return: Matrix of eigenvectors
+         )pbdoc")
     .def("set_eigenvectors",
          &NormalModeAnalyzer::setEigenvectors,
-         "Set eigenvectors, e.g. if you use an external solver",
+         R"pbdoc(
+         Set eigenvectors, e.g. if you use an external solver.
+         
+         :param eigenvectors: Matrix of eigenvectors to set
+         )pbdoc",
          py::arg("eigenvectors"))
     .def("evaluate_stress_autocorrelation",
          &NormalModeAnalyzer::evaluateStressAutocorrelation,
-         "Evaluate stress autocorrelation",
+         R"pbdoc(
+         Evaluate stress autocorrelation :math:`C(t)`.
+         
+         :param t: The time at which to evaluate the stress autocorrelation
+         :return: Stress autocorrelation values
+         )pbdoc",
          py::arg("t"))
     .def("evaluate_storage_modulus",
          &NormalModeAnalyzer::evaluateStorageModulus,
-         "Evaluate the storage modulus :math:`G'`. Yet misses the conversion "
-         "factor.",
+         R"pbdoc(
+         Evaluate the storage modulus :math:`G'(\omega)`. Yet misses the conversion factor.
+         
+         :param omega: Angular frequencies
+         :return: Storage modulus values
+         )pbdoc",
          py::arg("omega"))
     .def("evaluate_loss_modulus",
          &NormalModeAnalyzer::evaluateLossModulus,
-         "Evaluate the loss modulus :math:`G''`. Yet misses the conversion "
-         "factor.",
+         R"pbdoc(
+         Evaluate the loss modulus :math:`G''(\omega)`. Yet misses the conversion factor.
+         
+         :param omega: Angular frequencies
+         :return: Loss modulus values
+         )pbdoc",
          py::arg("omega"))
     .def("get_nr_of_soluble_clusters",
          &NormalModeAnalyzer::getNrOfSolubleClusters,
-         "Get the number of soluble clusters (Eigenvalues = 0)")
+         R"pbdoc(
+         Get the number of soluble clusters (eigenvalues = 0).
+         
+         :return: Number of soluble clusters
+         )pbdoc")
 #ifdef CEREALIZABLE
     .def(py::pickle(
       [](const NormalModeAnalyzer& u) {

@@ -111,29 +111,50 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("update_mean_squared") = true)
     .def("get_mean_bead_distance",
          &MCUniverseGenerator::getConfiguredBeadDistance,
-         "Get the currently configured mean bead distance.")
+         R"pbdoc(
+          Get the currently configured mean bead distance.
+
+          :return: The currently configured mean distance between beads
+         )pbdoc")
     .def("set_mean_squared_bead_distance",
          &MCUniverseGenerator::setMeanSquaredBeadDistance,
-         R"pbdoc(Set the mean squared distance between beads.
-         :param mean_squared_distance: Mean squared distance between beads.
-         :param update_mean: Whether to update the mean bead distance as well, deduced from the assumed gaussian distribution in 3D (default: true).
+         R"pbdoc(
+          Set the mean squared distance between beads.
+
+          :param mean_squared_distance: Mean squared distance between beads
+          :param update_mean: Whether to update the mean bead distance as well, deduced from the assumed gaussian distribution in 3D (default: true)
          )pbdoc",
          py::arg("mean_squared_distance"),
          py::arg("update_mean") = true)
     .def("get_mean_squared_bead_distance",
          &MCUniverseGenerator::getConfiguredMeanSquaredBeadDistance,
-         "Get the currently configured mean squared bead distance.")
+         R"pbdoc(
+          Get the currently configured mean squared bead distance.
+
+          :return: The currently configured mean squared distance between beads
+         )pbdoc")
     .def("get_nr_of_atoms",
          &MCUniverseGenerator::getCurrentNrOfAtoms,
-         "Get the current number of atoms that the universe would/will have.")
+         R"pbdoc(
+          Get the current number of atoms that the universe would/will have.
+
+          :return: Number of atoms in the generated universe
+         )pbdoc")
     .def("get_nr_of_bonds",
          &MCUniverseGenerator::getCurrentNrOfBonds,
-         "Get the current number of bonds that the universe would/will have.")
-    .def(
-      "config_nr_of_mc_steps",
-      &MCUniverseGenerator::configNrOfMCSteps,
-      "Set the number of Monte-Carlo steps during bond length equilibration.",
-      py::arg("n_steps") = 2000)
+         R"pbdoc(
+          Get the current number of bonds that the universe would/will have.
+
+          :return: Number of bonds in the generated universe
+         )pbdoc")
+    .def("config_nr_of_mc_steps",
+         &MCUniverseGenerator::configNrOfMCSteps,
+         R"pbdoc(
+       Set the number of Monte-Carlo steps during bond length equilibration.
+
+       :param n_steps: Number of MC steps to perform (default: 2000)
+      )pbdoc",
+         py::arg("n_steps") = 2000)
     .def("config_primary_loop_probability",
          &MCUniverseGenerator::configPrimaryLoopProbability,
          R"pbdoc(

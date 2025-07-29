@@ -2447,6 +2447,9 @@ Universe::getNetworkOfCrosslinker(const int crossLinkerType) const
 /**
  * @brief Combine vertices along a bond, for a certain bond type.
  *
+ * This function replaces two vertices that are connected by an edge of the type
+ * `bondType` with a single vertex.
+ *
  * @param bondType
  * @return Universe
  */
@@ -2464,50 +2467,114 @@ Universe::contractVerticesAlongBondType(const int bondType) const
   igraph_vector_int_init(&edgesToCopy, 0);
   while (lastRoundDidRemove) {
     lastRoundDidRemove = false;
-    for (igraph_integer_t edgeIdx = igraph_ecount(&result.graph) - 1;
-         edgeIdx >= 0;
-         --edgeIdx) {
+
+    // Collect all operations to batch them
+    std::vector<igraph_integer_t> edgesToAdd;
+    std::vector<std::pair<igraph_integer_t, igraph_integer_t>>
+      edgePropertyCopyPairs; // (old_edge, new_edge_offset)
+    std::vector<igraph_integer_t> edgesToDelete;
+    std::vector<igraph_integer_t> verticesToDelete;
+    std::vector<bool> vertexAffectedThisIteration =
+      pylimer_tools::utils::initializeWithValue<bool>(
+        igraph_vcount(&result.graph), false);
+
+    for (igraph_integer_t edgeIdx = 0; edgeIdx < igraph_ecount(&result.graph);
+         ++edgeIdx) {
       if (result.getEdgePropertyValue<int>("type", edgeIdx) == bondType) {
         lastRoundDidRemove = true;
-        // merge the two vertices connected by this edge
+
         igraph_integer_t vertex1OfEdge;
         igraph_integer_t vertex2OfEdge;
         REQUIRE_IGRAPH_SUCCESS(
           igraph_edge(&result.graph, edgeIdx, &vertex1OfEdge, &vertex2OfEdge));
+
+        if (vertexAffectedThisIteration[vertex1OfEdge] ||
+            vertexAffectedThisIteration[vertex2OfEdge]) {
+          // This vertex was already processed in this round, skip it
+          continue;
+        }
+
+        vertexAffectedThisIteration[vertex1OfEdge] = true;
+        vertexAffectedThisIteration[vertex2OfEdge] = true;
+
         if (vertex1OfEdge == vertex2OfEdge) {
-          // no need to merge, the vertices are the same already
-          REQUIRE_IGRAPH_SUCCESS(
-            igraph_delete_edges(&result.graph, igraph_ess_1(edgeIdx)));
+          // Self-loop case
+          edgesToDelete.push_back(edgeIdx);
         } else {
+          // Get incident edges of vertex1 to redirect to vertex2
           REQUIRE_IGRAPH_SUCCESS(igraph_incident(
             &result.graph, &edgesToCopy, vertex1OfEdge, IGRAPH_ALL));
+
           for (size_t i = 0; i < igraph_vector_int_size(&edgesToCopy); ++i) {
             igraph_integer_t edgeToCopy = VECTOR(edgesToCopy)[i];
             if (edgeToCopy != edgeIdx) {
-              REQUIRE_IGRAPH_SUCCESS(igraph_add_edge(
-                &result.graph,
-                vertex2OfEdge,
-                IGRAPH_OTHER(&result.graph, edgeToCopy, vertex1OfEdge)));
-              // copy edge properties
-              pylimer_tools::utils::copyEdgeProperties(
-                &result.graph,
-                edgeToCopy,
-                &result.graph,
-                igraph_ecount(&result.graph) - 1,
-                edgeProperties);
-              // -> this is the reason why we have the while loop, as it may
-              // result in edges (that are deleted afterwards) being new,
-              // having a higher index
+              // Add new edge from vertex2 to the other end
+              igraph_integer_t otherVertex =
+                IGRAPH_OTHER(&result.graph, edgeToCopy, vertex1OfEdge);
+              edgesToAdd.push_back(vertex2OfEdge);
+              edgesToAdd.push_back(otherVertex);
+
+              vertexAffectedThisIteration[otherVertex] = true;
+
+              // Record which edge properties to copy later
+              edgePropertyCopyPairs.emplace_back(edgeToCopy,
+                                                 (edgesToAdd.size() / 2) - 1);
             }
           }
-          REQUIRE_IGRAPH_SUCCESS(
-            igraph_delete_vertices(&result.graph, igraph_vss_1(vertex1OfEdge)));
-          edgeIdx = std::min(edgeIdx, igraph_ecount(&result.graph) - 1);
+
+          edgesToDelete.push_back(edgeIdx);
+          verticesToDelete.push_back(vertex1OfEdge);
         }
       }
     }
+
+    if (!lastRoundDidRemove) {
+      break;
+    }
+
+    // Batch add all new edges at once
+    if (!edgesToAdd.empty()) {
+      igraph_vector_int_t newEdgesVec;
+      igraph_vector_int_init(&newEdgesVec, edgesToAdd.size());
+      pylimer_tools::utils::StdVectorToIgraphVectorT(edgesToAdd, &newEdgesVec);
+
+      igraph_integer_t edgeCountBefore = igraph_ecount(&result.graph);
+      REQUIRE_IGRAPH_SUCCESS(
+        igraph_add_edges(&result.graph, &newEdgesVec, nullptr));
+
+      // Copy edge properties for all new edges
+      for (const auto& copyPair : edgePropertyCopyPairs) {
+        igraph_integer_t newEdgeIdx = edgeCountBefore + copyPair.second;
+        pylimer_tools::utils::copyEdgeProperties(&result.graph,
+                                                 copyPair.first,
+                                                 &result.graph,
+                                                 newEdgeIdx,
+                                                 edgeProperties);
+      }
+
+      igraph_vector_int_destroy(&newEdgesVec);
+    }
+
+    // Batch delete vertices (this also removes incident edges)
+    if (!verticesToDelete.empty()) {
+      // Sort and remove duplicates
+      std::sort(verticesToDelete.begin(), verticesToDelete.end());
+      verticesToDelete.erase(
+        std::unique(verticesToDelete.begin(), verticesToDelete.end()),
+        verticesToDelete.end());
+
+      igraph_vector_int_t verticesToDeleteVec;
+      igraph_vector_int_init(&verticesToDeleteVec, verticesToDelete.size());
+      for (size_t i = 0; i < verticesToDelete.size(); ++i) {
+        VECTOR(verticesToDeleteVec)[i] = verticesToDelete[i];
+      }
+
+      REQUIRE_IGRAPH_SUCCESS(igraph_delete_vertices(
+        &result.graph, igraph_vss_vector(&verticesToDeleteVec)));
+
+      igraph_vector_int_destroy(&verticesToDeleteVec);
+    }
   }
-  igraph_vector_int_destroy(&edgesToCopy);
 
   result.NAtoms = igraph_vcount(&result.graph);
   result.NBonds = igraph_ecount(&result.graph);

@@ -55,6 +55,9 @@ extensions = [
 
 bibtex_bibfiles = ["references.bib"]
 
+# Enable nitpicky mode to warn about missing references
+nitpicky = True
+
 # Configuration for specific extensions
 # napoleon settings
 napoleon_google_docstring = True
