@@ -16,7 +16,7 @@ generator = MCUniverseGenerator(45, 45, 45)
 universe = generator.get_universe()
 
 # Create output directory
-output_dir = Path("generated_networks")
+output_dir = Path("generated_structures")
 output_dir.mkdir(exist_ok=True)
 
 # Write LAMMPS data file

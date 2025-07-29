@@ -3,12 +3,13 @@ import warnings
 
 from pint import Quantity, UnitRegistry
 
-from pylimer_tools.io.unit_styles import UnitStyle, UnitStyleFactory
 from pylimer_tools.io.bead_spring_parameter_provider import (
     Parameters,
+    ParameterType,
     get_parameters_for_polymer,
     get_supported_polymer_names,
 )
+from pylimer_tools.io.unit_styles import UnitStyle, UnitStyleFactory
 
 
 class UnitStyleTest(unittest.TestCase):
@@ -95,10 +96,9 @@ class UnitStyleTest(unittest.TestCase):
                          1 * unit_style.get_base_unit_of("mass"))
 
     def test_get_parameters_for_polymer(self):
-        for polymer_name in get_supported_polymer_names():
-            params = get_parameters_for_polymer(polymer_name)
-            self.assertIsInstance(params, Parameters)
-            self.assertEqual(params.get_name(), "si-" + polymer_name)
+        self.assertTrue(len(get_supported_polymer_names()) > 10)
+
+        def check_parameter_types(params: Parameters):
             self.assertIsInstance(params.get_unit_registry(), UnitRegistry)
             self.assertIsInstance(params.get("distance_units"), Quantity)
             self.assertIsInstance(params.get_bead_density(), float)
@@ -110,12 +110,45 @@ class UnitStyleTest(unittest.TestCase):
             self.assertIsInstance(
                 params.get_gamma_conversion_factor(), Quantity)
 
+        # test the Kremer-Grest/Lennard-Jones parameters
+        for polymer_name in get_supported_polymer_names():
+            params = get_parameters_for_polymer(
+                polymer_name=polymer_name, parameter_type=ParameterType.KG_LJ
+            )
+            self.assertIsInstance(params, Parameters)
+            self.assertEqual(params.get_name(), "kg-lj-" + polymer_name)
+            check_parameter_types(params)
+
+        # test the kuhn parameters
+        for polymer_name in get_supported_polymer_names():
+            params = get_parameters_for_polymer(
+                polymer_name=polymer_name, parameter_type=ParameterType.KUHN
+            )
+            self.assertIsInstance(params, Parameters)
+            self.assertEqual(params.get_name(), "kuhn-si-" + polymer_name)
+            check_parameter_types(params)
+
+        # test the gaussian parameters
+        for polymer_name in get_supported_polymer_names():
+            params = get_parameters_for_polymer(
+                polymer_name, parameter_type=ParameterType.GAUSSIAN
+            )
+            self.assertIsInstance(params, Parameters)
+            self.assertEqual(params.get_name(), "si-" + polymer_name)
+            check_parameter_types(params)
+
     def test_get_polymer_names(self):
         polymer_names = get_supported_polymer_names()
         self.assertGreater(len(polymer_names), 0)
         for name in polymer_names:
             self.assertIsInstance(name, str)
             self.assertGreater(len(name), 0)
-            params = get_parameters_for_polymer(name)
+            params = get_parameters_for_polymer(
+                name, parameter_type=ParameterType.GAUSSIAN
+            )
             self.assertIsInstance(params, Parameters)
             self.assertEqual(params.get_name(), "si-" + name)
+
+
+if __name__ == "__main__":
+    unittest.main()

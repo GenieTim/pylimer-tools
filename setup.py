@@ -13,14 +13,27 @@ from setuptools.command.build_ext import build_ext
 
 VERSION = "0.2.4"
 
-# "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
+# ==============================================================================
+# CMake Build Configuration
+# ==============================================================================
+
+# Default to Release build for better performance
+# Use RelWithDebInfo for debugging while maintaining reasonable performance
+default_build_type = "Release"
+build_type = os.environ.get("CMAKE_BUILD_TYPE", default_build_type)
+
 cmake_args = [
-    "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
-    "-Dvendor_suffix=-skbuild-{}".format(platform.system()),
+    f"-DCMAKE_BUILD_TYPE={build_type}",
+    f"-Dvendor_suffix=-skbuild-{platform.system()}",
+    "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",  # For IDE support
 ]
-# cmake_args = ["-Digraph_DEBUG=ON", "-DCMAKE_FIND_DEBUG_MODE=ON"]
+
+# Add any user-specified CMake arguments
 if os.environ.get("CMAKE_ARGS"):
     cmake_args.extend(os.environ.get("CMAKE_ARGS", "").split())
+
+print(f"Building with CMake build type: {build_type}")
+print(f"Using {multiprocessing.cpu_count()} parallel jobs")
 
 if os.getenv("VCPKG_ROOT"):
     toolchain_file = os.path.join(
@@ -194,6 +207,10 @@ class CMakeBuild(build_ext):
                             "-GNinja",
                             f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}",
                         ]
+                        using_ninja = True
+                        print(
+                            "Using Ninja generator (parallelization handled automatically)"
+                        )
                     except (
                         ImportError,
                         subprocess.CalledProcessError,
@@ -234,19 +251,22 @@ class CMakeBuild(build_ext):
             if archs:
                 cmake_args += ["-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))]
 
-        # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
-        # across all generators.
-        if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
-            # self.parallel is a Python 3 only way to set parallel jobs by hand
-            # using -j in the build_ext call, not supported by pip or
-            # PyPA-build.
+        # Handle parallelization settings with clear priority to avoid conflicts:
+        # 1. CMAKE_BUILD_PARALLEL_LEVEL (as an environment variable)
+        # 2. User's self.parallel setting
+        # 3. The number of CPU cores available
+        if not os.environ.get("CMAKE_BUILD_PARALLEL_LEVEL"):
             if hasattr(self, "parallel") and self.parallel:
-                # CMake 3.12+ only.
-                build_args += [f"-j{self.parallel}"]
-            elif multiprocessing.cpu_count() > 2:
-                # find the number of CPUs for parallel build
-                build_args += [f"-j{multiprocessing.cpu_count()-1}"]
+                parallel_level = self.parallel
+            else:
+                parallel_level = min(1, multiprocessing.cpu_count())
+            if parallel_level > 1:
+                # Set the CMake variable for parallel builds
+                cmake_args.append(f"-DCMAKE_BUILD_PARALLEL_LEVEL={parallel_level}")
+                os.environ["CMAKE_BUILD_PARALLEL_LEVEL"] = str(parallel_level)
+                print(f"Using CMAKE_BUILD_PARALLEL_LEVEL={parallel_level}")
 
+        # Actually run CMake
         subprocess.run(
             ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True
         )

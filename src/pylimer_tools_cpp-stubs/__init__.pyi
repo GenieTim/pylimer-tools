@@ -19,7 +19,7 @@ __all__ = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'Box',
 class Atom:
     """
     
-           A single bead or atom
+           A single bead or atom.
       
     """
     __hash__: typing.ClassVar[None] = None
@@ -27,19 +27,34 @@ class Atom:
         ...
     def __getstate__(self) -> tuple:
         ...
+    @typing.overload
     def __init__(self, id: int, type: int, x: float, y: float, z: float, nx: int, ny: int, nz: int) -> None:
         """
-                 Construct this atom
+                 Construct this atom.
         
-                 Parameters:
-                     id: Unique identifier for the atom
-                     type: Type classification of the atom
-                     x: X coordinate position
-                     y: Y coordinate position  
-                     z: Z coordinate position
-                     nx: Periodic image flag in x direction
-                     ny: Periodic image flag in y direction
-                     nz: Periodic image flag in z direction
+                 :param id: Unique identifier for the atom
+                 :param type: Type classification of the atom
+                 :param x: X coordinate position
+                 :param y: Y coordinate position  
+                 :param z: Z coordinate position
+                 :param nx: Periodic image flag in x direction
+                 :param ny: Periodic image flag in y direction
+                 :param nz: Periodic image flag in z direction
+        """
+    @typing.overload
+    def __init__(self, properties: dict[str, float]) -> None:
+        """
+                 Construct this atom from a properties dictionary.
+        
+                 The dictionary should contain at least the following keys:
+                 - "id": Unique identifier for the atom
+                 - "type": Type classification of the atom  
+                 - "x", "y", "z": Coordinate positions
+                 - "nx", "ny", "nz": Periodic image flags
+                 
+                 Any additional properties will be stored as extra data.
+        
+                 :param properties: Dictionary containing atom properties
         """
     def __setstate__(self, arg0: tuple) -> None:
         """
@@ -48,67 +63,144 @@ class Atom:
     def compute_vector_to(self, to_atom: Atom, pbc_box: Box) -> numpy.ndarray:
         """
                     Compute the vector to another atom.
+                    
+                    :param to_atom: The target atom
+                    :param pbc_box: The periodic boundary conditions box
+                    :return: Vector pointing from this atom to the target atom
         """
     def distance_to(self, to_atom: Atom, pbc_box: Box) -> float:
         """
                     Compute the distance to another atom.
+                    
+                    :param to_atom: The target atom
+                    :param pbc_box: The periodic boundary conditions box
+                    :return: Euclidean distance between the atoms
         """
     def distance_to_unwrapped(self, arg0: Atom, arg1: Box) -> float:
         """
-        Compute the distance to another atom respecting the periodic image flag.
+                 Compute the distance to another atom respecting the periodic image flags.
+                 
+                 :param to_atom: The target atom
+                 :return: Unwrapped distance to the target atom
         """
     def get_coordinates(self) -> numpy.ndarray:
         """
                  Get the coordinates of this atom as a vector.
                  
-                 Returns:
-                     A vector containing the x, y, z coordinates
+                 :return: A vector containing the x, y, z coordinates
+        """
+    def get_extra_data(self) -> dict[str, float]:
+        """
+                 Get all extra data properties stored with this atom (e.g., charge, dipole, etc.).
+                 
+                 :return: Dictionary containing all extra properties
         """
     def get_id(self) -> int:
         """
-                    Get the id of the atom.
+                    Get the ID of the atom.
+                    
+                    :return: The atom's unique identifier
         """
     def get_nx(self) -> int:
         """
-        Get the box image that the atom is in in x direction (also known as `ix` or `nx`).
+                 Get the box image that the atom is in in x direction (also known as `ix` or `nx`).
+                 
+                 :return: The periodic image flag in x direction
         """
     def get_ny(self) -> int:
         """
-        Get the box image that the atom is in in y direction (also known as `iy` or `ny`).
+                 Get the box image that the atom is in in y direction (also known as `iy` or `ny`).
+                 
+                 :return: The periodic image flag in y direction
         """
     def get_nz(self) -> int:
         """
-        Get the box image that the atom is in in z direction (also known as `iz` or `nz`).
+                 Get the box image that the atom is in in z direction (also known as `iz` or `nz`).
+                 
+                 :return: The periodic image flag in z direction
+        """
+    def get_property(self, property: str) -> float:
+        """
+                 Get a specific property value from the extra data.
+                 
+                 :param property: The name of the property to retrieve
+                 :return: The value of the specified property
+                 :raises: std::out_of_range if the property doesn't exist
         """
     def get_type(self) -> int:
         """
                     Get the type of the atom.
+                    
+                    :return: The atom's type classification
         """
     def get_unwrapped_coordinates(self, arg0: Box) -> numpy.ndarray:
         """
                  Get the unwrapped coordinates of this atom.
                  
-                 Parameters:
-                     box: The simulation box to use for unwrapping
-                     
-                 Returns:
-                     A vector containing the unwrapped x, y, z coordinates
+                 :param box: The simulation box to use for unwrapping
+                 :return: A vector containing the unwrapped x, y, z coordinates
+        """
+    def get_unwrapped_x(self, box: Box) -> float:
+        """
+                 Get the unwrapped x coordinate of the atom.
+                 
+                 :param box: The simulation box to use for unwrapping
+                 :return: The unwrapped x coordinate
+        """
+    def get_unwrapped_y(self, box: Box) -> float:
+        """
+                 Get the unwrapped y coordinate of the atom.
+                 
+                 :param box: The simulation box to use for unwrapping
+                 :return: The unwrapped y coordinate
+        """
+    def get_unwrapped_z(self, box: Box) -> float:
+        """
+                 Get the unwrapped z coordinate of the atom.
+                 
+                 :param box: The simulation box to use for unwrapping
+                 :return: The unwrapped z coordinate
         """
     def get_x(self) -> float:
         """
                     Get the x coordinate of the atom.
+                    
+                    :return: The x coordinate
         """
     def get_y(self) -> float:
         """
                     Get the y coordinate of the atom.
+                    
+                    :return: The y coordinate
         """
     def get_z(self) -> float:
         """
                     Get the z coordinate of the atom.
+                    
+                    :return: The z coordinate
+        """
+    def mean_position_with(self, other_atom: Atom, pbc_box: Box) -> numpy.ndarray:
+        """
+                 Compute the mean position between this atom and another atom, considering periodic boundaries.
+                 
+                 :param other_atom: The other atom
+                 :param pbc_box: The periodic boundary conditions box
+                 :return: Vector representing the mean position
+        """
+    def mean_position_with_unwrapped(self, other_atom: Atom, pbc_box: Box) -> numpy.ndarray:
+        """
+                 Compute the mean position between this atom and another atom using unwrapped coordinates.
+                 
+                 :param other_atom: The other atom
+                 :param pbc_box: The periodic boundary conditions box  
+                 :return: Vector representing the mean position (unwrapped)
         """
     def vector_to_unwrapped(self, arg0: Atom, arg1: Box) -> numpy.ndarray:
         """
-        Compute the vector to another atom respecting the periodic image flags.
+                 Compute the vector to another atom respecting the periodic image flags.
+                 
+                 :param to_atom: The target atom
+                 :return: Unwrapped vector to the target atom
         """
 class AtomPairEntanglements:
     """
@@ -268,34 +360,63 @@ class AveFileReader:
          
     """
     def __init__(self, file_path: str) -> None:
-        ...
+        """
+                 Initialize the AveFileReader with a file path.
+                 
+                 :param file_path: Path to the averages file to read
+        """
     def autocorrelate_column(self, column_index: int, delta_indices: list[int]) -> list[float]:
         """
                   Do autocorrelation on one particular column for a specified set of delta indices.
         
                   Assumes the data is equally spaced.
+                  
+                  :param column_index: Index of the column to autocorrelate
+                  :param delta_indices: List of delta indices for the autocorrelation
+                  :return: Autocorrelation values for the specified deltas
         """
     def autocorrelate_column_difference(self, column_index1: int, column_index2: int, delta_indices: list[int]) -> list[float]:
         """
                   Do autocorrelation on the difference between two particular columns for a specified set of delta indices.
         
                   Assumes the data is equally spaced.
+                  
+                  :param column_index1: Index of the first column
+                  :param column_index2: Index of the second column  
+                  :param delta_indices: List of delta indices for the autocorrelation
+                  :return: Autocorrelation values for the column differences at specified deltas
         """
     def get_column_names(self) -> list[str]:
-        ...
+        """
+                 Get the names of all columns in the file.
+                 
+                 :return: List of column names
+        """
     def get_data(self) -> list[list[float]]:
-        ...
+        """
+                 Get all data from the file.
+                 
+                 :return: 2D array containing all the numerical data
+        """
     def get_nr_of_columns(self) -> int:
-        ...
+        """
+                 Get the number of columns in the file.
+                 
+                 :return: Number of columns
+        """
     def get_nr_of_rows(self) -> int:
-        ...
+        """
+                 Get the number of data rows in the file.
+                 
+                 :return: Number of rows
+        """
 class Box:
     """
     
             The box that the simulation is run in.
     
-            NOTE: 
-              currently, only rectangular boxes are supported.
+            .. note:: 
+              Currently, only rectangular boxes are supported.
             
     """
     def __getstate__(self) -> tuple:
@@ -313,51 +434,90 @@ class Box:
     def apply_pbc(self, distances: numpy.ndarray) -> numpy.ndarray:
         """
               Apply periodic boundary conditions (PBC): adjust the specified distances to fit into this box.
+              
+              :param distances: The distances to adjust
+              :return: The adjusted distances
         """
     def apply_simple_shear(self, shear_magnitude: float, shear_direction: int = 0) -> None:
         """
                   Apply a simple shear to the box.
         
-                  CAUTION:
-                    currently, this is not supported for all operations.
+                  .. warning::
+                    Currently, this is not supported for all operations.
         
                   For shear magnitude, you specify the angle :math:`\\gamma`.
         
-                  For the shearDirection parameter, you can specify `0` for x, `1` for y and `2` for z, respectively.
-                  Specify another integer to disable the shear.
+                  :param shear_magnitude: The shear magnitude (angle :math:`\\gamma`)
+                  :param shear_direction: Direction of shear: 0 for x, 1 for y, 2 for z. 
+                                         Use any other integer to disable shear.
         """
     def get_bounding_box(self) -> Box:
         """
              Get an orthogonal box that encloses this box.
+             
              For non-sheared boxes, the resulting box is identical to the current box.
+        
+             :return: A new Box object representing the bounding box
         """
     def get_high_x(self) -> float:
-        ...
+        """
+                    Get the upper bound of the box in x direction.
+        
+                    :return: The upper x-coordinate boundary
+        """
     def get_high_y(self) -> float:
-        ...
+        """
+                    Get the upper bound of the box in y direction.
+        
+                    :return: The upper y-coordinate boundary
+        """
     def get_high_z(self) -> float:
-        ...
+        """
+                    Get the upper bound of the box in z direction.
+        
+                    :return: The upper z-coordinate boundary
+        """
     def get_l(self) -> numpy.ndarray:
         """
                   Get the three lengths of the box in an array/list.
+        
+                  :return: Array containing [Lx, Ly, Lz] box dimensions
         """
     def get_low_x(self) -> float:
-        ...
+        """
+                    Get the lower bound of the box in x direction.
+        
+                    :return: The lower x-coordinate boundary
+        """
     def get_low_y(self) -> float:
-        ...
+        """
+                    Get the lower bound of the box in y direction.
+        
+                    :return: The lower y-coordinate boundary
+        """
     def get_low_z(self) -> float:
-        ...
+        """
+                    Get the lower bound of the box in z direction.
+        
+                    :return: The lower z-coordinate boundary
+        """
     def get_lx(self) -> float:
         """
                     Get the length of the box in x direction.
+        
+                    :return: The x-dimension length of the box
         """
     def get_ly(self) -> float:
         """
                     Get the length of the box in y direction.
+        
+                    :return: The y-dimension length of the box
         """
     def get_lz(self) -> float:
         """
                     Get the length of the box in z direction.
+        
+                    :return: The z-dimension length of the box
         """
     def get_offset(self, distances: numpy.ndarray) -> numpy.ndarray:
         """
@@ -366,16 +526,25 @@ class Box:
              Useful e.g. if you are using absolute coordinates for distances, but 
              still need an infinite network, 
              e.g., if the bonds need to be able to get longer than half the box.
+             
+             :param distances: The distances to compute offset for
+             :return: The computed offset
         """
     def get_volume(self) -> float:
         """
                     Compute the volume of the box.
         
                     :math:`V = L_x \\cdot L_y \\cdot L_z`
+        
+                    :return: The volume of the box
         """
     def is_valid_offset(self, potential_offset: numpy.ndarray, abs_precision: float = 1e-05) -> bool:
         """
-                  Check whether the passed offest is a valid one in this box.
+                  Check whether the passed offset is a valid one in this box.
+                  
+                  :param potential_offset: The offset to validate
+                  :param abs_precision: Absolute precision for the validation
+                  :return: True if the offset is valid, False otherwise
         """
 class ComputedDoubleValues:
     """
@@ -537,8 +706,7 @@ class DPDSimulator:
         """
                   Read a restart file in order to continue a simulation.
         
-                  :param file: The file path to the restart file to read.
-                  :type file: str
+                  :param file: The file path to the restart file to read
         """
     def __init__(self, universe: Universe, crosslinker_type: int = 2, slipspring_bond_type: int = 9, is_2d: bool = False, seed: str = '') -> None:
         """
@@ -577,7 +745,7 @@ class DPDSimulator:
         """
                   Set which values to compute averages for.
         
-                  :param values: a list of OutputConfiguration structs
+                  :param values: A list of OutputConfiguration structs specifying what to average
         """
     def config_bond_formation(self, num_bonds_to_form: int, max_bonds_per_atom_type: dict[int, int], bond_formation_dist: float = 1.0, attempt_bond_formation_every: int = 50, atom_type_form_from: int = 2, atom_type_form_to: int = 1) -> None:
         """
@@ -598,13 +766,17 @@ class DPDSimulator:
         """
                   Configure the modified velocity verlet integration parameter `\\lambda`.
         """
-    def config_num_steps_dpd(self, arg0: int) -> None:
+    def config_num_steps_dpd(self, num_steps: int = 500) -> None:
         """
                   Configure the number of steps to do in one DPD sequence.
+        
+                  :param num_steps: Number of DPD steps per sequence
         """
-    def config_num_steps_mc(self, arg0: int) -> None:
+    def config_num_steps_mc(self, num_steps: int = 500) -> None:
         """
                   Configure the number of steps to do in one MC sequence.
+        
+                  :param num_steps: Number of Monte Carlo steps per sequence
         """
     def config_restart_output(self, file: str, output_every: int = 50000) -> None:
         """
@@ -618,15 +790,21 @@ class DPDSimulator:
                        This method may not be backwards- nor forward-compatible.
                        Use the same version of pylimer-tools if you want to be sure that things work.
         
-                  :param file: The file path to the restart file to write.
-                  :type file: str
-                  :param output_every: How often to write the restart file.
-                  :type output_every: int
+                  :param file: The file path to the restart file to write
+                  :param output_every: How often to write the restart file (default: 50000)
         """
-    def config_shift_one_at_a_time(self, arg0: bool) -> None:
-        ...
-    def config_shift_possibility_empty(self, arg0: bool) -> None:
-        ...
+    def config_shift_one_at_a_time(self, shift_one_at_a_time: bool = False) -> None:
+        """
+                  Configure whether to shift atoms one at a time.
+        
+                  This setting affects Monte Carlo move behavior in the simulation.
+        """
+    def config_shift_possibility_empty(self, shift_possibility_empty: bool = True) -> None:
+        """
+                  Configure the possibility of shifting to empty positions.
+        
+                  This setting affects Monte Carlo moves in the simulation.
+        """
     def config_sigma(self, sigma: float = 3.0) -> None:
         """
                   Configure the force-field (pair-style) parameter `\\sigma`.
@@ -658,7 +836,11 @@ class DPDSimulator:
     def get_coordinates(self) -> numpy.ndarray:
         ...
     def get_current_timestep(self) -> int:
-        ...
+        """
+                  Get the current timestep number.
+        
+                  :return: The current timestep index
+        """
     def get_nr_of_atoms(self) -> int:
         ...
     def get_nr_of_bonds(self) -> int:
@@ -690,13 +872,16 @@ class DPDSimulator:
     def get_temperature(self) -> float:
         ...
     def get_timestep(self) -> float:
-        ...
+        """
+                  Get the timestep used in the simulation.
+        
+                  :return: The simulation timestep value
+        """
     def get_universe(self, with_slipsprings: bool = True) -> Universe:
         """
              Get a universe instance from the current coordinates (and connectivity).
         
-             :param with_slipsprings: Whether to include slip-springs in the returned universe.
-             :type with_slipsprings: bool
+             :param with_slipsprings: Whether to include slip-springs in the returned universe (default: True)
         """
     def get_volume(self) -> float:
         ...
@@ -712,17 +897,24 @@ class DPDSimulator:
                   Set a new origin for measuing the mean square displacement for a specified set of atoms
         """
     def validate_neighbour_list(self, arg0: float) -> None:
-        ...
+        """
+                  Validate the neighbor list consistency.
+        
+                  :return: True if the neighbor list is valid
+        """
     def validate_state(self) -> None:
-        ...
+        """
+                  Validate the current simulation state.
+        
+                  :return: True if the simulation state is valid
+        """
     @typing.overload
     def write_restart_file(self, file: str) -> None:
         """
                   Explicitly force the writing of a restart file, now!
         
                   :param file: The file path and name of the restart file to be written.
-                               Can end in .xml, .json or anything else (-> binary).
-                  :type file: str
+                               Can end in .xml, .json or anything else (-> binary)
         """
     @typing.overload
     def write_restart_file(self, file: str) -> None:
@@ -730,8 +922,7 @@ class DPDSimulator:
                   Explicitly force the writing of a restart file, now!
         
                   :param file: The file path and name of the restart file to be written.
-                               Can end in .xml, .json or anything else (-> binary).
-                  :type file: str
+                               Can end in .xml, .json or anything else (-> binary)
         """
 class DataFileReader:
     """
@@ -740,114 +931,232 @@ class DataFileReader:
       
     """
     def __init__(self) -> None:
-        ...
+        """
+                 Initialize a new data file parser.
+        """
     def get_atom_ids(self) -> list[int]:
-        ...
+        """
+                 Get all atom IDs from the data file.
+                 
+                 :return: Vector of atom IDs
+        """
     def get_atom_nx(self) -> list[int]:
-        ...
+        """
+                 Get periodic image flags in x direction for all atoms.
+                 
+                 :return: Vector of nx values (image flags)
+        """
     def get_atom_ny(self) -> list[int]:
-        ...
+        """
+                 Get periodic image flags in y direction for all atoms.
+                 
+                 :return: Vector of ny values (image flags)
+        """
     def get_atom_nz(self) -> list[int]:
-        ...
+        """
+                 Get periodic image flags in z direction for all atoms.
+                 
+                 :return: Vector of nz values (image flags)
+        """
     def get_atom_types(self) -> list[int]:
-        ...
+        """
+                 Get all atom types from the data file.
+                 
+                 :return: Vector of atom types
+        """
     def get_atom_x(self) -> list[float]:
-        ...
+        """
+                 Get x coordinates of all atoms.
+                 
+                 :return: Vector of x coordinates
+        """
     def get_atom_y(self) -> list[float]:
-        ...
+        """
+                 Get y coordinates of all atoms.
+                 
+                 :return: Vector of y coordinates
+        """
     def get_atom_z(self) -> list[float]:
-        ...
+        """
+                 Get z coordinates of all atoms.
+                 
+                 :return: Vector of z coordinates
+        """
     def get_bond_from(self) -> list[int]:
-        ...
+        """
+                 Get starting atom IDs for all bonds.
+                 
+                 :return: Vector of starting atom IDs for bonds
+        """
     def get_bond_to(self) -> list[int]:
-        ...
+        """
+                 Get ending atom IDs for all bonds.
+                 
+                 :return: Vector of ending atom IDs for bonds
+        """
     def get_bond_types(self) -> list[int]:
-        ...
+        """
+                 Get all bond types from the data file.
+                 
+                 :return: Vector of bond types
+        """
     def get_high_x(self) -> float:
-        ...
+        """
+                 Get the upper bound of the box in x direction.
+                 
+                 :return: Upper x boundary
+        """
     def get_high_y(self) -> float:
-        ...
+        """
+                 Get the upper bound of the box in y direction.
+                 
+                 :return: Upper y boundary
+        """
     def get_high_z(self) -> float:
-        ...
+        """
+                 Get the upper bound of the box in z direction.
+                 
+                 :return: Upper z boundary
+        """
     def get_low_x(self) -> float:
-        ...
+        """
+                 Get the lower bound of the box in x direction.
+                 
+                 :return: Lower x boundary
+        """
     def get_low_y(self) -> float:
-        ...
+        """
+                 Get the lower bound of the box in y direction.
+                 
+                 :return: Lower y boundary
+        """
     def get_low_z(self) -> float:
-        ...
+        """
+                 Get the lower bound of the box in z direction.
+                 
+                 :return: Lower z boundary
+        """
     def get_lx(self) -> float:
-        ...
+        """
+                 Get the box length in x direction.
+                 
+                 :return: Box length in x direction
+        """
     def get_ly(self) -> float:
-        ...
+        """
+                 Get the box length in y direction.
+                 
+                 :return: Box length in y direction
+        """
     def get_lz(self) -> float:
-        ...
+        """
+                 Get the box length in z direction.
+                 
+                 :return: Box length in z direction
+        """
     def get_masses(self) -> dict[int, float]:
-        ...
+        """
+                 Get the mass values for each atom type.
+                 
+                 :return: Map of atom types to their masses
+        """
     def get_molecule_ids(self) -> list[int]:
-        ...
+        """
+                 Get all molecule IDs from the data file.
+                 
+                 :return: Vector of molecule IDs
+        """
     def get_nr_of_atom_types(self) -> int:
-        ...
+        """
+                 Get the number of atom types in the data file.
+                 
+                 :return: Number of atom types
+        """
     def get_nr_of_atoms(self) -> int:
-        ...
+        """
+                 Get the number of atoms in the data file.
+                 
+                 :return: Number of atoms
+        """
     def get_nr_of_bond_types(self) -> int:
-        ...
+        """
+                 Get the number of bond types in the data file.
+                 
+                 :return: Number of bond types
+        """
     def get_nr_of_bonds(self) -> int:
-        ...
+        """
+                 Get the number of bonds in the data file.
+                 
+                 :return: Number of bonds
+        """
     def read(self, path_of_file_to_read: str, atom_style: AtomStyle = ..., atom_style2: AtomStyle = ..., atom_style_3: AtomStyle = ...) -> None:
         """
                Actually read a LAMMPS's `write_data` file.
         
-               Arguments:
-                  - `path_of_file_to_read`: The path to the file to read
-                  - `atom_style`: The format of the "Atoms" section, see https://docs.lammps.org/read_data.html
-                  - `atom_style2`: The format of the "Atoms" section if the previous parameter is equal to AtomStyle::HYBRID
-                  - `atom_style3`: The format of the "Atoms" section if the second to last parameter is equal to AtomStyle::HYBRID
+               :param path_of_file_to_read: The path to the file to read
+               :param atom_style: The format of the "Atoms" section, see https://docs.lammps.org/read_data.html
+               :param atom_style2: The format of the "Atoms" section if the previous parameter is equal to AtomStyle::HYBRID
+               :param atom_style_3: The format of the "Atoms" section if the second to last parameter is equal to AtomStyle::HYBRID
         """
 class DataFileWriter:
     """
-    A class to write a LAMMPS data file from a universe.
+    
+        A class to write a LAMMPS data file from a universe.
+        
+        .. attention::
+            The resulting file is not guaranteed to be a completely valid LAMMPS file.
+            In particular, this writer does not force you to set masses for all atom types,
+            and it does not have limits on the image flags.
+            You can use :meth:`~pylimer_tools_cpp.Universe.set_masses` to set the masses for all atom types,
+            and either :meth:`~pylimer_tools_cpp.Universe.set_vertex_property` or 
+            :meth:`~pylimer_tools_cpp.DataFileWriter.config_attempt_image_reset` and
+            :meth:`~pylimer_tools_cpp.DataFileWriter.config_move_into_box` to ensure that the image flags are correct.
+        
     """
     def __init__(self, universe: Universe) -> None:
         """
                 Initialize the writer with the universe to write.
+                
+                :param universe: The universe to write to the data file
         """
     def config_atom_style(self, atom_style: AtomStyle = ...) -> None:
         """
                 Set the (LAMMPS) atom style to use for writing the atoms.
         
-                Default: AtomStyle.ANGLE.
+                :param atom_style: The LAMMPS atom style to use (default: AtomStyle.ANGLE)
         """
     def config_attempt_image_reset(self, attempt_image_reset: bool = False) -> None:
         """
                 Set whether to attempt to reset image flags so that output coordinates lie in the box.
         
-                Default: false.
+                :param attempt_image_reset: Whether to attempt image flag reset (default: False)
         """
     def config_crosslinker_type(self, crosslinker_type: int = 2) -> None:
         """
                 Set which atom type represents crosslinkers.
                 Needed in case the moleculeIdx in the output file should have any meaning.
-                (e.g. with :func:`~pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap`).
+                (e.g. with :meth:`~pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap`).
         
-                Default: 2.
+                :param crosslinker_type: The atom type representing crosslinkers (default: 2)
         """
     def config_include_angles(self, include_angles: bool = True) -> None:
         """
                 Set whether to include the angles from the universe in the file or not.
         
-                Default: true.
+                :param include_angles: Whether to include angles (default: True)
         """
     def config_include_dihedral_angles(self, include_dihedral_angles: bool = True) -> None:
         """
                 Set whether to include the dihedral angles from the universe in the file or not.
         
-                Default: true.
+                :param include_dihedral_angles: Whether to include dihedral angles (default: True)
         """
     def config_include_velocities(self, include_velocities: bool = True) -> None:
         """
                 Set whether to include the velocities from the universe (if any) in the file or not.
         
-                Default: true.
+                :param include_velocities: Whether to include velocities (default: True)
         """
     def config_molecule_idx_for_swap(self, enable_swappability: bool = False) -> None:
         """
@@ -855,20 +1164,20 @@ class DataFileWriter:
                 identical per chain, but identical per position in the chain.
                 That's how you can have bond swapping with constant chain length distribution.
         
-                Default: false.
+                :param enable_swappability: Whether to enable molecule index swappability (default: False)
         """
     def config_move_into_box(self, move_into_box: bool = False) -> None:
         """
                 Set whether to change the output coordinates to lie in the box or not.
         
-                Default: false (used to be true).
+                :param move_into_box: Whether to move coordinates into box (default: False)
         """
     def config_reindex_atoms(self, reindex_atoms: bool = False) -> None:
         """
                 Set whether to reindex the atoms or not.
-                Re-indexing leads to atom ids being in the range of 1 to the number of atoms.
+                Re-indexing leads to atom IDs being in the range of 1 to the number of atoms.
         
-                Default: false.
+                :param reindex_atoms: Whether to reindex atoms (default: False)
         """
     def set_custom_atom_format(self, atom_format: str = '\t$atomId\t$moleculeId\t$atomType\t$x\t$y\t$z\t$nx\t$ny\t$nz') -> None:
         """
@@ -887,25 +1196,29 @@ class DataFileWriter:
                 - $nz
         
                 Additionally, you can use the keys used in
-                :func:`~pylimer_tools_cpp.Universe.set_property_value`
+                :meth:`~pylimer_tools_cpp.Universe.set_property_value`
                 as placeholders (as long as they are alphanumeric only; prefix in the format with '$' as well).
-                Specifically useful if you need a different (or hybrid) atom style in LAMMPS.
+                Other placeholders are available if the universe was read from a LAMMPS data file with an
+                atom style with additional data.
         
-                Be sure to still call :func:`~pylimer_tools_cpp.DataFileWriter.config_atom_style`,
+                This method is specifically useful if you need a different (or hybrid) atom style in LAMMPS.
+        
+                Be sure to still call :meth:`~pylimer_tools_cpp.DataFileWriter.config_atom_style`,
                 so that the file can be read correctly again.
         
-                Default: empty string, in which case the configured atom style will be used.
+                :param atom_format: Custom format string for atoms (default: tab-separated standard format)
         """
     def set_universe_to_write(self, universe: Universe) -> None:
         """
                 Re-set the universe to write.
+                
+                :param universe: The new universe to write to the data file
         """
     def write_to_file(self, file: str) -> None:
         """
                 Actually do the writing to the disk.
         
-                Arguments:
-                    file (str): The path and file name to write to.
+                :param file: The path and file name to write to
         """
 class DumpFileReader:
     """
@@ -914,34 +1227,62 @@ class DumpFileReader:
       
     """
     def __init__(self, path_of_file_to_read: str) -> None:
-        ...
+        """
+                 Initialize the dump file reader.
+                 
+                 :param path_of_file_to_read: Path to the dump file to read
+        """
     def get_length(self) -> int:
         """
-        Get the number of sections (time-steps) in the file
+                 Get the number of sections (time-steps) in the file.
+                 
+                 :return: Number of timesteps/sections in the dump file
         """
-    def get_numeric_values_for_at(self, arg0: int, arg1: str, arg2: str) -> list[float]:
+    def get_numeric_values_for_at(self, rowIndex: int, headerKey: str, columnIndex: str) -> list[float]:
         """
-        Get the values for the section `index`, the main header `headerKey` and the column (in the header) `column`.
+                 Get numeric values for the section at index, the main header headerKey and the column columnIndex.
+                 
+                 :param rowIndex: Index of the section/timestep to query
+                 :param headerKey: Name of the header section to query  
+                 :param columnIndex: Index of the column within the header
+                 :return: Vector of numeric values for the specified location
         """
     def get_string_values_for_at(self, rowIndex: int, headerKey: str, columnIndex: str) -> list[str]:
         """
-        Get the values for the section `index`, the main header `headerKey` and the column (in the header) `column`.
+                 Get string values for the section at index, the main header headerKey and the column columnIndex.
+                 
+                 :param rowIndex: Index of the section/timestep to query
+                 :param headerKey: Name of the header section to query
+                 :param columnIndex: Index of the column within the header
+                 :return: Vector of string values for the specified location
         """
     def has_key(self, headerKey: str) -> bool:
         """
-        Check whether the first section has the header specified
+                 Check whether the first section has the header specified.
+                 
+                 :param headerKey: Name of the header to check for
+                 :return: True if the header exists in the first section
         """
     def key_has_column(self, headerKey: str, columnName: str) -> bool:
         """
-        Check whether the header of the first section has the specified column
+                 Check whether the header of the first section has the specified column.
+                 
+                 :param headerKey: Name of the header section to check
+                 :param columnName: Name of the column to look for
+                 :return: True if the column exists in the specified header
         """
-    def key_has_directional_column(self, headerKey: str, dirPraefix: str = '', dirSuffix: str = '') -> bool:
+    def key_has_directional_column(self, header_key: str, dir_prefix: str = '', dir_suffix: str = '') -> bool:
         """
-        Check whether the header of the first section has all the three columns `{dirPraefix}{x|y|z}{dirSuffix}`.
+                 Check whether the header of the first section has all the three columns {dir_prefix}{x|y|z}{dir_suffix}.
+                 
+                 :param header_key: Name of the header section to check
+                 :param dir_prefix: Prefix for the directional columns (default: "")
+                 :param dir_suffix: Suffix for the directional columns (default: "")
+                 :return: True if all three directional columns (x, y, z) exist
         """
     def read(self) -> None:
         """
-        Read the whole file
+                 Read the whole file.
         """
 class ExitReason:
     """
@@ -1163,7 +1504,9 @@ class MCUniverseGenerator:
         """
     def config_nr_of_mc_steps(self, n_steps: int = 2000) -> None:
         """
-        Set the number of Monte-Carlo steps during bond length equilibration.
+               Set the number of Monte-Carlo steps during bond length equilibration.
+        
+               :param n_steps: Number of MC steps to perform (default: 2000)
         """
     def config_primary_loop_probability(self, probability: float = 1.0) -> None:
         """
@@ -1216,19 +1559,27 @@ class MCUniverseGenerator:
         """
     def get_mean_bead_distance(self) -> float:
         """
-        Get the currently configured mean bead distance.
+                  Get the currently configured mean bead distance.
+        
+                  :return: The currently configured mean distance between beads
         """
     def get_mean_squared_bead_distance(self) -> float:
         """
-        Get the currently configured mean squared bead distance.
+                  Get the currently configured mean squared bead distance.
+        
+                  :return: The currently configured mean squared distance between beads
         """
     def get_nr_of_atoms(self) -> int:
         """
-        Get the current number of atoms that the universe would/will have.
+                  Get the current number of atoms that the universe would/will have.
+        
+                  :return: Number of atoms in the generated universe
         """
     def get_nr_of_bonds(self) -> int:
         """
-        Get the current number of bonds that the universe would/will have.
+                  Get the current number of bonds that the universe would/will have.
+        
+                  :return: Number of bonds in the generated universe
         """
     def get_universe(self) -> Universe:
         """
@@ -1290,9 +1641,10 @@ class MCUniverseGenerator:
         """
     def set_mean_squared_bead_distance(self, mean_squared_distance: float, update_mean: bool = True) -> None:
         """
-        Set the mean squared distance between beads.
-                 :param mean_squared_distance: Mean squared distance between beads.
-                 :param update_mean: Whether to update the mean bead distance as well, deduced from the assumed gaussian distribution in 3D (default: true).
+                  Set the mean squared distance between beads.
+        
+                  :param mean_squared_distance: Mean squared distance between beads
+                  :param update_mean: Whether to update the mean bead distance as well, deduced from the assumed gaussian distribution in 3D (default: true)
         """
     def set_seed(self, seed: int) -> None:
         """
@@ -1344,7 +1696,13 @@ class MEHPForceBalance:
         """
     @staticmethod
     def get_neighbour_link_indices(network: SimplifiedBalanceNetwork, link_idx: int) -> list[int]:
-        ...
+        """
+                         Get the indices of neighboring links for a given link.
+        
+                         :param network: The force balance network
+                         :param link_idx: Index of the link to find neighbors for
+                         :return: Vector of connected link indices
+        """
     def __copy__(self) -> MEHPForceBalance:
         ...
     def __getstate__(self) -> tuple:
@@ -1436,14 +1794,37 @@ class MEHPForceBalance:
                   All coordinates etc. will be scaled as needed.
         """
     def evaluate_spring_distance(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray, spring_idx: int) -> numpy.ndarray:
-        ...
+        """
+               Evaluate the distance vector for a specific spring.
+        
+               :param network: The force balance network
+               :param displacements: Current displacement vector
+               :param spring_idx: Index of the spring to evaluate
+               :return: 3D distance vector for the spring
+        """
     def evaluate_spring_distance_from(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray, spring_idx: int, link_idx: int) -> numpy.ndarray:
-        ...
+        """
+               Evaluate the spring distance from a specific link.
+        
+               :param network: The force balance network
+               :param displacements: Current displacement vector
+               :param spring_idx: Index of the spring to evaluate
+               :param link_idx: Index of the starting link
+               :return: 3D distance vector from the specified link
+        """
     def evaluate_spring_distance_to(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray, spring_idx: int, link_idx: int) -> numpy.ndarray:
-        ...
+        """
+               Evaluate the spring distance to a specific link.
+        
+               :param network: The force balance network
+               :param displacements: Current displacement vector
+               :param spring_idx: Index of the spring to evaluate
+               :param link_idx: Index of the target link
+               :return: 3D distance vector to the specified link
+        """
     def get_average_strand_length(self) -> float:
         """
-                   Get the average length of the strands. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()`,
+                   Get the average length of the strands. Note that in contrast to :meth:`~pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor`,
                    this value is normalized by the number of strands rather than the number of chains.
         """
     def get_coordinates(self) -> numpy.ndarray:
@@ -1472,7 +1853,7 @@ class MEHPForceBalance:
         """
     def get_default_mean_bond_length(self) -> float:
         """
-                   Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for
+                   Returns the value effectively used in :meth:`~pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor` for
                    :math:`b` in :math:`\\langle R_{0,\\eta}^2 = N_{\\eta} b^2\\rangle`.
         """
     def get_displacement_residual_norm(self, one_over_strand_partition_upper_limit: float = 1.0) -> float:
@@ -1604,7 +1985,13 @@ class MEHPForceBalance:
                   Caution: ignores atom masses.
         """
     def get_strand_partition_indices_of_sliplink(self, network: SimplifiedBalanceNetwork, link_idx: int) -> list[int]:
-        ...
+        """
+                  Get the indices of strand partitions associated with a slip-link.
+        
+                  :param network: The force balance network
+                  :param link_idx: Index of the slip-link
+                  :return: Vector of strand partition indices
+        """
     def get_strand_partitions(self) -> numpy.ndarray:
         """
                   Get the current strand partitions (the fraction of the contour length associated with each spring).
@@ -1690,6 +2077,8 @@ class MEHPForceBalance:
                   Otherwise, it returns true.
         
                   Can be used e.g. as :code:`assert fb.validate_network()`.
+        
+                  :return: True if validation passes, raises exception otherwise
         """
     @property
     def network(self) -> SimplifiedBalanceNetwork:
@@ -1710,7 +2099,13 @@ class MEHPForceBalance2:
     """
     @staticmethod
     def get_neighbour_link_indices(network: SimplifiedBalance2Network, link_idx: int) -> list[int]:
-        ...
+        """
+                         Get the indices of neighboring links for a given link.
+        
+                         :param network: The force balance 2 network
+                         :param link_idx: Index of the link to find neighbors for
+                         :return: Vector of connected link indices
+        """
     def __copy__(self) -> MEHPForceBalance2:
         ...
     def __getstate__(self) -> tuple:
@@ -1790,12 +2185,35 @@ class MEHPForceBalance2:
                    Perform a deformation of the system box to a different box.
                    All coordinates etc. will be scaled as needed.
         """
-    def evaluate_partial_spring_distance(self, network: SimplifiedBalance2Network, displacements: numpy.ndarray, spring_idx: int) -> numpy.ndarray:
-        ...
-    def evaluate_partial_spring_distance_from(self, network: SimplifiedBalance2Network, displacements: numpy.ndarray, spring_idx: int, link_idx: int) -> numpy.ndarray:
-        ...
-    def evaluate_partial_spring_distance_to(self, network: SimplifiedBalance2Network, displacements: numpy.ndarray, spring_idx: int, link_idx: int) -> numpy.ndarray:
-        ...
+    def evaluate_spring_vector(self, network: SimplifiedBalance2Network, displacements: numpy.ndarray, spring_idx: int) -> numpy.ndarray:
+        """
+               Evaluate the distance vector for a specific spring.
+        
+               :param network: The force balance 2 network
+               :param displacements: Current displacement vector
+               :param spring_idx: Index of the spring to evaluate
+               :return: 3D distance vector for the spring
+        """
+    def evaluate_spring_vector_from(self, network: SimplifiedBalance2Network, displacements: numpy.ndarray, spring_idx: int, link_idx: int) -> numpy.ndarray:
+        """
+               Evaluate the spring vector in the direction from a specific link.
+        
+               :param network: The force balance 2 network
+               :param displacements: Current displacement vector
+               :param spring_idx: Index of the spring to evaluate
+               :param link_idx: Index of the starting link
+               :return: 3D distance vector from the specified link
+        """
+    def evaluate_spring_vector_to(self, network: SimplifiedBalance2Network, displacements: numpy.ndarray, spring_idx: int, link_idx: int) -> numpy.ndarray:
+        """
+               Evaluate the spring vector in the direction to a specific link.
+        
+               :param network: The force balance 2 network
+               :param displacements: Current displacement vector
+               :param spring_idx: Index of the spring to evaluate
+               :param link_idx: Index of the target link
+               :return: 3D distance vector to the specified link
+        """
     def get_average_spring_length(self) -> float:
         """
                     Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()`,
@@ -1809,13 +2227,13 @@ class MEHPForceBalance2:
         """
                    Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
         """
-    def get_current_partial_spring_lengths(self) -> list[float]:
+    def get_current_spring_lengths(self) -> list[float]:
         """
-                   Get the partial spring distances.
+                   Get the spring lengths (Euclidean distances of the spring vectors).
         """
-    def get_current_partial_spring_vectors(self) -> numpy.ndarray:
+    def get_current_spring_vectors(self) -> numpy.ndarray:
         """
-                   Get the partial spring vectors.
+                   Get the spring vectors.
         """
     def get_dangling_weight_fraction(self, tolerance: float = 0.001) -> float:
         """
@@ -1899,9 +2317,9 @@ class MEHPForceBalance2:
         
                    :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
         """
-    def get_nr_of_active_partial_springs(self, tolerance: float = 0.001) -> int:
+    def get_nr_of_active_spring(self, tolerance: float = 0.001) -> int:
         """
-                   Get the number of active partial springs remaining after running the simulation.
+                   Get the number of active springs remaining after running the simulation.
         
                   :param tolerance: springs under this length are considered inactive
         """
@@ -1942,9 +2360,9 @@ class MEHPForceBalance2:
         
                    :param tolerance: springs under this length are considered inactive
         """
-    def get_overall_spring_lengths(self) -> list[float]:
+    def get_overall_strand_lengths(self) -> list[float]:
         """
-                   Get the sum of the lengths of the partial springs of each spring.
+                   Get the sum of the lengths of the springs of each strand.
         """
     def get_pressure(self) -> float:
         """
@@ -1973,9 +2391,9 @@ class MEHPForceBalance2:
         """
                    Returns the stress tensor at the current state of the simulation.
         """
-    def get_weighted_partial_spring_lengths(self) -> numpy.ndarray:
+    def get_weighted_spring_lengths(self) -> numpy.ndarray:
         """
-                   Get the current partial spring lengths (norm of vector) divided by the spring partition times the contour length.
+                   Get the current spring lengths (norm of vector) divided by the spring partition times the contour length.
         """
     def inspect_displacement_to_mean_position_update(self, link_idx: int) -> numpy.ndarray:
         """
@@ -2057,8 +2475,8 @@ class MEHPForceRelaxation:
                   :param remove_2functional_crosslinkers: Whether to replace two-functional crosslinkers with a "normal" chain bead
                   :param remove_dangling_chains: Whether to remove dangling chains before running the simulation.
                        **Caution**: Removing the dangling chains will result in incorrect results fo the computation of
-                       :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction()` and
-                       :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getDanglingWeightFraction()`
+                       :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction` and
+                       :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction`
         """
     def __setstate__(self, arg0: tuple) -> None:
         ...
@@ -2075,7 +2493,7 @@ class MEHPForceRelaxation:
                   Configure the offset from the lower and upper bounds for the simulation to suggest another run.
                   
                   :param epsilon: The epsilon value to use for the rerun check
-                       (See: :func:`~pylimer_tools_cpp.MEHPForceRelaxation.requiresAnotherRun()`)
+                       (See: :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.requires_another_run`)
         """
     def config_step_output(self, output_configuration: list[OutputConfiguration]) -> None:
         """
@@ -2088,40 +2506,56 @@ class MEHPForceRelaxation:
         """
                   Counts the active clustered atoms in the system.
         
-                  :param tolerance: springs under this length are considered inactive.
+                  :param tolerance: Springs under this length are considered inactive
+                  :return: The number of active clustered atoms
         """
     def get_active_chains(self, tolerance: float = 0.001) -> list[Molecule]:
         """
                   Get the crosslinker chains that are active.
+        
+                  :param tolerance: Springs under this length are considered inactive
+                  :return: List of active crosslinker chains
         """
     def get_average_spring_length(self) -> float:
         """
-                   Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()`,
-                   this value is normalized by the number of springs rather than the number of chains.
+                  Get the average length of the springs. Note that in contrast to :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor`,
+                  this value is normalized by the number of springs rather than the number of chains.
+        
+                  :return: The average spring length
         """
     def get_crosslinker_universe(self) -> Universe:
         """
                   Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
+        
+                  :return: A Universe object containing the crosslinkers with updated positions
         """
     def get_dangling_weight_fraction(self, tolerance: float = 0.001) -> float:
         """
-                  Compute the weight fraction of non-active springs
+                  Compute the weight fraction of non-active springs.
         
                   Caution: ignores atom masses.
+        
+                  :param tolerance: Springs under this length are considered inactive
+                  :return: The dangling weight fraction
         """
     def get_default_r0_square(self) -> float:
         """
-                   Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for :math:`\\langle R_{0,\\eta}^2\\rangle`.
+                  Returns the value effectively used in :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor` for :math:`\\langle R_{0,\\eta}^2\\rangle`.
+        
+                  :return: The default R0 squared value used in gamma factor calculations
         """
     def get_effective_functionality_of_atoms(self, tolerance: float = 0.001) -> dict[int, int]:
         """
-                  Returns the number of active springs connected to each atom, atomId used as index
+                  Returns the number of active springs connected to each atom, atomId used as index.
         
-                  :param tolerance: springs under this length are considered inactive
+                  :param tolerance: Springs under this length are considered inactive
+                  :return: Vector with effective functionality for each atom (indexed by atom ID)
         """
     def get_exit_reason(self) -> ExitReason:
         """
-                   Returns the reason for termination of the simulation
+                  Returns the reason for termination of the simulation.
+        
+                  :return: The exit reason enum value indicating why the simulation ended
         """
     def get_force(self) -> float:
         """
@@ -2163,56 +2597,70 @@ class MEHPForceRelaxation:
                        For real systems, the value could be determined by :func:`~pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance()`
                        on the melt system, with subsequent division by the nr of bonds in the chain.
         
-                  See also :func:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor` for the mean of these.
+                  See also :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor` for the mean of these.
         """
     def get_ids_of_active_nodes(self, tolerance: float = 0.001, minimum_nr_of_active_connections: int = 2, maximum_nr_of_active_connections: int = -1) -> list[int]:
         """
                   Get the atom ids of the nodes that are considered active.
         
-                  Arguments:
-                   - :param tolerance: springs under this length are considered inactive. A node is active if it has > 2 active springs.
+                  :param tolerance: Springs under this length are considered inactive. A node is active if it has > 2 active springs.
+                  :param minimum_nr_of_active_connections: Minimum number of active connections required for a node to be considered active
+                  :param maximum_nr_of_active_connections: Maximum number of active connections allowed for a node to be considered active
+                  :return: List of atom IDs for active nodes
         """
     def get_nr_of_active_nodes(self, tolerance: float = 0.001, minimumNrOfActiveConnections: int = 2, maximumNrOfActiveConnections: int = -1) -> int:
         """
-                   Get the number of active nodes remaining after running the simulation.
+                  Get the number of active nodes remaining after running the simulation.
         
-                  :param tolerance: springs under this length are considered inactive.
-                  :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
-                  :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
-                       Use a value < 0 to indicate that there is no maximum number of active connections.
-                  :param usePartial: Whether to use the partial spring distances rather than the total (set to true if you want primary loop contributors)
+                  :param tolerance: Springs under this length are considered inactive
+                  :param minimumNrOfActiveConnections: A node is active if it has equal or more than this number of active springs
+                  :param maximumNrOfActiveConnections: A node is active if it has equal or less than this number of active springs.
+                       Use a value < 0 to indicate that there is no maximum number of active connections
+                  :return: The number of active nodes
         """
     def get_nr_of_active_springs(self, tolerance: float = 0.001) -> int:
         """
-                   Get the number of active springs remaining after running the simulation.
+                  Get the number of active springs remaining after running the simulation.
         
-                  :param tolerance: springs under this length are considered inactive
+                  :param tolerance: Springs under this length are considered inactive
+                  :return: The number of active springs
         """
     def get_nr_of_iterations(self) -> int:
         """
                   Returns the number of iterations used for force relaxation.
+        
+                  :return: The number of iterations performed during force relaxation
         """
     def get_nr_of_nodes(self) -> int:
         """
-                   Get the number of nodes considered in this simulation.
+                  Get the number of nodes considered in this simulation.
+        
+                  :return: The number of nodes in the simulation
         """
     def get_nr_of_springs(self) -> int:
         """
                   Get the number of springs considered in this simulation.
         
-                  :param tolerance: springs under this length are considered inactive
+                  :param tolerance: Springs under this length are considered inactive
+                  :return: The number of springs in the simulation
         """
     def get_pressure(self) -> float:
         """
                   Returns the pressure at the current state of the simulation.
+        
+                  :return: The current pressure value
         """
     def get_residual_norm(self) -> float:
         """
                   Returns the residual norm at the current state of the simulation.
+        
+                  :return: The current residual norm value
         """
     def get_residuals(self) -> numpy.ndarray:
         """
                   Returns the residuals at the current state of the simulation.
+        
+                  :return: The current residual vector
         """
     def get_soluble_weight_fraction(self, tolerance: float = 0.001) -> float:
         """
@@ -2220,24 +2668,27 @@ class MEHPForceRelaxation:
                   springs (any depth).
         
                   Caution: ignores atom masses.
+        
+                  :param tolerance: Springs under this length are considered inactive
+                  :return: The soluble weight fraction
         """
     def get_spring_distances(self) -> numpy.ndarray:
         """
                   Get the current coordinate differences for all the springs.
         
-                  Returns:
-                       - distances: a vector of size 3*nrOfSprings, with each x, y, z values of the springs
+                  :return: A vector of size 3*nrOfSprings, with each x, y, z values of the springs
         """
     def get_spring_lengths(self) -> numpy.ndarray:
         """
                   Get the current lengths for all the springs.
         
-                  Returns:
-                       - distances: a vector of size nrOfSprings, with each the norm of the distances
+                  :return: A vector of size nrOfSprings, with each the norm of the distances
         """
     def get_stress_tensor(self) -> numpy.ndarray:
         """
                   Returns the stress tensor at the current state of the simulation.
+        
+                  :return: The current stress tensor matrix
         """
     def requires_another_run(self) -> bool:
         """
@@ -2246,9 +2697,11 @@ class MEHPForceRelaxation:
                   that it would not be globally minimised.
         
                   If the final displacement of one of the atoms is close
-                  (1e-3, configurable via :func:`~pylimer_tools_cpp.MEHPForceRelaxation.configRerunEpsilon()`)
+                  (1e-3, configurable via :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon`)
                   to the imposed min/max, after minimizing,
                   this method would return true.
+        
+                  :return: True if another run is suggested, False otherwise
         """
     def run_force_relaxation(self, algorithm: str = 'LD_MMA', max_nr_of_steps: int = 250000, x_tolerance: float = 1e-12, f_tolerance: float = 1e-09) -> None:
         """
@@ -2294,8 +2747,7 @@ class Molecule:
         """
                  Create a copy of this molecule.
                  
-                 Returns:
-                     A new Molecule instance that is a copy of this one
+                 :return: A new Molecule instance that is a copy of this one
         """
     def __eq__(self, arg0: Molecule) -> bool:
         ...
@@ -2307,11 +2759,10 @@ class Molecule:
         """
                  Construct a molecule from a graph structure.
                  
-                 Parameters:
-                     box: The simulation box containing this molecule
-                     graph: Pointer to the igraph structure representing connectivity
-                     type: The type of molecule (see MoleculeType enum)
-                     mass_map: Map of atom types to their masses
+                 :param box: The simulation box containing this molecule
+                 :param graph: Pointer to the igraph structure representing connectivity
+                 :param type: The type of molecule (see MoleculeType enum)
+                 :param mass_map: Map of atom types to their masses
         """
     def __iter__(self) -> MoleculeIterator:
         """
@@ -2324,144 +2775,179 @@ class Molecule:
         """
     def compute_bond_lengths(self) -> list[float]:
         """
-                 Computes the length of each bond in the molecule, respecting periodic boundaries.
+                 Compute the length of each bond in the molecule, respecting periodic boundaries.
                  
-                 Returns:
-                     A vector of bond lengths
+                 :return: A vector of bond lengths
         """
     def compute_end_to_end_distance(self) -> float:
         """
                     Compute the end-to-end distance (:math:`R_{ee}`) of this molecule. 
         
-                    CAUTION:
+                    .. warning::
                        Returns 0.0 if the molecule does not have two or more atoms.
+                       
+                    :return: The end-to-end distance
         """
     def compute_end_to_end_distance_with_derived_image_flags(self) -> float:
         """
                     Compute the end-to-end distance (:math:`R_{ee}`) of this molecule,
                     but ignoring the image flags attached to the atoms. 
                     This only works for Molecules that can be lined up with 
-                    :func:`~pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
+                    :meth:`~pylimer_tools_cpp.Molecule.get_atoms_lined_up`,
                     as it needs the atoms sorted such that the periodic box can still be respected somewhat.
         
-                    CAUTION:
+                    .. warning::
                        Returns 0.0 if the molecule does not have two or more atoms.
                        Requires bonds to be shorter than half the box length.
+                       
+                    :return: The end-to-end distance with derived image flags
         """
     def compute_end_to_end_vector(self) -> numpy.ndarray:
         """
                     Compute the end-to-end vector (:math:`\\overrightarrow{R}_{ee}`) of this molecule. 
         
-                    CAUTION:
+                    .. warning::
                        Returns 0.0 if the molecule does not have two or more atoms.
+                       
+                    :return: The end-to-end vector
         """
     def compute_end_to_end_vector_with_derived_image_flags(self) -> numpy.ndarray:
         """
                     Compute the end-to-end vector (:math:`\\overrightarrow{R}_{ee}`) of this molecule,
                     but ignoring the image flags attached to the atoms. 
                     This only works for Molecules that can be lined up with 
-                    :func:`~pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
+                    :meth:`~pylimer_tools_cpp.Molecule.get_atoms_lined_up`,
                     as it needs the atoms sorted such that the periodic box can still be respected somewhat.
         
-                    CAUTION:
+                    .. warning::
                        Returns 0.0 if the molecule does not have two or more atoms.
                        Requires bonds to be shorter than half the box length.
+                       
+                    :return: The end-to-end vector with derived image flags
         """
     def compute_radius_of_gyration(self) -> float:
         """
-                    Computes the radius of gyration, :math:`R_g^2` of this molecule.
+                    Compute the radius of gyration, :math:`R_g^2` of this molecule.
                     
                     :math:`{R_g}^2 = \\\\frac{1}{M} \\sum_i m_i (r_i - r_{cm})^2`,
                     where :math:`M` is the total mass of the molecule, :math:`r_{cm}`
                     are the coordinates of the center of mass of the molecule and the
                     sum is over all contained atoms.
+                    
+                    :return: The radius of gyration squared
         """
     def compute_radius_of_gyration_with_derived_image_flags(self) -> float:
         """
-                    Computes the radius of gyration, :math:`R_g^2` of this molecule,
+                    Compute the radius of gyration, :math:`R_g^2` of this molecule,
                     but ignoring the image flags attached to the atoms.
                     This only works for Molecules that can be lined up with 
-                    :func:`~pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
+                    :meth:`~pylimer_tools_cpp.Molecule.get_atoms_lined_up`,
                     as it needs the atoms sorted such that the periodic box can still be respected somewhat.
                     In other words, this function computes the radius of gyration 
                     assuming the distance between two lined-up beads 
                     is smaller than half the periodic box in each direction.
                     
-                    See also: :func:`~pylimer_tools_cpp.Molecule.computeRadiusOfGyration()`.
+                    See also: :meth:`~pylimer_tools_cpp.Molecule.compute_radius_of_gyration`.
+                    
+                    :return: The radius of gyration squared with derived image flags
         """
     def compute_total_length(self) -> float:
         """
-                 Computes the sum of the lengths of all bonds.
+                 Compute the sum of the lengths of all bonds.
                  In most cases, this is equal to the contour length.
                  
-                 Returns:
-                     The total contour length of the molecule
+                 :return: The total contour length of the molecule
         """
     def compute_total_mass(self) -> float:
         """
-                    Computes the total mass of this molecule.
+                    Compute the total mass of this molecule.
                     
-                    Returns:
-                        The total mass of all atoms in this molecule
+                    :return: The total mass of all atoms in this molecule
         """
     def compute_total_vector(self, crosslinker_type: int = 2, close_loop: bool = True) -> numpy.ndarray:
         """
-                       Computes the sum of all bond vectors.
+                       Compute the sum of all bond vectors.
+                       
+                       :param crosslinker_type: The type of crosslinker atoms
+                       :param close_loop: Whether to close the loop for calculations
+                       :return: The vector sum of all bonds
         """
     def compute_vector_from_to(self, atom_id_from: int, atom_id_to: int, crosslinker_type: int = 2, require_order: bool = True) -> numpy.ndarray:
         """
-                       Computes the sum of all bond vectors between two specified atoms.
+                       Compute the sum of all bond vectors between two specified atoms.
+                       
+                       :param atom_id_from: ID of the starting atom
+                       :param atom_id_to: ID of the ending atom
+                       :param crosslinker_type: The type of crosslinker atoms
+                       :param require_order: Whether to require specific ordering
+                       :return: The vector sum from start to end atom
         """
     def get_atom_by_id(self, atom_id: int) -> Atom:
         """
                     Get an atom by its id.
+                    
+                    :param atom_id: The atom ID to search for
+                    :return: The atom with the specified ID
         """
     def get_atom_by_vertex_idx(self, vertex_idx: int) -> Atom:
         """
                     Get an atom for a specific vertex.
+                    
+                    :param vertex_idx: The vertex index to query
+                    :return: The atom at the specified vertex
         """
     def get_atom_id_by_vertex_idx(self, vertex_id: int) -> int:
         """
-                 Get the id of the atom by the vertex id of the underlying graph.
+                 Get the ID of the atom by the vertex ID of the underlying graph.
                  
-                 Parameters:
-                     vertex_id: The vertex index in the underlying graph
-                     
-                 Returns:
-                     The atom ID corresponding to the vertex
+                 :param vertex_id: The vertex index in the underlying graph
+                 :return: The atom ID corresponding to the vertex
         """
     def get_atom_types(self) -> list[int]:
         """
                  Query all types (each one for each atom) ordered by atom vertex id.
                  
-                 Returns:
-                     A vector of atom types in vertex order
+                 :return: A vector of atom types in vertex order
         """
     def get_atoms(self) -> list[Atom]:
         """
-                    Returns all atom objects enclosed in this molecule, ordered by vertex id.
+                    Return all atom objects enclosed in this molecule, ordered by vertex id.
+                    
+                    :return: List of atoms in vertex order
         """
     def get_atoms_by_degree(self, degree: int) -> list[Atom]:
         """
                     Get the atoms that have the specified number of bonds.
+                    
+                    :param degree: The number of bonds (degree/functionality)
+                    :return: List of atoms with the specified degree
         """
     def get_atoms_by_type(self, type: int) -> list[Atom]:
         """
                     Get the atoms with the specified type.
+                    
+                    :param type: The atom type to search for
+                    :return: List of atoms with the specified type
         """
     def get_atoms_connected_to(self, atom: Atom) -> list[Atom]:
         """
                     Get the atoms connected to a specified atom.
         
-                    Internally uses :func:`~pylimer_tools_cpp.Molecule.getAtomsConnectedTo`
+                    Internally uses :meth:`~pylimer_tools_cpp.Molecule.get_atoms_connected_to`.
+                    
+                    :param atom: The atom to query connections for
+                    :return: List of connected atoms
         """
     def get_atoms_connected_to_vertex(self, vertex_idx: int) -> list[Atom]:
         """
                     Get the atoms connected to a specified vertex id.
+                    
+                    :param vertex_idx: The vertex index to query
+                    :return: List of connected atoms
         """
     def get_atoms_lined_up(self, crosslinker_type: int = 2, assumed_coordinates: bool = False, close_loop: bool = False) -> list[Atom]:
         """
-                    Returns all atom objects enclosed in this molecule based on the connectivity.
+                    Return all atom objects enclosed in this molecule based on the connectivity.
         
                     This method works only for lone chains, atoms and loops, 
                     as it throws an error if the molecule does not allow such a "line-up", 
@@ -2469,61 +2955,73 @@ class Molecule:
         
                     Use the `crosslinker_type` parameter to force the atoms in a primary loop 
                     to start with the crosslink.
+                    
+                    :param crosslinker_type: The type of crosslinker atoms
+                    :param assumed_coordinates: Whether to assume coordinates are valid
+                    :param close_loop: Whether to close loops
+                    :return: List of atoms in connected order
         """
     def get_bonds(self) -> dict[str, list[int]]:
         """
                     Get all bonds. Returns a dict with three properties: 'bond_from', 'bond_to' and 'bond_type'.
+                    
+                    :return: Dictionary with bond information
         """
     def get_edge_ids_from(self, vertex_id: int) -> list[int]:
         """
-                 Get the edge ids incident to a specific vertex.
+                 Get the edge IDs incident to a specific vertex.
                  
-                 Parameters:
-                     vertex_id: The vertex to query
-                     
-                 Returns:
-                     A vector of edge ids connected to the vertex
+                 :param vertex_id: The vertex to query
+                 :return: A vector of edge IDs connected to the vertex
         """
     def get_edge_ids_from_to(self, vertex_id_from: int, vertex_id_to: int) -> list[int]:
         """
-              Get the edge ids of the edges between two specific vertices
+                 Get the edge IDs of the edges between two specific vertices.
+                 
+                 :param vertex_id_from: Starting vertex ID
+                 :param vertex_id_to: Ending vertex ID
+                 :return: Vector of edge IDs between the specified vertices
         """
     def get_edges(self) -> dict[str, list[int]]:
         """
                     Get all bonds. Returns a dict with three properties: 'edge_from', 'edge_to' and 'edge_type'.
                     The order is not necessarily related to any structural property.
                     
-                    NOTE:
+                    .. note::
                        The integer values returned refer to the vertex ids, not the atom ids.
-                       Use :func:`~pylimer_tools_cpp.Molecule.getAtomIdByIdx` to translate them to atom ids, or 
-                       :func:`~pylimer_tools_cpp.Molecule.getBonds` to have that done for you.
+                       Use :meth:`~pylimer_tools_cpp.Molecule.get_atom_id_by_idx` to translate them to atom ids, or 
+                       :meth:`~pylimer_tools_cpp.Molecule.get_bonds` to have that done for you.
+                       
+                    :return: Dictionary with edge information
         """
     def get_key(self) -> str:
         """
                     Get a unique identifier for this molecule.
                     
-                    Returns:
-                        A unique string identifier for this molecule
+                    :return: A unique string identifier for this molecule
         """
     def get_nr_of_atoms(self) -> int:
         """
-                 Counts and returns the number of atoms associated with this molecule.
+                 Count and return the number of atoms associated with this molecule.
                  
-                 Returns:
-                     The number of atoms in this molecule
+                 :return: The number of atoms in this molecule
         """
     def get_nr_of_bonds(self) -> int:
         """
-                 Counts and returns the number of bonds associated with this molecule.
+                 Count and return the number of bonds associated with this molecule.
                  
-                 Returns:
-                     The number of bonds in this molecule
+                 :return: The number of bonds in this molecule
         """
     def get_nr_of_edges_from_to(self, vertex_id_from: int, vertex_id_to: int, max_length: int = -1) -> int:
         """
-              Get the number of edges in the shortest path between two specific vertices.
+                 Get the number of edges in the shortest path between two specific vertices.
         
-              If `max_length` is provided and positive, it will only consider paths up to that length.
+                 If `max_length` is provided and positive, it will only consider paths up to that length.
+                 
+                 :param vertex_id_from: Starting vertex ID
+                 :param vertex_id_to: Ending vertex ID  
+                 :param max_length: Maximum path length to consider (-1 for no limit)
+                 :return: Number of edges in the shortest path, or -1 if no path exists
         """
     def get_strand_ends(self, crosslinker_type: int = 2, close_loop: bool = False) -> list[Atom]:
         """
@@ -2531,30 +3029,32 @@ class Molecule:
                   In case of a primary loop, the crosslink is returned, if there is one.
                   Use the argument `close_loop` to decide, whether this should be returned once or twice.
         
-                  NOTE: 
+                  .. note:: 
                        Currently only works for linear strands.
+                       
+                  :param crosslinker_type: The type of crosslinker atoms
+                  :param close_loop: Whether to return the crosslinker twice for loops
+                  :return: List of end atoms
         """
     def get_strand_type(self) -> MoleculeType:
         """
-                   Get the type of this molecule (see :obj:`~pylimer_tools_cpp.MoleculeType` enum).
+                   Get the type of this molecule (see :class:`~pylimer_tools_cpp.MoleculeType` enum).
         
-                   Note that this type might be unset; currently, only 
-                   :func:`~pylimer_tools_cpp.Universe.get_chains_with_crosslinker` assigns them automatically.
+                   .. note:: 
+                      This type might be unset; currently, only 
+                      :meth:`~pylimer_tools_cpp.Universe.get_chains_with_crosslinker` assigns them automatically.
         """
     def get_vertex_idx_by_atom_id(self, atom_id: int) -> int:
         """
-                 Get the vertex id of the underlying graph for an atom with a specified id.
+                 Get the vertex ID of the underlying graph for an atom with a specified ID.
                  
-                 Parameters:
-                     atom_id: The atom ID to look up
-                     
-                 Returns:
-                     The vertex index corresponding to the atom
+                 :param atom_id: The atom ID to look up
+                 :return: The vertex index corresponding to the atom
         """
 class MoleculeIterator:
     """
     
-           An iterator to iterate through the atoms in :obj:`~pylimer_tools_cpp.Molecule`.
+           An iterator to iterate through the atoms in :class:`~pylimer_tools_cpp.Molecule`.
       
     """
     def __iter__(self) -> MoleculeIterator:
@@ -2628,12 +3128,11 @@ class NeighbourList:
     """
     def __init__(self, atoms: list[Atom], box: Box, cutoff: float) -> None:
         """
-                 Instantiates a new neighbour list.
+                 Instantiate a new neighbour list.
                  
-                 Parameters:
-                     atoms: Vector of atoms to include in the neighbour list
-                     box: The simulation box
-                     cutoff: Maximum distance for neighbour searches
+                 :param atoms: Vector of atoms to include in the neighbour list
+                 :param box: The simulation box
+                 :param cutoff: Maximum distance for neighbour searches
         """
     def get_atoms_close_to(self, atom: Atom, upper_cutoff: float = 1.0, lower_cutoff: float = 0.0, unwrapped: bool = False, expect_self: bool = False) -> list[Atom]:
         """
@@ -2646,6 +3145,13 @@ class NeighbourList:
         
                   You can use a negative value for the upper_cutoff to use the cutoff used for 
                   filling the neighbour list buckets.
+                  
+                  :param atom: The reference atom
+                  :param upper_cutoff: Maximum distance for neighbours
+                  :param lower_cutoff: Minimum distance for neighbours
+                  :param unwrapped: Whether to use unwrapped coordinates
+                  :param expect_self: Whether to expect the atom itself in results
+                  :return: List of neighbouring atoms
         """
     def remove_atom(self, atom: Atom, debug_hint: str = '') -> None:
         """
@@ -2653,9 +3159,8 @@ class NeighbourList:
                  It will not show up when querying for neighbours, 
                  but its neighbours cannot be queried either.
                  
-                 Parameters:
-                     atom: The atom to remove
-                     debug_hint: Optional debug information
+                 :param atom: The atom to remove
+                 :param debug_hint: Optional debug information
         """
 class NoMaxDistanceProvider(MaxDistanceProvider):
     """
@@ -2705,67 +3210,105 @@ class NormalModeAnalyzer:
                  Initialize the NormalModeAnalyzer with the bonds (edges).
         
                  Constructs the connectivity matrix from the given edges.
+                 
+                 :param spring_from: Vector of starting node indices for springs/bonds
+                 :param spring_to: Vector of ending node indices for springs/bonds
         """
     def __setstate__(self, arg0: tuple) -> None:
         ...
     def evaluate_loss_modulus(self, omega: numpy.ndarray) -> numpy.ndarray:
         """
-        Evaluate the loss modulus :math:`G''`. Yet misses the conversion factor.
+                 Evaluate the loss modulus :math:`G''(\\omega)`. Yet misses the conversion factor.
+                 
+                 :param omega: Angular frequencies
+                 :return: Loss modulus values
         """
     def evaluate_storage_modulus(self, omega: numpy.ndarray) -> numpy.ndarray:
         """
-        Evaluate the storage modulus :math:`G'`. Yet misses the conversion factor.
+                 Evaluate the storage modulus :math:`G'(\\omega)`. Yet misses the conversion factor.
+                 
+                 :param omega: Angular frequencies
+                 :return: Storage modulus values
         """
     def evaluate_stress_autocorrelation(self, t: numpy.ndarray) -> numpy.ndarray:
         """
-        Evaluate stress autocorrelation
+                 Evaluate stress autocorrelation :math:`C(t)`.
+                 
+                 :param t: The time at which to evaluate the stress autocorrelation
+                 :return: Stress autocorrelation values
         """
     def find_all_eigenvalues(self, compute_eigenvectors: bool = False) -> None:
         """
-        Find all eigenvalues using a dense solver
+                 Find all eigenvalues using a dense solver.
+                 
+                 :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
+                 :return: True if computation was successful
         """
     def find_sparse_eigenvalues(self, nr_of_eigenvalues: int, compute_eigenvectors: bool = False) -> None:
         """
-        Find the `k` smallest eigenvalues using a sparse solver
+                 Find the k smallest eigenvalues using a sparse solver.
+                 
+                 :param nr_of_eigenvalues: Number of smallest eigenvalues to find
+                 :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
+                 :return: True if computation was successful
         """
     def get_eigenvalues(self) -> numpy.ndarray:
         """
-        Get the eigenvalues
+                 Get the eigenvalues.
+                 
+                 :return: Vector of eigenvalues
         """
     def get_eigenvectors(self) -> numpy.ndarray:
         """
-        Get eigenvectors
+                 Get eigenvectors.
+                 
+                 :return: Matrix of eigenvectors
         """
     def get_matrix(self) -> scipy.sparse.csc_matrix:
         """
-        Get the assembled connectivity matrix.
+                 Get the assembled connectivity matrix.
+                 
+                 :return: The connectivity matrix
         """
     def get_matrix_size(self) -> int:
         """
-        Get the size of the matrix (the maximum of eigenvalues that could be queried)
+                 Get the size of the matrix (the maximum number of eigenvalues that could be queried).
+                 
+                 :return: Size of the connectivity matrix
         """
     def get_nr_of_soluble_clusters(self) -> int:
         """
-        Get the number of soluble clusters (Eigenvalues = 0)
+                 Get the number of soluble clusters (eigenvalues = 0).
+                 
+                 :return: Number of soluble clusters
         """
     def set_eigenvalues(self, eigenvalues: numpy.ndarray) -> None:
         """
-        Set the eigenvalues, e.g. if you use an external solver
+                 Set the eigenvalues, e.g. if you use an external solver.
+                 
+                 :param eigenvalues: Vector of eigenvalues to set
         """
     def set_eigenvectors(self, eigenvectors: numpy.ndarray) -> None:
         """
-        Set eigenvectors, e.g. if you use an external solver
+                 Set eigenvectors, e.g. if you use an external solver.
+                 
+                 :param eigenvectors: Matrix of eigenvectors to set
         """
 class OutputConfiguration:
     """
-    A configuration object to configure the output,
-        as supported by most "simulation-like" classes in this package.
+    
+         A configuration object to configure the output values and frequency
+         for simulation classes in this package.
+    
+         This class specifies which quantities to output and how often to write them
+         during simulations.
+        
     """
-    double_values: list[ComputedDoubleValues]
-    int_values: list[ComputedIntValues]
     def __init__(self) -> None:
         """
-        Get an instance of this struct
+                  Create a new OutputConfiguration instance.
+        
+                  :return: A new OutputConfiguration object with default settings
         """
     @property
     def append(self) -> bool:
@@ -2776,6 +3319,17 @@ class OutputConfiguration:
     def append(self, arg0: bool) -> None:
         ...
     @property
+    def double_values(self) -> list[ComputedDoubleValues]:
+        """
+                            List of double-valued quantities to output.
+                            
+                            Use ComputedDoubleValues enum to specify which floating-point quantities
+                            should be computed and written to output.
+        """
+    @double_values.setter
+    def double_values(self, arg0: list[ComputedDoubleValues]) -> None:
+        ...
+    @property
     def filename(self) -> str:
         """
               The path and name of the file to write to.
@@ -2783,6 +3337,17 @@ class OutputConfiguration:
         """
     @filename.setter
     def filename(self, arg0: str) -> None:
+        ...
+    @property
+    def int_values(self) -> list[ComputedIntValues]:
+        """
+                            List of integer-valued quantities to output.
+                            
+                            Use ComputedIntValues enum to specify which integer quantities
+                            should be computed and written to output.
+        """
+    @int_values.setter
+    def int_values(self, arg0: list[ComputedIntValues]) -> None:
         ...
     @property
     def output_every(self) -> int:
@@ -3177,8 +3742,7 @@ class Universe:
         """
                  Create a copy of this universe.
                  
-                 Returns:
-                     A new Universe instance that is a copy of this one
+                 :return: A new Universe instance that is a copy of this one
         """
     def __getitem__(self, arg0: int) -> Atom:
         """
@@ -3190,10 +3754,9 @@ class Universe:
         """
                  Instantiate this Universe (Collection of Molecules) providing the box lengths.
                  
-                 Parameters:
-                     Lx: Box length in x direction
-                     Ly: Box length in y direction
-                     Lz: Box length in z direction
+                 :param Lx: Box length in x direction
+                 :param Ly: Box length in y direction
+                 :param Lz: Box length in z direction
         """
     def __len__(self) -> int:
         """
@@ -3206,25 +3769,23 @@ class Universe:
                  Add angles to the Universe. No relation to the underlying graph, 
                  just a method to preserve read & write capabilities.
                  
-                 Parameters:
-                     angles_from: Vector of atom IDs for angle start points
-                     angles_via: Vector of atom IDs for angle middle points
-                     angles_to: Vector of atom IDs for angle end points
-                     angle_types: Vector of angle types
+                 :param angles_from: Vector of atom IDs for angle start points
+                 :param angles_via: Vector of atom IDs for angle middle points
+                 :param angles_to: Vector of atom IDs for angle end points
+                 :param angle_types: Vector of angle types
         """
     def add_atoms(self, ids: list[int], types: list[int], x: list[float], y: list[float], z: list[float], nx: list[int], ny: list[int], nz: list[int]) -> None:
         """
                  Add atoms to the Universe, vertices to the underlying graph.
                  
-                 Parameters:
-                     ids: Vector of atom IDs
-                     types: Vector of atom types
-                     x: Vector of x coordinates
-                     y: Vector of y coordinates
-                     z: Vector of z coordinates
-                     nx: Vector of periodic image flags in x direction
-                     ny: Vector of periodic image flags in y direction
-                     nz: Vector of periodic image flags in z direction
+                 :param ids: Vector of atom IDs
+                 :param types: Vector of atom types
+                 :param x: Vector of x coordinates
+                 :param y: Vector of y coordinates
+                 :param z: Vector of z coordinates
+                 :param nx: Vector of periodic image flags in x direction
+                 :param ny: Vector of periodic image flags in y direction
+                 :param nz: Vector of periodic image flags in z direction
         """
     @typing.overload
     def add_bonds(self, bonds_from: list[int], bonds_to: list[int]) -> None:
@@ -3232,139 +3793,142 @@ class Universe:
                  Add bonds to the underlying atoms, edges to the underlying graph. 
                  If the connected atoms are not found, the bonds are silently skipped.
                  
-                 Parameters:
-                     bonds_from: Vector of atom IDs for bond start points
-                     bonds_to: Vector of atom IDs for bond end points
+                 :param bonds_from: Vector of atom IDs for bond start points
+                 :param bonds_to: Vector of atom IDs for bond end points
         """
     @typing.overload
     def add_bonds(self, nr_of_bonds: int, bonds_from: list[int], bonds_to: list[int], bond_types: list[int], ignore_non_existent_atoms: bool = False, simplify_universe: bool = True) -> None:
         """
                  Add bonds to the underlying atoms, edges to the underlying graph.
                  
-                 Parameters:
-                     nr_of_bonds: Number of bonds to add
-                     bonds_from: Vector of atom IDs for bond start points
-                     bonds_to: Vector of atom IDs for bond end points
-                     bond_types: Vector of bond types
-                     ignore_non_existent_atoms: Whether to skip bonds to non-existent atoms
-                     simplify_universe: Whether to simplify the universe after adding bonds
+                 :param nr_of_bonds: Number of bonds to add
+                 :param bonds_from: Vector of atom IDs for bond start points
+                 :param bonds_to: Vector of atom IDs for bond end points
+                 :param bond_types: Vector of bond types
+                 :param ignore_non_existent_atoms: Whether to skip bonds to non-existent atoms
+                 :param simplify_universe: Whether to simplify the universe after adding bonds
         """
     def add_bonds_with_types(self, bonds_from: list[int], bonds_to: list[int], bond_types: list[int]) -> None:
         """
                  Add bonds to the underlying atoms, edges to the underlying graph. 
                  If the connected atoms are not found, the bonds are silently skipped.
                  
-                 Parameters:
-                     bonds_from: Vector of atom IDs for bond start points
-                     bonds_to: Vector of atom IDs for bond end points
-                     bond_types: Vector of bond types
+                 :param bonds_from: Vector of atom IDs for bond start points
+                 :param bonds_to: Vector of atom IDs for bond end points
+                 :param bond_types: Vector of bond types
         """
     def add_dihedral_angles(self, angles_from: list[int], angles_via1: list[int], angles_via2: list[int], angles_to: list[int], angle_types: list[int]) -> None:
         """
                  Add dihedral angles to the Universe. No relation to the underlying graph, 
                  just a method to preserve read & write capabilities.
                  
-                 Parameters:
-                     angles_from: Vector of atom IDs for dihedral start points
-                     angles_via1: Vector of atom IDs for first middle points
-                     angles_via2: Vector of atom IDs for second middle points
-                     angles_to: Vector of atom IDs for dihedral end points
-                     angle_types: Vector of dihedral angle types
+                 :param angles_from: Vector of atom IDs for dihedral start points
+                 :param angles_via1: Vector of atom IDs for first middle points
+                 :param angles_via2: Vector of atom IDs for second middle points
+                 :param angles_to: Vector of atom IDs for dihedral end points
+                 :param angle_types: Vector of dihedral angle types
         """
     def compute_angles(self) -> list[float]:
         """
-                 Computes the angle of each angle in the molecule, respecting periodic boundaries.
+                 Compute the angle of each angle in the molecule, respecting periodic boundaries.
                  
-                 Returns:
-                     A list of angle values in radians
+                 :return: A list of angle values in radians
         """
     def compute_bond_lengths(self) -> list[float]:
         """
-                 Computes the length of each bond in the molecule, respecting periodic boundaries.
+                 Compute the length of each bond in the molecule, respecting periodic boundaries.
                  
-                 Returns:
-                     A list of bond lengths
+                 :return: A list of bond lengths
         """
     def compute_bond_vectors(self) -> list[numpy.ndarray]:
         """
-                 Computes the vectors of each bond in the molecule, respecting periodic boundaries.
+                 Compute the vectors of each bond in the molecule, respecting periodic boundaries.
                  
-                 Returns:
-                     A list of bond vectors
+                 :return: A list of bond vectors
         """
-    def compute_dxs(self, atomIdsTo: list[int], atomIdsFrom: list[int]) -> list[float]:
+    def compute_dxs(self, atom_ids_to: list[int], atom_ids_from: list[int]) -> list[float]:
         """
                  Compute the dx distance for certain bonds (length in x direction).
                  
-                 Parameters:
-                     atomIdsTo: Vector of destination atom IDs
-                     atomIdsFrom: Vector of source atom IDs
-                     
-                 Returns:
-                     Vector of x-direction distances
+                 :param atom_ids_to: Vector of destination atom IDs
+                 :param atom_ids_from: Vector of source atom IDs
+                 :return: Vector of x-direction distances
         """
-    def compute_dys(self, atomIdsTo: list[int], atomIdsFrom: list[int]) -> list[float]:
+    def compute_dys(self, atom_ids_to: list[int], atom_ids_from: list[int]) -> list[float]:
         """
                  Compute the dy distance for certain bonds (length in y direction).
                  
-                 Parameters:
-                     atomIdsTo: Vector of destination atom IDs
-                     atomIdsFrom: Vector of source atom IDs
-                     
-                 Returns:
-                     Vector of y-direction distances
+                 :param atom_ids_to: Vector of destination atom IDs
+                 :param atom_ids_from: Vector of source atom IDs
+                 :return: Vector of y-direction distances
         """
-    def compute_dzs(self, atomIdsTo: list[int], atomIdsFrom: list[int]) -> list[float]:
+    def compute_dzs(self, atom_ids_to: list[int], atom_ids_from: list[int]) -> list[float]:
         """
                  Compute the dz distance for certain bonds (length in z direction).
                  
-                 Parameters:
-                     atomIdsTo: Vector of destination atom IDs
-                     atomIdsFrom: Vector of source atom IDs
-                     
-                 Returns:
-                     Vector of z-direction distances
+                 :param atom_ids_to: Vector of destination atom IDs
+                 :param atom_ids_from: Vector of source atom IDs
+                 :return: Vector of z-direction distances
         """
     def compute_end_to_end_distances(self, crosslinker_type: int, derive_image_flags: bool = False) -> list[float]:
         """
                   Compute the end-to-end distance of each strand in the network.
         
-                  NOTE:
-                       Internally, this uses either :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance` 
-                       or :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance_with_derived_image_flags`, 
+                  .. note::
+                       Internally, this uses either :meth:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance` 
+                       or :meth:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance_with_derived_image_flags`, 
                        depending on `derive_image_flags`.
                        Invalid strands (where said function returns 0.0 or -1.0) are ignored.
+                       
+                  :param crosslinker_type: The type of crosslinker atoms
+                  :param derive_image_flags: Whether to derive image flags from connectivity
+                  :return: List of end-to-end distances
         """
     def compute_mean_end_to_end_distance(self, crosslinker_type: int, derive_image_flags: bool = False) -> float:
         """
-                  Computes the mean of the end-to-end distances of each strand in the network.
+                  Compute the mean of the end-to-end distances of each strand in the network.
         
-                  NOTE:
-                       Internally, this uses either :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance` 
-                       or :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance_with_derived_image_flags`, 
+                  .. note::
+                       Internally, this uses either :meth:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance` 
+                       or :meth:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance_with_derived_image_flags`, 
                        depending on `derive_image_flags`.
                        Invalid strands (where said function returns 0.0 or -1.0) are ignored.
+                       
+                  :param crosslinker_type: The type of crosslinker atoms
+                  :param derive_image_flags: Whether to derive image flags from connectivity
+                  :return: Mean end-to-end distance
         """
     def compute_mean_squared_end_to_end_distance(self, crosslinker_type: int, only_those_with_two_crosslinkers: bool = False, derive_image_flags: bool = False) -> float:
         """
-                  Computes the mean square of the end-to-end distances of each strand (incl. crosslinks) in the network.
+                  Compute the mean square of the end-to-end distances of each strand (incl. crosslinks) in the network.
         
-                  NOTE:
-                       Internally, this uses either :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance` 
-                       or :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance_with_derived_image_flags`, 
+                  .. note::
+                       Internally, this uses either :meth:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance` 
+                       or :meth:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance_with_derived_image_flags`, 
                        depending on `derive_image_flags`.
                        Invalid strands (where said function returns 0.0 or -1.0) are ignored.
+                       
+                  :param crosslinker_type: The type of crosslinker atoms
+                  :param only_those_with_two_crosslinkers: Whether to only consider strands with two crosslinkers
+                  :param derive_image_flags: Whether to derive image flags from connectivity
+                  :return: Mean squared end-to-end distance
         """
     def compute_mean_strand_length(self, crosslinker_type: int) -> float:
         """
                       Compute the mean number of beads per strand.
+                      
+                      :param crosslinker_type: The type of crosslinker atoms
+                      :return: Mean strand length
         """
     def compute_number_average_molecular_weight(self, crosslinker_type: int) -> float:
         """
                       Compute the number average molecular weight.
         
-                      NOTE: 
+                      .. note:: 
                             Crosslinkers are ignored completely.
+                            
+                      :param crosslinker_type: The type of crosslinker atoms
+                      :return: Number average molecular weight
         """
     def compute_polydispersity_index(self, crosslinker_type: int) -> float:
         """
@@ -3373,19 +3937,28 @@ class Universe:
         """
     def compute_temperature(self, dimensions: int = 3, k_b: float = 1.0) -> float:
         """
-        Use the velocities per atom to compute the temperature from the kinetic energy of the system.
+              Use the velocities per atom to compute the temperature from the kinetic energy of the system.
+              
+              :param dimensions: Number of dimensions (typically 3)
+              :param k_b: Boltzmann constant value
+              :return: Computed temperature
         """
     def compute_total_mass(self) -> float:
         """
                   Compute the total mass of this network/universe in whatever mass unit was used when 
-                  :func:`~pylimer_tools_cpp.Universe.setMasses()` was called.
+                  :meth:`~pylimer_tools_cpp.Universe.set_masses` was called.
+                  
+                  :return: Total mass of the universe
         """
     def compute_weight_average_molecular_weight(self, crosslinker_type: int) -> float:
         """
                       Compute the weight average molecular weight.
         
-                      NOTE: 
+                      .. note:: 
                             Crosslinkers are ignored completely.
+                            
+                      :param crosslinker_type: The type of crosslinker atoms
+                      :return: Weight average molecular weight
         """
     def compute_weight_fractions(self) -> dict[int, float]:
         """
@@ -3399,20 +3972,24 @@ class Universe:
         """
                   Merge vertices along a specific bond type.
         
-                  May result in new self-loops; use :func:`~pylimer_tools_cpp.Universe.simplify()` to remove them.
+                  May result in new self-loops; use :meth:`~pylimer_tools_cpp.Universe.simplify` to remove them.
+                  
+                  :param bond_type: The bond type to contract along
         """
     def count_atom_types(self) -> dict[int, int]:
         """
                   Count how often each atom type is present.
+                  
+                  :return: Dictionary mapping atom types to their counts
         """
     def count_atoms_in_skin_distance(self, distances: list[float], unwrapped: bool = False) -> list[int]:
         """
                   This is a function that may help you to compute the radial distribution function.
-                  It loops the 
+                  It loops through all atoms and counts neighbors within specified distance ranges.
         
-                  Parameters:
-                       - distances: The edges of the bins
-                       - unwrapped: whether to measure the distance in unwrapped coordinates or as PBC-corrected distance
+                  :param distances: The edges of the bins for distance counting
+                  :param unwrapped: Whether to measure the distance in unwrapped coordinates or as PBC-corrected distance
+                  :return: Array of counts for each distance bin
         """
     def count_loop_lengths(self, max_length: int = -1) -> dict[int, int]:
         """
@@ -3421,31 +3998,41 @@ class Universe:
         """
     def detect_angles(self) -> dict[str, list[int]]:
         """
-        Returns just as
-                  :func:`~pylimer_tools_cpp.Universe.getAngles`, 
-                  but all angles that are detected in the network, rather than the one already set.
+                  Detect angles in the network based on the current bonds.
+                  Return the result in the same format as :meth:`~pylimer_tools_cpp.Universe.get_angles`, 
+                  but all angles that are detected in the network, rather than the ones already set.
                   Note that the angle types are determined by 
-                  :func:`~pylimer_tools_cpp.Universe.hashAngleType`,
+                  :meth:`~pylimer_tools_cpp.Universe.hash_angle_type`,
                   which serves angle types that should be mapped by you back to smaller numbers, 
-                  before serving them to :func:`~pylimer_tools_cpp.Universe.addAngles`.
+                  before serving them again to :meth:`~pylimer_tools_cpp.Universe.add_angles`,
+                  if you want to have them written e.g. for LAMMPS.
+                  
+                  :return: Dictionary with detected angle information
         """
     def detect_dihedral_angles(self) -> dict[str, list[int]]:
         """
-        Returns just as
-                  :func:`~pylimer_tools_cpp.Universe.getDihedralAngles`, 
-                  but all dihedral angles that are detected in the network, rather than the one already set.
+                  Detect dihedral angles in the network based on the current bonds.
+                  Return the result in the same format as :meth:`~pylimer_tools_cpp.Universe.get_dihedral_angles`, 
+                  but all dihedral angles that are detected in the network, rather than the ones already set.
                   Note that the angle types are determined by 
-                  :func:`~pylimer_tools_cpp.Universe.hashDihedralAngleType`,
+                  :meth:`~pylimer_tools_cpp.Universe.hash_dihedral_angle_type`,
                   which serves angle types that should be mapped by you back to smaller numbers, 
-                  before serving them to :func:`~pylimer_tools_cpp.Universe.addDiheralAngles`.
+                  before serving them to :meth:`~pylimer_tools_cpp.Universe.add_dihedral_angles`,
+                  if you want to have them written e.g. for LAMMPS.
+        
+                  :return: Dictionary with detected dihedral angle information
         """
     def determine_effective_functionality_per_type(self) -> dict[int, float]:
         """
                     Find the average functionality of each atom type in the network.
+                    
+                    :return: Dictionary mapping atom types to average functionality
         """
     def determine_functionality_per_type(self) -> dict[int, int]:
         """
                     Find the maximum functionality of each atom type in the network.
+                    
+                    :return: Dictionary mapping atom types to maximum functionality
         """
     def find_loops(self, crosslinker_type: int, max_length: int = -1, skip_self_loops: bool = False) -> dict[int, list[list[Atom]]]:
         """
@@ -3460,19 +4047,19 @@ class Universe:
         """
     def find_minimal_order_loop_from(self, loop_start: int, loop_step1: int, max_length: int = -1, skip_self_loops: bool = False) -> list[Atom]:
         """
-                    Find the loops in the network starting with one connection
+                    Find the loops in the network starting with one connection.
         
-                    CAUTION:
+                    .. warning::
                        There are exponentially many paths between two crosslinkers of a network,
                        and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
                        You can use the `max_length` parameter to restrict the algorithm to only search for loops up to a certain length.
                        Use a negative value to find all loops and paths.
         
-                  Parameters:
-                       loop_start: The atom id to start the search from
-                       loop_step1: The first step to take, i.e., the first bond to follow
-                       max_length: The maximum length of the loop to find, or -1 for no limit
-                       skip_self_loops: Whether to skip self-loops (i.e., loops that start and end at the same atom; only relevant if `loop_start` is equal to `loop_step1`).
+                    :param loop_start: The atom ID to start the search from
+                    :param loop_step1: The first step to take, i.e., the first bond to follow
+                    :param max_length: The maximum length of the loop to find, or -1 for no limit
+                    :param skip_self_loops: Whether to skip self-loops (i.e., loops that start and end at the same atom; only relevant if `loop_start` is equal to `loop_step1`)
+                    :return: List of loops found
         """
     def get_angles(self) -> dict[str, list[int]]:
         """
@@ -3480,41 +4067,44 @@ class Universe:
         
                    Returns a dict with three properties: 'angle_from', 'angle_via' and 'angle_to'.
         
-                   NOTE:
-                       The integer values returned refer to the the atom ids, not the vertex ids.
-                       Use :func:`~pylimer_tools_cpp.Universe.get_idx_by_atom_id` to translate them to vertex ids.
+                   .. note::
+                       The integer values returned refer to the atom IDs, not the vertex IDs.
+                       Use :meth:`~pylimer_tools_cpp.Universe.get_idx_by_atom_id` to translate them to vertex IDs.
+                       
+                   :return: Dictionary with angle information
         """
     def get_atom(self, atom_id: int) -> Atom:
         """
                  Find an atom by its ID.
                  
-                 Parameters:
-                     atom_id: The ID of the atom to find
-                     
-                 Returns:
-                     The atom with the specified ID
+                 :param atom_id: The ID of the atom to find
+                 :return: The atom with the specified ID
         """
     def get_atom_by_vertex_id(self, vertex_id: int) -> Atom:
         """
-        Find an atom by the ID of the vertex of the underlying graph.
+              Find an atom by the ID of the vertex of the underlying graph.
+              
+              :param vertex_id: The vertex ID to query
+              :return: The atom at the specified vertex
         """
     def get_atom_id_by_vertex_idx(self, vertex_id: int) -> int:
         """
-                 Get the id of the atom by the vertex id of the underlying graph.
+                 Get the ID of the atom by the vertex ID of the underlying graph.
                  
-                 Parameters:
-                     vertex_id: The vertex index in the underlying graph
-                     
-                 Returns:
-                     The atom ID corresponding to the vertex
+                 :param vertex_id: The vertex index in the underlying graph
+                 :return: The atom ID corresponding to the vertex
         """
     def get_atom_types(self) -> list[int]:
         """
-                  Get all types (each one for each atom) ordered by atom vertex id.
+                  Get all types (each one for each atom) ordered by atom vertex ID.
+                  
+                  :return: Vector of atom types in vertex order
         """
     def get_atoms(self) -> list[Atom]:
         """
-                    Get all atoms.
+                    Get all atoms in the universe.
+                    
+                    :return: List of all atoms
         """
     def get_atoms_by_degree(self, functionality: int) -> list[Atom]:
         """
@@ -3528,75 +4118,107 @@ class Universe:
         """
                     Get the atoms connected to a specified atom.
         
-                    Internally uses :func:`~pylimer_tools_cpp.Universe.getAtomsConnectedTo`
+                    Internally uses :meth:`~pylimer_tools_cpp.Universe.get_atoms_connected_to`.
+                    
+                    :param atom: The atom to query connections for
+                    :return: List of connected atoms
         """
     def get_atoms_connected_to_vertex(self, vertex_idx: int) -> list[Atom]:
         """
-                    Get the atoms connected to a specified vertex id.
+                    Get the atoms connected to a specified vertex ID.
+                    
+                    :param vertex_idx: The vertex index to query
+                    :return: List of connected atoms
         """
     def get_bonds(self) -> dict[str, list[int]]:
         """
                     Get all bonds. Returns a dict with three properties: 'bond_from', 'bond_to' and 'bond_type'.
                     The order is not necessarily related to any structural characteristic.
+                    
+                    :return: Dictionary with bond information
         """
     def get_box(self) -> Box:
         """
                     Get the underlying bounding box object.
+                    
+                    :return: The simulation box
         """
     def get_chains_with_crosslinker(self, crosslinker_type: int) -> list[Molecule]:
         """
                     Decompose the Universe into strands (molecules, which could be either chains, or even lonely atoms), without omitting the crosslinkers
-                    (as in :func:`~pylimer_tools_cpp.Universe.getMolecules(crosslinker_type)`).
+                    (as in :meth:`~pylimer_tools_cpp.Universe.get_molecules`).
                     In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resulting molecules.
                     
-                    NOTE:
+                    .. note::
                        Crosslinkers without bonds to non-crosslinkers are not returned 
                        (i.e., single crosslinkers, are not counted as strands).
+                       
+                    :param crosslinker_type: The type of crosslinker atoms
+                    :return: List of chains including crosslinkers
         """
     def get_clusters(self) -> list[Universe]:
         """
                   Get the components of the universe that are not connected to each other.
-                  Returns a list of :obj:`~pylimer_tools_cpp.Universe`s.
-                  Unconnected, free atoms/beads become their own :obj:`~pylimer_tools_cpp.Universe`.
+                  Returns a list of :class:`~pylimer_tools_cpp.Universe` objects.
+                  Unconnected, free atoms/beads become their own :class:`~pylimer_tools_cpp.Universe`.
+                  
+                  :return: List of disconnected Universe components
         """
     def get_edge_ids_from(self, vertex_id: int) -> list[int]:
-        ...
+        """
+                  Get the edge IDs incident to a specific vertex.
+        
+                  :param vertex_id: The ID of the vertex to query
+                  :return: List of edge IDs connected to the vertex
+        """
     def get_edge_ids_from_to(self, vertex_id_from: int, vertex_id_to: int) -> list[int]:
         """
-              Get the edge ids of the edges between two specific vertices
+                  Get the edge IDs of all edges between two specific vertices.
+        
+                  :param vertex_id_from: The starting vertex ID
+                  :param vertex_id_to: The ending vertex ID
+                  :return: List of edge IDs connecting the two vertices
         """
     def get_edges(self) -> dict[str, list[int]]:
         """
                     Get all edges. Returns a dict with three properties: 'edge_from', 'edge_to' and 'edge_type'.
                     The order is not necessarily related to any structural characteristic.
                     
-                    NOTE:
-                       The integer values returned refer to the vertex ids, not the atom ids.
-                       Use :func:`~pylimer_tools_cpp.Universe.get_atom_id_by_idx` to translate them to atom ids, or
-                       :func:`~pylimer_tools_cpp.Universe.get_bonds` to have that done for you.
+                    .. note::
+                       The integer values returned refer to the vertex IDs, not the atom IDs.
+                       Use :meth:`~pylimer_tools_cpp.Universe.get_atom_id_by_idx` to translate them to atom IDs, or
+                       :meth:`~pylimer_tools_cpp.Universe.get_bonds` to have that done for you.
+                       
+                    :return: Dictionary with edge information
         """
     def get_masses(self) -> dict[int, float]:
         """
-                    Get the mass of one atom per type
+                    Get the mass of one atom per type.
+                    
+                    :return: Dictionary mapping atom types to masses
         """
     def get_molecules(self, atom_type_to_omit: int) -> list[Molecule]:
         """
                   Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms.
                   
                   Reduces the Universe to a list of molecules. 
-                  Specify the crosslinker_type to an existing type id, 
+                  Specify the crosslinker_type to an existing type ID, 
                   then those atoms will be omitted, and this function returns chains instead.
         
                   :param atom_type_to_omit: The type of atom to omit from the universe to end up with the desired molecules (e.g., the type of the crosslinkers).
+                  :return: List of molecules
         """
     def get_network_of_crosslinker(self, crosslinker_type: int) -> Universe:
         """
                     Reduce the network to contain only crosslinkers, replacing all the strands with a single bond.
-                    Useful e.g. to reduce the memory useage and runtime of 
-                    :func:`~pylimer_tools_cpp.Universe.findLoops()` or 
-                    :func:`~pylimer_tools_cpp.Universe.hasInfiniteStrand()`.
+                    Useful e.g. to reduce the memory usage and runtime of 
+                    :meth:`~pylimer_tools_cpp.Universe.find_loops` or 
+                    :meth:`~pylimer_tools_cpp.Universe.has_infinite_strand`.
                     
-                    Further use :func:`~pylimer_tools_cpp.Universe.simplify()` to remove primary loops.
+                    Further use :meth:`~pylimer_tools_cpp.Universe.simplify` to remove primary loops.
+                    
+                    :param crosslinker_type: The type of crosslinker atoms
+                    :return: Reduced network containing only crosslinkers
         """
     def get_nr_of_angles(self) -> int:
         """
@@ -3605,6 +4227,8 @@ class Universe:
     def get_nr_of_atoms(self) -> int:
         """
                     Query the number of atoms in this universe.
+                    
+                    :return: Number of atoms
         """
     def get_nr_of_bonds(self) -> int:
         """
@@ -3612,11 +4236,17 @@ class Universe:
         """
     def get_nr_of_bonds_of_atom(self, arg0: int) -> int:
         """
-        Count the number of immediate neighbors of an atom, specified by its id.
+               Count the number of immediate neighbors of an atom, specified by its ID.
+        
+               :param atom_id: The ID of the atom to query
+               :return: Number of bonds connected to the atom
         """
     def get_nr_of_bonds_of_vertex(self, arg0: int) -> int:
         """
-        Count the number of immediate neighbors of an atom, specified by its vertex id.
+               Count the number of immediate neighbors of an atom, specified by its vertex ID.
+        
+               :param vertex_id: The vertex ID of the atom to query
+               :return: Number of bonds connected to the vertex
         """
     def get_nr_of_dihedral_angles(self) -> int:
         """
@@ -3624,9 +4254,14 @@ class Universe:
         """
     def get_nr_of_edges_from_to(self, vertex_id_from: int, vertex_id_to: int, max_length: int = -1) -> int:
         """
-              Get the number of edges in the shortest path between two specific vertices.
+                  Get the number of edges in the shortest path between two specific vertices.
         
-              If `max_length` is provided and positive, it will only consider paths up to that length.
+                  If `max_length` is provided and positive, it will only consider paths up to that length.
+        
+                  :param vertex_id_from: The starting vertex ID
+                  :param vertex_id_to: The ending vertex ID  
+                  :param max_length: Maximum path length to consider (default: -1 for no limit)
+                  :return: Number of edges in shortest path, or -1 if no path exists
         """
     def get_timestep(self) -> int:
         """
@@ -3638,47 +4273,63 @@ class Universe:
         """
     def get_vertex_idx_by_atom_id(self, atom_id: int) -> int:
         """
-                 Get the vertex id of the underlying graph for an atom with a specified id.
+                 Get the vertex ID of the underlying graph for an atom with a specified ID.
                  
-                 Parameters:
-                     atom_id: The atom ID to look up
-                     
-                 Returns:
-                     The vertex index corresponding to the atom
+                 :param atom_id: The atom ID to look up
+                 :return: The vertex index corresponding to the atom
         """
     def get_volume(self) -> float:
         """
                     Query the volume of the underlying bounding box.
+                    
+                    :return: The volume of the simulation box
         """
     def has_infinite_strand(self, arg0: int, arg1: int) -> bool:
         """
-                   Checks whether there is a strand (with crosslinker) in the universe that loops through periodic images without coming back.
+                   Check whether there is a strand (with crosslinker) in the universe that loops through periodic images without coming back.
                    
-                    CAUTION:
+                    .. warning::
                        There are exponentially many paths between two crosslinkers of a network,
                        and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
+                       
+                   :return: True if infinite strands are detected, False otherwise
         """
     def hash_angle_type(self, angle_from: int, angle_via: int, angle_to: int) -> int:
         """
                   Convert the three integers to one long number/hash.
                   Used internally for duplicate detection.
+                  
+                  :param angle_from: First atom ID in the angle
+                  :param angle_via: Middle atom ID in the angle
+                  :param angle_to: Last atom ID in the angle
+                  :return: Hash value for the angle type
         """
     def hash_dihedral_angle_type(self, angle_from: int, angle_via1: int, angle_via2: int, angle_to: int) -> int:
         """
                   Convert the four integers to one long number/hash.
                   Used internally for duplicate detection.
+                  
+                  :param angle_from: First atom ID in the dihedral
+                  :param angle_via1: Second atom ID in the dihedral
+                  :param angle_via2: Third atom ID in the dihedral
+                  :param angle_to: Fourth atom ID in the dihedral
+                  :return: Hash value for the dihedral angle type
         """
     def interpolate_edges(self, crosslinker_type: int, interpolation_factor: float) -> list[tuple[int, int]]:
         """
                   Get more or less edges than currently present, interpolating between junctions.
+                  
+                  :param crosslinker_type: The type of crosslinker atoms
+                  :param interpolation_factor: Factor for edge interpolation
+                  :return: Interpolated edge structure
         """
     def remove_all_angles(self) -> None:
         """
                   Remove all angles from the Universe. 
                   This will not remove the atoms or bonds, just the angles.
                   
-                  CAUTION:
-                    This will not remove dihedral angles, use :func:`~pylimer_tools_cpp.Universe.removeAllDihedralAngles` for that.
+                  .. warning::
+                    This will not remove dihedral angles, use :meth:`~pylimer_tools_cpp.Universe.remove_all_dihedral_angles` for that.
         """
     def remove_all_dihedral_angles(self) -> None:
         """
@@ -3687,59 +4338,88 @@ class Universe:
         """
     def remove_atoms(self, atom_ids: list[int]) -> None:
         """
-                  Remove atoms and all associated bonds by their atom ids. 
+                  Remove atoms and all associated bonds by their atom IDs. 
+                  
+                  :param atom_ids: Vector of atom IDs to remove
         """
     def remove_bonds(self, bonds_from: list[int], bonds_to: list[int]) -> None:
         """
-                  Remove bonds by their connected atom ids. 
+                  Remove bonds by their connected atom IDs. 
+                  
+                  :param bonds_from: Vector of starting atom IDs
+                  :param bonds_to: Vector of ending atom IDs
         """
     def remove_bonds_by_type(self, bond_type: int) -> None:
         """
                   Remove bonds with a specific type. 
+                  
+                  :param bond_type: The bond type to remove
         """
     def replace_atom(self, atom_id: int, replacement_atom: Atom) -> None:
         """
                   Replace the properties of an atom with the properties of another given atom.
+                  
+                  :param atom_id: ID of the atom to replace
+                  :param replacement_atom: The atom with new properties
         """
     def replace_atom_type(self, atom_id: int, new_type: int) -> None:
         """
                   Replace the type of an atom with another type.
+                  
+                  :param atom_id: ID of the atom to modify
+                  :param new_type: The new atom type
         """
     def resample_velocities(self, mean: float, variance: float, seed: str = '', is_2d: bool = False) -> None:
-        ...
+        """
+                 Resample velocities for atoms in the universe.
+                 
+                 :param mean: Mean velocity
+                 :param variance: Velocity variance
+                 :param seed: Random seed for velocity generation
+                 :param is_2d: Whether to omit sampling the z direction
+        """
     def set_box(self, box: Box, rescale_atoms: bool = False) -> None:
         """
                   Override the currently assigned box with the one specified.
+                  
+                  :param box: The new box to assign
+                  :param rescale_atoms: Whether to rescale atom positions
         """
     def set_box_lengths(self, lx: float, ly: float, lz: float, rescale_atoms: bool = False) -> None:
         """
                   Override the currently assigned box with one with the side lengths specified.
+                  
+                  :param lx: Length in x direction
+                  :param ly: Length in y direction
+                  :param lz: Length in z direction
+                  :param rescale_atoms: Whether to rescale atom positions
         """
     def set_mass(self, atom_type: int, mass: float) -> None:
         """
                  Set the mass for a specific atom type.
                  
-                 Parameters:
-                     atom_type: The atom type to set mass for
-                     mass: The mass value to assign
+                 :param atom_type: The atom type to set mass for
+                 :param mass: The mass value to assign
         """
     def set_masses(self, mass_per_type: dict[int, float]) -> None:
         """
                  Set the mass per type of atom.
                  
-                 Parameters:
-                     mass_per_type: Map of atom types to their masses
+                 :param mass_per_type: Map of atom types to their masses
         """
     def set_timestep(self, timestep: int) -> None:
         """
-                 Set the time-step when this Universe was captured.
+                 Set the timestep when this Universe was captured.
                  
-                 Parameters:
-                     timestep: The timestep value
+                 :param timestep: The timestep value
         """
     def set_vertex_property(self, vertex_id: int, property_name: str, value: float) -> None:
         """
                   Set a specific property for a specific vertex.
+                  
+                  :param vertex_id: The vertex ID to modify
+                  :param property_name: Name of the property to set
+                  :param value: Value to assign to the property
         """
     def simplify(self) -> None:
         """
@@ -3759,7 +4439,7 @@ class UniverseSequence:
          This, while it can lead to two (or more) reads of the whole file, 
          is a measure in order to enable low memory useage if needed (i.e. for large dump files).
          Use Python's iterator to have this UniverseSequence only ever retain one universe in memory.
-         Alternatively, use :func:`~pylimer_tools_cpp.UniverseSequence.forgetAtIndex`
+         Alternatively, use :meth:`~pylimer_tools_cpp.UniverseSequence.forget_at_index`
          to have the UniverseSequence forget about already read universes.
          
     """
@@ -3767,11 +4447,8 @@ class UniverseSequence:
         """
               Get a universe by its index.
               
-              Parameters:
-                  index: The index of the universe to retrieve
-                  
-              Returns:
-                  The Universe at the specified index
+              :param index: The index of the universe to retrieve
+              :return: The Universe at the specified index
         """
     def __init__(self) -> None:
         """
@@ -3802,19 +4479,15 @@ class UniverseSequence:
         """
                  Get the number of universes in this sequence.
                  
-                 Returns:
-                     The total number of universes available
+                 :return: The total number of universes available
         """
     def at_index(self, index: int) -> Universe:
         """
                  Get the Universe at the given index (as of in the sequence given 
                  by the dump file).
                  
-                 Parameters:
-                     index: The index of the universe to retrieve
-                     
-                 Returns:
-                     The Universe at the specified index
+                 :param index: The index of the universe to retrieve
+                 :return: The Universe at the specified index
         """
     def compute_distance_autocorrelation_from_to(self, atom_ids_from: list[int], atom_ids_to: list[int], nr_of_origins: int = 25, reduce_memory: bool = False) -> dict[int, float]:
         """
@@ -3829,13 +4502,28 @@ class UniverseSequence:
                   Can be used to somewhat faster compute e.g. all the end-to-end or bond distances.
                   Pay attention that the image flags are correct, otherwise, this data may not be useable.
         """
-    def compute_msd_for_atom_properties(self, atom_ids: list[int], x_property: str, y_property: str, z_property: str, nr_of_origins: int = 25, reduce_memory: bool = False) -> dict[int, float]:
+    def compute_msd_for_atom_properties(self, atom_ids: list[int], x_property: str, y_property: str, z_property: str, nr_of_origins: int = 25, reduce_memory: bool = False, max_tau: int = -1) -> dict[int, float]:
         """
-                  Compute the mean square displacement for atoms with the specified ids
+                  Compute the mean square displacement for atoms using specified property names.
+                  
+                  :param atom_ids: List of atom IDs for which to compute the MSD
+                  :param x_property: Name of the x-coordinate property in the dump file (e.g., "x", "xu", "xs")
+                  :param y_property: Name of the y-coordinate property in the dump file (e.g., "y", "yu", "ys")
+                  :param z_property: Name of the z-coordinate property in the dump file (e.g., "z", "zu", "zs")
+                  :param nr_of_origins: Number of time origins to use for averaging. Higher values provide better statistics but increase computation time (default: 25)
+                  :param reduce_memory: If True, reduces memory usage by forgetting universes after processing them (default: False)
+                  :param max_tau: Maximum time lag (tau) to compute. If -1, computes for all possible tau values. For better statistics, consider setting this to approximately half the sequence length (default: -1)
+                  :return: Dictionary mapping time lag (tau) to mean square displacement values
         """
-    def compute_msd_for_atoms(self, atom_ids: list[int], nr_of_origins: int = 25, reduce_memory: bool = False) -> dict[int, float]:
+    def compute_msd_for_atoms(self, atom_ids: list[int], nr_of_origins: int = 25, reduce_memory: bool = False, max_tau: int = -1) -> dict[int, float]:
         """
-                  Compute the mean square displacement for atoms with the specified ids
+                  Compute the mean square displacement for atoms with the specified IDs.
+                  
+                  :param atom_ids: List of atom IDs for which to compute the MSD
+                  :param nr_of_origins: Number of time origins to use for averaging. Higher values provide better statistics but increase computation time (default: 25)
+                  :param reduce_memory: If True, reduces memory usage by forgetting universes after processing them (default: False)
+                  :param max_tau: Maximum time lag (tau) to compute. If -1, computes for all possible tau values. For better statistics, consider setting this to approximately half the sequence length (default: -1)
+                  :return: Dictionary mapping time lag (tau) to mean square displacement values
         """
     def compute_vector_from_to_atoms(self, atom_ids_from: list[int], atom_ids_to: list[int], reduce_memory: bool = False) -> list[numpy.ndarray]:
         """
@@ -3846,16 +4534,16 @@ class UniverseSequence:
         """
     def forget_at_index(self, index: int) -> None:
         """
-        Clear the memory of the Universe at the given index (as of in the
-                   sequence given by the dump file).
+              Clear the memory of the Universe at the given index (as of in the
+              sequence given by the dump file).
         """
     def get_all(self) -> list[Universe]:
         """
                     Get all universes initialized back in a list.
                     For big dump files or lots of data files, this might lead to memory issues.
-                    Use :func:`~pylimer_tools_cpp.UniverseSequence.__iter__`
-                    or :func:`~pylimer_tools_cpp.UniverseSequence.atIndex`
-                    and :func:`~pylimer_tools_cpp.UniverseSequence.forgetAtIndex`
+                    Use :meth:`~pylimer_tools_cpp.UniverseSequence.__iter__`
+                    or :meth:`~pylimer_tools_cpp.UniverseSequence.at_index`
+                    and :meth:`~pylimer_tools_cpp.UniverseSequence.forget_at_index`
                     to craft a more memory-efficient retrieval mechanism.
                     
                     Returns:
@@ -3881,13 +4569,12 @@ class UniverseSequence:
         """
                  Get the Universe that's next in the sequence.
                  
-                 Returns:
-                     The next Universe in the sequence
+                 :return: The next Universe in the sequence
         """
     def reset_iterator(self) -> None:
         """
                   Reset the internal iterator, such that a subsequent call to 
-                  :func:`~pylimer_tools_cpp.UniverseSequence.next` returns the first one again.
+                  :meth:`~pylimer_tools_cpp.UniverseSequence.next` returns the first one again.
         """
     def set_data_file_atom_style(self, atom_styles: list[AtomStyle]) -> None:
         """
@@ -3940,9 +4627,12 @@ def do_random_walk_chain_from_to_mc(box: Box, from_coordinates: numpy.ndarray, t
     """
 def inverse_langevin(x: float) -> float:
     """
-         A somewhat accurate (for :math:`x \\in (-1, 1)`) implementation of the inverse Langevin.
+         A somewhat accurate (for :math:`x \\in (-1, 1)`) implementation of the inverse Langevin function.
     
          Source: https://scicomp.stackexchange.com/a/30251
+    
+         :param x: Input value in the range (-1, 1)
+         :return: Inverse Langevin function value
     """
 def randomly_sample_entanglements(universe: Universe, nr_of_samples: int, upper_cutoff: float, lower_cutoff: float = 0, minimum_nr_of_samples: int = 0, same_strand_cutoff: float = 3.0, seed: str = '', crosslinker_type: int = 2, ignore_crosslinks: bool = True, filter_dangling_and_soluble: bool = False) -> AtomPairEntanglements:
     """
@@ -3961,9 +4651,13 @@ def randomly_sample_entanglements(universe: Universe, nr_of_samples: int, upper_
         :param filter_dangling_and_soluble: Whether to filter out dangling chains and soluble crosslinks when finding entanglements.
           This means, entanglements involving an obviously (1st order) dangling or soluble chain are 
     """
-def split_csv(arg0: str, arg1: str) -> list[str]:
+def split_csv(file_path: str, delimiter: str = ',') -> list[str]:
     """
-    Read a file containing a number of CSVs. Returns them split up.
+            Read a file containing a number of CSVs. Returns them split up.
+            
+            :param file_path: Path to the file containing CSV data
+            :param delimiter: Delimiter used in the CSV file (default: ',')
+            :return: Split CSV data structures
     """
 def version_information() -> str:
     """

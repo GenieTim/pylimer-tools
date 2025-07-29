@@ -16,11 +16,15 @@ import random
 
 import matplotlib.pyplot as plt
 
-from pylimer_tools.io.bead_spring_parameter_provider import get_parameters_for_polymer
+from pylimer_tools.io.bead_spring_parameter_provider import (
+    ParameterType,
+    get_parameters_for_polymer,
+)
 from pylimer_tools_cpp import MCUniverseGenerator
 
 # Get parameters for PDMS polymer density and bead distance
-params = get_parameters_for_polymer("PDMS")
+params = get_parameters_for_polymer(
+    "PDMS", parameter_type=ParameterType.GAUSSIAN)
 
 # setup strand lengths
 n_strands = 1000
@@ -71,7 +75,8 @@ assert math.isclose(
 # For now, we will show that this produces a variety of different strand
 # lengths:
 
-strand_lengths = [m.get_nr_of_atoms() for m in universe.get_chains_with_crosslinker(2)]
+strand_lengths = [m.get_nr_of_atoms()
+                  for m in universe.get_chains_with_crosslinker(2)]
 
 # Plot the distribution of strand lengths
 plt.figure()
