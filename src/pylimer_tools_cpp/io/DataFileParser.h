@@ -235,7 +235,8 @@ private:
                                            const int nToRead)
   {
     std::vector<OUT> resultnumbers;
-    pylimer_tools::utils::CsvTokenizer tokenizer(line, static_cast<size_t>(nToRead));
+    pylimer_tools::utils::CsvTokenizer tokenizer(line,
+                                                 static_cast<size_t>(nToRead));
     resultnumbers.reserve(tokenizer.getLength());
     for (size_t i = 0; i < tokenizer.getLength(); ++i) {
       resultnumbers.push_back(tokenizer.get<OUT>(i));

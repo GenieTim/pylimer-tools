@@ -637,10 +637,8 @@ protected:
       std::vector<pylimer_tools::entities::Atom> endsOfChain =
         crossLinkerChains[i].getChainEnds(crossLinkerType, true);
       assert(endsOfChain.size() == 2);
-      long int nodeIdxFrom =
-        atomIdToNode.at(endsOfChain[0].getId());
-      long int nodeIdxTo =
-        atomIdToNode.at(endsOfChain[1].getId());
+      long int nodeIdxFrom = atomIdToNode.at(endsOfChain[0].getId());
+      long int nodeIdxTo = atomIdToNode.at(endsOfChain[1].getId());
       bool addChain = false;
       if (crossLinkerChains[i].getType() ==
           pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {

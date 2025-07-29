@@ -137,21 +137,21 @@ class Parameters:
         return self.get("distance_units")
 
     def get_entanglement_density(
-            self, Ge: Optional[pint.Quantity] = None) -> float:
+            self, g_e: Optional[pint.Quantity] = None) -> float:
         """
         Returns the number of entanglements per unit volume of this particular parameter set.
 
         Parameters:
-        - Ge: the entanglement modulus
+        - g_e: the entanglement modulus
         """
         nm_to_actual_units = (
             (1 * self.ureg.nanometer).to(self.get("distance_units")).magnitude
         )
 
-        if Ge is None:
-            Ge = self.get("Ge")
+        if g_e is None:
+            g_e = self.get("Ge")
 
-        return (Ge / (self.get("kb") * self.get("T"))).to("nm^-3").magnitude / (
+        return (g_e / (self.get("kb") * self.get("T"))).to("nm^-3").magnitude / (
             nm_to_actual_units**3
         )
 

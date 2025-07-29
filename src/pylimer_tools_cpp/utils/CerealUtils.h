@@ -82,7 +82,9 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar, Eigen::PlainObjectBase<Derived> const& m)
   if (ArrT::ColsAtCompileTime == Eigen::Dynamic) {
     ar(m.cols());
   }
-  ar(binary_data(m.data(), static_cast<std::size_t>(m.size()) * sizeof(typename Derived::Scalar)));
+  ar(binary_data(m.data(),
+                 static_cast<std::size_t>(m.size()) *
+                   sizeof(typename Derived::Scalar)));
 }
 
 template<class Archive, class Derived>
@@ -101,9 +103,10 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, Eigen::PlainObjectBase<Derived>& m)
     ar(cols);
   }
   m.resize(rows, cols);
-  ar(binary_data(
-    m.data(),
-    static_cast<std::size_t>(static_cast<std::size_t>(rows) * static_cast<std::size_t>(cols) * sizeof(typename Derived::Scalar))));
+  ar(binary_data(m.data(),
+                 static_cast<std::size_t>(static_cast<std::size_t>(rows) *
+                                          static_cast<std::size_t>(cols) *
+                                          sizeof(typename Derived::Scalar))));
 }
 
 // if we cannot store binary data
@@ -371,7 +374,8 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar,
   igraph_vector_int_init(&allEdges, static_cast<igraph_integer_t>(numEdges));
   ar(make_nvp("edges", allEdges));
 
-  igraph_add_vertices(&graph, static_cast<igraph_integer_t>(numVertices), nullptr);
+  igraph_add_vertices(
+    &graph, static_cast<igraph_integer_t>(numVertices), nullptr);
   igraph_add_edges(&graph, &allEdges, nullptr);
   igraph_vector_int_destroy(&allEdges);
 
@@ -391,14 +395,16 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar,
       // case IGRAPH_ATTRIBUTE_DEFAULT:
       case IGRAPH_ATTRIBUTE_NUMERIC: {
         igraph_vector_t results;
-        igraph_vector_init(&results, static_cast<igraph_integer_t>(numVertices));
+        igraph_vector_init(&results,
+                           static_cast<igraph_integer_t>(numVertices));
         ar(make_nvp("vertex_attr_" + attributeName, results));
         igraph_cattribute_VAN_setv(&graph, attributeName.c_str(), &results);
         igraph_vector_destroy(&results);
       }; break;
       case IGRAPH_ATTRIBUTE_STRING: {
         igraph_strvector_t strresults;
-        igraph_strvector_init(&strresults, static_cast<igraph_integer_t>(numVertices));
+        igraph_strvector_init(&strresults,
+                              static_cast<igraph_integer_t>(numVertices));
         ar(make_nvp("vertex_attr_" + attributeName, strresults));
         igraph_cattribute_VAS_setv(&graph, attributeName.c_str(), &strresults);
         igraph_strvector_destroy(&strresults);

@@ -16,7 +16,7 @@ from pylimer_tools_cpp import UniverseSequence
 # Load a LAMMPS dump trajectory file (replace with your file)
 file_path = os.path.join(
     os.getcwd(),
-    # "../..",
+    "../..",
     "tests/pylimer_tools/fixtures/",
 )
 sequence = UniverseSequence()
@@ -57,10 +57,17 @@ for universe in sequence:
 fig, axs = plt.subplots(2, 1, figsize=(10, 10), sharex=False)
 
 # Panel 1: MSD
-axs[0].plot(list(msd.keys()), list(msd.values()), label="Mean Square Displacement")
+axs[0].plot(
+    list(
+        msd.keys()), list(
+            msd.values()), label="Mean Square Displacement")
 axs[0].axhline(
-    np.mean(list(msd.values())), color="black", linestyle="--", label="Mean MSD"
-)
+    np.mean(
+        list(
+            msd.values())),
+    color="black",
+    linestyle="--",
+    label="Mean")
 # add cumulative mean
 axs[0].plot(
     list(msd.keys()),
@@ -71,14 +78,23 @@ axs[0].plot(
 axs[0].set_xlabel("$\\tau$")
 axs[0].set_ylabel("MSD")
 axs[0].set_title("Mean Square Displacement")
-axs[0].legend()
 axs[0].set(xscale="log", yscale="log")
+axs[0].legend()
 
 # Panel 2: Radius of Gyration
 axs[1].plot(timesteps, rgs, label="Radius of Gyration", color="orange")
+axs[1].axhline(np.mean(rgs), color="black", linestyle="--", label="Mean")
+# add cumulative mean
+axs[1].plot(
+    timesteps,
+    [np.mean(rgs[: i + 1]) for i in range(len(rgs))],
+    label="Cumulative Mean",
+    color="red",
+)
 axs[1].set_xlabel("Timestep")
 axs[1].set_ylabel("Radius of Gyration")
 axs[1].set_title("Radius of Gyration Over Time")
+axs[1].set(xscale="log", yscale="log")
 axs[1].legend()
 
 plt.tight_layout()

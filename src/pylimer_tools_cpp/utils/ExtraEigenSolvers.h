@@ -17,20 +17,24 @@ gradientDescent(const MatrixType& A,
                 int& iteration,
                 const Eigen::VectorXd& initialX = Eigen::VectorXd(),
                 const double initialResidual = -1.0,
-                const std::function<bool(int, const Eigen::VectorXd&)>& iterationCallback = nullptr)
+                const std::function<bool(int, const Eigen::VectorXd&)>&
+                  iterationCallback = nullptr)
 {
-  Eigen::VectorXd x = initialX.size() == b.size() ? initialX 
-                     : Eigen::VectorXd::Zero(b.size());    // Initialize solution vector
-  Eigen::VectorXd gradient = b - A * x; // Compute initial residual
+  Eigen::VectorXd x =
+    initialX.size() == b.size()
+      ? initialX
+      : Eigen::VectorXd::Zero(b.size()); // Initialize solution vector
+  Eigen::VectorXd gradient = b - A * x;  // Compute initial residual
 
-  const double initialNorm = initialResidual > 0.0 ? initialResidual : gradient.squaredNorm();
+  const double initialNorm =
+    initialResidual > 0.0 ? initialResidual : gradient.squaredNorm();
   while ((gradient.squaredNorm() / initialNorm) > tolerance &&
          iteration < maxIterations) {
     Eigen::VectorXd Ar = A * gradient;
     double stepSize = gradient.dot(gradient) / gradient.dot(Ar);
     x = x + stepSize * gradient;
     iteration += 1;
-    
+
     // reset to "correct" gradient after every 100 iterations
     // against floating point precision issues
     if (iteration % 100 == 0) {
@@ -39,7 +43,7 @@ gradientDescent(const MatrixType& A,
       // otherwise, stick with the more efficient gradient update
       gradient = gradient - stepSize * Ar;
     }
-    
+
     // Call iteration callback if provided
     if (iterationCallback && iterationCallback(iteration, x)) {
       break; // Allow early termination via callback
@@ -72,30 +76,37 @@ gradientDescent(const MatrixType& A,
  * @param shortAlpha If true, uses the "short" step length formula, otherwise
  * uses the "long" formula
  * @param initialX Initial solution vector (if empty, uses zero vector)
- * @param initialResidual Initial residual norm (if negative, computes from initial solution)
- * @param iterationCallback Optional callback function called each iteration (return true to stop)
+ * @param initialResidual Initial residual norm (if negative, computes from
+ * initial solution)
+ * @param iterationCallback Optional callback function called each iteration
+ * (return true to stop)
  * @return Eigen::VectorXd The solution vector x that approximates the solution
  * to Ax = b
  */
 template<typename MatrixType>
 static inline Eigen::VectorXd
-gradientDescentBarzilaiBorwein(const MatrixType& A,
-                               const Eigen::VectorXd& b,
-                               const double learningRate,
-                               const double tolerance,
-                               const int maxIterations,
-                               int& iteration,
-                               const bool shortAlpha = false,
-                               const Eigen::VectorXd& initialX = Eigen::VectorXd(),
-                               const double initialResidual = -1.0,
-                               const std::function<bool(int, const Eigen::VectorXd&)>& iterationCallback = nullptr)
+gradientDescentBarzilaiBorwein(
+  const MatrixType& A,
+  const Eigen::VectorXd& b,
+  const double learningRate,
+  const double tolerance,
+  const int maxIterations,
+  int& iteration,
+  const bool shortAlpha = false,
+  const Eigen::VectorXd& initialX = Eigen::VectorXd(),
+  const double initialResidual = -1.0,
+  const std::function<bool(int, const Eigen::VectorXd&)>& iterationCallback =
+    nullptr)
 {
-  Eigen::VectorXd x = initialX.size() == b.size() ? initialX 
-                     : Eigen::VectorXd::Zero(b.size());    // Initialize solution vector
-  Eigen::VectorXd gradient = A * x - b; // Compute initial residual
-  double alpha = learningRate;          // Initial step size
+  Eigen::VectorXd x =
+    initialX.size() == b.size()
+      ? initialX
+      : Eigen::VectorXd::Zero(b.size()); // Initialize solution vector
+  Eigen::VectorXd gradient = A * x - b;  // Compute initial residual
+  double alpha = learningRate;           // Initial step size
 
-  const double initialNorm = initialResidual > 0.0 ? initialResidual : gradient.squaredNorm();
+  const double initialNorm =
+    initialResidual > 0.0 ? initialResidual : gradient.squaredNorm();
   while ((gradient.squaredNorm() / initialNorm) > tolerance &&
          iteration < maxIterations) {
     Eigen::VectorXd nextX = x - alpha * gradient;
@@ -116,7 +127,7 @@ gradientDescentBarzilaiBorwein(const MatrixType& A,
     }
 
     iteration++;
-    
+
     // Call iteration callback if provided
     if (iterationCallback && iterationCallback(iteration, x)) {
       break; // Allow early termination via callback
@@ -128,24 +139,29 @@ gradientDescentBarzilaiBorwein(const MatrixType& A,
 
 template<typename MatrixType>
 static inline Eigen::VectorXd
-gradientDescentHeavyBallBarzilaiBorwein(const MatrixType& A,
-                                        const Eigen::VectorXd& b,
-                                        const double learningRate,
-                                        const double tolerance,
-                                        const int maxIterations,
-                                        int& iteration,
-                                        const Eigen::VectorXd& initialX = Eigen::VectorXd(),
-                                        const double initialResidual = -1.0,
-                                        const std::function<bool(int, const Eigen::VectorXd&)>& iterationCallback = nullptr)
+gradientDescentHeavyBallBarzilaiBorwein(
+  const MatrixType& A,
+  const Eigen::VectorXd& b,
+  const double learningRate,
+  const double tolerance,
+  const int maxIterations,
+  int& iteration,
+  const Eigen::VectorXd& initialX = Eigen::VectorXd(),
+  const double initialResidual = -1.0,
+  const std::function<bool(int, const Eigen::VectorXd&)>& iterationCallback =
+    nullptr)
 {
-  Eigen::VectorXd x = initialX.size() == b.size() ? initialX 
-                     : Eigen::VectorXd::Zero(b.size());    // Initialize solution vector
-  Eigen::VectorXd gradient = A * x - b; // Compute initial residual
-  double alpha = learningRate;          // Initial step size
+  Eigen::VectorXd x =
+    initialX.size() == b.size()
+      ? initialX
+      : Eigen::VectorXd::Zero(b.size()); // Initialize solution vector
+  Eigen::VectorXd gradient = A * x - b;  // Compute initial residual
+  double alpha = learningRate;           // Initial step size
   Eigen::VectorXd deltaX =
     Eigen::VectorXd::Zero(b.size()); // Initialize deltaX, the momentum
 
-  const double initialNorm = initialResidual > 0.0 ? initialResidual : gradient.squaredNorm();
+  const double initialNorm =
+    initialResidual > 0.0 ? initialResidual : gradient.squaredNorm();
   while ((gradient.squaredNorm() / initialNorm) > tolerance &&
          iteration < maxIterations) {
     Eigen::VectorXd nextX = x - alpha * gradient + alpha * deltaX;
@@ -172,7 +188,7 @@ gradientDescentHeavyBallBarzilaiBorwein(const MatrixType& A,
     }
 
     iteration++;
-    
+
     // Call iteration callback if provided
     if (iterationCallback && iterationCallback(iteration, x)) {
       break; // Allow early termination via callback

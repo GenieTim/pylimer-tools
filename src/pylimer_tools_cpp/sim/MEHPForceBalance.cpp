@@ -4398,9 +4398,9 @@ MEHPForceBalance::displaceToMeanPosition(
   // actually displace
   const Eigen::VectorXd finalDisplacement =
     (remainingDisplacement + backForthDisplacement).matrix();
-  RUNTIME_EXP_IFN(
-    pylimer_tools::utils::all_components_finite<Eigen::VectorXd>(finalDisplacement),
-    "Some displacements are not finite");
+  RUNTIME_EXP_IFN(pylimer_tools::utils::all_components_finite<Eigen::VectorXd>(
+                    finalDisplacement),
+                  "Some displacements are not finite");
   // this->box.handlePBC(finalDisplacement);
   u += finalDisplacement;
 

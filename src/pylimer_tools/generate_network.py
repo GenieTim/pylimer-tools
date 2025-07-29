@@ -12,7 +12,6 @@ from typing import Union
 
 import click
 import numpy as np
-from scipy.stats import anderson, normaltest
 from termcolor import colored
 
 from pylimer_tools.calc.structure_analysis import compute_crosslinker_conversion
@@ -25,7 +24,6 @@ from pylimer_tools_cpp import (
     DataFileWriter,
     MCUniverseGenerator,
     MEHPForceBalance2,
-    SLESolver,
     Universe,
 )
 
