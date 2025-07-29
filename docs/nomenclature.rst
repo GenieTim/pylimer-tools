@@ -59,7 +59,7 @@ Mass vs. Weight Terminology
 ---------------------------
 
 .. note::
-   **Mass vs. Weight**: We generally follow official scientific nomenclature. 
+   **Mass vs. Weight**: We generally try to follow official scientific nomenclature. 
    However, there are historical inconsistencies where we follow tradition and use "weight" instead of "mass" in certain function names:
    
    - :func:`~pylimer_tools_cpp.Universe.compute_number_average_molecular_weight()`

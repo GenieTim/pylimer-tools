@@ -50,6 +50,9 @@ jobs:
 
       - name: Run Tests
         run: ./bin/run-tests-short.sh
+        env:
+          CI: true
+          CMAKE_BUILD_TYPE: Release
 
       # Generate Coverage Badge
       - name: Install Badge Generator

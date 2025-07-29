@@ -163,3 +163,5 @@ examples/readers_writers/generated_structures
 
 examples/dpd_simulations/dpd_simulation_avg_output.txt
 docs/api
+
+docs/sg_execution_times.rst

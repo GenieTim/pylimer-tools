@@ -27,12 +27,10 @@ or refer to the [documentation](https://genietim.github.io/pylimer-tools) for in
 
 ## Usage
 
-**NOTE**: currently, the API of this release is _unstable_ and subject to change.
-
 See the [documentation](https://genietim.github.io/pylimer-tools) for a current list of all available functions.
 
-Example usage can be found in the [documentation](https://genietim.github.io/pylimer-tools), the [tests](https://github.com/GenieTim/pylimer-tools/tree/main/tests),
-or the [CLI application](https://github.com/GenieTim/pylimer-tools/tree/main//src/pylimer_tools/pylimer_tools.py).
+Example usage can be found in the [documentation](https://genietim.github.io/pylimer-tools/auto_examples/index.html), the [tests](https://github.com/GenieTim/pylimer-tools/tree/main/tests), the [examples](https://github.com/GenieTim/pylimer-tools/tree/main/examples)
+or the [CLI applications](https://github.com/GenieTim/pylimer-tools/tree/main//src/pylimer_tools/).
 
 ## Contributing
 
