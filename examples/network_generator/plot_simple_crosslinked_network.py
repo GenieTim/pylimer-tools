@@ -45,5 +45,5 @@ writer = DataFileWriter(universe)
 
 if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
-    
+
 writer.write_to_file("generated_structures/simple_crosslinked_network.data")

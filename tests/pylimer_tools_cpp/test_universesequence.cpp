@@ -282,4 +282,34 @@ TEST_CASE("Universe sequence can compute things", "[UniverseSequence][entity]")
     CHECK_THAT(fromToDistance[1],
                Catch::Matchers::WithinAbs(fromTo[1].norm(), 1e-7));
   }
+
+  SECTION("Max tau parameter limits computed time lags")
+  {
+    universeSeq.initializeFromDumpFile(
+      suspectedPath + "/lammps_data_file_small.out",
+      suspectedPath + "/lammps_dump_small_3step.lammpstrj");
+
+    // Test with max_tau = 1 - should only compute tau = 1
+    auto msdResLimited = universeSeq.computeMsdForAtoms({ 90000 }, 1, true, 1);
+    CHECK(msdResLimited.size() == 1);
+    CHECK(msdResLimited.find(1) != msdResLimited.end());
+    CHECK(msdResLimited.find(2) == msdResLimited.end());
+
+    // Test with max_tau = -1 (unlimited) - should compute all possible tau values
+    auto msdResUnlimited = universeSeq.computeMsdForAtoms({ 90000 }, 1, true, -1);
+    CHECK(msdResUnlimited.size() == 2);
+    CHECK(msdResUnlimited.find(1) != msdResUnlimited.end());
+    CHECK(msdResUnlimited.find(2) != msdResUnlimited.end());
+
+    // Test with max_tau = 0 - should compute no tau values
+    auto msdResZero = universeSeq.computeMsdForAtoms({ 90000 }, 1, true, 0);
+    CHECK(msdResZero.size() == 0);
+
+    // Test with computeMsdForAtomProperties as well
+    auto msdPropsLimited = universeSeq.computeMsdForAtomProperties(
+      { 90000 }, "xsu", "ysu", "zsu", 1, true, 1);
+    CHECK(msdPropsLimited.size() == 1);
+    CHECK(msdPropsLimited.find(1) != msdPropsLimited.end());
+    CHECK(msdPropsLimited.find(2) == msdPropsLimited.end());
+  }
 }

@@ -640,14 +640,15 @@ UniverseSequence::computeDistanceAutocorrelationFromToAtoms(
 std::unordered_map<long int, double>
 UniverseSequence::computeMsdForAtoms(const std::vector<long int>& atomIds,
                                      const int nrOfOrigins,
-                                     const bool reduceMemory)
+                                     const bool reduceMemory,
+                                     const int max_tau)
 {
   if (this->modeDataFiles) {
     return this->computeMsdForAtomsFromDataFiles(
-      atomIds, nrOfOrigins, reduceMemory);
+      atomIds, nrOfOrigins, reduceMemory, max_tau);
   } else {
     return this->computeMsdForAtomsFromDumpFile(
-      atomIds, nrOfOrigins, reduceMemory);
+      atomIds, nrOfOrigins, reduceMemory, max_tau);
   }
 }
 
@@ -670,11 +671,13 @@ UniverseSequence::computeMsdForAtomProperties(
   std::string y,
   std::string z,
   int nrOfOrigins,
-  bool reduceMemory)
+  bool reduceMemory,
+  int max_tau)
 {
   RUNTIME_EXP_IFN(!this->modeDataFiles,
                   "UniverseSequence::computeMsdForAtomsFromDumpFile only "
                   "works with dump files, duh.");
+
   pylimer_tools::utils::ReadDumpFileSections sections =
     this->dumpFileParser.readDumpFileSections(
       pylimer_tools::utils::ReadableDumpFileSections::TIMESTEP |
@@ -779,6 +782,11 @@ UniverseSequence::computeMsdForAtomProperties(
                   << this->dumpFileParser.getFile() << std::endl;
       }
 
+      // Skip if delta_t exceeds max_tau for better statistics
+      if (delta_t > max_tau && max_tau >= 0) {
+        continue;
+      }
+
       distance = coordinates[universe_idx - startingIndex] -
                  coordinates[parent_universe_idx - startingIndex];
       double localMean = 0.0;
@@ -822,11 +830,13 @@ std::unordered_map<long int, double>
 UniverseSequence::computeMsdForAtomsFromDumpFile(
   const std::vector<long int>& atomIds,
   int nrOfOrigins,
-  bool reduceMemory)
+  bool reduceMemory,
+  int max_tau)
 {
   RUNTIME_EXP_IFN(!this->modeDataFiles,
                   "UniverseSequence::computeMsdForAtomsFromDumpFile only "
                   "works with dump files, duh.");
+
   pylimer_tools::utils::ReadDumpFileSections sections =
     this->dumpFileParser.readDumpFileSections(
       pylimer_tools::utils::ReadableDumpFileSections::TIMESTEP |
@@ -916,6 +926,11 @@ UniverseSequence::computeMsdForAtomsFromDumpFile(
                   << this->dumpFileParser.getFile() << std::endl;
       }
 
+      // Skip if delta_t exceeds max_tau for better statistics
+      if (delta_t > max_tau && max_tau >= 0) {
+        continue;
+      }
+
       distance = coordinates[universe_idx - startingIndex] -
                  coordinates[parent_universe_idx - startingIndex];
       double localMean = 0.0;
@@ -958,7 +973,8 @@ std::unordered_map<long int, double>
 UniverseSequence::computeMsdForAtomsFromDataFiles(
   const std::vector<long int>& atomIds,
   int nrOfOrigins,
-  bool reduceMemory)
+  bool reduceMemory,
+  int max_tau)
 {
   igraph_vector_int_t vertex_ids;
   igraph_vector_int_init(&vertex_ids, atomIds.size());
@@ -1013,6 +1029,11 @@ UniverseSequence::computeMsdForAtomsFromDataFiles(
          ++universe_idx) {
 
       int delta_t = (timeSteps[universe_idx] - timeSteps[parent_universe_idx]);
+
+      // Skip if delta_t exceeds max_tau for better statistics
+      if (delta_t > max_tau && max_tau >= 0) {
+        continue;
+      }
 
       distance = coordinates[parent_universe_idx] - coordinates[universe_idx];
       for (size_t atom_id = 0; atom_id < atomIds.size(); ++atom_id) {

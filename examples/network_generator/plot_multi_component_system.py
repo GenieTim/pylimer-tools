@@ -83,4 +83,5 @@ writer = DataFileWriter(universe)
 if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
 
-writer.write_to_file("generated_structures/multi_component_polymer_network.data")
+writer.write_to_file(
+    "generated_structures/multi_component_polymer_network.data")

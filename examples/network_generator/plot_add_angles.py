@@ -9,7 +9,7 @@ The generated networks can include topological information.
 # sphinx_gallery_thumbnail_path = '_static/thumbnails/network_generator/plot_add_angles.png'
 import os
 from pylimer_tools_cpp import DataFileWriter, MCUniverseGenerator
-    
+
 # Generate basic network
 generator = MCUniverseGenerator(40, 40, 40)
 generator.set_seed(54321)
@@ -67,5 +67,5 @@ writer.config_include_dihedral_angles(True)
 
 if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
-    
+
 writer.write_to_file("generated_structures/polymer_network_with_angles.data")
