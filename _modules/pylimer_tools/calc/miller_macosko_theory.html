@@ -1320,19 +1320,48 @@
 <span class="sd">    :return: The extent of reaction p</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="k">if</span> <span class="n">w_sol</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="n">param</span> <span class="o">=</span> <span class="n">_compute_validate_parameters</span><span class="p">(</span>
+        <span class="p">{</span><span class="o">**</span><span class="nb">locals</span><span class="p">()},</span>
+        <span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">,</span> <span class="s2">&quot;weight_fractions&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;b2&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">functionality_per_type</span><span class="p">,</span> <span class="n">weight_fractions</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">b2</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;weight_fractions&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">],</span>
+        <span class="n">param</span><span class="p">[</span><span class="s2">&quot;b2&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">functionality_per_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weight_fractions</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">b2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">)</span>
+
+    <span class="n">p_gel</span> <span class="o">=</span> <span class="n">predict_gelation_point</span><span class="p">(</span>
+        <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">],</span> <span class="n">b2</span><span class="o">=</span><span class="n">b2</span>
+    <span class="p">)</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_wsol</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">compute_weight_fraction_of_soluble_material</span><span class="p">(</span>
-            <span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span>
-            <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">crosslinker_type</span><span class="p">,</span>
-            <span class="n">functionality_per_type</span><span class="o">=</span><span class="n">functionality_per_type</span><span class="p">,</span>
-            <span class="n">weight_fractions</span><span class="o">=</span><span class="n">weight_fractions</span><span class="p">,</span>
-            <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">,</span>
-            <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
-            <span class="n">b2</span><span class="o">=</span><span class="n">b2</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">compute_weight_fraction_of_soluble_material</span><span class="p">(</span>
+                <span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span>
+                <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">crosslinker_type</span><span class="p">,</span>
+                <span class="n">functionality_per_type</span><span class="o">=</span><span class="n">functionality_per_type</span><span class="p">,</span>
+                <span class="n">weight_fractions</span><span class="o">=</span><span class="n">weight_fractions</span><span class="p">,</span>
+                <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">,</span>
+                <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+                <span class="n">b2</span><span class="o">=</span><span class="n">b2</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>  <span class="c1"># If parameters are invalid, return infinity</span>
 
     <span class="n">res</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize_scalar</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">w_sol</span> <span class="o">-</span> <span class="n">compute_wsol</span><span class="p">(</span><span class="n">p</span><span class="p">)),</span> <span class="n">bounds</span><span class="o">=</span><span class="p">[</span><span class="mf">1e-5</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1e-5</span><span class="p">]</span>
+        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">w_sol</span> <span class="o">-</span> <span class="n">compute_wsol</span><span class="p">(</span><span class="n">p</span><span class="p">)),</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="n">p_gel</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The p predicted from w_sol might be incorrect&quot;</span><span class="p">)</span>
