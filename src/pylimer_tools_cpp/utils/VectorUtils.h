@@ -226,7 +226,10 @@ segmentwise_norm(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
   std::vector<double> results;
   results.reserve(vecSize / segmentSize);
   for (size_t i = 0; i < vecSize / segmentSize; i++) {
-    results.push_back(vecs.segment(static_cast<Eigen::Index>(segmentSize * i), static_cast<Eigen::Index>(segmentSize)).norm());
+    results.push_back(vecs
+                        .segment(static_cast<Eigen::Index>(segmentSize * i),
+                                 static_cast<Eigen::Index>(segmentSize))
+                        .norm());
   }
   return results;
 }
@@ -259,8 +262,11 @@ segmentwise_norm_max(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
   double result = 0.; //-DBL_MAX;
 
   for (size_t i = 0; i < vecSize / segmentSize; i++) {
-    result =
-      std::max(vecs.segment(static_cast<Eigen::Index>(segmentSize * i), static_cast<Eigen::Index>(segmentSize)).norm(), result);
+    result = std::max(vecs
+                        .segment(static_cast<Eigen::Index>(segmentSize * i),
+                                 static_cast<Eigen::Index>(segmentSize))
+                        .norm(),
+                      result);
   }
   return result;
 }
@@ -293,7 +299,10 @@ segmentwise_norm_mean(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
   double denominator = 1. / static_cast<double>(vecSize / segmentSize);
 
   for (size_t i = 0; i < vecSize / segmentSize; i++) {
-    const double norm = vecs.segment(static_cast<Eigen::Index>(segmentSize * i), static_cast<Eigen::Index>(segmentSize)).norm();
+    const double norm = vecs
+                          .segment(static_cast<Eigen::Index>(segmentSize * i),
+                                   static_cast<Eigen::Index>(segmentSize))
+                          .norm();
     result += (norm * denominator);
   }
   return result;
@@ -315,9 +324,9 @@ segmentwise_norm_mean(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
 // For Eigen types - using a simpler SFINAE approach
 template<typename IN>
 static inline typename std::enable_if<
-  std::is_class<IN>::value && 
-  !std::is_same<IN, std::vector<typename IN::value_type>>::value,
-  bool>::type 
+  std::is_class<IN>::value &&
+    !std::is_same<IN, std::vector<typename IN::value_type>>::value,
+  bool>::type
 all_components_finite(const IN& vec)
 {
   for (typename IN::Index i = 0; i < vec.size(); ++i) {
@@ -444,11 +453,13 @@ MAKE_REMOVE_ROWS(Eigen::ArrayXb);
           i == indicesToRemove[indicesToRemove.size() - j - 1]) {              \
         ++j;                                                                   \
       } else {                                                                 \
-        vec[static_cast<Eigen::Index>(i - j)] = vec[static_cast<Eigen::Index>(i)]; \
+        vec[static_cast<Eigen::Index>(i - j)] =                                \
+          vec[static_cast<Eigen::Index>(i)];                                   \
       }                                                                        \
     }                                                                          \
                                                                                \
-    vec.conservativeResize(static_cast<Eigen::Index>(static_cast<size_t>(vec.size()) - indicesToRemove.size())); \
+    vec.conservativeResize(static_cast<Eigen::Index>(                          \
+      static_cast<size_t>(vec.size()) - indicesToRemove.size()));              \
   }
 
 MAKE_REMOVE_ROWS(Eigen::VectorXd);
@@ -513,22 +524,27 @@ getMappingForRenumbering(const std::vector<size_t>& removedValues,
                          const size_t nRemovableValues)
 {
   // make sure things are sorted
-  for (long int i = static_cast<long int>(removedValues.size()) - 2; i >= 0; --i) {
+  for (long int i = static_cast<long int>(removedValues.size()) - 2; i >= 0;
+       --i) {
     INVALIDARG_EXP_IFN(
-      removedValues[static_cast<size_t>(i + 1)] < removedValues[static_cast<size_t>(i)],
+      removedValues[static_cast<size_t>(i + 1)] <
+        removedValues[static_cast<size_t>(i)],
       "Values to remove must be sorted descending and unique, got values " +
-        std::to_string(removedValues[static_cast<size_t>(i)]) + "@" + std::to_string(i) + " and " +
-        std::to_string(removedValues[static_cast<size_t>(i + 1)]) + "@" + std::to_string(i + 1) +
-        ".");
+        std::to_string(removedValues[static_cast<size_t>(i)]) + "@" +
+        std::to_string(i) + " and " +
+        std::to_string(removedValues[static_cast<size_t>(i + 1)]) + "@" +
+        std::to_string(i + 1) + ".");
   }
 
   // for performance reasons, first assemble a new mapping
   std::vector<long int> newMapping =
     initializeWithValue<long int>(nRemovableValues, -1);
-  long int idxInDeletedStrands = static_cast<long int>(removedValues.size()) - 1;
+  long int idxInDeletedStrands =
+    static_cast<long int>(removedValues.size()) - 1;
   long int nDeletedSoFar = 0;
   for (size_t i = 0; i < nRemovableValues; ++i) {
-    if (idxInDeletedStrands >= 0 && i == removedValues[static_cast<size_t>(idxInDeletedStrands)]) {
+    if (idxInDeletedStrands >= 0 &&
+        i == removedValues[static_cast<size_t>(idxInDeletedStrands)]) {
       idxInDeletedStrands -= 1;
       nDeletedSoFar += 1;
     } else {
@@ -562,8 +578,12 @@ renumberWithMapping(std::vector<std::vector<size_t>>& v,
   }
 }
 
+// For Eigen-like types - SFINAE to detect Eigen-like types
 template<typename VecType>
-static inline void
+static inline typename std::enable_if<
+  std::is_class<VecType>::value &&
+    !std::is_same<VecType, std::vector<typename VecType::value_type>>::value,
+  void>::type
 renumberWithMapping(VecType& v, const std::vector<long int>& newMapping)
 {
   for (size_t i = 0; i < static_cast<size_t>(v.size()); ++i) {
@@ -574,6 +594,20 @@ renumberWithMapping(VecType& v, const std::vector<long int>& newMapping)
     assert(newMapping[static_cast<size_t>(v[idx])] >= 0);
     v[idx] = static_cast<typename VecType::Scalar>(
       newMapping[static_cast<size_t>(v[idx])]);
+  }
+}
+
+// For std::vector types
+template<typename T>
+static inline void
+renumberWithMapping(std::vector<T>& v, const std::vector<long int>& newMapping)
+{
+  for (size_t i = 0; i < v.size(); ++i) {
+    assert(v[i] >= 0 && static_cast<size_t>(v[i]) < newMapping.size());
+    // the following assertion fails if the mapping is < 0,
+    // which may happen if the value is one that should have been removed
+    assert(newMapping[static_cast<size_t>(v[i])] >= 0);
+    v[i] = static_cast<T>(newMapping[static_cast<size_t>(v[i])]);
   }
 }
 
