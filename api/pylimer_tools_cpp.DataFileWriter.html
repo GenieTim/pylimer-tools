@@ -411,6 +411,11 @@ and either <a class="reference internal" href="pylimer_tools_cpp.Universe.html#p
 <a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_move_into_box" title="pylimer_tools_cpp.DataFileWriter.config_move_into_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">config_move_into_box()</span></code></a> to ensure that the image flags are correct.</p>
 </div>
 <p>Initialize the writer with the universe to write.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>universe</strong> – The universe to write to the data file</p>
+</dd>
+</dl>
 <p class="rubric">Methods Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -459,14 +464,22 @@ and either <a class="reference internal" href="pylimer_tools_cpp.Universe.html#p
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileWriter.config_atom_style">
 <span class="sig-name descname"><span class="pre">config_atom_style</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self:</span> <span class="pre">pylimer_tools_cpp.DataFileWriter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_style:</span> <span class="pre">pylimer_tools_cpp.AtomStyle</span> <span class="pre">=</span> <span class="pre">&lt;AtomStyle.ANGLE:</span> <span class="pre">1&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileWriter.config_atom_style" title="Link to this definition">¶</a></dt>
 <dd><p>Set the (LAMMPS) atom style to use for writing the atoms.</p>
-<p>Default: AtomStyle.ANGLE.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>atom_style</strong> – The LAMMPS atom style to use (default: AtomStyle.ANGLE)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileWriter.config_attempt_image_reset">
 <span class="sig-name descname"><span class="pre">config_attempt_image_reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">attempt_image_reset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileWriter.config_attempt_image_reset" title="Link to this definition">¶</a></dt>
 <dd><p>Set whether to attempt to reset image flags so that output coordinates lie in the box.</p>
-<p>Default: false.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>attempt_image_reset</strong> – Whether to attempt image flag reset (default: False)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -475,28 +488,44 @@ and either <a class="reference internal" href="pylimer_tools_cpp.Universe.html#p
 <dd><p>Set which atom type represents crosslinkers.
 Needed in case the moleculeIdx in the output file should have any meaning.
 (e.g. with <a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap" title="pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">config_molecule_idx_for_swap()</span></code></a>).</p>
-<p>Default: 2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>crosslinker_type</strong> – The atom type representing crosslinkers (default: 2)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileWriter.config_include_angles">
 <span class="sig-name descname"><span class="pre">config_include_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_angles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileWriter.config_include_angles" title="Link to this definition">¶</a></dt>
 <dd><p>Set whether to include the angles from the universe in the file or not.</p>
-<p>Default: true.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>include_angles</strong> – Whether to include angles (default: True)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileWriter.config_include_dihedral_angles">
 <span class="sig-name descname"><span class="pre">config_include_dihedral_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_dihedral_angles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileWriter.config_include_dihedral_angles" title="Link to this definition">¶</a></dt>
 <dd><p>Set whether to include the dihedral angles from the universe in the file or not.</p>
-<p>Default: true.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>include_dihedral_angles</strong> – Whether to include dihedral angles (default: True)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileWriter.config_include_velocities">
 <span class="sig-name descname"><span class="pre">config_include_velocities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_velocities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileWriter.config_include_velocities" title="Link to this definition">¶</a></dt>
 <dd><p>Set whether to include the velocities from the universe (if any) in the file or not.</p>
-<p>Default: true.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>include_velocities</strong> – Whether to include velocities (default: True)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -505,22 +534,34 @@ Needed in case the moleculeIdx in the output file should have any meaning.
 <dd><p>Swappable chains implies that their <cite>moleculeIdx</cite> in the LAMMPS data file is not
 identical per chain, but identical per position in the chain.
 That’s how you can have bond swapping with constant chain length distribution.</p>
-<p>Default: false.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>enable_swappability</strong> – Whether to enable molecule index swappability (default: False)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileWriter.config_move_into_box">
 <span class="sig-name descname"><span class="pre">config_move_into_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">move_into_box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileWriter.config_move_into_box" title="Link to this definition">¶</a></dt>
 <dd><p>Set whether to change the output coordinates to lie in the box or not.</p>
-<p>Default: false (used to be true).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>move_into_box</strong> – Whether to move coordinates into box (default: False)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileWriter.config_reindex_atoms">
 <span class="sig-name descname"><span class="pre">config_reindex_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">reindex_atoms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileWriter.config_reindex_atoms" title="Link to this definition">¶</a></dt>
 <dd><p>Set whether to reindex the atoms or not.
-Re-indexing leads to atom ids being in the range of 1 to the number of atoms.</p>
-<p>Default: false.</p>
+Re-indexing leads to atom IDs being in the range of 1 to the number of atoms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>reindex_atoms</strong> – Whether to reindex atoms (default: False)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -547,13 +588,22 @@ atom style with additional data.</p>
 <p>This method is specifically useful if you need a different (or hybrid) atom style in LAMMPS.</p>
 <p>Be sure to still call <a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_atom_style" title="pylimer_tools_cpp.DataFileWriter.config_atom_style"><code class="xref py py-meth docutils literal notranslate"><span class="pre">config_atom_style()</span></code></a>,
 so that the file can be read correctly again.</p>
-<p>Default: empty string, in which case the configured atom style will be used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>atom_format</strong> – Custom format string for atoms (default: tab-separated standard format)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileWriter.set_universe_to_write">
 <span class="sig-name descname"><span class="pre">set_universe_to_write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">universe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileWriter.set_universe_to_write" title="Link to this definition">¶</a></dt>
 <dd><p>Re-set the universe to write.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>universe</strong> – The new universe to write to the data file</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -562,7 +612,7 @@ so that the file can be read correctly again.</p>
 <dd><p>Actually do the writing to the disk.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The path and file name to write to.</p>
+<dd class="field-odd"><p><strong>file</strong> – The path and file name to write to</p>
 </dd>
 </dl>
 </dd></dl>

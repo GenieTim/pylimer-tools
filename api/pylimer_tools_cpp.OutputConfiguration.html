@@ -399,9 +399,16 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.OutputConfiguration">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">OutputConfiguration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.OutputConfiguration"><span class="pre">pylimer_tools_cpp.OutputConfiguration</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.OutputConfiguration" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
-<p>A configuration object to configure the output,
-as supported by most “simulation-like” classes in this package.</p>
-<p>Get an instance of this struct</p>
+<p>A configuration object to configure the output values and frequency
+for simulation classes in this package.</p>
+<p>This class specifies which quantities to output and how often to write them
+during simulations.</p>
+<p>Create a new OutputConfiguration instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new OutputConfiguration object with default settings</p>
+</dd>
+</dl>
 <p class="rubric">Attributes Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -410,13 +417,13 @@ as supported by most “simulation-like” classes in this package.</p>
 <td><p>Whether to append to the file or truncate it</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.OutputConfiguration.double_values" title="pylimer_tools_cpp.OutputConfiguration.double_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">double_values</span></code></a></p></td>
-<td><p></p></td>
+<td><p>List of double-valued quantities to output.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.OutputConfiguration.filename" title="pylimer_tools_cpp.OutputConfiguration.filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filename</span></code></a></p></td>
 <td><p>The path and name of the file to write to.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.OutputConfiguration.int_values" title="pylimer_tools_cpp.OutputConfiguration.int_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int_values</span></code></a></p></td>
-<td><p></p></td>
+<td><p>List of integer-valued quantities to output.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.OutputConfiguration.output_every" title="pylimer_tools_cpp.OutputConfiguration.output_every"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_every</span></code></a></p></td>
 <td><p>How often to write the values to the output.</p></td>
@@ -437,7 +444,10 @@ as supported by most “simulation-like” classes in this package.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.OutputConfiguration.double_values">
 <span class="sig-name descname"><span class="pre">double_values</span></span><a class="headerlink" href="#pylimer_tools_cpp.OutputConfiguration.double_values" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>List of double-valued quantities to output.</p>
+<p>Use ComputedDoubleValues enum to specify which floating-point quantities
+should be computed and written to output.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.OutputConfiguration.filename">
@@ -449,7 +459,10 @@ An empty string (“”) means standard output (console).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.OutputConfiguration.int_values">
 <span class="sig-name descname"><span class="pre">int_values</span></span><a class="headerlink" href="#pylimer_tools_cpp.OutputConfiguration.int_values" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>List of integer-valued quantities to output.</p>
+<p>Use ComputedIntValues enum to specify which integer quantities
+should be computed and written to output.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.OutputConfiguration.output_every">

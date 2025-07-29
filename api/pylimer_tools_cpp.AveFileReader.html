@@ -404,6 +404,12 @@
 <p>This implementation is better for certain use cases, worse for others.
 In the end, only performance and memory usage are different.
 For moderately sized and small files, we recommend to use the Python interface instead.</p>
+<p>Initialize the AveFileReader with a file path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> – Path to the averages file to read</p>
+</dd>
+</dl>
 <p class="rubric">Methods Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -415,16 +421,16 @@ For moderately sized and small files, we recommend to use the Python interface i
 <td><p>Do autocorrelation on the difference between two particular columns for a specified set of delta indices.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.AveFileReader.get_column_names" title="pylimer_tools_cpp.AveFileReader.get_column_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_column_names</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the names of all columns in the file.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.AveFileReader.get_data" title="pylimer_tools_cpp.AveFileReader.get_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get all data from the file.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.AveFileReader.get_nr_of_columns" title="pylimer_tools_cpp.AveFileReader.get_nr_of_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_columns</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the number of columns in the file.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.AveFileReader.get_nr_of_rows" title="pylimer_tools_cpp.AveFileReader.get_nr_of_rows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_rows</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the number of data rows in the file.</p></td>
 </tr>
 </tbody>
 </table>
@@ -435,6 +441,17 @@ For moderately sized and small files, we recommend to use the Python interface i
 <span class="sig-name descname"><span class="pre">autocorrelate_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.AveFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.AveFileReader.autocorrelate_column" title="Link to this definition">¶</a></dt>
 <dd><p>Do autocorrelation on one particular column for a specified set of delta indices.</p>
 <p>Assumes the data is equally spaced.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>column_index</strong> – Index of the column to autocorrelate</p></li>
+<li><p><strong>delta_indices</strong> – List of delta indices for the autocorrelation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Autocorrelation values for the specified deltas</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -442,27 +459,63 @@ For moderately sized and small files, we recommend to use the Python interface i
 <span class="sig-name descname"><span class="pre">autocorrelate_column_difference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.AveFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_index1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_index2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.AveFileReader.autocorrelate_column_difference" title="Link to this definition">¶</a></dt>
 <dd><p>Do autocorrelation on the difference between two particular columns for a specified set of delta indices.</p>
 <p>Assumes the data is equally spaced.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>column_index1</strong> – Index of the first column</p></li>
+<li><p><strong>column_index2</strong> – Index of the second column</p></li>
+<li><p><strong>delta_indices</strong> – List of delta indices for the autocorrelation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Autocorrelation values for the column differences at specified deltas</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.AveFileReader.get_column_names">
 <span class="sig-name descname"><span class="pre">get_column_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.AveFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.AveFileReader.get_column_names" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the names of all columns in the file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of column names</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.AveFileReader.get_data">
 <span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.AveFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.AveFileReader.get_data" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get all data from the file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2D array containing all the numerical data</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.AveFileReader.get_nr_of_columns">
 <span class="sig-name descname"><span class="pre">get_nr_of_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.AveFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.AveFileReader.get_nr_of_columns" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the number of columns in the file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of columns</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.AveFileReader.get_nr_of_rows">
 <span class="sig-name descname"><span class="pre">get_nr_of_rows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.AveFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.AveFileReader.get_nr_of_rows" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the number of data rows in the file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of rows</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

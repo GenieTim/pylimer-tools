@@ -431,20 +431,20 @@ and <span id="id2">Schneider <em>et al.</em> [<a class="reference internal" href
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_lambda" title="pylimer_tools_cpp.DPDSimulator.config_lambda"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_lambda</span></code></a>(self[, l])</p></td>
 <td><p>Configure the modified velocity verlet integration parameter <cite>lambda</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_num_steps_dpd" title="pylimer_tools_cpp.DPDSimulator.config_num_steps_dpd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_num_steps_dpd</span></code></a>(self, arg0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_num_steps_dpd" title="pylimer_tools_cpp.DPDSimulator.config_num_steps_dpd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_num_steps_dpd</span></code></a>(self[, num_steps])</p></td>
 <td><p>Configure the number of steps to do in one DPD sequence.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_num_steps_mc" title="pylimer_tools_cpp.DPDSimulator.config_num_steps_mc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_num_steps_mc</span></code></a>(self, arg0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_num_steps_mc" title="pylimer_tools_cpp.DPDSimulator.config_num_steps_mc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_num_steps_mc</span></code></a>(self[, num_steps])</p></td>
 <td><p>Configure the number of steps to do in one MC sequence.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_restart_output" title="pylimer_tools_cpp.DPDSimulator.config_restart_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_restart_output</span></code></a>(self, file[, output_every])</p></td>
 <td><p>Set when to output a restart file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_shift_one_at_a_time" title="pylimer_tools_cpp.DPDSimulator.config_shift_one_at_a_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_shift_one_at_a_time</span></code></a>(self, arg0)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_shift_one_at_a_time" title="pylimer_tools_cpp.DPDSimulator.config_shift_one_at_a_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_shift_one_at_a_time</span></code></a>(self[, ...])</p></td>
+<td><p>Configure whether to shift atoms one at a time.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_shift_possibility_empty" title="pylimer_tools_cpp.DPDSimulator.config_shift_possibility_empty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_shift_possibility_empty</span></code></a>(self, arg0)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_shift_possibility_empty" title="pylimer_tools_cpp.DPDSimulator.config_shift_possibility_empty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_shift_possibility_empty</span></code></a>(self[, ...])</p></td>
+<td><p>Configure the possibility of shifting to empty positions.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_sigma" title="pylimer_tools_cpp.DPDSimulator.config_sigma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_sigma</span></code></a>(self[, sigma])</p></td>
 <td><p>Configure the force-field (pair-style) parameter <cite>sigma</cite>.</p></td>
@@ -471,7 +471,7 @@ and <span id="id2">Schneider <em>et al.</em> [<a class="reference internal" href
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_current_timestep" title="pylimer_tools_cpp.DPDSimulator.get_current_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_timestep</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the current timestep number.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_atoms" title="pylimer_tools_cpp.DPDSimulator.get_nr_of_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_atoms</span></code></a>(self)</p></td>
 <td><p></p></td>
@@ -516,7 +516,7 @@ and <span id="id2">Schneider <em>et al.</em> [<a class="reference internal" href
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_timestep" title="pylimer_tools_cpp.DPDSimulator.get_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_timestep</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the timestep used in the simulation.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_universe" title="pylimer_tools_cpp.DPDSimulator.get_universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_universe</span></code></a>(self[, with_slipsprings])</p></td>
 <td><p>Get a universe instance from the current coordinates (and connectivity).</p></td>
@@ -537,10 +537,10 @@ and <span id="id2">Schneider <em>et al.</em> [<a class="reference internal" href
 <td><p>Set a new origin for measuing the mean square displacement for a specified set of atoms</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.validate_neighbour_list" title="pylimer_tools_cpp.DPDSimulator.validate_neighbour_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_neighbour_list</span></code></a>(self, arg0)</p></td>
-<td><p></p></td>
+<td><p>Validate the neighbor list consistency.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.validate_state" title="pylimer_tools_cpp.DPDSimulator.validate_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_state</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Validate the current simulation state.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.write_restart_file" title="pylimer_tools_cpp.DPDSimulator.write_restart_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_restart_file</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Overloaded function.</p></td>
@@ -598,7 +598,7 @@ If you use this, you should cite <span id="id3">Ramírez <em>et al.</em> [<a cla
 <dd><p>Set which values to compute averages for.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>values</strong> – a list of OutputConfiguration structs</p>
+<dd class="field-odd"><p><strong>values</strong> – A list of OutputConfiguration structs specifying what to average</p>
 </dd>
 </dl>
 </dd></dl>
@@ -635,14 +635,24 @@ If you use this, you should cite <span id="id3">Ramírez <em>et al.</em> [<a cla
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.config_num_steps_dpd">
-<span class="sig-name descname"><span class="pre">config_num_steps_dpd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.config_num_steps_dpd" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">config_num_steps_dpd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.config_num_steps_dpd" title="Link to this definition">¶</a></dt>
 <dd><p>Configure the number of steps to do in one DPD sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_steps</strong> – Number of DPD steps per sequence</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.config_num_steps_mc">
-<span class="sig-name descname"><span class="pre">config_num_steps_mc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.config_num_steps_mc" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">config_num_steps_mc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.config_num_steps_mc" title="Link to this definition">¶</a></dt>
 <dd><p>Configure the number of steps to do in one MC sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_steps</strong> – Number of Monte Carlo steps per sequence</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -662,8 +672,8 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The file path to the restart file to write.</p></li>
-<li><p><strong>output_every</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – How often to write the restart file.</p></li>
+<li><p><strong>file</strong> – The file path to the restart file to write</p></li>
+<li><p><strong>output_every</strong> – How often to write the restart file (default: 50000)</p></li>
 </ul>
 </dd>
 </dl>
@@ -671,13 +681,17 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.config_shift_one_at_a_time">
-<span class="sig-name descname"><span class="pre">config_shift_one_at_a_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.config_shift_one_at_a_time" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">config_shift_one_at_a_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_one_at_a_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.config_shift_one_at_a_time" title="Link to this definition">¶</a></dt>
+<dd><p>Configure whether to shift atoms one at a time.</p>
+<p>This setting affects Monte Carlo move behavior in the simulation.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.config_shift_possibility_empty">
-<span class="sig-name descname"><span class="pre">config_shift_possibility_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.config_shift_possibility_empty" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">config_shift_possibility_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_possibility_empty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.config_shift_possibility_empty" title="Link to this definition">¶</a></dt>
+<dd><p>Configure the possibility of shifting to empty positions.</p>
+<p>This setting affects Monte Carlo moves in the simulation.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.config_sigma">
@@ -733,7 +747,13 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_current_timestep">
 <span class="sig-name descname"><span class="pre">get_current_timestep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_current_timestep" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the current timestep number.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current timestep index</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_nr_of_atoms">
@@ -809,7 +829,13 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_timestep">
 <span class="sig-name descname"><span class="pre">get_timestep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_timestep" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the timestep used in the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The simulation timestep value</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_universe">
@@ -817,7 +843,7 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dd><p>Get a universe instance from the current coordinates (and connectivity).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>with_slipsprings</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – Whether to include slip-springs in the returned universe.</p>
+<dd class="field-odd"><p><strong>with_slipsprings</strong> – Whether to include slip-springs in the returned universe (default: True)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -833,7 +859,7 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dd><p>Read a restart file in order to continue a simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The file path to the restart file to read.</p>
+<dd class="field-odd"><p><strong>file</strong> – The file path to the restart file to read</p>
 </dd>
 </dl>
 </dd></dl>
@@ -859,12 +885,24 @@ this method should be called to update the current stress tensor etc.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.validate_neighbour_list">
 <span class="sig-name descname"><span class="pre">validate_neighbour_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.validate_neighbour_list" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Validate the neighbor list consistency.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if the neighbor list is valid</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.validate_state">
 <span class="sig-name descname"><span class="pre">validate_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.validate_state" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Validate the current simulation state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if the simulation state is valid</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.write_restart_file">
@@ -877,10 +915,7 @@ this method should be called to update the current stress tensor etc.</p>
 <dl class="field-list simple">
 <dt class="field-odd">param file<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The file path and name of the restart file to be written.
-Can end in .xml, .json or anything else (-&gt; binary).</p>
-</dd>
-<dt class="field-even">type file<span class="colon">:</span></dt>
-<dd class="field-even"><p>str</p>
+Can end in .xml, .json or anything else (-&gt; binary)</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -891,10 +926,7 @@ Can end in .xml, .json or anything else (-&gt; binary).</p>
 <dl class="field-list simple">
 <dt class="field-odd">param file<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The file path and name of the restart file to be written.
-Can end in .xml, .json or anything else (-&gt; binary).</p>
-</dd>
-<dt class="field-even">type file<span class="colon">:</span></dt>
-<dd class="field-even"><p>str</p>
+Can end in .xml, .json or anything else (-&gt; binary)</p>
 </dd>
 </dl>
 </div></blockquote>

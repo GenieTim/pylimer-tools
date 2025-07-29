@@ -400,87 +400,88 @@
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">DataFileReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A reader for LAMMPS’s <cite>write_data</cite> files.</p>
+<p>Initialize a new data file parser.</p>
 <p class="rubric">Methods Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_atom_ids" title="pylimer_tools_cpp.DataFileReader.get_atom_ids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atom_ids</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get all atom IDs from the data file.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_atom_nx" title="pylimer_tools_cpp.DataFileReader.get_atom_nx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atom_nx</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get periodic image flags in x direction for all atoms.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_atom_ny" title="pylimer_tools_cpp.DataFileReader.get_atom_ny"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atom_ny</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get periodic image flags in y direction for all atoms.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_atom_nz" title="pylimer_tools_cpp.DataFileReader.get_atom_nz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atom_nz</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get periodic image flags in z direction for all atoms.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_atom_types" title="pylimer_tools_cpp.DataFileReader.get_atom_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atom_types</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get all atom types from the data file.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_atom_x" title="pylimer_tools_cpp.DataFileReader.get_atom_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atom_x</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get x coordinates of all atoms.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_atom_y" title="pylimer_tools_cpp.DataFileReader.get_atom_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atom_y</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get y coordinates of all atoms.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_atom_z" title="pylimer_tools_cpp.DataFileReader.get_atom_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atom_z</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get z coordinates of all atoms.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_bond_from" title="pylimer_tools_cpp.DataFileReader.get_bond_from"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bond_from</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get starting atom IDs for all bonds.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_bond_to" title="pylimer_tools_cpp.DataFileReader.get_bond_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bond_to</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get ending atom IDs for all bonds.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_bond_types" title="pylimer_tools_cpp.DataFileReader.get_bond_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bond_types</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get all bond types from the data file.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_high_x" title="pylimer_tools_cpp.DataFileReader.get_high_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_high_x</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the upper bound of the box in x direction.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_high_y" title="pylimer_tools_cpp.DataFileReader.get_high_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_high_y</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the upper bound of the box in y direction.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_high_z" title="pylimer_tools_cpp.DataFileReader.get_high_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_high_z</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the upper bound of the box in z direction.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_low_x" title="pylimer_tools_cpp.DataFileReader.get_low_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_low_x</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the lower bound of the box in x direction.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_low_y" title="pylimer_tools_cpp.DataFileReader.get_low_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_low_y</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the lower bound of the box in y direction.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_low_z" title="pylimer_tools_cpp.DataFileReader.get_low_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_low_z</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the lower bound of the box in z direction.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_lx" title="pylimer_tools_cpp.DataFileReader.get_lx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lx</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the box length in x direction.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_ly" title="pylimer_tools_cpp.DataFileReader.get_ly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ly</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the box length in y direction.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_lz" title="pylimer_tools_cpp.DataFileReader.get_lz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lz</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the box length in z direction.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_masses" title="pylimer_tools_cpp.DataFileReader.get_masses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_masses</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the mass values for each atom type.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_molecule_ids" title="pylimer_tools_cpp.DataFileReader.get_molecule_ids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_molecule_ids</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get all molecule IDs from the data file.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_nr_of_atom_types" title="pylimer_tools_cpp.DataFileReader.get_nr_of_atom_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_atom_types</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the number of atom types in the data file.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_nr_of_atoms" title="pylimer_tools_cpp.DataFileReader.get_nr_of_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_atoms</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the number of atoms in the data file.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_nr_of_bond_types" title="pylimer_tools_cpp.DataFileReader.get_nr_of_bond_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_bond_types</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the number of bond types in the data file.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.get_nr_of_bonds" title="pylimer_tools_cpp.DataFileReader.get_nr_of_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_bonds</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the number of bonds in the data file.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader.read" title="pylimer_tools_cpp.DataFileReader.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>(self, path_of_file_to_read, atom_style, ...)</p></td>
 <td><p>Actually read a LAMMPS's <cite>write_data</cite> file.</p></td>
@@ -492,132 +493,288 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_atom_ids">
 <span class="sig-name descname"><span class="pre">get_atom_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_atom_ids" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get all atom IDs from the data file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of atom IDs</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_atom_nx">
 <span class="sig-name descname"><span class="pre">get_atom_nx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_atom_nx" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get periodic image flags in x direction for all atoms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of nx values (image flags)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_atom_ny">
 <span class="sig-name descname"><span class="pre">get_atom_ny</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_atom_ny" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get periodic image flags in y direction for all atoms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of ny values (image flags)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_atom_nz">
 <span class="sig-name descname"><span class="pre">get_atom_nz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_atom_nz" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get periodic image flags in z direction for all atoms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of nz values (image flags)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_atom_types">
 <span class="sig-name descname"><span class="pre">get_atom_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_atom_types" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get all atom types from the data file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of atom types</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_atom_x">
 <span class="sig-name descname"><span class="pre">get_atom_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_atom_x" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get x coordinates of all atoms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of x coordinates</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_atom_y">
 <span class="sig-name descname"><span class="pre">get_atom_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_atom_y" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get y coordinates of all atoms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of y coordinates</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_atom_z">
 <span class="sig-name descname"><span class="pre">get_atom_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_atom_z" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get z coordinates of all atoms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of z coordinates</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_bond_from">
 <span class="sig-name descname"><span class="pre">get_bond_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_bond_from" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get starting atom IDs for all bonds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of starting atom IDs for bonds</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_bond_to">
 <span class="sig-name descname"><span class="pre">get_bond_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_bond_to" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get ending atom IDs for all bonds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of ending atom IDs for bonds</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_bond_types">
 <span class="sig-name descname"><span class="pre">get_bond_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_bond_types" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get all bond types from the data file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of bond types</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_high_x">
 <span class="sig-name descname"><span class="pre">get_high_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_high_x" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the upper bound of the box in x direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Upper x boundary</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_high_y">
 <span class="sig-name descname"><span class="pre">get_high_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_high_y" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the upper bound of the box in y direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Upper y boundary</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_high_z">
 <span class="sig-name descname"><span class="pre">get_high_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_high_z" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the upper bound of the box in z direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Upper z boundary</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_low_x">
 <span class="sig-name descname"><span class="pre">get_low_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_low_x" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the lower bound of the box in x direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Lower x boundary</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_low_y">
 <span class="sig-name descname"><span class="pre">get_low_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_low_y" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the lower bound of the box in y direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Lower y boundary</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_low_z">
 <span class="sig-name descname"><span class="pre">get_low_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_low_z" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the lower bound of the box in z direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Lower z boundary</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_lx">
 <span class="sig-name descname"><span class="pre">get_lx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_lx" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the box length in x direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Box length in x direction</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_ly">
 <span class="sig-name descname"><span class="pre">get_ly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_ly" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the box length in y direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Box length in y direction</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_lz">
 <span class="sig-name descname"><span class="pre">get_lz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_lz" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the box length in z direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Box length in z direction</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_masses">
 <span class="sig-name descname"><span class="pre">get_masses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_masses" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the mass values for each atom type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Map of atom types to their masses</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_molecule_ids">
 <span class="sig-name descname"><span class="pre">get_molecule_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_molecule_ids" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get all molecule IDs from the data file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of molecule IDs</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_nr_of_atom_types">
 <span class="sig-name descname"><span class="pre">get_nr_of_atom_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_nr_of_atom_types" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the number of atom types in the data file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of atom types</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_nr_of_atoms">
 <span class="sig-name descname"><span class="pre">get_nr_of_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_nr_of_atoms" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the number of atoms in the data file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of atoms</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_nr_of_bond_types">
 <span class="sig-name descname"><span class="pre">get_nr_of_bond_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_nr_of_bond_types" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the number of bond types in the data file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of bond types</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.get_nr_of_bonds">
 <span class="sig-name descname"><span class="pre">get_nr_of_bonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.DataFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DataFileReader.get_nr_of_bonds" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the number of bonds in the data file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of bonds</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DataFileReader.read">
@@ -626,10 +783,10 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path_of_file_to_read</strong> (<em>-</em>) – The path to the file to read</p></li>
-<li><p><strong>atom_style</strong> (<em>-</em>) – The format of the “Atoms” section, see <a class="reference external" href="https://docs.lammps.org/read_data.html">https://docs.lammps.org/read_data.html</a></p></li>
-<li><p><strong>atom_style2</strong> (<em>-</em>) – The format of the “Atoms” section if the previous parameter is equal to AtomStyle::HYBRID</p></li>
-<li><p><strong>atom_style3</strong> (<em>-</em>) – The format of the “Atoms” section if the second to last parameter is equal to AtomStyle::HYBRID</p></li>
+<li><p><strong>path_of_file_to_read</strong> – The path to the file to read</p></li>
+<li><p><strong>atom_style</strong> – The format of the “Atoms” section, see <a class="reference external" href="https://docs.lammps.org/read_data.html">https://docs.lammps.org/read_data.html</a></p></li>
+<li><p><strong>atom_style2</strong> – The format of the “Atoms” section if the previous parameter is equal to AtomStyle::HYBRID</p></li>
+<li><p><strong>atom_style_3</strong> – The format of the “Atoms” section if the second to last parameter is equal to AtomStyle::HYBRID</p></li>
 </ul>
 </dd>
 </dl>

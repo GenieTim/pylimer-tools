@@ -400,30 +400,36 @@
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">DumpFileReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader" title="pylimer_tools_cpp.DumpFileReader"><span class="pre">pylimer_tools_cpp.DumpFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_of_file_to_read</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.DumpFileReader" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A reader for LAMMPS’s <cite>dump</cite> files.</p>
+<p>Initialize the dump file reader.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path_of_file_to_read</strong> – Path to the dump file to read</p>
+</dd>
+</dl>
 <p class="rubric">Methods Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader.get_length" title="pylimer_tools_cpp.DumpFileReader.get_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_length</span></code></a>(self)</p></td>
-<td><p>Get the number of sections (time-steps) in the file</p></td>
+<td><p>Get the number of sections (time-steps) in the file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at" title="pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_numeric_values_for_at</span></code></a>(self, arg0, arg1, arg2)</p></td>
-<td><p>Get the values for the section <cite>index</cite>, the main header <cite>headerKey</cite> and the column (in the header) <cite>column</cite>.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at" title="pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_numeric_values_for_at</span></code></a>(self, rowIndex, ...)</p></td>
+<td><p>Get numeric values for the section at index, the main header headerKey and the column columnIndex.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader.get_string_values_for_at" title="pylimer_tools_cpp.DumpFileReader.get_string_values_for_at"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_string_values_for_at</span></code></a>(self, rowIndex, ...)</p></td>
-<td><p>Get the values for the section <cite>index</cite>, the main header <cite>headerKey</cite> and the column (in the header) <cite>column</cite>.</p></td>
+<td><p>Get string values for the section at index, the main header headerKey and the column columnIndex.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader.has_key" title="pylimer_tools_cpp.DumpFileReader.has_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_key</span></code></a>(self, headerKey)</p></td>
-<td><p>Check whether the first section has the header specified</p></td>
+<td><p>Check whether the first section has the header specified.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader.key_has_column" title="pylimer_tools_cpp.DumpFileReader.key_has_column"><code class="xref py py-obj docutils literal notranslate"><span class="pre">key_has_column</span></code></a>(self, headerKey, columnName)</p></td>
-<td><p>Check whether the header of the first section has the specified column</p></td>
+<td><p>Check whether the header of the first section has the specified column.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader.key_has_directional_column" title="pylimer_tools_cpp.DumpFileReader.key_has_directional_column"><code class="xref py py-obj docutils literal notranslate"><span class="pre">key_has_directional_column</span></code></a>(self, headerKey)</p></td>
-<td><p>Check whether the header of the first section has all the three columns <cite>{dirPraefix}{x|y|z}{dirSuffix}</cite>.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader.key_has_directional_column" title="pylimer_tools_cpp.DumpFileReader.key_has_directional_column"><code class="xref py py-obj docutils literal notranslate"><span class="pre">key_has_directional_column</span></code></a>(self, header_key)</p></td>
+<td><p>Check whether the header of the first section has all the three columns {dir_prefix}{x|y|z}{dir_suffix}.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader.read" title="pylimer_tools_cpp.DumpFileReader.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>(self)</p></td>
-<td><p>Read the whole file</p></td>
+<td><p>Read the whole file.</p></td>
 </tr>
 </tbody>
 </table>
@@ -432,43 +438,103 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DumpFileReader.get_length">
 <span class="sig-name descname"><span class="pre">get_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader" title="pylimer_tools_cpp.DumpFileReader"><span class="pre">pylimer_tools_cpp.DumpFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DumpFileReader.get_length" title="Link to this definition">¶</a></dt>
-<dd><p>Get the number of sections (time-steps) in the file</p>
+<dd><p>Get the number of sections (time-steps) in the file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of timesteps/sections in the dump file</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at">
-<span class="sig-name descname"><span class="pre">get_numeric_values_for_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader" title="pylimer_tools_cpp.DumpFileReader"><span class="pre">pylimer_tools_cpp.DumpFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at" title="Link to this definition">¶</a></dt>
-<dd><p>Get the values for the section <cite>index</cite>, the main header <cite>headerKey</cite> and the column (in the header) <cite>column</cite>.</p>
+<span class="sig-name descname"><span class="pre">get_numeric_values_for_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader" title="pylimer_tools_cpp.DumpFileReader"><span class="pre">pylimer_tools_cpp.DumpFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rowIndex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">headerKey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">columnIndex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at" title="Link to this definition">¶</a></dt>
+<dd><p>Get numeric values for the section at index, the main header headerKey and the column columnIndex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rowIndex</strong> – Index of the section/timestep to query</p></li>
+<li><p><strong>headerKey</strong> – Name of the header section to query</p></li>
+<li><p><strong>columnIndex</strong> – Index of the column within the header</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of numeric values for the specified location</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DumpFileReader.get_string_values_for_at">
 <span class="sig-name descname"><span class="pre">get_string_values_for_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader" title="pylimer_tools_cpp.DumpFileReader"><span class="pre">pylimer_tools_cpp.DumpFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rowIndex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">headerKey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">columnIndex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DumpFileReader.get_string_values_for_at" title="Link to this definition">¶</a></dt>
-<dd><p>Get the values for the section <cite>index</cite>, the main header <cite>headerKey</cite> and the column (in the header) <cite>column</cite>.</p>
+<dd><p>Get string values for the section at index, the main header headerKey and the column columnIndex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rowIndex</strong> – Index of the section/timestep to query</p></li>
+<li><p><strong>headerKey</strong> – Name of the header section to query</p></li>
+<li><p><strong>columnIndex</strong> – Index of the column within the header</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of string values for the specified location</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DumpFileReader.has_key">
 <span class="sig-name descname"><span class="pre">has_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader" title="pylimer_tools_cpp.DumpFileReader"><span class="pre">pylimer_tools_cpp.DumpFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">headerKey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DumpFileReader.has_key" title="Link to this definition">¶</a></dt>
-<dd><p>Check whether the first section has the header specified</p>
+<dd><p>Check whether the first section has the header specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>headerKey</strong> – Name of the header to check for</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the header exists in the first section</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DumpFileReader.key_has_column">
 <span class="sig-name descname"><span class="pre">key_has_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader" title="pylimer_tools_cpp.DumpFileReader"><span class="pre">pylimer_tools_cpp.DumpFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">headerKey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">columnName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DumpFileReader.key_has_column" title="Link to this definition">¶</a></dt>
-<dd><p>Check whether the header of the first section has the specified column</p>
+<dd><p>Check whether the header of the first section has the specified column.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>headerKey</strong> – Name of the header section to check</p></li>
+<li><p><strong>columnName</strong> – Name of the column to look for</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the column exists in the specified header</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DumpFileReader.key_has_directional_column">
-<span class="sig-name descname"><span class="pre">key_has_directional_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader" title="pylimer_tools_cpp.DumpFileReader"><span class="pre">pylimer_tools_cpp.DumpFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">headerKey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirPraefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirSuffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DumpFileReader.key_has_directional_column" title="Link to this definition">¶</a></dt>
-<dd><p>Check whether the header of the first section has all the three columns <cite>{dirPraefix}{x|y|z}{dirSuffix}</cite>.</p>
+<span class="sig-name descname"><span class="pre">key_has_directional_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader" title="pylimer_tools_cpp.DumpFileReader"><span class="pre">pylimer_tools_cpp.DumpFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DumpFileReader.key_has_directional_column" title="Link to this definition">¶</a></dt>
+<dd><p>Check whether the header of the first section has all the three columns {dir_prefix}{x|y|z}{dir_suffix}.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>header_key</strong> – Name of the header section to check</p></li>
+<li><p><strong>dir_prefix</strong> – Prefix for the directional columns (default: “”)</p></li>
+<li><p><strong>dir_suffix</strong> – Suffix for the directional columns (default: “”)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if all three directional columns (x, y, z) exist</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DumpFileReader.read">
 <span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DumpFileReader" title="pylimer_tools_cpp.DumpFileReader"><span class="pre">pylimer_tools_cpp.DumpFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DumpFileReader.read" title="Link to this definition">¶</a></dt>
-<dd><p>Read the whole file</p>
+<dd><p>Read the whole file.</p>
 </dd></dl>
 
 </dd></dl>

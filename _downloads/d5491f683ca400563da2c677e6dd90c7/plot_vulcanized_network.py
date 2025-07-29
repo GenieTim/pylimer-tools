@@ -12,9 +12,14 @@ import numpy as np
 from scipy.stats import chisquare, kstest
 
 from pylimer_tools.io.bead_spring_parameter_provider import (
-    ParameterType, get_parameters_for_polymer)
-from pylimer_tools_cpp import (DataFileWriter, MCUniverseGenerator,
-                               randomly_sample_entanglements)
+    ParameterType,
+    get_parameters_for_polymer,
+)
+from pylimer_tools_cpp import (
+    DataFileWriter,
+    MCUniverseGenerator,
+    randomly_sample_entanglements,
+)
 
 # Get parameters for PDMS polymer density and bead distance
 params = get_parameters_for_polymer(
@@ -87,7 +92,7 @@ writer = DataFileWriter(universe)
 
 if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
-    
+
 writer.write_to_file("generated_structures/vulcanized_network.data")
 
 # %%

@@ -23,7 +23,7 @@ Multi-Component System
 
 Create complex systems with multiple components:
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-87
+.. GENERATED FROM PYTHON SOURCE LINES 8-88
 
 
 
@@ -32,11 +32,11 @@ Create complex systems with multiple components:
 
  .. code-block:: none
 
-    Starting network generation at 2025-07-28 19:36:39.453704
+    Starting network generation at 2025-07-29 07:36:12.577782
     Adding crosslinkers...
     Adding solvent chains...
     Adding and linking polymer strands...
-    Network generation completed at 2025-07-28 19:36:39.855567
+    Network generation completed at 2025-07-29 07:36:12.979913
 
 
 
@@ -125,12 +125,13 @@ Create complex systems with multiple components:
     if not os.path.exists("generated_structures"):
         os.makedirs("generated_structures")
 
-    writer.write_to_file("generated_structures/multi_component_polymer_network.data")
+    writer.write_to_file(
+        "generated_structures/multi_component_polymer_network.data")
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.420 seconds)
+   **Total running time of the script:** (0 minutes 0.419 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_multi_component_system.py:

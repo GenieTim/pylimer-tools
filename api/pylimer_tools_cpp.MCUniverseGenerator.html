@@ -612,6 +612,11 @@ To link them to crosslinkers, use some of the <code class="code docutils literal
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps">
 <span class="sig-name descname"><span class="pre">config_nr_of_mc_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2000</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps" title="Link to this definition">¶</a></dt>
 <dd><p>Set the number of Monte-Carlo steps during bond length equilibration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n_steps</strong> – Number of MC steps to perform (default: 2000)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -687,24 +692,44 @@ This is a useful shorthand e.g. to skip the sampling of beads within in the stra
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance">
 <span class="sig-name descname"><span class="pre">get_mean_bead_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance" title="Link to this definition">¶</a></dt>
 <dd><p>Get the currently configured mean bead distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The currently configured mean distance between beads</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_mean_squared_bead_distance">
 <span class="sig-name descname"><span class="pre">get_mean_squared_bead_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_mean_squared_bead_distance" title="Link to this definition">¶</a></dt>
 <dd><p>Get the currently configured mean squared bead distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The currently configured mean squared distance between beads</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_atoms">
 <span class="sig-name descname"><span class="pre">get_nr_of_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_atoms" title="Link to this definition">¶</a></dt>
 <dd><p>Get the current number of atoms that the universe would/will have.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of atoms in the generated universe</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_bonds">
 <span class="sig-name descname"><span class="pre">get_nr_of_bonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_bonds" title="Link to this definition">¶</a></dt>
 <dd><p>Get the current number of bonds that the universe would/will have.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of bonds in the generated universe</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -807,15 +832,13 @@ Also used for the target crosslinker partner sampling.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance">
 <span class="sig-name descname"><span class="pre">set_mean_squared_bead_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_squared_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance" title="Link to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Set the mean squared distance between beads.</dt><dd><dl class="field-list simple">
-<dt class="field-odd">param mean_squared_distance<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Mean squared distance between beads.</p>
-</dd>
-<dt class="field-even">param update_mean<span class="colon">:</span></dt>
-<dd class="field-even"><p>Whether to update the mean bead distance as well, deduced from the assumed gaussian distribution in 3D (default: true).</p>
-</dd>
-</dl>
+<dd><p>Set the mean squared distance between beads.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mean_squared_distance</strong> – Mean squared distance between beads</p></li>
+<li><p><strong>update_mean</strong> – Whether to update the mean bead distance as well, deduced from the assumed gaussian distribution in 3D (default: true)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

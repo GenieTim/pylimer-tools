@@ -23,7 +23,7 @@ Generate Vulcanized Networks
 
 In this example, we create a vulcanized network using the `pylimer-tools` library.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-93
+.. GENERATED FROM PYTHON SOURCE LINES 8-98
 
 .. code-block:: Python
 
@@ -34,9 +34,14 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
     from scipy.stats import chisquare, kstest
 
     from pylimer_tools.io.bead_spring_parameter_provider import (
-        ParameterType, get_parameters_for_polymer)
-    from pylimer_tools_cpp import (DataFileWriter, MCUniverseGenerator,
-                                   randomly_sample_entanglements)
+        ParameterType,
+        get_parameters_for_polymer,
+    )
+    from pylimer_tools_cpp import (
+        DataFileWriter,
+        MCUniverseGenerator,
+        randomly_sample_entanglements,
+    )
 
     # Get parameters for PDMS polymer density and bead distance
     params = get_parameters_for_polymer(
@@ -109,7 +114,7 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
 
     if not os.path.exists("generated_structures"):
         os.makedirs("generated_structures")
-    
+
     writer.write_to_file("generated_structures/vulcanized_network.data")
 
 
@@ -125,14 +130,14 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-98
+.. GENERATED FROM PYTHON SOURCE LINES 99-103
 
 Refer to :ref:`sphx_glr_auto_examples_readers_writers` for more details on how you can save the universe to a file.
 
 For now, we will show that this produces a variety of different strand
 lengths:
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-109
+.. GENERATED FROM PYTHON SOURCE LINES 103-114
 
 .. code-block:: Python
 
@@ -162,7 +167,7 @@ lengths:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 25.509 seconds)
+   **Total running time of the script:** (1 minutes 25.684 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_vulcanized_network.py:

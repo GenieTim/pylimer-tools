@@ -467,13 +467,13 @@ adjusting the fraction of the contour length on both sides of the link.</p>
 <td><p>Perform a deformation of the system box to a different box.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance" title="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_spring_distance</span></code></a>(self, network, ...)</p></td>
-<td><p></p></td>
+<td><p>Evaluate the distance vector for a specific spring.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from" title="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_spring_distance_from</span></code></a>(self, network, ...)</p></td>
-<td><p></p></td>
+<td><p>Evaluate the spring distance from a specific link.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_to" title="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_spring_distance_to</span></code></a>(self, network, ...)</p></td>
-<td><p></p></td>
+<td><p>Evaluate the spring distance to a specific link.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_average_strand_length" title="pylimer_tools_cpp.MEHPForceBalance.get_average_strand_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_average_strand_length</span></code></a>(self)</p></td>
 <td><p>Get the average length of the strands.</p></td>
@@ -533,7 +533,7 @@ adjusting the fraction of the contour length on both sides of the link.</p>
 <td><p>Get the initial coordinates of the (remaining) crosslinkers and entanglement links.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_neighbour_link_indices" title="pylimer_tools_cpp.MEHPForceBalance.get_neighbour_link_indices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_neighbour_link_indices</span></code></a>(network, link_idx)</p></td>
-<td><p></p></td>
+<td><p>Get the indices of neighboring links for a given link.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_nr_of_active_nodes" title="pylimer_tools_cpp.MEHPForceBalance.get_nr_of_active_nodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_active_nodes</span></code></a>(self[, tolerance])</p></td>
 <td><p>Get the number of active nodes (incl.</p></td>
@@ -581,7 +581,7 @@ adjusting the fraction of the contour length on both sides of the link.</p>
 <td><p>Compute the weight fraction of strands connected to active strands (any depth).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_strand_partition_indices_of_sliplink" title="pylimer_tools_cpp.MEHPForceBalance.get_strand_partition_indices_of_sliplink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_strand_partition_indices_of_sliplink</span></code></a>(...)</p></td>
-<td><p></p></td>
+<td><p>Get the indices of strand partitions associated with a slip-link.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_strand_partitions" title="pylimer_tools_cpp.MEHPForceBalance.get_strand_partitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_strand_partitions</span></code></a>(self)</p></td>
 <td><p>Get the current strand partitions (the fraction of the contour length associated with each spring).</p></td>
@@ -764,17 +764,58 @@ All coordinates etc. will be scaled as needed.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance">
 <span class="sig-name descname"><span class="pre">evaluate_spring_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><span class="pre">pylimer_tools_cpp.MEHPForceBalance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork" title="pylimer_tools_cpp.SimplifiedBalanceNetwork"><span class="pre">pylimer_tools_cpp.SimplifiedBalanceNetwork</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">displacements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Evaluate the distance vector for a specific spring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> – The force balance network</p></li>
+<li><p><strong>displacements</strong> – Current displacement vector</p></li>
+<li><p><strong>spring_idx</strong> – Index of the spring to evaluate</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>3D distance vector for the spring</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from">
 <span class="sig-name descname"><span class="pre">evaluate_spring_distance_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><span class="pre">pylimer_tools_cpp.MEHPForceBalance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork" title="pylimer_tools_cpp.SimplifiedBalanceNetwork"><span class="pre">pylimer_tools_cpp.SimplifiedBalanceNetwork</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">displacements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Evaluate the spring distance from a specific link.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> – The force balance network</p></li>
+<li><p><strong>displacements</strong> – Current displacement vector</p></li>
+<li><p><strong>spring_idx</strong> – Index of the spring to evaluate</p></li>
+<li><p><strong>link_idx</strong> – Index of the starting link</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>3D distance vector from the specified link</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_to">
 <span class="sig-name descname"><span class="pre">evaluate_spring_distance_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><span class="pre">pylimer_tools_cpp.MEHPForceBalance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork" title="pylimer_tools_cpp.SimplifiedBalanceNetwork"><span class="pre">pylimer_tools_cpp.SimplifiedBalanceNetwork</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">displacements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_to" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Evaluate the spring distance to a specific link.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> – The force balance network</p></li>
+<li><p><strong>displacements</strong> – Current displacement vector</p></li>
+<li><p><strong>spring_idx</strong> – Index of the spring to evaluate</p></li>
+<li><p><strong>link_idx</strong> – Index of the target link</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>3D distance vector to the specified link</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance.get_average_strand_length">
@@ -931,7 +972,19 @@ Only crosslink ids are returned (not e.g. entanglement links).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance.get_neighbour_link_indices">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_neighbour_link_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork" title="pylimer_tools_cpp.SimplifiedBalanceNetwork"><span class="pre">pylimer_tools_cpp.SimplifiedBalanceNetwork</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance.get_neighbour_link_indices" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the indices of neighboring links for a given link.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> – The force balance network</p></li>
+<li><p><strong>link_idx</strong> – Index of the link to find neighbors for</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of connected link indices</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance.get_nr_of_active_nodes">
@@ -1053,7 +1106,19 @@ strands (any depth).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance.get_strand_partition_indices_of_sliplink">
 <span class="sig-name descname"><span class="pre">get_strand_partition_indices_of_sliplink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><span class="pre">pylimer_tools_cpp.MEHPForceBalance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork" title="pylimer_tools_cpp.SimplifiedBalanceNetwork"><span class="pre">pylimer_tools_cpp.SimplifiedBalanceNetwork</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance.get_strand_partition_indices_of_sliplink" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the indices of strand partitions associated with a slip-link.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> – The force balance network</p></li>
+<li><p><strong>link_idx</strong> – Index of the slip-link</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of strand partition indices</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance.get_strand_partitions">
@@ -1175,6 +1240,11 @@ As a consequence though, you cannot simply benchmark only this method; you must 
 <p>Throws an error if something is not ok.
 Otherwise, it returns true.</p>
 <p>Can be used e.g. as <code class="code docutils literal notranslate"><span class="pre">assert</span> <span class="pre">fb.validate_network()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if validation passes, raises exception otherwise</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

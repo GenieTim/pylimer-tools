@@ -519,7 +519,7 @@ atoms, bonds, angles, and the simulation box.</p>
 <td><p>Find an atom by the ID of the vertex of the underlying graph.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.get_atom_id_by_vertex_idx" title="pylimer_tools_cpp.Universe.get_atom_id_by_vertex_idx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atom_id_by_vertex_idx</span></code></a>(self, vertex_id)</p></td>
-<td><p>Get the id of the atom by the vertex id of the underlying graph.</p></td>
+<td><p>Get the ID of the atom by the vertex ID of the underlying graph.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.get_atom_types" title="pylimer_tools_cpp.Universe.get_atom_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_atom_types</span></code></a>(self)</p></td>
 <td><p>Get all types (each one for each atom) ordered by atom vertex ID.</p></td>
@@ -552,10 +552,10 @@ atoms, bonds, angles, and the simulation box.</p>
 <td><p>Get the components of the universe that are not connected to each other.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.get_edge_ids_from" title="pylimer_tools_cpp.Universe.get_edge_ids_from"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_edge_ids_from</span></code></a>(self, vertex_id)</p></td>
-<td><p></p></td>
+<td><p>Get the edge IDs incident to a specific vertex.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.get_edge_ids_from_to" title="pylimer_tools_cpp.Universe.get_edge_ids_from_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_edge_ids_from_to</span></code></a>(self, vertex_id_from, ...)</p></td>
-<td><p>Get the edge ids of the edges between two specific vertices</p></td>
+<td><p>Get the edge IDs of all edges between two specific vertices.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.get_edges" title="pylimer_tools_cpp.Universe.get_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_edges</span></code></a>(self)</p></td>
 <td><p>Get all edges.</p></td>
@@ -579,10 +579,10 @@ atoms, bonds, angles, and the simulation box.</p>
 <td><p>Query the number of bonds associated with this universe.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.get_nr_of_bonds_of_atom" title="pylimer_tools_cpp.Universe.get_nr_of_bonds_of_atom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_bonds_of_atom</span></code></a>(self, arg0)</p></td>
-<td><p>Count the number of immediate neighbors of an atom, specified by its id.</p></td>
+<td><p>Count the number of immediate neighbors of an atom, specified by its ID.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.get_nr_of_bonds_of_vertex" title="pylimer_tools_cpp.Universe.get_nr_of_bonds_of_vertex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_bonds_of_vertex</span></code></a>(self, arg0)</p></td>
-<td><p>Count the number of immediate neighbors of an atom, specified by its vertex id.</p></td>
+<td><p>Count the number of immediate neighbors of an atom, specified by its vertex ID.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.get_nr_of_dihedral_angles" title="pylimer_tools_cpp.Universe.get_nr_of_dihedral_angles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_dihedral_angles</span></code></a>(self)</p></td>
 <td><p>Query the number of dihedral angles that have been added to this universe.</p></td>
@@ -597,7 +597,7 @@ atoms, bonds, angles, and the simulation box.</p>
 <td><p>Get the degree (functionality) of each vertex.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.get_vertex_idx_by_atom_id" title="pylimer_tools_cpp.Universe.get_vertex_idx_by_atom_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_vertex_idx_by_atom_id</span></code></a>(self, atom_id)</p></td>
-<td><p>Get the vertex id of the underlying graph for an atom with a specified id.</p></td>
+<td><p>Get the vertex ID of the underlying graph for an atom with a specified ID.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.get_volume" title="pylimer_tools_cpp.Universe.get_volume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_volume</span></code></a>(self)</p></td>
 <td><p>Query the volume of the underlying bounding box.</p></td>
@@ -1226,7 +1226,7 @@ Use <code class="xref py py-meth docutils literal notranslate"><span class="pre"
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Universe.get_atom_id_by_vertex_idx">
 <span class="sig-name descname"><span class="pre">get_atom_id_by_vertex_idx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Universe.get_atom_id_by_vertex_idx" title="Link to this definition">¶</a></dt>
-<dd><p>Get the id of the atom by the vertex id of the underlying graph.</p>
+<dd><p>Get the ID of the atom by the vertex ID of the underlying graph.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>vertex_id</strong> – The vertex index in the underlying graph</p>
@@ -1360,12 +1360,32 @@ Unconnected, free atoms/beads become their own <a class="reference internal" hre
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Universe.get_edge_ids_from">
 <span class="sig-name descname"><span class="pre">get_edge_ids_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Universe.get_edge_ids_from" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the edge IDs incident to a specific vertex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vertex_id</strong> – The ID of the vertex to query</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of edge IDs connected to the vertex</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Universe.get_edge_ids_from_to">
 <span class="sig-name descname"><span class="pre">get_edge_ids_from_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_id_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_id_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Universe.get_edge_ids_from_to" title="Link to this definition">¶</a></dt>
-<dd><p>Get the edge ids of the edges between two specific vertices</p>
+<dd><p>Get the edge IDs of all edges between two specific vertices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vertex_id_from</strong> – The starting vertex ID</p></li>
+<li><p><strong>vertex_id_to</strong> – The ending vertex ID</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of edge IDs connecting the two vertices</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1458,13 +1478,29 @@ Useful e.g. to reduce the memory usage and runtime of
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Universe.get_nr_of_bonds_of_atom">
 <span class="sig-name descname"><span class="pre">get_nr_of_bonds_of_atom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Universe.get_nr_of_bonds_of_atom" title="Link to this definition">¶</a></dt>
-<dd><p>Count the number of immediate neighbors of an atom, specified by its id.</p>
+<dd><p>Count the number of immediate neighbors of an atom, specified by its ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>atom_id</strong> – The ID of the atom to query</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of bonds connected to the atom</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Universe.get_nr_of_bonds_of_vertex">
 <span class="sig-name descname"><span class="pre">get_nr_of_bonds_of_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Universe.get_nr_of_bonds_of_vertex" title="Link to this definition">¶</a></dt>
-<dd><p>Count the number of immediate neighbors of an atom, specified by its vertex id.</p>
+<dd><p>Count the number of immediate neighbors of an atom, specified by its vertex ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vertex_id</strong> – The vertex ID of the atom to query</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of bonds connected to the vertex</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1478,6 +1514,18 @@ Useful e.g. to reduce the memory usage and runtime of
 <span class="sig-name descname"><span class="pre">get_nr_of_edges_from_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_id_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_id_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Universe.get_nr_of_edges_from_to" title="Link to this definition">¶</a></dt>
 <dd><p>Get the number of edges in the shortest path between two specific vertices.</p>
 <p>If <cite>max_length</cite> is provided and positive, it will only consider paths up to that length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vertex_id_from</strong> – The starting vertex ID</p></li>
+<li><p><strong>vertex_id_to</strong> – The ending vertex ID</p></li>
+<li><p><strong>max_length</strong> – Maximum path length to consider (default: -1 for no limit)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of edges in shortest path, or -1 if no path exists</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1495,7 +1543,7 @@ Useful e.g. to reduce the memory usage and runtime of
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Universe.get_vertex_idx_by_atom_id">
 <span class="sig-name descname"><span class="pre">get_vertex_idx_by_atom_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Universe.get_vertex_idx_by_atom_id" title="Link to this definition">¶</a></dt>
-<dd><p>Get the vertex id of the underlying graph for an atom with a specified id.</p>
+<dd><p>Get the vertex ID of the underlying graph for an atom with a specified ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>atom_id</strong> – The atom ID to look up</p>
