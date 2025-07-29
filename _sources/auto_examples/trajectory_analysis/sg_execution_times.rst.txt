@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**09:55.331** total execution time for 1 file **from auto_examples/trajectory_analysis**:
+**09:47.605** total execution time for 1 file **from auto_examples/trajectory_analysis**:
 
 .. container::
 
@@ -33,5 +33,5 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_trajectory_analysis_plot_trajectory_analysis.py` (``plot_trajectory_analysis.py``)
-     - 09:55.331
+     - 09:47.605
      - 0.0
