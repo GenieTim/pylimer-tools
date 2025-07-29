@@ -776,21 +776,24 @@ MEHPForceBalance2::runForceRelaxation(
     // Common parameters for gradient descent solvers
     constexpr double gradientDescentLearningRate = 0.01;
 
-    // Define common callback for gradient descent solvers to handle output and interrupts
+    // Define common callback for gradient descent solvers to handle output and
+    // interrupts
     auto createGradientDescentCallback = [&](size_t& iterationsDone) {
-      return [&](int currentIteration, const Eigen::VectorXd& currentSolution) -> bool {
+      return [&](int currentIteration,
+                 const Eigen::VectorXd& currentSolution) -> bool {
         // Temporarily update the current displacements for handleOutput
         Eigen::VectorXd oldDisplacements = this->currentDisplacements;
-        this->currentDisplacements = currentSolution - this->initialConfig.coordinates;
-        
+        this->currentDisplacements =
+          currentSolution - this->initialConfig.coordinates;
+
         this->handleOutput(iterationsDone + currentIteration);
         bool shouldStop = shouldInterrupt();
-        
+
         // Restore the previous displacements if not stopping
         if (!shouldStop) {
           this->currentDisplacements = oldDisplacements;
         }
-        
+
         return shouldStop;
       };
     };
@@ -866,7 +869,7 @@ MEHPForceBalance2::runForceRelaxation(
       case SLESolver::GRADIENT_DESCENT: {
         int solverIterations = 0;
         auto callback = createGradientDescentCallback(iterationsDone);
-        
+
         finalCoordinates = Eigen::gradientDescent(
           sysMatrix,
           constants,
@@ -874,10 +877,11 @@ MEHPForceBalance2::runForceRelaxation(
           residualReduction,
           maxIterations,
           solverIterations,
-          this->currentDisplacements + this->initialConfig.coordinates, // initial solution
-          currentResidual, // initial residual
+          this->currentDisplacements +
+            this->initialConfig.coordinates, // initial solution
+          currentResidual,                   // initial residual
           callback);
-        
+
         handleGradientDescentResult(solverIterations);
         break;
       }
@@ -886,7 +890,7 @@ MEHPForceBalance2::runForceRelaxation(
       case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG: {
         int solverIterations = 0;
         auto callback = createGradientDescentCallback(iterationsDone);
-        
+
         finalCoordinates = Eigen::gradientDescentBarzilaiBorwein(
           sysMatrix,
           constants,
@@ -895,17 +899,18 @@ MEHPForceBalance2::runForceRelaxation(
           maxIterations,
           solverIterations,
           solverChoice == SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT,
-          this->currentDisplacements + this->initialConfig.coordinates, // initial solution
-          currentResidual, // initial residual
+          this->currentDisplacements +
+            this->initialConfig.coordinates, // initial solution
+          currentResidual,                   // initial residual
           callback);
-        
+
         handleGradientDescentResult(solverIterations);
         break;
       }
       case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM: {
         int solverIterations = 0;
         auto callback = createGradientDescentCallback(iterationsDone);
-        
+
         finalCoordinates = Eigen::gradientDescentHeavyBallBarzilaiBorwein(
           sysMatrix,
           constants,
@@ -913,10 +918,11 @@ MEHPForceBalance2::runForceRelaxation(
           residualReduction,
           maxIterations,
           solverIterations,
-          this->currentDisplacements + this->initialConfig.coordinates, // initial solution
-          currentResidual, // initial residual
+          this->currentDisplacements +
+            this->initialConfig.coordinates, // initial solution
+          currentResidual,                   // initial residual
           callback);
-        
+
         handleGradientDescentResult(solverIterations);
         break;
       }

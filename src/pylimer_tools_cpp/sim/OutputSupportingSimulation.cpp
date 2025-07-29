@@ -284,7 +284,8 @@ OutputSupportingSimulation::handleOutput(const long int currentStep)
                         "Autocorrelation states are inconsistent.");
       }
 
-      for (size_t output_idx = 0; output_idx < static_cast<size_t>(npcorr); output_idx += 1) {
+      for (size_t output_idx = 0; output_idx < static_cast<size_t>(npcorr);
+           output_idx += 1) {
         outputBuffer += std::to_string(
           this->autocorrelators[autocorrelator_idx_before].t[output_idx]);
         for (size_t autocorr_idx_offset = 0;

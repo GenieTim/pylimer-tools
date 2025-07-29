@@ -199,7 +199,8 @@ public:
 
     va_end(args);
 
-    return hash_product + hash_sum + (static_cast<unsigned long long>(hash_xor) << 32);
+    return hash_product + hash_sum +
+           (static_cast<unsigned long long>(hash_xor) << 32);
   }
 
   /**
@@ -359,9 +360,11 @@ public:
       return results;
     }
     igraph_vector_t allValues;
-    igraph_vector_init(&allValues, static_cast<igraph_integer_t>(vertices.size()));
+    igraph_vector_init(&allValues,
+                       static_cast<igraph_integer_t>(vertices.size()));
     igraph_vector_int_t vertexIdxs;
-    igraph_vector_int_init(&vertexIdxs, static_cast<igraph_integer_t>(vertices.size()));
+    igraph_vector_int_init(&vertexIdxs,
+                           static_cast<igraph_integer_t>(vertices.size()));
     pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertexIdxs);
     if (igraph_cattribute_VANV(&this->graph,
                                propertyName,
