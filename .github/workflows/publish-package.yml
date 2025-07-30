@@ -139,7 +139,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install OS dependencies
-        run: sudo apt install ninja-build cmake flex bison
+        run: sudo apt install ninja-build cmake flex bison libeigen3-dev
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
@@ -209,7 +209,7 @@ jobs:
         with:
           python-versions: "cp39-cp39 cp310-cp310 cp311-cp311 cp312-cp312"
           build-requirements: "cython numpy scikit-build pybind11 cmake ninja wheel"
-          system-packages: "cmake bison flex libomp libopenblas-dev"
+          system-packages: "cmake bison flex libomp libopenblas-dev libeigen3-dev"
         env:
           CI: true
           CMAKE_BUILD_TYPE: Release
