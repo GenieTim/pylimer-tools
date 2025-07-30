@@ -210,7 +210,7 @@ jobs:
         with:
           python-versions: "cp39-cp39 cp310-cp310 cp311-cp311 cp312-cp312"
           build-requirements: "cython numpy scikit-build pybind11 cmake ninja wheel"
-          system-packages: "cmake bison flex libgomp libopenblas-dev libeigen3-dev"
+          system-packages: "cmake bison flex libgomp openblas-devel eigen3-devel"
         env:
           CI: true
           CMAKE_BUILD_TYPE: Release
@@ -269,20 +269,20 @@ jobs:
           pattern: python-package-distributions-windows-*
           path: dist/
           merge-multiple: true
-          
-      - name: Download macOS artifacts  
+
+      - name: Download macOS artifacts
         uses: actions/download-artifact@v4.1.7
         with:
           pattern: python-package-distributions-macos-*
           path: dist/
           merge-multiple: true
-          
+
       - name: Download Linux artifacts
         uses: actions/download-artifact@v4.1.7
         with:
           name: python-package-distributions-linux
           path: dist/
-          
+
       - name: Download sdist artifacts
         uses: actions/download-artifact@v4.1.7
         with:
@@ -342,26 +342,26 @@ jobs:
           pattern: python-package-distributions-windows-*
           path: dist/
           merge-multiple: true
-          
-      - name: Download macOS artifacts  
+
+      - name: Download macOS artifacts
         uses: actions/download-artifact@v4.1.7
         with:
           pattern: python-package-distributions-macos-*
           path: dist/
           merge-multiple: true
-          
+
       - name: Download Linux artifacts
         uses: actions/download-artifact@v4.1.7
         with:
           name: python-package-distributions-linux
           path: dist/
-          
+
       # - name: Download WASM artifacts
       #   uses: actions/download-artifact@v4.1.7
       #   with:
       #     name: wheels-wasm
       #     path: dist/
-          
+
       - name: Download sdist artifacts
         uses: actions/download-artifact@v4.1.7
         with:
