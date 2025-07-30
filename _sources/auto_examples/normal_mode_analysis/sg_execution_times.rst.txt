@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:15.804** total execution time for 1 file **from auto_examples/normal_mode_analysis**:
+**00:15.235** total execution time for 1 file **from auto_examples/normal_mode_analysis**:
 
 .. container::
 
@@ -33,5 +33,5 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py` (``plot_normal_mode_analysis.py``)
-     - 00:15.804
+     - 00:15.235
      - 0.0
