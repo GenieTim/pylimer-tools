@@ -34,8 +34,8 @@ if (NOT DEFINED igraph_LOADED)
         # Add Windows-specific configuration
         if (WIN32)
             list(APPEND igraph_EXTRA_CMAKE_ARGS 
-                "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-                "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+#                 "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+#                 "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                 "-DCMAKE_POSITION_INDEPENDENT_CODE=OFF"
             )
         else ()
