@@ -15,12 +15,12 @@ struct AtomPairEntanglements
   /**
    * pairs of atom ids
    */
-  std::vector<std::pair<size_t, size_t>> pairsOfAtoms;
+  std::vector<std::pair<size_t, size_t>> pairsOfAtoms = {};
   /**
    * For each atom, the index of the pair it is associated with, or -1 if
    * none
    */
-  std::vector<long int> pairOfAtom;
+  std::vector<long int> pairOfAtom = {};
 };
 
 /**
