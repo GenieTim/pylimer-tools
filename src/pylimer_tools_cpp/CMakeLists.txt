@@ -55,8 +55,6 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMakeLists.txt)
 target_link_libraries(pylimer_tools 
     PUBLIC 
         Eigen3::Eigen
-        ${igraph_LIBRARIES}
-        ${nlopt_LIBRARIES}
     PRIVATE
         ${STD_FS_LIB}
 )
@@ -65,9 +63,15 @@ target_link_libraries(pylimer_tools
 if (TARGET igraph::igraph)
     add_dependencies(pylimer_tools igraph::igraph)
     target_link_libraries(pylimer_tools PUBLIC igraph::igraph)
+else ()
+    # Fallback to variable-based linking if target doesn't exist
+    target_link_libraries(pylimer_tools PUBLIC ${igraph_LIBRARIES})
 endif ()
 if (TARGET nlopt)
     add_dependencies(pylimer_tools nlopt)
+    target_link_libraries(pylimer_tools PUBLIC nlopt)
+else ()
+    target_link_libraries(pylimer_tools PUBLIC ${nlopt_LIBRARIES})
 endif ()
 if (TARGET cerealLib)
     add_dependencies(pylimer_tools cerealLib)
