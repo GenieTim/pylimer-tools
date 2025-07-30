@@ -49,17 +49,16 @@ public:
     const Eigen::VectorXd& springDistances,
     bool requiresGradient) const
   {
-    PYBIND11_OVERRIDE_PURE(
-      returntype,
-      /* Return type */
-      MEHPForceEvaluator,
-      /* Parent class */
-      evaluateForceSetGradient,
-      /* Name of function in C++
-         (must match Python name) */
-      n,
-      springDistances,
-      requiresGradient /* Argument(s) */
+    PYBIND11_OVERRIDE_PURE(returntype,
+                           /* Return type */
+                           MEHPForceEvaluator,
+                           /* Parent class */
+                           evaluateForceSetGradient,
+                           /* Name of function in C++
+                              (must match Python name) */
+                           n,
+                           springDistances,
+                           requiresGradient /* Argument(s) */
     );
   }
 
@@ -1891,7 +1890,7 @@ A strand is a chain of connected links between two crosslinks.
            Get the current link displacement residual norm.
       )pbdoc")
     .def("get_ids_of_active_nodes",
-         &mehp::MEHPForceBalance2::getIdsOfActiveNodes,
+         &mehp::MEHPForceBalance2::getAtomIdsOfActiveNodes,
          R"pbdoc(
            Get the atom ids of the nodes that are considered active.
            Only crosslink ids are returned (not e.g. entanglement links).

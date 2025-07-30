@@ -218,12 +218,11 @@ public:
 
   // copy constructor
   MCUniverseGenerator(const MCUniverseGenerator& other)
-    : box(other.box)
-    , beadDistance(other.beadDistance)
+    : beadDistance(other.beadDistance)
     , meanSquaredBeadDistance(other.meanSquaredBeadDistance)
-    , nMcSteps(other.nMcSteps)
     , primaryLoopProbability(other.primaryLoopProbability)
     , secondaryLoopProbability(other.secondaryLoopProbability)
+    , nMcSteps(other.nMcSteps)
     , rng(other.rng)
     , distX(other.distX)
     , distY(other.distY)
@@ -234,6 +233,7 @@ public:
     , nrOfAvailableCrosslinkSites(other.nrOfAvailableCrosslinkSites)
     , remainingCrossLinkerFunctionality(other.remainingCrossLinkerFunctionality)
     , xlinkNeighbourList(other.xlinkNeighbourList)
+    , box(other.box)
   {
     // clone/copy the maxDistanceProvider
     if (other.maxDistanceProvider) {

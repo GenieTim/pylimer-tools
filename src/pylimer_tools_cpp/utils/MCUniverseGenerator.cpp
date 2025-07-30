@@ -1029,21 +1029,47 @@ MCUniverseGenerator::removeSolubleFraction(bool rescale)
     forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-12, 1e-9);
   }
 
-  auto activeComponents = forceRelaxer.findClusteredToActive();
-  Eigen::ArrayXb activeSprings = activeComponents.first;
-  Eigen::ArrayXb activeNodes = activeComponents.second;
+  Eigen::ArrayXb activeSprings =
+    forceRelaxer.findActiveSprings(&forceRelaxationNetwork);
+  Eigen::ArrayXb activeNodes =
+    Eigen::ArrayXb::Zero(forceRelaxationNetwork.nrOfNodes);
 
-  RUNTIME_EXP_IFN(activeNodes.count() > 0,
-                  "No active nodes found during force relaxation. "
-                  "Removing soluble fraction does not make sense.");
-
-  // now that we know which springs and nodes are soluble,
-  // we can remove them
   RUNTIME_EXP_IFN(activeSprings.size() ==
                     this->simplifiedUniverse.strandFrom.size(),
                   "Number of springs does not match the number of strands. "
                   "Therefore, the mapping would be incorrect.");
 
+  // need to follow connections to mark the whole clusters as active
+  bool hasChanged = true;
+  while (hasChanged) {
+    hasChanged = false;
+
+    for (size_t i = 0; i < activeNodes.size(); ++i) {
+      // had already marked/handled this node and its connections
+      if (activeNodes[i]) {
+        continue;
+      }
+
+      bool nodeIsConnectedToActive = false;
+      // check if this node is connected to an active spring
+      for (int springIdx : forceRelaxationNetwork.springIndicesOfLinks[i]) {
+        if (activeSprings[springIdx]) {
+          nodeIsConnectedToActive = true;
+          break; // no need to check further springs
+        }
+      }
+      if (nodeIsConnectedToActive) {
+        activeNodes[i] = true;
+        hasChanged = true;
+        for (int springIdx : forceRelaxationNetwork.springIndicesOfLinks[i]) {
+          activeSprings[springIdx] = true;
+        }
+      }
+    }
+  }
+
+  // now that we know which springs and nodes are soluble,
+  // we can remove them
   for (long int i = activeSprings.size() - 1; i >= 0; --i) {
     if (!activeSprings[i]) {
       this->removeStrand(i);

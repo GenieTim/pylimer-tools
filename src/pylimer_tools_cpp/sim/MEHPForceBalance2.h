@@ -52,10 +52,10 @@ public:
   /**
    * @brief Instantiate this simulator with chosen entanglements.
    *
-   * @param universe
-   * @param entanglements
-   * @param crossLinkerType
-   * @param is2D
+   * @param universe the universe containing atoms and connectivity
+   * @param entanglements the detected entanglements to include in the network
+   * @param crossLinkerType the atom type of crosslinkers
+   * @param is2D whether to perform 2D simulation (z-coordinates ignored)
    * @param entanglementsAsSprings whether to model the entanglements as merged
    * beads or beads with 1 spring in between
    * @return MEHPForceBalance2
@@ -79,6 +79,12 @@ public:
         is2D,
         false) {};
 
+  /**
+   * @brief Constructor from a network and 2D flag
+   *
+   * @param net the force balance network to use
+   * @param is2D whether to perform 2D simulation (z-coordinates ignored)
+   */
   MEHPForceBalance2(const ForceBalance2Network& net, const bool is2D = false)
   {
     this->is2D = is2D;
@@ -87,6 +93,13 @@ public:
     this->completeInitialization();
   }
 
+  /**
+   * @brief Constructor from universe and network
+   *
+   * @param universe the universe containing atoms and connectivity
+   * @param net the force balance network to use
+   * @param is2D whether to perform 2D simulation (z-coordinates ignored)
+   */
   MEHPForceBalance2(const pylimer_tools::entities::Universe& universe,
                     const ForceBalance2Network& net,
                     const bool is2D = false)
@@ -98,6 +111,14 @@ public:
     this->completeInitialization();
   }
 
+  /**
+   * @brief Constructor from universe, old network and spring partitions
+   *
+   * @param u the universe containing atoms and connectivity
+   * @param net1 the force balance network to convert from
+   * @param springPartitions the spring partition parameters
+   * @param is2D whether to perform 2D simulation (z-coordinates ignored)
+   */
   MEHPForceBalance2(const pylimer_tools::entities::Universe& u,
                     const ForceBalanceNetwork& net1,
                     Eigen::VectorXd springPartitions,
@@ -154,6 +175,13 @@ public:
     this->completeInitialization();
   }
 
+  /**
+   * @brief Constructor from old network and spring partitions
+   *
+   * @param net1 the force balance network to convert from
+   * @param springPartitions the spring partition parameters
+   * @param is2D whether to perform 2D simulation (z-coordinates ignored)
+   */
   MEHPForceBalance2(const ForceBalanceNetwork& net1,
                     const Eigen::VectorXd& springPartitions,
                     const bool is2D = false)
@@ -222,11 +250,11 @@ public:
   /**
    * @brief Actually do run the simulation
    *
-   * @param simplificationMode
-   * @param inactiveRemovalCutoff
-   * @param solver
-   * @param residualReduction
-   * @param maxIterations
+   * @param simplificationMode the mode for simplifying network structure
+   * @param inactiveRemovalCutoff tolerance for removing inactive elements
+   * @param solver the solver algorithm to use
+   * @param residualReduction the target residual reduction
+   * @param maxIterations maximum number of iterations allowed
    */
   void runForceRelaxation(const StructureSimplificationMode simplificationMode =
                             StructureSimplificationMode::NO_SIMPLIFICATION,
@@ -248,13 +276,14 @@ public:
   /**
    * @brief Actually do run the simulation
    *
-   * @param simplificationMode
-   * @param inactiveRemovalCutoff
-   * @param solverChoice
-   * @param residualReduction
-   * @param maxIterations
-   * @param shouldInterrupt
-   * @param cleanupInterrupt
+   * @param simplificationMode the mode for simplifying network structure
+   * @param inactiveRemovalCutoff tolerance for removing inactive elements
+   * @param solverChoice the solver algorithm to use
+   * @param residualReduction the target residual reduction
+   * @param maxIterations maximum number of iterations allowed
+   * @param shouldInterrupt callback function to check if simulation should be
+   * interrupted
+   * @param cleanupInterrupt callback function to clean up when interrupted
    */
   void runForceRelaxation(StructureSimplificationMode simplificationMode,
                           double inactiveRemovalCutoff,
@@ -268,8 +297,8 @@ public:
    * @brief Remove springs that exert a stress higher than
    * `this->springBreakingLength`
    *
-   * @param net
-   * @param displacements
+   * @param net the network to modify
+   * @param displacements the current displacements (modified in place)
    * @return size_t the number of springs broken
    */
   size_t breakTooLongStrands(ForceBalance2Network& net,
@@ -308,6 +337,7 @@ public:
    * @brief Delete the springs indicated by `toDelete` from the network
    *
    * @param net the network to be modified
+   * @param displacements the current displacements (modified in place)
    * @param springsToDeleteIndices a vector of indices of springs to be removed
    */
   void removeSprings(ForceBalance2Network& net,
@@ -349,6 +379,11 @@ public:
    */
   [[nodiscard]] pylimer_tools::entities::Universe getCrosslinkerVerse() const;
 
+  /**
+   * @brief Get the default mean bond length
+   *
+   * @return double the default bond length
+   */
   double getDefaultMeanBondLength() const { return this->defaultBondLength; }
 
   double getVolume() override
@@ -357,8 +392,18 @@ public:
            this->initialConfig.L[2];
   }
 
+  /**
+   * @brief Get the number of nodes in the network
+   *
+   * @return int the number of nodes
+   */
   int getNrOfNodes() const { return this->initialConfig.nrOfNodes; }
 
+  /**
+   * @brief Get the number of links in the network
+   *
+   * @return int the number of links
+   */
   int getNrOfLinks() const { return this->initialConfig.nrOfLinks; }
 
   size_t getNumBonds() override
@@ -384,22 +429,52 @@ public:
     return static_cast<size_t>(this->getNrOfLinks() - this->getNrOfNodes());
   }
 
+  /**
+   * @brief Get the number of strands in the network
+   *
+   * @return int the number of strands
+   */
   int getNrOfStrands() const { return this->initialConfig.nrOfStrands; }
 
+  /**
+   * @brief Get the number of springs in the network
+   *
+   * @return int the number of springs
+   */
   int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
 
+  /**
+   * @brief Get the number of intra-chain slip links
+   *
+   * @return int the number of intra-chain slip links
+   */
   int getNumIntraChainSlipLinks() const;
 
+  /**
+   * @brief Get the current displacements
+   *
+   * @return Eigen::VectorXd the current displacements vector
+   */
   Eigen::VectorXd getCurrentDisplacements() const
   {
     return this->currentDisplacements;
   }
 
+  /**
+   * @brief Set the current displacements
+   *
+   * @param displacements the new displacements vector
+   */
   void setCurrentDisplacements(const Eigen::VectorXd& displacements)
   {
     this->currentDisplacements = displacements;
   }
 
+  /**
+   * @brief Set the spring contour lengths
+   *
+   * @param springsContourLengths the contour lengths for each spring
+   */
   void setSpringContourLengths(const Eigen::VectorXd& springsContourLengths)
   {
     INVALIDARG_EXP_IFN(springsContourLengths.size() ==
@@ -408,13 +483,28 @@ public:
     this->initialConfig.springContourLength = springsContourLengths;
   }
 
+  /**
+   * @brief Configure the mean bond length
+   *
+   * @param meanBondLength the mean bond length to set
+   */
   void configMeanBondLength(const double meanBondLength)
   {
     this->defaultBondLength = meanBondLength;
   }
 
+  /**
+   * @brief Configure the spring constant
+   *
+   * @param kappa the spring constant value
+   */
   void configSpringConstant(const double kappa = 1.0) { this->kappa = kappa; }
 
+  /**
+   * @brief Configure the spring breaking distance
+   *
+   * @param newSpringBreakingForce the force threshold for spring breaking
+   */
   void configSpringBreakingDistance(const double newSpringBreakingForce = -1.)
   {
     this->springBreakingLength = newSpringBreakingForce;
@@ -440,8 +530,8 @@ public:
   /**
    * @brief Get the Soluble Weight Fraction
    *
-   * @param tolerance
-   * @return double
+   * @param tolerance the tolerance for considering springs as inactive
+   * @return double the soluble weight fraction
    */
   double getSolubleWeightFraction(const double tolerance = 1e-6)
   {
@@ -452,8 +542,8 @@ public:
   /**
    * @brief Get the Dangling Weight Fraction
    *
-   * @param tolerance
-   * @return double
+   * @param tolerance the tolerance for considering springs as inactive
+   * @return double the dangling weight fraction
    */
   double getDanglingWeightFraction(const double tolerance = 1e-6)
   {
@@ -464,8 +554,8 @@ public:
   /**
    * @brief Get the Weight Fraction of Active Springs (atoms)
    *
-   * @param tolerance
-   * @return double
+   * @param tolerance the tolerance for considering springs as inactive
+   * @return double the active weight fraction
    */
   double getActiveWeightFraction(const double tolerance = 1e-6)
   {
@@ -477,8 +567,8 @@ public:
    * @brief Count the number of atoms that are in any way connected to an
    * active spring
    *
-   * @param tolerance
-   * @return double
+   * @param tolerance the tolerance for considering springs as inactive
+   * @return double the number of active clustered atoms
    */
   double countActiveClusteredAtoms(const double tolerance = 1e-6)
   {
@@ -576,10 +666,9 @@ public:
    * considered inactive
    * @return std::vector<long int> the atom ids
    */
-  std::vector<long int> getIndicesOfActiveNodes(
-    const ForceBalance2Network& net,
-    const Eigen::VectorXd& u,
-    const double tolerance = 1e-6) const;
+  std::vector<int> getIndicesOfActiveNodes(const ForceBalance2Network& net,
+                                           const Eigen::VectorXd& u,
+                                           const double tolerance = 1e-6) const;
 
   /**
    * @brief Get the Ids of active Nodes
@@ -588,7 +677,7 @@ public:
    * considered inactive
    * @return std::vector<long int> the atom ids
    */
-  std::vector<long int> getIdsOfActiveNodes(
+  std::vector<long int> getAtomIdsOfActiveNodes(
     const double tolerance = 1e-6) const;
 
   /**
@@ -597,8 +686,18 @@ public:
    */
   std::vector<double> getOverallSpringLengths() const;
 
+  /**
+   * @brief Get the current spring distances
+   *
+   * @return Eigen::VectorXd the current spring distances
+   */
   Eigen::VectorXd getCurrentSpringDistances() const;
 
+  /**
+   * @brief Get the current spring lengths
+   *
+   * @return std::vector<double> the current spring lengths
+   */
   std::vector<double> getCurrentSpringLengths() const;
 
   /**
@@ -624,13 +723,20 @@ public:
    * @brief Get the Nr Of Active Springs object
    *
    * @param tolerance springs under a certain length are considered inactive
-   * @return int
+   * @return int the number of active strands
    */
   int getNrOfActiveStrands(const double tolerance = 1e-6) const
   {
     return this->countNrOfActiveStrands(tolerance);
   }
 
+  /**
+   * @brief Get the number of active strands in a specific direction
+   *
+   * @param dir the direction (0=x, 1=y, 2=z)
+   * @param tolerance springs under a certain length are considered inactive
+   * @return int the number of active strands in the specified direction
+   */
   int getNrOfActiveStrandsInDir(const int dir,
                                 const double tolerance = 1e-6) const
   {
@@ -642,7 +748,7 @@ public:
    *
    * @param tolerance the tolerance: springs under a certain length are
    * considered inactive
-   * @return int
+   * @return int the number of active springs
    */
   int getNrOfActiveSprings(const double tolerance = 1e-6) const
   {
@@ -652,19 +758,30 @@ public:
   /**
    * @brief Get the Average Spring Length at the current step
    *
-   * @return double
+   * @return double the average strand length
    */
   double getAverageStrandLength() const;
 
+  /**
+   * @brief Get the stress tensor
+   *
+   * @return Eigen::Matrix3d the stress tensor
+   */
   Eigen::Matrix3d getStressTensor() override;
 
+  /**
+   * @brief Get the stress tensor based on links
+   *
+   * @param crosslinksOnly whether to only consider crosslinks
+   * @return Eigen::Matrix3d the stress tensor
+   */
   Eigen::Matrix3d getStressTensorLinkBased(
     const bool crosslinksOnly = false) const;
 
   /**
    * @brief Get the Pressure
    *
-   * @return double
+   * @return double the pressure
    */
   double getPressure() const
   {
@@ -683,6 +800,11 @@ public:
    */
   double getGammaFactor(double b02 = 0.96, int nrOfChains = -1) const;
 
+  /**
+   * @brief Get the gamma factor override
+   *
+   * @return double the gamma factor
+   */
   double getGamma() override { return this->getGammaFactor(1., -1.); }
 
   /**
@@ -707,11 +829,17 @@ public:
   /**
    * @brief Get the number of force balance iterations done so far
    *
-   * @return int
+   * @return int the number of iterations
    */
   int getNrOfIterations() const { return this->nrOfStepsDone; }
 
+  /**
+   * @brief Get the exit/stop reason for the simulation
+   *
+   * @return ExitReason the reason for simulation stop
+   */
   ExitReason getExitReason() const { return this->exitReason; }
+
   /**
    * @brief Compute one spring length
    *
