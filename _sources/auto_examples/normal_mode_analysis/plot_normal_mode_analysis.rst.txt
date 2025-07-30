@@ -69,12 +69,14 @@ Reference: :cite:t:`gusev_molecular_2024`
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-45
+.. GENERATED FROM PYTHON SOURCE LINES 43-47
 
-TODO: apply conversion factors if necessary
-plot the results
+.. todo:
+  Apply conversion factors where necessary
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-54
+Plot the results
+
+.. GENERATED FROM PYTHON SOURCE LINES 47-56
 
 .. code-block:: Python
 
@@ -102,7 +104,7 @@ plot the results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 15.957 seconds)
+   **Total running time of the script:** (0 minutes 16.968 seconds)
 
 
 .. _sphx_glr_download_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py:

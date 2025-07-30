@@ -23,10 +23,9 @@ Deformation Experiment
 
 This example shows how to use the `MEHPForceBalance2` class in a deformation experiment.
 
-It also indicates, that for small deformations,
-deformation is an equivalent method to obtain the modulus.
+It also shows, that deformation is an equivalent method to the :math:`\Gamma` factor to obtain the modulus.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-133
+.. GENERATED FROM PYTHON SOURCE LINES 9-127
 
 .. code-block:: Python
 
@@ -47,8 +46,7 @@ deformation is an equivalent method to obtain the modulus.
     from pylimer_tools_cpp import Box, MEHPForceBalance2, Universe
 
     # Get parameters for conversion factors
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
     assert isinstance(params, Parameters)
 
     # Load your network (replace with your file)
@@ -141,11 +139,7 @@ deformation is an equivalent method to obtain the modulus.
     # plot deformation results
     plt.figure()
     plt.plot(lmbdas, moduli_deformed, marker="o", label="From Deformation")
-    plt.axhline(
-        y=shear_modulus,
-        color="r",
-        linestyle="--",
-        label="From Equilibrium")
+    plt.axhline(y=shear_modulus, color="r", linestyle="--", label="From Equilibrium")
     plt.xlabel("Deformation Ratio (λ)")
     plt.ylabel("Shear Modulus [MPa]")
     plt.ylim(0, max(moduli_deformed) * 1.1)
@@ -166,13 +160,13 @@ deformation is an equivalent method to obtain the modulus.
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 1.748019358071877e-13
-    Shear Modulus from Equilibrium [MPa]:  0.10957252983578977
+    Final residual (should be close to 0): 4.4112700698607503e-13
+    Shear Modulus from Equilibrium [MPa]:  0.08801807662630982
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-137
+.. GENERATED FROM PYTHON SOURCE LINES 128-131
 
 Rather than using the nominal stress, you can also use the
 stress tensor directly to compute the shear modulus.
@@ -181,7 +175,7 @@ Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.312 seconds)
+   **Total running time of the script:** (0 minutes 1.160 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_fb_deformation_exp.py:

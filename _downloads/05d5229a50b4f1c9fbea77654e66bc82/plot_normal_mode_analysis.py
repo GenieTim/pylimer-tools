@@ -40,8 +40,10 @@ storage_modulus = nma.evaluate_storage_modulus(omega=frequencies)
 loss_modulus = nma.evaluate_loss_modulus(omega=frequencies)
 
 # %%
-# TODO: apply conversion factors if necessary
-# plot the results
+# .. todo:
+#   Apply conversion factors where necessary
+#
+# Plot the results
 df = pd.DataFrame(
     {
         "Frequency": frequencies,
