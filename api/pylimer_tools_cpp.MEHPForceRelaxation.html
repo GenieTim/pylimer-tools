@@ -431,8 +431,8 @@ Consequently, it offers a variety of configurable non-linear solvers using NLopt
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon" title="pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_rerun_epsilon</span></code></a>(self[, epsilon])</p></td>
 <td><p>Configure the offset from the lower and upper bounds for the simulation to suggest another run.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_step_output" title="pylimer_tools_cpp.MEHPForceRelaxation.config_step_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_step_output</span></code></a>(self, output_configuration)</p></td>
-<td><p>Set which values to log during the simulation.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_step_output" title="pylimer_tools_cpp.MEHPForceRelaxation.config_step_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_step_output</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Overloaded function.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.count_active_clustered_atoms" title="pylimer_tools_cpp.MEHPForceRelaxation.count_active_clustered_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_active_clustered_atoms</span></code></a>(self[, tolerance])</p></td>
 <td><p>Counts the active clustered atoms in the system.</p></td>
@@ -546,14 +546,32 @@ this must be kept False (default).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.config_step_output">
-<span class="sig-name descname"><span class="pre">config_step_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.OutputConfiguration"><span class="pre">pylimer_tools_cpp.OutputConfiguration</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_step_output" title="Link to this definition">¶</a></dt>
-<dd><p>Set which values to log during the simulation.</p>
+<span class="sig-name descname"><span class="pre">config_step_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_step_output" title="Link to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>config_step_output(self: pylimer_tools_cpp.MEHPForceRelaxation, output_configuration: list[pylimer_tools_cpp.OutputConfiguration]) -&gt; None</p>
+<blockquote>
+<div><p>Set which values to log during the simulation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>output_configuration</strong> – An OutputConfiguration struct or list of OutputConfiguration structs
+<dt class="field-odd">param output_configuration<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An OutputConfiguration struct or list of OutputConfiguration structs
 specifying what values to log and how often</p>
 </dd>
 </dl>
+</div></blockquote>
+</li>
+<li><p>config_step_output(self: pylimer_tools_cpp.MEHPForceRelaxation, output_configuration: list[pylimer_tools_cpp.OutputConfiguration]) -&gt; None</p>
+<blockquote>
+<div><p>Set which values to log during the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">param output_configuration<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An OutputConfiguration struct or list of OutputConfiguration structs
+specifying what values to log and how often</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+</ol>
 </dd></dl>
 
 <dl class="py method">
