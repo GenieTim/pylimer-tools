@@ -35,3 +35,4 @@ sphinx-gallery>=0.19.0
 psutil>=7.0.0
 intersphinx_registry>=0.2501.23
 sphinxcontrib-bibtex>=2.6.5
+build>=1.2.2
