@@ -818,7 +818,7 @@ init_pylimer_bound_entities(py::module_& m)
          :return: The total contour length of the molecule
          )pbdoc")
     .def("get_edge_ids_from",
-         &Universe::getIncidentEdgeIds,
+         &Molecule::getIncidentEdgeIds,
          R"pbdoc(
          Get the edge IDs incident to a specific vertex.
          
@@ -827,7 +827,7 @@ init_pylimer_bound_entities(py::module_& m)
          )pbdoc",
          py::arg("vertex_id"))
     .def("get_edge_ids_from_to",
-         &Universe::getEdgeIdsFromTo,
+         &Molecule::getEdgeIdsFromTo,
          R"pbdoc(
          Get the edge IDs of the edges between two specific vertices.
          
@@ -838,7 +838,7 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("vertex_id_from"),
          py::arg("vertex_id_to"))
     .def("get_nr_of_edges_from_to",
-         &Universe::getPathLength,
+         &Molecule::getPathLength,
          R"pbdoc(
          Get the number of edges in the shortest path between two specific vertices.
 
@@ -1813,6 +1813,16 @@ init_pylimer_bound_entities(py::module_& m)
          This operation cleans up the graph structure by removing
          redundant connections.
          )pbdoc")
+    //
+    .def("has_atom_with_id",
+         &Universe::containsAtomWithId,
+         R"pbdoc(
+         Check whether this universe contains an atom with the specified ID.
+
+         :param atom_id: The atom ID to check
+         :return: True if the atom exists in this universe, False otherwise
+         )pbdoc",
+         py::arg("atom_id"))
     // operators
     //     .def(pybind11::self == pybind11::self)
     .def(

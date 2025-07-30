@@ -763,6 +763,52 @@ A strand is a chain of connected links between two crosslinks.
 
           :return: A Universe object containing the crosslinkers with updated positions
      )pbdoc")
+    .def_property_readonly("network",
+                           &mehp::MEHPForceRelaxation::getNetwork,
+                           R"pbdoc(
+          Get the network structure.
+
+          :return: The network structure used in the simulation
+     )pbdoc")
+    .def("get_spring_contour_length",
+         &mehp::MEHPForceRelaxation::getSpringContourLength,
+         R"pbdoc(
+          Get the spring contour lengths.
+
+          :return: A vector containing the contour lengths of all springs
+     )pbdoc")
+    .def("get_nr_of_active_springs_connected",
+         &mehp::MEHPForceRelaxation::getNrOfActiveSpringsConnected,
+         R"pbdoc(
+          Returns the number of active springs connected to each node.
+
+          :param tolerance: Springs under this length are considered inactive
+          :return: Vector with the number of active springs for each node
+     )pbdoc",
+         py::arg("tolerance") = 0.05)
+    .def("get_current_spring_distances",
+         &mehp::MEHPForceRelaxation::getCurrentSpringDistances,
+         R"pbdoc(
+          Get the current spring distances.
+
+          :return: A vector containing the current spring distance vectors
+     )pbdoc")
+    .def("get_average_contour_length",
+         &mehp::MEHPForceRelaxation::getAverageContourLength,
+         R"pbdoc(
+          Get the average contour length of all springs.
+
+          :return: The average contour length
+     )pbdoc")
+    .def("config_step_output",
+         &mehp::MEHPForceRelaxation::configStepOutput,
+         R"pbdoc(
+          Set which values to log during the simulation.
+
+          :param output_configuration: An OutputConfiguration struct or list of OutputConfiguration structs
+                                      specifying what values to log and how often
+     )pbdoc",
+         py::arg("output_configuration"))
 #ifdef CEREALIZABLE
     .def(py::pickle(
       [](const mehp::MEHPForceRelaxation& u) {
