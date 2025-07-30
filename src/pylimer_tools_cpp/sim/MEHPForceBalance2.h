@@ -73,8 +73,7 @@ public:
                              const bool is2D = false)
     : MEHPForceBalance2(
         u,
-        pylimer_tools::topo::entanglement_detection::AtomPairEntanglements({},
-                                                                           {}),
+        pylimer_tools::topo::entanglement_detection::AtomPairEntanglements(),
         crossLinkerType,
         is2D,
         false) {};

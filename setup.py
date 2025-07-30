@@ -105,7 +105,7 @@ for vendor_file in vendor_files_to_delete:
 #         warnings.warn(
 #             "Could not delete directory {}. Errors incoming.".format(skbuildCaches))
 
-with open("README.md", "r") as file:
+with open("README.md", "r", encoding="utf-8") as file:
     readme_content = file.read()
 
 # Convert distutils Windows platform specifiers to CMake -A arguments

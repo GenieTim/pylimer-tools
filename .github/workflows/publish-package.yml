@@ -185,7 +185,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           cache: "pip"
-          python-version: "3.10"
+          python-version: "3.12"
 
       - uses: actions/cache@v3
         with:
@@ -198,19 +198,19 @@ jobs:
             ./vendor/cereal
             ./vendor/cereal-skbuild
             ./_skbuild
-          key: ${{ runner.os }}-pip-3.10-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-3.12-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-3.10-
+            ${{ runner.os }}-pip-3.12-
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
       - name: Build manylinux Python wheels
-        uses: RalfG/python-wheels-manylinux-build@v0.5.0
+        uses: RalfG/python-wheels-manylinux-build@v0.7.1
         with:
           python-versions: "cp39-cp39 cp310-cp310 cp311-cp311 cp312-cp312"
           build-requirements: "cython numpy scikit-build pybind11 cmake ninja wheel"
-          system-packages: "cmake bison flex libomp libopenblas-dev libeigen3-dev"
+          system-packages: "cmake bison flex libgomp libopenblas-dev libeigen3-dev"
         env:
           CI: true
           CMAKE_BUILD_TYPE: Release
