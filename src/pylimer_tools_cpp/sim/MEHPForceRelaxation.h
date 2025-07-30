@@ -246,7 +246,7 @@ public:
    * connections allowed (-1 for no limit)
    * @return int the number of active nodes
    */
-  int getNrOfActiveNodes(const double tolerance = 0.05,
+  int getNrOfActiveNodes(const double tolerance = 1e-3,
                          const int minimumNrOfActiveConnections = 2,
                          const int maximumNrOfActiveConnections = -1) const
   {
@@ -262,7 +262,7 @@ public:
    * @param tolerance the tolerance for determining active springs
    * @return double the soluble weight fraction
    */
-  double getSolubleWeightFraction(const double tolerance = 0.05)
+  double getSolubleWeightFraction(const double tolerance = 1e-3)
   {
     return this->computeSolubleWeightFraction(&this->forceRelaxationNetwork,
                                               tolerance);
@@ -275,7 +275,7 @@ public:
    * @param tolerance the tolerance for determining active springs
    * @return double the number of active clustered atoms
    */
-  double countActiveClusteredAtoms(const double tolerance = 0.05)
+  double countActiveClusteredAtoms(const double tolerance = 1e-3)
   {
     return this->countActiveClusteredAtoms(&this->forceRelaxationNetwork,
                                            tolerance);
@@ -287,7 +287,7 @@ public:
    * @param tolerance the tolerance for determining active springs
    * @return double the dangling weight fraction
    */
-  double getDanglingWeightFraction(const double tolerance = 0.05)
+  double getDanglingWeightFraction(const double tolerance = 1e-3)
   {
     return this->computeDanglingWeightFraction(&this->forceRelaxationNetwork,
                                                tolerance);
@@ -301,7 +301,7 @@ public:
    * chains
    */
   std::vector<pylimer_tools::entities::Molecule> getActiveChains(
-    const double tolerance = 0.05) const
+    const double tolerance = 1e-3) const
   {
     const std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
       this->universe.getChainsWithCrosslinker(crossLinkerType);
@@ -619,7 +619,7 @@ public:
    * @return Eigen::ArrayXb
    */
   Eigen::ArrayXb findActiveSprings(const Network* net,
-                                   const double tolerance = 0.05) const;
+                                   const double tolerance = 1e-3) const;
 
 protected:
   /**
@@ -741,7 +741,7 @@ protected:
    * @return int
    */
   int countNrOfActiveSprings(const Network* net,
-                             const double tolerance = 0.05) const
+                             const double tolerance = 1e-3) const
   {
     return (this->findActiveSprings(net, tolerance) == true).count();
   }
@@ -755,7 +755,7 @@ protected:
    * @return double
    */
   double computeActiveWeightFraction(Network* net,
-                                     const double tolerance = 0.05) const;
+                                     const double tolerance = 1e-3) const;
 
   /**
    * @brief Count the number of atoms that can be considered part of an
@@ -767,10 +767,10 @@ protected:
    * @return double
    */
   double countActiveClusteredAtoms(Network* net,
-                                   const double tolerance = 0.05) const;
+                                   const double tolerance = 1e-3) const;
 
   std::vector<int> getIndicesOfActiveNodes(const Network* net,
-                                           const double tolerance = 0.05) const;
+                                           const double tolerance = 1e-3) const;
 
   /**
    * @brief Compute the weight fraction of non-active springs
@@ -780,19 +780,18 @@ protected:
    * @return double
    */
   double computeDanglingWeightFraction(Network* net,
-                                       const double tolerance = 0.05) const;
+                                       const double tolerance = 1e-3) const;
 
   /**
    * @brief Compute the weight fraction of springs connected to active
    * springs (any depth)
    *
    * @param net
-   * @param springDistances
    * @param tolerance
    * @return double
    */
   double computeSolubleWeightFraction(Network* net,
-                                      const double tolerance = 0.05) const
+                                      const double tolerance = 1e-3) const
   {
     const double nActiveClusteredAtoms =
       this->countActiveClusteredAtoms(net, tolerance);
