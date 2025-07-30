@@ -4,8 +4,7 @@ Deformation Experiment
 
 This example shows how to use the `MEHPForceBalance2` class in a deformation experiment.
 
-It also indicates, that for small deformations,
-deformation is an equivalent method to obtain the modulus.
+It also shows, that deformation is an equivalent method to the :math:`\\Gamma` factor to obtain the modulus.
 """
 
 import copy
@@ -24,8 +23,7 @@ from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import Box, MEHPForceBalance2, Universe
 
 # Get parameters for conversion factors
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
 
 # Load your network (replace with your file)
@@ -118,11 +116,7 @@ for lmbda in lmbdas:
 # plot deformation results
 plt.figure()
 plt.plot(lmbdas, moduli_deformed, marker="o", label="From Deformation")
-plt.axhline(
-    y=shear_modulus,
-    color="r",
-    linestyle="--",
-    label="From Equilibrium")
+plt.axhline(y=shear_modulus, color="r", linestyle="--", label="From Equilibrium")
 plt.xlabel("Deformation Ratio (λ)")
 plt.ylabel("Shear Modulus [MPa]")
 plt.ylim(0, max(moduli_deformed) * 1.1)

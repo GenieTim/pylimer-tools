@@ -32,6 +32,7 @@ add_library(pylimer_tools
     sim/MEHPForceBalance.cpp
     sim/MEHPForceBalance2.cpp
     sim/DPDSimulator.cpp
+    utils/MCUniverseGenerator.cpp
 )
 
 # Set target properties

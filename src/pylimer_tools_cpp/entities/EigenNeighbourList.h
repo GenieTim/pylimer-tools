@@ -109,7 +109,7 @@ namespace entities {
       double newCutoff,
       bool sort = false) const;
 
-#ifdef CERALIZABLE
+#ifdef CEREALIZABLE
     template<class Archive>
     void serialize(Archive& ar)
     {

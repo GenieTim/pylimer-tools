@@ -56,8 +56,7 @@ public:
       /* Parent class */
       evaluateForceSetGradient,
       /* Name of function in C++
-                                                       (must
-         match Python name) */
+         (must match Python name) */
       n,
       springDistances,
       requiresGradient /* Argument(s) */
@@ -127,7 +126,7 @@ init_pylimer_bound_sim(py::module_& m)
                    R"pbdoc(
                     List of integer-valued quantities to output.
                     
-                    Use ComputedIntValues enum to specify which integer quantities
+                    Use :class:`~pylimer_tools_cpp.ComputedIntValues` enum to specify which integer quantities
                     should be computed and written to output.
                    )pbdoc")
     .def_readwrite("double_values",
@@ -135,7 +134,7 @@ init_pylimer_bound_sim(py::module_& m)
                    R"pbdoc(
                     List of double-valued quantities to output.
                     
-                    Use ComputedDoubleValues enum to specify which floating-point quantities
+                    Use :class:`~pylimer_tools_cpp.ComputedDoubleValues` enum to specify which floating-point quantities
                     should be computed and written to output.
                    )pbdoc")
     .def_readwrite("use_every",
@@ -1436,7 +1435,7 @@ A strand is a chain of connected links between two crosslinks.
     .def("get_nr_of_iterations",
          &mehp::MEHPForceBalance::getNrOfIterations,
          R"pbdoc(
-          Returns the number of iterations used for force relaxation so far.
+           Returns the number of iterations used for force relaxation so far.
      )pbdoc")
     .def("get_exit_reason",
          &mehp::MEHPForceBalance::getExitReason,
@@ -1446,7 +1445,7 @@ A strand is a chain of connected links between two crosslinks.
     .def("get_crosslinker_universe",
          &mehp::MEHPForceBalance::getCrosslinkerVerse,
          R"pbdoc(
-          Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
+           Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
      )pbdoc")
 #ifdef CEREALIZABLE
     .def(py::pickle(
@@ -1563,6 +1562,8 @@ A strand is a chain of connected links between two crosslinks.
            Otherwise, it returns true.
 
            Can be used e.g. as :code:`assert fb.validate_network()`.
+
+           :return: True if validation passes, raises exception otherwise
       )pbdoc")
     .def(
       "run_force_relaxation",
