@@ -290,7 +290,7 @@ setup(
     package_dir={"": "src"},
     include_package_data=True,
     extras_require={"test": ["unittest"]},
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     ext_modules=[CMakeExtension("pylimer_tools_cpp")],
     cmdclass={"build_ext": CMakeBuild},
     entry_points={
