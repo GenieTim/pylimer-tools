@@ -19,6 +19,11 @@ if (NOT DEFINED nlopt_LOADED)
         endif ()
 
         set(nlopt_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/nlopt${vendor_suffix}")
+        
+        set(nlopt_BUILD_TYPE "Release")
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+            set(nlopt_BUILD_TYPE "Debug")
+        endif ()
 
         ExternalProject_Add(
                 nloptLib
@@ -26,8 +31,8 @@ if (NOT DEFINED nlopt_LOADED)
                 GIT_TAG 11cff2c773b4b98821915a72179f4667c307ce6d # 2.9.1
                 PREFIX ${nlopt_PREFIX_PATH}
                 INSTALL_DIR ${nlopt_PREFIX_PATH}/nloptLib-install
-                CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${nlopt_PREFIX_PATH}/nloptLib-install -DINSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DCMAKE_INSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DNLOPT_GUILE=OFF -DNLOPT_OCTAVE=OFF -DNLOPT_MATLAB=OFF -DNLOPT_SWIG=OFF -DNLOPT_PYTHON=OFF -DBUILD_SHARED_LIBS=OFF
-                BUILD_COMMAND ${CMAKE_COMMAND} --build ${nlopt_PREFIX_PATH}/src/nloptLib-build --config Release
+                CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${nlopt_PREFIX_PATH}/nloptLib-install -DINSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DCMAKE_INSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DNLOPT_GUILE=OFF -DNLOPT_OCTAVE=OFF -DNLOPT_MATLAB=OFF -DNLOPT_SWIG=OFF -DNLOPT_PYTHON=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=${nlopt_BUILD_TYPE}
+                BUILD_COMMAND ${CMAKE_COMMAND} --build ${nlopt_PREFIX_PATH}/src/nloptLib-build --config ${nlopt_BUILD_TYPE}
                 BUILD_BYPRODUCTS ${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt${LIBRARY_SUFFIX}
         )
         # FetchContent_MakeAvailable(nloptLib)
@@ -46,7 +51,10 @@ if (NOT DEFINED nlopt_LOADED)
             # file(GLOB_RECURSE nlopt_LIBRARIES "${nlopt_PREFIX_PATH}/*.a")
         endif ()
         message("Hoping nlopt_LIBRARIES will be compiled to: ${nlopt_LIBRARIES}")
-        set_target_properties(nlopt PROPERTIES IMPORTED_LOCATION ${nlopt_LIBRARIES})
+        set_target_properties(nlopt PROPERTIES 
+            IMPORTED_LOCATION ${nlopt_LIBRARIES}
+            INTERFACE_INCLUDE_DIRECTORIES "${nlopt_INCLUDE_DIRS}"
+        )
         set(nlopt_LOADED ON)
     endif ()
 endif ()
