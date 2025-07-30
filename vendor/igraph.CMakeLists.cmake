@@ -70,7 +70,7 @@ if (NOT DEFINED igraph_LOADED)
         
         add_library(igraph::igraph STATIC IMPORTED)
         add_dependencies(igraph::igraph igraphLib)
-        
+
         if (MSVC)
             set(igraph_INCLUDE_DIRS "${igraph_PREFIX_PATH}/igraphLib-install/include" "${igraph_PREFIX_PATH}/src/igraphLib/msvc/include")
         else ()
@@ -112,12 +112,6 @@ if (NOT DEFINED igraph_LOADED)
             INTERFACE_INCLUDE_DIRECTORIES "${igraph_INCLUDE_DIRS}"
         )
         
-        # On Windows, igraph might need additional system libraries
-        if (WIN32)
-            set_target_properties(igraph::igraph PROPERTIES 
-                INTERFACE_LINK_LIBRARIES "ws2_32;bcrypt"
-            )
-        endif ()
         set(igraph_LOADED ON)
     endif ()
     # endif()
