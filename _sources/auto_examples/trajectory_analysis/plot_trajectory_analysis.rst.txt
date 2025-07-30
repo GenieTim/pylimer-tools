@@ -180,7 +180,7 @@ consider using the :py:mod:`tidynamics` package instead like so:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (9 minutes 48.501 seconds)
+   **Total running time of the script:** (9 minutes 49.504 seconds)
 
 
 .. _sphx_glr_download_auto_examples_trajectory_analysis_plot_trajectory_analysis.py:

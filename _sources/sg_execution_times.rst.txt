@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**18:10.199** total execution time for 32 files **from all galleries**:
+**18:10.397** total execution time for 32 files **from all galleries**:
 
 .. container::
 
@@ -33,49 +33,49 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_trajectory_analysis_plot_trajectory_analysis.py` (``../examples/trajectory_analysis/plot_trajectory_analysis.py``)
-     - 09:48.501
+     - 09:49.504
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py` (``../examples/force_balance/plot_polydispersity_study.py``)
-     - 05:43.999
+     - 05:44.350
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_vulcanized_network.py` (``../examples/network_generator/plot_vulcanized_network.py``)
-     - 01:27.085
+     - 01:26.686
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_monte_carlo_configuration.py` (``../examples/network_generator/plot_monte_carlo_configuration.py``)
-     - 00:34.395
+     - 00:34.300
      - 0.0
    * - :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py` (``../examples/normal_mode_analysis/plot_normal_mode_analysis.py``)
-     - 00:16.968
+     - 00:16.180
      - 0.0
    * - :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_simulation.py` (``../examples/dpd_simulations/plot_dpd_simulation.py``)
-     - 00:07.919
+     - 00:07.985
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py` (``../examples/network_generator/plot_polydisperse_system.py``)
-     - 00:06.818
+     - 00:06.897
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py` (``../examples/force_balance/plot_fb_deformation_exp.py``)
-     - 00:01.160
+     - 00:01.113
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``../examples/force_balance/plot_force_balance_2.py``)
-     - 00:00.626
+     - 00:00.630
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_add_angles.py` (``../examples/network_generator/plot_add_angles.py``)
-     - 00:00.574
+     - 00:00.578
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_simple_crosslinked_network.py` (``../examples/network_generator/plot_simple_crosslinked_network.py``)
-     - 00:00.519
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py` (``../examples/force_balance/plot_force_balance.py``)
-     - 00:00.490
+     - 00:00.522
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py` (``../examples/force_balance/plot_force_relaxation.py``)
-     - 00:00.482
+     - 00:00.491
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py` (``../examples/force_balance/plot_force_balance.py``)
+     - 00:00.487
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_multi_component_system.py` (``../examples/network_generator/plot_multi_component_system.py``)
-     - 00:00.423
+     - 00:00.434
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_reader.py` (``../examples/readers_writers/plot_data_file_reader.py``)
-     - 00:00.238
+     - 00:00.237
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_save_network.py` (``../examples/network_generator/plot_save_network.py``)
      - 00:00.001
