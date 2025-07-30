@@ -53,7 +53,7 @@ if (NOT DEFINED nlopt_LOADED)
         message("Hoping nlopt_LIBRARIES will be compiled to: ${nlopt_LIBRARIES}")
         set_target_properties(nlopt PROPERTIES 
             IMPORTED_LOCATION ${nlopt_LIBRARIES}
-            INTERFACE_INCLUDE_DIRECTORIES "${nlopt_INCLUDE_DIRS}"
+#             INTERFACE_INCLUDE_DIRECTORIES "${nlopt_INCLUDE_DIRS}"
         )
         set(nlopt_LOADED ON)
     endif ()
