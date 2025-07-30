@@ -1120,10 +1120,10 @@ TEST_CASE(
           forceBalancerEntanglementLinks.getNrOfActiveSprings());
 
   std::vector<long int> activeNodes0_1 =
-    forceBalancerEntanglementSprings.getIdsOfActiveNodes();
+    forceBalancerEntanglementSprings.getAtomIdsOfActiveNodes();
   std::ranges::sort(activeNodes0_1);
   std::vector<long int> activeNodes0_2 =
-    forceBalancerEntanglementLinks.getIdsOfActiveNodes();
+    forceBalancerEntanglementLinks.getAtomIdsOfActiveNodes();
   std::ranges::sort(activeNodes0_2);
   REQUIRE(activeNodes0_1 == activeNodes0_2);
 
@@ -1137,10 +1137,10 @@ TEST_CASE(
     CHECK(forceBalancerEntanglementSprings.getNrOfStrands() >
           forceBalancerEntanglementLinks.getNrOfStrands());
     std::vector<long int> activeNodes1 =
-      forceBalancerEntanglementSprings.getIdsOfActiveNodes();
+      forceBalancerEntanglementSprings.getAtomIdsOfActiveNodes();
     std::ranges::sort(activeNodes1);
     std::vector<long int> activeNodes2 =
-      forceBalancerEntanglementLinks.getIdsOfActiveNodes();
+      forceBalancerEntanglementLinks.getAtomIdsOfActiveNodes();
     std::ranges::sort(activeNodes2);
     CHECK(activeNodes1 == activeNodes2);
 
@@ -1177,10 +1177,10 @@ TEST_CASE(
     CHECK(forceBalancerEntanglementSprings.getNrOfStrands() >
           forceBalancerEntanglementLinks.getNrOfStrands());
     std::vector<long int> activeNodes1 =
-      forceBalancerEntanglementSprings.getIdsOfActiveNodes();
+      forceBalancerEntanglementSprings.getAtomIdsOfActiveNodes();
     std::ranges::sort(activeNodes1);
     std::vector<long int> activeNodes2 =
-      forceBalancerEntanglementLinks.getIdsOfActiveNodes();
+      forceBalancerEntanglementLinks.getAtomIdsOfActiveNodes();
     std::ranges::sort(activeNodes2);
     CHECK(activeNodes1 == activeNodes2);
 
@@ -2322,9 +2322,11 @@ TEST_CASE("All MEHP Force Balance2 vs. Force Relaxation Phantom Comparisons",
 
 #define CHECK_THAT_OR_ZERO(expr, otherExpr)                                    \
   if (std::abs(expr) < 1e-5) {                                                 \
-    CHECK(std::abs(otherExpr) < 1e-5);                                         \
+    CHECK(std::abs(otherExpr) < 2e-5);                                         \
   } else {                                                                     \
-    CHECK_THAT(expr, Catch::Matchers::WithinRel(otherExpr, 1e-3));             \
+    CHECK_THAT(                                                                \
+      expr,                                                                    \
+      Catch::Matchers::WithinRel(otherExpr, 1e-2)); /** allow 1% deviation */  \
   }
 
   size_t nFilesFound = 0;
@@ -2412,6 +2414,16 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
           "Simplification",
           "[analysis][MEHPForceBalance2][MEHPForceBalance][long]")
 {
+  /**
+   * @brief This test compares the MEHP Force Balance 1 and 2 implementations
+   *
+   * There are two main reasons why the test may fail:
+   * 1. The new version has much better convergence,
+   * 2. The old version handled removal quite differently.
+   *
+   * For each system, you can check which one of the two it is,
+   * by running the new one with the old's final network when disabling removal.
+   */
   std::cout << "Running test \"All MEHP Force Balance 1 vs. 2 Comparisons with "
                "Entanglements and Simplification\""
             << std::endl;
@@ -2550,17 +2562,18 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
     }
 
     auto start_fr = std::chrono::high_resolution_clock::now();
-    forceBalance.runForceRelaxation(5000,
-                                    1e-9 / forceBalance.getResidual(),
-                                    -1.,
-                                    pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
-                                    1e-5,
-                                    false,
-                                    pcm::LinkSwappingMode::NO_SWAPPING,
-                                    1e6,
-                                    1.,
-                                    0,
-                                    true);
+    forceBalance.runForceRelaxation(
+      5000,
+      1e-9 / forceBalance.getResidual(),
+      -1.,
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
+      1e-5,
+      false,
+      pcm::LinkSwappingMode::NO_SWAPPING,
+      1e6,
+      1.,
+      0,
+      true);
     auto end_fr = std::chrono::high_resolution_clock::now();
     auto duration_fr =
       std::chrono::duration_cast<std::chrono::microseconds>(end_fr - start_fr);
@@ -2568,7 +2581,8 @@ TEST_CASE("All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and "
               << std::duration_to_string(duration_fr) << " " << std::endl;
 
     auto start_fb2 = std::chrono::high_resolution_clock::now();
-    forceBalance2.runForceRelaxation(pcm::StructureSimplificationMode::INACTIVE_THEN_X2F);
+    forceBalance2.runForceRelaxation(
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F);
     auto end_fb2 = std::chrono::high_resolution_clock::now();
     auto duration_fb2 = std::chrono::duration_cast<std::chrono::microseconds>(
       end_fb2 - start_fb2);

@@ -134,29 +134,84 @@ public:
    */
   pylimer_tools::entities::Universe getCrosslinkerVerse() const;
 
+  /**
+   * @brief Get the default R0 squared value
+   *
+   * @return double the default R_0^2
+   */
   double getDefaultR0Square() const { return this->defaultR0Squared; }
 
+  /**
+   * @brief Get the volume of the simulation box
+   *
+   * @return double the volume
+   */
   double getVolume() override { return this->forceRelaxationNetwork.vol; }
 
+  /**
+   * @brief Get the number of nodes in the network
+   *
+   * @return size_t the number of nodes
+   */
   size_t getNrOfNodes() const { return this->forceRelaxationNetwork.nrOfNodes; }
 
+  /**
+   * @brief Get the number of springs in the network
+   *
+   * @return size_t the number of springs
+   */
   size_t getNrOfSprings() const
   {
     return this->forceRelaxationNetwork.nrOfSprings;
   }
 
+  /**
+   * @brief Get the number of bonds (same as springs)
+   *
+   * @return size_t the number of bonds
+   */
   size_t getNumBonds() override { return this->getNrOfSprings(); }
 
+  /**
+   * @brief Get the number of extra bonds
+   *
+   * @return size_t the number of extra bonds (always 0)
+   */
   size_t getNumExtraBonds() override { return 0; }
 
+  /**
+   * @brief Get the number of bonds to form
+   *
+   * @return long int the number of bonds to form (always 0)
+   */
   long int getNumBondsToForm() override { return 0; }
 
+  /**
+   * @brief Get the number of atoms (same as nodes)
+   *
+   * @return size_t the number of atoms
+   */
   size_t getNumAtoms() override { return this->getNrOfNodes(); }
 
+  /**
+   * @brief Get the number of extra atoms
+   *
+   * @return size_t the number of extra atoms (always 0)
+   */
   size_t getNumExtraAtoms() override { return 0; }
 
+  /**
+   * @brief Get the network structure
+   *
+   * @return Network the network structure
+   */
   Network getNetwork() const { return this->forceRelaxationNetwork; }
 
+  /**
+   * @brief Configure assumption about box size
+   *
+   * @param assumption whether to assume the box is large enough
+   */
   void configAssumeBoxLargeEnough(const bool assumption = true)
   {
     this->forceRelaxationNetwork.assumeBoxLargeEnough = assumption;
@@ -167,6 +222,11 @@ public:
   //   return *this->forceEvaluator;
   // }
 
+  /**
+   * @brief Set the force evaluator
+   *
+   * @param forceEvaluator pointer to the force evaluator to use
+   */
   void setForceEvaluator(MEHPForceEvaluator* forceEvaluator)
   {
     this->forceEvaluator = forceEvaluator;
@@ -178,9 +238,13 @@ public:
   /**
    * @brief Get the Nr Of Active Nodes
    *
-   * @param tolerance  the tolerance: springs under a certain length are
+   * @param tolerance the tolerance: springs under a certain length are
    * considered inactive
-   * @return int
+   * @param minimumNrOfActiveConnections the minimum number of active
+   * connections required for a node to be considered active
+   * @param maximumNrOfActiveConnections the maximum number of active
+   * connections allowed (-1 for no limit)
+   * @return int the number of active nodes
    */
   int getNrOfActiveNodes(const double tolerance = 0.05,
                          const int minimumNrOfActiveConnections = 2,
@@ -195,8 +259,8 @@ public:
   /**
    * @brief Get the Soluble Weight Fraction
    *
-   * @param tolerance
-   * @return double
+   * @param tolerance the tolerance for determining active springs
+   * @return double the soluble weight fraction
    */
   double getSolubleWeightFraction(const double tolerance = 0.05)
   {
@@ -208,8 +272,8 @@ public:
    * @brief Count the number of atoms that are in any way connected to an
    * active spring
    *
-   * @param tolerance
-   * @return double
+   * @param tolerance the tolerance for determining active springs
+   * @return double the number of active clustered atoms
    */
   double countActiveClusteredAtoms(const double tolerance = 0.05)
   {
@@ -218,24 +282,10 @@ public:
   }
 
   /**
-   * @brief Determine whether a node and spring, respectively, are in any
-   * way connected to an active spring
-   *
-   * @param tolerance
-   * @return std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
-   */
-  std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
-    const double tolerance = 0.05) const
-  {
-    return this->findClusteredToActive(&this->forceRelaxationNetwork,
-                                       tolerance);
-  }
-
-  /**
    * @brief Get the Dangling Weight Fraction
    *
-   * @param tolerance
-   * @return double
+   * @param tolerance the tolerance for determining active springs
+   * @return double the dangling weight fraction
    */
   double getDanglingWeightFraction(const double tolerance = 0.05)
   {
@@ -246,8 +296,9 @@ public:
   /**
    * @brief Get the crosslinker Chains that are active
    *
-   * @param tolerance
-   * @return std::vector<pylimer_tools::entities::Molecule>
+   * @param tolerance the tolerance for determining active springs
+   * @return std::vector<pylimer_tools::entities::Molecule> vector of active
+   * chains
    */
   std::vector<pylimer_tools::entities::Molecule> getActiveChains(
     const double tolerance = 0.05) const
@@ -302,6 +353,11 @@ public:
    */
   Eigen::VectorXi getNrOfActiveSpringsConnected(double tolerance = 0.05) const;
 
+  /**
+   * @brief Get the current spring distances
+   *
+   * @return Eigen::VectorXd the current spring distances
+   */
   Eigen::VectorXd getCurrentSpringDistances() const
   {
     return this->currentSpringDistances;
@@ -312,18 +368,28 @@ public:
    *
    * @param tol the tolerance: springs under a certain length are considered
    * inactive
-   * @return int
+   * @return int the number of active springs
    */
   int getNrOfActiveSprings(const double tol = 0.1) const
   {
     return this->countNrOfActiveSprings(&this->forceRelaxationNetwork, tol);
   }
 
+  /**
+   * @brief Get the average contour length of all springs
+   *
+   * @return double the average contour length
+   */
   double getAverageContourLength() const
   {
     return this->forceRelaxationNetwork.meanSpringContourLength;
   }
 
+  /**
+   * @brief Get the spring contour lengths
+   *
+   * @return Eigen::VectorXd the spring contour lengths
+   */
   Eigen::VectorXd getSpringContourLength() const
   {
     return this->forceRelaxationNetwork.springsContourLength;
@@ -332,14 +398,14 @@ public:
   /**
    * @brief Get the Average Spring Length at the current step
    *
-   * @return double
+   * @return double the average spring length
    */
   double getAverageSpringLength() const;
 
   /**
    * @brief Get the Pressure
    *
-   * @return double
+   * @return double the pressure
    */
   double getPressure() const
   {
@@ -349,9 +415,15 @@ public:
   /**
    * @brief Get the Residual Norm at the current step
    *
-   * @return double
+   * @return double the residual norm
    */
   double getResidualNorm() const;
+
+  /**
+   * @brief Get the residual override
+   *
+   * @return double the residual
+   */
   double getResidual() override
   {
     // std::cout << "ResidualNorm: " << this->getResidualNorm() <<
@@ -362,14 +434,14 @@ public:
   /**
    * @brief Get the residuals (gradient) at the current step
    *
-   * @return Eigen::VectorXd
+   * @return Eigen::VectorXd the residuals vector
    */
   Eigen::VectorXd getResiduals() const;
 
   /**
    * @brief Get the Force at the current step
    *
-   * @return double
+   * @return double the force
    */
   double getForce() const;
 
@@ -389,18 +461,28 @@ public:
    *
    * @param b02 for the denominator, part of the melt <R_0^2> = b02 *
    * nrOfBondsInSpring
-   * @return Eigen::VectorXd
+   * @return Eigen::VectorXd the gamma factors vector
    */
   Eigen::VectorXd getGammaFactors(double b2 = 1.) const;
 
+  /**
+   * @brief Get the number of iterations performed
+   *
+   * @return int the number of iterations
+   */
   int getNrOfIterations() const { return this->nrOfStepsDone; }
 
+  /**
+   * @brief Get the exit reason of the simulation
+   *
+   * @return ExitReason the exit reason
+   */
   ExitReason getExitReason() const { return this->exitReason; }
 
   /**
    * @brief Get the Spring Lengths
    *
-   * @return Eigen::VectorXd
+   * @return Eigen::VectorXd the spring lengths vector
    */
   Eigen::VectorXd getSpringLengths() const
   {
@@ -417,7 +499,7 @@ public:
   /**
    * @brief Get the Spring Distances
    *
-   * @return Eigen::VectorXd
+   * @return Eigen::VectorXd the spring distances vector
    */
   Eigen::VectorXd getSpringDistances() const
   {
@@ -429,10 +511,19 @@ public:
    * @brief Compute the spring lengths
    *
    * @param net the network to do the computation for
-   * @return Eigen::VectorXd
+   * @param is2D whether to use 2D mode
+   * @return Eigen::VectorXd the spring distances
    */
   static Eigen::VectorXd evaluateSpringDistances(const Network* net,
                                                  const bool is2D);
+  /**
+   * @brief Compute the spring lengths with displacement
+   *
+   * @param net the network to do the computation for
+   * @param displacement the displacement vector
+   * @param is2D whether to use 2D mode
+   * @return Eigen::VectorXd the spring distances
+   */
   static Eigen::VectorXd evaluateSpringDistances(
     const Network* net,
     const Eigen::VectorXd& displacement,
@@ -520,6 +611,16 @@ public:
     return this->forceRelaxationNetwork.nrOfNodes;
   }
 
+  /**
+   * @brief Iterate all spring distances, mark active ones (length >
+   * tolerance)
+   *
+   * @param tolerance
+   * @return Eigen::ArrayXb
+   */
+  Eigen::ArrayXb findActiveSprings(const Network* net,
+                                   const double tolerance = 0.05) const;
+
 protected:
   /**
    * @brief Convert the universe to a network
@@ -532,200 +633,8 @@ protected:
   bool ConvertNetwork(Network* net,
                       const int crossLinkerType = 2,
                       bool remove2functionalCrosslinkers = false,
-                      bool removeDanglingChains = false)
-  {
-    std::vector<pylimer_tools::entities::Atom> springEndAtoms =
-      this->universe.getAtomsOfType(crossLinkerType);
-
-    if (remove2functionalCrosslinkers) {
-      for (pylimer_tools::entities::Atom xlinker : springEndAtoms) {
-        // change type of crosslinkers with a degree <= 2 to "normal",
-        // non-crosslink beads
-        size_t vertexId = this->universe.getIdxByAtomId(xlinker.getId());
-        if (this->universe.computeFunctionalityForVertex(vertexId) <= 2) {
-          this->universe.setPropertyValue(
-            vertexId, "type", crossLinkerType - 1);
-        }
-      }
-      springEndAtoms = this->universe.getAtomsOfType(crossLinkerType);
-    }
-
-    std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
-      this->universe.getChainsWithCrosslinker(crossLinkerType);
-    net->moleculeIdxToSpring =
-      Eigen::VectorXi::Constant(crossLinkerChains.size(), -1);
-
-    // need to include all but dangling and free chains in order to
-    // model entanglement
-    size_t nrOfSprings = 0;
-
-    std::vector<bool> vertexAdded = pylimer_tools::utils::initializeWithValue(
-      this->universe.getNrOfAtoms(), false);
-    for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
-      std::vector<pylimer_tools::entities::Atom> endAtoms =
-        crossLinkerChains[i].getChainEnds(crossLinkerType, true);
-      for (pylimer_tools::entities::Atom endAtom : endAtoms) {
-        size_t endAtomVertexId =
-          static_cast<size_t>(this->universe.getIdxByAtomId(endAtom.getId()));
-        if (endAtom.getType() != crossLinkerType &&
-            !vertexAdded[endAtomVertexId]) {
-          springEndAtoms.push_back(endAtom);
-          vertexAdded[endAtomVertexId] = true;
-        }
-      }
-      RUNTIME_EXP_IFN(crossLinkerChains[i].getType() !=
-                        pylimer_tools::entities::MoleculeType::UNDEFINED,
-                      "Crosslinker chain's chain type could not be "
-                      "detected. Cannot work like that.");
-      if (crossLinkerChains[i].getType() ==
-            pylimer_tools::entities::MoleculeType::NETWORK_STRAND ||
-          crossLinkerChains[i].getType() ==
-            pylimer_tools::entities::MoleculeType::PRIMARY_LOOP ||
-          (!removeDanglingChains &&
-           crossLinkerChains[i].getType() ==
-             pylimer_tools::entities::MoleculeType::DANGLING_CHAIN)) {
-        net->moleculeIdxToSpring[i] = static_cast<int>(nrOfSprings);
-        nrOfSprings += 1;
-      }
-    }
-
-    size_t nrOfSpringEnds = springEndAtoms.size();
-
-    // crossLinkerUniverse.simplify();
-    pylimer_tools::entities::Box box = this->universe.getBox();
-    net->L[0] = box.getLx();
-    net->L[1] = box.getLy();
-    net->L[2] = box.getLz();
-    net->nrOfNodes = nrOfSpringEnds;
-    net->nrOfSprings = nrOfSprings;
-    net->coordinates = Eigen::VectorXd::Zero(3 * net->nrOfNodes);
-    net->oldAtomIds = Eigen::ArrayXi::Zero(net->nrOfNodes);
-    net->springIndexA = Eigen::ArrayXi::Zero(net->nrOfSprings);
-    net->springIndexB = Eigen::ArrayXi::Zero(net->nrOfSprings);
-    net->springCoordinateIndexA = Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
-    net->springBoxOffset = Eigen::VectorXd::Zero(3 * net->nrOfSprings);
-    net->springCoordinateIndexB = Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
-    net->springIsActive = Eigen::ArrayXb::Constant(net->nrOfSprings, false);
-    net->springsContourLength = Eigen::VectorXd::Zero(net->nrOfSprings);
-    Eigen::VectorXd targetDistances =
-      Eigen::VectorXd::Zero(3 * net->nrOfSprings);
-
-    net->springIndicesOfLinks.reserve(net->nrOfNodes);
-    for (size_t i = 0; i < net->nrOfNodes; ++i) {
-      net->springIndicesOfLinks.push_back(std::vector<size_t>());
-    }
-
-    // convert beads
-    std::map<long int, long int> atomIdToNode;
-    for (long int i = 0; i < springEndAtoms.size(); ++i) {
-      pylimer_tools::entities::Atom atom = springEndAtoms[i];
-      atomIdToNode[atom.getId()] = i;
-      net->oldAtomIds[static_cast<Eigen::Index>(i)] = atom.getId();
-      net->coordinates[3 * static_cast<Eigen::Index>(i) + 0] = atom.getX();
-      net->coordinates[3 * static_cast<Eigen::Index>(i) + 1] = atom.getY();
-      net->coordinates[3 * static_cast<Eigen::Index>(i) + 2] = atom.getZ();
-    }
-
-    // convert springs
-    size_t spring_idx = 0;
-    for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
-      if (crossLinkerChains[i].getNrOfBonds() == 0) {
-        continue;
-      }
-      std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
-        crossLinkerChains[i].getAtomsOfType(crossLinkerType);
-      std::vector<pylimer_tools::entities::Atom> endsOfChain =
-        crossLinkerChains[i].getChainEnds(crossLinkerType, true);
-      assert(endsOfChain.size() == 2);
-      long int nodeIdxFrom = atomIdToNode.at(endsOfChain[0].getId());
-      long int nodeIdxTo = atomIdToNode.at(endsOfChain[1].getId());
-      bool addChain = false;
-      if (crossLinkerChains[i].getType() ==
-          pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
-        addChain = true;
-        // spring contour length = nr of bonds between two crosslinkers
-        net->springsContourLength[spring_idx] =
-          crossLinkerChains[i].getNrOfBonds();
-      } else if (crossLinkerChains[i].getType() ==
-                 pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
-        addChain = true;
-
-        net->springsContourLength[spring_idx] =
-          crossLinkerChains[i].getNrOfBonds();
-      } else if (crossLinkerChains[i].getType() ==
-                 pylimer_tools::entities::MoleculeType::DANGLING_CHAIN) {
-        if (!removeDanglingChains) {
-          // to keep dangling chains, we convert the trailing atom to a
-          // crosslink
-          net->springsContourLength[spring_idx] =
-            crossLinkerChains[i].getNrOfBonds();
-          addChain = true;
-        }
-      }
-
-      if (addChain) {
-        RUNTIME_EXP_IFN(net->moleculeIdxToSpring[i] == spring_idx,
-                        "Expected spring mapping to be consistent.");
-        std::vector<pylimer_tools::entities::Atom> allChainAtoms =
-          crossLinkerChains[i].getAtomsLinedUp();
-        targetDistances.segment(3 * spring_idx, 3) =
-          crossLinkerChains[i].getOverallBondSum(crossLinkerType);
-
-        if (atomIdToNode.at(allChainAtoms[0].getId()) == nodeIdxTo) {
-          targetDistances.segment(3 * spring_idx, 3) *= -1;
-        } else {
-          assert(atomIdToNode.at(allChainAtoms[0].getId()) == nodeIdxFrom);
-        }
-
-        pylimer_tools::utils::addIfNotContained(
-          net->springIndicesOfLinks[nodeIdxFrom], spring_idx);
-        if (nodeIdxFrom != nodeIdxTo) {
-          pylimer_tools::utils::addIfNotContained(
-            net->springIndicesOfLinks[nodeIdxTo], spring_idx);
-        }
-
-        net->springIndexA[spring_idx] = nodeIdxFrom;
-        net->springIndexB[spring_idx] = nodeIdxTo;
-        for (size_t j = 0; j < 3; j++) {
-          net->springCoordinateIndexA[3 * spring_idx + j] =
-            static_cast<int>(nodeIdxFrom * 3 + j);
-          net->springCoordinateIndexB[3 * spring_idx + j] =
-            static_cast<int>(nodeIdxTo * 3 + j);
-        }
-
-        spring_idx += 1;
-      }
-    }
-
-    RUNTIME_EXP_IFN(spring_idx == net->nrOfSprings,
-                    "Expected nr of springs not fulfilled.");
-
-    // box volume
-    net->vol = net->L[0] * net->L[1] * net->L[2];
-    if (net->nrOfSprings > 0) {
-      net->meanSpringContourLength = net->springsContourLength.mean();
-    }
-
-    net->springBoxOffset = ((net->coordinates(net->springCoordinateIndexA) -
-                             net->coordinates(net->springCoordinateIndexB)) +
-                            targetDistances);
-    // net->springBoxOffset = this->universe.getBox().getOffset(
-    //   net->coordinates(net->springCoordinateIndexB) -
-    //   net->coordinates(net->springCoordinateIndexA));
-
-    // check whether spring contour lengths are what we want them to be
-    size_t numCrosslinkers = springEndAtoms.size();
-    // this->universe.countPropertyValue<int>("type", crossLinkerType);
-    size_t contourSum = net->springsContourLength.sum();
-    assert(contourSum + omittedChainsBonds == this->universe.getNrOfBonds());
-    assert(net->springsContourLength.size() == net->nrOfSprings);
-    assert(contourSum - net->nrOfSprings + omittedChainsAtoms +
-             net->nrOfNodes ==
-           this->universe.getNrOfAtoms());
-    assert(numCrosslinkers == net->nrOfNodes);
-
-    return true; // crossLinkerUniverse.getNrOfBonds() == net->nrOfSprings;
-  };
+                      bool removeDanglingChains = false);
+  ;
 
   /**
    * @brief Compute the gamma factor from certain spring distances
@@ -838,81 +747,15 @@ protected:
   }
 
   /**
-   * @brief Compute the weight fraction of non-active springs
+   * @brief Compute the elastically effective/active weight fraction of the
+   * network
    *
    * @param net
    * @param tolerance
    * @return double
    */
-  double computeDanglingWeightFraction(Network* net,
-                                       const double tolerance = 0.05) const
-  {
-    if (net->nrOfSprings < 1) {
-      return 1.;
-    }
-    // find all active springs
-    const Eigen::ArrayXb activeSprings =
-      this->findActiveSprings(net, tolerance);
-    if (activeSprings.count() == 0) {
-      return 1. - this->computeSolubleWeightFraction(net, tolerance);
-    }
-    // as of now, the springsContourLength is equal to the number of bonds
-    // from crosslink to crosslink. therefore, the number of atoms of each
-    // of these springs is one less
-    Eigen::ArrayXd allActiveAtomsPerChains =
-      activeSprings.cast<double>() * (net->springsContourLength.array() -
-                                      Eigen::ArrayXd::Ones(net->nrOfSprings));
-    // finally, normalize by the number of atoms.
-    // TODO: currently, the weight of the atoms is ignored
-    return 1. -
-           (((allActiveAtomsPerChains).matrix().sum() +
-             this->getNrOfActiveNodes()) /
-            this->universe.getNrOfAtoms()) -
-           this->computeSolubleWeightFraction(net, tolerance);
-  }
-
-  /**
-   * @brief Find whether springs and nodes are in any way connected to an
-   * active spring
-   *
-   * @param net the network that includes the connectivity
-   * @param tolerance the tolerance for considering springs as active
-   * @return std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
-   */
-  std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
-    const Network* net,
-    const double tolerance = 0.05) const
-  {
-    // find all active springs
-    Eigen::ArrayXb activeSprings = this->findActiveSprings(net, tolerance);
-
-    // then, iteratively walk along the springs to mark those as "active"
-    // that are connected to active springs
-    bool hadChanged = true;
-    Eigen::ArrayXb nodeIsActive = Eigen::ArrayXb::Zero(net->nrOfNodes);
-    while (hadChanged) {
-      Eigen::ArrayXb oldActiveSprings = activeSprings;
-      for (size_t i = 0; i < net->nrOfNodes; ++i) {
-        bool anyActive = false;
-        for (const size_t spring_idx : net->springIndicesOfLinks[i]) {
-          if (activeSprings[spring_idx]) {
-            anyActive = true;
-            break;
-          }
-        }
-
-        nodeIsActive(i) = anyActive;
-        if (anyActive) {
-          for (const size_t spring_idx : net->springIndicesOfLinks[i]) {
-            activeSprings[spring_idx] = true;
-          }
-        }
-      }
-      hadChanged = (oldActiveSprings.count() != activeSprings.count());
-    }
-
-    return std::make_pair(activeSprings, nodeIsActive);
-  }
+  double computeActiveWeightFraction(Network* net,
+                                     const double tolerance = 0.05) const;
 
   /**
    * @brief Count the number of atoms that can be considered part of an
@@ -924,31 +767,20 @@ protected:
    * @return double
    */
   double countActiveClusteredAtoms(Network* net,
-                                   const double tolerance = 0.05) const
-  {
-    if (net->nrOfSprings < 1) {
-      return 0.;
-    }
+                                   const double tolerance = 0.05) const;
 
-    const std::pair<Eigen::ArrayXb, Eigen::ArrayXb> clusteredToActive =
-      this->findClusteredToActive(net, tolerance);
-    // find all active springs
-    const Eigen::ArrayXb activeSprings = clusteredToActive.first;
-    assert(activeSprings.size() == net->nrOfSprings);
+  std::vector<int> getIndicesOfActiveNodes(const Network* net,
+                                           const double tolerance = 0.05) const;
 
-    const Eigen::ArrayXb nodeIsActive = clusteredToActive.second;
-    assert(nodeIsActive.size() == net->nrOfNodes);
-
-    // as of now, the springsContourLength is equal to the number of bonds
-    // from crosslink to crosslink. therefore, the number of atoms of each
-    // of these springs is one less
-    Eigen::ArrayXd allActiveAtomsPerChains =
-      activeSprings.cast<double>() * (net->springsContourLength.array() -
-                                      Eigen::ArrayXd::Ones(net->nrOfSprings));
-    const double activeNodes = nodeIsActive.count();
-
-    return ((allActiveAtomsPerChains).matrix().sum() + activeNodes);
-  }
+  /**
+   * @brief Compute the weight fraction of non-active springs
+   *
+   * @param net
+   * @param tolerance
+   * @return double
+   */
+  double computeDanglingWeightFraction(Network* net,
+                                       const double tolerance = 0.05) const;
 
   /**
    * @brief Compute the weight fraction of springs connected to active
@@ -968,30 +800,6 @@ protected:
     // NOTE: currently, the weight of the atoms is ignored
     return 1. - (nActiveClusteredAtoms /
                  (static_cast<double>(this->universe.getNrOfAtoms())));
-  }
-
-  /**
-   * @brief Iterate all spring distances, mark active ones (length >
-   * tolerance)
-   *
-   * @param tolerance
-   * @return Eigen::ArrayXb
-   */
-  Eigen::ArrayXb findActiveSprings(const Network* net,
-                                   const double tolerance = 0.05) const
-  {
-    Eigen::VectorXd springVectors =
-      this->evaluateSpringDistances(net, this->is2D);
-
-    Eigen::ArrayXb result =
-      Eigen::ArrayXb::Constant(springVectors.size() / 3, false);
-    for (size_t i = 0; i < springVectors.size() / 3; ++i) {
-      result[i] =
-        !this->distanceIsWithinTolerance(springVectors.segment(3 * i, 3),
-                                         tolerance,
-                                         net->springsContourLength[i]);
-    }
-    return result;
   }
 
   /**

@@ -2664,6 +2664,17 @@ MEHPForceBalance2::getEffectiveFunctionalityOfAtoms(
   return results;
 }
 
+/**
+ * @brief Compute the weight fraction of non-active springs
+ *
+ * We go the full route via active and soluble in order to compensate for
+ * removed springs and atoms
+ *
+ * @param net the network to analyze
+ * @param u the displacements
+ * @param tolerance the tolerance for considering springs as active
+ * @return double the dangling weight fraction
+ */
 double
 MEHPForceBalance2::computeDanglingWeightFraction(ForceBalance2Network& net,
                                                  const Eigen::VectorXd& u,
@@ -2685,11 +2696,18 @@ MEHPForceBalance2::computeDanglingWeightFraction(ForceBalance2Network& net,
     "got " +
       std::to_string(activeWeightFraction + solubleWeightFraction) + ".");
 
-  // finally, normalize by the number of atoms.
   // TODO: currently, the weight of the atoms is ignored
   return 1. - activeWeightFraction - solubleWeightFraction;
 }
 
+/**
+ * @brief Compute the weight fraction of active springs
+ *
+ * @param net the network to analyze
+ * @param u the displacements
+ * @param tolerance the tolerance for considering springs as active
+ * @return double the active weight fraction
+ */
 double
 MEHPForceBalance2::computeActiveWeightFraction(ForceBalance2Network& net,
                                                const Eigen::VectorXd& u,
@@ -2753,6 +2771,16 @@ MEHPForceBalance2::computeActiveWeightFraction(ForceBalance2Network& net,
   return result;
 }
 
+/**
+ * @brief Find whether springs and nodes are in any way connected to an
+ * active spring
+ *
+ * @param net the network that includes the connectivity
+ * @param u the current displacements of the links
+ * @param tolerance the tolerance for considering springs as active
+ * @return std::pair<Eigen::ArrayXb, Eigen::ArrayXb> indices of springs
+ * (first) and links (second) connected in any way to active springs
+ */
 std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
 MEHPForceBalance2::findClusteredToActive(const ForceBalance2Network& net,
                                          const Eigen::VectorXd& u,
@@ -2795,6 +2823,15 @@ MEHPForceBalance2::findClusteredToActive(const ForceBalance2Network& net,
   return std::make_pair(strandIsActive, nodeIsActive);
 }
 
+/**
+ * @brief Count the number of atoms that can be considered part of an
+ * active cluster, i.e., are somehow connected to an active spring
+ *
+ * @param net the network to analyze
+ * @param u the current displacements of the links
+ * @param tolerance the tolerance for considering springs as active
+ * @return double the number of active clustered atoms
+ */
 double
 MEHPForceBalance2::countActiveClusteredAtoms(ForceBalance2Network& net,
                                              const Eigen::VectorXd& u,
@@ -2818,7 +2855,7 @@ MEHPForceBalance2::countActiveClusteredAtoms(ForceBalance2Network& net,
   std::vector<bool> clusterIsActive(clusters.size(), false);
 
   // find active atoms
-  const std::vector<long int> activeNodeIndices =
+  const std::vector<int> activeNodeIndices =
     this->getIndicesOfActiveNodes(net, u, tolerance);
 
   for (const long int& nodeIdx : activeNodeIndices) {
@@ -2837,6 +2874,15 @@ MEHPForceBalance2::countActiveClusteredAtoms(ForceBalance2Network& net,
   return nClusteredAtoms;
 }
 
+/**
+ * @brief Compute the weight fraction of springs connected to active
+ * springs (any depth)
+ *
+ * @param net the network to analyze
+ * @param u the current displacements of the links
+ * @param tolerance the tolerance for considering springs as active
+ * @return double the soluble weight fraction
+ */
 double
 MEHPForceBalance2::computeSolubleWeightFraction(ForceBalance2Network& net,
                                                 const Eigen::VectorXd& u,
@@ -2858,29 +2904,31 @@ MEHPForceBalance2::computeSolubleWeightFraction(ForceBalance2Network& net,
 /**
  * @brief Get the indices of active Nodes
  *
+ * @param net the network to analyze
+ * @param u the current displacements of the links
  * @param tolerance the tolerance: springs under a certain length are
  * considered inactive
- * @return std::vector<long int> the atom ids
+ * @return std::vector<int> the indices of active nodes
  */
-std::vector<long int>
+std::vector<int>
 MEHPForceBalance2::getIndicesOfActiveNodes(const ForceBalance2Network& net,
                                            const Eigen::VectorXd& u,
                                            const double tolerance) const
 {
-  std::vector<long int> results;
+  std::vector<int> results;
   results.reserve(net.nrOfNodes);
 
   // find all active springs
   Eigen::ArrayXb strandIsActive = this->findActiveStrands(net, u, tolerance);
 
-  for (size_t i = 0; i < net.nrOfLinks; i++) {
+  for (Eigen::Index i = 0; i < net.nrOfLinks; i++) {
     if (net.linkIsEntanglement[i]) {
       continue;
     }
 
-    for (const size_t strandIdx : net.strandIndicesOfLink[i]) {
+    for (const int strandIdx : net.strandIndicesOfLink[i]) {
       if (strandIsActive[strandIdx]) {
-        results.push_back(i);
+        results.push_back(static_cast<int>(i));
         break;
       }
     }
@@ -2895,25 +2943,31 @@ MEHPForceBalance2::getIndicesOfActiveNodes(const ForceBalance2Network& net,
  *
  * @param tolerance the tolerance: springs under a certain length are
  * considered inactive
- * @return std::vector<long int> the atom ids
+ * @return std::vector<long int> the atom ids of active nodes
  */
 std::vector<long int>
-MEHPForceBalance2::getIdsOfActiveNodes(const double tolerance) const
+MEHPForceBalance2::getAtomIdsOfActiveNodes(const double tolerance) const
 {
   std::vector<long int> results;
   // find all active springs
-  const std::vector<long int> activeNodes = this->getIndicesOfActiveNodes(
+  const std::vector<int> activeNodes = this->getIndicesOfActiveNodes(
     this->initialConfig, this->currentDisplacements, tolerance);
 
   results.reserve(activeNodes.size());
 
-  for (const long int nodeIdx : activeNodes) {
+  for (const int nodeIdx : activeNodes) {
     results.push_back(this->initialConfig.oldAtomIds[nodeIdx]);
   }
 
   return results;
 }
 
+/**
+ * @brief Get the overall spring lengths
+ *
+ * @return std::vector<double> a vector with the sum of the norms of all the
+ * springs per strand
+ */
 std::vector<double>
 MEHPForceBalance2::getOverallSpringLengths() const
 {
@@ -2930,6 +2984,11 @@ MEHPForceBalance2::getOverallSpringLengths() const
   return results;
 }
 
+/**
+ * @brief Get the current spring distances
+ *
+ * @return Eigen::VectorXd the current spring distances
+ */
 Eigen::VectorXd
 MEHPForceBalance2::getCurrentSpringDistances() const
 {
@@ -2939,6 +2998,11 @@ MEHPForceBalance2::getCurrentSpringDistances() const
   return partialSpringVectors;
 }
 
+/**
+ * @brief Get the current spring lengths
+ *
+ * @return std::vector<double> the current spring lengths
+ */
 std::vector<double>
 MEHPForceBalance2::getCurrentSpringLengths() const
 {

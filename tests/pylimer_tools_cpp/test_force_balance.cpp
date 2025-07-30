@@ -787,9 +787,9 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
   {
     CHECK(std::filesystem::exists(suspectedPath));
     universeSeq.initializeFromDataSequence(
-      { { suspectedPath +
-          "structure/equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
-          "333_2d_t_7500001.structure.out" } });
+      { { suspectedPath + "/structure/"
+                          "equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
+                          "333_2d_t_7500001.structure.out" } });
     CHECK(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
     pcm::MEHPForceBalance forceBalancer =
