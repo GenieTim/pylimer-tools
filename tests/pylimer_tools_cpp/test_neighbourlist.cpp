@@ -286,7 +286,7 @@ TEST_CASE("EigenNeighbourList Works as intended",
   }
 }
 
-#ifdef CERALIZABLE
+#ifdef CEREALIZABLE
 TEST_CASE("EigenNeighbourList can be serialized and deserialized",
           "[EigenNeighbourList][entity][serialization]")
 {

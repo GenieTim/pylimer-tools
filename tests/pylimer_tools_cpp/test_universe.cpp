@@ -1442,7 +1442,7 @@ TEST_CASE("Querying the universe", "[Universe][entity]")
   CHECK_THAT(universe.getVolume(), Catch::Matchers::WithinRel(10. * 10. * 10.));
 }
 
-#ifdef CERALIZABLE
+#ifdef CEREALIZABLE
 TEST_CASE("Universe can be serialized and deserialized",
           "[Universe][entity][serialization]")
 {
