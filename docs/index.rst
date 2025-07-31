@@ -1,6 +1,14 @@
 pylimer-tools Documentation
 ===========================
 
+.. image:: https://github.com/GenieTim/pylimer-tools/blob/main/.github/coverage.svg?raw=true
+   :target: https://github.com/GenieTim/pylimer-tools/actions/workflows/run-tests.yml
+   :alt: Test Coverage of Python Code
+
+.. image:: https://github.com/GenieTim/pylimer-tools/blob/main/.github/cpp-coverage.svg?raw=true
+   :target: https://github.com/GenieTim/pylimer-tools/actions/workflows/run-tests.yml
+   :alt: C++ Code Coverage
+
 .. image:: https://codecov.io/gh/GenieTim/pylimer-tools/branch/main/graph/badge.svg?token=5ZE1VSDXJQ 
    :target: https://codecov.io/gh/GenieTim/pylimer-tools
    :alt: Test Coverage
