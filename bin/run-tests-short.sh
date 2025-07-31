@@ -72,7 +72,7 @@ ls ./*
 cd "$ROOT_DIR" || exit 8
 
 if command -v npx; then
-  run_timed "C++ Coverage Badge" npx -y lcov-badge2 -l "C++ Code Coverage" -o ".github/cpp-coverage.svg" tests/build/lcov/data/capture/pylimer_tools.info || echo "Failed to generate coverage badge"
+  run_timed "C++ Coverage Badge" npx -y lcov-badge2 -l "C++ Code Coverage" -o ".github/cpp-coverage.svg" tests/build/pylimer_tests-gcov.info || echo "Failed to generate coverage badge"
 fi
 
 # then, build/install project for Python

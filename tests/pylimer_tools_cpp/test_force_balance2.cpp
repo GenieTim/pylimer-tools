@@ -2686,7 +2686,7 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple melt systems",
          pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG,
          pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM,
        }) {
-    INFO("Testing solver: " << solver);
+    INFO("Testing solver: " << solver << " (" << pcm::SLESolverNames[static_cast<int>(solver)] << ")");
     pcm::MEHPForceBalance2 forceBalancer =
       pcm::MEHPForceBalance2(universe, 2, false);
     CHECK(forceBalancer.getNrOfSprings() == nrOfChains + 5);

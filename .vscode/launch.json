@@ -12,7 +12,7 @@
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
         //"[MEHPForceBalance2]"
-        "All MEHP Force Balance 1 vs. 2 Comparisons with Entanglements and Simplification"
+        "All MEHPForceBalance2 solvers solve simple melt systems"
       ],
       "env": {
         "MallocNanoZone": "0",
