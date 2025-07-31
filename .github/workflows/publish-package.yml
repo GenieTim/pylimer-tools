@@ -351,9 +351,11 @@ jobs:
           ls dist/*-linux_*
           rm dist/*-linux_*
 
-      - name: Publish a Python distribution to PyPI
+      - name: Publish a Python distribution to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-
+        with:
+          repository-url: https://test.pypi.org/legacy/
+  
   github_release:
     runs-on: ubuntu-latest
     name: Create GitHub Release

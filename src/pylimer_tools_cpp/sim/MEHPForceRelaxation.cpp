@@ -17,11 +17,11 @@ namespace pylimer_tools::sim::mehp {
  * FORCE RELAXATION
  */
 void
-MEHPForceRelaxation::runForceRelaxation(
-  const char* algorithm,
-  const long int maxNrOfSteps, // default: 10000
-  const double xtol,
-  const double ftol)
+MEHPForceRelaxation::runForceRelaxation(const char* algorithm,
+                                        const long int maxNrOfSteps,
+                                        // default: 10000
+                                        const double xtol,
+                                        const double ftol)
 {
   this->simulationHasRun = true;
   RUNTIME_EXP_IFN(this->forceEvaluator != nullptr,
@@ -271,6 +271,7 @@ MEHPForceRelaxation::findActiveSprings(const Network* net,
   }
   return result;
 }
+
 bool
 MEHPForceRelaxation::ConvertNetwork(Network* net,
                                     const int crossLinkerType,
@@ -463,6 +464,7 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
 
   return true; // crossLinkerUniverse.getNrOfBonds() == net->nrOfSprings;
 }
+
 /**
  * @brief Compute the stress tensor from spring distances and volume
  *
@@ -522,6 +524,7 @@ MEHPForceRelaxation::evaluateStressTensor(Network* net,
 
   return this->evaluateStressTensor(springDistances, net->vol);
 }
+
 double
 MEHPForceRelaxation::computeActiveWeightFraction(Network* net,
                                                  const double tolerance) const
@@ -545,12 +548,35 @@ MEHPForceRelaxation::computeActiveWeightFraction(Network* net,
                              this->getNrOfActiveNodes()) /
          static_cast<double>(this->universe.getNrOfAtoms());
 }
+
 double
 MEHPForceRelaxation::countActiveClusteredAtoms(Network* net,
                                                const double tolerance) const
 {
   if (net->nrOfSprings < 1) {
     return 0.;
+  }
+
+  // if we don't have a universe, we cannot compute the clusters
+  // and we should fall back to counting what we have,
+  // assuming that the network is complete, i.e., no dangling chains
+  // had been omitted
+  if (this->universe.getNrOfAtoms() == 0) {
+    const std::pair<Eigen::ArrayXb, Eigen::ArrayXb> clusteredToActive =
+      this->findClusteredToActive(net, tolerance);
+    // find all active springs
+    const Eigen::ArrayXb activeSprings = clusteredToActive.first;
+    assert(activeSprings.size() == net->nrOfSprings);
+    const Eigen::ArrayXb nodeIsActive = clusteredToActive.second;
+    assert(nodeIsActive.size() == net->nrOfNodes);
+    // as of now, the springsContourLength is equal to the number of bonds
+    // from crosslink to crosslink. therefore, the number of atoms of each
+    // of these springs is one less
+    Eigen::ArrayXd allActiveAtomsPerChains =
+      activeSprings.cast<double>() * (net->springsContourLength.array() -
+                                      Eigen::ArrayXd::Ones(net->nrOfSprings));
+    const double activeNodes = nodeIsActive.count();
+    return ((allActiveAtomsPerChains).matrix().sum() + activeNodes);
   }
 
   // because our internal structure may not contain the full universe,
@@ -586,6 +612,7 @@ MEHPForceRelaxation::countActiveClusteredAtoms(Network* net,
 
   return nClusteredAtoms;
 }
+
 std::vector<int>
 MEHPForceRelaxation::getIndicesOfActiveNodes(const Network* net,
                                              const double tolerance) const
@@ -607,6 +634,7 @@ MEHPForceRelaxation::getIndicesOfActiveNodes(const Network* net,
 
   return results;
 }
+
 double
 MEHPForceRelaxation::computeDanglingWeightFraction(Network* net,
                                                    const double tolerance) const
@@ -708,7 +736,8 @@ MEHPForceRelaxation::getNrOfActiveSpringsConnected(const double tolerance) const
   for (Eigen::Index i = 0;
        i < static_cast<Eigen::Index>(this->forceRelaxationNetwork.nrOfSprings);
        i++) {
-    if (springIsActive[i] == true) { /* active spring */
+    if (springIsActive[i] == true) {
+      /* active spring */
       const Eigen::Index a =
         static_cast<Eigen::Index>(this->forceRelaxationNetwork.springIndexA[i]);
       const Eigen::Index b =

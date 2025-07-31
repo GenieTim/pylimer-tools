@@ -80,6 +80,7 @@ MCUniverseGenerator::configMaxDistanceProvider(
   this->maxDistanceProvider = std::move(newMaxDistanceProvider);
   this->resetNeighbourList();
 }
+
 entities::Universe
 MCUniverseGenerator::getUniverse()
 {
@@ -196,6 +197,7 @@ MCUniverseGenerator::getUniverse()
   universe.addBonds(bondsFrom, bondsTo);
   return universe;
 }
+
 void
 MCUniverseGenerator::addCrosslinkersAt(Eigen::VectorXd coordinates,
                                        int crosslinkerFunctionality,
@@ -226,6 +228,7 @@ MCUniverseGenerator::addCrosslinkersAt(Eigen::VectorXd coordinates,
   this->validateInternalState();
 #endif
 }
+
 void
 MCUniverseGenerator::addCrosslinkers(int nrOfCrosslinkers,
                                      int crosslinkerFunctionality,
@@ -238,6 +241,7 @@ MCUniverseGenerator::addCrosslinkers(int nrOfCrosslinkers,
   this->addCrosslinkersAt(
     randomPos, crosslinkerFunctionality, crossLinkerAtomType);
 }
+
 void
 MCUniverseGenerator::addRandomlyFunctionalizedStrands(
   int nrOfStrands,
@@ -422,6 +426,7 @@ MCUniverseGenerator::addRandomlyFunctionalizedStrands(
   this->updateNeighbourListCoordinates();
   this->validateInternalState();
 }
+
 void
 MCUniverseGenerator::addCrosslinkStrands(int nrOfCrosslinkStrands,
                                          std::vector<int> beadsPerStrand,
@@ -475,6 +480,7 @@ MCUniverseGenerator::addCrosslinkStrands(int nrOfCrosslinkStrands,
   this->updateNeighbourListCoordinates();
   this->validateInternalState();
 }
+
 void
 MCUniverseGenerator::addSolventChains(int nrOfSolventChains,
                                       int chainLength,
@@ -491,6 +497,7 @@ MCUniverseGenerator::addSolventChains(int nrOfSolventChains,
       this->meanSquaredBeadDistance);
   }
 }
+
 void
 MCUniverseGenerator::addMonofunctionalStrands(int nrOfStrands,
                                               std::vector<int> beadsPerChains,
@@ -516,6 +523,7 @@ MCUniverseGenerator::addMonofunctionalStrands(int nrOfStrands,
   this->validateInternalState();
 #endif
 }
+
 void
 MCUniverseGenerator::addMonofunctionalStrands(int nrOfStrands,
                                               int chainLength,
@@ -526,6 +534,7 @@ MCUniverseGenerator::addMonofunctionalStrands(int nrOfStrands,
   return this->addMonofunctionalStrands(
     nrOfStrands, chainLengths, strandAtomType);
 }
+
 void
 MCUniverseGenerator::addStrand(const int beadsOfChain,
                                const int strandAtomType,
@@ -545,6 +554,7 @@ MCUniverseGenerator::addStrand(const int beadsOfChain,
   this->simplifiedUniverse.strandFrom.push_back(connectionFrom);
   this->simplifiedUniverse.strandTo.push_back(connectionTo);
 }
+
 void
 MCUniverseGenerator::addStrands(const int nrOfStrands,
                                 const std::vector<int> beadsPerChains,
@@ -558,6 +568,7 @@ MCUniverseGenerator::addStrands(const int nrOfStrands,
     this->addStrand(beadsPerChains[strandIdx], strandAtomType);
   }
 }
+
 void
 MCUniverseGenerator::linkStrand(const size_t strandIdx, const double cInfinity)
 {
@@ -619,6 +630,7 @@ MCUniverseGenerator::linkStrand(const size_t strandIdx, const double cInfinity)
     this->nrOfAvailableCrosslinkSites -= 1;
   }
 }
+
 void
 MCUniverseGenerator::linkStrandsCallback(
   std::function<BackTrackStatus(const MCUniverseGenerator&, long int)>
@@ -773,6 +785,7 @@ MCUniverseGenerator::linkStrandsCallback(
 
   this->validateInternalState();
 }
+
 void
 MCUniverseGenerator::linkStrandsToConversion(
   const double targetCrossLinkerConversion,
@@ -837,6 +850,7 @@ MCUniverseGenerator::linkStrandsToConversion(
     },
     cInfinity);
 }
+
 void
 MCUniverseGenerator::linkStrandsToSolubleFraction(double targetSolubleFraction,
                                                   double cInfinity)
@@ -909,6 +923,7 @@ MCUniverseGenerator::linkStrandsToSolubleFraction(double targetSolubleFraction,
     },
     cInfinity);
 }
+
 void
 MCUniverseGenerator::removeStrand(size_t strandIdx)
 {
@@ -957,6 +972,7 @@ MCUniverseGenerator::removeStrand(size_t strandIdx)
     }
   }
 }
+
 void
 MCUniverseGenerator::removeCrosslink(size_t crosslinkIdx)
 {
@@ -1001,6 +1017,7 @@ MCUniverseGenerator::removeCrosslink(size_t crosslinkIdx)
   this->remainingCrossLinkerFunctionality.erase(
     this->remainingCrossLinkerFunctionality.begin() + crosslinkIdx);
 }
+
 void
 MCUniverseGenerator::removeSolubleFraction(bool rescale)
 {
@@ -1029,44 +1046,20 @@ MCUniverseGenerator::removeSolubleFraction(bool rescale)
     forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-12, 1e-9);
   }
 
-  Eigen::ArrayXb activeSprings =
-    forceRelaxer.findActiveSprings(&forceRelaxationNetwork);
-  Eigen::ArrayXb activeNodes =
-    Eigen::ArrayXb::Zero(forceRelaxationNetwork.nrOfNodes);
+  std::pair<Eigen::ArrayXb, Eigen::ArrayXb> activeComponents =
+    forceRelaxer.findClusteredToActive();
+  Eigen::ArrayXb activeSprings = activeComponents.first;
+  Eigen::ArrayXb activeNodes = activeComponents.second;
 
+  RUNTIME_EXP_IFN(activeNodes.count() > 0,
+                  "No active nodes found during force relaxation. "
+                  "Removing soluble fraction does not make sense.");
+  // now that we know which springs and nodes are soluble,
+  // we can remove them
   RUNTIME_EXP_IFN(activeSprings.size() ==
                     this->simplifiedUniverse.strandFrom.size(),
                   "Number of springs does not match the number of strands. "
                   "Therefore, the mapping would be incorrect.");
-
-  // need to follow connections to mark the whole clusters as active
-  bool hasChanged = true;
-  while (hasChanged) {
-    hasChanged = false;
-
-    for (size_t i = 0; i < activeNodes.size(); ++i) {
-      // had already marked/handled this node and its connections
-      if (activeNodes[i]) {
-        continue;
-      }
-
-      bool nodeIsConnectedToActive = false;
-      // check if this node is connected to an active spring
-      for (int springIdx : forceRelaxationNetwork.springIndicesOfLinks[i]) {
-        if (activeSprings[springIdx]) {
-          nodeIsConnectedToActive = true;
-          break; // no need to check further springs
-        }
-      }
-      if (nodeIsConnectedToActive) {
-        activeNodes[i] = true;
-        hasChanged = true;
-        for (int springIdx : forceRelaxationNetwork.springIndicesOfLinks[i]) {
-          activeSprings[springIdx] = true;
-        }
-      }
-    }
-  }
 
   // now that we know which springs and nodes are soluble,
   // we can remove them
@@ -1104,6 +1097,7 @@ MCUniverseGenerator::removeSolubleFraction(bool rescale)
   }
   this->updateNeighbourListCoordinates();
 }
+
 pylimer_tools::sim::mehp::Network
 MCUniverseGenerator::convertToForceRelaxationNetwork() const
 {
@@ -1229,6 +1223,7 @@ MCUniverseGenerator::convertToForceRelaxationNetwork() const
 
   return forceRelaxationNetwork;
 }
+
 pylimer_tools::sim::mehp::MEHPForceRelaxation
 MCUniverseGenerator::getForceRelaxation() const
 {
@@ -1242,6 +1237,7 @@ MCUniverseGenerator::getForceRelaxation() const
 
   return forceRelaxer;
 }
+
 pylimer_tools::sim::mehp::ForceBalanceNetwork
 MCUniverseGenerator::convertToForceBalanceNetwork() const
 {
@@ -1395,6 +1391,7 @@ MCUniverseGenerator::convertToForceBalanceNetwork() const
 
   return forceBalanceNetwork;
 }
+
 pylimer_tools::sim::mehp::MEHPForceBalance
 MCUniverseGenerator::getForceBalance() const
 {
@@ -1407,6 +1404,7 @@ MCUniverseGenerator::getForceBalance() const
   assert(balance.validateNetwork());
   return balance;
 }
+
 pylimer_tools::sim::mehp::MEHPForceBalance2
 MCUniverseGenerator::getForceBalance2() const
 {
@@ -1419,6 +1417,7 @@ MCUniverseGenerator::getForceBalance2() const
   assert(balance.validateNetwork());
   return balance;
 }
+
 void
 MCUniverseGenerator::relaxCrosslinks()
 {
@@ -1451,6 +1450,7 @@ MCUniverseGenerator::relaxCrosslinks()
   }
   this->updateNeighbourListCoordinates();
 }
+
 size_t
 MCUniverseGenerator::getCurrentNrOfAtoms() const
 {
@@ -1461,6 +1461,7 @@ MCUniverseGenerator::getCurrentNrOfAtoms() const
     this->simplifiedUniverse.xlinkTypes.size();
   return nAtomsTotal;
 }
+
 size_t
 MCUniverseGenerator::getCurrentNrOfBonds() const
 {
@@ -1483,12 +1484,14 @@ MCUniverseGenerator::getCurrentNrOfBonds() const
   }
   return nBondsTotal;
 }
+
 double
 MCUniverseGenerator::getCurrentCrosslinkerConversion() const
 {
   return 1. - (static_cast<double>(this->nrOfAvailableCrosslinkSites) /
                static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
 }
+
 void
 MCUniverseGenerator::validateInternalState() const
 {
@@ -1555,6 +1558,7 @@ MCUniverseGenerator::validateInternalState() const
     }
   }
 }
+
 Eigen::VectorXd
 MCUniverseGenerator::sampleFreeChainCoordinates(int chainLen)
 {
@@ -1576,6 +1580,7 @@ MCUniverseGenerator::sampleFreeChainCoordinates(int chainLen)
   positions += from.replicate(chainLen, 1);
   return positions;
 }
+
 Eigen::VectorXd
 MCUniverseGenerator::sampleDanglingChainCoordinates(size_t idxFrom,
                                                     int chainLen)
@@ -1602,6 +1607,7 @@ MCUniverseGenerator::sampleDanglingChainCoordinates(size_t idxFrom,
   positions += from.replicate(chainLen, 1);
   return positions;
 }
+
 Eigen::VectorXd
 MCUniverseGenerator::sampleStrandCoordinates(size_t from,
                                              size_t to,
@@ -1637,6 +1643,7 @@ MCUniverseGenerator::sampleStrandCoordinates(size_t from,
   // for the MC stepping
   return positions.segment(3, positions.size() - 6);
 }
+
 void
 MCUniverseGenerator::linkStrandToCrosslink(size_t strandIdx,
                                            size_t crosslinkIdx,
@@ -1676,6 +1683,7 @@ MCUniverseGenerator::linkStrandToCrosslink(size_t strandIdx,
     Eigen::VectorXd newCoordinates = this->getCrosslinkCoordinates();
   }
 }
+
 std::vector<size_t>
 MCUniverseGenerator::addXlinkAtoms(int nrOfAtomsToAdd,
                                    int atomType,
@@ -1714,6 +1722,7 @@ MCUniverseGenerator::addXlinkAtoms(int nrOfAtomsToAdd,
 
   return indicesAdded;
 }
+
 std::vector<size_t>
 MCUniverseGenerator::addXlinkAtoms(int nrOfAtomsToAdd,
                                    int atomType,
@@ -1723,6 +1732,7 @@ MCUniverseGenerator::addXlinkAtoms(int nrOfAtomsToAdd,
     this->generateRandomPositions(nrOfAtomsToAdd, whiteNoise);
   return this->addXlinkAtoms(nrOfAtomsToAdd, atomType, randomPos);
 }
+
 Eigen::VectorXd
 MCUniverseGenerator::generateRandomWhitePositions(int nSamples)
 {
@@ -1736,6 +1746,7 @@ MCUniverseGenerator::generateRandomWhitePositions(int nSamples)
 
   return coordinates;
 }
+
 Eigen::VectorXd
 MCUniverseGenerator::generateRandomBluePositions(int nSamples)
 {
@@ -1787,6 +1798,7 @@ MCUniverseGenerator::generateRandomBluePositions(int nSamples)
 
   return coordinates;
 }
+
 long int
 MCUniverseGenerator::findAppropriateLink(size_t from,
                                          const double desiredR02,
@@ -1855,6 +1867,7 @@ MCUniverseGenerator::findAppropriateLink(size_t from,
                                                   matchWeights.end());
   return suitableMatches[weightDist(this->rng)];
 }
+
 double
 MCUniverseGenerator::evaluatePartnerProbability(
   size_t from,
@@ -1924,6 +1937,7 @@ MCUniverseGenerator::evaluatePartnerProbability(
   }
   return thisWeight;
 }
+
 double
 MCUniverseGenerator::getIdealCutoff() const
 {
@@ -1936,6 +1950,7 @@ MCUniverseGenerator::getIdealCutoff() const
                         std::end(this->simplifiedUniverse.beadsInStrand))) +
     1.);
 }
+
 void
 MCUniverseGenerator::resetNeighbourList()
 {
@@ -1945,6 +1960,7 @@ MCUniverseGenerator::resetNeighbourList()
     this->xlinkNeighbourList.initialize(newCoordinates, this->box, idealCutoff);
   }
 }
+
 void
 MCUniverseGenerator::updateNeighbourListCoordinates()
 {
@@ -1953,6 +1969,7 @@ MCUniverseGenerator::updateNeighbourListCoordinates()
     this->xlinkNeighbourList.resetCoordinates(newCoordinates);
   }
 }
+
 double
 MCUniverseGenerator::distanceBetween(size_t i, size_t j) const
 {
@@ -1963,6 +1980,7 @@ MCUniverseGenerator::distanceBetween(size_t i, size_t j) const
                            this->simplifiedUniverse.xlinkY[j],
                            this->simplifiedUniverse.xlinkZ[j]);
 }
+
 Eigen::Vector3d
 MCUniverseGenerator::getVectorBetween(size_t i, size_t j) const
 {
@@ -1974,6 +1992,7 @@ MCUniverseGenerator::getVectorBetween(size_t i, size_t j) const
   this->box.handlePBC(diff);
   return diff;
 }
+
 double
 MCUniverseGenerator::getDistance(double x1,
                                  double y1,
@@ -1987,6 +2006,7 @@ MCUniverseGenerator::getDistance(double x1,
   this->box.handlePBC(diff);
   return diff.norm();
 }
+
 Eigen::Vector3d
 MCUniverseGenerator::sampleCoordinatesWithinNBeadDistance(int nBeads)
 {
@@ -2000,6 +2020,7 @@ MCUniverseGenerator::sampleCoordinatesWithinNBeadDistance(int nBeads)
     otherEndCoordinateDist(this->rng), otherEndCoordinateDist(this->rng);
   return otherEndCoordinates;
 }
+
 Eigen::VectorXd
 MCUniverseGenerator::getCrosslinkCoordinates() const
 {
@@ -2012,6 +2033,7 @@ MCUniverseGenerator::getCrosslinkCoordinates() const
   }
   return coordinates;
 }
+
 void
 MCUniverseGenerator::linkStrandTo(size_t strandIdx, size_t crosslinkIdx)
 {

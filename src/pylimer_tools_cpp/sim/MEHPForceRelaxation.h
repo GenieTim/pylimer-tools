@@ -282,6 +282,20 @@ public:
   }
 
   /**
+   * @brief Determine whether a node and spring, respectively, are in any
+   * way connected to an active spring
+   *
+   * @param tolerance
+   * @return std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
+   */
+  std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
+    const double tolerance = 0.05) const
+  {
+    return this->findClusteredToActive(&this->forceRelaxationNetwork,
+                                       tolerance);
+  }
+
+  /**
    * @brief Get the Dangling Weight Fraction
    *
    * @param tolerance the tolerance for determining active springs
@@ -455,6 +469,7 @@ public:
    * @return double
    */
   double getGammaFactor(double b02 = -1.0, int nrOfChains = -1) const;
+
   double getGamma() override { return this->getGammaFactor(-1.); }
   /**
    * @brief Get all the gamma factors for each spring
@@ -516,6 +531,7 @@ public:
    */
   static Eigen::VectorXd evaluateSpringDistances(const Network* net,
                                                  const bool is2D);
+
   /**
    * @brief Compute the spring lengths with displacement
    *
@@ -771,6 +787,46 @@ protected:
 
   std::vector<int> getIndicesOfActiveNodes(const Network* net,
                                            const double tolerance = 1e-3) const;
+
+  /**
+   * @brief Find whether springs and nodes are in any way connected to an
+   * active spring
+   *
+   * @param net the network that includes the connectivity
+   * @param tolerance the tolerance for considering springs as active
+   * @return std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
+   */
+  std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
+    const Network* net,
+    const double tolerance = 0.05) const
+  {
+    // find all active springs
+    Eigen::ArrayXb activeSprings = this->findActiveSprings(net, tolerance);
+    // then, iteratively walk along the springs to mark those as "active"
+    // that are connected to active springs
+    bool hadChanged = true;
+    Eigen::ArrayXb nodeIsActive = Eigen::ArrayXb::Zero(net->nrOfNodes);
+    while (hadChanged) {
+      Eigen::ArrayXb oldActiveSprings = activeSprings;
+      for (size_t i = 0; i < net->nrOfNodes; ++i) {
+        bool anyActive = false;
+        for (const size_t spring_idx : net->springIndicesOfLinks[i]) {
+          if (activeSprings[spring_idx]) {
+            anyActive = true;
+            break;
+          }
+        }
+        nodeIsActive(i) = anyActive;
+        if (anyActive) {
+          for (const size_t spring_idx : net->springIndicesOfLinks[i]) {
+            activeSprings[spring_idx] = true;
+          }
+        }
+      }
+      hadChanged = (oldActiveSprings.count() != activeSprings.count());
+    }
+    return std::make_pair(activeSprings, nodeIsActive);
+  }
 
   /**
    * @brief Compute the weight fraction of non-active springs

@@ -5400,7 +5400,7 @@ MEHPForceBalance::evaluateStressTensor(
     }
   }
 
-  for (size_t partialSpringIdx = 0; partialSpringIdx < net.nrOfPartialSprings;
+  for (Eigen::Index partialSpringIdx = 0; partialSpringIdx < net.nrOfPartialSprings;
        ++partialSpringIdx) {
     Eigen::Vector3d distance =
       relevantPartialDistancesA.segment(3 * partialSpringIdx, 3);
@@ -5414,8 +5414,8 @@ MEHPForceBalance::evaluateStressTensor(
       oneOverSpringPartitionUpperLimit);
 
     /* spring contribution to the overall stress tensor */
-    for (size_t j = 0; j < 3; j++) {
-      for (size_t k = 0; k < 3; k++) {
+    for (Eigen::Index j = 0; j < 3; j++) {
+      for (Eigen::Index k = 0; k < 3; k++) {
         const double contribution = distance[j] * distance[k] * this->kappa *
                                     oneOverContourLengthFraction;
         RUNTIME_EXP_IFN(
@@ -5435,8 +5435,8 @@ MEHPForceBalance::evaluateStressTensor(
     }
   }
 
-  for (size_t i = 0; i < 3; ++i) {
-    for (size_t j = 0; j < 3; ++j) {
+  for (Eigen::Index i = 0; i < 3; ++i) {
+    for (Eigen::Index j = 0; j < 3; ++j) {
       stress[i][j] *= oneOverVolume;
       RUNTIME_EXP_IFN(std::isfinite(stress[i][j]),
                       "Got non-finite stress tensor component: " +

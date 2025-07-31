@@ -517,7 +517,7 @@ public:
    * considered inactive
    * @return int
    */
-  int getNrOfActiveNodes(const double tolerance = 1e-6) const
+  int getNrOfActiveNodes(const double tolerance = 1e-3) const
   {
     if (this->initialConfig.nrOfNodes == 0) {
       return 0;
@@ -532,7 +532,7 @@ public:
    * @param tolerance the tolerance for considering springs as inactive
    * @return double the soluble weight fraction
    */
-  double getSolubleWeightFraction(const double tolerance = 1e-6)
+  double getSolubleWeightFraction(const double tolerance = 1e-3)
   {
     return this->computeSolubleWeightFraction(
       this->initialConfig, this->currentDisplacements, tolerance);
@@ -544,7 +544,7 @@ public:
    * @param tolerance the tolerance for considering springs as inactive
    * @return double the dangling weight fraction
    */
-  double getDanglingWeightFraction(const double tolerance = 1e-6)
+  double getDanglingWeightFraction(const double tolerance = 1e-3)
   {
     return this->computeDanglingWeightFraction(
       this->initialConfig, this->currentDisplacements, tolerance);
@@ -556,7 +556,7 @@ public:
    * @param tolerance the tolerance for considering springs as inactive
    * @return double the active weight fraction
    */
-  double getActiveWeightFraction(const double tolerance = 1e-6)
+  double getActiveWeightFraction(const double tolerance = 1e-3)
   {
     return this->computeActiveWeightFraction(
       this->initialConfig, this->currentDisplacements, tolerance);
@@ -569,7 +569,7 @@ public:
    * @param tolerance the tolerance for considering springs as inactive
    * @return double the number of active clustered atoms
    */
-  double countActiveClusteredAtoms(const double tolerance = 1e-6)
+  double countActiveClusteredAtoms(const double tolerance = 1e-3)
   {
     return this->countActiveClusteredAtoms(
       this->initialConfig, this->currentDisplacements, tolerance);
@@ -586,7 +586,7 @@ public:
    * @return std::unordered_map<long int, int>
    */
   std::unordered_map<long int, int> getEffectiveFunctionalityOfAtoms(
-    const double tolerance = 1e-6) const;
+    const double tolerance = 1e-3) const;
 
   /**
    * @brief Compute the weight fraction of non-active springs
@@ -601,7 +601,7 @@ public:
    */
   double computeDanglingWeightFraction(ForceBalance2Network& net,
                                        const Eigen::VectorXd& u,
-                                       const double tolerance = 1e-6) const;
+                                       const double tolerance = 1e-3) const;
 
   /**
    * @brief Compute the weight fraction of active springs
@@ -613,7 +613,7 @@ public:
    */
   double computeActiveWeightFraction(ForceBalance2Network& net,
                                      const Eigen::VectorXd& u,
-                                     const double tolerance = 1e-6) const;
+                                     const double tolerance = 1e-3) const;
 
   /**
    * @brief Find whether springs and nodes are in any way connected to an
@@ -628,7 +628,7 @@ public:
   std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
     const ForceBalance2Network& net,
     const Eigen::VectorXd& u,
-    const double tolerance = 1e-6) const;
+    const double tolerance = 1e-3) const;
 
   /**
    * @brief Count the number of atoms that can be considered part of an
@@ -641,7 +641,7 @@ public:
    */
   double countActiveClusteredAtoms(ForceBalance2Network& net,
                                    const Eigen::VectorXd& u,
-                                   const double tolerance = 1e-6) const;
+                                   const double tolerance = 1e-3) const;
 
   /**
    * @brief Compute the weight fraction of springs connected to active
@@ -654,7 +654,7 @@ public:
    */
   double computeSolubleWeightFraction(ForceBalance2Network& net,
                                       const Eigen::VectorXd& u,
-                                      const double tolerance = 1e-6) const;
+                                      const double tolerance = 1e-3) const;
 
   /**
    * @brief Get the indices of active Nodes
@@ -667,7 +667,7 @@ public:
    */
   std::vector<int> getIndicesOfActiveNodes(const ForceBalance2Network& net,
                                            const Eigen::VectorXd& u,
-                                           const double tolerance = 1e-6) const;
+                                           const double tolerance = 1e-3) const;
 
   /**
    * @brief Get the Ids of active Nodes
@@ -677,7 +677,7 @@ public:
    * @return std::vector<long int> the atom ids
    */
   std::vector<long int> getAtomIdsOfActiveNodes(
-    const double tolerance = 1e-6) const;
+    const double tolerance = 1e-3) const;
 
   /**
    *
@@ -707,7 +707,7 @@ public:
    * @return Eigen::VectorXi
    */
   Eigen::VectorXi getNrOfActiveStrandsConnected(
-    const double tolerance = 1e-6) const;
+    const double tolerance = 1e-3) const;
 
   /**
    * @brief Get the Nr Of Active Springs connected to each node
@@ -716,7 +716,7 @@ public:
    * @return Eigen::VectorXi
    */
   Eigen::VectorXi getNrOfActiveSpringsConnected(
-    const double tolerance = 1e-6) const;
+    const double tolerance = 1e-3) const;
 
   /**
    * @brief Get the Nr Of Active Springs object
@@ -724,7 +724,7 @@ public:
    * @param tolerance springs under a certain length are considered inactive
    * @return int the number of active strands
    */
-  int getNrOfActiveStrands(const double tolerance = 1e-6) const
+  int getNrOfActiveStrands(const double tolerance = 1e-3) const
   {
     return this->countNrOfActiveStrands(tolerance);
   }
@@ -737,7 +737,7 @@ public:
    * @return int the number of active strands in the specified direction
    */
   int getNrOfActiveStrandsInDir(const int dir,
-                                const double tolerance = 1e-6) const
+                                const double tolerance = 1e-3) const
   {
     return this->countNrOfActiveStrandsInDir(dir, tolerance);
   }
@@ -749,7 +749,7 @@ public:
    * considered inactive
    * @return int the number of active springs
    */
-  int getNrOfActiveSprings(const double tolerance = 1e-6) const
+  int getNrOfActiveSprings(const double tolerance = 1e-3) const
   {
     return this->countNrOfActiveSprings(tolerance);
   }
@@ -1396,24 +1396,24 @@ protected:
    */
   [[nodiscard]] int countNrOfActiveStrands(const ForceBalance2Network& net,
                                            const Eigen::VectorXd& u,
-                                           const double tolerance = 1e-6) const
+                                           const double tolerance = 1e-3) const
   {
     return (this->findActiveStrands(net, u, tolerance)).count();
   }
 
-  [[nodiscard]] int countNrOfActiveStrands(const double tolerance = 1e-6) const
+  [[nodiscard]] int countNrOfActiveStrands(const double tolerance = 1e-3) const
   {
     return (this->findActiveStrands(tolerance) == true).count();
   }
 
   [[nodiscard]] int countNrOfActiveStrandsInDir(
     const int dir,
-    const double tolerance = 1e-6) const
+    const double tolerance = 1e-3) const
   {
     return (this->findActiveStrandsInDir(dir, tolerance) == true).count();
   }
 
-  [[nodiscard]] int countNrOfActiveSprings(const double tolerance = 1e-6) const
+  [[nodiscard]] int countNrOfActiveSprings(const double tolerance = 1e-3) const
   {
     return (this->findActiveSprings(tolerance) == true).count();
   }
@@ -1430,7 +1430,7 @@ protected:
    */
   Eigen::ArrayXb findActiveStrands(const ForceBalance2Network& net,
                                    const Eigen::VectorXd& u,
-                                   const double tolerance = 1e-6) const
+                                   const double tolerance = 1e-3) const
   {
     Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net.nrOfStrands, false);
     Eigen::ArrayXb activeSprings = this->findActiveSprings(net, u, tolerance);
@@ -1557,7 +1557,7 @@ protected:
     return result;
   }
 
-  Eigen::ArrayXb findActiveStrands(const double tolerance = 1e-6) const
+  Eigen::ArrayXb findActiveStrands(const double tolerance = 1e-3) const
   {
     return this->findActiveStrands(
       this->initialConfig, this->currentDisplacements, tolerance);
@@ -1577,7 +1577,7 @@ protected:
   Eigen::ArrayXb findActiveStrandsInDir(const ForceBalance2Network& net,
                                         const Eigen::VectorXd& u,
                                         const int dir,
-                                        const double tolerance = 1e-6) const
+                                        const double tolerance = 1e-3) const
   {
     INVALIDARG_EXP_IFN(dir >= 0 && dir < 3, "Invalid direction");
     Eigen::VectorXd partialSpringVectors =
@@ -1597,7 +1597,7 @@ protected:
   }
 
   Eigen::ArrayXb findActiveStrandsInDir(const int dir,
-                                        const double tolerance = 1e-6) const
+                                        const double tolerance = 1e-3) const
   {
     return this->findActiveStrandsInDir(
       this->initialConfig, this->currentDisplacements, dir, tolerance);
@@ -1610,7 +1610,7 @@ protected:
    * @return for each node whether the node is connected to at least one active
    * spring
    */
-  Eigen::ArrayXb findActiveLinks(const double tolerance = 1e-6) const
+  Eigen::ArrayXb findActiveLinks(const double tolerance = 1e-3) const
   {
     Eigen::ArrayXb activeStrands = this->findActiveStrands(tolerance);
     assert(activeStrands.size() == this->initialConfig.nrOfStrands);
@@ -1635,7 +1635,7 @@ protected:
    * @return for each node whether the node is connected to at least one active
    * spring
    */
-  Eigen::ArrayXb findActiveNodes(const double tolerance = 1e-6) const
+  Eigen::ArrayXb findActiveNodes(const double tolerance = 1e-3) const
   {
     Eigen::ArrayXb activeLinks = this->findActiveLinks(tolerance);
     Eigen::ArrayXb activeNodes =
@@ -1662,7 +1662,7 @@ protected:
    */
   Eigen::ArrayXb findActiveSprings(const ForceBalance2Network& net,
                                    const Eigen::VectorXd& u,
-                                   const double tolerance = 1e-6) const
+                                   const double tolerance = 1e-3) const
   {
     Eigen::VectorXd springVectors =
       this->evaluateSpringVectors(net, u, this->is2D);
@@ -1676,7 +1676,7 @@ protected:
     return result;
   }
 
-  Eigen::ArrayXb findActiveSprings(const double tolerance = 1e-6) const
+  Eigen::ArrayXb findActiveSprings(const double tolerance = 1e-3) const
   {
     return this->findActiveSprings(
       this->initialConfig, this->currentDisplacements, tolerance);
@@ -1694,7 +1694,7 @@ protected:
    * @return false
    */
   static bool distanceIsWithinTolerance(const Eigen::Vector3d& dist,
-                                        const double tolerance = 1e-6,
+                                        const double tolerance = 1e-3,
                                         const double contourLength = 1.,
                                         const double contourLengthFraction = 1.)
   {
