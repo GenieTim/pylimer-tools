@@ -471,23 +471,6 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Convert LAMMPS units to SI or other unit systems:">
-
-.. only:: html
-
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_unit_conversion_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_unit_conversion.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Unit Conversion</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command.">
 
 .. only:: html
@@ -500,6 +483,23 @@ The library supports four main file I/O operations:
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Convert LAMMPS units to SI or other unit systems:">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_unit_conversion_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_readers_writers_plot_unit_conversion.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Unit Conversion</div>
     </div>
 
 
