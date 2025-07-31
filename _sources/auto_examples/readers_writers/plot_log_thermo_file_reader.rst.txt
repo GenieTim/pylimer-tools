@@ -91,7 +91,7 @@ and :func:`~pylimer_tools.io.extract_thermo_data.extract_thermo_params`
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.062 seconds)
+   **Total running time of the script:** (0 minutes 0.061 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_log_thermo_file_reader.py:
