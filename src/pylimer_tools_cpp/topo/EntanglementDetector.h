@@ -21,6 +21,20 @@ struct AtomPairEntanglements
    * none
    */
   std::vector<long int> pairOfAtom = {};
+
+  /**
+   * @brief Constructor for AtomPairEntanglements
+   *
+   * @param pairs Vector of atom pairs (default: empty)
+   * @param pairIndices Vector of pair indices for each atom (default: empty)
+   */
+  AtomPairEntanglements(
+    const std::vector<std::pair<size_t, size_t>>& pairs = {},
+    const std::vector<long int>& pairIndices = {})
+    : pairsOfAtoms(pairs)
+    , pairOfAtom(pairIndices)
+  {
+  }
 };
 
 /**
