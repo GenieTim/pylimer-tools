@@ -84,12 +84,12 @@ removeAll(std::string& haystack, std::string needle)
 static inline std::string
 removeAllRegex(const std::string& haystack,
                std::string pattern,
-               bool caseInsensitive = false)
+               const bool caseInsensitive = false)
 {
-  std::regex reg(pattern,
-                 caseInsensitive ? std::regex_constants::icase |
-                                     std::regex_constants::ECMAScript
-                                 : std::regex_constants::ECMAScript);
+  const std::regex reg(pattern,
+                       caseInsensitive ? std::regex_constants::icase |
+                                           std::regex_constants::ECMAScript
+                                       : std::regex_constants::ECMAScript);
   return std::regex_replace(haystack, reg, "");
 }
 
@@ -119,14 +119,14 @@ static const std::string WHITESPACE = " \n\r\t\f\v";
 static inline std::string
 ltrim(const std::string& s)
 {
-  size_t start = s.find_first_not_of(WHITESPACE);
+  const size_t start = s.find_first_not_of(WHITESPACE);
   return (start == std::string::npos) ? "" : s.substr(start);
 }
 
 static inline std::string
 rtrim(const std::string& s)
 {
-  size_t end = s.find_last_not_of(WHITESPACE);
+  const size_t end = s.find_last_not_of(WHITESPACE);
   return (end == std::string::npos) ? "" : s.substr(0, end + 1);
 }
 
@@ -139,7 +139,7 @@ trim(const std::string& s)
 static inline std::string
 rstrip(std::string haystack, const std::string& needle)
 {
-  auto pos = haystack.find(needle);
+  const auto pos = haystack.find(needle);
   if (pos != std::string::npos) {
     haystack.erase(pos);
   }
@@ -164,7 +164,7 @@ trimLineOmitComment(std::string line)
 static inline std::string
 trimLineOmitComment(char* line)
 {
-  std::string tempString = std::string(line);
+  const std::string tempString = std::string(line);
   return pylimer_tools::utils::trimLineOmitComment(tempString);
 }
 
@@ -229,11 +229,11 @@ public:
     // }
 
     // or the "manual" one below
-    std::string separators = " ,;\t\n";
+    const std::string separators = " ,;\t\n";
     const std::string& text = subject;
     size_t start = text.find_first_not_of(separators);
     do {
-      size_t end = text.find_first_of(separators, start);
+      const size_t end = text.find_first_of(separators, start);
 
       if (end == std::string::npos) {
         const std::string token = text.substr(start);
@@ -267,7 +267,7 @@ public:
     size_t start = text.find_first_not_of(separators);
     size_t iteration = 0;
     do {
-      size_t end = text.find_first_of(separators, start);
+      const size_t end = text.find_first_of(separators, start);
 
       if (end == std::string::npos) {
         const std::string token = text.substr(start);
@@ -291,7 +291,7 @@ public:
   [[nodiscard]] size_t getLength() const { return this->results.size(); }
 
   template<typename OUT>
-  inline OUT get(size_t index) const
+  inline OUT get(const size_t index) const
   {
     return dynamic_cast<OUT>(this->results[index]);
   };

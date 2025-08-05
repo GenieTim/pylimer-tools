@@ -1145,18 +1145,18 @@ public:
     // then, iteratively walk along the springs to mark those as "active"
     // that are connected to active springs
     bool hadChanged = true;
-    Eigen::ArrayXb nodeIsActive =
+    Eigen::ArrayXb linkIsActive =
       Eigen::ArrayXb::Constant(net->nrOfNodes, false);
     while (hadChanged) {
       hadChanged = false;
       for (size_t i = 0; i < net->nrOfNodes; ++i) {
-        if (nodeIsActive(i)) {
+        if (linkIsActive(i)) {
           continue;
         }
         for (const size_t springIdx : net->springIndicesOfLinks[i]) {
           if (springIsActive[springIdx]) {
             hadChanged = true;
-            nodeIsActive(i) = true;
+            linkIsActive(i) = true;
             for (const size_t innerSpringIdx : net->springIndicesOfLinks[i]) {
               springIsActive[innerSpringIdx] = true;
             }
@@ -1166,7 +1166,7 @@ public:
       }
     }
 
-    return std::make_pair(springIsActive, nodeIsActive);
+    return std::make_pair(springIsActive, linkIsActive);
   }
 
   /**
@@ -1995,7 +1995,7 @@ public:
     const double oneOverSpringPartitionUpperLimit,
     const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
     const bool respectLoops = true,
-    const bool moveAttempt = false);
+    const bool moveAttempt = false) const;
 
   /**
    * @brief Move a slip-link if appropriate to other springs

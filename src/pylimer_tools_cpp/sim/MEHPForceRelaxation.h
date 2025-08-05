@@ -217,6 +217,19 @@ public:
     this->forceRelaxationNetwork.assumeBoxLargeEnough = assumption;
   }
 
+  /**
+   * @brief Configure whether the network is complete
+   *
+   * If true, the network is assumed to be complete,
+   * i.e., no dangling or free chains have been omitted.
+   *
+   * @param assumeNetworkIsComplete whether to assume the network is complete
+   */
+  void configAssumeNetworkIsComplete(const bool assumeNetworkIsComplete = false)
+  {
+    this->forceRelaxationNetwork.assumeComplete = assumeNetworkIsComplete;
+  }
+
   // MEHPForceEvaluator getForceEvaluator() const
   // {
   //   return *this->forceEvaluator;
@@ -807,8 +820,12 @@ protected:
     bool hadChanged = true;
     Eigen::ArrayXb nodeIsActive = Eigen::ArrayXb::Zero(net->nrOfNodes);
     while (hadChanged) {
-      Eigen::ArrayXb oldActiveSprings = activeSprings;
+      hadChanged = false;
       for (size_t i = 0; i < net->nrOfNodes; ++i) {
+        if (nodeIsActive[i]) {
+          continue; // already active
+        }
+        // check whether any of the springs connected to this node is active
         bool anyActive = false;
         for (const size_t spring_idx : net->springIndicesOfLinks[i]) {
           if (activeSprings[spring_idx]) {
@@ -816,14 +833,16 @@ protected:
             break;
           }
         }
-        nodeIsActive(i) = anyActive;
+        // if so, mark this node as active as well as all the springs
+        // connected to it
         if (anyActive) {
+          hadChanged = true;
+          nodeIsActive(i) = true;
           for (const size_t spring_idx : net->springIndicesOfLinks[i]) {
             activeSprings[spring_idx] = true;
           }
         }
       }
-      hadChanged = (oldActiveSprings.count() != activeSprings.count());
     }
     return std::make_pair(activeSprings, nodeIsActive);
   }
@@ -851,10 +870,14 @@ protected:
   {
     const double nActiveClusteredAtoms =
       this->countActiveClusteredAtoms(net, tolerance);
+
+    double nAtoms = net->assumeComplete
+                      ? static_cast<double>(net->nrOfNodes) +
+                          net->springsContourLength.sum() - net->nrOfSprings
+                      : static_cast<double>(this->universe.getNrOfAtoms());
     // finally, normalize by the number of atoms.
     // NOTE: currently, the weight of the atoms is ignored
-    return 1. - (nActiveClusteredAtoms /
-                 (static_cast<double>(this->universe.getNrOfAtoms())));
+    return 1. - (nActiveClusteredAtoms / nAtoms);
   }
 
   /**

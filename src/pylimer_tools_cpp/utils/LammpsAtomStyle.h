@@ -44,7 +44,7 @@ enum AtomStyle : int
 };
 
 static inline std::string
-getAtomStyleString(AtomStyle type)
+getAtomStyleString(const AtomStyle type)
 {
   switch (type) {
 #define X(e, s)                                                                \

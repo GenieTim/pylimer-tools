@@ -162,7 +162,9 @@ struct Network
   Eigen::ArrayXi moleculeIdxToSpring;
 
   // config
-  bool assumeBoxLargeEnough = false;
+  bool assumeBoxLargeEnough =
+    false; /* whether traditional PBC can be applied or not */
+  bool assumeComplete = false; /* whether dangling & free chains are included */
 };
 
 struct ForceBalanceNetwork

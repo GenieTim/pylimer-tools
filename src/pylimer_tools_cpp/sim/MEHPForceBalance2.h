@@ -47,6 +47,7 @@ private:
   int nrOfStepsDone = 0;
   double defaultBondLength = 0.0;
   double springBreakingLength = -1.;
+  bool assumeNetworkIsComplete = false;
 
 public:
   /**
@@ -188,6 +189,29 @@ public:
         pylimer_tools::entities::Universe(net1.L[0], net1.L[1], net1.L[2]),
         net1,
         springPartitions,
+        is2D) {};
+
+  /**
+   * @brief Construct from old force relaxation network
+   *
+   * @param u
+   * @param net
+   * @param is2D
+   */
+  MEHPForceBalance2(const pylimer_tools::entities::Universe& u,
+                    const Network& net,
+                    const bool is2D = false);
+
+  /**
+   * @brief Construct from old force relaxation network
+   *
+   * @param net
+   * @param is2D
+   */
+  MEHPForceBalance2(const Network& net, const bool is2D = false)
+    : MEHPForceBalance2(
+        pylimer_tools::entities::Universe(net.L[0], net.L[1], net.L[2]),
+        net,
         is2D) {};
 
   /**
@@ -510,6 +534,19 @@ public:
   }
 
   /**
+   * @brief Configure whether the network is complete
+   *
+   * If true, the network is assumed to be complete,
+   * i.e., no dangling or free chains have been omitted.
+   *
+   * @param assumeNetworkIsComplete whether to assume the network is complete
+   */
+  void configAssumeNetworkIsComplete(const bool assumeNetworkIsComplete = false)
+  {
+    this->assumeNetworkIsComplete = assumeNetworkIsComplete;
+  }
+
+  /**
    * @brief Get the number of active nodes (incl. entanglement nodes, excl.
    * entanglement links)
    *
@@ -604,6 +641,29 @@ public:
                                        const double tolerance = 1e-3) const;
 
   /**
+   * @brief Infer the number of atoms from the network
+   *
+   * This is a heuristic that counts the number of springs, links and nodes
+   * in the network to estimate the number of atoms.
+   *
+   * @param net the network to infer from
+   * @return double the inferred number of atoms
+   */
+  static double inferNrOfAtomsFromNetwork(const ForceBalance2Network& net)
+  {
+    return net.springContourLength.sum() -
+           static_cast<double>(net.nrOfSprings) +
+           static_cast<double>(
+             2 * net.nrOfLinks - net.nrOfNodes // count entanglement links twice
+           );
+  }
+
+  double inferNrOfAtomsFromNetwork() const
+  {
+    return this->inferNrOfAtomsFromNetwork(this->initialConfig);
+  }
+
+  /**
    * @brief Compute the weight fraction of active springs
    *
    * @param net
@@ -616,7 +676,7 @@ public:
                                      const double tolerance = 1e-3) const;
 
   /**
-   * @brief Find whether springs and nodes are in any way connected to an
+   * @brief Find whether strands and nodes are in any way connected to an
    * active spring
    *
    * @param net the network that includes the connectivity
@@ -625,10 +685,23 @@ public:
    * @return std::pair<Eigen::ArrayXb, Eigen::ArrayXb> indices of springs
    * (first) and links (second) connected in any way to active springs
    */
-  std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
-    const ForceBalance2Network& net,
-    const Eigen::VectorXd& u,
-    const double tolerance = 1e-3) const;
+  std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
+  findStrandsAndNodesClusteredToActive(const ForceBalance2Network& net,
+                                       const Eigen::VectorXd& u,
+                                       const double tolerance = 1e-3) const;
+
+  /**
+   * @brief Find whether springs and links that are clustered to active springs
+   *
+   * @param net the network that includes the connectivity
+   * @param u the current displacements of the links
+   * @param tolerance the tolerance for considering springs as active
+   * @return std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
+   */
+  std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
+  findSpringsAndLinksClusteredToActive(const ForceBalance2Network& net,
+                                       const Eigen::VectorXd& u,
+                                       const double tolerance = 1e-3) const;
 
   /**
    * @brief Count the number of atoms that can be considered part of an
@@ -1125,7 +1198,7 @@ public:
   }
 
   /**
-   * @brief Evaluate the current stress on a particular cross- or slip-link
+   * @brief Evaluate the stress on a particular cross- or slip-link
    *
    * @param linkIdx
    * @return Eigen::Matrix3d

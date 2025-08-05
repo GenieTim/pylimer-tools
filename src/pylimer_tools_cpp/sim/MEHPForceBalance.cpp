@@ -3160,7 +3160,7 @@ MEHPForceBalance::moveSlipLinksToTheirBestBranch(
   const double oneOverSpringPartitionUpperLimit,
   const int nrOfCrosslinkSwapsAllowedPerSliplink,
   const bool respectLoops,
-  const bool moveAttempt)
+  const bool moveAttempt) const
 {
   for (size_t sliplinkIdx = net.nrOfNodes; sliplinkIdx < net.nrOfLinks;
        ++sliplinkIdx) {
@@ -5400,7 +5400,8 @@ MEHPForceBalance::evaluateStressTensor(
     }
   }
 
-  for (Eigen::Index partialSpringIdx = 0; partialSpringIdx < net.nrOfPartialSprings;
+  for (Eigen::Index partialSpringIdx = 0;
+       partialSpringIdx < net.nrOfPartialSprings;
        ++partialSpringIdx) {
     Eigen::Vector3d distance =
       relevantPartialDistancesA.segment(3 * partialSpringIdx, 3);

@@ -4,7 +4,7 @@
 
 template<typename T>
 bool
-all_equal(int count, ...)
+all_equal(const int count, ...)
 {
   va_list args;
   va_start(args, count);

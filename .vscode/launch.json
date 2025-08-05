@@ -12,7 +12,7 @@
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
         //"[MEHPForceBalance2]"
-        "All MEHPForceBalance2 solvers solve simple melt systems"
+        "Universe generator uses correct w_sol even for strange structures"
       ],
       "env": {
         "MallocNanoZone": "0",

@@ -84,7 +84,9 @@ jobs:
         uses: tj-actions/verify-changed-files@v20
         id: changed_files
         with:
-          files: .github/coverage.svg
+          files: |
+            .github/coverage.svg
+            .github/cpp-coverage.svg
 
       - name: Commit files
         if: steps.changed_files.outputs.files_changed == 'true'
@@ -92,7 +94,8 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add .github/coverage.svg
-          git commit -m "Updated coverage.svg"
+          git add .github/cpp-coverage.svg
+          git commit -m "Updated coverage badges [skip ci]"
 
       - name: Push changes
         if: steps.changed_files.outputs.files_changed == 'true'

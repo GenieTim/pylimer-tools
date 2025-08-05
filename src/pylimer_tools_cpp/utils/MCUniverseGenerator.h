@@ -243,7 +243,7 @@ public:
     }
   }
 
-  void setSeed(unsigned int seed) { this->rng.seed(seed); }
+  void setSeed(const unsigned int seed) { this->rng.seed(seed); }
 
   void setBeadDistance(double newBeadDistance, bool updateMeanSquared = true);
 
@@ -257,7 +257,7 @@ public:
     return this->meanSquaredBeadDistance;
   }
 
-  void configNrOfMCSteps(size_t newNrOfMCSteps)
+  void configNrOfMCSteps(const size_t newNrOfMCSteps)
   {
     this->nMcSteps = newNrOfMCSteps;
   }
@@ -283,21 +283,18 @@ public:
    * @return pylimer_tools::entities::Universe
    */
   pylimer_tools::entities::Universe getUniverse();
-  ;
 
   /**
    * @brief Add free atoms with a specified type and functionality for
    * possible crosslinking later
    *
-   * @param nrOfCrosslinkers
+   * @param coordinates
    * @param crosslinkerFunctionality
    * @param crossLinkerAtomType
-   * @param whiteNoise
    */
-  void addCrosslinkersAt(Eigen::VectorXd coordinates,
+  void addCrosslinkersAt(const Eigen::VectorXd& coordinates,
                          int crosslinkerFunctionality = 4,
                          int crossLinkerAtomType = 2);
-  ;
 
   /**
    * @brief Add free atoms with a specified type and functionality for
@@ -312,7 +309,6 @@ public:
                        int crosslinkerFunctionality = 4,
                        int crossLinkerAtomType = 2,
                        bool whiteNoise = true);
-  ;
 
   /**
    * @brief Add strands which contain crosslinks at random positions
@@ -363,7 +359,6 @@ public:
                         int chainLength,
                         int solventAtomType = 3,
                         bool whiteNoise = true);
-  ;
 
   /**
    * @brief Add multiple monofunctional strands with specified bead types,
@@ -405,7 +400,9 @@ public:
                   const std::vector<int> beadsPerChains,
                   const int strandAtomType = 1);
 
-  void addStrands(int nrOfStrands, int chainLength, int strandAtomType = 1)
+  void addStrands(const int nrOfStrands,
+                  const int chainLength,
+                  const int strandAtomType = 1)
   {
     const std::vector<int> chainLengths =
       pylimer_tools::utils::initializeWithValue<int>(nrOfStrands, chainLength);
@@ -425,7 +422,7 @@ public:
    * @brief Add strands, link them to the crosslinks, stop when the callback
    * says so
    *
-   * @param stopLinking a callback to indicated whether to stop linking
+   * @param linkingController
    * @param cInfinity `C_\infty` for `<R_ee^2>_0` from `N` and `<b^2>`
    */
   void linkStrandsCallback(
@@ -520,6 +517,8 @@ public:
 
   double getCurrentCrosslinkerConversion() const;
 
+  double getCurrentStrandsConversion() const;
+
   size_t getCurrentNrOfAvailableCrosslinkSites() const
   {
     return this->nrOfAvailableCrosslinkSites;
@@ -582,7 +581,7 @@ private:
    *
    * @return std::string
    */
-  std::string getCurrentSeed()
+  std::string getCurrentSeed() const
   {
     std::ostringstream oss;
     oss << this->rng;
@@ -592,9 +591,7 @@ private:
   /**
    * @brief Do a random walk of certain length to add a chain
    *
-   * @param from the starting Atom of the chain
    * @param chainLen the number of additional atoms to add to the chain
-   * @param atomType the atom type of the atoms in the chain
    */
   Eigen::VectorXd sampleFreeChainCoordinates(int chainLen);
 
@@ -660,7 +657,8 @@ private:
    * @param nSamples the number of positions to generate
    * @return Positions
    */
-  Eigen::VectorXd generateRandomPositions(int nSamples, bool whiteNoise = true)
+  Eigen::VectorXd generateRandomPositions(const int nSamples,
+                                          const bool whiteNoise = true)
   {
     if (whiteNoise) {
       return this->generateRandomWhitePositions(nSamples);

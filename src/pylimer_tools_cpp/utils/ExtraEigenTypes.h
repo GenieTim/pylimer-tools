@@ -84,9 +84,9 @@ isSelfAdjoint(const SparseMatrix<double>& mat, const double tol = 1e-9)
 
   for (Eigen::Index k = 0; k < mat.outerSize(); ++k) {
     for (Eigen::SparseMatrix<double>::InnerIterator it(mat, k); it; ++it) {
-      Eigen::Index row = it.row();
-      Eigen::Index col = it.col();
-      double value = it.value();
+      const Eigen::Index row = it.row();
+      const Eigen::Index col = it.col();
+      const double value = it.value();
 
       // Check symmetry within tolerance
       if (std::abs(value - mat.coeff(col, row)) > tol) {
@@ -125,7 +125,7 @@ saveDenseVector(const Eigen::VectorXd& vec, const std::string& filename)
   if (!file.is_open())
     return;
 
-  for (double i : vec) {
+  for (const double i : vec) {
     file << i << "\n";
   }
 
