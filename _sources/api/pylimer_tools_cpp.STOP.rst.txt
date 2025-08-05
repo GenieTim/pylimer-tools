@@ -1,0 +1,6 @@
+STOP
+====
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autodata:: STOP

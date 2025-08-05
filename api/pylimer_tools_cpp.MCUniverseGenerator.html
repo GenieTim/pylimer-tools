@@ -249,6 +249,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_custom_crosslinking_callback.html">Custom Crosslinking with Callback Functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 </ul>
@@ -262,8 +263,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
@@ -311,6 +312,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AtomPairEntanglements.html">AtomPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AtomStyle.html">AtomStyle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AveFileReader.html">AveFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BackTrackStatus.html">BackTrackStatus</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Box.html">Box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
@@ -345,6 +347,9 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ZScoreMaxDistanceProvider.html">ZScoreMaxDistanceProvider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.STOP.html">STOP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.TRACK_BACKWARD.html">TRACK_BACKWARD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.TRACK_FORWARD.html">TRACK_FORWARD</a></li>
 </ul>
 </li>
 </ul>
@@ -439,7 +444,7 @@
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_crosslinker_conversion</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the current conversion of crosslinkers, i.e., the fraction of crosslinkers that have been linked to strands.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_atoms" title="pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_nr_of_atoms</span></code></a>(self)</p></td>
 <td><p></p></td>
@@ -645,7 +650,9 @@ This results in more secondary loops for shorter chains than for longer ones.</p
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion">
 <span class="sig-name descname"><span class="pre">get_current_crosslinker_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the current conversion of crosslinkers, i.e., the fraction of crosslinkers
+that have been linked to strands.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_atoms">

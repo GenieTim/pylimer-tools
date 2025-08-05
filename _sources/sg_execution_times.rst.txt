@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:34.385** total execution time for 32 files **from all galleries**:
+**00:35.222** total execution time for 33 files **from all galleries**:
 
 .. container::
 
@@ -33,10 +33,10 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_monte_carlo_configuration.py` (``../examples/network_generator/plot_monte_carlo_configuration.py``)
-     - 00:34.322
+     - 00:35.145
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_log_thermo_file_reader.py` (``../examples/readers_writers/plot_log_thermo_file_reader.py``)
-     - 00:00.062
+   * - :ref:`sphx_glr_auto_examples_network_generator_plot_custom_crosslinking_callback.py` (``../examples/network_generator/plot_custom_crosslinking_callback.py``)
+     - 00:00.077
      - 0.0
    * - :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_simulation.py` (``../examples/dpd_simulations/plot_dpd_simulation.py``)
      - 00:00.000
@@ -96,6 +96,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_histogram_reader.py` (``../examples/readers_writers/plot_histogram_reader.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_readers_writers_plot_log_thermo_file_reader.py` (``../examples/readers_writers/plot_log_thermo_file_reader.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_memory_efficient_dump_file_reading.py` (``../examples/readers_writers/plot_memory_efficient_dump_file_reading.py``)

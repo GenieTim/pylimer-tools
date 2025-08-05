@@ -32,7 +32,9 @@ thermo_data = read_log_file(log_file)
 
 # Access thermodynamic properties
 print(
-    f"Temperature range: {thermo_data['Temp'].min():.2f} - {thermo_data['Temp'].max():.2f}"
+    f"Temperature range: {thermo_data['Temp'].min():.2f} - {
+        thermo_data['Temp'].max():.2f
+    }"
 )
 print(f"Final pressure: {thermo_data['Press'].iloc[-1]:.6f}")
 

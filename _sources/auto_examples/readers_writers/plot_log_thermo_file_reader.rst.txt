@@ -33,7 +33,7 @@ The log file reader automatically:
 Relevant documentation: :func:`~pylimer_tools.io.read_lammps_output_file.read_log_file`
 and :func:`~pylimer_tools.io.extract_thermo_data.extract_thermo_params`
 
-.. GENERATED FROM PYTHON SOURCE LINES 18-46
+.. GENERATED FROM PYTHON SOURCE LINES 18-48
 
 
 
@@ -76,7 +76,9 @@ and :func:`~pylimer_tools.io.extract_thermo_data.extract_thermo_params`
 
     # Access thermodynamic properties
     print(
-        f"Temperature range: {thermo_data['Temp'].min():.2f} - {thermo_data['Temp'].max():.2f}"
+        f"Temperature range: {thermo_data['Temp'].min():.2f} - {
+            thermo_data['Temp'].max():.2f
+        }"
     )
     print(f"Final pressure: {thermo_data['Press'].iloc[-1]:.6f}")
 
@@ -91,7 +93,7 @@ and :func:`~pylimer_tools.io.extract_thermo_data.extract_thermo_params`
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.062 seconds)
+   **Total running time of the script:** (0 minutes 0.059 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_log_thermo_file_reader.py:

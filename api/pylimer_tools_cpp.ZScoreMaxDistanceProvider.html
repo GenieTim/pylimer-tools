@@ -18,7 +18,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="pylimer-tools" />
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="UniverseSequence" href="pylimer_tools_cpp.UniverseSequence.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="STOP" href="pylimer_tools_cpp.STOP.html" /><link rel="prev" title="UniverseSequence" href="pylimer_tools_cpp.UniverseSequence.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>ZScoreMaxDistanceProvider - pylimer-tools</title>
@@ -249,6 +249,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_custom_crosslinking_callback.html">Custom Crosslinking with Callback Functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 </ul>
@@ -262,8 +263,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
@@ -311,6 +312,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AtomPairEntanglements.html">AtomPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AtomStyle.html">AtomStyle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AveFileReader.html">AveFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.BackTrackStatus.html">BackTrackStatus</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Box.html">Box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
@@ -345,6 +347,9 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">ZScoreMaxDistanceProvider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.STOP.html">STOP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.TRACK_BACKWARD.html">TRACK_BACKWARD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.TRACK_FORWARD.html">TRACK_FORWARD</a></li>
 </ul>
 </li>
 </ul>
@@ -442,7 +447,15 @@ E.g., 3.29 for 99.9% of all conformations.</p></li>
       <footer>
         
         <div class="related-pages">
-          
+          <a class="next-page" href="pylimer_tools_cpp.STOP.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">STOP</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
           <a class="prev-page" href="pylimer_tools_cpp.UniverseSequence.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
