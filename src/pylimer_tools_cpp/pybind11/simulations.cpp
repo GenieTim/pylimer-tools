@@ -214,7 +214,9 @@ the simulation or optimization procedure.)pbdoc")
     .def_readonly("spring_index_a", &mehp::Network::springIndexA)
     .def_readonly("spring_index_b", &mehp::Network::springIndexB)
     // .def_readonly("springIsActive", &mehp::Network::springIsActive)
-    ;
+    .def_readonly("assume_box_large_enough",
+                  &mehp::Network::assumeBoxLargeEnough)
+    .def_readonly("assume_complete", &mehp::Network::assumeComplete);
 
   py::class_<mehp::ForceBalanceNetwork>(m,
                                         "SimplifiedBalanceNetwork",
@@ -1686,6 +1688,22 @@ A strand is a chain of connected links between two crosslinks.
            :param distance_over_contour_length: The threshold for breaking springs.
           )pbdoc",
          py::arg("distance_over_contour_length") = -1)
+    .def("config_assume_network_is_complete",
+         &mehp::MEHPForceBalance2::configAssumeNetworkIsComplete,
+         R"pbdoc(
+           Configure whether the network is assumed to be complete.
+
+           This assumption means, that the `universe` instance is not queried for clusters when
+           computing the fraction of e.g. the soluble or dangling strands.
+           Do not set this to true if inactive
+           (dangling or free) strands have been removed from the network.
+
+           This is useful to reduce memory between MC generator and force balance,
+           since the universe representation with all the in-between beads does not need to be stored.
+           However, currently, the removal procedures are not loss-free.
+           Therefore, use this with care.
+         )pbdoc",
+         py::arg("assume_network_is_complete") = false)
     .def(
       "get_force_on",
       [](mehp::MEHPForceBalance2& sim, const size_t linkIdx) {

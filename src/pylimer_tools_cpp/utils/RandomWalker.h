@@ -41,8 +41,8 @@ namespace utils {
     double stepSize = beadDistance;
 
     for (int i = 0; i < chainLen; ++i) {
-      double alpha = angleDistribution(rng);
-      double beta = angleDistribution(rng);
+      const double alpha = angleDistribution(rng);
+      const double beta = angleDistribution(rng);
 
       // TODO: adjust step size according to mean squared bead distance
       stepSize = stepSizeDistribution(rng);
@@ -121,7 +121,6 @@ namespace utils {
     coordinates += from.replicate(chainLen + 2, 1);
 
     assert(coordinates.size() == 3 * (chainLen + 2));
-    // TODO: continue from here
 
     // at this point, it was a "normal" random walk,
     // but now, we need to close the Brownian bridge

@@ -14,7 +14,10 @@ namespace utils {
         std::cout << message << std::endl;
       }
     }
-    static void enableLog(bool enable = true) { Logger::logEnabled = enable; }
+    static void enableLog(const bool enable = true)
+    {
+      Logger::logEnabled = enable;
+    }
 
   private:
     Logger() { Logger::logEnabled = false; }

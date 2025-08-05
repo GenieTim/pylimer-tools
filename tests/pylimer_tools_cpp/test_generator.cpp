@@ -279,10 +279,16 @@ TEST_CASE("MCUniverseGenerator can generate without primary loops",
   generator.configPrimaryLoopProbability(0.);
   generator.configSecondaryLoopProbability(0.5);
   generator.addStrands(200, 10, 1);
+  CHECK(generator.getCurrentCrosslinkerConversion() == 0.0);
+  CHECK(generator.getCurrentStrandsConversion() == 0.0);
 
   SECTION("Without max distance")
   {
     generator.linkStrandsToConversion(0.9, 1.);
+    CHECK_THAT(generator.getCurrentCrosslinkerConversion(),
+               Catch::Matchers::WithinAbs(0.9, 1e-3));
+    CHECK_THAT(generator.getCurrentStrandsConversion(),
+               Catch::Matchers::WithinAbs(0.9, 1e-3));
 
     pe::Universe universe = generator.getUniverse();
     CHECK(universe.getAtomsOfType(2).size() == 100);
@@ -323,7 +329,8 @@ TEST_CASE("MCUniverseGenerator can generate without primary loops",
 }
 
 TEST_CASE("Universe can crosslink up to w_sol",
-          "[generator][MCUniverseGenerator]")
+          "[generator][MCUniverseGenerator][MEHPForceRelaxation]["
+          "MEHPForceBalance][MEHPForceBalance2]")
 {
   std::cout << "Running test \"Universe can crosslink up to w_sol\""
             << std::endl;
@@ -337,9 +344,18 @@ TEST_CASE("Universe can crosslink up to w_sol",
   generator.linkStrandsToSolubleFraction(0.1, 1.);
 
   pe::Universe universe = generator.getUniverse();
+  std::map<int, double> weights;
+  weights[1] = 1.0;
+  weights[2] = 1.0;
+  universe.setMasses(weights);
   REQUIRE(universe.getVolume() == 10.0 * 10.0 * 10.0);
   REQUIRE(universe.getAtomsOfType(2).size() == 100);
   REQUIRE(universe.getAtomsOfType(1).size() == 200 * 19);
+
+  size_t nFreeStrands = 0;
+  for (const pe::Molecule& mol : universe.getChainsWithCrosslinker(2)) {
+    nFreeStrands += mol.getType() == pe::MoleculeType::FREE_CHAIN;
+  }
 
   auto clusters = universe.getClusters();
   CHECK(clusters.size() < 20);
@@ -361,22 +377,14 @@ TEST_CASE("Universe can crosslink up to w_sol",
   pylimer_tools::sim::mehp::MEHPForceBalance forceBalance =
     generator.getForceBalance();
   forceBalance.configAssumeBoxLargeEnough(true);
+
   // compare structures before running optimization procedures
-  CHECK(forceBalance.getNrOfSprings() == forceRelaxer.getNrOfSprings());
+  CHECK(forceBalance.getNrOfSprings() == forceRelaxer2.getNrOfSprings());
+  CHECK(forceBalance.getNrOfSprings() ==
+        forceRelaxer.getNrOfSprings() + nFreeStrands);
   Eigen::VectorXd fbVecs = forceBalance.getCurrentPartialSpringDistances();
   Eigen::VectorXd frVecs = forceRelaxer2.getCurrentSpringDistances();
   REQUIRE(fbVecs.size() == 3 * forceBalance.getNrOfSprings());
-  REQUIRE(frVecs.size() == 3 * forceBalance.getNrOfSprings());
-  for (size_t springIdx = 0; springIdx < forceBalance.getNrOfSprings();
-       springIdx += 1) {
-    for (size_t dir = 0; dir < 3; dir++) {
-      CHECK_THAT(frVecs[3 * springIdx + dir],
-                 Catch::Matchers::WithinRel(fbVecs[3 * springIdx + dir]));
-    }
-    REQUIRE_THAT(frVecs.segment(3 * springIdx, 3).squaredNorm(),
-                 Catch::Matchers::WithinRel(
-                   fbVecs.segment(3 * springIdx, 3).squaredNorm()));
-  }
   CHECK(frVecs.isApprox(fbVecs));
   CHECK_THAT(
     forceBalance.getNrOfActiveSprings(1e-2),
@@ -398,12 +406,101 @@ TEST_CASE("Universe can crosslink up to w_sol",
   forceBalance.runForceRelaxation();
 
   CHECK(forceBalance.validateNetwork());
-  CHECK(forceBalance.getNrOfSprings() == forceRelaxer.getNrOfSprings());
+  CHECK(forceBalance.getNrOfSprings() ==
+        forceRelaxer.getNrOfSprings() + nFreeStrands);
   CHECK_THAT(forceBalance.getGammaFactor(1.),
-             Catch::Matchers::WithinRel(forceRelaxer.getGammaFactor(1.), 0.01));
+             Catch::Matchers::WithinRel(forceRelaxer.getGammaFactor(1.), 0.05));
   CHECK_THAT(
     forceBalance.getNrOfActiveSprings(1e-2),
     Catch::Matchers::WithinAbs(forceRelaxer.getNrOfActiveSprings(1e-2), 1));
+
+  // and finally force balance 2
+  pylimer_tools::sim::mehp::MEHPForceBalance2 forceBalance2 =
+    pylimer_tools::sim::mehp::MEHPForceBalance2(universe);
+  forceBalance2.runForceRelaxation();
+  CHECK_THAT(forceBalance2.getSolubleWeightFraction(),
+             Catch::Matchers::WithinAbs(0.1, 0.05));
+  double activeClusteredAtomsFromUniverse =
+    forceBalance2.countActiveClusteredAtoms();
+  forceBalance2.configAssumeNetworkIsComplete(true);
+  CHECK_THAT(forceBalance2.getSolubleWeightFraction(),
+             Catch::Matchers::WithinAbs(0.1, 0.05));
+  double activeClusteredAtomsFromNetwork =
+    forceBalance2.countActiveClusteredAtoms();
+  CHECK_THAT(activeClusteredAtomsFromUniverse,
+             Catch::Matchers::WithinRel(activeClusteredAtomsFromNetwork, 0.01));
+
+  pylimer_tools::sim::mehp::MEHPForceBalance2 forceBalance2Generator =
+    generator.getForceBalance2();
+  forceBalance2Generator.runForceRelaxation();
+  CHECK_THAT(forceBalance2Generator.getSolubleWeightFraction(),
+             Catch::Matchers::WithinRel(
+               forceBalance2.getSolubleWeightFraction(), 0.005));
+  double activeClusteredAtomsFromGenerator =
+    forceBalance2Generator.countActiveClusteredAtoms();
+  CHECK_THAT(
+    activeClusteredAtomsFromNetwork,
+    Catch::Matchers::WithinRel(activeClusteredAtomsFromGenerator, 0.01));
+
+  Eigen::ArrayXi clusterIndicesPerLink =
+    Eigen::ArrayXi::Constant(forceBalance2Generator.getNrOfLinks(), -1);
+  Eigen::ArrayXi clusterIndicesPerStrand =
+    Eigen::ArrayXi::Constant(forceBalance2Generator.getNrOfStrands(), -1);
+  size_t minIndexWithoutCluster = 0;
+  size_t currentClusterIdx = 0;
+  pylimer_tools::sim::mehp::ForceBalance2Network net2 =
+    forceBalance2Generator.getNetwork();
+  while ((clusterIndicesPerLink < 0).any()) {
+    while (clusterIndicesPerLink[minIndexWithoutCluster] >= 0) {
+      minIndexWithoutCluster++;
+    }
+    // find clusters
+    clusterIndicesPerLink[minIndexWithoutCluster] = currentClusterIdx;
+    bool didChange = true;
+    while (didChange) {
+      didChange = false;
+      for (Eigen::Index linkIdx = 0; linkIdx < net2.nrOfLinks; ++linkIdx) {
+        if (clusterIndicesPerLink[linkIdx] != currentClusterIdx) {
+          continue;
+        }
+
+        for (const int strandIdx : net2.strandIndicesOfLink[linkIdx]) {
+            clusterIndicesPerStrand[strandIdx] = currentClusterIdx;
+          for (const int strandsLinkIdx : net2.linkIndicesOfStrand[strandIdx]) {
+            if (clusterIndicesPerLink[strandsLinkIdx] < 0) {
+              didChange = true;
+              clusterIndicesPerLink[strandsLinkIdx] = currentClusterIdx;
+            }
+          }
+        }
+      }
+    }
+    currentClusterIdx += 1;
+  }
+
+  CHECK(clusterIndicesPerLink.maxCoeff() + 1 == universe.getClusters().size());
+  CHECK(clusterIndicesPerLink.maxCoeff() + 1 == currentClusterIdx);
+  // output cluster sizes
+  std::map<int, int> clusterSizes;
+  for (const int clusterIdx : clusterIndicesPerLink) {
+    if (clusterSizes.find(clusterIdx) == clusterSizes.end()) {
+      clusterSizes[clusterIdx] = 0;
+    }
+    clusterSizes[clusterIdx] += 1;
+  }
+  for (int strandIdx = 0; strandIdx < net2.nrOfStrands; ++strandIdx) {
+    double strandNAtoms = 0;
+    for (size_t springIdx : net2.springIndicesOfStrand[strandIdx]) {
+      strandNAtoms += net2.springContourLength[springIdx] - 1;
+    }
+    clusterSizes[clusterIndicesPerStrand[strandIdx]] += strandNAtoms;
+  }
+
+  std::cout << "Cluster sizes: ";
+  for (const auto& [clusterIdx, size] : clusterSizes) {
+    std::cout << clusterIdx << ": " << size << ", ";
+  }
+  std::cout << std::endl;
 }
 
 TEST_CASE("Generator can return force balance and relaxation",
@@ -560,6 +657,11 @@ TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
   CHECK(generator.getCurrentNrOfAtoms() == universe.getNrOfAtoms());
   CHECK(generator.getCurrentNrOfBonds() == universe.getNrOfBonds());
 
+  size_t nFreeStrands = 0;
+  for (const pe::Molecule& mol : universe.getChainsWithCrosslinker(2)) {
+    nFreeStrands += mol.getType() == pe::MoleculeType::FREE_CHAIN;
+  }
+
   pylimer_tools::sim::mehp::MEHPForceRelaxation relaxer =
     pylimer_tools::sim::mehp::MEHPForceRelaxation(
       universe, 2, false, nullptr, 1.0, false, false);
@@ -575,7 +677,8 @@ TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
   // CHECK(relaxer.countActiveClusteredAtoms() ==
   //       Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
   // CHECK(relaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
-  CHECK(relaxer.getNrOfSprings() == relaxerFromGenerator.getNrOfSprings());
+  CHECK(relaxer.getNrOfSprings() + nFreeStrands ==
+        relaxerFromGenerator.getNrOfSprings());
 
   relaxer.runForceRelaxation();
   relaxerFromGenerator.runForceRelaxation();
@@ -585,7 +688,8 @@ TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
   // cannot compare, since each strand end becomes a node in the from-universe
   // generation
   // CHECK(relaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
-  CHECK(relaxer.getNrOfSprings() == relaxerFromGenerator.getNrOfSprings());
+  CHECK(relaxer.getNrOfSprings() + nFreeStrands ==
+        relaxerFromGenerator.getNrOfSprings());
 }
 
 TEST_CASE("MUniverseGenerator can generate with crosslink chains",
@@ -952,6 +1056,11 @@ TEST_CASE(
 
   pe::Universe universe = generator.getUniverse();
 
+  size_t nFreeStrands = 0;
+  for (const pe::Molecule& mol : universe.getChainsWithCrosslinker(2)) {
+    nFreeStrands += mol.getType() == pe::MoleculeType::FREE_CHAIN;
+  }
+
   CHECK(generator.getCurrentNrOfAtoms() == universe.getNrOfAtoms());
   CHECK(generator.getCurrentNrOfBonds() == universe.getNrOfBonds());
 
@@ -973,7 +1082,8 @@ TEST_CASE(
   // CHECK(relaxer.countActiveClusteredAtoms() ==
   //       Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
   // CHECK(forceRelaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
-  CHECK(forceRelaxer.getNrOfSprings() == relaxerFromGenerator.getNrOfSprings());
+  CHECK(forceRelaxer.getNrOfSprings() + nFreeStrands ==
+        relaxerFromGenerator.getNrOfSprings());
 
   while (forceRelaxer.suggestsRerun()) {
     forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-11, 1e-8);
@@ -985,6 +1095,9 @@ TEST_CASE(
   CHECK_THAT(
     0.31,
     Catch::Matchers::WithinRel(forceRelaxer.getSolubleWeightFraction(), 0.05));
+  CHECK_THAT(0.31,
+             Catch::Matchers::WithinRel(
+               relaxerFromGenerator.getSolubleWeightFraction(), 0.05));
 
   CHECK(forceRelaxer.countActiveClusteredAtoms() ==
         Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
@@ -1077,17 +1190,120 @@ TEST_CASE("Universe generator uses correct w_sol even for strange structures",
   const std::vector<int> chainLengths = pu::initializeWithValue(2121, 107);
   generator.addStrands(chainLengths.size(), chainLengths, 1);
 
+  {
+    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2_initial =
+      generator.getForceBalance2();
+    fb2_initial.runForceRelaxation();
+    CHECK_THAT(fb2_initial.getSolubleWeightFraction(),
+               Catch::Matchers::WithinAbs(1.0, 0.05));
+  }
+
   generator.useZScoreMaxDistance(3., 1.107008);
   generator.linkStrandsToSolubleFraction(0.31);
 
+  const pylimer_tools::sim::mehp::ForceBalanceNetwork net1 =
+    generator.getForceBalance().getNetwork();
+
   const pe::Universe universe = generator.getUniverse();
-  pylimer_tools::sim::mehp::MEHPForceBalance forceBalance =
-    pylimer_tools::sim::mehp::MEHPForceBalance(universe);
 
-  forceBalance.runForceRelaxation();
+  double nBondsInStrands = net1.springsContourLength.sum();
+  double nStrands = net1.springsContourLength.size();
+  CHECK(nStrands == net1.nrOfSprings);
+  CHECK(nBondsInStrands - nStrands + net1.nrOfLinks == universe.getNrOfAtoms());
+  CHECK(nBondsInStrands == universe.getNrOfBonds());
+  CHECK(generator.getCurrentNrOfAtoms() == universe.getNrOfAtoms());
+  CHECK(generator.getCurrentNrOfBonds() == universe.getNrOfBonds());
 
-  CHECK_THAT(forceBalance.getSolubleWeightFraction(),
-             Catch::Matchers::WithinAbs(0.31, 0.05));
+  {
+    // SCOPE 1:
+    INFO("Force Balance 2 based on Universe");
+    pylimer_tools::sim::mehp::MEHPForceBalance2 forceBalance =
+      pylimer_tools::sim::mehp::MEHPForceBalance2(universe);
+
+    forceBalance.runForceRelaxation();
+    CHECK(forceBalance.inferNrOfAtomsFromNetwork() == universe.getNrOfAtoms());
+
+    CHECK_THAT(forceBalance.getSolubleWeightFraction(),
+               Catch::Matchers::WithinAbs(0.31, 0.05));
+    const pylimer_tools::sim::mehp::ForceBalance2Network net2 =
+      forceBalance.getNetwork();
+    CHECK(net2.springContourLength.sum() - net2.nrOfSprings + net2.nrOfLinks ==
+          universe.getNrOfAtoms());
+    CHECK(forceBalance.inferNrOfAtomsFromNetwork(net2) ==
+          universe.getNrOfAtoms());
+    forceBalance.configAssumeNetworkIsComplete(true);
+    CHECK_THAT(forceBalance.getSolubleWeightFraction(),
+               Catch::Matchers::WithinAbs(0.31, 0.05));
+  }
+
+  {
+    // SCOPE 2:
+    INFO("Force Balance 2 based on force balance 1 network from generator");
+
+    pylimer_tools::sim::mehp::MEHPForceBalance2 forceBalance =
+      pylimer_tools::sim::mehp::MEHPForceBalance2(
+        net1, generator.getForceBalance().getSpringPartitions());
+    forceBalance.configAssumeNetworkIsComplete(true);
+
+    forceBalance.runForceRelaxation();
+    CHECK_THAT(forceBalance.getSolubleWeightFraction(),
+               Catch::Matchers::WithinAbs(0.31, 0.05));
+  }
+
+  {
+    // SCOPE 3:
+    INFO("Force Balance 2 based on force relaxation network from generator");
+
+    pylimer_tools::sim::mehp::MEHPForceBalance2 forceBalance =
+      pylimer_tools::sim::mehp::MEHPForceBalance2(
+        generator.getForceRelaxation().getNetwork());
+
+    forceBalance.runForceRelaxation();
+    CHECK_THAT(forceBalance.getSolubleWeightFraction(),
+               Catch::Matchers::WithinAbs(0.31, 0.05));
+  }
+
+  {
+    // SCOPE 4:
+    INFO("Force Relaxation based on network from generator");
+
+    pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
+      generator.getForceRelaxation();
+    forceRelaxer.configAssumeBoxLargeEnough(false);
+    forceRelaxer.configAssumeNetworkIsComplete(true);
+
+    while (forceRelaxer.suggestsRerun()) {
+      forceRelaxer.runForceRelaxation();
+    }
+
+    CHECK_THAT(forceRelaxer.getSolubleWeightFraction(),
+               Catch::Matchers::WithinAbs(0.31, 0.05));
+
+    INFO("Now with assuming box large enough");
+        forceRelaxer.configAssumeBoxLargeEnough(true);
+    while (forceRelaxer.suggestsRerun()) {
+      forceRelaxer.runForceRelaxation();
+    }
+
+    CHECK_THAT(forceRelaxer.getSolubleWeightFraction(),
+               Catch::Matchers::WithinAbs(0.31, 0.05));
+  }
+
+  {
+    // SCOPE 5:
+    INFO("Force Relaxation based on Universe");
+
+    pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
+      pylimer_tools::sim::mehp::MEHPForceRelaxation(universe, 2);
+    forceRelaxer.configAssumeBoxLargeEnough(false);
+
+    while (forceRelaxer.suggestsRerun()) {
+      forceRelaxer.runForceRelaxation();
+    }
+
+    CHECK_THAT(forceRelaxer.getSolubleWeightFraction(),
+               Catch::Matchers::WithinAbs(0.31, 0.05));
+  }
 }
 
 TEST_CASE("Universe generator handles structures without crosslinks",

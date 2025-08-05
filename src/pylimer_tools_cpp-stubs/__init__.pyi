@@ -15,7 +15,7 @@ import numpy
 import pybind11_stubgen.typing_ext
 import scipy.sparse
 import typing
-__all__ = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NeighbourList', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'OutputConfiguration', 'SLESolver', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'randomly_sample_entanglements', 'split_csv', 'version_information']
+__all__ = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'BackTrackStatus', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NeighbourList', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'OutputConfiguration', 'SLESolver', 'STOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'TRACK_BACKWARD', 'TRACK_FORWARD', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'randomly_sample_entanglements', 'split_csv', 'version_information']
 class Atom:
     """
     
@@ -410,6 +410,50 @@ class AveFileReader:
                  
                  :return: Number of rows
         """
+class BackTrackStatus:
+    """
+    
+         Enum for controlling the strand linking process in linkStrandsCallback.
+         
+    
+    Members:
+    
+      STOP : Stop the linking process
+    
+      TRACK_FORWARD : Continue linking forward
+    
+      TRACK_BACKWARD : Track backward in the linking process
+    """
+    STOP: typing.ClassVar[BackTrackStatus]  # value = <BackTrackStatus.STOP: 0>
+    TRACK_BACKWARD: typing.ClassVar[BackTrackStatus]  # value = <BackTrackStatus.TRACK_BACKWARD: 2>
+    TRACK_FORWARD: typing.ClassVar[BackTrackStatus]  # value = <BackTrackStatus.TRACK_FORWARD: 1>
+    __members__: typing.ClassVar[dict[str, BackTrackStatus]]  # value = {'STOP': <BackTrackStatus.STOP: 0>, 'TRACK_FORWARD': <BackTrackStatus.TRACK_FORWARD: 1>, 'TRACK_BACKWARD': <BackTrackStatus.TRACK_BACKWARD: 2>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: int) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: int) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
 class Box:
     """
     
@@ -1529,11 +1573,18 @@ class MCUniverseGenerator:
     def disable_max_distance(self) -> None:
         ...
     def get_current_crosslinker_conversion(self) -> float:
-        ...
+        """
+                 Get the current conversion of crosslinkers, i.e., the fraction of crosslinkers
+                 that have been linked to strands.
+        """
     def get_current_nr_of_atoms(self) -> int:
         ...
     def get_current_nr_of_bonds(self) -> int:
         ...
+    def get_current_strand_conversion(self) -> float:
+        """
+                 Get the current conversion of strands, i.e., the fraction of strand ends that have been consumed.
+        """
     def get_force_balance(self) -> ...:
         """
                  Get an instance of the force balance procedure.
@@ -1603,6 +1654,20 @@ class MCUniverseGenerator:
         
                   :param strand_idx: Index of the strand to be linked.
                   :param link_idx: Index of the crosslinker to be linked.
+        """
+    def link_strands_callback(self, linking_controller: typing.Callable[[MCUniverseGenerator, int], BackTrackStatus], c_infinity: float = 1.0) -> None:
+        """
+                    Link strands to crosslinkers using a custom callback function to control when to stop.
+        
+                    The callback function receives the current MCUniverseGenerator state and the current step number,
+                    and should return a BackTrackStatus value:
+                    - STOP: Stop the linking process
+                    - TRACK_FORWARD: Continue linking, make more bonds
+                    - TRACK_BACKWARD: Track backward in the linking process, i.e., remove bonds again
+        
+                    :param linking_controller: Callback function that controls the linking process. 
+                                              Function signature: (MCUniverseGenerator, int) -> BackTrackStatus
+                    :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
         """
     def link_strands_to_conversion(self, crosslinker_conversion: float, c_infinity: float = 1.0) -> None:
         """
@@ -1833,7 +1898,7 @@ class MEHPForceBalance:
         """
     def get_crosslinker_universe(self) -> Universe:
         """
-                  Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
+                   Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
         """
     def get_current_spring_lengths(self) -> list[float]:
         """
@@ -1959,7 +2024,7 @@ class MEHPForceBalance:
         ...
     def get_nr_of_iterations(self) -> int:
         """
-                  Returns the number of iterations used for force relaxation so far.
+                   Returns the number of iterations used for force relaxation so far.
         """
     def get_nr_of_nodes(self) -> int:
         """
@@ -2152,6 +2217,20 @@ class MEHPForceBalance2:
         """
     def __setstate__(self, arg0: tuple) -> None:
         ...
+    def config_assume_network_is_complete(self, assume_network_is_complete: bool = False) -> None:
+        """
+                   Configure whether the network is assumed to be complete.
+        
+                   This assumption means, that the `universe` instance is not queried for clusters when
+                   computing the fraction of e.g. the soluble or dangling strands.
+                   Do not set this to true if inactive
+                   (dangling or free) strands have been removed from the network.
+        
+                   This is useful to reduce memory between MC generator and force balance,
+                   since the universe representation with all the in-between beads does not need to be stored.
+                   However, currently, the removal procedures are not loss-free.
+                   Therefore, use this with care.
+        """
     def config_mean_bond_length(self, b: float = 1.0) -> None:
         """
               Configure the :math:`b` used e.g. for the topological Gamma-factor.
@@ -2425,6 +2504,8 @@ class MEHPForceBalance2:
                    Otherwise, it returns true.
         
                    Can be used e.g. as :code:`assert fb.validate_network()`.
+        
+                   :return: True if validation passes, raises exception otherwise
         """
     @property
     def network(self) -> SimplifiedBalance2Network:
@@ -2495,6 +2576,15 @@ class MEHPForceRelaxation:
                   :param epsilon: The epsilon value to use for the rerun check
                        (See: :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.requires_another_run`)
         """
+    @typing.overload
+    def config_step_output(self, output_configuration: list[OutputConfiguration]) -> None:
+        """
+                  Set which values to log during the simulation.
+        
+                  :param output_configuration: An OutputConfiguration struct or list of OutputConfiguration structs
+                                              specifying what values to log and how often
+        """
+    @typing.overload
     def config_step_output(self, output_configuration: list[OutputConfiguration]) -> None:
         """
                   Set which values to log during the simulation.
@@ -2516,6 +2606,12 @@ class MEHPForceRelaxation:
                   :param tolerance: Springs under this length are considered inactive
                   :return: List of active crosslinker chains
         """
+    def get_average_contour_length(self) -> float:
+        """
+                  Get the average contour length of all springs.
+        
+                  :return: The average contour length
+        """
     def get_average_spring_length(self) -> float:
         """
                   Get the average length of the springs. Note that in contrast to :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor`,
@@ -2528,6 +2624,12 @@ class MEHPForceRelaxation:
                   Returns the universe [of crosslinkers] with the positions of the current state of the simulation.
         
                   :return: A Universe object containing the crosslinkers with updated positions
+        """
+    def get_current_spring_distances(self) -> numpy.ndarray:
+        """
+                  Get the current spring distances.
+        
+                  :return: A vector containing the current spring distance vectors
         """
     def get_dangling_weight_fraction(self, tolerance: float = 0.001) -> float:
         """
@@ -2625,6 +2727,13 @@ class MEHPForceRelaxation:
                   :param tolerance: Springs under this length are considered inactive
                   :return: The number of active springs
         """
+    def get_nr_of_active_springs_connected(self, tolerance: float = 0.05) -> numpy.ndarray:
+        """
+                  Returns the number of active springs connected to each node.
+        
+                  :param tolerance: Springs under this length are considered inactive
+                  :return: Vector with the number of active springs for each node
+        """
     def get_nr_of_iterations(self) -> int:
         """
                   Returns the number of iterations used for force relaxation.
@@ -2671,6 +2780,12 @@ class MEHPForceRelaxation:
         
                   :param tolerance: Springs under this length are considered inactive
                   :return: The soluble weight fraction
+        """
+    def get_spring_contour_length(self) -> numpy.ndarray:
+        """
+                  Get the spring contour lengths.
+        
+                  :return: A vector containing the contour lengths of all springs
         """
     def get_spring_distances(self) -> numpy.ndarray:
         """
@@ -2721,6 +2836,13 @@ class MEHPForceRelaxation:
                   Reset the currently used force evaluator.
                   
                   :param force_evaluator: The new force evaluator to use
+        """
+    @property
+    def network(self) -> SimplifiedNetwork:
+        """
+                  Get the network structure.
+        
+                  :return: The network structure used in the simulation
         """
 class MaxDistanceProvider:
     """
@@ -3323,7 +3445,7 @@ class OutputConfiguration:
         """
                             List of double-valued quantities to output.
                             
-                            Use ComputedDoubleValues enum to specify which floating-point quantities
+                            Use :class:`~pylimer_tools_cpp.ComputedDoubleValues` enum to specify which floating-point quantities
                             should be computed and written to output.
         """
     @double_values.setter
@@ -3343,7 +3465,7 @@ class OutputConfiguration:
         """
                             List of integer-valued quantities to output.
                             
-                            Use ComputedIntValues enum to specify which integer quantities
+                            Use :class:`~pylimer_tools_cpp.ComputedIntValues` enum to specify which integer quantities
                             should be computed and written to output.
         """
     @int_values.setter
@@ -3644,6 +3766,12 @@ class SimplifiedNetwork:
          Consists usually only of the crosslinkers.
      
     """
+    @property
+    def assume_box_large_enough(self) -> bool:
+        ...
+    @property
+    def assume_complete(self) -> bool:
+        ...
     @property
     def box_lengths(self) -> typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)]:
         ...
@@ -4284,6 +4412,13 @@ class Universe:
                     
                     :return: The volume of the simulation box
         """
+    def has_atom_with_id(self, atom_id: int) -> bool:
+        """
+                 Check whether this universe contains an atom with the specified ID.
+        
+                 :param atom_id: The atom ID to check
+                 :return: True if the atom exists in this universe, False otherwise
+        """
     def has_infinite_strand(self, arg0: int, arg1: int) -> bool:
         """
                    Check whether there is a strand (with crosslinker) in the universe that loops through periodic images without coming back.
@@ -4663,4 +4798,7 @@ def version_information() -> str:
     """
         Returns  a string of the the current version, incl. git hash and date of compilation.
     """
+STOP: BackTrackStatus  # value = <BackTrackStatus.STOP: 0>
+TRACK_BACKWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_BACKWARD: 2>
+TRACK_FORWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_FORWARD: 1>
 __version__: str = ''

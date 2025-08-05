@@ -217,7 +217,7 @@ static inline std::vector<double>
 segmentwise_norm(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
 {
   INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
-  size_t vecSize = static_cast<size_t>(vecs.size());
+  const size_t vecSize = static_cast<size_t>(vecs.size());
   INVALIDARG_EXP_IFN(vecSize % segmentSize == 0,
                      "The size of the supplied vector, " +
                        std::to_string(vecSize) +
@@ -253,7 +253,7 @@ static inline double
 segmentwise_norm_max(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
 {
   INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
-  size_t vecSize = static_cast<size_t>(vecs.size());
+  const size_t vecSize = static_cast<size_t>(vecs.size());
   INVALIDARG_EXP_IFN(vecSize % segmentSize == 0,
                      "The size of the supplied vector, " +
                        std::to_string(vecSize) +
@@ -289,14 +289,14 @@ static inline double
 segmentwise_norm_mean(const Eigen::VectorXd& vecs, const size_t segmentSize = 3)
 {
   INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a usable size");
-  size_t vecSize = static_cast<size_t>(vecs.size());
+  const size_t vecSize = static_cast<size_t>(vecs.size());
   INVALIDARG_EXP_IFN(vecSize % segmentSize == 0,
                      "The size of the supplied vector, " +
                        std::to_string(vecSize) +
                        " is not a multiple of the segment size, " +
                        std::to_string(segmentSize) + ".");
   double result = 0.; //-DBL_MAX;
-  double denominator = 1. / static_cast<double>(vecSize / segmentSize);
+  const double denominator = 1. / static_cast<double>(vecSize / segmentSize);
 
   for (size_t i = 0; i < vecSize / segmentSize; i++) {
     const double norm = vecs
@@ -888,7 +888,7 @@ template<typename IN>
 static inline void
 eraseIndices(std::vector<IN> from, std::vector<long int>& indices)
 {
-  for (auto index : indices) {
+  for (const auto index : indices) {
     from.erase(static_cast<size_t>(index));
   }
 }
@@ -910,7 +910,7 @@ MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(igraph_vector_int);
 static inline void
 StdVectorToIgraphVectorT(std::vector<std::string>& vectR, igraph_strvector_t* v)
 {
-  igraph_integer_t n = static_cast<igraph_integer_t>(vectR.size());
+  const igraph_integer_t n = static_cast<igraph_integer_t>(vectR.size());
   igraph_strvector_resize(v, n);
   for (igraph_integer_t i = 0; i < n; ++i) {
     igraph_strvector_set(v, i, vectR[static_cast<size_t>(i)].c_str());

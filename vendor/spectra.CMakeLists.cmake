@@ -1,4 +1,4 @@
-# load the spectra library
+# load the Spectra library
 include(FetchContent)
 
 FetchContent_Declare(

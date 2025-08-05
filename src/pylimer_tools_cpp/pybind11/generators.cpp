@@ -6,6 +6,7 @@
 #include "../utils/RandomWalker.h"
 
 #include <pybind11/eigen.h>
+#include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <string>
@@ -82,6 +83,18 @@ init_pylimer_bound_generators(py::module_& m)
          &NoMaxDistanceProvider::getMaxDistance,
          "",
          py::arg("N"));
+
+  py::enum_<BackTrackStatus>(m, "BackTrackStatus", R"pbdoc(
+     Enum for controlling the strand linking process in linkStrandsCallback.
+     )pbdoc")
+    .value("STOP", BackTrackStatus::STOP, "Stop the linking process")
+    .value("TRACK_FORWARD",
+           BackTrackStatus::TRACK_FORWARD,
+           "Continue linking forward")
+    .value("TRACK_BACKWARD",
+           BackTrackStatus::TRACK_BACKWARD,
+           "Track backward in the linking process")
+    .export_values();
 
   py::class_<MCUniverseGenerator>(m, "MCUniverseGenerator", R"pbdoc(
        A :obj:`pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
@@ -361,6 +374,23 @@ init_pylimer_bound_generators(py::module_& m)
             )pbdoc",
          py::arg("soluble_fraction"),
          py::arg("c_infinity") = 1.)
+    .def("link_strands_callback",
+         &MCUniverseGenerator::linkStrandsCallback,
+         R"pbdoc(
+            Link strands to crosslinkers using a custom callback function to control when to stop.
+
+            The callback function receives the current MCUniverseGenerator state and the current step number,
+            and should return a BackTrackStatus value:
+            - STOP: Stop the linking process
+            - TRACK_FORWARD: Continue linking, make more bonds
+            - TRACK_BACKWARD: Track backward in the linking process, i.e., remove bonds again
+
+            :param linking_controller: Callback function that controls the linking process. 
+                                      Function signature: (MCUniverseGenerator, int) -> BackTrackStatus
+            :param c_infinity: As needed for the end-to-end distribution, given by :math:`\langle R^2\rangle_0 = C_{\infty} N b^2`.
+            )pbdoc",
+         py::arg("linking_controller"),
+         py::arg("c_infinity") = 1.)
     .def("remove_soluble_fraction",
          &MCUniverseGenerator::removeSolubleFraction,
          R"pbdoc(
@@ -376,7 +406,16 @@ init_pylimer_bound_generators(py::module_& m)
     .def("get_current_nr_of_atoms", &MCUniverseGenerator::getCurrentNrOfAtoms)
     .def("get_current_nr_of_bonds", &MCUniverseGenerator::getCurrentNrOfBonds)
     .def("get_current_crosslinker_conversion",
-         &MCUniverseGenerator::getCurrentCrosslinkerConversion)
+         &MCUniverseGenerator::getCurrentCrosslinkerConversion,
+         R"pbdoc(
+         Get the current conversion of crosslinkers, i.e., the fraction of crosslinkers
+         that have been linked to strands.
+    )pbdoc")
+    .def("get_current_strand_conversion",
+         &MCUniverseGenerator::getCurrentStrandsConversion,
+         R"pbdoc(
+         Get the current conversion of strands, i.e., the fraction of strand ends that have been consumed.
+         )pbdoc")
     .def("validate", &MCUniverseGenerator::validateInternalState, R"pbdoc(
          Check whether the internal state of the generator is valid.
          Throws errors if not. 

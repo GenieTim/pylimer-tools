@@ -91,7 +91,8 @@ private:
 
   void printSection(const unsigned int idx, const double total) const
   {
-    std::pair<std::string, double> timeConversion = this->formatTime(total);
+    const std::pair<std::string, double> timeConversion =
+      this->formatTime(total);
     std::string unit = timeConversion.first;
     double conversionFactor = timeConversion.second;
 
@@ -172,7 +173,7 @@ public:
     std::chrono::duration duration = end - this->startTime;
     long int us =
       (std::chrono::duration_cast<std::chrono::microseconds>(duration)).count();
-    double numMeasurementsBefore =
+    const double numMeasurementsBefore =
       static_cast<double>(this->sectionNumMeasurements[this->currentSection]);
     this->sectionNumMeasurements[this->currentSection] += 1;
     double denominator =
@@ -233,7 +234,7 @@ public:
 
     std::cout << "\n";
 
-    std::pair<std::string, double> totalTimeConversion =
+    const std::pair<std::string, double> totalTimeConversion =
       this->formatTime(total);
     // std::pair<double, std::string> meanTimeConversion =
     // this->formatTime(total/(static_cast<double>(numMeasurements)));

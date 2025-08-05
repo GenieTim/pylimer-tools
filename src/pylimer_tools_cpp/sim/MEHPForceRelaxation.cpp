@@ -561,7 +561,7 @@ MEHPForceRelaxation::countActiveClusteredAtoms(Network* net,
   // and we should fall back to counting what we have,
   // assuming that the network is complete, i.e., no dangling chains
   // had been omitted
-  if (this->universe.getNrOfAtoms() == 0) {
+  if (net->assumeComplete) {
     const std::pair<Eigen::ArrayXb, Eigen::ArrayXb> clusteredToActive =
       this->findClusteredToActive(net, tolerance);
     // find all active springs
@@ -578,6 +578,11 @@ MEHPForceRelaxation::countActiveClusteredAtoms(Network* net,
     const double activeNodes = nodeIsActive.count();
     return ((allActiveAtomsPerChains).matrix().sum() + activeNodes);
   }
+
+  INVALIDARG_EXP_IFN(
+    this->universe.getNrOfAtoms() > net->nrOfNodes,
+    "Cannot compute active clustered atoms if the universe does not "
+    "correspond to the universe. ");
 
   // because our internal structure may not contain the full universe,
   // i.e., e.g., dangling chains have been omitted,

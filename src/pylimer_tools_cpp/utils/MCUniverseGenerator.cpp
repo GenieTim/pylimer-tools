@@ -2,8 +2,8 @@
 
 namespace pylimer_tools::utils {
 void
-MCUniverseGenerator::setBeadDistance(double newBeadDistance,
-                                     bool updateMeanSquared)
+MCUniverseGenerator::setBeadDistance(const double newBeadDistance,
+                                     const bool updateMeanSquared)
 {
   INVALIDARG_EXP_IFN(newBeadDistance > 0, "Invalid mean bead distance");
   INVALIDARG_EXP_IFN(std::isfinite(newBeadDistance),
@@ -19,8 +19,8 @@ MCUniverseGenerator::setBeadDistance(double newBeadDistance,
 
 void
 MCUniverseGenerator::setMeanSquaredBeadDistance(
-  double newMeanSquaredBeadDistance,
-  bool updateMean)
+  const double newMeanSquaredBeadDistance,
+  const bool updateMean)
 {
   INVALIDARG_EXP_IFN(newMeanSquaredBeadDistance > 0,
                      "Invalid mean squared bead distance");
@@ -36,7 +36,7 @@ MCUniverseGenerator::setMeanSquaredBeadDistance(
 
 void
 MCUniverseGenerator::configPrimaryLoopProbability(
-  double newPrimaryLoopProbability)
+  const double newPrimaryLoopProbability)
 {
   INVALIDARG_EXP_IFN(newPrimaryLoopProbability >= 0,
                      "Invalid primary loop formation probability");
@@ -45,7 +45,7 @@ MCUniverseGenerator::configPrimaryLoopProbability(
 
 void
 MCUniverseGenerator::configSecondaryLoopProbability(
-  double newSecondaryLoopProbability)
+  const double newSecondaryLoopProbability)
 {
   INVALIDARG_EXP_IFN(newSecondaryLoopProbability >= 0,
                      "Invalid secondary loop formation probability");
@@ -89,9 +89,9 @@ MCUniverseGenerator::getUniverse()
 #endif
 
   entities::Universe universe = entities::Universe(this->box);
-  size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
-  long int nrOfAtoms = this->getCurrentNrOfAtoms();
-  std::vector<int> zeros = initializeWithValue(nrOfAtoms, 0);
+  const size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+  const long int nrOfAtoms = this->getCurrentNrOfAtoms();
+  const std::vector<int> zeros = initializeWithValue(nrOfAtoms, 0);
   std::vector<double> xs;
   xs.reserve(nrOfAtoms);
   std::vector<double> ys;
@@ -120,8 +120,8 @@ MCUniverseGenerator::getUniverse()
   // Sample the strands
   assert(this->simplifiedUniverse.strandFrom.size() ==
          this->simplifiedUniverse.strandTo.size());
-  double prevBeadDistance = this->beadDistance;
-  double prevMeanSquaredBeadDistance = this->meanSquaredBeadDistance;
+  const double prevBeadDistance = this->beadDistance;
+  const double prevMeanSquaredBeadDistance = this->meanSquaredBeadDistance;
   for (size_t strandI = 0; strandI < this->simplifiedUniverse.strandFrom.size();
        ++strandI) {
     this->beadDistance = this->simplifiedUniverse.beadDistanceInStrand[strandI];
@@ -129,9 +129,9 @@ MCUniverseGenerator::getUniverse()
       this->simplifiedUniverse.meanSquaredBeadDistanceInStrand[strandI];
     // sample the bead coordinates, depending on the type of strand
     Eigen::VectorXd coordinates;
-    long int strandEnd1 = this->simplifiedUniverse.strandFrom[strandI];
-    long int strandEnd2 = this->simplifiedUniverse.strandTo[strandI];
-    int nBeadsInStrand = this->simplifiedUniverse.beadsInStrand[strandI];
+    const long int strandEnd1 = this->simplifiedUniverse.strandFrom[strandI];
+    const long int strandEnd2 = this->simplifiedUniverse.strandTo[strandI];
+    const int nBeadsInStrand = this->simplifiedUniverse.beadsInStrand[strandI];
     if (strandEnd1 < 0) {
       RUNTIME_EXP_IFN(
         strandEnd2 < 0,
@@ -199,18 +199,18 @@ MCUniverseGenerator::getUniverse()
 }
 
 void
-MCUniverseGenerator::addCrosslinkersAt(Eigen::VectorXd coordinates,
-                                       int crosslinkerFunctionality,
-                                       int crossLinkerAtomType)
+MCUniverseGenerator::addCrosslinkersAt(const Eigen::VectorXd& coordinates,
+                                       const int crosslinkerFunctionality,
+                                       const int crossLinkerAtomType)
 {
   INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
                      "Length of coordinates must be a multiple of 3");
   INVALIDARG_EXP_IFN(crosslinkerFunctionality >= 0,
                      "Expecting positive crosslinker functionality, got " +
                        std::to_string(crosslinkerFunctionality) + ".");
-  int nCrosslinkerBefore = this->remainingCrossLinkerFunctionality.size();
+  const int nCrosslinkerBefore = this->remainingCrossLinkerFunctionality.size();
 
-  size_t nrOfCrosslinkers = coordinates.size() / 3;
+  const size_t nrOfCrosslinkers = coordinates.size() / 3;
 
   this->addXlinkAtoms(nrOfCrosslinkers, crossLinkerAtomType, coordinates);
 
@@ -230,12 +230,12 @@ MCUniverseGenerator::addCrosslinkersAt(Eigen::VectorXd coordinates,
 }
 
 void
-MCUniverseGenerator::addCrosslinkers(int nrOfCrosslinkers,
-                                     int crosslinkerFunctionality,
-                                     int crossLinkerAtomType,
-                                     bool whiteNoise)
+MCUniverseGenerator::addCrosslinkers(const int nrOfCrosslinkers,
+                                     const int crosslinkerFunctionality,
+                                     const int crossLinkerAtomType,
+                                     const bool whiteNoise)
 {
-  Eigen::VectorXd randomPos =
+  const Eigen::VectorXd randomPos =
     this->generateRandomPositions(nrOfCrosslinkers, whiteNoise);
 
   this->addCrosslinkersAt(
@@ -244,13 +244,13 @@ MCUniverseGenerator::addCrosslinkers(int nrOfCrosslinkers,
 
 void
 MCUniverseGenerator::addRandomlyFunctionalizedStrands(
-  int nrOfStrands,
+  const int nrOfStrands,
   std::vector<int> beadsPerStrand,
   double functionalizationProbability,
-  int crosslinkerFunctionality,
-  int crosslinkerAtomType,
-  int strandAtomType,
-  bool whiteNoise)
+  const int crosslinkerFunctionality,
+  const int crosslinkerAtomType,
+  const int strandAtomType,
+  const bool whiteNoise)
 {
   INVALIDARG_EXP_IFN(nrOfStrands > 0, "Cannot add 0 or less strands");
   INVALIDARG_EXP_IFN(
@@ -269,8 +269,9 @@ MCUniverseGenerator::addRandomlyFunctionalizedStrands(
   this->validateInternalState();
 #endif
 
-  size_t nCrosslinksBefore = this->remainingCrossLinkerFunctionality.size();
-  size_t nStrandsBefore = this->simplifiedUniverse.strandFrom.size();
+  const size_t nCrosslinksBefore =
+    this->remainingCrossLinkerFunctionality.size();
+  const size_t nStrandsBefore = this->simplifiedUniverse.strandFrom.size();
 
   std::uniform_real_distribution<double> randomDist(0., 1.);
   size_t nCrosslinks = 0;
@@ -301,8 +302,8 @@ MCUniverseGenerator::addRandomlyFunctionalizedStrands(
 
       if (convertThisBead) {
         // yes, we want to replace this bead `i` with a crosslink
-        size_t currentSpringIdx = nStrandsBefore + nEffectiveStrands;
-        long int lengthToPrevious =
+        const size_t currentSpringIdx = nStrandsBefore + nEffectiveStrands;
+        const long int lengthToPrevious =
           i - (lastSampledBead >= 0 ? (lastSampledBead + 1) : 0);
         if (i > 0) {
           this->addStrand(lengthToPrevious,
@@ -333,10 +334,10 @@ MCUniverseGenerator::addRandomlyFunctionalizedStrands(
     if (lastSampledBead < beadsPerStrand[strandI] - 1) {
       // add dangling spring
       // possibly, this is the full spring if no crosslink was sampled
-      size_t currentSpringIdx = nStrandsBefore + nEffectiveStrands;
+      const size_t currentSpringIdx = nStrandsBefore + nEffectiveStrands;
       assert(this->simplifiedUniverse.strandTo.size() == currentSpringIdx);
 
-      long int remainingLength =
+      const long int remainingLength =
         beadsPerStrand[strandI] -
         (lastSampledBead >= 0 ? (lastSampledBead + 1) : 0);
       this->addStrand(remainingLength,
@@ -360,18 +361,19 @@ MCUniverseGenerator::addRandomlyFunctionalizedStrands(
                   "Did not register the expected number of crosslinks.");
   this->addCrosslinkers(
     nCrosslinks, crosslinkerFunctionality, crosslinkerAtomType, whiteNoise);
-  for (size_t newXlinOffset = 0; newXlinOffset < nCrosslinks; ++newXlinOffset) {
-    this->simplifiedUniverse.xlinkChainId[nCrosslinksBefore + newXlinOffset] =
-      strandIdOfCrosslink[newXlinOffset];
-    int functionalityDifferenceToDesired =
-      newCrosslinkFunctionality[newXlinOffset] -
+  for (size_t newXlinkOffset = 0; newXlinkOffset < nCrosslinks;
+       ++newXlinkOffset) {
+    this->simplifiedUniverse.xlinkChainId[nCrosslinksBefore + newXlinkOffset] =
+      strandIdOfCrosslink[newXlinkOffset];
+    const int functionalityDifferenceToDesired =
+      newCrosslinkFunctionality[newXlinkOffset] -
       this
-        ->remainingCrossLinkerFunctionality[nCrosslinksBefore + newXlinOffset];
+        ->remainingCrossLinkerFunctionality[nCrosslinksBefore + newXlinkOffset];
     this->originalNrOfAvailableCrosslinkSites +=
       functionalityDifferenceToDesired;
     this->nrOfAvailableCrosslinkSites += functionalityDifferenceToDesired;
     this
-      ->remainingCrossLinkerFunctionality[nCrosslinksBefore + newXlinOffset] +=
+      ->remainingCrossLinkerFunctionality[nCrosslinksBefore + newXlinkOffset] +=
       functionalityDifferenceToDesired;
   }
 
@@ -379,8 +381,8 @@ MCUniverseGenerator::addRandomlyFunctionalizedStrands(
   for (size_t newStrandIdx = nStrandsBefore;
        newStrandIdx < nStrandsBefore + nEffectiveStrands;
        ++newStrandIdx) {
-    long int from = this->simplifiedUniverse.strandFrom[newStrandIdx];
-    long int to = this->simplifiedUniverse.strandTo[newStrandIdx];
+    const long int from = this->simplifiedUniverse.strandFrom[newStrandIdx];
+    const long int to = this->simplifiedUniverse.strandTo[newStrandIdx];
     assert(from < static_cast<long int>(nCrosslinksBefore + nCrosslinks));
     assert(to < static_cast<long int>(nCrosslinksBefore + nCrosslinks));
     // do the linking that was omitted earlier
@@ -406,8 +408,8 @@ MCUniverseGenerator::addRandomlyFunctionalizedStrands(
 
       // validate the distances
 #ifndef NDEBUG
-      double distance = this->distanceBetween(from, to);
-      double maxDistance =
+      const double distance = this->distanceBetween(from, to);
+      const double maxDistance =
         (this->simplifiedUniverse.beadsInStrand[newStrandIdx] + 2) *
         this->beadDistance;
       if (maxDistance > 1.) {
@@ -428,12 +430,12 @@ MCUniverseGenerator::addRandomlyFunctionalizedStrands(
 }
 
 void
-MCUniverseGenerator::addCrosslinkStrands(int nrOfCrosslinkStrands,
+MCUniverseGenerator::addCrosslinkStrands(const int nrOfCrosslinkStrands,
                                          std::vector<int> beadsPerStrand,
-                                         int crosslinkerFunctionality,
-                                         int crosslinkerAtomType,
-                                         int strandAtomType,
-                                         bool whiteNoise)
+                                         const int crosslinkerFunctionality,
+                                         const int crosslinkerAtomType,
+                                         const int strandAtomType,
+                                         const bool whiteNoise)
 {
   INVALIDARG_EXP_IFN(nrOfCrosslinkStrands > 0, "");
   INVALIDARG_EXP_IFN(crosslinkerFunctionality >= 2,
@@ -444,8 +446,9 @@ MCUniverseGenerator::addCrosslinkStrands(int nrOfCrosslinkStrands,
 #ifndef NDEBUG
   this->validateInternalState();
 #endif
-  size_t nCrosslinksBefore = this->remainingCrossLinkerFunctionality.size();
-  size_t nStrandsBefore = this->simplifiedUniverse.strandFrom.size();
+  const size_t nCrosslinksBefore =
+    this->remainingCrossLinkerFunctionality.size();
+  const size_t nStrandsBefore = this->simplifiedUniverse.strandFrom.size();
 
   // start with adding the ends
   this->addCrosslinkers(2 * nrOfCrosslinkStrands,
@@ -458,9 +461,9 @@ MCUniverseGenerator::addCrosslinkStrands(int nrOfCrosslinkStrands,
 
   // finally, do the linking and adjustment of the positions
   for (size_t i = 0; i < nrOfCrosslinkStrands; ++i) {
-    size_t strandIdx = nStrandsBefore + i;
-    size_t from = nCrosslinksBefore + i * 2;
-    size_t to = nCrosslinksBefore + i * 2 + 1;
+    const size_t strandIdx = nStrandsBefore + i;
+    const size_t from = nCrosslinksBefore + i * 2;
+    const size_t to = nCrosslinksBefore + i * 2 + 1;
     // actually link these strands
     this->linkStrandToCrosslink(strandIdx, from, false);
     this->linkStrandToCrosslink(strandIdx, to, false);
@@ -482,9 +485,9 @@ MCUniverseGenerator::addCrosslinkStrands(int nrOfCrosslinkStrands,
 }
 
 void
-MCUniverseGenerator::addSolventChains(int nrOfSolventChains,
-                                      int chainLength,
-                                      int solventAtomType,
+MCUniverseGenerator::addSolventChains(const int nrOfSolventChains,
+                                      const int chainLength,
+                                      const int solventAtomType,
                                       bool whiteNoise)
 {
   for (size_t i = 0; i < nrOfSolventChains; ++i) {
@@ -499,9 +502,9 @@ MCUniverseGenerator::addSolventChains(int nrOfSolventChains,
 }
 
 void
-MCUniverseGenerator::addMonofunctionalStrands(int nrOfStrands,
+MCUniverseGenerator::addMonofunctionalStrands(const int nrOfStrands,
                                               std::vector<int> beadsPerChains,
-                                              int strandAtomType)
+                                              const int strandAtomType)
 {
   INVALIDARG_EXP_IFN(beadsPerChains.size() == nrOfStrands,
                      "Nr of strands (" + std::to_string(nrOfStrands) +
@@ -525,9 +528,9 @@ MCUniverseGenerator::addMonofunctionalStrands(int nrOfStrands,
 }
 
 void
-MCUniverseGenerator::addMonofunctionalStrands(int nrOfStrands,
-                                              int chainLength,
-                                              int strandAtomType)
+MCUniverseGenerator::addMonofunctionalStrands(const int nrOfStrands,
+                                              const int chainLength,
+                                              const int strandAtomType)
 {
   const std::vector<int> chainLengths =
     pylimer_tools::utils::initializeWithValue<int>(nrOfStrands, chainLength);
@@ -598,7 +601,7 @@ MCUniverseGenerator::linkStrand(const size_t strandIdx, const double cInfinity)
       cInfinity;
     // we don't have free crosslink choice
     // find one that follows the desired end-to-end distribution
-    long int partnerCrosslinker = this->findAppropriateLink(
+    const long int partnerCrosslinker = this->findAppropriateLink(
       this->simplifiedUniverse.strandFrom[strandIdx],
       static_cast<double>(this->simplifiedUniverse.beadsInStrand[strandIdx] +
                           1) *
@@ -620,7 +623,7 @@ MCUniverseGenerator::linkStrand(const size_t strandIdx, const double cInfinity)
       this->remainingCrossLinkerFunctionality.begin(),
       this->remainingCrossLinkerFunctionality.end());
 
-    long int matchingCrosslink = xlinkIdxDist(this->rng);
+    const long int matchingCrosslink = xlinkIdxDist(this->rng);
 
     // link to this crosslink
     this->simplifiedUniverse.strandFrom[strandIdx] = matchingCrosslink;
@@ -635,14 +638,14 @@ void
 MCUniverseGenerator::linkStrandsCallback(
   std::function<BackTrackStatus(const MCUniverseGenerator&, long int)>
     linkingController,
-  double cInfinity)
+  const double cInfinity)
 {
 #ifndef NDEBUG
   this->validateInternalState();
 #endif
 
   // prepare sampling of partners
-  long int nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+  const long int nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
   int nrOfStrandsAdded = 0;
 
   double currentCrosslinkerConversion =
@@ -651,7 +654,7 @@ MCUniverseGenerator::linkStrandsCallback(
   double conversionPerBond =
     1. / (static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
 
-  size_t nrOfStrands = this->simplifiedUniverse.strandFrom.size();
+  const size_t nrOfStrands = this->simplifiedUniverse.strandFrom.size();
   std::vector<size_t> availableStrandEnds;
   availableStrandEnds.reserve(2 * nrOfStrands);
   for (size_t i = 0; i < nrOfStrands; ++i) {
@@ -664,8 +667,7 @@ MCUniverseGenerator::linkStrandsCallback(
     }
   }
   availableStrandEnds.shrink_to_fit();
-  std::shuffle(
-    availableStrandEnds.begin(), availableStrandEnds.end(), this->rng);
+  std::ranges::shuffle(availableStrandEnds, this->rng);
 
   std::vector<size_t> availableCrosslinkSites;
   availableCrosslinkSites.reserve(this->nrOfAvailableCrosslinkSites);
@@ -674,22 +676,21 @@ MCUniverseGenerator::linkStrandsCallback(
       availableCrosslinkSites.push_back(i);
     }
   }
-  std::shuffle(
-    availableCrosslinkSites.begin(), availableCrosslinkSites.end(), this->rng);
+  std::ranges::shuffle(availableCrosslinkSites, this->rng);
 
   std::stack<size_t> removedCrosslinkSites;
   // removedCrosslinkSites.reserve(availableCrosslinkSites.size());
 
   // link one strand at a time until we reach the target conversion
-  size_t maxStep =
+  const size_t maxStep =
     std::min(availableStrandEnds.size(), availableCrosslinkSites.size());
   for (size_t sampleIdx = 0; sampleIdx < maxStep; ++sampleIdx) {
-    BackTrackStatus status = linkingController(
+    const BackTrackStatus status = linkingController(
       *this, static_cast<long int>(maxStep) - static_cast<long int>(sampleIdx));
     if (status == BackTrackStatus::STOP) {
       break;
     } else if (status == BackTrackStatus::TRACK_FORWARD) {
-      size_t strandIdx = availableStrandEnds[sampleIdx];
+      const size_t strandIdx = availableStrandEnds[sampleIdx];
       const double timesNForR02 =
         this->simplifiedUniverse.meanSquaredBeadDistanceInStrand[strandIdx] *
         cInfinity;
@@ -707,7 +708,7 @@ MCUniverseGenerator::linkStrandsCallback(
             " for strand " + std::to_string(strandIdx) + ".");
         // we don't have free crosslink choice
         // find one that follows the desired end-to-end distribution
-        long int partnerCrosslinker = this->findAppropriateLink(
+        const long int partnerCrosslinker = this->findAppropriateLink(
           this->simplifiedUniverse.strandFrom[strandIdx],
           static_cast<double>(
             this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
@@ -755,7 +756,7 @@ MCUniverseGenerator::linkStrandsCallback(
       assert(status == BackTrackStatus::TRACK_BACKWARD);
       // track backward -> reset the last link done
       sampleIdx -= 1;
-      long int strandIdx = availableStrandEnds[sampleIdx];
+      const long int strandIdx = availableStrandEnds[sampleIdx];
       // this strand has been assigned a partner last step, add it again
       long int linkedXlink = -1;
       if (this->simplifiedUniverse.strandTo[strandIdx] >= 0) {
@@ -853,7 +854,7 @@ MCUniverseGenerator::linkStrandsToConversion(
 
 void
 MCUniverseGenerator::linkStrandsToSolubleFraction(double targetSolubleFraction,
-                                                  double cInfinity)
+                                                  const double cInfinity)
 {
   INVALIDARG_EXP_IFN(APPROX_WITHIN(targetSolubleFraction, 0., 1., 1e-8),
                      "Soluble fraction must be between 0 and 1, got " +
@@ -872,7 +873,8 @@ MCUniverseGenerator::linkStrandsToSolubleFraction(double targetSolubleFraction,
      &status,
      &nSteps,
      &lastStep,
-     &currentStep](const MCUniverseGenerator& gen, long int nStrandsRemaining) {
+     &currentStep](const MCUniverseGenerator& gen,
+                   const long int nStrandsRemaining) {
       if (currentStep == 0) {
         // go all in, we want to jump to end to know when to stop
         nSteps = nStrandsRemaining;
@@ -888,21 +890,19 @@ MCUniverseGenerator::linkStrandsToSolubleFraction(double targetSolubleFraction,
       }
 
       lastStep = currentStep;
-      pylimer_tools::sim::mehp::Network frNet =
-        gen.convertToForceRelaxationNetwork();
+      const pylimer_tools::sim::mehp::ForceBalanceNetwork fbNet =
+        gen.convertToForceBalanceNetwork();
 
       // actually start force relaxation
-      pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
-        pylimer_tools::sim::mehp::MEHPForceRelaxation(frNet);
-      forceRelaxer.configAssumeBoxLargeEnough(true);
+      pylimer_tools::sim::mehp::MEHPForceBalance2 forceBalance =
+        pylimer_tools::sim::mehp::MEHPForceBalance2(
+          fbNet, Eigen::VectorXd::Ones(fbNet.nrOfPartialSprings));
 
-      while (forceRelaxer.suggestsRerun()) {
-        forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-11, 1e-8);
-      }
+      forceBalance.configAssumeNetworkIsComplete(true);
+      forceBalance.runForceRelaxation();
 
       // finally, calculate the soluble fraction
-      double solubleFraction = 1. - forceRelaxer.countActiveClusteredAtoms() /
-                                      static_cast<double>(nAtomsTotal);
+      const double solubleFraction = forceBalance.getSolubleWeightFraction();
       std::cout << "Got w_sol = " << solubleFraction << " at step "
                 << currentStep << " (+" << nSteps << ") with "
                 << nStrandsRemaining << " strands remaining." << std::endl;
@@ -910,7 +910,7 @@ MCUniverseGenerator::linkStrandsToSolubleFraction(double targetSolubleFraction,
         nSteps /= 2;
         status = BackTrackStatus::TRACK_FORWARD;
         return status;
-      } else if (solubleFraction == targetSolubleFraction) {
+      } else if (APPROX_EQUAL(solubleFraction, targetSolubleFraction, 1e-12)) {
         return BackTrackStatus::STOP;
       } else {
         if (nSteps == 1) {
@@ -925,14 +925,14 @@ MCUniverseGenerator::linkStrandsToSolubleFraction(double targetSolubleFraction,
 }
 
 void
-MCUniverseGenerator::removeStrand(size_t strandIdx)
+MCUniverseGenerator::removeStrand(const size_t strandIdx)
 {
   INVALIDARG_EXP_IFN(strandIdx < this->simplifiedUniverse.strandFrom.size(),
                      "Strand to be removed is out of range.");
 
   if (this->simplifiedUniverse.strandFrom[strandIdx] >= 0) {
     // remove this strand from the crosslinker
-    size_t xlink = this->simplifiedUniverse.strandFrom[strandIdx];
+    const size_t xlink = this->simplifiedUniverse.strandFrom[strandIdx];
     pylimer_tools::utils::removeIfContained<long int>(
       this->simplifiedUniverse.strandsOfXlink[xlink], strandIdx);
     this->remainingCrossLinkerFunctionality[xlink] += 1;
@@ -940,7 +940,7 @@ MCUniverseGenerator::removeStrand(size_t strandIdx)
   }
   if (this->simplifiedUniverse.strandTo[strandIdx] >= 0) {
     // remove this strand from the crosslinker
-    size_t xlink = this->simplifiedUniverse.strandTo[strandIdx];
+    const size_t xlink = this->simplifiedUniverse.strandTo[strandIdx];
     pylimer_tools::utils::removeIfContained<long int>(
       this->simplifiedUniverse.strandsOfXlink[xlink], strandIdx);
     this->remainingCrossLinkerFunctionality[xlink] += 1;
@@ -974,7 +974,7 @@ MCUniverseGenerator::removeStrand(size_t strandIdx)
 }
 
 void
-MCUniverseGenerator::removeCrosslink(size_t crosslinkIdx)
+MCUniverseGenerator::removeCrosslink(const size_t crosslinkIdx)
 {
   INVALIDARG_EXP_IFN(crosslinkIdx < this->simplifiedUniverse.xlinkTypes.size(),
                      "Crosslink to be removed is out of range.");
@@ -993,9 +993,9 @@ MCUniverseGenerator::removeCrosslink(size_t crosslinkIdx)
   }
 
   // adjust sum of available crosslink sites
-  size_t remainingFunctionality =
+  const size_t remainingFunctionality =
     this->remainingCrossLinkerFunctionality[crosslinkIdx];
-  size_t originalFunctionality =
+  const size_t originalFunctionality =
     remainingFunctionality +
     this->simplifiedUniverse.strandsOfXlink[crosslinkIdx].size();
   this->nrOfAvailableCrosslinkSites -= remainingFunctionality;
@@ -1019,10 +1019,10 @@ MCUniverseGenerator::removeCrosslink(size_t crosslinkIdx)
 }
 
 void
-MCUniverseGenerator::removeSolubleFraction(bool rescale)
+MCUniverseGenerator::removeSolubleFraction(const bool rescale)
 {
-  size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
-  size_t nAtomsTotal =
+  const size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+  const size_t nAtomsTotal =
     std::reduce(this->simplifiedUniverse.beadsInStrand.begin(),
                 this->simplifiedUniverse.beadsInStrand.end(),
                 0) +
@@ -1046,7 +1046,7 @@ MCUniverseGenerator::removeSolubleFraction(bool rescale)
     forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-12, 1e-9);
   }
 
-  std::pair<Eigen::ArrayXb, Eigen::ArrayXb> activeComponents =
+  const std::pair<Eigen::ArrayXb, Eigen::ArrayXb> activeComponents =
     forceRelaxer.findClusteredToActive();
   Eigen::ArrayXb activeSprings = activeComponents.first;
   Eigen::ArrayXb activeNodes = activeComponents.second;
@@ -1079,13 +1079,13 @@ MCUniverseGenerator::removeSolubleFraction(bool rescale)
 
   // finally, rescale the box if requested
   if (rescale) {
-    size_t newNrOfAtoms =
+    const size_t newNrOfAtoms =
       std::reduce(this->simplifiedUniverse.beadsInStrand.begin(),
                   this->simplifiedUniverse.beadsInStrand.end(),
                   0) +
       this->simplifiedUniverse.xlinkTypes.size();
-    double scalingFactor = std::cbrt(static_cast<double>(newNrOfAtoms) /
-                                     static_cast<double>(nAtomsTotal));
+    const double scalingFactor = std::cbrt(static_cast<double>(newNrOfAtoms) /
+                                           static_cast<double>(nAtomsTotal));
     this->box = pylimer_tools::entities::Box(scalingFactor * this->box.getLx(),
                                              scalingFactor * this->box.getLy(),
                                              scalingFactor * this->box.getLz());
@@ -1109,20 +1109,26 @@ MCUniverseGenerator::convertToForceRelaxationNetwork() const
 
   const size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
   size_t nDanglingEnds = 0;
+  size_t nFreeEnds = 0;
   std::vector<size_t> danglingEndPartners = {};
   for (size_t i = 0; i < this->simplifiedUniverse.strandFrom.size(); ++i) {
     if (this->simplifiedUniverse.strandFrom[i] >= 0 &&
         this->simplifiedUniverse.strandTo[i] < 0) {
       nDanglingEnds += 1;
       danglingEndPartners.push_back(this->simplifiedUniverse.strandFrom[i]);
+    } else if (this->simplifiedUniverse.strandFrom[i] < 0 &&
+               this->simplifiedUniverse.strandTo[i] < 0) {
+      nFreeEnds += 2; // two ends per free strand
     }
   }
-  forceRelaxationNetwork.nrOfNodes = nCrosslinks + nDanglingEnds;
+  forceRelaxationNetwork.nrOfNodes = nCrosslinks + nDanglingEnds + nFreeEnds;
   forceRelaxationNetwork.oldAtomIds =
     Eigen::ArrayXi::Zero(forceRelaxationNetwork.nrOfNodes);
   forceRelaxationNetwork.coordinates =
     Eigen::VectorXd(forceRelaxationNetwork.nrOfNodes * 3);
-  forceRelaxationNetwork.springIndicesOfLinks.reserve(nCrosslinks);
+  forceRelaxationNetwork.springIndicesOfLinks.reserve(
+    forceRelaxationNetwork.nrOfNodes);
+
   // crosslinks first, in order to keep consistent numbering
   for (size_t crosslinkIdx = 0; crosslinkIdx < nCrosslinks; ++crosslinkIdx) {
     forceRelaxationNetwork.coordinates(3 * crosslinkIdx + 0) =
@@ -1133,9 +1139,10 @@ MCUniverseGenerator::convertToForceRelaxationNetwork() const
       this->simplifiedUniverse.xlinkZ[crosslinkIdx];
     forceRelaxationNetwork.oldAtomIds(crosslinkIdx) = crosslinkIdx;
   }
+  // then, dangling ends (collapsed to their connected crosslink)
   for (size_t danglingEndIdx = 0; danglingEndIdx < nDanglingEnds;
        ++danglingEndIdx) {
-    size_t nodeIdx = nCrosslinks + danglingEndIdx;
+    const size_t nodeIdx = nCrosslinks + danglingEndIdx;
     // collapse dangling ends already to connected crosslink
     forceRelaxationNetwork.coordinates(3 * nodeIdx + 0) =
       this->simplifiedUniverse.xlinkX[danglingEndPartners[danglingEndIdx]];
@@ -1144,59 +1151,69 @@ MCUniverseGenerator::convertToForceRelaxationNetwork() const
     forceRelaxationNetwork.coordinates(3 * nodeIdx + 2) =
       this->simplifiedUniverse.xlinkZ[danglingEndPartners[danglingEndIdx]];
   }
+  // finally, free ends (initialized at origin)
+  forceRelaxationNetwork.coordinates.tail(3 * nFreeEnds).setZero();
+
   for (size_t i = 0; i < forceRelaxationNetwork.nrOfNodes; ++i) {
     std::vector<size_t> empty = {};
     forceRelaxationNetwork.springIndicesOfLinks.push_back(empty);
   }
 
-  size_t nSpringEstimate = this->simplifiedUniverse.strandFrom.size();
-  forceRelaxationNetwork.springIndexA = Eigen::ArrayXi::Zero(nSpringEstimate);
-  forceRelaxationNetwork.springIndexB = Eigen::ArrayXi::Zero(nSpringEstimate);
-  forceRelaxationNetwork.springsContourLength =
-    Eigen::VectorXd::Zero(nSpringEstimate);
-  size_t newSpringIdx = 0;
+  const size_t nSprings = this->simplifiedUniverse.strandFrom.size();
+  forceRelaxationNetwork.springIndexA = Eigen::ArrayXi::Zero(nSprings);
+  forceRelaxationNetwork.springIndexB = Eigen::ArrayXi::Zero(nSprings);
+  forceRelaxationNetwork.springsContourLength = Eigen::VectorXd::Zero(nSprings);
+
   size_t handledDanglingIdx = 0;
-  // we omit all free strands
+  size_t handledFreeIdx = 0;
+
+  // include all strands (connected, dangling, and free)
   for (size_t springIdx = 0;
        springIdx < this->simplifiedUniverse.strandFrom.size();
        ++springIdx) {
     long int from = this->simplifiedUniverse.strandFrom[springIdx];
     long int to = this->simplifiedUniverse.strandTo[springIdx];
+
     if (from >= 0) {
       if (to < 0) {
         // dangling strand
         to = nCrosslinks + handledDanglingIdx;
         handledDanglingIdx += 1;
-        forceRelaxationNetwork.springsContourLength(newSpringIdx) =
+        forceRelaxationNetwork.springsContourLength(springIdx) =
           this->simplifiedUniverse.beadsInStrand[springIdx];
       } else {
-        forceRelaxationNetwork.springsContourLength(newSpringIdx) =
+        // connected strand
+        forceRelaxationNetwork.springsContourLength(springIdx) =
           this->simplifiedUniverse.beadsInStrand[springIdx] + 1;
       }
-      forceRelaxationNetwork.springIndexA(newSpringIdx) = from;
-      forceRelaxationNetwork.springIndexB(newSpringIdx) = to;
-      forceRelaxationNetwork.springIndicesOfLinks[from].push_back(newSpringIdx);
-      if (to != from) {
-        forceRelaxationNetwork.springIndicesOfLinks[to].push_back(newSpringIdx);
-      }
-      newSpringIdx += 1;
     } else {
+      // free strand - both ends are unconnected
       assert(to < 0);
+      from = nCrosslinks + nDanglingEnds + handledFreeIdx;
+      to = nCrosslinks + nDanglingEnds + handledFreeIdx + 1;
+      forceRelaxationNetwork.springsContourLength(springIdx) =
+        this->simplifiedUniverse.beadsInStrand[springIdx] - 1;
+      handledFreeIdx += 2; // the two ends per free strand were handled
+    }
+
+    forceRelaxationNetwork.springIndexA(springIdx) = from;
+    forceRelaxationNetwork.springIndexB(springIdx) = to;
+    forceRelaxationNetwork.springIndicesOfLinks[from].push_back(springIdx);
+    if (to != from) {
+      forceRelaxationNetwork.springIndicesOfLinks[to].push_back(springIdx);
     }
   }
+
   assert(handledDanglingIdx == nDanglingEnds);
-  const size_t nActualSprings = newSpringIdx;
-  forceRelaxationNetwork.springIndexA.conservativeResize(nActualSprings);
-  forceRelaxationNetwork.springIndexB.conservativeResize(nActualSprings);
-  forceRelaxationNetwork.springsContourLength.conservativeResize(
-    nActualSprings);
-  forceRelaxationNetwork.nrOfSprings = nActualSprings;
+  assert(handledFreeIdx == nFreeEnds);
+
+  forceRelaxationNetwork.nrOfSprings = nSprings;
 
   forceRelaxationNetwork.springCoordinateIndexA =
-    Eigen::ArrayXi::Zero(3 * nActualSprings);
+    Eigen::ArrayXi::Zero(3 * nSprings);
   forceRelaxationNetwork.springCoordinateIndexB =
-    Eigen::ArrayXi::Zero(3 * nActualSprings);
-  for (size_t i = 0; i < nActualSprings; ++i) {
+    Eigen::ArrayXi::Zero(3 * nSprings);
+  for (size_t i = 0; i < nSprings; ++i) {
     for (size_t dir = 0; dir < 3; ++dir) {
       forceRelaxationNetwork.springCoordinateIndexA(3 * i + dir) =
         forceRelaxationNetwork.springIndexA(i) * 3 + dir;
@@ -1220,6 +1237,7 @@ MCUniverseGenerator::convertToForceRelaxationNetwork() const
       ? forceRelaxationNetwork.springsContourLength.mean()
       : 1.;
   forceRelaxationNetwork.assumeBoxLargeEnough = true;
+  forceRelaxationNetwork.assumeComplete = true;
 
   return forceRelaxationNetwork;
 }
@@ -1228,7 +1246,7 @@ pylimer_tools::sim::mehp::MEHPForceRelaxation
 MCUniverseGenerator::getForceRelaxation() const
 {
   // first, convert to a useable structure for the force relaxation
-  pylimer_tools::sim::mehp::Network forceRelaxationNetwork =
+  const pylimer_tools::sim::mehp::Network forceRelaxationNetwork =
     this->convertToForceRelaxationNetwork();
 
   // actually start force relaxation
@@ -1252,15 +1270,19 @@ MCUniverseGenerator::convertToForceBalanceNetwork() const
 
   const size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
   size_t nDanglingEnds = 0;
+  size_t nFreeEnds = 0;
   std::vector<size_t> danglingEndPartners = {};
   for (size_t i = 0; i < this->simplifiedUniverse.strandFrom.size(); ++i) {
-    if (this->simplifiedUniverse.strandFrom[i] >= 0 &&
-        this->simplifiedUniverse.strandTo[i] < 0) {
-      nDanglingEnds += 1;
-      danglingEndPartners.push_back(this->simplifiedUniverse.strandFrom[i]);
+    if (this->simplifiedUniverse.strandTo[i] < 0) {
+      if (this->simplifiedUniverse.strandFrom[i] >= 0) {
+        nDanglingEnds += 1;
+        danglingEndPartners.push_back(this->simplifiedUniverse.strandFrom[i]);
+      } else {
+        nFreeEnds += 2; // two ends per free strand
+      }
     }
   }
-  forceBalanceNetwork.nrOfNodes = nCrosslinks + nDanglingEnds;
+  forceBalanceNetwork.nrOfNodes = nCrosslinks + nDanglingEnds + nFreeEnds;
   forceBalanceNetwork.nrOfLinks = forceBalanceNetwork.nrOfNodes;
   forceBalanceNetwork.oldAtomIds =
     Eigen::ArrayXi::Zero(forceBalanceNetwork.nrOfNodes);
@@ -1284,9 +1306,10 @@ MCUniverseGenerator::convertToForceBalanceNetwork() const
     forceBalanceNetwork.oldAtomTypes(crosslinkIdx) =
       this->simplifiedUniverse.xlinkTypes[crosslinkIdx];
   }
+  // then, dangling ends
   for (size_t danglingEndIdx = 0; danglingEndIdx < nDanglingEnds;
        ++danglingEndIdx) {
-    size_t nodeIdx = nCrosslinks + danglingEndIdx;
+    const Eigen::Index nodeIdx = nCrosslinks + danglingEndIdx;
     // collapse dangling ends already to connected crosslink
     forceBalanceNetwork.coordinates(3 * nodeIdx + 0) =
       this->simplifiedUniverse.xlinkX[danglingEndPartners[danglingEndIdx]];
@@ -1295,22 +1318,24 @@ MCUniverseGenerator::convertToForceBalanceNetwork() const
     forceBalanceNetwork.coordinates(3 * nodeIdx + 2) =
       this->simplifiedUniverse.xlinkZ[danglingEndPartners[danglingEndIdx]];
   }
+  // finally, free ends
+  forceBalanceNetwork.coordinates.tail(3 * nFreeEnds).setZero();
+
+  // then, start to assemble connectivity
   for (size_t i = 0; i < forceBalanceNetwork.nrOfNodes; ++i) {
     std::vector<size_t> empty = {};
     forceBalanceNetwork.springIndicesOfLinks.push_back(empty);
   }
 
-  size_t nSpringEstimate = this->simplifiedUniverse.strandFrom.size();
-  forceBalanceNetwork.springIndexA = Eigen::ArrayXi::Zero(nSpringEstimate);
-  forceBalanceNetwork.springIndexB = Eigen::ArrayXi::Zero(nSpringEstimate);
-  forceBalanceNetwork.springsContourLength =
-    Eigen::VectorXd::Zero(nSpringEstimate);
-  size_t newSpringIdx = 0;
+  const Eigen::Index nSprings = this->simplifiedUniverse.strandFrom.size();
+  forceBalanceNetwork.springIndexA = Eigen::ArrayXi::Zero(nSprings);
+  forceBalanceNetwork.springIndexB = Eigen::ArrayXi::Zero(nSprings);
+  forceBalanceNetwork.springsContourLength = Eigen::VectorXd::Zero(nSprings);
+
   size_t handledDanglingIdx = 0;
-  // we omit all free strands
-  for (size_t springIdx = 0;
-       springIdx < this->simplifiedUniverse.strandFrom.size();
-       ++springIdx) {
+  size_t handledFreeIdx = 0;
+
+  for (Eigen::Index springIdx = 0; springIdx < nSprings; ++springIdx) {
     long int from = this->simplifiedUniverse.strandFrom[springIdx];
     long int to = this->simplifiedUniverse.strandTo[springIdx];
     if (from >= 0) {
@@ -1318,44 +1343,46 @@ MCUniverseGenerator::convertToForceBalanceNetwork() const
         // dangling strand
         to = nCrosslinks + handledDanglingIdx;
         handledDanglingIdx += 1;
-        forceBalanceNetwork.springsContourLength(newSpringIdx) =
+        forceBalanceNetwork.springsContourLength(springIdx) =
           this->simplifiedUniverse.beadsInStrand[springIdx];
       } else {
-        forceBalanceNetwork.springsContourLength(newSpringIdx) =
+        forceBalanceNetwork.springsContourLength(springIdx) =
           this->simplifiedUniverse.beadsInStrand[springIdx] + 1;
       }
-      forceBalanceNetwork.springIndexA(newSpringIdx) = from;
-      forceBalanceNetwork.springIndexB(newSpringIdx) = to;
-      forceBalanceNetwork.springIndicesOfLinks[from].push_back(newSpringIdx);
-      if (from != to) {
-        forceBalanceNetwork.springIndicesOfLinks[to].push_back(newSpringIdx);
-      }
-      newSpringIdx += 1;
     } else {
+      // this is a free strand
       assert(to < 0);
+      from = nCrosslinks + nDanglingEnds + handledFreeIdx;
+      to = nCrosslinks + nDanglingEnds + handledFreeIdx + 1;
+      forceBalanceNetwork.springsContourLength(springIdx) =
+        this->simplifiedUniverse.beadsInStrand[springIdx] - 1;
+      handledFreeIdx += 2; // the two ends per free strand were handled
+    }
+    forceBalanceNetwork.springIndexA(springIdx) = from;
+    forceBalanceNetwork.springIndexB(springIdx) = to;
+    forceBalanceNetwork.springIndicesOfLinks[from].push_back(springIdx);
+    if (from != to) {
+      forceBalanceNetwork.springIndicesOfLinks[to].push_back(springIdx);
     }
   }
   assert(handledDanglingIdx == nDanglingEnds);
-  const size_t nActualSprings = newSpringIdx;
-  forceBalanceNetwork.springIndexA.conservativeResize(nActualSprings);
-  forceBalanceNetwork.springIndexB.conservativeResize(nActualSprings);
-  forceBalanceNetwork.springsContourLength.conservativeResize(nActualSprings);
-  forceBalanceNetwork.nrOfSprings = nActualSprings;
-  forceBalanceNetwork.springsType = Eigen::ArrayXi::Ones(nActualSprings);
-  forceBalanceNetwork.springIsActive = Eigen::ArrayXb::Ones(nActualSprings);
-  forceBalanceNetwork.partialSpringIsPartial =
-    Eigen::ArrayXb::Zero(nActualSprings);
-  forceBalanceNetwork.nrOfPartialSprings = nActualSprings;
+  assert(handledFreeIdx == nFreeEnds);
+
+  forceBalanceNetwork.nrOfSprings = nSprings;
+  forceBalanceNetwork.springsType = Eigen::ArrayXi::Ones(nSprings);
+  forceBalanceNetwork.springIsActive = Eigen::ArrayXb::Ones(nSprings);
+  forceBalanceNetwork.partialSpringIsPartial = Eigen::ArrayXb::Zero(nSprings);
+  forceBalanceNetwork.nrOfPartialSprings = nSprings;
   forceBalanceNetwork.nrOfSpringsWithPartition = 0;
 
   forceBalanceNetwork.springCoordinateIndexA =
-    Eigen::ArrayXi::Zero(3 * nActualSprings);
+    Eigen::ArrayXi::Zero(3 * nSprings);
   forceBalanceNetwork.springCoordinateIndexB =
-    Eigen::ArrayXi::Zero(3 * nActualSprings);
+    Eigen::ArrayXi::Zero(3 * nSprings);
   forceBalanceNetwork.partialToFullSpringIndex =
-    Eigen::ArrayXi::LinSpaced(nActualSprings, 0, nActualSprings - 1);
-  for (size_t i = 0; i < nActualSprings; ++i) {
-    for (size_t dir = 0; dir < 3; ++dir) {
+    Eigen::ArrayXi::LinSpaced(nSprings, 0, nSprings - 1);
+  for (Eigen::Index i = 0; i < nSprings; ++i) {
+    for (Eigen::Index dir = 0; dir < 3; ++dir) {
       forceBalanceNetwork.springCoordinateIndexA(3 * i + dir) =
         forceBalanceNetwork.springIndexA(i) * 3 + dir;
       forceBalanceNetwork.springCoordinateIndexB(3 * i + dir) =
@@ -1369,13 +1396,9 @@ MCUniverseGenerator::convertToForceBalanceNetwork() const
       { static_cast<size_t>(forceBalanceNetwork.springIndexA(i)),
         static_cast<size_t>(forceBalanceNetwork.springIndexB(i)) };
     forceBalanceNetwork.linkIndicesOfSprings.push_back(linkIndices);
-    forceBalanceNetwork.localToGlobalSpringIndex.push_back({ i });
+    forceBalanceNetwork.localToGlobalSpringIndex.push_back(
+      { static_cast<size_t>(i) });
   }
-  forceBalanceNetwork.springPartBoxOffset =
-    this->box.getOffset(forceBalanceNetwork.coordinates(
-                          forceBalanceNetwork.springCoordinateIndexB) -
-                        forceBalanceNetwork.coordinates(
-                          forceBalanceNetwork.springCoordinateIndexA));
 
   forceBalanceNetwork.springPartCoordinateIndexA =
     forceBalanceNetwork.springCoordinateIndexA;
@@ -1384,10 +1407,29 @@ MCUniverseGenerator::convertToForceBalanceNetwork() const
   forceBalanceNetwork.springPartIndexA = forceBalanceNetwork.springIndexA;
   forceBalanceNetwork.springPartIndexB = forceBalanceNetwork.springIndexB;
 
+  // compute the box offset for the springs
+  const Eigen::VectorXd actualDistance =
+    forceBalanceNetwork.coordinates(
+      forceBalanceNetwork.springPartCoordinateIndexB) -
+    forceBalanceNetwork.coordinates(
+      forceBalanceNetwork.springPartCoordinateIndexA);
+  Eigen::VectorXd expectedDistance = actualDistance;
+  this->box.handlePBC(expectedDistance);
+  forceBalanceNetwork.springPartBoxOffset = expectedDistance - actualDistance;
+  // forceBalanceNetwork.springPartBoxOffset =
+  //   this->box.getOffset(forceBalanceNetwork.coordinates(
+  //                         forceBalanceNetwork.springCoordinateIndexB) -
+  //                       forceBalanceNetwork.coordinates(
+  //                         forceBalanceNetwork.springCoordinateIndexA));
+
   forceBalanceNetwork.meanSpringContourLength =
     forceBalanceNetwork.springsContourLength.size() > 0
       ? forceBalanceNetwork.springsContourLength.mean()
-      : 1.;
+      : 0.;
+
+  assert(forceBalanceNetwork.springsContourLength.sum() -
+           forceBalanceNetwork.nrOfSprings + forceBalanceNetwork.nrOfLinks ==
+         this->getCurrentNrOfAtoms());
 
   return forceBalanceNetwork;
 }
@@ -1398,7 +1440,8 @@ MCUniverseGenerator::getForceBalance() const
   const pylimer_tools::sim::mehp::ForceBalanceNetwork net =
     this->convertToForceBalanceNetwork();
 
-  Eigen::VectorXd springPartitions = Eigen::VectorXd::Ones(net.nrOfSprings);
+  const Eigen::VectorXd springPartitions =
+    Eigen::VectorXd::Ones(net.nrOfSprings);
   pylimer_tools::sim::mehp::MEHPForceBalance balance =
     pylimer_tools::sim::mehp::MEHPForceBalance(net, springPartitions);
   assert(balance.validateNetwork());
@@ -1411,9 +1454,11 @@ MCUniverseGenerator::getForceBalance2() const
   const pylimer_tools::sim::mehp::ForceBalanceNetwork net =
     this->convertToForceBalanceNetwork();
 
-  Eigen::VectorXd springPartitions = Eigen::VectorXd::Ones(net.nrOfSprings);
+  const Eigen::VectorXd springPartitions =
+    Eigen::VectorXd::Ones(net.nrOfSprings);
   pylimer_tools::sim::mehp::MEHPForceBalance2 balance =
     pylimer_tools::sim::mehp::MEHPForceBalance2(net, springPartitions);
+  balance.configAssumeNetworkIsComplete(true);
   assert(balance.validateNetwork());
   return balance;
 }
@@ -1436,7 +1481,7 @@ MCUniverseGenerator::relaxCrosslinks()
 
   // copy results
   forceRelaxationNetwork = forceRelaxer.getNetwork();
-  size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+  const size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
   // dangling strands lead to higher nr of nodes
   RUNTIME_EXP_IFN(forceRelaxationNetwork.nrOfNodes >= nCrosslinks,
                   "Expected force relaxation to preserve crosslinks.");
@@ -1454,7 +1499,7 @@ MCUniverseGenerator::relaxCrosslinks()
 size_t
 MCUniverseGenerator::getCurrentNrOfAtoms() const
 {
-  size_t nAtomsTotal =
+  const size_t nAtomsTotal =
     std::reduce(this->simplifiedUniverse.beadsInStrand.begin(),
                 this->simplifiedUniverse.beadsInStrand.end(),
                 0) +
@@ -1469,9 +1514,9 @@ MCUniverseGenerator::getCurrentNrOfBonds() const
   for (size_t strandIdx = 0;
        strandIdx < this->simplifiedUniverse.strandFrom.size();
        ++strandIdx) {
-    size_t nBeads = this->simplifiedUniverse.beadsInStrand[strandIdx];
-    long int from = this->simplifiedUniverse.strandFrom[strandIdx];
-    long int to = this->simplifiedUniverse.strandTo[strandIdx];
+    const size_t nBeads = this->simplifiedUniverse.beadsInStrand[strandIdx];
+    const long int from = this->simplifiedUniverse.strandFrom[strandIdx];
+    const long int to = this->simplifiedUniverse.strandTo[strandIdx];
     if (nBeads > 0) {
       nBondsTotal += nBeads - 1;
       if (to >= 0) {
@@ -1490,6 +1535,20 @@ MCUniverseGenerator::getCurrentCrosslinkerConversion() const
 {
   return 1. - (static_cast<double>(this->nrOfAvailableCrosslinkSites) /
                static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
+}
+
+double
+MCUniverseGenerator::getCurrentStrandsConversion() const
+{
+  const size_t nStrands = this->simplifiedUniverse.strandFrom.size();
+  const size_t nFreeEndsFrom = std::ranges::count_if(
+    this->simplifiedUniverse.strandFrom,
+    [](const long int from) { return from == UNCONNECTED; });
+  const size_t nFreeEndsTo =
+    std::ranges::count_if(this->simplifiedUniverse.strandTo,
+                          [](const long int to) { return to == UNCONNECTED; });
+  const size_t nFreeEnds = nFreeEndsFrom + nFreeEndsTo;
+  return 1. - (static_cast<double>(nFreeEnds) / static_cast<double>(nStrands));
 }
 
 void
@@ -1514,7 +1573,7 @@ MCUniverseGenerator::validateInternalState() const
                       this->simplifiedUniverse.xlinkChainId.size()),
     "Inconsistent sizes in simplified universe.");
 
-  long int nCrosslinks = this->simplifiedUniverse.xlinkX.size();
+  const long int nCrosslinks = this->simplifiedUniverse.xlinkX.size();
   const long int nrOfAvailableSites =
     std::reduce(this->remainingCrossLinkerFunctionality.begin(),
                 this->remainingCrossLinkerFunctionality.end(),
@@ -1524,7 +1583,7 @@ MCUniverseGenerator::validateInternalState() const
                   "Inconsistent nr of crosslink sites.");
 
   for (size_t xlinkIdx = 0; xlinkIdx < nCrosslinks; ++xlinkIdx) {
-    for (long int subStrandIdx :
+    for (const long int subStrandIdx :
          this->simplifiedUniverse.strandsOfXlink[xlinkIdx]) {
       RUNTIME_EXP_IFN(
         this->simplifiedUniverse.strandFrom[subStrandIdx] == xlinkIdx ||
@@ -1560,7 +1619,7 @@ MCUniverseGenerator::validateInternalState() const
 }
 
 Eigen::VectorXd
-MCUniverseGenerator::sampleFreeChainCoordinates(int chainLen)
+MCUniverseGenerator::sampleFreeChainCoordinates(const int chainLen)
 {
   Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
     chainLen, this->beadDistance, this->meanSquaredBeadDistance, this->rng);
@@ -1574,7 +1633,7 @@ MCUniverseGenerator::sampleFreeChainCoordinates(int chainLen)
                                                this->nMcSteps);
   }
 
-  Eigen::Vector3d from = Eigen::Vector3d(
+  const Eigen::Vector3d from = Eigen::Vector3d(
     this->distX(this->rng), this->distY(this->rng), this->distZ(this->rng));
 
   positions += from.replicate(chainLen, 1);
@@ -1582,8 +1641,8 @@ MCUniverseGenerator::sampleFreeChainCoordinates(int chainLen)
 }
 
 Eigen::VectorXd
-MCUniverseGenerator::sampleDanglingChainCoordinates(size_t idxFrom,
-                                                    int chainLen)
+MCUniverseGenerator::sampleDanglingChainCoordinates(const size_t idxFrom,
+                                                    const int chainLen)
 {
   INVALIDARG_EXP_IFN(idxFrom < this->simplifiedUniverse.xlinkTypes.size(),
                      "Invalid index for dangling chain start");
@@ -1599,7 +1658,7 @@ MCUniverseGenerator::sampleDanglingChainCoordinates(size_t idxFrom,
                                                this->nMcSteps);
   }
 
-  Eigen::Vector3d from =
+  const Eigen::Vector3d from =
     Eigen::Vector3d(this->simplifiedUniverse.xlinkX[idxFrom],
                     this->simplifiedUniverse.xlinkY[idxFrom],
                     this->simplifiedUniverse.xlinkZ[idxFrom]);
@@ -1609,9 +1668,9 @@ MCUniverseGenerator::sampleDanglingChainCoordinates(size_t idxFrom,
 }
 
 Eigen::VectorXd
-MCUniverseGenerator::sampleStrandCoordinates(size_t from,
-                                             size_t to,
-                                             int chainLen)
+MCUniverseGenerator::sampleStrandCoordinates(const size_t from,
+                                             const size_t to,
+                                             const int chainLen)
 {
   // determine the positions
   Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChainFromTo(
@@ -1645,9 +1704,9 @@ MCUniverseGenerator::sampleStrandCoordinates(size_t from,
 }
 
 void
-MCUniverseGenerator::linkStrandToCrosslink(size_t strandIdx,
-                                           size_t crosslinkIdx,
-                                           bool ignoreInexistent)
+MCUniverseGenerator::linkStrandToCrosslink(const size_t strandIdx,
+                                           const size_t crosslinkIdx,
+                                           const bool ignoreInexistent)
 {
   INVALIDARG_EXP_IFN(
     strandIdx < this->simplifiedUniverse.strandFrom.size(),
@@ -1685,15 +1744,15 @@ MCUniverseGenerator::linkStrandToCrosslink(size_t strandIdx,
 }
 
 std::vector<size_t>
-MCUniverseGenerator::addXlinkAtoms(int nrOfAtomsToAdd,
-                                   int atomType,
+MCUniverseGenerator::addXlinkAtoms(const int nrOfAtomsToAdd,
+                                   const int atomType,
                                    Eigen::VectorXd coordinates)
 {
   INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
                      "Coordinates must have a size multiple of 3");
   INVALIDARG_EXP_IFN(coordinates.size() / 3 == nrOfAtomsToAdd,
                      "Coordinates must match the promised number of atoms");
-  size_t currentNrOfJunctions = this->simplifiedUniverse.xlinkX.size();
+  const size_t currentNrOfJunctions = this->simplifiedUniverse.xlinkX.size();
   this->simplifiedUniverse.xlinkChainId.reserve(currentNrOfJunctions +
                                                 nrOfAtomsToAdd);
   this->simplifiedUniverse.xlinkTypes.reserve(currentNrOfJunctions +
@@ -1724,17 +1783,17 @@ MCUniverseGenerator::addXlinkAtoms(int nrOfAtomsToAdd,
 }
 
 std::vector<size_t>
-MCUniverseGenerator::addXlinkAtoms(int nrOfAtomsToAdd,
-                                   int atomType,
-                                   bool whiteNoise)
+MCUniverseGenerator::addXlinkAtoms(const int nrOfAtomsToAdd,
+                                   const int atomType,
+                                   const bool whiteNoise)
 {
-  Eigen::VectorXd randomPos =
+  const Eigen::VectorXd randomPos =
     this->generateRandomPositions(nrOfAtomsToAdd, whiteNoise);
   return this->addXlinkAtoms(nrOfAtomsToAdd, atomType, randomPos);
 }
 
 Eigen::VectorXd
-MCUniverseGenerator::generateRandomWhitePositions(int nSamples)
+MCUniverseGenerator::generateRandomWhitePositions(const int nSamples)
 {
   Eigen::VectorXd coordinates = Eigen::VectorXd(3 * nSamples);
 
@@ -1748,7 +1807,7 @@ MCUniverseGenerator::generateRandomWhitePositions(int nSamples)
 }
 
 Eigen::VectorXd
-MCUniverseGenerator::generateRandomBluePositions(int nSamples)
+MCUniverseGenerator::generateRandomBluePositions(const int nSamples)
 {
   Eigen::VectorXd coordinates = Eigen::VectorXd(3 * nSamples);
 
@@ -1756,7 +1815,7 @@ MCUniverseGenerator::generateRandomBluePositions(int nSamples)
   // inspiration:
   // https://github.com/Atrix256/RandomCode/blob/master/Mitchell/Source.cpp
   for (size_t i = 0; i < nSamples; ++i) {
-    size_t numCandidates =
+    const size_t numCandidates =
       std::min((size_t)(i * 1 + 1),
                (size_t)500); // decrease the multiplier to speed things up
     double bestDistance = 0.0;
@@ -1765,18 +1824,18 @@ MCUniverseGenerator::generateRandomBluePositions(int nSamples)
     double bestCandidateZ = 0.0;
 
     for (size_t j = 0; j < numCandidates; ++j) {
-      double x = this->distX(this->rng);
-      double y = this->distY(this->rng);
-      double z = this->distZ(this->rng);
+      const double x = this->distX(this->rng);
+      const double y = this->distY(this->rng);
+      const double z = this->distZ(this->rng);
 
       double minDistance = std::numeric_limits<double>::max();
       for (size_t k = 0; k < nSamples; ++k) {
-        double dist = this->getDistance(x,
-                                        y,
-                                        z,
-                                        coordinates(3 * k),
-                                        coordinates(3 * k + 1),
-                                        coordinates(3 * k + 2));
+        const double dist = this->getDistance(x,
+                                              y,
+                                              z,
+                                              coordinates(3 * k),
+                                              coordinates(3 * k + 1),
+                                              coordinates(3 * k + 2));
         if (dist < minDistance) {
           minDistance = dist;
         }
@@ -1800,7 +1859,7 @@ MCUniverseGenerator::generateRandomBluePositions(int nSamples)
 }
 
 long int
-MCUniverseGenerator::findAppropriateLink(size_t from,
+MCUniverseGenerator::findAppropriateLink(const size_t from,
                                          const double desiredR02,
                                          const double maxDistance)
 {
@@ -1817,7 +1876,7 @@ MCUniverseGenerator::findAppropriateLink(size_t from,
   if (maxDistance < 0.) {
     matchWeights.reserve(this->nrOfAvailableCrosslinkSites);
     suitableMatches.reserve(this->nrOfAvailableCrosslinkSites);
-    size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+    const size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
     for (int i = 0; i < nCrosslinks; ++i) {
       double thisWeight = this->evaluatePartnerProbability(
         from, i, normalisationFactorInExponential, maxDistance);
@@ -1841,7 +1900,7 @@ MCUniverseGenerator::findAppropriateLink(size_t from,
     suitableMatches.reserve(acceptableIndices.size());
     matchWeights.reserve(acceptableIndices.size());
     for (int i = 0; i < acceptableIndices.size(); ++i) {
-      int crosslinkIdx = acceptableIndices(i);
+      const int crosslinkIdx = acceptableIndices(i);
       double thisWeight = this->evaluatePartnerProbability(
         from, crosslinkIdx, normalisationFactorInExponential, maxDistance);
       if (thisWeight <= 0.0) {
@@ -1870,23 +1929,23 @@ MCUniverseGenerator::findAppropriateLink(size_t from,
 
 double
 MCUniverseGenerator::evaluatePartnerProbability(
-  size_t from,
-  size_t to,
+  const size_t from,
+  const size_t to,
   const double normalisationFactorInExponential,
   const double maxDistance,
-  bool respectXlinkChains)
+  const bool respectXlinkChains)
 {
   if (this->remainingCrossLinkerFunctionality[to] < 1) {
     return -1.;
   }
-  Eigen::Vector3d dist = this->getVectorBetween(from, to);
+  const Eigen::Vector3d dist = this->getVectorBetween(from, to);
   double thisWeight = -1.;
   if (dist.norm() < maxDistance || maxDistance < 0.) {
     thisWeight =
       static_cast<double>(this->remainingCrossLinkerFunctionality[to]) *
       std::exp(dist.squaredNorm() * normalisationFactorInExponential);
-    int strand1 = this->simplifiedUniverse.xlinkChainId[from];
-    int strand2 = this->simplifiedUniverse.xlinkChainId[to];
+    const int strand1 = this->simplifiedUniverse.xlinkChainId[from];
+    const int strand2 = this->simplifiedUniverse.xlinkChainId[to];
     if (to == from || (respectXlinkChains && strand1 == strand2)) {
       thisWeight *= this->primaryLoopProbability;
     }
@@ -1906,13 +1965,13 @@ MCUniverseGenerator::evaluatePartnerProbability(
       while (xlinkIdxOnStrand1 < this->simplifiedUniverse.xlinkChainId.size() &&
              this->simplifiedUniverse.xlinkChainId[xlinkIdxOnStrand1] ==
                strand1) {
-        for (size_t partnersSubStrand :
+        for (const size_t partnersSubStrand :
              this->simplifiedUniverse.strandsOfXlink[xlinkIdxOnStrand1]) {
           assert(this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
                    xlinkIdxOnStrand1 ||
                  this->simplifiedUniverse.strandTo[partnersSubStrand] ==
                    xlinkIdxOnStrand1);
-          long int otherStrandEnd =
+          const long int otherStrandEnd =
             this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
                 xlinkIdxOnStrand1
               ? this->simplifiedUniverse.strandTo[partnersSubStrand]
@@ -1954,9 +2013,9 @@ MCUniverseGenerator::getIdealCutoff() const
 void
 MCUniverseGenerator::resetNeighbourList()
 {
-  double idealCutoff = this->getIdealCutoff();
+  const double idealCutoff = this->getIdealCutoff();
   if (idealCutoff > 0.) {
-    Eigen::VectorXd newCoordinates = this->getCrosslinkCoordinates();
+    const Eigen::VectorXd newCoordinates = this->getCrosslinkCoordinates();
     this->xlinkNeighbourList.initialize(newCoordinates, this->box, idealCutoff);
   }
 }
@@ -1971,7 +2030,7 @@ MCUniverseGenerator::updateNeighbourListCoordinates()
 }
 
 double
-MCUniverseGenerator::distanceBetween(size_t i, size_t j) const
+MCUniverseGenerator::distanceBetween(const size_t i, const size_t j) const
 {
   return this->getDistance(this->simplifiedUniverse.xlinkX[i],
                            this->simplifiedUniverse.xlinkY[i],
@@ -1982,7 +2041,7 @@ MCUniverseGenerator::distanceBetween(size_t i, size_t j) const
 }
 
 Eigen::Vector3d
-MCUniverseGenerator::getVectorBetween(size_t i, size_t j) const
+MCUniverseGenerator::getVectorBetween(const size_t i, const size_t j) const
 {
   Eigen::Vector3d diff;
   diff << (this->simplifiedUniverse.xlinkX[j] -
@@ -1994,12 +2053,12 @@ MCUniverseGenerator::getVectorBetween(size_t i, size_t j) const
 }
 
 double
-MCUniverseGenerator::getDistance(double x1,
-                                 double y1,
-                                 double z1,
-                                 double x2,
-                                 double y2,
-                                 double z2) const
+MCUniverseGenerator::getDistance(const double x1,
+                                 const double y1,
+                                 const double z1,
+                                 const double x2,
+                                 const double y2,
+                                 const double z2) const
 {
   Eigen::Vector3d diff;
   diff << x2 - x1, y2 - y1, z2 - z1;
@@ -2008,10 +2067,10 @@ MCUniverseGenerator::getDistance(double x1,
 }
 
 Eigen::Vector3d
-MCUniverseGenerator::sampleCoordinatesWithinNBeadDistance(int nBeads)
+MCUniverseGenerator::sampleCoordinatesWithinNBeadDistance(const int nBeads)
 {
-  double stddev = std::sqrt(static_cast<double>(nBeads + 1) *
-                            this->meanSquaredBeadDistance / 3.);
+  const double stddev = std::sqrt(static_cast<double>(nBeads + 1) *
+                                  this->meanSquaredBeadDistance / 3.);
   std::normal_distribution<double> otherEndCoordinateDist =
     std::normal_distribution<double>(0., stddev);
   // sample the coordinates delta, return
@@ -2024,7 +2083,7 @@ MCUniverseGenerator::sampleCoordinatesWithinNBeadDistance(int nBeads)
 Eigen::VectorXd
 MCUniverseGenerator::getCrosslinkCoordinates() const
 {
-  size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+  const size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
   Eigen::VectorXd coordinates = Eigen::VectorXd(3 * nCrosslinks);
   for (size_t i = 0; i < nCrosslinks; ++i) {
     coordinates(3 * i) = this->simplifiedUniverse.xlinkX[i];
@@ -2035,7 +2094,8 @@ MCUniverseGenerator::getCrosslinkCoordinates() const
 }
 
 void
-MCUniverseGenerator::linkStrandTo(size_t strandIdx, size_t crosslinkIdx)
+MCUniverseGenerator::linkStrandTo(const size_t strandIdx,
+                                  const size_t crosslinkIdx)
 {
   return this->linkStrandToCrosslink(strandIdx, crosslinkIdx, false);
 }

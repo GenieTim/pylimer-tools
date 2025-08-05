@@ -1,71 +1,17 @@
 # Changelog
 
-## v0.1.11
+## main
 
-- [12cd735899] - Improve implementation of Langevin force evaluator (Tim Bernhard)
-- [6f08a4ac37] - Use default false for is2D on MEHPForceEvaluator (Tim Bernhard)
-- [03be3822f3] - Make GitHub Actions respect Python Version for loading cache (Tim Bernhard)
-- [b9f67690cc] - Add (random, to correct) tests for NonGaussianSpringForceEvaluator (Tim Bernhard)
-- [681857263c] - Implement Langevin-Type Spring Force Evaluator (Tim Bernhard)
-- [a0f7636627] - Move MEHPForceRelaxation to cpp, introduce interface to change force calculation (Tim Bernhard)
-- [d7359547c4] - Make tests less strict (Tim Bernhard)
-- [a0170783f0] - Further adjust mmt codes to improve accuracy (Tim Bernhard)
-- [c624e85b43] - Various improvments, incl. MMT fixes for certain f (Tim Bernhard)
-- [0d992d0fb8] - Use more assertAlmostEqual in test to fix failing in GitHub Action (Tim Bernhard)
-- [f487a84bac] - Increase version (Tim Bernhard)
+- Implement Python binding for the MCUniverseGenerator's `link_strands_callback`, i.e., allow the Python users to stear and stop the cross-linking procedure
+- Switch from MEHPForceRelaxation to MEHPForceBalance2 internally of the MCUniverseGenerator to improve performance
+- Allow MEHPForceRelaxation and MEHPForceBalance2 to compute soluble fractions even when the Universe is empty
 
-## v0.1.10
+## v0.3.1
 
-- [[`f223559338`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/f223559338)] - Add some more features to MEHP Relaxation (Tim Bernhard)
-- [[`c94249020f`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/c94249020f)] - Arbitrarily cut alpha and beta to 0, 1. TODO: find a better solution (Tim Bernhard)
-- [[`a10cfc7d89`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/a10cfc7d89)] - Allow to pass a maximum nr of active connections when getting the nr of active nodes in MEHP (Tim Bernhard)
-- [[`1ab5119480`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/1ab5119480)] - Expose more MMT and MEHP underlying results (Tim Bernhard)
-- [[`7c18820c41`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/7c18820c41)] - Implement possibility to replace atom (Tim Bernhard)
-- [[`eb904b82a2`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/eb904b82a2)] - Expose lined up atoms to Python, other minor improvements (Tim Bernhard)
-- [[`5049427676`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/5049427676)] - Set precision higher when writing data files (Tim Bernhard)
-- [[`7784611143`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/7784611143)] - Add (slow) benchmarks for MEHP refactor (Tim Bernhard)
-- [[`7f674f370d`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/7f674f370d)] - Finally get all (incl. MEHP2) tests working again, incl. Python compilation usage (Tim Bernhard)
-- [[`1fcdebaffa`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/1fcdebaffa)] - Remove comparison operator from Atom entity as not actually implemented (Tim Bernhard)
-- [[`784a56c0f3`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/784a56c0f3)] - Add more tests (Tim Bernhard)
-- [[`ba6f5fad4e`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/ba6f5fad4e)] - Implement minimal loop order detection + tests (Tim Bernhard)
-- [[`72925984d2`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/72925984d2)] - Adjust test values after adjusting MMT (Tim Bernhard)
-- [[`b716d9dcf5`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/b716d9dcf5)] - Resolve left over merge conflicts (Tim Bernhard)
-- [[`9b54b9d8e8`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/9b54b9d8e8)] - Close a memory leak (Tim Bernhard)
-- [[`8339505730`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/8339505730)] - Improve compilation support on WSL (Tim Bernhard)
-- [[`5aaf55e8a1`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/5aaf55e8a1)] - Open access to rescaling atoms method (Tim Bernhard)
-- [[`c1f002692e`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/c1f002692e)] - Adjust Eigen Tag to use (Tim Bernhard)
-- [[`ef674e5efc`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/ef674e5efc)] - Automatically download Eigen if not yet available (Tim Bernhard)
-- [[`07440953e0`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/07440953e0)] - (Yet tests failing) refactor of MEHP2 (Tim Bernhard)
-- [[`cf72ee3149`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/cf72ee3149)] - Use 'crossLinkerType' rather than 'junctionType' in function signature \[breaking\] (Tim Bernhard)
-- [[`5a7bc03f2c`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/5a7bc03f2c)] - Use 'of...' rather than 'with...' in function signature \[breaking\] (Tim Bernhard)
-- [[`65ba4dd634`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/65ba4dd634)] - (In)Consistently use mass instead of weight. Re-introduce alternative MEHP implementation. (Tim Bernhard)
-- [[`86efd2f833`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/86efd2f833)] - Implement weight and polydispersity calculation for universe (Tim Bernhard)
-- [[`99977fbee0`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/99977fbee0)] - Add even more tests (Tim Bernhard)
-- [[`fc818fa906`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/fc818fa906)] - Add more tests for df optimization (Tim Bernhard)
-- [[`39436cbb39`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/39436cbb39)] - Remove strange auto-import (Tim Bernhard)
-- [[`c55969db99`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/c55969db99)] - Add new/further tests for new functions (Tim Bernhard)
-- [[`e3357d33db`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/e3357d33db)] - Increase coverage further (Tim Bernhard)
-- [[`cd4cdf1abc`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/cd4cdf1abc)] - Update Changelog (Tim Bernhard)
+This version mainly fixes some issues in the CI.
 
-## v0.1.9
+## v0.3.0
 
-- [[`3bffee2ec9`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/3bffee2ec9)] - Additional test for modulus decomposition (Tim Bernhard)
-- [[`1ec3b2c2c9`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/1ec3b2c2c9)] - Add splitting of MMT modulus (CAUTION: breaking change) (Tim Bernhard)
-- [[`3a90ad6a57`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/3a90ad6a57)] - Bind lazyuniverseiterator (Tim Bernhard)
-- [[`08e3874e60`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/08e3874e60)] - Remove unused headers (Tim Bernhard)
-- [[`40f1a6ddae`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/40f1a6ddae)] - Fix possible error of too long filename of cache (Tim Bernhard)
-- [[`1277318156`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/1277318156)] - Implement radius of gyration correctly (CAUTION: breaking change) (Tim Bernhard)
-- [[`fbd65bdda4`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/fbd65bdda4)] - Fix deprecation, implement access to unit registry (Tim Bernhard)
-- [[`4ff54f66db`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/4ff54f66db)] - Add openpyxl as additional requirement to read the polymer data table (Tim Bernhard)
-- [[`3ea1c290c8`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/3ea1c290c8)] - Add unitStyles for easy LAMMPS unit conversions (Tim Bernhard)
-- [[`8da789c2cf`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/8da789c2cf)] - Add some more tests (Tim Bernhard)
-- [[`648decbddb`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/648decbddb)] - Further increase test coverage (Tim Bernhard)
-- [[`1cbd01ca4d`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/1cbd01ca4d)] - Add coverage to clang, too, and leak analysis to g++ (Tim Bernhard)
-
-## v0.1.8
-
-- [[`fea941f4f9`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/fea941f4f9)] - Implement mean end-to-end distance computations (Tim Bernhard)
-- [[`4143227ec7`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/4143227ec7)] - Merge branch 'main' of github.com:GenieTim/pylimer-tools (Tim Bernhard)
-- [[`aaded3cf4d`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/aaded3cf4d)] - Setup scripts to automatically generate Changelog, publish GitHub release (Tim Bernhard)
-- Re-activate the compilation of the header_tests (Tim Bernhard)
-- Increase test coverage (Tim Bernhard)
+This has become the new baseline version.
+There are only breaking changes, compared to previous versions, such that a CHANGELOG has become useless.
+Sorry for that, please enjoy the many new features.

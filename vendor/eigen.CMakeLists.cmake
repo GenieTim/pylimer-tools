@@ -4,9 +4,10 @@ if (NOT DEFINED eigen_LOADED)
     if (TARGET Eigen3::Eigen)  #(${Eigen3_FOUND}) # AND (${Eigen3_VERSION} VERSION_GREATER_EQUAL 3.4)
         message(STATUS "Found Eigen3 Version: ${Eigen3_VERSION} Path: ${Eigen3_DIR}")
     else ()
+        message(STATUS "Using FetchContent to load Eigen3")
         include(FetchContent)
         FetchContent_Declare(
-                Eigen3
+                Eigen
                 GIT_REPOSITORY https://gitlab.com/libeigen/eigen
                 GIT_TAG 3.4.0
                 GIT_SHALLOW TRUE
@@ -14,11 +15,11 @@ if (NOT DEFINED eigen_LOADED)
         )
         set(EIGEN_BUILD_DOC OFF)
         set(EIGEN_BUILD_PKGCONFIG OFF)
-        FetchContent_MakeAvailable(Eigen3)
+        FetchContent_MakeAvailable(Eigen)
     endif ()
 
     set(eigen_LOADED ON)
-    message(STATUS "Eigen include directories: ${EIGEN3_INCLUDE_DIRS}, libraries ${EIGEN3_LIBRARIES}")
+    message(STATUS "Eigen include directories: ${eigen_INCLUDE_DIRS}, libraries ${eigen_LIBRARIES}")
 endif ()
 
 # include(${CMAKE_CURRENT_LIST_DIR}/FindLAPACKE.cmake)
