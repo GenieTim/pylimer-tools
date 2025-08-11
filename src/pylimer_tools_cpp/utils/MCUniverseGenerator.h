@@ -530,6 +530,75 @@ public:
    */
   void validateInternalState() const;
 
+  /**
+   * @brief Add star-like crosslinkers with pre-connected strands
+   *
+   * @param nrOfStars number of star crosslinkers to add
+   * @param functionality functionality of each star crosslinker (number of
+   * strands)
+   * @param beadsPerStrand number of beads in each strand
+   * @param crosslinkerAtomType atom type for the crosslinker
+   * @param strandAtomType atom type for the strand beads
+   * @param whiteNoise whether to use white noise positioning
+   */
+  void addStarCrosslinkers(int nrOfStars,
+                           int functionality,
+                           int beadsPerStrand,
+                           int crosslinkerAtomType = 2,
+                           int strandAtomType = 1,
+                           bool whiteNoise = true);
+
+  /**
+   * @brief Link two free strand ends together directly
+   *
+   * @param strandIdx index of the strand to link
+   * @param candidateStrands list of candidate strands to link to
+   * @param cInfinity statistical parameter for end-to-end distance calculation
+   * @return the idx of the other chosen strand, or -1 if no suitable pair was
+   * found
+   */
+  long int linkStrandToStrand(const size_t strandIdx,
+                              const std::vector<size_t>& candidateStrands,
+                              const double cInfinity = 1.);
+
+  long int linkStrandToStrand(const size_t strandIdx,
+                              const double cInfinity = 1.)
+  {
+    return this->linkStrandToStrand(
+      strandIdx, this->findFreeStrandEnds(), cInfinity);
+  };
+
+  bool linkStrandToStrand(const double cInfinity = 1.)
+  {
+    std::vector<size_t> candidates = this->findFreeStrandEnds();
+
+    if (candidates.empty()) {
+      return false; // no free strand ends available
+    }
+
+    // shuffle candidates to sample a random start point
+    std::ranges::shuffle(candidates, this->rng);
+
+    return this->linkStrandToStrand(candidates[0], candidates, cInfinity) >= 0;
+  };
+
+  /**
+   * @brief Link free strand ends to each other until target conversion is
+   * reached
+   *
+   * @param targetStrandConversion target conversion of free strand ends
+   * @param cInfinity statistical parameter for end-to-end distance calculation
+   */
+  void linkStrandsToStrandsToConversion(double targetStrandConversion,
+                                        double cInfinity = 1.);
+
+  /**
+   * @brief Find all free strand ends (not connected to any crosslinker)
+   *
+   * @return std::vector<size_t> vector of strand indices
+   */
+  std::vector<size_t> findFreeStrandEnds() const;
+
 #ifdef CEREALIZABLE
   // This method lets cereal know which data members to serialize
   template<class Archive>
@@ -745,5 +814,25 @@ private:
    * @return Eigen::VectorXd
    */
   Eigen::VectorXd getCrosslinkCoordinates() const;
+
+  /**
+   * @brief Combine two strands into one by merging them
+   *
+   * @param strandIdx1 index of first strand
+   * @param strandIdx2 index of second strand
+   */
+  void combineStrands(size_t strandIdx1, size_t strandIdx2);
+
+  /**
+   * @brief Calculate end-to-end distance probability for strand combination
+   *
+   * @param strandIdx1 index of first strand
+   * @param strandIdx2 index of second strand
+   * @param cInfinity statistical parameter
+   * @return probability weight for this combination
+   */
+  double calculateStrandCombinationProbability(size_t strandIdx1,
+                                               size_t strandIdx2,
+                                               double cInfinity);
 };
 } // namespace pylimer_tools::utils

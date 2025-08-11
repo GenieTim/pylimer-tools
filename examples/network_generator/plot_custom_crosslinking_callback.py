@@ -57,11 +57,12 @@ def conversion_callback(gen, step):
     .. todo:
       Implement the search in a binary search fashion to improve efficiency
     """
-    assert isinstance(
-        gen, MCUniverseGenerator
-    ), "Callback must receive a MCUniverseGenerator instance"
+    assert isinstance(gen, MCUniverseGenerator), (
+        "Callback must receive a MCUniverseGenerator instance"
+    )
     fb2 = gen.get_force_balance2()
-    assert isinstance(fb2, MEHPForceBalance2), "Force balance must be MEHPForceBalance2"
+    assert isinstance(
+        fb2, MEHPForceBalance2), "Force balance must be MEHPForceBalance2"
     fb2.run_force_relaxation()
     current_wsol = fb2.get_soluble_weight_fraction()
     current_conversion = gen.get_current_crosslinker_conversion()
@@ -71,7 +72,9 @@ def conversion_callback(gen, step):
 
     if current_conversion >= target_conversion or current_wsol <= target_wsol:
         print(
-            f"  Target conversion {target_conversion:.1%} or soluble fraction {target_wsol:.1%} reached at step {step}"
+            f"  Target conversion {
+                target_conversion:.1%} or soluble fraction {
+                target_wsol:.1%} reached at step {step}"
         )
         return BackTrackStatus.STOP
     else:
@@ -81,7 +84,8 @@ def conversion_callback(gen, step):
 generator.link_strands_callback(conversion_callback, 1.0)
 
 final_conversion = generator.get_current_crosslinker_conversion()
-print(f"  Final conversion: {final_conversion:.3f} and w_sol: {wsol_values[-1]:.3f}")
+print(
+    f"  Final conversion: {final_conversion:.3f} and w_sol: {wsol_values[-1]:.3f}")
 
 # %%
 # Visualizing the Results
