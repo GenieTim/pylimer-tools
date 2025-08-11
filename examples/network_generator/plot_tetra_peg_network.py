@@ -4,8 +4,8 @@ Tetra-PEG Network Generation
 =============================
 
 This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol)
-network using the new `~pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers`
-and `~pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion` methods.
+network using the :meth:`~pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers`
+and :meth:`~pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion` methods.
 
 Tetra-PEG networks are model systems commonly used in soft matter research where
 4-functional star polymers are mixed and crosslinked to form a well-defined network structure.

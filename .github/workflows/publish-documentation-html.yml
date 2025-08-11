@@ -22,7 +22,7 @@ jobs:
 
       - uses: actions/setup-python@v4
         with:
-          python-version: "3.12.4"
+          python-version: "3.12.6"
 
       - uses: actions/cache@v3
         with:
@@ -35,11 +35,12 @@ jobs:
             ./vendor/nlopt-skbuild
             ./vendor/cereal
             ./vendor/cereal-skbuild
-            ./docs
+            ./docs/auto_examples
+            ./docs/gen_modules
             ./docs-html
-          key: ${{ runner.os }}-pip-3.12.4-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-3.12.6-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-3.12.4-
+            ${{ runner.os }}-pip-3.12.6-
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
