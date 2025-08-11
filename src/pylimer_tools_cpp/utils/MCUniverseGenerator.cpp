@@ -703,7 +703,8 @@ MCUniverseGenerator::linkStrandsCallback(
       if (this->simplifiedUniverse.strandFrom[strandIdx] >= 0) {
         RUNTIME_EXP_IFN(
           this->simplifiedUniverse.strandTo[strandIdx] == UNCONNECTED,
-          "Expected second strand end to be free, got " +
+          "Expected second strand end of strand " + std::to_string(strandIdx) +
+            " to be free, got " +
             std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
             " for strand " + std::to_string(strandIdx) + ".");
         // we don't have free crosslink choice
@@ -1548,7 +1549,8 @@ MCUniverseGenerator::getCurrentStrandsConversion() const
     std::ranges::count_if(this->simplifiedUniverse.strandTo,
                           [](const long int to) { return to == UNCONNECTED; });
   const size_t nFreeEnds = nFreeEndsFrom + nFreeEndsTo;
-  return 1. - (static_cast<double>(nFreeEnds) / static_cast<double>(nStrands));
+  return 1. -
+         (static_cast<double>(nFreeEnds) / static_cast<double>(nStrands * 2.));
 }
 
 void
@@ -2098,5 +2100,345 @@ MCUniverseGenerator::linkStrandTo(const size_t strandIdx,
                                   const size_t crosslinkIdx)
 {
   return this->linkStrandToCrosslink(strandIdx, crosslinkIdx, false);
+}
+
+void
+MCUniverseGenerator::addStarCrosslinkers(const int nrOfStars,
+                                         const int functionality,
+                                         const int beadsPerStrand,
+                                         const int crosslinkerAtomType,
+                                         const int strandAtomType,
+                                         const bool whiteNoise)
+{
+  INVALIDARG_EXP_IFN(nrOfStars > 0, "Number of stars must be positive");
+  INVALIDARG_EXP_IFN(functionality > 1, "Functionality must be greater than 1");
+  INVALIDARG_EXP_IFN(beadsPerStrand > 0, "Beads per strand must be positive");
+
+  // Store the current number of crosslinkers & strands before adding new ones
+  const size_t firstNewCrosslinkerIdx =
+    this->remainingCrossLinkerFunctionality.size();
+  const size_t firstNewStrandIdx = this->simplifiedUniverse.strandFrom.size();
+
+  // Add the crosslinkers first
+  this->addCrosslinkers(
+    nrOfStars, functionality, crosslinkerAtomType, whiteNoise);
+
+  // Add the strands
+  this->addStrands(nrOfStars * functionality, beadsPerStrand, strandAtomType);
+
+  // For each star crosslinker, link the strands
+  for (int starIdx = 0; starIdx < nrOfStars; ++starIdx) {
+    const size_t crosslinkerIdx = firstNewCrosslinkerIdx + starIdx;
+
+    // Add the strands for this star
+    for (int armIdx = 0; armIdx < functionality; ++armIdx) {
+      const size_t strandIdx =
+        firstNewStrandIdx + starIdx * functionality + armIdx;
+
+      // Link the strand to the crosslinker using the normal validation logic
+      this->linkStrandToCrosslink(strandIdx, crosslinkerIdx, false);
+    }
+  }
+
+#ifndef NDEBUG
+  this->validateInternalState();
+#endif
+}
+
+std::vector<size_t>
+MCUniverseGenerator::findFreeStrandEnds() const
+{
+  std::vector<size_t> freeEnds;
+
+  for (size_t i = 0; i < this->simplifiedUniverse.strandFrom.size(); ++i) {
+    // Check "to" end
+    if (this->simplifiedUniverse.strandTo[i] == UNCONNECTED) {
+      freeEnds.push_back(i);
+    }
+
+    // Check "from" end (always applies if the "to" end is unconnected)
+    if (this->simplifiedUniverse.strandFrom[i] == UNCONNECTED) {
+      freeEnds.push_back(i);
+    }
+  }
+
+  return freeEnds;
+}
+
+double
+MCUniverseGenerator::calculateStrandCombinationProbability(
+  const size_t strandIdx1,
+  const size_t strandIdx2,
+  const double cInfinity)
+{
+  INVALIDINDEX_EXP_IFN(
+    strandIdx1 < this->simplifiedUniverse.strandFrom.size(),
+    "Strand 1 index " + std::to_string(strandIdx1) +
+      " is out of range (maximum allowed: " +
+      std::to_string(this->simplifiedUniverse.strandFrom.size() - 1) + ")");
+  INVALIDINDEX_EXP_IFN(
+    strandIdx2 < this->simplifiedUniverse.strandFrom.size(),
+    "Strand 2 index " + std::to_string(strandIdx2) +
+      " is out of range (maximum allowed: " +
+      std::to_string(this->simplifiedUniverse.strandFrom.size() - 1) + ")");
+  INVALIDARG_EXP_IFN(this->simplifiedUniverse.strandTo[strandIdx1] ==
+                       UNCONNECTED,
+                     "Expect at least one end of strand 1 to be unconnected.");
+  INVALIDARG_EXP_IFN(this->simplifiedUniverse.strandTo[strandIdx2] ==
+                       UNCONNECTED,
+                     "Expect at least one end of strand 2 to be unconnected.");
+  INVALIDARG_EXP_IFN(
+    APPROX_EQUAL(
+      this->simplifiedUniverse.meanSquaredBeadDistanceInStrand[strandIdx1],
+      this->simplifiedUniverse.meanSquaredBeadDistanceInStrand[strandIdx2],
+      1e-12),
+    "Require both strands to have comparable mean squared bead distances.");
+
+  // For free strand ends, we don't know the exact end-to-end distance
+  // We assume a distance of 0
+  // since the positions are not constrained by existing connections
+
+  // Check if both ends are truly free (both ends of both strands are
+  // unconnected or free background)
+  bool strand1FullyFree = (this->simplifiedUniverse.strandFrom[strandIdx1] < 0);
+  bool strand2FullyFree = (this->simplifiedUniverse.strandFrom[strandIdx2] < 0);
+
+  if (strand1FullyFree || strand2FullyFree) {
+    return 1.0;
+  }
+
+  // If each one end of each strand is connected, we can estimate the distance
+  // between the connected ends and use that for probability calculation
+  long int connectedEnd1 = this->simplifiedUniverse.strandFrom[strandIdx1];
+  long int connectedEnd2 = this->simplifiedUniverse.strandFrom[strandIdx2];
+
+  assert(connectedEnd1 >= 0 && connectedEnd2 >= 0);
+
+  // Calculate combined strand length
+  int totalBeads = this->simplifiedUniverse.beadsInStrand[strandIdx1] +
+                   this->simplifiedUniverse.beadsInStrand[strandIdx2];
+
+  double desiredR02 =
+    (totalBeads + 1.) *
+    this->simplifiedUniverse.meanSquaredBeadDistanceInStrand[strandIdx1] *
+    cInfinity;
+  const double normalisationFactorInExponential = -3. / (2. * desiredR02);
+
+  return this->evaluatePartnerProbability(
+    connectedEnd1,
+    connectedEnd2,
+    normalisationFactorInExponential,
+    this->maxDistanceProvider->getMaxDistance(totalBeads + 1));
+}
+
+void
+MCUniverseGenerator::combineStrands(const size_t strandIdx1,
+                                    const size_t strandIdx2)
+{
+  if (strandIdx2 < strandIdx1) {
+    return this->combineStrands(strandIdx2, strandIdx1);
+  }
+  INVALIDARG_EXP_IFN(strandIdx1 != strandIdx2,
+                     "Cannot combine strand with itself (strand index: " +
+                       std::to_string(strandIdx1) + ")");
+  INVALIDINDEX_EXP_IFN(
+    strandIdx1 < this->simplifiedUniverse.strandFrom.size(),
+    "Strand 1 index " + std::to_string(strandIdx1) +
+      " is out of range (maximum allowed: " +
+      std::to_string(this->simplifiedUniverse.strandFrom.size() - 1) + ")");
+  INVALIDINDEX_EXP_IFN(
+    strandIdx2 < this->simplifiedUniverse.strandFrom.size(),
+    "Strand 2 index " + std::to_string(strandIdx2) +
+      " is out of range (maximum allowed: " +
+      std::to_string(this->simplifiedUniverse.strandFrom.size() - 1) + ")");
+  assert(strandIdx1 < strandIdx2);
+
+  // verify that we don't override some emerging properties
+  INVALIDARG_EXP_IFN(
+    APPROX_EQUAL(
+      this->simplifiedUniverse.meanSquaredBeadDistanceInStrand[strandIdx1],
+      this->simplifiedUniverse.meanSquaredBeadDistanceInStrand[strandIdx2],
+      1e-12),
+    "Require both strands to have comparable mean squared bead distances.");
+  INVALIDARG_EXP_IFN(this->simplifiedUniverse.strandBeadType[strandIdx1] ==
+                       this->simplifiedUniverse.strandBeadType[strandIdx2],
+                     "Require both strands to have the same bead type.");
+
+  // Verify the ends are actually free
+  INVALIDARG_EXP_IFN(this->simplifiedUniverse.strandTo[strandIdx1] ==
+                       UNCONNECTED,
+                     "Expect at least one end of strand 1 to be unconnected.");
+  INVALIDARG_EXP_IFN(this->simplifiedUniverse.strandTo[strandIdx2] ==
+                       UNCONNECTED,
+                     "Expect at least one end of strand 2 to be unconnected.");
+
+  bool strand1IsFrom =
+    this->simplifiedUniverse.strandFrom[strandIdx1] == UNCONNECTED;
+  bool strand2IsFrom =
+    this->simplifiedUniverse.strandFrom[strandIdx2] == UNCONNECTED;
+
+  // Create a new combined strand
+  int combinedBeads = this->simplifiedUniverse.beadsInStrand[strandIdx1] +
+                      this->simplifiedUniverse.beadsInStrand[strandIdx2];
+
+  // Determine the connections of the new combined strand
+  long int newFrom = this->simplifiedUniverse.strandFrom[strandIdx1];
+  long int newTo = this->simplifiedUniverse.strandFrom[strandIdx2];
+
+  if (newFrom < 0) {
+    std::swap(newFrom, newTo);
+  }
+
+  // Use the properties of the first strand for the combined strand
+  // also, use the index of the first strand to write our new things into
+  assert(newFrom >= 0 || newTo < 0);
+  this->simplifiedUniverse.strandFrom[strandIdx1] = newFrom;
+  this->simplifiedUniverse.strandTo[strandIdx1] = newTo;
+  this->simplifiedUniverse.beadsInStrand[strandIdx1] = combinedBeads;
+
+  if (newTo >= 0) {
+    auto& strandsOfXlink = this->simplifiedUniverse.strandsOfXlink[newTo];
+    auto it =
+      std::find(strandsOfXlink.begin(), strandsOfXlink.end(), strandIdx2);
+    if (it != strandsOfXlink.end()) {
+      *it = strandIdx1;
+    }
+  }
+
+  // Remove the old strand
+  this->removeStrand(strandIdx2);
+}
+
+long int
+MCUniverseGenerator::linkStrandToStrand(
+  const size_t strandIdx,
+  const std::vector<size_t>& candidateStrands,
+  const double cInfinity)
+{
+  if (candidateStrands.size() < 2) {
+    return -1; // Need at least 2 free ends to make a link
+  }
+
+  // Calculate probabilities for all possible pairs
+  std::vector<double> probabilities;
+  probabilities.reserve(candidateStrands.size() - 1); // Exclude self-linking
+  std::vector<size_t> validCandidates;
+  validCandidates.reserve(candidateStrands.size() - 1);
+
+  for (size_t otherEnd : candidateStrands) {
+    if (otherEnd == strandIdx) {
+      continue; // Skip self-linking
+    }
+    double prob = this->calculateStrandCombinationProbability(
+      strandIdx, otherEnd, cInfinity);
+    probabilities.push_back(prob);
+    validCandidates.push_back(otherEnd);
+  }
+
+  if (probabilities.empty()) {
+    return -1;
+  }
+
+  // Select a pair based on probability weights
+  std::discrete_distribution<size_t> pairDist(probabilities.begin(),
+                                              probabilities.end());
+  size_t selectedIdx = pairDist(this->rng);
+  size_t selectedOtherStrand = validCandidates[selectedIdx];
+
+  // Combine the strands
+  this->combineStrands(strandIdx, selectedOtherStrand);
+
+  return static_cast<long int>(selectedOtherStrand);
+}
+
+void
+MCUniverseGenerator::linkStrandsToStrandsToConversion(
+  const double targetStrandConversion,
+  const double cInfinity)
+{
+  INVALIDARG_EXP_IFN(targetStrandConversion >= 0.0 &&
+                       targetStrandConversion <= 1.0,
+                     "Target strand conversion must be between 0 and 1, got " +
+                       std::to_string(targetStrandConversion) + ".");
+
+  // Count initial free ends
+  auto freeStrandEnds = this->findFreeStrandEnds();
+  std::ranges::shuffle(freeStrandEnds, this->rng);
+  size_t initialFreeEndCount = freeStrandEnds.size();
+
+  if (initialFreeEndCount == 0) {
+    return; // No free ends to link
+  }
+
+  double nTotalStrandEnds =
+    static_cast<double>(this->simplifiedUniverse.strandFrom.size()) * 2.;
+
+  for (long int startingCandidateIdx = 0;
+       startingCandidateIdx < freeStrandEnds.size();
+       ++startingCandidateIdx) {
+
+    double currentConversion =
+      (nTotalStrandEnds - static_cast<double>(freeStrandEnds.size())) /
+      nTotalStrandEnds;
+    if (currentConversion >= targetStrandConversion) {
+      std::cout << "Target strand conversion " << targetStrandConversion
+                << " reached: " << currentConversion << " with "
+                << freeStrandEnds.size() << " free ends of " << nTotalStrandEnds
+                << " remaining." << std::endl;
+      break;
+    }
+
+    size_t startingCandidate = freeStrandEnds[startingCandidateIdx];
+    long int targetStrand =
+      this->linkStrandToStrand(startingCandidate, freeStrandEnds, cInfinity);
+
+    if (targetStrand < 0) {
+      std::cerr << "No suitable target strand found for candidate strand "
+                << startingCandidate << ". Skipping." << std::endl;
+      continue;
+    }
+    // we need to renumber the freeEnds (since merging the two strands led to
+    // them having now a new index, namely the `startingCandidate`) and remove
+    // the first occurrence of the two strands,
+    // startingCandidate and targetStrand
+    // Remove first occurrence of startingCandidate
+    freeStrandEnds.erase(freeStrandEnds.begin() + startingCandidateIdx);
+
+    // Remove first occurrence of targetStrand
+    auto it2 =
+      std::find(freeStrandEnds.begin(), freeStrandEnds.end(), targetStrand);
+    RUNTIME_EXP_IFN(it2 != freeStrandEnds.end(),
+                    "Expected to find targetStrand");
+    freeStrandEnds.erase(it2);
+
+    size_t indexOfRemoved =
+      std::max(startingCandidate, static_cast<size_t>(targetStrand));
+    for (size_t i = 0; i < freeStrandEnds.size(); ++i) {
+      if (freeStrandEnds[i] > indexOfRemoved) {
+        freeStrandEnds[i]--;
+      } else if (freeStrandEnds[i] == indexOfRemoved) {
+        freeStrandEnds[i] =
+          std::min(startingCandidate, static_cast<size_t>(targetStrand));
+      }
+    }
+
+#ifndef NDEBUG
+    for (const auto& freeEnd : freeStrandEnds) {
+      assert(freeEnd < this->simplifiedUniverse.strandFrom.size());
+    }
+#endif
+
+    // add some protection against infinite loops
+    if (freeStrandEnds.size() < 2) {
+      std::cerr << "Only " << freeStrandEnds.size()
+                << " free ends left, stopping linking strands to strands."
+                << std::endl;
+      break; // No point in continuing with only 2 or fewer ends
+    }
+
+    startingCandidateIdx -= 1;
+  }
+
+  this->validateInternalState();
 }
 }

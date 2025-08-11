@@ -1536,6 +1536,24 @@ class MCUniverseGenerator:
         """
                     Randomly distribute additional, free chains.
         """
+    def add_star_crosslinkers(self, nr_of_stars: int, functionality: int, beads_per_strand: int, crosslinker_atom_type: int = 2, strand_atom_type: int = 1, white_noise: bool = True) -> None:
+        """
+                 Add star-like crosslinkers with pre-connected strands (useful e.g. for tetra-PEG networks).
+                 Each star crosslinker will have the specified functionality with strands already attached.
+        
+                 .. tip::
+        
+                    To have a certain polydispersity in the arms of __one__ star crosslinker,
+                    the stars can alternatively be created using :meth:`~pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers`,
+                    :meth:`~pylimer_tools_cpp.MCUniverseGenerator.add_strands` and :meth:`~pylimer_tools_cpp.MCUniverseGenerator.link_strand_to`.
+        
+                 :param nr_of_stars: Number of star crosslinkers to add
+                 :param functionality: Functionality of each star crosslinker (number of strands)
+                 :param beads_per_strand: Number of beads in each strand
+                 :param crosslinker_atom_type: Atom type for the crosslinker
+                 :param strand_atom_type: Atom type for the strand beads
+                 :param white_noise: Whether to use white noise positioning
+        """
     def add_strands(self, nr_of_strands: int, strand_lengths: list[int], strand_atom_type: int = 1) -> None:
         """
                     Add strands.
@@ -1589,19 +1607,11 @@ class MCUniverseGenerator:
         """
                  Get an instance of the force balance procedure.
                  This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
-                 
-                 Note: 
-                       due to the universe missing, some methods will not work;
-                       you won't be able to query the fraction of active and dangling and soluble structures, for example.
         """
     def get_force_balance2(self) -> ...:
         """
                       Get an instance of the force balance procedure.
                       This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
-                      
-                      Note: 
-                            due to the universe missing, some methods will not work;
-                            you won't be able to query the fraction of active and dangling and soluble structures, for example.
         """
     def get_force_relaxation(self) -> ...:
         """
@@ -1650,10 +1660,30 @@ class MCUniverseGenerator:
     def link_strand_to(self, strand_idx: int, link_idx: int) -> None:
         """
                   Link a strand to a specific crosslinker.
-                  This assumes that you keep track of the order in which you added the crosslinkers and strands.
+                  This assumes that you keep track of the order in which you added the crosslinkers and strands,
+                  as those will determine the indices.
+        
+                  .. caution::
+        
+                       Be aware that some few methods may change the cross-link or strand indices.
         
                   :param strand_idx: Index of the strand to be linked.
                   :param link_idx: Index of the crosslinker to be linked.
+        """
+    def link_strand_to_strand(self, c_infinity: float = 1.0) -> bool:
+        """
+                 Link two free strand ends together directly.
+                 This method finds free strand ends and combines them into a single strand based on
+                 end-to-end distance probability distributions.
+        
+                 .. caution::
+        
+                       - The strand indices will change after this method is called.
+                       - The probability of linking to the end of a free strand is the same as 
+                         linking to an end with a distance 0.
+        
+                 :param c_infinity: Statistical parameter for end-to-end distance calculation
+                 :return: True if a successful link was made, False if no suitable pair was found
         """
     def link_strands_callback(self, linking_controller: typing.Callable[[MCUniverseGenerator, int], BackTrackStatus], c_infinity: float = 1.0) -> None:
         """
@@ -1684,6 +1714,26 @@ class MCUniverseGenerator:
         
                     :param soluble_fraction: Target soluble_fraction (0: no connections to crosslinks; 1: all crosslinkers fully connected).
                     :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
+        """
+    def link_strands_to_strands_to_conversion(self, target_strand_conversion: float, c_infinity: float = 1.0) -> None:
+        """
+                 Link free strand ends to each other until target conversion is reached.
+                 This method repeatedly calls :meth:`~pylimer_tools_cpp.MCUniverseGenerator.link_strand_to_strand` 
+                 in a slightly more efficient manner than you could from Python,
+                 until the specified conversion of free strand ends is achieved.
+        
+                 .. warning::
+        
+                    The strands are merged during this process, i.e., from two strands results one strand.
+                    Consequently, calling :meth:`~pylimer_tools_cpp.MCUniverseGenerator.get_current_strands_conversion` after this method will not return
+                    the requested `target_strand_conversion`, since that one is taken relative to the number of strands when calling this method.
+        
+                 .. caution::
+        
+                    Beware of the notes on :meth:`~pylimer_tools_cpp.MCUniverseGenerator.link_strand_to_strand`.
+        
+                 :param target_strand_conversion: Target conversion of free strand ends (0.0 to 1.0)
+                 :param c_infinity: Statistical parameter for end-to-end distance calculation
         """
     def relax_crosslinks(self) -> None:
         """

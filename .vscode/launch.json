@@ -12,7 +12,7 @@
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
         //"[MEHPForceBalance2]"
-        "Universe generator uses correct w_sol even for strange structures"
+        "[tetra-peg]"
       ],
       "env": {
         "MallocNanoZone": "0",
