@@ -24,7 +24,7 @@ endif ()
 
 # Project definition
 if (NOT DEFINED VERSION_NR)
-    project(pylimer_tools VERSION "0.3.1" LANGUAGES CXX)
+    project(pylimer_tools VERSION "0.3.2" LANGUAGES CXX)
 else ()
     project(pylimer_tools VERSION ${VERSION_NR} LANGUAGES CXX)
 endif ()
