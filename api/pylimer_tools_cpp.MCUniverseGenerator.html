@@ -252,6 +252,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_custom_crosslinking_callback.html">Custom Crosslinking with Callback Functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/network_generator/plot_tetra_peg_network.html">Tetra-PEG Network Generation</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/normal_mode_analysis/index.html">Normal Mode Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Normal Mode Analysis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -669,11 +670,6 @@ that have been linked to strands.</p>
 <span class="sig-name descname"><span class="pre">get_force_balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pylimer_tools::sim::mehp::MEHPForceBalance</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance" title="Link to this definition">¶</a></dt>
 <dd><p>Get an instance of the force balance procedure.
 This is a useful shorthand e.g. to skip the sampling of beads within in the strands.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>due to the universe missing, some methods will not work;
-you won’t be able to query the fraction of active and dangling and soluble structures, for example.</p>
-</div>
 </dd></dl>
 
 <dl class="py method">
@@ -681,11 +677,6 @@ you won’t be able to query the fraction of active and dangling and soluble str
 <span class="sig-name descname"><span class="pre">get_force_balance2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pylimer_tools::sim::mehp::MEHPForceBalance2</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2" title="Link to this definition">¶</a></dt>
 <dd><p>Get an instance of the force balance procedure.
 This is a useful shorthand e.g. to skip the sampling of beads within in the strands.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>due to the universe missing, some methods will not work;
-you won’t be able to query the fraction of active and dangling and soluble structures, for example.</p>
-</div>
 </dd></dl>
 
 <dl class="py method">
@@ -766,7 +757,12 @@ as chosen by the parameters associated with the strand.</p>
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.link_strand_to">
 <span class="sig-name descname"><span class="pre">link_strand_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to" title="Link to this definition">¶</a></dt>
 <dd><p>Link a strand to a specific crosslinker.
-This assumes that you keep track of the order in which you added the crosslinkers and strands.</p>
+This assumes that you keep track of the order in which you added the crosslinkers and strands,
+as those will determine the indices.</p>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>Be aware that some few methods may change the cross-link or strand indices.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

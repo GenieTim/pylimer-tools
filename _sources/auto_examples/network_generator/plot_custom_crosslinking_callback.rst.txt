@@ -62,7 +62,7 @@ Example 1: Stop at Conversion OR Soluble Fraction
 Using a callback allows for more complex logic, such as
 stopping the process based on multiple criteria as illustrated here.
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-86
+.. GENERATED FROM PYTHON SOURCE LINES 34-90
 
 .. code-block:: Python
 
@@ -92,11 +92,12 @@ stopping the process based on multiple criteria as illustrated here.
         .. todo:
           Implement the search in a binary search fashion to improve efficiency
         """
-        assert isinstance(
-            gen, MCUniverseGenerator
-        ), "Callback must receive a MCUniverseGenerator instance"
+        assert isinstance(gen, MCUniverseGenerator), (
+            "Callback must receive a MCUniverseGenerator instance"
+        )
         fb2 = gen.get_force_balance2()
-        assert isinstance(fb2, MEHPForceBalance2), "Force balance must be MEHPForceBalance2"
+        assert isinstance(
+            fb2, MEHPForceBalance2), "Force balance must be MEHPForceBalance2"
         fb2.run_force_relaxation()
         current_wsol = fb2.get_soluble_weight_fraction()
         current_conversion = gen.get_current_crosslinker_conversion()
@@ -106,7 +107,9 @@ stopping the process based on multiple criteria as illustrated here.
 
         if current_conversion >= target_conversion or current_wsol <= target_wsol:
             print(
-                f"  Target conversion {target_conversion:.1%} or soluble fraction {target_wsol:.1%} reached at step {step}"
+                f"  Target conversion {
+                    target_conversion:.1%} or soluble fraction {
+                    target_wsol:.1%} reached at step {step}"
             )
             return BackTrackStatus.STOP
         else:
@@ -116,7 +119,8 @@ stopping the process based on multiple criteria as illustrated here.
     generator.link_strands_callback(conversion_callback, 1.0)
 
     final_conversion = generator.get_current_crosslinker_conversion()
-    print(f"  Final conversion: {final_conversion:.3f} and w_sol: {wsol_values[-1]:.3f}")
+    print(
+        f"  Final conversion: {final_conversion:.3f} and w_sol: {wsol_values[-1]:.3f}")
 
 
 
@@ -132,7 +136,7 @@ stopping the process based on multiple criteria as illustrated here.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-92
+.. GENERATED FROM PYTHON SOURCE LINES 91-96
 
 Visualizing the Results
 ----------------------
@@ -140,7 +144,7 @@ Visualizing the Results
 Let's plot the evolution of crosslinker conversion
 and soluble fraction over the steps.
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-102
+.. GENERATED FROM PYTHON SOURCE LINES 96-106
 
 .. code-block:: Python
 
@@ -169,7 +173,7 @@ and soluble fraction over the steps.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.077 seconds)
+   **Total running time of the script:** (0 minutes 0.078 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_custom_crosslinking_callback.py:

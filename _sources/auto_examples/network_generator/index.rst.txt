@@ -168,6 +168,23 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol) network using the new add_star_crosslinkers and link_strands_to_strands_to_conversion methods.">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_tetra_peg_network_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_network_generator_plot_tetra_peg_network.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Tetra-PEG Network Generation</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -186,4 +203,5 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
    /auto_examples/network_generator/plot_custom_crosslinking_callback
    /auto_examples/network_generator/plot_monte_carlo_configuration
    /auto_examples/network_generator/plot_vulcanized_network
+   /auto_examples/network_generator/plot_tetra_peg_network
 
