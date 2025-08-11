@@ -11,7 +11,7 @@ from pathlib import Path
 from setuptools import Extension, find_namespace_packages, setup
 from setuptools.command.build_ext import build_ext
 
-VERSION = "0.3.1"
+VERSION = "0.3.2"
 
 # ==============================================================================
 # CMake Build Configuration
