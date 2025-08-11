@@ -96,6 +96,7 @@ ax.plot(steps, [c * 100 for c in conversions], label="Conversion")
 ax.plot(steps, [wsol * 100 for wsol in wsol_values], label="Soluble Fraction")
 ax.set_xlabel("Step")
 ax.set_ylabel("Percent [%]")
+ax.set(xlim=(0, max(steps)), ylim=(0, 100))
 ax.legend()
 
 plt.show()
