@@ -170,7 +170,7 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol) network using the new add_star_crosslinkers and link_strands_to_strands_to_conversion methods.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol) network using the add_star_crosslinkers and link_strands_to_strands_to_conversion methods.">
 
 .. only:: html
 

@@ -14,15 +14,22 @@ Atom
       ~Atom.distance_to
       ~Atom.distance_to_unwrapped
       ~Atom.get_coordinates
+      ~Atom.get_extra_data
       ~Atom.get_id
       ~Atom.get_nx
       ~Atom.get_ny
       ~Atom.get_nz
+      ~Atom.get_property
       ~Atom.get_type
       ~Atom.get_unwrapped_coordinates
+      ~Atom.get_unwrapped_x
+      ~Atom.get_unwrapped_y
+      ~Atom.get_unwrapped_z
       ~Atom.get_x
       ~Atom.get_y
       ~Atom.get_z
+      ~Atom.mean_position_with
+      ~Atom.mean_position_with_unwrapped
       ~Atom.vector_to_unwrapped
 
    .. rubric:: Methods Documentation
@@ -31,13 +38,20 @@ Atom
    .. automethod:: distance_to
    .. automethod:: distance_to_unwrapped
    .. automethod:: get_coordinates
+   .. automethod:: get_extra_data
    .. automethod:: get_id
    .. automethod:: get_nx
    .. automethod:: get_ny
    .. automethod:: get_nz
+   .. automethod:: get_property
    .. automethod:: get_type
    .. automethod:: get_unwrapped_coordinates
+   .. automethod:: get_unwrapped_x
+   .. automethod:: get_unwrapped_y
+   .. automethod:: get_unwrapped_z
    .. automethod:: get_x
    .. automethod:: get_y
    .. automethod:: get_z
+   .. automethod:: mean_position_with
+   .. automethod:: mean_position_with_unwrapped
    .. automethod:: vector_to_unwrapped

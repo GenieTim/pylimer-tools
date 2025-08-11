@@ -22,8 +22,8 @@ Tetra-PEG Network Generation
 =============================
 
 This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol)
-network using the new `~pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers`
-and `~pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion` methods.
+network using the :meth:`~pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers`
+and :meth:`~pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion` methods.
 
 Tetra-PEG networks are model systems commonly used in soft matter research where
 4-functional star polymers are mixed and crosslinked to form a well-defined network structure.
@@ -39,7 +39,7 @@ The thumbnail was created using the `polymer-graph-sketcher <https://genietim.gi
 
  .. code-block:: none
 
-    Starting tetra-PEG network generation at 2025-08-11 07:27:12.952171
+    Starting tetra-PEG network generation at 2025-08-11 08:12:08.228877
     System parameters:
       Box size: 80.0³
       Star crosslinkers: 150
@@ -59,7 +59,7 @@ The thumbnail was created using the `polymer-graph-sketcher <https://genietim.gi
       Final strand conversion: 0.822
     Relaxing crosslink positions...
     Generating final universe with bead coordinates...
-    Network generation completed at 2025-08-11 07:27:12.974986
+    Network generation completed at 2025-08-11 08:12:08.251470
     Final network statistics:
       Total atoms: 12900
       Total bonds: 12985
@@ -236,7 +236,7 @@ The thumbnail was created using the `polymer-graph-sketcher <https://genietim.gi
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.087 seconds)
+   **Total running time of the script:** (0 minutes 0.086 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_tetra_peg_network.py:

@@ -10,6 +10,8 @@ SimplifiedNetwork
 
    .. autosummary::
 
+      ~SimplifiedNetwork.assume_box_large_enough
+      ~SimplifiedNetwork.assume_complete
       ~SimplifiedNetwork.box_lengths
       ~SimplifiedNetwork.coordinates
       ~SimplifiedNetwork.nr_of_crosslinks
@@ -24,6 +26,8 @@ SimplifiedNetwork
 
    .. rubric:: Attributes Documentation
 
+   .. autoattribute:: assume_box_large_enough
+   .. autoattribute:: assume_complete
    .. autoattribute:: box_lengths
    .. autoattribute:: coordinates
    .. autoattribute:: nr_of_crosslinks

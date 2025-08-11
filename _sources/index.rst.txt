@@ -1,6 +1,14 @@
 pylimer-tools Documentation
 ===========================
 
+.. image:: https://github.com/GenieTim/pylimer-tools/blob/main/.github/coverage.svg?raw=true
+   :target: https://github.com/GenieTim/pylimer-tools/actions/workflows/run-tests.yml
+   :alt: Test Coverage of Python Code
+
+.. image:: https://github.com/GenieTim/pylimer-tools/blob/main/.github/cpp-coverage.svg?raw=true
+   :target: https://github.com/GenieTim/pylimer-tools/actions/workflows/run-tests.yml
+   :alt: C++ Code Coverage
+
 .. image:: https://codecov.io/gh/GenieTim/pylimer-tools/branch/main/graph/badge.svg?token=5ZE1VSDXJQ 
    :target: https://codecov.io/gh/GenieTim/pylimer-tools
    :alt: Test Coverage
@@ -99,19 +107,14 @@ Basic usage example:
 - **Need examples?** Browse :doc:`auto_examples/index` for practical code samples
 - **Understanding limitations?** Review :doc:`assumptions` and :doc:`nomenclature`
 
-⚠️ **Important Note**
----------------------
-
-The API of this release is currently **unstable** and subject to change. 
-Please refer to the latest documentation for current function signatures and usage patterns.
-
 🔗 **Useful Links**
 -------------------
 
 - `GitHub Repository <https://github.com/GenieTim/pylimer-tools>`_
 - `PyPI Package <https://pypi.org/project/pylimer-tools/>`_
 - `Issue Tracker <https://github.com/GenieTim/pylimer-tools/issues>`_
-- `Examples and Tests <https://github.com/GenieTim/pylimer-tools/tree/main/tests>`_
+- `Tests <https://github.com/GenieTim/pylimer-tools/tree/main/tests>`_
+- `Examples <https://github.com/GenieTim/pylimer-tools/tree/main/examples>`_
 
 📖 **Indices and Tables**
 -------------------------

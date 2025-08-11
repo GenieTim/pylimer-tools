@@ -16,19 +16,20 @@ MEHPForceBalance2
 
    .. autosummary::
 
+      ~MEHPForceBalance2.config_assume_network_is_complete
       ~MEHPForceBalance2.config_mean_bond_length
       ~MEHPForceBalance2.config_spring_breaking_distance
       ~MEHPForceBalance2.config_spring_constant
       ~MEHPForceBalance2.config_step_output
       ~MEHPForceBalance2.deform_to
-      ~MEHPForceBalance2.evaluate_partial_spring_distance
-      ~MEHPForceBalance2.evaluate_partial_spring_distance_from
-      ~MEHPForceBalance2.evaluate_partial_spring_distance_to
+      ~MEHPForceBalance2.evaluate_spring_vector
+      ~MEHPForceBalance2.evaluate_spring_vector_from
+      ~MEHPForceBalance2.evaluate_spring_vector_to
       ~MEHPForceBalance2.get_average_spring_length
       ~MEHPForceBalance2.get_coordinates
       ~MEHPForceBalance2.get_crosslinker_universe
-      ~MEHPForceBalance2.get_current_partial_spring_lengths
-      ~MEHPForceBalance2.get_current_partial_spring_vectors
+      ~MEHPForceBalance2.get_current_spring_lengths
+      ~MEHPForceBalance2.get_current_spring_vectors
       ~MEHPForceBalance2.get_dangling_weight_fraction
       ~MEHPForceBalance2.get_default_mean_bond_length
       ~MEHPForceBalance2.get_displacement_residual_norm
@@ -44,7 +45,7 @@ MEHPForceBalance2
       ~MEHPForceBalance2.get_initial_coordinates
       ~MEHPForceBalance2.get_neighbour_link_indices
       ~MEHPForceBalance2.get_nr_of_active_nodes
-      ~MEHPForceBalance2.get_nr_of_active_partial_springs
+      ~MEHPForceBalance2.get_nr_of_active_spring
       ~MEHPForceBalance2.get_nr_of_active_springs
       ~MEHPForceBalance2.get_nr_of_active_springs_in_dir
       ~MEHPForceBalance2.get_nr_of_atoms
@@ -55,13 +56,13 @@ MEHPForceBalance2
       ~MEHPForceBalance2.get_nr_of_iterations
       ~MEHPForceBalance2.get_nr_of_nodes
       ~MEHPForceBalance2.get_nr_of_springs
-      ~MEHPForceBalance2.get_overall_spring_lengths
+      ~MEHPForceBalance2.get_overall_strand_lengths
       ~MEHPForceBalance2.get_pressure
       ~MEHPForceBalance2.get_soluble_weight_fraction
       ~MEHPForceBalance2.get_stress_on
       ~MEHPForceBalance2.get_stress_tensor
       ~MEHPForceBalance2.get_stress_tensor_link_based
-      ~MEHPForceBalance2.get_weighted_partial_spring_lengths
+      ~MEHPForceBalance2.get_weighted_spring_lengths
       ~MEHPForceBalance2.inspect_displacement_to_mean_position_update
       ~MEHPForceBalance2.run_force_relaxation
       ~MEHPForceBalance2.set_displacements
@@ -74,19 +75,20 @@ MEHPForceBalance2
 
    .. rubric:: Methods Documentation
 
+   .. automethod:: config_assume_network_is_complete
    .. automethod:: config_mean_bond_length
    .. automethod:: config_spring_breaking_distance
    .. automethod:: config_spring_constant
    .. automethod:: config_step_output
    .. automethod:: deform_to
-   .. automethod:: evaluate_partial_spring_distance
-   .. automethod:: evaluate_partial_spring_distance_from
-   .. automethod:: evaluate_partial_spring_distance_to
+   .. automethod:: evaluate_spring_vector
+   .. automethod:: evaluate_spring_vector_from
+   .. automethod:: evaluate_spring_vector_to
    .. automethod:: get_average_spring_length
    .. automethod:: get_coordinates
    .. automethod:: get_crosslinker_universe
-   .. automethod:: get_current_partial_spring_lengths
-   .. automethod:: get_current_partial_spring_vectors
+   .. automethod:: get_current_spring_lengths
+   .. automethod:: get_current_spring_vectors
    .. automethod:: get_dangling_weight_fraction
    .. automethod:: get_default_mean_bond_length
    .. automethod:: get_displacement_residual_norm
@@ -102,7 +104,7 @@ MEHPForceBalance2
    .. automethod:: get_initial_coordinates
    .. automethod:: get_neighbour_link_indices
    .. automethod:: get_nr_of_active_nodes
-   .. automethod:: get_nr_of_active_partial_springs
+   .. automethod:: get_nr_of_active_spring
    .. automethod:: get_nr_of_active_springs
    .. automethod:: get_nr_of_active_springs_in_dir
    .. automethod:: get_nr_of_atoms
@@ -113,13 +115,13 @@ MEHPForceBalance2
    .. automethod:: get_nr_of_iterations
    .. automethod:: get_nr_of_nodes
    .. automethod:: get_nr_of_springs
-   .. automethod:: get_overall_spring_lengths
+   .. automethod:: get_overall_strand_lengths
    .. automethod:: get_pressure
    .. automethod:: get_soluble_weight_fraction
    .. automethod:: get_stress_on
    .. automethod:: get_stress_tensor
    .. automethod:: get_stress_tensor_link_based
-   .. automethod:: get_weighted_partial_spring_lengths
+   .. automethod:: get_weighted_spring_lengths
    .. automethod:: inspect_displacement_to_mean_position_update
    .. automethod:: run_force_relaxation
    .. automethod:: set_displacements

@@ -165,8 +165,8 @@ It also shows, that deformation is an equivalent method to the :math:`\Gamma` fa
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 2.6197937718659056e-13
-    Shear Modulus from Equilibrium [MPa]:  0.10653223516586917
+    Final residual (should be close to 0): 3.735581227097679e-13
+    Shear Modulus from Equilibrium [MPa]:  0.09152628320630349
 
 
 
@@ -180,7 +180,7 @@ Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.048 seconds)
+   **Total running time of the script:** (0 minutes 0.894 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_fb_deformation_exp.py:

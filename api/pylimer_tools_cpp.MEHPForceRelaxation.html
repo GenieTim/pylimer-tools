@@ -427,6 +427,16 @@ Consequently, it offers a variety of configurable non-linear solvers using NLopt
 </ul>
 </dd>
 </dl>
+<p class="rubric">Attributes Summary</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.network" title="pylimer_tools_cpp.MEHPForceRelaxation.network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">network</span></code></a></p></td>
+<td><p>Get the network structure.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Methods Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -446,11 +456,17 @@ Consequently, it offers a variety of configurable non-linear solvers using NLopt
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_active_chains" title="pylimer_tools_cpp.MEHPForceRelaxation.get_active_chains"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_active_chains</span></code></a>(self[, tolerance])</p></td>
 <td><p>Get the crosslinker chains that are active.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_average_spring_length" title="pylimer_tools_cpp.MEHPForceRelaxation.get_average_spring_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_average_spring_length</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_average_contour_length" title="pylimer_tools_cpp.MEHPForceRelaxation.get_average_contour_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_average_contour_length</span></code></a>(self)</p></td>
+<td><p>Get the average contour length of all springs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_average_spring_length" title="pylimer_tools_cpp.MEHPForceRelaxation.get_average_spring_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_average_spring_length</span></code></a>(self)</p></td>
 <td><p>Get the average length of the springs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_crosslinker_universe" title="pylimer_tools_cpp.MEHPForceRelaxation.get_crosslinker_universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_crosslinker_universe</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_crosslinker_universe" title="pylimer_tools_cpp.MEHPForceRelaxation.get_crosslinker_universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_crosslinker_universe</span></code></a>(self)</p></td>
 <td><p>Returns the universe [of crosslinkers] with the positions of the current state of the simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_current_spring_distances" title="pylimer_tools_cpp.MEHPForceRelaxation.get_current_spring_distances"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_spring_distances</span></code></a>(self)</p></td>
+<td><p>Get the current spring distances.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction" title="pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dangling_weight_fraction</span></code></a>(self[, tolerance])</p></td>
 <td><p>Compute the weight fraction of non-active springs.</p></td>
@@ -482,26 +498,32 @@ Consequently, it offers a variety of configurable non-linear solvers using NLopt
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_springs" title="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_springs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_active_springs</span></code></a>(self[, tolerance])</p></td>
 <td><p>Get the number of active springs remaining after running the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_iterations" title="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_iterations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_iterations</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_springs_connected" title="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_springs_connected"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_active_springs_connected</span></code></a>(self[, ...])</p></td>
+<td><p>Returns the number of active springs connected to each node.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_iterations" title="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_iterations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_iterations</span></code></a>(self)</p></td>
 <td><p>Returns the number of iterations used for force relaxation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_nodes" title="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_nodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_nodes</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_nodes" title="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_nodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_nodes</span></code></a>(self)</p></td>
 <td><p>Get the number of nodes considered in this simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_springs" title="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_springs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_springs</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_springs" title="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_springs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_springs</span></code></a>(self)</p></td>
 <td><p>Get the number of springs considered in this simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_pressure" title="pylimer_tools_cpp.MEHPForceRelaxation.get_pressure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_pressure</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_pressure" title="pylimer_tools_cpp.MEHPForceRelaxation.get_pressure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_pressure</span></code></a>(self)</p></td>
 <td><p>Returns the pressure at the current state of the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_residual_norm" title="pylimer_tools_cpp.MEHPForceRelaxation.get_residual_norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_residual_norm</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_residual_norm" title="pylimer_tools_cpp.MEHPForceRelaxation.get_residual_norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_residual_norm</span></code></a>(self)</p></td>
 <td><p>Returns the residual norm at the current state of the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_residuals" title="pylimer_tools_cpp.MEHPForceRelaxation.get_residuals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_residuals</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_residuals" title="pylimer_tools_cpp.MEHPForceRelaxation.get_residuals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_residuals</span></code></a>(self)</p></td>
 <td><p>Returns the residuals at the current state of the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction" title="pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_soluble_weight_fraction</span></code></a>(self[, tolerance])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction" title="pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_soluble_weight_fraction</span></code></a>(self[, tolerance])</p></td>
 <td><p>Compute the weight fraction of springs connected to active springs (any depth).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_spring_contour_length" title="pylimer_tools_cpp.MEHPForceRelaxation.get_spring_contour_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_spring_contour_length</span></code></a>(self)</p></td>
+<td><p>Get the spring contour lengths.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_spring_distances" title="pylimer_tools_cpp.MEHPForceRelaxation.get_spring_distances"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_spring_distances</span></code></a>(self)</p></td>
 <td><p>Get the current coordinate differences for all the springs.</p></td>
@@ -524,6 +546,18 @@ Consequently, it offers a variety of configurable non-linear solvers using NLopt
 </tbody>
 </table>
 </div>
+<p class="rubric">Attributes Documentation</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.network">
+<span class="sig-name descname"><span class="pre">network</span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.network" title="Link to this definition">¶</a></dt>
+<dd><p>Get the network structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The network structure used in the simulation</p>
+</dd>
+</dl>
+</dd></dl>
+
 <p class="rubric">Methods Documentation</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough">
@@ -609,6 +643,17 @@ specifying what values to log and how often</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.get_average_contour_length">
+<span class="sig-name descname"><span class="pre">get_average_contour_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_average_contour_length" title="Link to this definition">¶</a></dt>
+<dd><p>Get the average contour length of all springs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The average contour length</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.get_average_spring_length">
 <span class="sig-name descname"><span class="pre">get_average_spring_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_average_spring_length" title="Link to this definition">¶</a></dt>
 <dd><p>Get the average length of the springs. Note that in contrast to <a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor" title="pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_gamma_factor()</span></code></a>,
@@ -627,6 +672,17 @@ this value is normalized by the number of springs rather than the number of chai
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A Universe object containing the crosslinkers with updated positions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.get_current_spring_distances">
+<span class="sig-name descname"><span class="pre">get_current_spring_distances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_current_spring_distances" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current spring distances.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A vector containing the current spring distance vectors</p>
 </dd>
 </dl>
 </dd></dl>
@@ -790,6 +846,20 @@ Use a value &lt; 0 to indicate that there is no maximum number of active connect
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_springs_connected">
+<span class="sig-name descname"><span class="pre">get_nr_of_active_springs_connected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.int32</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_springs_connected" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the number of active springs connected to each node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tolerance</strong> – Springs under this length are considered inactive</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector with the number of active springs for each node</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_iterations">
 <span class="sig-name descname"><span class="pre">get_nr_of_iterations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_iterations" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the number of iterations used for force relaxation.</p>
@@ -870,6 +940,17 @@ springs (any depth).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The soluble weight fraction</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.get_spring_contour_length">
+<span class="sig-name descname"><span class="pre">get_spring_contour_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_spring_contour_length" title="Link to this definition">¶</a></dt>
+<dd><p>Get the spring contour lengths.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A vector containing the contour lengths of all springs</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1016,13 +1097,16 @@ As a consequence though, you cannot simply benchmark only this method; you must 
             <ul>
 <li><a class="reference internal" href="#">MEHPForceRelaxation</a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.network"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.network</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.assume_box_large_enough()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.config_rerun_epsilon()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_step_output"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.config_step_output()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.count_active_clustered_atoms"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.count_active_clustered_atoms()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_active_chains"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_active_chains()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_average_contour_length"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_average_contour_length()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_average_spring_length"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_average_spring_length()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_crosslinker_universe"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_crosslinker_universe()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_current_spring_distances"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_current_spring_distances()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_dangling_weight_fraction()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_default_r0_square"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_default_r0_square()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_effective_functionality_of_atoms"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_effective_functionality_of_atoms()</span></code></a></li>
@@ -1033,6 +1117,7 @@ As a consequence though, you cannot simply benchmark only this method; you must 
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_ids_of_active_nodes"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_ids_of_active_nodes()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_nodes"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_nr_of_active_nodes()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_springs"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_nr_of_active_springs()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_springs_connected"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_nr_of_active_springs_connected()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_iterations"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_nr_of_iterations()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_nodes"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_nr_of_nodes()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_springs"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_nr_of_springs()</span></code></a></li>
@@ -1040,6 +1125,7 @@ As a consequence though, you cannot simply benchmark only this method; you must 
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_residual_norm"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_residual_norm()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_residuals"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_residuals()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_soluble_weight_fraction()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_spring_contour_length"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_spring_contour_length()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_spring_distances"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_spring_distances()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_spring_lengths"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_spring_lengths()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_stress_tensor"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_stress_tensor()</span></code></a></li>

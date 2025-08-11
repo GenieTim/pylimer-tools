@@ -16,6 +16,7 @@ MCUniverseGenerator
       ~MCUniverseGenerator.add_monofunctional_strands
       ~MCUniverseGenerator.add_randomly_functionalized_strands
       ~MCUniverseGenerator.add_solvent_chains
+      ~MCUniverseGenerator.add_star_crosslinkers
       ~MCUniverseGenerator.add_strands
       ~MCUniverseGenerator.config_nr_of_mc_steps
       ~MCUniverseGenerator.config_primary_loop_probability
@@ -24,6 +25,7 @@ MCUniverseGenerator
       ~MCUniverseGenerator.get_current_crosslinker_conversion
       ~MCUniverseGenerator.get_current_nr_of_atoms
       ~MCUniverseGenerator.get_current_nr_of_bonds
+      ~MCUniverseGenerator.get_current_strand_conversion
       ~MCUniverseGenerator.get_force_balance
       ~MCUniverseGenerator.get_force_balance2
       ~MCUniverseGenerator.get_force_relaxation
@@ -34,8 +36,11 @@ MCUniverseGenerator
       ~MCUniverseGenerator.get_universe
       ~MCUniverseGenerator.link_strand
       ~MCUniverseGenerator.link_strand_to
+      ~MCUniverseGenerator.link_strand_to_strand
+      ~MCUniverseGenerator.link_strands_callback
       ~MCUniverseGenerator.link_strands_to_conversion
       ~MCUniverseGenerator.link_strands_to_soluble_fraction
+      ~MCUniverseGenerator.link_strands_to_strands_to_conversion
       ~MCUniverseGenerator.relax_crosslinks
       ~MCUniverseGenerator.remove_soluble_fraction
       ~MCUniverseGenerator.set_bead_distance
@@ -53,6 +58,7 @@ MCUniverseGenerator
    .. automethod:: add_monofunctional_strands
    .. automethod:: add_randomly_functionalized_strands
    .. automethod:: add_solvent_chains
+   .. automethod:: add_star_crosslinkers
    .. automethod:: add_strands
    .. automethod:: config_nr_of_mc_steps
    .. automethod:: config_primary_loop_probability
@@ -61,6 +67,7 @@ MCUniverseGenerator
    .. automethod:: get_current_crosslinker_conversion
    .. automethod:: get_current_nr_of_atoms
    .. automethod:: get_current_nr_of_bonds
+   .. automethod:: get_current_strand_conversion
    .. automethod:: get_force_balance
    .. automethod:: get_force_balance2
    .. automethod:: get_force_relaxation
@@ -71,8 +78,11 @@ MCUniverseGenerator
    .. automethod:: get_universe
    .. automethod:: link_strand
    .. automethod:: link_strand_to
+   .. automethod:: link_strand_to_strand
+   .. automethod:: link_strands_callback
    .. automethod:: link_strands_to_conversion
    .. automethod:: link_strands_to_soluble_fraction
+   .. automethod:: link_strands_to_strands_to_conversion
    .. automethod:: relax_crosslinks
    .. automethod:: remove_soluble_fraction
    .. automethod:: set_bead_distance

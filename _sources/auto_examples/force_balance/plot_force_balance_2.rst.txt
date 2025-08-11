@@ -34,8 +34,8 @@ See :cite:t:`bernhard_phantom_2025`
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 1.4022224255773352e-13
-    Shear Modulus [MPa]:  0.06974070926673574
+    Final residual (should be close to 0): 4.0308888619196605e-13
+    Shear Modulus [MPa]:  0.1552932426456382
 
 
 
@@ -107,7 +107,7 @@ See :cite:t:`bernhard_phantom_2025`
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.613 seconds)
+   **Total running time of the script:** (0 minutes 0.617 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_force_balance_2.py:

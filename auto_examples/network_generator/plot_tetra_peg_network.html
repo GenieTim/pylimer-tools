@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/network_generator/plot_tetra_peg_network.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol) network using the new~pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers and~pylimer_tools_cpp.MC..." />
+<meta property="og:description" content="This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol) network using the add_star_crosslinkers() and link_strands_to_strands_to_conversion() methods. Tetra-PEG n..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
-<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_network_generator_plot_tetra_peg_network_c970e3a2.png" />
-<meta property="og:image:alt" content="This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol) network using the new~pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers and~pylimer_tools_cpp.MC..." />
-<meta name="description" content="This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol) network using the new~pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers and~pylimer_tools_cpp.MC..." />
+<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_network_generator_plot_tetra_peg_network_e2de412b.png" />
+<meta property="og:image:alt" content="This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol) network using the add_star_crosslinkers() and link_strands_to_strands_to_conversion() methods. Tetra-PEG n..." />
+<meta name="description" content="This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol) network using the add_star_crosslinkers() and link_strands_to_strands_to_conversion() methods. Tetra-PEG n..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -409,12 +409,12 @@ to download the full example code.</p>
 <section class="sphx-glr-example-title" id="tetra-peg-network-generation">
 <span id="sphx-glr-auto-examples-network-generator-plot-tetra-peg-network-py"></span><h1>Tetra-PEG Network Generation<a class="headerlink" href="#tetra-peg-network-generation" title="Link to this heading">¶</a></h1>
 <p>This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol)
-network using the new <cite>~pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers</cite>
-and <cite>~pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion</cite> methods.</p>
+network using the <a class="reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers" title="pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_star_crosslinkers()</span></code></a>
+and <a class="reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion"><code class="xref py py-meth docutils literal notranslate"><span class="pre">link_strands_to_strands_to_conversion()</span></code></a> methods.</p>
 <p>Tetra-PEG networks are model systems commonly used in soft matter research where
 4-functional star polymers are mixed and crosslinked to form a well-defined network structure.</p>
 <p>The thumbnail was created using the <a class="reference external" href="https://genietim.github.io/polymer-graph-sketcher/">polymer-graph-sketcher</a> tool.</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Starting tetra-PEG network generation at 2025-08-11 07:27:12.952171
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Starting tetra-PEG network generation at 2025-08-11 08:12:08.228877
 System parameters:
   Box size: 80.0³
   Star crosslinkers: 150
@@ -434,7 +434,7 @@ System after strand-strand linking:
   Final strand conversion: 0.822
 Relaxing crosslink positions...
 Generating final universe with bead coordinates...
-Network generation completed at 2025-08-11 07:27:12.974986
+Network generation completed at 2025-08-11 08:12:08.251470
 Final network statistics:
   Total atoms: 12900
   Total bonds: 12985
@@ -494,7 +494,7 @@ Network saved to &#39;generated_structures/tetra_peg_network.data&#39;
 
 <span class="c1"># Add star crosslinkers - these create pre-formed 4-functional stars</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Adding star crosslinkers with pre-attached arms...&quot;</span><span class="p">)</span>
-<a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">generator</span></a><span class="o">.</span><span class="n">add_star_crosslinkers</span><span class="p">(</span>
+<a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers" title="pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">generator</span><span class="o">.</span><span class="n">add_star_crosslinkers</span></a><span class="p">(</span>
     <span class="n">nr_of_stars</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_star_crosslinkers</span></a><span class="p">,</span>
     <span class="n">functionality</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">star_functionality</span></a><span class="p">,</span>
     <span class="n">beads_per_strand</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">arm_length</span></a><span class="p">,</span>
@@ -519,7 +519,7 @@ Network saved to &#39;generated_structures/tetra_peg_network.data&#39;
 <span class="nb">print</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">&quot;Linking strand ends to achieve </span><span class="si">{</span>
 <span class="w">        </span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">strand_to_strand_conversion</span></a><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2"> conversion...&quot;</span><span class="p">)</span>
-<a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">generator</span></a><span class="o">.</span><span class="n">link_strands_to_strands_to_conversion</span><span class="p">(</span>
+<a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">generator</span><span class="o">.</span><span class="n">link_strands_to_strands_to_conversion</span></a><span class="p">(</span>
     <span class="n">target_strand_conversion</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">strand_to_strand_conversion</span></a>
 <span class="p">)</span>
 
@@ -528,7 +528,7 @@ Network saved to &#39;generated_structures/tetra_peg_network.data&#39;
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Total bonds: </span><span class="si">{</span><a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_bonds" title="pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_bonds" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">generator</span><span class="o">.</span><span class="n">get_current_nr_of_bonds</span></a><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">&quot;  Final strand conversion: </span><span class="si">{</span>
-<span class="w">        </span><a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">generator</span></a><span class="o">.</span><span class="n">get_current_strand_conversion</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="w">        </span><a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.get_current_strand_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.get_current_strand_conversion" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">generator</span><span class="o">.</span><span class="n">get_current_strand_conversion</span></a><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Optional: Relax crosslink positions for better equilibration</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Relaxing crosslink positions...&quot;</span><span class="p">)</span>
@@ -603,7 +603,7 @@ Network saved to &#39;generated_structures/tetra_peg_network.data&#39;
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Network saved to &#39;generated_structures/tetra_peg_network.data&#39;&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.087 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.086 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-network-generator-plot-tetra-peg-network-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/54a57014b6049a20fd8452564f1e141d/plot_tetra_peg_network.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_tetra_peg_network.ipynb</span></code></a></p>

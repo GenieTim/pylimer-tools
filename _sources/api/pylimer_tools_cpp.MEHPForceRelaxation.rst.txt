@@ -6,6 +6,12 @@ MEHPForceRelaxation
 .. autoclass:: MEHPForceRelaxation
    :show-inheritance:
 
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~MEHPForceRelaxation.network
+
    .. rubric:: Methods Summary
 
    .. autosummary::
@@ -15,8 +21,10 @@ MEHPForceRelaxation
       ~MEHPForceRelaxation.config_step_output
       ~MEHPForceRelaxation.count_active_clustered_atoms
       ~MEHPForceRelaxation.get_active_chains
+      ~MEHPForceRelaxation.get_average_contour_length
       ~MEHPForceRelaxation.get_average_spring_length
       ~MEHPForceRelaxation.get_crosslinker_universe
+      ~MEHPForceRelaxation.get_current_spring_distances
       ~MEHPForceRelaxation.get_dangling_weight_fraction
       ~MEHPForceRelaxation.get_default_r0_square
       ~MEHPForceRelaxation.get_effective_functionality_of_atoms
@@ -27,6 +35,7 @@ MEHPForceRelaxation
       ~MEHPForceRelaxation.get_ids_of_active_nodes
       ~MEHPForceRelaxation.get_nr_of_active_nodes
       ~MEHPForceRelaxation.get_nr_of_active_springs
+      ~MEHPForceRelaxation.get_nr_of_active_springs_connected
       ~MEHPForceRelaxation.get_nr_of_iterations
       ~MEHPForceRelaxation.get_nr_of_nodes
       ~MEHPForceRelaxation.get_nr_of_springs
@@ -34,12 +43,17 @@ MEHPForceRelaxation
       ~MEHPForceRelaxation.get_residual_norm
       ~MEHPForceRelaxation.get_residuals
       ~MEHPForceRelaxation.get_soluble_weight_fraction
+      ~MEHPForceRelaxation.get_spring_contour_length
       ~MEHPForceRelaxation.get_spring_distances
       ~MEHPForceRelaxation.get_spring_lengths
       ~MEHPForceRelaxation.get_stress_tensor
       ~MEHPForceRelaxation.requires_another_run
       ~MEHPForceRelaxation.run_force_relaxation
       ~MEHPForceRelaxation.set_force_evaluator
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: network
 
    .. rubric:: Methods Documentation
 
@@ -48,8 +62,10 @@ MEHPForceRelaxation
    .. automethod:: config_step_output
    .. automethod:: count_active_clustered_atoms
    .. automethod:: get_active_chains
+   .. automethod:: get_average_contour_length
    .. automethod:: get_average_spring_length
    .. automethod:: get_crosslinker_universe
+   .. automethod:: get_current_spring_distances
    .. automethod:: get_dangling_weight_fraction
    .. automethod:: get_default_r0_square
    .. automethod:: get_effective_functionality_of_atoms
@@ -60,6 +76,7 @@ MEHPForceRelaxation
    .. automethod:: get_ids_of_active_nodes
    .. automethod:: get_nr_of_active_nodes
    .. automethod:: get_nr_of_active_springs
+   .. automethod:: get_nr_of_active_springs_connected
    .. automethod:: get_nr_of_iterations
    .. automethod:: get_nr_of_nodes
    .. automethod:: get_nr_of_springs
@@ -67,6 +84,7 @@ MEHPForceRelaxation
    .. automethod:: get_residual_norm
    .. automethod:: get_residuals
    .. automethod:: get_soluble_weight_fraction
+   .. automethod:: get_spring_contour_length
    .. automethod:: get_spring_distances
    .. automethod:: get_spring_lengths
    .. automethod:: get_stress_tensor

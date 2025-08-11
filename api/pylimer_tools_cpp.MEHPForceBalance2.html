@@ -513,20 +513,32 @@ although without slipping along the chain.</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_mean_bond_length" title="pylimer_tools_cpp.MEHPForceBalance2.config_mean_bond_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_mean_bond_length</span></code></a>(self[, b])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_assume_network_is_complete" title="pylimer_tools_cpp.MEHPForceBalance2.config_assume_network_is_complete"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_assume_network_is_complete</span></code></a>(self[, ...])</p></td>
+<td><p>Configure whether the network is assumed to be complete.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_mean_bond_length" title="pylimer_tools_cpp.MEHPForceBalance2.config_mean_bond_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_mean_bond_length</span></code></a>(self[, b])</p></td>
 <td><p>Configure the <span class="math notranslate nohighlight">\(b\)</span> used e.g. for the topological Gamma-factor.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_spring_breaking_distance" title="pylimer_tools_cpp.MEHPForceBalance2.config_spring_breaking_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_spring_breaking_distance</span></code></a>(self[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_spring_breaking_distance" title="pylimer_tools_cpp.MEHPForceBalance2.config_spring_breaking_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_spring_breaking_distance</span></code></a>(self[, ...])</p></td>
 <td><p>Configure the &quot;force&quot; (distance over contour length) at which the bonds break.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_spring_constant" title="pylimer_tools_cpp.MEHPForceBalance2.config_spring_constant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_spring_constant</span></code></a>(self[, kappa])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_spring_constant" title="pylimer_tools_cpp.MEHPForceBalance2.config_spring_constant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_spring_constant</span></code></a>(self[, kappa])</p></td>
 <td><p>Configure the spring constant used in the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_step_output" title="pylimer_tools_cpp.MEHPForceBalance2.config_step_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_step_output</span></code></a>(self, values)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_step_output" title="pylimer_tools_cpp.MEHPForceBalance2.config_step_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_step_output</span></code></a>(self, values)</p></td>
 <td><p>Set which values to log.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.deform_to" title="pylimer_tools_cpp.MEHPForceBalance2.deform_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deform_to</span></code></a>(self, new_box)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.deform_to" title="pylimer_tools_cpp.MEHPForceBalance2.deform_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deform_to</span></code></a>(self, new_box)</p></td>
 <td><p>Perform a deformation of the system box to a different box.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector" title="pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_spring_vector</span></code></a>(self, network, ...)</p></td>
+<td><p>Evaluate the distance vector for a specific spring.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector_from" title="pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector_from"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_spring_vector_from</span></code></a>(self, network, ...)</p></td>
+<td><p>Evaluate the spring vector in the direction from a specific link.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector_to" title="pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_spring_vector_to</span></code></a>(self, network, ...)</p></td>
+<td><p>Evaluate the spring vector in the direction to a specific link.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_average_spring_length" title="pylimer_tools_cpp.MEHPForceBalance2.get_average_spring_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_average_spring_length</span></code></a>(self)</p></td>
 <td><p>Get the average length of the springs.</p></td>
@@ -536,6 +548,12 @@ although without slipping along the chain.</p>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_crosslinker_universe" title="pylimer_tools_cpp.MEHPForceBalance2.get_crosslinker_universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_crosslinker_universe</span></code></a>(self)</p></td>
 <td><p>Returns the universe [of crosslinkers] with the positions of the current state of the simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_current_spring_lengths" title="pylimer_tools_cpp.MEHPForceBalance2.get_current_spring_lengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_spring_lengths</span></code></a>(self)</p></td>
+<td><p>Get the spring lengths (Euclidean distances of the spring vectors).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_current_spring_vectors" title="pylimer_tools_cpp.MEHPForceBalance2.get_current_spring_vectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_spring_vectors</span></code></a>(self)</p></td>
+<td><p>Get the spring vectors.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_dangling_weight_fraction" title="pylimer_tools_cpp.MEHPForceBalance2.get_dangling_weight_fraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dangling_weight_fraction</span></code></a>(self[, tolerance])</p></td>
 <td><p>Compute the weight fraction of non-active springs</p></td>
@@ -582,35 +600,41 @@ although without slipping along the chain.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_nodes" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_nodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_active_nodes</span></code></a>(self[, tolerance])</p></td>
 <td><p>Get the number of active nodes (incl.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_active_springs</span></code></a>(self[, tolerance])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_spring" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_spring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_active_spring</span></code></a>(self[, tolerance])</p></td>
 <td><p>Get the number of active springs remaining after running the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs_in_dir" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs_in_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_active_springs_in_dir</span></code></a>(self, direction)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_active_springs</span></code></a>(self[, tolerance])</p></td>
 <td><p>Get the number of active springs remaining after running the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_atoms" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_atoms</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs_in_dir" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs_in_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_active_springs_in_dir</span></code></a>(self, direction)</p></td>
+<td><p>Get the number of active springs remaining after running the simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_atoms" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_atoms</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_bonds" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_bonds</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_bonds" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_bonds</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_extra_atoms" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_extra_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_extra_atoms</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_extra_atoms" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_extra_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_extra_atoms</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_extra_bonds" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_extra_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_extra_bonds</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_extra_bonds" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_extra_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_extra_bonds</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_intra_chain_sliplinks" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_intra_chain_sliplinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_intra_chain_sliplinks</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_intra_chain_sliplinks" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_intra_chain_sliplinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_intra_chain_sliplinks</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_iterations" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_iterations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_iterations</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_iterations" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_iterations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_iterations</span></code></a>(self)</p></td>
 <td><p>Returns the number of iterations used for force relaxation so far.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_nodes" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_nodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_nodes</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_nodes" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_nodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_nodes</span></code></a>(self)</p></td>
 <td><p>Get the number of nodes (crosslinkers) considered in this simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_springs" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_springs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_springs</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_springs" title="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_springs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_springs</span></code></a>(self)</p></td>
 <td><p>Get the number of springs considered in this simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_overall_strand_lengths" title="pylimer_tools_cpp.MEHPForceBalance2.get_overall_strand_lengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_overall_strand_lengths</span></code></a>(self)</p></td>
+<td><p>Get the sum of the lengths of the springs of each strand.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_pressure" title="pylimer_tools_cpp.MEHPForceBalance2.get_pressure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_pressure</span></code></a>(self)</p></td>
 <td><p>Returns the pressure at the current state of the simulation.</p></td>
@@ -627,19 +651,22 @@ although without slipping along the chain.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_stress_tensor_link_based" title="pylimer_tools_cpp.MEHPForceBalance2.get_stress_tensor_link_based"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_stress_tensor_link_based</span></code></a>(self[, xlinks_only])</p></td>
 <td><p>Returns the stress tensor at the current state of the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.inspect_displacement_to_mean_position_update" title="pylimer_tools_cpp.MEHPForceBalance2.inspect_displacement_to_mean_position_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inspect_displacement_to_mean_position_update</span></code></a>(...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_weighted_spring_lengths" title="pylimer_tools_cpp.MEHPForceBalance2.get_weighted_spring_lengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_weighted_spring_lengths</span></code></a>(self)</p></td>
+<td><p>Get the current spring lengths (norm of vector) divided by the spring partition times the contour length.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.inspect_displacement_to_mean_position_update" title="pylimer_tools_cpp.MEHPForceBalance2.inspect_displacement_to_mean_position_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inspect_displacement_to_mean_position_update</span></code></a>(...)</p></td>
 <td><p>Helper method to debug and/or understand what happens to certain links when being displaced.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.run_force_relaxation" title="pylimer_tools_cpp.MEHPForceBalance2.run_force_relaxation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_force_relaxation</span></code></a>(self, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.run_force_relaxation" title="pylimer_tools_cpp.MEHPForceBalance2.run_force_relaxation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_force_relaxation</span></code></a>(self, ...)</p></td>
 <td><p>Run the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.set_displacements" title="pylimer_tools_cpp.MEHPForceBalance2.set_displacements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_displacements</span></code></a>(self, arg0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.set_displacements" title="pylimer_tools_cpp.MEHPForceBalance2.set_displacements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_displacements</span></code></a>(self, arg0)</p></td>
 <td><p>Set the current link displacements.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.set_spring_contour_lengths" title="pylimer_tools_cpp.MEHPForceBalance2.set_spring_contour_lengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_spring_contour_lengths</span></code></a>(self, arg0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.set_spring_contour_lengths" title="pylimer_tools_cpp.MEHPForceBalance2.set_spring_contour_lengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_spring_contour_lengths</span></code></a>(self, arg0)</p></td>
 <td><p>Set/overwrite the contour lengths.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.validate_network" title="pylimer_tools_cpp.MEHPForceBalance2.validate_network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_network</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.validate_network" title="pylimer_tools_cpp.MEHPForceBalance2.validate_network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_network</span></code></a>(self)</p></td>
 <td><p>Validates the internal structures.</p></td>
 </tr>
 </tbody>
@@ -652,6 +679,20 @@ although without slipping along the chain.</p>
 <dd></dd></dl>
 
 <p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.config_assume_network_is_complete">
+<span class="sig-name descname"><span class="pre">config_assume_network_is_complete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">assume_network_is_complete</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.config_assume_network_is_complete" title="Link to this definition">¶</a></dt>
+<dd><p>Configure whether the network is assumed to be complete.</p>
+<p>This assumption means, that the <cite>universe</cite> instance is not queried for clusters when
+computing the fraction of e.g. the soluble or dangling strands.
+Do not set this to true if inactive
+(dangling or free) strands have been removed from the network.</p>
+<p>This is useful to reduce memory between MC generator and force balance,
+since the universe representation with all the in-between beads does not need to be stored.
+However, currently, the removal procedures are not loss-free.
+Therefore, use this with care.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.config_mean_bond_length">
 <span class="sig-name descname"><span class="pre">config_mean_bond_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.config_mean_bond_length" title="Link to this definition">¶</a></dt>
@@ -708,6 +749,62 @@ All coordinates etc. will be scaled as needed.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector">
+<span class="sig-name descname"><span class="pre">evaluate_spring_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalance2Network.html#pylimer_tools_cpp.SimplifiedBalance2Network" title="pylimer_tools_cpp.SimplifiedBalance2Network"><span class="pre">pylimer_tools_cpp.SimplifiedBalance2Network</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">displacements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector" title="Link to this definition">¶</a></dt>
+<dd><p>Evaluate the distance vector for a specific spring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> – The force balance 2 network</p></li>
+<li><p><strong>displacements</strong> – Current displacement vector</p></li>
+<li><p><strong>spring_idx</strong> – Index of the spring to evaluate</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>3D distance vector for the spring</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector_from">
+<span class="sig-name descname"><span class="pre">evaluate_spring_vector_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalance2Network.html#pylimer_tools_cpp.SimplifiedBalance2Network" title="pylimer_tools_cpp.SimplifiedBalance2Network"><span class="pre">pylimer_tools_cpp.SimplifiedBalance2Network</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">displacements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector_from" title="Link to this definition">¶</a></dt>
+<dd><p>Evaluate the spring vector in the direction from a specific link.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> – The force balance 2 network</p></li>
+<li><p><strong>displacements</strong> – Current displacement vector</p></li>
+<li><p><strong>spring_idx</strong> – Index of the spring to evaluate</p></li>
+<li><p><strong>link_idx</strong> – Index of the starting link</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>3D distance vector from the specified link</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector_to">
+<span class="sig-name descname"><span class="pre">evaluate_spring_vector_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalance2Network.html#pylimer_tools_cpp.SimplifiedBalance2Network" title="pylimer_tools_cpp.SimplifiedBalance2Network"><span class="pre">pylimer_tools_cpp.SimplifiedBalance2Network</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">displacements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector_to" title="Link to this definition">¶</a></dt>
+<dd><p>Evaluate the spring vector in the direction to a specific link.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> – The force balance 2 network</p></li>
+<li><p><strong>displacements</strong> – Current displacement vector</p></li>
+<li><p><strong>spring_idx</strong> – Index of the spring to evaluate</p></li>
+<li><p><strong>link_idx</strong> – Index of the target link</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>3D distance vector to the specified link</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.get_average_spring_length">
 <span class="sig-name descname"><span class="pre">get_average_spring_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.get_average_spring_length" title="Link to this definition">¶</a></dt>
 <dd><p>Get the average length of the springs. Note that in contrast to <code class="xref py py-func docutils literal notranslate"><span class="pre">getGammaFactor()</span></code>,
@@ -724,6 +821,18 @@ this value is normalized by the number of springs rather than the number of chai
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.get_crosslinker_universe">
 <span class="sig-name descname"><span class="pre">get_crosslinker_universe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.get_crosslinker_universe" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the universe [of crosslinkers] with the positions of the current state of the simulation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.get_current_spring_lengths">
+<span class="sig-name descname"><span class="pre">get_current_spring_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.get_current_spring_lengths" title="Link to this definition">¶</a></dt>
+<dd><p>Get the spring lengths (Euclidean distances of the spring vectors).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.get_current_spring_vectors">
+<span class="sig-name descname"><span class="pre">get_current_spring_vectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.get_current_spring_vectors" title="Link to this definition">¶</a></dt>
+<dd><p>Get the spring vectors.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -871,6 +980,19 @@ excl. entanglement links [the slip-links created internally when e.g. constructi
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_spring">
+<span class="sig-name descname"><span class="pre">get_nr_of_active_spring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_spring" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Get the number of active springs remaining after running the simulation.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tolerance</strong> – springs under this length are considered inactive</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs">
 <span class="sig-name descname"><span class="pre">get_nr_of_active_springs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
@@ -948,6 +1070,12 @@ excl. entanglement links [the slip-links created internally when e.g. constructi
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.get_overall_strand_lengths">
+<span class="sig-name descname"><span class="pre">get_overall_strand_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.get_overall_strand_lengths" title="Link to this definition">¶</a></dt>
+<dd><p>Get the sum of the lengths of the springs of each strand.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.get_pressure">
 <span class="sig-name descname"><span class="pre">get_pressure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.get_pressure" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the pressure at the current state of the simulation.</p>
@@ -980,6 +1108,12 @@ Make sure to multiply by <span class="math notranslate nohighlight">\(\kappa\)</
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.get_stress_tensor_link_based">
 <span class="sig-name descname"><span class="pre">get_stress_tensor_link_based</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlinks_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.get_stress_tensor_link_based" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the stress tensor at the current state of the simulation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance2.get_weighted_spring_lengths">
+<span class="sig-name descname"><span class="pre">get_weighted_spring_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="pre">pylimer_tools_cpp.MEHPForceBalance2</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance2.get_weighted_spring_lengths" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current spring lengths (norm of vector) divided by the spring partition times the contour length.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1093,14 +1227,20 @@ Otherwise, it returns true.</p>
 <li><a class="reference internal" href="#">MEHPForceBalance2</a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2</span></code></a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.network"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.network</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_assume_network_is_complete"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.config_assume_network_is_complete()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_mean_bond_length"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.config_mean_bond_length()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_spring_breaking_distance"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.config_spring_breaking_distance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_spring_constant"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.config_spring_constant()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.config_step_output"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.config_step_output()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.deform_to"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.deform_to()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.evaluate_spring_vector()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector_from"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.evaluate_spring_vector_from()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector_to"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.evaluate_spring_vector_to()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_average_spring_length"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_average_spring_length()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_coordinates"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_coordinates()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_crosslinker_universe"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_crosslinker_universe()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_current_spring_lengths"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_current_spring_lengths()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_current_spring_vectors"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_current_spring_vectors()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_dangling_weight_fraction"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_dangling_weight_fraction()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_default_mean_bond_length"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_default_mean_bond_length()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_displacement_residual_norm"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_displacement_residual_norm()</span></code></a></li>
@@ -1116,6 +1256,7 @@ Otherwise, it returns true.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_initial_coordinates"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_initial_coordinates()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_neighbour_link_indices"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_neighbour_link_indices()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_nodes"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_nr_of_active_nodes()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_spring"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_nr_of_active_spring()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_nr_of_active_springs()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs_in_dir"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_nr_of_active_springs_in_dir()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_atoms"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_nr_of_atoms()</span></code></a></li>
@@ -1126,11 +1267,13 @@ Otherwise, it returns true.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_iterations"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_nr_of_iterations()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_nodes"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_nr_of_nodes()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_springs"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_nr_of_springs()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_overall_strand_lengths"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_overall_strand_lengths()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_pressure"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_pressure()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_soluble_weight_fraction"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_soluble_weight_fraction()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_stress_on"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_stress_on()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_stress_tensor"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_stress_tensor()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_stress_tensor_link_based"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_stress_tensor_link_based()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.get_weighted_spring_lengths"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.get_weighted_spring_lengths()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.inspect_displacement_to_mean_position_update"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.inspect_displacement_to_mean_position_update()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.run_force_relaxation"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.run_force_relaxation()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance2.set_displacements"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance2.set_displacements()</span></code></a></li>

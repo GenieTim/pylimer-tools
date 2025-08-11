@@ -472,17 +472,23 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_coordinates" title="pylimer_tools_cpp.Atom.get_coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_coordinates</span></code></a>(self)</p></td>
 <td><p>Get the coordinates of this atom as a vector.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_id" title="pylimer_tools_cpp.Atom.get_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_id</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_extra_data" title="pylimer_tools_cpp.Atom.get_extra_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_data</span></code></a>(self)</p></td>
+<td><p>Get all extra data properties stored with this atom (e.g., charge, dipole, etc.).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_id" title="pylimer_tools_cpp.Atom.get_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_id</span></code></a>(self)</p></td>
 <td><p>Get the ID of the atom.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_nx" title="pylimer_tools_cpp.Atom.get_nx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nx</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_nx" title="pylimer_tools_cpp.Atom.get_nx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nx</span></code></a>(self)</p></td>
 <td><p>Get the box image that the atom is in in x direction (also known as <cite>ix</cite> or <cite>nx</cite>).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_ny" title="pylimer_tools_cpp.Atom.get_ny"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ny</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_ny" title="pylimer_tools_cpp.Atom.get_ny"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ny</span></code></a>(self)</p></td>
 <td><p>Get the box image that the atom is in in y direction (also known as <cite>iy</cite> or <cite>ny</cite>).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_nz" title="pylimer_tools_cpp.Atom.get_nz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nz</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_nz" title="pylimer_tools_cpp.Atom.get_nz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nz</span></code></a>(self)</p></td>
 <td><p>Get the box image that the atom is in in z direction (also known as <cite>iz</cite> or <cite>nz</cite>).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_property" title="pylimer_tools_cpp.Atom.get_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_property</span></code></a>(self, property)</p></td>
+<td><p>Get a specific property value from the extra data.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_type" title="pylimer_tools_cpp.Atom.get_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_type</span></code></a>(self)</p></td>
 <td><p>Get the type of the atom.</p></td>
@@ -490,16 +496,31 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_unwrapped_coordinates" title="pylimer_tools_cpp.Atom.get_unwrapped_coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unwrapped_coordinates</span></code></a>(self, arg0)</p></td>
 <td><p>Get the unwrapped coordinates of this atom.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_x" title="pylimer_tools_cpp.Atom.get_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_x</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_unwrapped_x" title="pylimer_tools_cpp.Atom.get_unwrapped_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unwrapped_x</span></code></a>(self, box)</p></td>
+<td><p>Get the unwrapped x coordinate of the atom.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_unwrapped_y" title="pylimer_tools_cpp.Atom.get_unwrapped_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unwrapped_y</span></code></a>(self, box)</p></td>
+<td><p>Get the unwrapped y coordinate of the atom.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_unwrapped_z" title="pylimer_tools_cpp.Atom.get_unwrapped_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unwrapped_z</span></code></a>(self, box)</p></td>
+<td><p>Get the unwrapped z coordinate of the atom.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_x" title="pylimer_tools_cpp.Atom.get_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_x</span></code></a>(self)</p></td>
 <td><p>Get the x coordinate of the atom.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_y" title="pylimer_tools_cpp.Atom.get_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_y</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_y" title="pylimer_tools_cpp.Atom.get_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_y</span></code></a>(self)</p></td>
 <td><p>Get the y coordinate of the atom.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_z" title="pylimer_tools_cpp.Atom.get_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_z</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_z" title="pylimer_tools_cpp.Atom.get_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_z</span></code></a>(self)</p></td>
 <td><p>Get the z coordinate of the atom.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.vector_to_unwrapped" title="pylimer_tools_cpp.Atom.vector_to_unwrapped"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vector_to_unwrapped</span></code></a>(self, arg0, arg1)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.mean_position_with" title="pylimer_tools_cpp.Atom.mean_position_with"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_position_with</span></code></a>(self, other_atom, pbc_box)</p></td>
+<td><p>Compute the mean position between this atom and another atom, considering periodic boundaries.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.mean_position_with_unwrapped" title="pylimer_tools_cpp.Atom.mean_position_with_unwrapped"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_position_with_unwrapped</span></code></a>(self, ...)</p></td>
+<td><p>Compute the mean position between this atom and another atom using unwrapped coordinates.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Atom.vector_to_unwrapped" title="pylimer_tools_cpp.Atom.vector_to_unwrapped"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vector_to_unwrapped</span></code></a>(self, arg0, arg1)</p></td>
 <td><p>Compute the vector to another atom respecting the periodic image flags.</p></td>
 </tr>
 </tbody>
@@ -566,6 +587,17 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_extra_data">
+<span class="sig-name descname"><span class="pre">get_extra_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_extra_data" title="Link to this definition">¶</a></dt>
+<dd><p>Get all extra data properties stored with this atom (e.g., charge, dipole, etc.).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing all extra properties</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_id">
 <span class="sig-name descname"><span class="pre">get_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_id" title="Link to this definition">¶</a></dt>
 <dd><p>Get the ID of the atom.</p>
@@ -610,6 +642,23 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_property">
+<span class="sig-name descname"><span class="pre">get_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">property</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_property" title="Link to this definition">¶</a></dt>
+<dd><p>Get a specific property value from the extra data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>property</strong> – The name of the property to retrieve</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of the specified property</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>std::out_of_range if the property doesn’t exist</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_type">
 <span class="sig-name descname"><span class="pre">get_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_type" title="Link to this definition">¶</a></dt>
 <dd><p>Get the type of the atom.</p>
@@ -630,6 +679,48 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A vector containing the unwrapped x, y, z coordinates</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_unwrapped_x">
+<span class="sig-name descname"><span class="pre">get_unwrapped_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_unwrapped_x" title="Link to this definition">¶</a></dt>
+<dd><p>Get the unwrapped x coordinate of the atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>box</strong> – The simulation box to use for unwrapping</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The unwrapped x coordinate</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_unwrapped_y">
+<span class="sig-name descname"><span class="pre">get_unwrapped_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_unwrapped_y" title="Link to this definition">¶</a></dt>
+<dd><p>Get the unwrapped y coordinate of the atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>box</strong> – The simulation box to use for unwrapping</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The unwrapped y coordinate</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.get_unwrapped_z">
+<span class="sig-name descname"><span class="pre">get_unwrapped_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.get_unwrapped_z" title="Link to this definition">¶</a></dt>
+<dd><p>Get the unwrapped z coordinate of the atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>box</strong> – The simulation box to use for unwrapping</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The unwrapped z coordinate</p>
 </dd>
 </dl>
 </dd></dl>
@@ -663,6 +754,40 @@
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The z coordinate</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.mean_position_with">
+<span class="sig-name descname"><span class="pre">mean_position_with</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_atom</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc_box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.mean_position_with" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the mean position between this atom and another atom, considering periodic boundaries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other_atom</strong> – The other atom</p></li>
+<li><p><strong>pbc_box</strong> – The periodic boundary conditions box</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector representing the mean position</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Atom.mean_position_with_unwrapped">
+<span class="sig-name descname"><span class="pre">mean_position_with_unwrapped</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_atom</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc_box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Atom.mean_position_with_unwrapped" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the mean position between this atom and another atom using unwrapped coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other_atom</strong> – The other atom</p></li>
+<li><p><strong>pbc_box</strong> – The periodic boundary conditions box</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector representing the mean position (unwrapped)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -746,15 +871,22 @@
 <li><a class="reference internal" href="#pylimer_tools_cpp.Atom.distance_to"><code class="docutils literal notranslate"><span class="pre">Atom.distance_to()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Atom.distance_to_unwrapped"><code class="docutils literal notranslate"><span class="pre">Atom.distance_to_unwrapped()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_coordinates"><code class="docutils literal notranslate"><span class="pre">Atom.get_coordinates()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_extra_data"><code class="docutils literal notranslate"><span class="pre">Atom.get_extra_data()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_id"><code class="docutils literal notranslate"><span class="pre">Atom.get_id()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_nx"><code class="docutils literal notranslate"><span class="pre">Atom.get_nx()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_ny"><code class="docutils literal notranslate"><span class="pre">Atom.get_ny()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_nz"><code class="docutils literal notranslate"><span class="pre">Atom.get_nz()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_property"><code class="docutils literal notranslate"><span class="pre">Atom.get_property()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_type"><code class="docutils literal notranslate"><span class="pre">Atom.get_type()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_unwrapped_coordinates"><code class="docutils literal notranslate"><span class="pre">Atom.get_unwrapped_coordinates()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_unwrapped_x"><code class="docutils literal notranslate"><span class="pre">Atom.get_unwrapped_x()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_unwrapped_y"><code class="docutils literal notranslate"><span class="pre">Atom.get_unwrapped_y()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_unwrapped_z"><code class="docutils literal notranslate"><span class="pre">Atom.get_unwrapped_z()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_x"><code class="docutils literal notranslate"><span class="pre">Atom.get_x()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_y"><code class="docutils literal notranslate"><span class="pre">Atom.get_y()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Atom.get_z"><code class="docutils literal notranslate"><span class="pre">Atom.get_z()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Atom.mean_position_with"><code class="docutils literal notranslate"><span class="pre">Atom.mean_position_with()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Atom.mean_position_with_unwrapped"><code class="docutils literal notranslate"><span class="pre">Atom.mean_position_with_unwrapped()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Atom.vector_to_unwrapped"><code class="docutils literal notranslate"><span class="pre">Atom.vector_to_unwrapped()</span></code></a></li>
 </ul>
 </li>

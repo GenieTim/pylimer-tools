@@ -72,6 +72,7 @@ Universe
       ~Universe.get_vertex_degrees
       ~Universe.get_vertex_idx_by_atom_id
       ~Universe.get_volume
+      ~Universe.has_atom_with_id
       ~Universe.has_infinite_strand
       ~Universe.hash_angle_type
       ~Universe.hash_dihedral_angle_type
@@ -156,6 +157,7 @@ Universe
    .. automethod:: get_vertex_degrees
    .. automethod:: get_vertex_idx_by_atom_id
    .. automethod:: get_volume
+   .. automethod:: has_atom_with_id
    .. automethod:: has_infinite_strand
    .. automethod:: hash_angle_type
    .. automethod:: hash_dihedral_angle_type
