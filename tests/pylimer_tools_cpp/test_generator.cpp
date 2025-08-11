@@ -465,7 +465,7 @@ TEST_CASE("Universe can crosslink up to w_sol",
         }
 
         for (const int strandIdx : net2.strandIndicesOfLink[linkIdx]) {
-            clusterIndicesPerStrand[strandIdx] = currentClusterIdx;
+          clusterIndicesPerStrand[strandIdx] = currentClusterIdx;
           for (const int strandsLinkIdx : net2.linkIndicesOfStrand[strandIdx]) {
             if (clusterIndicesPerLink[strandsLinkIdx] < 0) {
               didChange = true;
@@ -483,7 +483,7 @@ TEST_CASE("Universe can crosslink up to w_sol",
   // output cluster sizes
   std::map<int, int> clusterSizes;
   for (const int clusterIdx : clusterIndicesPerLink) {
-    if (clusterSizes.find(clusterIdx) == clusterSizes.end()) {
+    if (!clusterSizes.contains(clusterIdx)) {
       clusterSizes[clusterIdx] = 0;
     }
     clusterSizes[clusterIdx] += 1;
@@ -1280,7 +1280,7 @@ TEST_CASE("Universe generator uses correct w_sol even for strange structures",
                Catch::Matchers::WithinAbs(0.31, 0.05));
 
     INFO("Now with assuming box large enough");
-        forceRelaxer.configAssumeBoxLargeEnough(true);
+    forceRelaxer.configAssumeBoxLargeEnough(true);
     while (forceRelaxer.suggestsRerun()) {
       forceRelaxer.runForceRelaxation();
     }
@@ -1468,4 +1468,271 @@ TEST_CASE("doRandomWalkChain generates very long chains",
   const Eigen::VectorXd bondLengths =
     coordinates.tail((chainLen - 1) * 3) - coordinates.head((chainLen - 1) * 3);
   CHECK(andersonDarlingNormalDistributionTest(bondLengths, 0., M_PI / 8.));
+}
+
+/**
+ * Tests for new tetra-PEG network generation methods
+ */
+
+TEST_CASE("addStarCrosslinkers generates star-like crosslinkers with "
+          "pre-connected strands",
+          "[generator][MCUniverseGenerator][tetra-peg]")
+{
+  std::cout << "Running test \"addStarCrosslinkers generates star-like "
+               "crosslinkers with pre-connected strands\""
+            << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);
+  generator.setSeed(12345);
+  generator.setBeadDistance(0.964);
+  generator.configNrOfMCSteps(0);
+
+  SECTION("Basic star crosslinker generation")
+  {
+    // Add star crosslinkers with f=6 functionality and strand length 10
+    generator.addStarCrosslinkers(50, 6, 10, 2, 1);
+
+    pe::Universe universe = generator.getUniverse();
+
+    // Check total number of atoms: 50 crosslinkers + 50*6*10 strand atoms
+    CHECK(universe.getNrOfAtoms() == 50 + 50 * 6 * 10);
+    CHECK(universe.getAtomsOfType(2).size() == 50);          // crosslinkers
+    CHECK(universe.getAtomsOfType(1).size() == 50 * 6 * 10); // strand atoms
+
+    // Check number of bonds: 50*6*9 bonds in strands + 50*6 crosslinker-strand
+    // bonds
+    CHECK(universe.getNrOfBonds() == 50 * 6 * 10);
+
+    // Check that we have exactly 50*6 molecules (6 per star)
+    auto molecules = universe.getMolecules(2);
+    CHECK(molecules.size() == 50 * 6);
+
+    // Check that each molecule has the correct number of atoms
+    for (const auto& molecule : molecules) {
+      CHECK(molecule.getNrOfAtoms() == 10); // 10 atoms per strand
+    }
+
+    // then, check that we have a cross-link for each strand
+    auto chains = universe.getChainsWithCrosslinker(2);
+    CHECK(chains.size() == 50 * 6);
+
+    for (const auto& chain : chains) {
+      CHECK(chain.getNrOfAtoms() == 11); // 10 atoms per strand + 1 crosslinker
+    }
+  }
+
+  SECTION("Star crosslinkers with different functionality")
+  {
+    // Add star crosslinkers with f=8 functionality
+    generator.addStarCrosslinkers(25, 8, 15, 3, 2);
+
+    pe::Universe universe = generator.getUniverse();
+
+    CHECK(universe.getNrOfAtoms() == 25 + 25 * 8 * 15);
+    CHECK(universe.getAtomsOfType(3).size() == 25);          // crosslinkers
+    CHECK(universe.getAtomsOfType(2).size() == 25 * 8 * 15); // strand atoms
+
+    auto molecules = universe.getMolecules(3);
+    CHECK(molecules.size() == 25 * 8);
+
+    for (const auto& molecule : molecules) {
+      CHECK(molecule.getNrOfAtoms() == 15); // 15 atoms per strand
+    }
+  }
+
+  SECTION("Error handling for invalid parameters")
+  {
+    // Test error cases
+    CHECK_THROWS(
+      generator.addStarCrosslinkers(-1, 4, 10, 2, 1)); // negative number
+    CHECK_THROWS(
+      generator.addStarCrosslinkers(10, 1, 10, 2, 1)); // functionality < 2
+    CHECK_THROWS(
+      generator.addStarCrosslinkers(10, 4, 0, 2, 1)); // zero strand length
+  }
+}
+
+TEST_CASE(
+  "linkStrandToStrand connects strand ends based on distance probability",
+  "[generator][MCUniverseGenerator][tetra-peg]")
+{
+  std::cout << "Running test \"linkStrandToStrand connects strand ends based "
+               "on distance probability\""
+            << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(15.0, 15.0, 15.0);
+  generator.setSeed(54321);
+  generator.setBeadDistance(0.964);
+  generator.configNrOfMCSteps(0);
+
+  SECTION("Basic strand end linking")
+  {
+    // First add 20 star crosslinkers to have free strand ends
+    generator.addStarCrosslinkers(20, 4, 8, 2, 1);
+
+    pe::Universe universeBefore = generator.getUniverse();
+    size_t bondsBefore = universeBefore.getNrOfBonds();
+
+    // Link strand ends - should create some new bonds
+    bool linkMade = generator.linkStrandToStrand();
+
+    pe::Universe universeAfter = generator.getUniverse();
+    size_t bondsAfter = universeAfter.getNrOfBonds();
+
+    // Check that a link was potentially made
+    CHECK(bondsAfter == bondsBefore + 1);
+    CHECK(universeAfter.getNrOfAtoms() ==
+          universeBefore.getNrOfAtoms()); // no new atoms created
+  }
+
+  SECTION("Linking with custom cInfinity parameter")
+  {
+    // Add strands with free ends
+    generator.addStarCrosslinkers(15, 6, 12, 2, 1);
+
+    size_t bondsBefore = generator.getUniverse().getNrOfBonds();
+    bool linkMade =
+      generator.linkStrandToStrand(2.0); // custom cInfinity parameter
+    size_t bondsAfter = generator.getUniverse().getNrOfBonds();
+
+    CHECK(bondsAfter == bondsBefore + 1);
+  }
+
+  SECTION("No linking when no free strand ends exist")
+  {
+    // Add regular crosslinkers without free strand ends
+    generator.addCrosslinkers(10, 4, 2);
+
+    size_t bondsBefore = generator.getUniverse().getNrOfBonds();
+    bool linkMade = generator.linkStrandToStrand();
+    size_t bondsAfter = generator.getUniverse().getNrOfBonds();
+
+    // Should not create any new bonds since there are no free strand ends
+    CHECK_FALSE(linkMade);
+    CHECK(bondsAfter == bondsBefore);
+  }
+}
+
+TEST_CASE("linkStrandsToStrandsToConversion achieves target conversion through "
+          "iterative linking",
+          "[generator][MCUniverseGenerator][tetra-peg]")
+{
+  std::cout
+    << "Running test \"linkStrandsToStrandsToConversion achieves target "
+       "conversion through iterative linking\""
+    << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
+  generator.setSeed(98765);
+  generator.setBeadDistance(0.964);
+  generator.configNrOfMCSteps(0);
+
+  SECTION("Achieving target conversion")
+  {
+    // Add 30 star crosslinkers to create many free strand ends
+    generator.addStarCrosslinkers(30, 6, 10, 2, 1);
+
+    pe::Universe universeBefore = generator.getUniverse();
+    size_t bondsBefore = universeBefore.getNrOfBonds();
+    CHECK(bondsBefore == 30 * (6 * 10));
+
+    // Check that the current conversion rate is accurate
+    CHECK_THAT(generator.getCurrentStrandsConversion(),
+               Catch::Matchers::WithinRel(0.5, 1e-4));
+    // since this is the current conversion, no extra linking should occur
+    generator.linkStrandsToStrandsToConversion(0.5);
+    CHECK(generator.getUniverse().getNrOfBonds() == bondsBefore);
+
+    // Target 50% conversion of free strand ends,
+    // while 50% is already converted by being connected to the crosslinkers
+    double targetConversion = 0.5 + 0.25;
+    generator.linkStrandsToStrandsToConversion(targetConversion);
+
+    pe::Universe universeAfter = generator.getUniverse();
+    size_t bondsAfter = universeAfter.getNrOfBonds();
+
+    double nStrands = 30 * 6;
+    CHECK(universeBefore.getMolecules(2).size() == nStrands);
+
+    // With 30 stars * 6 strands = 180 strands, total 360 strand ends
+    // Starting conversion: 0.5 (180 ends connected to crosslinkers, 180 free)
+    // Target conversion: 0.75 (270 ends connected, 90 free)
+    // Need to connect 90 more ends, which means 45 strand-to-strand bonds
+    CHECK(bondsAfter == bondsBefore + 45);
+    CHECK(universeAfter.getMolecules(2).size() == nStrands * targetConversion);
+    CHECK(generator.findFreeStrandEnds().size() ==
+          (1. - targetConversion) * 30 * 6 * 2);
+  }
+
+  SECTION("High conversion rate")
+  {
+    // Test with higher conversion rate
+    generator.addStarCrosslinkers(20, 4, 8, 2, 1);
+
+    size_t bondsBefore = generator.getUniverse().getNrOfBonds();
+    CHECK(bondsBefore == 20 * (4 * 8));
+
+    // Target 80% conversion.
+    // Again, 50% is already converted by being connected to the crosslinkers
+    double targetConversion = 0.8 * 0.5 + 0.5;
+    generator.linkStrandsToStrandsToConversion(targetConversion);
+
+    size_t bondsAfter = generator.getUniverse().getNrOfBonds();
+
+    CHECK_THAT(bondsAfter - bondsBefore,
+               Catch::Matchers::WithinRel(20 * 4 * 0.8 / 2., 1e-4));
+    CHECK_THAT(
+      generator.findFreeStrandEnds().size(),
+      Catch::Matchers::WithinRel((1. - targetConversion) * 20 * 4 * 2, 1e-4));
+  }
+
+  SECTION("Custom cInfinity parameter")
+  {
+    generator.addStarCrosslinkers(25, 4, 6, 2, 1);
+
+    size_t bondsBefore = generator.getUniverse().getNrOfBonds();
+    generator.linkStrandsToStrandsToConversion(0.6, 2.0); // custom cInfinity
+    size_t bondsAfter = generator.getUniverse().getNrOfBonds();
+
+    CHECK(bondsAfter >= bondsBefore);
+  }
+
+  SECTION("Error handling")
+  {
+    generator.addStarCrosslinkers(10, 4, 5, 2, 1);
+
+    // Test invalid conversion values
+    CHECK_THROWS(
+      generator.linkStrandsToStrandsToConversion(-0.1)); // negative conversion
+    CHECK_THROWS(
+      generator.linkStrandsToStrandsToConversion(1.1)); // conversion > 1
+  }
+}
+
+
+TEST_CASE("linkStrandsToStrandsToConversion also works with free strands",
+          "[generator][MCUniverseGenerator][tetra-peg]")
+{
+ std::cout << "Running test \"linkStrandsToStrandsToConversion also works with free strands\""
+           << std::endl;
+
+           
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(80.0, 80.0, 80.0);
+  generator.setSeed(12345);
+
+  generator.setBeadDistance(1.0);
+
+  generator.configNrOfMCSteps(0);
+
+  generator.addStarCrosslinkers(
+    150, 4, 20, 2, 1
+  );
+
+  generator.addStrands(
+    50, 15, 1
+  );
+
+  CHECK_NOTHROW(
+    generator.linkStrandsToStrandsToConversion(0.9)
+  );
 }
