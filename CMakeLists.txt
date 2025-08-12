@@ -22,9 +22,32 @@ if (POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)  # find_package() uses PackageName_ROOT variables
 endif ()
 
+# Function to get version from git tag
+function(get_version_from_git VERSION_VAR)
+    # Try to get version from git tag
+    find_package(Git QUIET)
+    if (GIT_FOUND)
+        execute_process(
+            COMMAND ${CMAKE_CURRENT_LIST_DIR}/bin/get-version.sh
+            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+            OUTPUT_VARIABLE GIT_VERSION
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+        )
+        if (GIT_VERSION)
+            set(${VERSION_VAR} ${GIT_VERSION} PARENT_SCOPE)
+        else()
+            set(${VERSION_VAR} "0.0.0" PARENT_SCOPE)  # Fallback
+        endif()
+    else()
+        set(${VERSION_VAR} "0.0.0" PARENT_SCOPE)  # Fallback
+    endif()
+endfunction()
+
 # Project definition
 if (NOT DEFINED VERSION_NR)
-    project(pylimer_tools VERSION "0.3.2" LANGUAGES CXX)
+    get_version_from_git(AUTO_VERSION)
+    project(pylimer_tools VERSION ${AUTO_VERSION} LANGUAGES CXX)
 else ()
     project(pylimer_tools VERSION ${VERSION_NR} LANGUAGES CXX)
 endif ()
