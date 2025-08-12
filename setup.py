@@ -11,7 +11,32 @@ from pathlib import Path
 from setuptools import Extension, find_namespace_packages, setup
 from setuptools.command.build_ext import build_ext
 
-VERSION = "0.3.2"
+
+def get_version_from_git():
+    """Get version from git tag using our version script."""
+    try:
+        version_script = Path(__file__).parent / "bin" / "get-version.sh"
+        if not version_script.exists():
+            return "0.0.0"  # Fallback
+            
+        result = subprocess.run(
+            [str(version_script)],
+            cwd=Path(__file__).parent,
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        
+        if result.returncode == 0:
+            return result.stdout.strip()
+        else:
+            return "0.0.0"  # Fallback
+            
+    except (subprocess.SubprocessError, FileNotFoundError, OSError):
+        return "0.0.0"  # Fallback
+
+
+VERSION = get_version_from_git()
 
 # ==============================================================================
 # CMake Build Configuration

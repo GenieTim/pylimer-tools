@@ -16,5 +16,8 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+# Set the project version in the configure variables
+set(OVERALL_PROJECT_VERSION ${CMAKE_PROJECT_VERSION})
+
 configure_file(${CMAKE_CURRENT_LIST_DIR}/../src/pylimer_tools_cpp/version_config.h.in ${CMAKE_BINARY_DIR}/generated/version_config.h)
 include_directories(${CMAKE_BINARY_DIR}/generated/)
