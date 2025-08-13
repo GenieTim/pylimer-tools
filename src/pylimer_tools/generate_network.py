@@ -16,7 +16,7 @@ from termcolor import colored
 
 from pylimer_tools.calc.structure_analysis import compute_crosslinker_conversion
 from pylimer_tools.io.bead_spring_parameter_provider import (
-    Parameters,
+    Parameters, ParameterType,
     get_parameters_for_polymer,
     get_supported_polymer_names,
 )
@@ -541,7 +541,7 @@ def cli(
         raise click.UsageError(
             "Either --target-p or --target-wsol must be provided")
 
-    params = get_parameters_for_polymer(polymer_name)
+    params = get_parameters_for_polymer(polymer_name, parameter_type=ParameterType.GAUSSIAN)
 
     universe = generate_structure(
         params=params,
