@@ -33,7 +33,5 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
 .. caution::
 
    There are exponentially many paths between two crosslinkers of a network,
-   and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
-   You can use the `max_length` parameter to restrict the algorithm to only search for loops up to a certain length.
-   Use a negative value to find all loops and paths.
+   and you may run out of memory when using these functions, if your network is lattice-like.
 

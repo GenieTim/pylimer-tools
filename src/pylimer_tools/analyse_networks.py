@@ -13,14 +13,10 @@ import click
 import numpy as np
 
 from pylimer_tools.calc.structure_analysis import (
-    compute_crosslinker_conversion,
-    compute_extent_of_reaction,
-    compute_stoichiometric_imbalance,
-)
+    compute_crosslinker_conversion, compute_extent_of_reaction,
+    compute_stoichiometric_imbalance)
 from pylimer_tools.io.bead_spring_parameter_provider import (
-    get_parameters_for_polymer,
-    get_supported_polymer_names,
-)
+    get_parameters_for_polymer, get_supported_polymer_names)
 from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import MEHPForceBalance2
 
@@ -32,7 +28,7 @@ from pylimer_tools_cpp import MEHPForceBalance2
     "--polymer-name",
     type=click.Choice(get_supported_polymer_names(), case_sensitive=False),
     default="PDMS",
-    help="Name of the polymer to generate the network for",
+    help="Name of the polymer to use for parameter retrieval.",
 )
 def cli(files, crosslinker_type, polymer_name):
     """
