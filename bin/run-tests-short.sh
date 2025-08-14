@@ -38,10 +38,16 @@ if [ -d "_skbuild" ]; then
   rm -rf ./_skbuild
 fi
 
+# Cleanup stale coverage files
+cd "$ROOT_DIR" || exit 2
+find . -name "*.gcda" -delete
+find . -name "*.gcno" -delete
+
 # first, run cpp tests
 # (build them first)
 export WITH_ERROR=0
-run_timed "Build Tests" "$ROOT_DIR/bin/build-tests.sh" || exit 3
+run_timed "Build Tests" "$ROOT_DIR/bin/config-tests-build.sh" || exit 3
+
 cd "$ROOT_DIR/tests/build" || exit 2
 
 GENERATOR_BIN="make"

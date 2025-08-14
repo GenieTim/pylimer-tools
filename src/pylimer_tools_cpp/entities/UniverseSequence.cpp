@@ -56,11 +56,10 @@ UniverseSequence::next()
 Universe
 UniverseSequence::atIndex(size_t idx)
 {
-  if (idx >= this->length) {
-    throw std::invalid_argument("Index (" + std::to_string(idx) +
-                                ") larger than nr. of universes (" +
-                                std::to_string(this->length) + ").");
-  }
+  INVALIDARG_EXP_IFN(idx < this->length,
+                     "Index (" + std::to_string(idx) +
+                       ") larger than nr. of universes (" +
+                       std::to_string(this->length) + ").");
   if (!pylimer_tools::utils::map_has_key(this->universeCache, idx)) {
     this->universeCache.emplace(idx,
                                 this->modeDataFiles
@@ -143,11 +142,13 @@ UniverseSequence::readDumpFileAtIndex(size_t index)
     }
   }
 
-  std::vector<double> positionsX = this->dumpFileParser.getValuesForAt<double>(
+  // Pre-allocate vectors to avoid stack issues
+  std::vector<double> positionsX, positionsY, positionsZ;
+  positionsX = this->dumpFileParser.getValuesForAt<double>(
     index, "ATOMS", "x" + positionSuffix);
-  std::vector<double> positionsY = this->dumpFileParser.getValuesForAt<double>(
+  positionsY = this->dumpFileParser.getValuesForAt<double>(
     index, "ATOMS", "y" + positionSuffix);
-  std::vector<double> positionsZ = this->dumpFileParser.getValuesForAt<double>(
+  positionsZ = this->dumpFileParser.getValuesForAt<double>(
     index, "ATOMS", "z" + positionSuffix);
   if (positionsZ.size() != positionsY.size() ||
       positionsY.size() != positionsX.size()) {
@@ -165,9 +166,7 @@ UniverseSequence::readDumpFileAtIndex(size_t index)
     }
   }
 
-  std::vector<int> nx;
-  std::vector<int> ny;
-  std::vector<int> nz;
+  std::vector<int> nx, ny, nz;
 
   int nAtoms = 0;
   if (this->dumpFileParser.hasKey("NUMBER OF ATOMS")) {
@@ -187,20 +186,16 @@ UniverseSequence::readDumpFileAtIndex(size_t index)
     ny = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "iy");
     nz = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "iz");
   } else {
-    nx = pylimer_tools::utils::initializeWithValue(
-      nAtoms, 0); // this->dataFileParser.getAtomNx();
-    ny = pylimer_tools::utils::initializeWithValue(
-      nAtoms, 0); // this->dataFileParser.getAtomNy();
-    nz = pylimer_tools::utils::initializeWithValue(
-      nAtoms, 0); // this->dataFileParser.getAtomNz();
+    nx = pylimer_tools::utils::initializeWithValue(nAtoms, 0);
+    ny = pylimer_tools::utils::initializeWithValue(nAtoms, 0);
+    nz = pylimer_tools::utils::initializeWithValue(nAtoms, 0);
   }
 
   // read/parse/process atom ids
   std::vector<long int> atomIds;
   bool hasAtomIds = false;
   if (this->dumpFileParser.keyHasColumn("ATOMS", "id")) {
-    atomIds =
-      this->dumpFileParser.getValuesForAt<long int>(index, "ATOMS", "id");
+    atomIds = this->dumpFileParser.getValuesForAt<long int>(index, "ATOMS", "id");
     hasAtomIds = true;
   } else {
     atomIds.reserve(nAtoms);
@@ -213,8 +208,7 @@ UniverseSequence::readDumpFileAtIndex(size_t index)
   std::vector<int> atomTypes;
   atomTypes.reserve(nAtoms);
   if (this->dumpFileParser.keyHasColumn("ATOMS", "type")) {
-    atomTypes =
-      this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "type");
+    atomTypes = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "type");
   } else {
     if (hasAtomIds) {
       // infer from data file
