@@ -5,7 +5,6 @@ Loop Finding and Analysis
 This example demonstrates how to find and analyze loops in polymer networks using pylimer-tools.
 """
 
-# Import the main Universe class from pylimer_tools_cpp
 import os
 
 import matplotlib.pyplot as plt
