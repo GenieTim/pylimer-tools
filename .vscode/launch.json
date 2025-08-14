@@ -12,7 +12,7 @@
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
         //"[MEHPForceBalance2]"
-        "[tetra-peg]"
+        "UniverseSequence can be used"
       ],
       "env": {
         "MallocNanoZone": "0",
