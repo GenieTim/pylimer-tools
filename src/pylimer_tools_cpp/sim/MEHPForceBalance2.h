@@ -283,8 +283,8 @@ public:
                             StructureSimplificationMode::NO_SIMPLIFICATION,
                           const double inactiveRemovalCutoff = 1e-6,
                           const SLESolver solver = SLESolver::DEFAULT,
-                          const double residualReduction = 1e-15,
-                          const int maxIterations = 10000)
+                          const double residualReduction = 1e-12,
+                          const int maxIterations = 50000)
   {
     this->runForceRelaxation(
       simplificationMode,

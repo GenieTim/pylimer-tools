@@ -12,7 +12,7 @@
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
         //"[MEHPForceBalance2]"
-        "UniverseSequence can be used"
+        "MEHP Force Balance2 correctly collapses melts even with random entanglements"
       ],
       "env": {
         "MallocNanoZone": "0",
