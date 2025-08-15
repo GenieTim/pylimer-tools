@@ -46,7 +46,7 @@ find . -name "*.gcno" -delete
 # first, run cpp tests
 # (build them first)
 export WITH_ERROR=0
-run_timed "Build Tests" "$ROOT_DIR/bin/config-tests-build.sh" || exit 3
+run_timed "Build Tests" "$ROOT_DIR/bin/build-tests.sh" || exit 3
 
 cd "$ROOT_DIR/tests/build" || exit 2
 
