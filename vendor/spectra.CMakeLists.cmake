@@ -1,5 +1,6 @@
 # load the Spectra library
 include(FetchContent)
+message(STATUS "Using FetchContent to load Spectra")
 
 FetchContent_Declare(
         Spectra
