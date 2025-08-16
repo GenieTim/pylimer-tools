@@ -205,15 +205,15 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
+      - name: Install cibuildwheel
+        run: pip install cibuildwheel
+
       - name: Build manylinux Python wheels
-        uses: RalfG/python-wheels-manylinux-build@v0.7.1
-        with:
-          python-versions: "cp39-cp39 cp310-cp310 cp311-cp311 cp312-cp312"
-          build-requirements: "cython numpy scikit-build pybind11 cmake ninja wheel"
-          system-packages: "cmake bison flex libgomp openblas-devel eigen3-devel"
+        run: cibuildwheel --output-dir dist --platform linux
         env:
-          CI: true
-          CMAKE_BUILD_TYPE: Release
+          CIBW_BUILD: cp39-* cp310-* cp311-* cp312-*
+          CIBW_ARCHS_LINUX: x86_64
+          CIBW_BUILD_VERBOSITY: 1
 
       - name: Store the build
         uses: actions/upload-artifact@v4

@@ -79,16 +79,30 @@ endif ()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     # GCC-specific optimizations and warnings
-    add_compile_options(
-        -Wall -Wextra -Wpedantic
-        -Wcast-align -Wcast-qual -Wctor-dtor-privacy
-        -Wdisabled-optimization -Wformat=2 -Winit-self
-        -Wmissing-declarations -Wmissing-include-dirs
-        -Wold-style-cast -Woverloaded-virtual -Wredundant-decls
-        -Wshadow -Wsign-conversion -Wsign-promo
-        -Wstrict-overflow=5 -Wswitch-default -Wundef
-        -Wno-unused-parameter  # Common in template-heavy code
-    )
+    if (DEFINED ENV{CI})
+        # Reduced warning set for CI to avoid hiding actual errors
+        add_compile_options(
+            -Wall -Wextra
+            -Wformat=2 -Winit-self
+            -Wmissing-declarations -Woverloaded-virtual
+            -Wshadow -Wswitch-default -Wundef
+            -Wno-unused-parameter  # Common in template-heavy code
+        )
+        message(STATUS "CI environment detected: Using reduced warning set for GCC")
+    else ()
+        # Full warning set for development
+        add_compile_options(
+            -Wall -Wextra -Wpedantic
+            -Wcast-align -Wcast-qual -Wctor-dtor-privacy
+            -Wdisabled-optimization -Wformat=2 -Winit-self
+            -Wmissing-declarations -Wmissing-include-dirs
+            -Wold-style-cast -Woverloaded-virtual -Wredundant-decls
+            -Wshadow -Wsign-conversion -Wsign-promo
+            -Wstrict-overflow=5 -Wswitch-default -Wundef
+            -Wno-unused-parameter  # Common in template-heavy code
+        )
+    endif ()
+    
     
     # Enable more aggressive optimization for Release builds
     if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
@@ -99,15 +113,29 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # Clang-specific optimizations and warnings
-    add_compile_options(
-        -Wall -Wextra -Wpedantic
-        -Wcast-align -Wcast-qual -Wctor-dtor-privacy
-        -Wdisabled-optimization -Wformat=2 -Winit-self
-        -Wmissing-declarations -Wold-style-cast -Woverloaded-virtual
-        -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo
-        -Wstrict-overflow=5 -Wswitch-default -Wundef
-        -Wno-unused-parameter
-    )
+    if (DEFINED ENV{CI})
+        # Reduced warning set for CI to avoid hiding actual errors
+        add_compile_options(
+            -Wall -Wextra
+            -Wformat=2 -Winit-self
+            -Wmissing-declarations -Woverloaded-virtual
+            -Wshadow -Wswitch-default -Wundef
+            -Wno-unused-parameter
+        )
+        message(STATUS "CI environment detected: Using reduced warning set for Clang")
+    else ()
+        # Full warning set for development
+        add_compile_options(
+            -Wall -Wextra -Wpedantic
+            -Wcast-align -Wcast-qual -Wctor-dtor-privacy
+            -Wdisabled-optimization -Wformat=2 -Winit-self
+            -Wmissing-declarations -Wold-style-cast -Woverloaded-virtual
+            -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo
+            -Wstrict-overflow=5 -Wswitch-default -Wundef
+            -Wno-unused-parameter
+        )
+    endif ()
+    
     
     # Enable LTO for Release builds
     if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
@@ -116,11 +144,23 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     # MSVC-specific optimizations
-    add_compile_options(
-        /W4                # High warning level
-        /permissive-       # Strict conformance
-        /Zc:__cplusplus   # Correct __cplusplus macro
-    )
+    if (DEFINED ENV{CI})
+        # Reduced warning set for CI to avoid hiding actual errors
+        add_compile_options(
+            /W3                # Standard warning level instead of W4
+            /permissive-       # Strict conformance
+            /Zc:__cplusplus   # Correct __cplusplus macro
+        )
+        message(STATUS "CI environment detected: Using reduced warning set for MSVC")
+    else ()
+        # Full warning set for development
+        add_compile_options(
+            /W4                # High warning level
+            /permissive-       # Strict conformance
+            /Zc:__cplusplus   # Correct __cplusplus macro
+        )
+    endif ()
+    
     
     # Suppress some noisy MSVC warnings
     add_compile_options(

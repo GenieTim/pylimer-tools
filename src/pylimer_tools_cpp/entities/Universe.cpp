@@ -793,12 +793,12 @@ Universe::countAtomsInSkinDistance(const std::vector<double>& distances,
 /**
  * @brief Set the masses of the atoms in this universe
  *
- * @param newMassPerType the weight per type
+ * @param atomMassPerType the weight per type
  */
 void
-Universe::setMasses(const std::map<int, double>& newMassPerType)
+Universe::setMasses(const std::map<int, double>& atomMassPerType)
 {
-  this->massPerType = newMassPerType;
+  this->massPerType = atomMassPerType;
 }
 
 void

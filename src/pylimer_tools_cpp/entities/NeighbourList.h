@@ -18,9 +18,9 @@ namespace entities {
   class NeighbourList
   {
   public:
-    NeighbourList(const std::vector<Atom>& atoms,
-                  const Box& box,
-                  double cutoff);
+    NeighbourList(const std::vector<Atom>& atomList,
+                  const Box& boxGeometry,
+                  double cutoffDistance);
 
     std::vector<pylimer_tools::entities::Atom> getAtomsCloseTo(
       const pylimer_tools::entities::Atom& atom);

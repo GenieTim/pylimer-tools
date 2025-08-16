@@ -16,15 +16,15 @@ extern "C"
 
 namespace pylimer_tools::entities {
 
-Molecule::Molecule(const Box& parent,
+Molecule::Molecule(const Box& parentBox,
                    const igraph_t* inGraph,
                    const MoleculeType type,
-                   const std::map<int, double>& massPerType)
+                   const std::map<int, double>& atomMassPerType)
 {
-  this->parent = parent;
+  this->parent = parentBox;
   this->initializeFromGraph(inGraph);
   this->typeOfThisMolecule = type;
-  this->massPerType = massPerType;
+  this->massPerType = atomMassPerType;
 };
 
 /**
@@ -58,8 +58,8 @@ Molecule::initializeFromGraph(const igraph_t* inGraph)
       "Molecule's graph's attribute id was not queried.");
   }
   this->atomIdToVertexIdx.reserve(ids.size());
-  for (int i = 0; i < ids.size(); ++i) {
-    this->atomIdToVertexIdx[ids[i]] = i;
+  for (size_t i = 0; i < ids.size(); ++i) {
+    this->atomIdToVertexIdx[ids[i]] = static_cast<int>(i);
   }
   // TODO: possibly use the lined up atoms instead? Check performance.
   std::sort(ids.begin(), ids.end());
@@ -571,18 +571,18 @@ Molecule::getNrOfBondsFromTo(const size_t atomIdFrom,
   size_t vertexIdTo = this->atomIdToVertexIdx.at(atomIdTo);
   bool recording = false;
   size_t result = 0;
-  for (long alignedVertice : alignedVertices) {
+  for (igraph_integer_t alignedVertex : alignedVertices) {
     if (recording) {
       result += 1;
 
-      if ((alignedVertice == vertexIdFrom && !requireOrder) ||
-          alignedVertice == vertexIdTo) {
+      if ((alignedVertex == static_cast<igraph_integer_t>(vertexIdFrom) && !requireOrder) ||
+          alignedVertex == static_cast<igraph_integer_t>(vertexIdTo)) {
         return result;
       }
     }
 
-    if (alignedVertice == vertexIdFrom ||
-        (alignedVertice == vertexIdTo && !requireOrder)) {
+    if (alignedVertex == static_cast<igraph_integer_t>(vertexIdFrom) ||
+        (alignedVertex == static_cast<igraph_integer_t>(vertexIdTo) && !requireOrder)) {
       recording = true;
     }
   }
@@ -663,7 +663,7 @@ Molecule::getVerticesLinedUp(const int crossLinkerType,
     }
   }
 
-  RUNTIME_EXP_IFN(results.size() == this->getNrOfAtoms(),
+  RUNTIME_EXP_IFN(static_cast<int>(results.size()) == this->getNrOfAtoms(),
                   "Failed to align all atoms on one strand: Lined up " +
                     std::to_string(results.size()) + " instead of " +
                     std::to_string(this->getNrOfAtoms()) + " atoms.");

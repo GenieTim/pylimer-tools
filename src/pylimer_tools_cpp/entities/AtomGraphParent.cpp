@@ -120,7 +120,7 @@ AtomGraphParent::getShortestPath(const long int vertexIdxFrom,
     &this->graph, &vertices, nullptr, vertexIdxFrom, vertexIdxTo, IGRAPH_ALL);
 
   result.reserve(igraph_vector_int_size(&vertices));
-  for (size_t i = 0; i < igraph_vector_int_size(&vertices); i++) {
+  for (igraph_integer_t i = 0; i < igraph_vector_int_size(&vertices); i++) {
     result.push_back(
       this->getAtomByVertexIdx(igraph_vector_int_get(&vertices, i)));
   }
@@ -181,7 +181,7 @@ AtomGraphParent::getPathLength(const long int vertexIdxFrom,
     nullptr,
     nullptr,
     nullptr,
-    [](const igraph_t* graph,
+    [](const igraph_t* igraph,
        const igraph_integer_t vid,
        igraph_integer_t pred,
        igraph_integer_t succ,
@@ -344,7 +344,7 @@ AtomGraphParent::getComplexAtomByVertexIdx(const long int vertexIdx) const
   // fetch all atom properties
   std::unordered_map<std::string, double> atomProperties;
   atomProperties.reserve(igraph_strvector_size(&vnames));
-  for (size_t i = 0; i < igraph_strvector_size(&vnames); ++i) {
+  for (igraph_integer_t i = 0; i < igraph_strvector_size(&vnames); ++i) {
     atomProperties[igraph_strvector_get(&vnames, i)] = igraph_cattribute_VAN(
       &this->graph, igraph_strvector_get(&vnames, i), vertexIdx);
   }
@@ -785,13 +785,13 @@ AtomGraphParent::getEdges() const
       throw std::runtime_error("Failed to fetch type attribute");
     }
     assert(igraph_vector_size(&typesVec) == this->getNrOfEdges());
-    for (size_t i = 0; i < this->getNrOfEdges(); ++i) {
+    for (int i = 0; i < this->getNrOfEdges(); ++i) {
       type.push_back(
         igraphRealToInt<long int>(igraph_vector_get(&typesVec, i)));
     }
     igraph_vector_destroy(&typesVec);
   } else {
-    for (size_t i = 0; i < this->getNrOfEdges(); ++i) {
+    for (int i = 0; i < this->getNrOfEdges(); ++i) {
       type.push_back(-1); // TODO: find a nice default
     }
   }
@@ -824,7 +824,7 @@ AtomGraphParent::getBonds() const
   std::vector<long int> oldTo = vertexResults.at("edge_to");
   assert(oldTo.size() == this->getNrOfEdges());
 
-  for (size_t i = 0; i < this->getNrOfEdges(); ++i) {
+  for (int i = 0; i < this->getNrOfEdges(); ++i) {
     newFrom.push_back(this->getAtomIdByIdx(oldFrom[i]));
     newTo.push_back(this->getAtomIdByIdx(oldTo[i]));
   }

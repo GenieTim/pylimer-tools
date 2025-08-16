@@ -29,7 +29,7 @@ namespace topo {
 
     // find non-parallel axis to the intersection normal
     Eigen::Index minRow;
-    double minVal = intersectionNormal.cwiseAbs().minCoeff(&minRow);
+    intersectionNormal.cwiseAbs().minCoeff(&minRow);
 
     Eigen::Vector3d nonParallelAxis = Eigen::Vector3d::Zero();
     nonParallelAxis[minRow] = 1.0;
