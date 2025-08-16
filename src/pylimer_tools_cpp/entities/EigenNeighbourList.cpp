@@ -14,11 +14,11 @@
 namespace pylimer_tools {
 namespace entities {
   EigenNeighbourList::EigenNeighbourList(const Eigen::VectorXd& coordinates,
-                                         const Box& box,
-                                         const double cutoff,
-                                         const double scalingFactor)
+                                         const Box& boxGeometry,
+                                         const double cutoffDistance,
+                                         const double scalingParam)
   {
-    this->initialize(coordinates, box, cutoff, scalingFactor);
+    this->initialize(coordinates, boxGeometry, cutoffDistance, scalingParam);
   }
 
   bool EigenNeighbourList::operator==(const EigenNeighbourList& other) const
@@ -121,7 +121,7 @@ namespace entities {
     int currentX = this->nrOfBuckets[0] - 1;
     int currentY = nB1x2 - 1;
     int currentZ = this->totalNrOfBuckets - 1;
-    for (bucket_idx_t bucketIndex = 0; bucketIndex < this->totalNrOfBuckets;
+    for (bucket_idx_t bucketIndex = 0; bucketIndex < static_cast<bucket_idx_t>(this->totalNrOfBuckets);
          ++bucketIndex) {
       currentX += 1;
       if (bucketIndex % this->nrOfBuckets[0] == 0) {
@@ -170,7 +170,7 @@ namespace entities {
 
     // fill neighbour buckets
     this->neighbourBucketSizes = Eigen::ArrayXi::Zero(this->totalNrOfBuckets);
-    for (size_t i = 0; i < (coordinates.size() / 3); ++i) {
+    for (Eigen::Index i = 0; i < (coordinates.size() / 3); ++i) {
       bucket_idx_t bucketIndex = this->getBucketIndexForTriplet(
         this->getBucketTripletForCoordinates(coordinates.segment(3 * i, 3)));
       assert(bucketIndex >= 0 && bucketIndex < this->totalNrOfBuckets);
@@ -188,10 +188,10 @@ namespace entities {
   {
     // just override all the buckets.
     this->neighbourBucketSizes.setZero();
-    for (size_t i = 0; i < (newCoordinates.size() / 3); ++i) {
+    for (Eigen::Index i = 0; i < (newCoordinates.size() / 3); ++i) {
       int bucketIndex = this->getBucketIndexForTriplet(
         this->getBucketTripletForCoordinates(newCoordinates.segment(3 * i, 3)));
-      if (this->neighbourBuckets[bucketIndex].size() <=
+      if (static_cast<int>(this->neighbourBuckets[bucketIndex].size()) <=
           this->neighbourBucketSizes[bucketIndex]) {
         this->neighbourBuckets[bucketIndex].push_back(i);
       } else {

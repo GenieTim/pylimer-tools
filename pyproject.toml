@@ -1,11 +1,29 @@
+[tool.cibuildwheel.environment]
+CMAKE_BUILD_PARALLEL_LEVEL = "1"
+CXXFLAGS = "-ftemplate-backtrace-limit=0"
+CI = "true"
+CMAKE_BUILD_TYPE = "Release"
+
+[tool.cibuildwheel.linux]
+before-all = [
+    "yum install -y cmake bison flex libgomp openblas-devel eigen3-devel || apt-get install -y ninja-build cmake flex bison libeigen3-dev",
+    # Add swap for memory-intensive builds
+    "test -f /proc/swaps && echo 'Swap already configured' || (dd if=/dev/zero of=/tmp/swapfile bs=1M count=2048 && chmod 600 /tmp/swapfile && mkswap /tmp/swapfile && swapon /tmp/swapfile)",
+]
+
+[tool.cibuildwheel.macos]
+before-all = "brew install bison flex libomp"
+
+[tool.cibuildwheel.windows]
+before-all = "choco install -y winflexbison3 eigen"
+
 [build-system]
 requires = [
-    "setuptools>=42", 
-    "wheel", 
+    "setuptools>=42",
+    "wheel",
     "scikit-build",
     "pybind11",
-    "cmake>=3.12", 
+    "cmake>=3.12",
     "ninja; platform_system!='Windows'",
-    "igraph"
 ]
 build-backend = "setuptools.build_meta"

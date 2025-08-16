@@ -113,7 +113,7 @@ public:
                          const std::vector<long int>& via2,
                          const std::vector<long int>& to,
                          const std::vector<int>& types);
-  void setMasses(const std::map<int, double>& massPerType);
+  void setMasses(const std::map<int, double>& atomMassPerType);
   void setMassForType(int atomType, double mass);
   void setBox(const Box& box, bool rescaleAtomCoordinates = false);
   void setTimestep(const long int newTimestep)

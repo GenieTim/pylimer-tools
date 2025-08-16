@@ -15,31 +15,31 @@ extern "C"
 namespace pylimer_tools {
 namespace entities {
 
-  NeighbourList::NeighbourList(const std::vector<Atom>& atoms,
-                               const Box& box,
-                               const double cutoff)
+  NeighbourList::NeighbourList(const std::vector<Atom>& atomList,
+                               const Box& boxGeometry,
+                               const double cutoffDistance)
   {
-    if (cutoff <= 1e-3) {
+    if (cutoffDistance <= 1e-3) {
       throw std::invalid_argument("Cutoff must be larger than zero");
     }
 
-    this->cutoff = cutoff;
-    this->atoms = atoms;
-    this->box = box;
+    this->cutoff = cutoffDistance;
+    this->atoms = atomList;
+    this->box = boxGeometry;
 
     this->nrOfBucketsX =
       std::max(static_cast<size_t>(1),
-               static_cast<size_t>(std::floor(box.getLx() / cutoff)));
+               static_cast<size_t>(std::floor(boxGeometry.getLx() / cutoffDistance)));
     this->nrOfBucketsY =
       std::max(static_cast<size_t>(1),
-               static_cast<size_t>(std::floor(box.getLy() / cutoff)));
+               static_cast<size_t>(std::floor(boxGeometry.getLy() / cutoffDistance)));
     this->nrOfBucketsZ =
       std::max(static_cast<size_t>(1),
-               static_cast<size_t>(std::floor(box.getLz() / cutoff)));
+               static_cast<size_t>(std::floor(boxGeometry.getLz() / cutoffDistance)));
 
-    this->bucketWidthX = box.getLx() / static_cast<double>(this->nrOfBucketsX);
-    this->bucketWidthY = box.getLy() / static_cast<double>(this->nrOfBucketsY);
-    this->bucketWidthZ = box.getLz() / static_cast<double>(this->nrOfBucketsZ);
+    this->bucketWidthX = boxGeometry.getLx() / static_cast<double>(this->nrOfBucketsX);
+    this->bucketWidthY = boxGeometry.getLy() / static_cast<double>(this->nrOfBucketsY);
+    this->bucketWidthZ = boxGeometry.getLz() / static_cast<double>(this->nrOfBucketsZ);
 
     this->totalNrOfBuckets =
       this->nrOfBucketsX * this->nrOfBucketsY * this->nrOfBucketsZ;

@@ -55,7 +55,7 @@ graphHasVertexWithProperty(igraph_t* graph,
   return false;
 }
 
-static void
+[[maybe_unused]] static void
 copyVertexProperties(const igraph_t* sourceGraph,
                      const igraph_integer_t sourceVertex,
                      igraph_t* targetGraph,
@@ -71,7 +71,7 @@ copyVertexProperties(const igraph_t* sourceGraph,
   }
 }
 
-static void
+[[maybe_unused]] static void
 copyEdgeProperties(const igraph_t* sourceGraph,
                    const igraph_integer_t sourceEdge,
                    igraph_t* targetGraph,

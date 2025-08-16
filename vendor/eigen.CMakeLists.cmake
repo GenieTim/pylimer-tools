@@ -12,7 +12,6 @@ if (NOT DEFINED eigen_LOADED)
                 GIT_TAG 3.4.0
                 GIT_SHALLOW TRUE
                 GIT_PROGRESS TRUE
-                FIND_PACKAGE_ARGS NAMES Eigen3
         )
         set(EIGEN_BUILD_DOC OFF)
         set(EIGEN_BUILD_PKGCONFIG OFF)
@@ -21,30 +20,39 @@ if (NOT DEFINED eigen_LOADED)
 
         FetchContent_MakeAvailable(Eigen)
 
-        # Synchronize Eigen3_* variables from Eigen_* variables if needed
-        #         get_cmake_property(_allVariables VARIABLES)
-        #         foreach(_var ${_allVariables})
-        #             if(_var MATCHES "^Eigen_(.+)$")
-        #                 set(_suffix ${CMAKE_MATCH_1})
-        #                 set(_eigen3_var "Eigen3_${_suffix}")
+        # Create alias target if it doesn't exist
+        if(NOT TARGET Eigen3::Eigen)
+            add_library(Eigen3::Eigen ALIAS eigen)
+        endif()
 
-        #                 # Check if Eigen3_* variable needs to be set
-        #                 if(NOT DEFINED ${_eigen3_var} OR
-        #                    "${${_eigen3_var}}" STREQUAL "" OR
-        #                    "${${_eigen3_var}}" STREQUAL "OFF" OR
-        #                    "${${_eigen3_var}}" MATCHES ".*-NOTFOUND$")
-        #                     set(${_eigen3_var} ${${_var}})
-        #                     message(STATUS "Set ${_eigen3_var} to ${${_var}}")
-        #                 endif()
-        #             endif()
-        #         endforeach()
+        # Synchronize Eigen3_* variables from Eigen_* variables if needed
+        get_cmake_property(_allVariables VARIABLES)
+        foreach(_var ${_allVariables})
+            if(_var MATCHES "^Eigen_(.+)$")
+                set(_suffix ${CMAKE_MATCH_1})
+                set(_eigen3_var "Eigen3_${_suffix}")
+
+                # Check if Eigen3_* variable needs to be set
+                if(NOT DEFINED ${_eigen3_var} OR
+                   "${${_eigen3_var}}" STREQUAL "" OR
+                   "${${_eigen3_var}}" STREQUAL "OFF" OR
+                   "${${_eigen3_var}}" MATCHES ".*-NOTFOUND$")
+                    set(${_eigen3_var} ${${_var}})
+                    message(STATUS "Set ${_eigen3_var} to ${${_var}}")
+                endif()
+            endif()
+        endforeach()
 
         if (NOT EXISTS ${CMAKE_FIND_PACKAGE_REDIRECTS_DIR}/eigen3-config.cmake AND
                 NOT EXISTS ${CMAKE_FIND_PACKAGE_REDIRECTS_DIR}/Eigen3Config.cmake)
             file(WRITE ${CMAKE_FIND_PACKAGE_REDIRECTS_DIR}/eigen3-config.cmake
                     [=[
-            include(CMakeFindDependencyMacro)
-            find_dependency(Eigen)
+# Redirect to the FetchContent Eigen target
+if(NOT TARGET Eigen3::Eigen AND TARGET eigen)
+    add_library(Eigen3::Eigen ALIAS eigen)
+endif()
+set(Eigen3_FOUND TRUE)
+set(EIGEN3_FOUND TRUE)
             ]=])
         endif ()
     endif ()

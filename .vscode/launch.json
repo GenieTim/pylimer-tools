@@ -12,7 +12,7 @@
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
         //"[MEHPForceBalance2]"
-        "All MEHPForceBalance2 solvers solve simple melt systems"
+        "MEHP Force Balance2 correctly collapses melts even with random entanglements"
       ],
       "env": {
         "MallocNanoZone": "0",

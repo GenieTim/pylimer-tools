@@ -21,9 +21,9 @@ namespace entities {
   public:
     EigenNeighbourList() {}
     EigenNeighbourList(const Eigen::VectorXd& coordinates,
-                       const Box& box,
-                       double cutoff,
-                       double scalingFactor = 1.);
+                       const Box& boxGeometry,
+                       double cutoffDistance,
+                       double scalingParam = 1.);
 
     /**
      * @brief Equality operator to compare two EigenNeighbourList instances
