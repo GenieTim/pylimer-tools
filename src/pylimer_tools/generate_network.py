@@ -390,6 +390,12 @@ def generate_structure(
     help="Name of the polymer to generate the network for",
 )
 @click.option(
+    "--parameter-type",
+    type=click.Choice(["GAUSSIAN", "KG_LJ", "KUHN"], case_sensitive=False),
+    default="GAUSSIAN",
+    help="Type of parameters to use for the polymer model",
+)
+@click.option(
     "--target-p",
     type=float,
     help="Target crosslinker conversion (p). Mutually exclusive with --target-wsol.",
@@ -502,6 +508,7 @@ def generate_structure(
 )
 def cli(
     polymer_name,
+    parameter_type,
     target_p,
     target_wsol,
     n_chains_crosslinkers,
@@ -530,7 +537,7 @@ def cli(
     (soluble fraction), but not both.
 
     Example:
-        pylimer-generate-network --polymer-name PDMS --target-p 0.8 --n-chains-crosslinks 100 --target-file network.dat
+        pylimer-generate-network --polymer-name PDMS --parameter-type GAUSSIAN --target-p 0.8 --n-chains-crosslinks 100 --target-file network.dat
     """
     # Validate mutually exclusive options
     if target_p is not None and target_wsol is not None:
@@ -541,7 +548,7 @@ def cli(
         raise click.UsageError(
             "Either --target-p or --target-wsol must be provided")
 
-    params = get_parameters_for_polymer(polymer_name, parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer(polymer_name, parameter_type=ParameterType[parameter_type.upper()])
 
     universe = generate_structure(
         params=params,
