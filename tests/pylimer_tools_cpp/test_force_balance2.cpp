@@ -978,7 +978,7 @@ TEST_CASE("MEHP Force Balance2 correctly collapses melts even with random "
     CHECK(forceBalancer.getNetwork().nrOfSprings >
           forceBalancer.getNetwork().nrOfStrands);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F));
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F, 1e-6, pcm::SLESolver::DEFAULT, 1e-10, 50000));
     pcm::ForceBalance2Network net = forceBalancer.getNetwork();
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);

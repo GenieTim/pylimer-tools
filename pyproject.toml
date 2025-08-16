@@ -7,8 +7,6 @@ CMAKE_BUILD_TYPE = "Release"
 [tool.cibuildwheel.linux]
 before-all = [
     "yum install -y cmake bison flex libgomp openblas-devel eigen3-devel || apt-get install -y ninja-build cmake flex bison libeigen3-dev",
-    # Add swap for memory-intensive builds
-    "test -f /proc/swaps && echo 'Swap already configured' || (dd if=/dev/zero of=/tmp/swapfile bs=1M count=2048 && chmod 600 /tmp/swapfile && mkswap /tmp/swapfile && swapon /tmp/swapfile)",
 ]
 
 [tool.cibuildwheel.macos]
