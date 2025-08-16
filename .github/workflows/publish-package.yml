@@ -370,16 +370,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+          fetch-tags: true
 
       - name: Get tag
-        uses: actions-ecosystem/action-get-latest-tag@v1
-        id: get_version
-        with:
-          semver_only: true
+        run: echo "GIT_TAG=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
 
       - name: Determine Changelog
         id: changelog_determiner
-        run: echo "##[set-output name=changelog;]$(./bin/extract-changelog.sh CHANGELOG.md ${{ steps.get_version.outputs.tag }})"
+        run: echo "##[set-output name=changelog;]$(./bin/extract-changelog.sh CHANGELOG.md $GIT_TAG)"
 
       - name: Create Release
         id: create_release
