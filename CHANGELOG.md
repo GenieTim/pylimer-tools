@@ -2,6 +2,8 @@
 
 ## main
 
+## v0.3.3
+
 - Enable switching between the unit types in the `generate_network` command
 - (Possibly) fix compilation if Eigen3 is not installed
 
