@@ -194,6 +194,16 @@ class CMakeBuild(build_ext):
         if "CMAKE_ARGS" in os.environ:
             cmake_args += [item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
 
+        # Detect Pyodide / Emscripten build environment
+        is_emscripten = (
+            os.environ.get("PYODIDE_BUILD")
+            or sys.platform.startswith("emscripten")
+            or "emscripten" in str(sys.platform)
+        )
+        if is_emscripten:
+            cmake_args.append("-DPYODIDE_BUILD=ON")
+            print("Detected Pyodide/Emscripten build environment, setting PYODIDE_BUILD=ON")
+
         # In this example, we pass in the version to C++. You might not need
         # to.
         cmake_args += [f"-DVERSION_NR={self.distribution.get_version()}"]
@@ -292,9 +302,11 @@ class CMakeBuild(build_ext):
                 print(f"Using CMAKE_BUILD_PARALLEL_LEVEL={parallel_level}")
 
         # Actually run CMake
-        subprocess.run(
-            ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True
-        )
+        configure_cmd = ["cmake", ext.sourcedir, *cmake_args]
+        if is_emscripten:
+            print("Using emcmake for Emscripten configuration")
+            configure_cmd = ["emcmake"] + configure_cmd
+        subprocess.run(configure_cmd, cwd=build_temp, check=True)
         subprocess.run(
             ["cmake", "--build", ".", *build_args], cwd=build_temp, check=True
         )
