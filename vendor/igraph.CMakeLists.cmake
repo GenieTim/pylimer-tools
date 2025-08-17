@@ -30,6 +30,25 @@ if (NOT DEFINED igraph_LOADED)
         if (DEFINED ENV{BISON_EXECUTABLE})
             set(igraph_EXTRA_CMAKE_ARGS "-DBISON_EXECUTABLE=$ENV{BISON_EXECUTABLE}")
         endif ()
+
+        # For WebAssembly / Pyodide builds we cannot link against system GMP.
+        # igraph optionally uses GMP for big integer support; disable it to
+        # avoid pulling in a non-wasm libgmp.a from the host toolchain.
+        if (BUILDING_WITH_PYODIDE)
+            # Aggressively disable GMP: igraph changed option names across versions; provide all.
+            list(APPEND igraph_EXTRA_CMAKE_ARGS
+                -DIGRAPH_USE_INTERNAL_BLAS=ON
+                -DIGRAPH_USE_INTERNAL_LAPACK=ON
+                -DIGRAPH_USE_INTERNAL_ARPACK=ON
+                -DIGRAPH_USE_INTERNAL_GLPK=ON
+                -DIGRAPH_USE_INTERNAL_GMP=ON
+                -DIGRAPH_USE_INTERNAL_PLFIT=ON
+                -DHAVE_GMP=0
+                #
+                -DIGRAPH_GRAPHML_SUPPORT=OFF
+                -DIGRAPH_WARNINGS_AS_ERRORS=OFF
+            )
+        endif ()
         
         # Add Windows-specific configuration
         if (WIN32)
@@ -59,7 +78,7 @@ if (NOT DEFINED igraph_LOADED)
         ExternalProject_Add(
                 igraphLib
                 GIT_REPOSITORY https://github.com/GenieTim/igraph.git # https://github.com/igraph/igraph.git
-                GIT_TAG a27b9387c290c1f9d38aaff82b54600177f19826 # 635b432eff0a89580ac9bb98068d2fbc8ef374f2 # 0.10.15
+                GIT_TAG ca4def86c89f1a3b9a15003b14abde60bc864931 # 0.10.15
                 PREFIX ${igraph_PREFIX_PATH}
                 INSTALL_DIR ${igraph_PREFIX_PATH}/igraphLib-install
                 CMAKE_ARGS ${igraph_EXTRA_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=${igraph_BUILD_TYPE} -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=OFF

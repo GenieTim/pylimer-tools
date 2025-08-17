@@ -163,13 +163,6 @@ jobs:
           CMAKE_BUILD_TYPE: Release
           CMAKE_PREFIX_PATH: ${{ env.CMAKE_PREFIX_PATH }}
 
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
-        if: ${{ failure() }}
-        with:
-          limit-access-to-actor: true
-          wait-timeout-minutes: 5
-
       - name: Store the build
         uses: actions/upload-artifact@v4
         with:
