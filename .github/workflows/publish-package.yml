@@ -296,8 +296,8 @@ jobs:
 
       - name: List and delete invalid packages
         run: |
-          ls dist/*-linux_*
-          rm dist/*-linux_*
+          ls dist/*-linux_* || true
+          rm dist/*-linux_* || true
 
       - name: Publish a Python distribution to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
