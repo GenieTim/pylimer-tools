@@ -372,6 +372,7 @@ jobs:
         with:
           submodules: "recursive"
           fetch-tags: true
+          ref: ${{ github.ref }}
 
       - name: Get tag
         run: echo "GIT_TAG=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
