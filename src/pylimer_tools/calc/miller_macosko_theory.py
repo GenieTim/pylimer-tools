@@ -22,7 +22,6 @@ from typing import Callable, List, Tuple, Union
 
 import numpy as np
 import pint
-import scipy.special
 from scipy import optimize
 
 from pylimer_tools.calc.structure_analysis import (
@@ -745,7 +744,7 @@ def compute_probability_that_crosslink_is_effective(
     f = functionality_of_monomer
     m = expected_degree_of_effect
     alpha = p_f_a_out
-    return scipy.special.binom(
+    return math.comb(
         f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
 
 
@@ -785,7 +784,7 @@ def compute_probability_that_crosslink_with_degree_is_dangling(
     alpha = p_f_a_out
     # NOTE: verify that the last exponent is f - m, rather than f - 1 as in
     # the paper
-    return scipy.special.binom(f, i) * (alpha ** (i)) * \
+    return math.comb(f, i) * (alpha ** (i)) * \
         ((1.0 - alpha) ** (f - i))
 
 
@@ -807,7 +806,7 @@ def compute_probability_that_crosslink_is_dangling(
     assert 0 <= p_f_a_out <= 1, "p_f_a_out must be between 0 and 1"
     f = functionality_of_monomer
     alpha = p_f_a_out
-    return scipy.special.binom(f, 1) * (alpha ** (f - 1)) * (1.0 - alpha)
+    return math.comb(f, 1) * (alpha ** (f - 1)) * (1.0 - alpha)
 
 
 def compute_probability_that_bifunctional_monomer_is_dangling(
@@ -824,7 +823,7 @@ def compute_probability_that_bifunctional_monomer_is_dangling(
     :return: The probability that a bifunctional monomer is dangling
     """
     assert 0 <= p_f_b_out <= 1, "p_f_b_out must be between 0 and 1"
-    return scipy.special.binom(2, 1) * (p_f_b_out) * (1.0 - p_f_b_out)
+    return math.comb(2, 1) * (p_f_b_out) * (1.0 - p_f_b_out)
 
 
 def predict_gelation_point(r: float, f: int, b2: float = 1) -> float:
