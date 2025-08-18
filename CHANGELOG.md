@@ -2,6 +2,11 @@
 
 ## main
 
+
+## v0.3.4
+
+- Build & deploy system improvements
+
 ## v0.3.3
 
 - Enable switching between the unit types in the `generate_network` command
