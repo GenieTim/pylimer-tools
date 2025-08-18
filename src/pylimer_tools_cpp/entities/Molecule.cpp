@@ -575,14 +575,16 @@ Molecule::getNrOfBondsFromTo(const size_t atomIdFrom,
     if (recording) {
       result += 1;
 
-      if ((alignedVertex == static_cast<igraph_integer_t>(vertexIdFrom) && !requireOrder) ||
+      if ((alignedVertex == static_cast<igraph_integer_t>(vertexIdFrom) &&
+           !requireOrder) ||
           alignedVertex == static_cast<igraph_integer_t>(vertexIdTo)) {
         return result;
       }
     }
 
     if (alignedVertex == static_cast<igraph_integer_t>(vertexIdFrom) ||
-        (alignedVertex == static_cast<igraph_integer_t>(vertexIdTo) && !requireOrder)) {
+        (alignedVertex == static_cast<igraph_integer_t>(vertexIdTo) &&
+         !requireOrder)) {
       recording = true;
     }
   }

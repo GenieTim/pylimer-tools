@@ -25,7 +25,7 @@ def _is_numeric_string(test: str) -> bool:
     :rtype: bool
     """
     return bool(
-        np.all(
+        all(
             [
                 c.isnumeric()
                 or c == "."
@@ -73,13 +73,13 @@ def detect_headers(
                 previous_line is not None
                 and len(line.strip().split())
                 == len(previous_line.removeprefix("#").strip().split())
-                and np.sum([w[0].isalpha() for w in previous_line.split()])
+                and sum([w[0].isalpha() for w in previous_line.split()])
                 > 0.74 * len(previous_line.split())
-                and np.sum([_is_numeric_string(w) for w in line.split()])
+                and sum([_is_numeric_string(w) for w in line.split()])
                 > 0.5 * len(line.split())
                 and "..." not in previous_line
                 and len(previous_line.split()) > 2
-                and not np.any(
+                and not any(
                     [
                         previous_line.startswith(val)
                         for val in [
@@ -475,8 +475,7 @@ def read_multi_section_separated_value_file(
         if got_err:
             continue
         headers = re.split("{}+".format(separator), header_line.strip())
-        if np.sum([_is_numeric_string(h)
-                  for h in headers]) > 0.5 * len(headers):
+        if sum([_is_numeric_string(h) for h in headers]) > 0.5 * len(headers):
             warnings.warn(
                 "CSV file {} has header line {}, which does not seem to be a header.".format(
                     csv_file, header_line
@@ -492,10 +491,9 @@ def read_multi_section_separated_value_file(
                         first_line,
                         header_line,
                     )
-                if np.all(
-                        [c.isdigit() or c == "-" for c in first_line_split[i]]):
+                if all([c.isdigit() or c == "-" for c in first_line_split[i]]):
                     detected_dtypes[h] = np.int64
-                elif np.all(
+                elif all(
                     [
                         c.isdigit() or c == "-" or c == "." or c == "e" or c == "E"
                         for c in first_line_split[i]

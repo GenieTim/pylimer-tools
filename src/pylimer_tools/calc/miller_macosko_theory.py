@@ -18,11 +18,10 @@ Caution:
 
 import math
 import warnings
-from typing import Callable, List, Tuple, Union
+from typing import TYPE_CHECKING, Callable, List, Tuple, Union
+from __future__ import annotations
 
-import numpy as np
 import pint
-from scipy import optimize
 
 from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
@@ -30,7 +29,9 @@ from pylimer_tools.calc.structure_analysis import (
     compute_stoichiometric_imbalance,
 )
 from pylimer_tools.io.unit_styles import UnitStyle
-from pylimer_tools_cpp import Universe
+
+if TYPE_CHECKING:
+    from pylimer_tools_cpp import Universe
 
 
 def predict_shear_modulus(**kwargs) -> pint.Quantity:
@@ -443,6 +444,14 @@ def compute_miller_macosko_probabilities(
                 "A functionality of {} is not supported.".format(f)
             )
 
+        try:
+            from scipy import optimize
+        except ImportError:
+            raise ImportError(
+                "scipy is required for crosslinker functionality > 4. "
+                "Please install scipy or use f <= 4."
+            )
+
         def fun_to_root_for_alpha(alpha):
             return r * b2 * p**2 * \
                 alpha ** (f - 1) - alpha - r * b2 * (p**2) + 1
@@ -478,7 +487,7 @@ def compute_miller_macosko_probabilities(
             + "as it will be clipped to [0,1] from {}".format(beta)
         )
     # TODO: reconsider clipping.
-    return np.clip(alpha, 0, 1), np.clip(beta, 0, 1)
+    return max(0, min(alpha, 1)), max(0, min(beta, 1))
 
 
 def compute_modulus_decomposition(
@@ -744,8 +753,7 @@ def compute_probability_that_crosslink_is_effective(
     f = functionality_of_monomer
     m = expected_degree_of_effect
     alpha = p_f_a_out
-    return math.comb(
-        f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
+    return math.comb(f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
 
 
 def compute_probability_that_bifunctional_monomer_is_effective(
@@ -784,8 +792,7 @@ def compute_probability_that_crosslink_with_degree_is_dangling(
     alpha = p_f_a_out
     # NOTE: verify that the last exponent is f - m, rather than f - 1 as in
     # the paper
-    return math.comb(f, i) * (alpha ** (i)) * \
-        ((1.0 - alpha) ** (f - i))
+    return math.comb(f, i) * (alpha ** (i)) * ((1.0 - alpha) ** (f - i))
 
 
 def compute_probability_that_crosslink_is_dangling(
@@ -927,6 +934,14 @@ def predict_p_from_w_sol(
         except ValueError:
             return float("inf")  # If parameters are invalid, return infinity
 
+    try:
+        from scipy import optimize
+    except ImportError:
+        raise ImportError(
+            "scipy is required for predicting p from w_sol. "
+            "Please install scipy to use this functionality."
+        )
+
     res = optimize.minimize_scalar(
         lambda p: abs(w_sol - compute_wsol(p)), bounds=(p_gel, 1.0)
     )
@@ -1029,7 +1044,7 @@ _validators_assembler = [
     _ParamValidatorAssembler(
         "f",
         lambda p: p["functionality_per_type"].get(p["crosslinker_type"], 0),
-        lambda f: f >= 2 and np.isfinite(f),
+        lambda f: f >= 2 and math.isfinite(f),
         ["functionality_per_type", "crosslinker_type"],
     ),
     _ParamValidatorAssembler(
@@ -1039,7 +1054,7 @@ _validators_assembler = [
             crosslinker_type=p["crosslinker_type"],
             functionality_per_type=p["functionality_per_type"],
         ),
-        lambda r: r > 0 and np.isfinite(r),
+        lambda r: r > 0 and math.isfinite(r),
         ["network", "crosslinker_type"],
     ),
     _ParamValidatorAssembler(
@@ -1058,7 +1073,7 @@ _validators_assembler = [
             len(p["network"].get_molecules(p["crosslinker_type"]))
             / (p["network"].get_volume() * p["unit_style"].get_base_unit_of("volume"))
         ),
-        lambda nu: nu.magnitude > 0 and np.isfinite(nu.magnitude),
+        lambda nu: nu.magnitude > 0 and math.isfinite(nu.magnitude),
         ["network", "crosslinker_type", "unit_style"],
     ),
     _ParamValidatorAssembler(

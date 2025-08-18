@@ -7,8 +7,6 @@ import tempfile
 import warnings
 from typing import List, Union
 
-import numpy as np
-
 
 def do_cache(obj, file: str, suffix: str, tmp_dir: Union[str, None] = None):
     """
@@ -55,7 +53,7 @@ def load_cache(
         shutil.copy2(old_cache_file_name, cache_file_name)
         os.remove(old_cache_file_name)
     if os.path.isfile(cache_file_name):
-        if not np.all([os.path.isfile(f) for f in file]):
+        if not all(os.path.isfile(f) for f in file):
             if not disable_warnings:
                 warnings.warn(
                     "Cache called for non-existent file. Make sure the key is time-restricted"
@@ -131,4 +129,4 @@ def is_current_cache(cache_file: str, dependencies: Union[str, List[str]]):
         datetime.datetime.fromtimestamp(os.path.getmtime(f)) for f in dependencies
     ]
 
-    return np.all([mtime_cache > mt for mt in mtimes_origin])
+    return all(mtime_cache > mt for mt in mtimes_origin)
