@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # cli.py
 import click
-import numpy as np
+import statistics
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
 
@@ -26,29 +26,35 @@ def cli(files):
             )
         )
         molecules = universe.get_molecules(2)
-        bond_lengths = [np.mean(m.compute_bond_lengths()) for m in molecules]
+        bond_lengths = [
+            statistics.mean(m.compute_bond_lengths())
+            if m.compute_bond_lengths()
+            else None
+            for m in molecules
+        ]
         non_none_bond_lengths = [
             bl for bl in bond_lengths if bl is not None and bl > 0]
         click.echo(
             "Mean bond length: {} u, (min: {}, max: {}, median: {}) u".format(
-                np.mean(non_none_bond_lengths),
-                np.min(non_none_bond_lengths),
-                np.max(non_none_bond_lengths),
-                np.median(non_none_bond_lengths),
+                statistics.mean(non_none_bond_lengths),
+                min(non_none_bond_lengths),
+                max(non_none_bond_lengths),
+                statistics.median(non_none_bond_lengths),
             )
         )
         end_to_end_distances = [m.compute_end_to_end_distance()
                                 for m in molecules]
         click.echo(
             "Mean end to end distance: {} u".format(
-                np.mean(
-                    [e for e in end_to_end_distances if e is not None and e > 0])
+                statistics.mean(
+                    [e for e in end_to_end_distances if e is not None and e > 0]
+                )
             )
         )
         click.echo(
             "For {} molecules of mean length of {} atoms".format(
-                len(molecules), np.mean(
-                    [m.get_nr_of_atoms() for m in molecules])
+                len(molecules),
+                statistics.mean([m.get_nr_of_atoms() for m in molecules]),
             )
         )
     click.echo("Arbitrary units used. E.g.: Length: u")

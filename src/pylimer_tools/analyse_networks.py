@@ -10,13 +10,17 @@ end-to-end distances, and stoichiometric imbalances.
 """
 
 import click
-import numpy as np
+import statistics
 
 from pylimer_tools.calc.structure_analysis import (
-    compute_crosslinker_conversion, compute_extent_of_reaction,
-    compute_stoichiometric_imbalance)
+    compute_crosslinker_conversion,
+    compute_extent_of_reaction,
+    compute_stoichiometric_imbalance,
+)
 from pylimer_tools.io.bead_spring_parameter_provider import (
-    get_parameters_for_polymer, get_supported_polymer_names)
+    get_parameters_for_polymer,
+    get_supported_polymer_names,
+)
 from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import MEHPForceBalance2
 
@@ -75,13 +79,14 @@ def cli(files, crosslinker_type, polymer_name):
             bl for bl in bond_lengths if bl is not None and bl > 0]
         click.echo(
             "Bond length b: <b> = {} {}, (min: {}, max: {}, median: {}) {}, <b^2> = {} {}^2".format(
-                np.mean(non_none_bond_lengths),
+                statistics.mean(non_none_bond_lengths),
                 base_distance_unit,
-                np.min(non_none_bond_lengths),
-                np.max(non_none_bond_lengths),
-                np.median(non_none_bond_lengths),
+                min(non_none_bond_lengths),
+                max(non_none_bond_lengths),
+                statistics.median(non_none_bond_lengths),
                 base_distance_unit,
-                np.mean(np.square(bond_lengths)),
+                statistics.mean(
+                    bl**2 for bl in bond_lengths if bl is not None),
                 base_distance_unit,
             )
         )
@@ -93,15 +98,15 @@ def cli(files, crosslinker_type, polymer_name):
         ]
         click.echo(
             "End to end distance R_ee: <R_ee> = {} {}, <R_ee^2> = {}".format(
-                np.mean(non_none_end_to_end_distances),
+                statistics.mean(non_none_end_to_end_distances),
                 base_distance_unit,
-                np.mean(np.square(non_none_end_to_end_distances)),
+                statistics.mean(e**2 for e in non_none_end_to_end_distances),
             )
         )
         click.echo(
             "For {} molecules of mean length of {} atoms".format(
-                len(molecules), np.mean(
-                    [m.get_nr_of_atoms() for m in molecules])
+                len(molecules),
+                statistics.mean([m.get_nr_of_atoms() for m in molecules]),
             )
         )
         click.echo(
@@ -131,7 +136,7 @@ def cli(files, crosslinker_type, polymer_name):
         click.echo(
             "Shear Modulus [MPa]: {:.2f}".format(
                 params.get_gamma_conversion_factor().to("MPa").magnitude
-                * np.sum(
+                * sum(
                     mehp.get_gamma_factors(
                         params.get("R02")
                         .to(params.get("distance_units") ** 2)

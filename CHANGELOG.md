@@ -2,6 +2,8 @@
 
 ## main
 
+- More build & deploy system improvements (we got wasm now!)
+- Less expensive imports, use lazy importing of scipy
 
 ## v0.3.4
 

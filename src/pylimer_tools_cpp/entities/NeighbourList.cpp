@@ -27,19 +27,22 @@ namespace entities {
     this->atoms = atomList;
     this->box = boxGeometry;
 
-    this->nrOfBucketsX =
-      std::max(static_cast<size_t>(1),
-               static_cast<size_t>(std::floor(boxGeometry.getLx() / cutoffDistance)));
-    this->nrOfBucketsY =
-      std::max(static_cast<size_t>(1),
-               static_cast<size_t>(std::floor(boxGeometry.getLy() / cutoffDistance)));
-    this->nrOfBucketsZ =
-      std::max(static_cast<size_t>(1),
-               static_cast<size_t>(std::floor(boxGeometry.getLz() / cutoffDistance)));
+    this->nrOfBucketsX = std::max(
+      static_cast<size_t>(1),
+      static_cast<size_t>(std::floor(boxGeometry.getLx() / cutoffDistance)));
+    this->nrOfBucketsY = std::max(
+      static_cast<size_t>(1),
+      static_cast<size_t>(std::floor(boxGeometry.getLy() / cutoffDistance)));
+    this->nrOfBucketsZ = std::max(
+      static_cast<size_t>(1),
+      static_cast<size_t>(std::floor(boxGeometry.getLz() / cutoffDistance)));
 
-    this->bucketWidthX = boxGeometry.getLx() / static_cast<double>(this->nrOfBucketsX);
-    this->bucketWidthY = boxGeometry.getLy() / static_cast<double>(this->nrOfBucketsY);
-    this->bucketWidthZ = boxGeometry.getLz() / static_cast<double>(this->nrOfBucketsZ);
+    this->bucketWidthX =
+      boxGeometry.getLx() / static_cast<double>(this->nrOfBucketsX);
+    this->bucketWidthY =
+      boxGeometry.getLy() / static_cast<double>(this->nrOfBucketsY);
+    this->bucketWidthZ =
+      boxGeometry.getLz() / static_cast<double>(this->nrOfBucketsZ);
 
     this->totalNrOfBuckets =
       this->nrOfBucketsX * this->nrOfBucketsY * this->nrOfBucketsZ;

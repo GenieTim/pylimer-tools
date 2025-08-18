@@ -7,11 +7,14 @@ from __future__ import annotations
 import math
 import warnings
 from collections import Counter
-from typing import Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Sequence, Tuple, Union
 
 import numpy as np
 
-from pylimer_tools_cpp import MoleculeType, Universe
+from pylimer_tools_cpp import MoleculeType
+
+if TYPE_CHECKING:
+    from pylimer_tools_cpp import Universe
 
 
 def compute_stoichiometric_imbalance(

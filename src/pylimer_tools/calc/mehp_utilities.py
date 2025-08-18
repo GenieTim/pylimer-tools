@@ -10,12 +10,15 @@ to these methods should be minimized first.
 
 from __future__ import annotations
 
-from typing import Sequence, Union
+from typing import TYPE_CHECKING, Sequence, Union
 
 import numpy as np
 
 from pylimer_tools.calc.structure_analysis import compute_mean_end_to_end_distances
-from pylimer_tools_cpp import MoleculeType, Universe
+from pylimer_tools_cpp import MoleculeType
+
+if TYPE_CHECKING:
+    from pylimer_tools_cpp import Universe
 
 
 def predict_shear_modulus(

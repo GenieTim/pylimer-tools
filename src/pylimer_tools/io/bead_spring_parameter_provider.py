@@ -2,7 +2,6 @@ import math
 from enum import Enum
 from typing import Optional, Union
 
-import numpy as np
 import pint
 from pint import Quantity, UnitRegistry
 
@@ -110,7 +109,7 @@ class Parameters:
 
     def get_sampling_cutoff(self) -> float:
         cutoff = Quantity(
-            -0.45 * np.log(self.get("Ge").to("MPa").magnitude) + 1.97,
+            -0.45 * math.log(self.get("Ge").to("MPa").magnitude) + 1.97,
             "nm",
         )
         distance_units_to_nm = (
@@ -164,7 +163,7 @@ class Parameters:
 
         .. code-block:: python
 
-            shear_modulus = gamma_conversion_factor * np.sum(gamma_factors) / universe.get_volume()
+            shear_modulus = gamma_conversion_factor * sum(gamma_factors) / universe.get_volume()
 
         where `gamma_factors` are the gamma factors calculated from the force balance method,
         using the appropriate `b02`, which can be obtained from the parameters as such:

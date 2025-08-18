@@ -121,7 +121,8 @@ namespace entities {
     int currentX = this->nrOfBuckets[0] - 1;
     int currentY = nB1x2 - 1;
     int currentZ = this->totalNrOfBuckets - 1;
-    for (bucket_idx_t bucketIndex = 0; bucketIndex < static_cast<bucket_idx_t>(this->totalNrOfBuckets);
+    for (bucket_idx_t bucketIndex = 0;
+         bucketIndex < static_cast<bucket_idx_t>(this->totalNrOfBuckets);
          ++bucketIndex) {
       currentX += 1;
       if (bucketIndex % this->nrOfBuckets[0] == 0) {

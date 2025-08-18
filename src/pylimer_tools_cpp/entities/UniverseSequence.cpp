@@ -195,7 +195,8 @@ UniverseSequence::readDumpFileAtIndex(size_t index)
   std::vector<long int> atomIds;
   bool hasAtomIds = false;
   if (this->dumpFileParser.keyHasColumn("ATOMS", "id")) {
-    atomIds = this->dumpFileParser.getValuesForAt<long int>(index, "ATOMS", "id");
+    atomIds =
+      this->dumpFileParser.getValuesForAt<long int>(index, "ATOMS", "id");
     hasAtomIds = true;
   } else {
     atomIds.reserve(nAtoms);
@@ -208,7 +209,8 @@ UniverseSequence::readDumpFileAtIndex(size_t index)
   std::vector<int> atomTypes;
   atomTypes.reserve(nAtoms);
   if (this->dumpFileParser.keyHasColumn("ATOMS", "type")) {
-    atomTypes = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "type");
+    atomTypes =
+      this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "type");
   } else {
     if (hasAtomIds) {
       // infer from data file

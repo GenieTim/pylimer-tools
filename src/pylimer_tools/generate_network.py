@@ -11,12 +11,13 @@ import time
 from typing import Union
 
 import click
-import numpy as np
+import statistics
 from termcolor import colored
 
 from pylimer_tools.calc.structure_analysis import compute_crosslinker_conversion
 from pylimer_tools.io.bead_spring_parameter_provider import (
-    Parameters, ParameterType,
+    Parameters,
+    ParameterType,
     get_parameters_for_polymer,
     get_supported_polymer_names,
 )
@@ -87,7 +88,7 @@ def prepare_structure_generation(
         + (n_crosslinks * n_beads_per_xlink)
         + (n_solvent_chains * n_beads_per_solvent_chain)
     ) / params.get_bead_density()
-    box_l = np.cbrt(volume)
+    box_l = volume ** (1 / 3)
 
     # randomly sample chains
     universe_generator = MCUniverseGenerator(box_l, box_l, box_l)
@@ -142,18 +143,18 @@ def prepare_structure_generation(
     if n_mono_chains > 0:
         universe_generator.add_monofunctional_strands(
             n_mono_chains,
-            np.repeat(n_mono_beads_per_chain, n_mono_chains).tolist(),
+            [n_mono_beads_per_chain] * n_mono_chains,
             monofunctional_chains_type,
         )
     universe_generator.add_strands(
         n_chains_1,
-        np.repeat(n_beads_per_chain_1, n_chains_1).tolist(),
+        [n_beads_per_chain_1] * n_chains_1,
         strand_atom_type=normal_atom_type,
     )
     if n_chains_2 > 0 and n_beads_per_chain_2 > 0:
         universe_generator.add_strands(
             n_chains_2,
-            np.repeat(n_beads_per_chain_2, n_chains_2).tolist(),
+            [n_beads_per_chain_2] * n_chains_2,
             strand_atom_type=normal_atom_type,
         )
     if n_solvent_chains > 0 and n_beads_per_solvent_chain > 0:
@@ -335,9 +336,9 @@ def generate_structure(
     bond_lengths = universe.compute_bond_lengths()
     print(
         "Bond lengths, squared mean: {}, mean: {} (median: {}, max: {}, min: {})".format(
-            np.mean(np.square(bond_lengths)),
-            np.mean(bond_lengths),
-            np.median(bond_lengths),
+            statistics.mean(bl**2 for bl in bond_lengths),
+            statistics.mean(bond_lengths),
+            statistics.median(bond_lengths),
             max(bond_lengths),
             min(bond_lengths),
         )
@@ -548,7 +549,9 @@ def cli(
         raise click.UsageError(
             "Either --target-p or --target-wsol must be provided")
 
-    params = get_parameters_for_polymer(polymer_name, parameter_type=ParameterType[parameter_type.upper()])
+    params = get_parameters_for_polymer(
+        polymer_name, parameter_type=ParameterType[parameter_type.upper()]
+    )
 
     universe = generate_structure(
         params=params,
