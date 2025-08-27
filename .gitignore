@@ -166,3 +166,4 @@ docs/api
 
 docs/sg_execution_times.rst
 wheelhouse
+src/pylimer_tools/data/everaers_et_al_unit_properties.json

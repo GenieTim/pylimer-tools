@@ -16,10 +16,11 @@ Caution:
 
 """
 
+from __future__ import annotations
+
 import math
 import warnings
 from typing import TYPE_CHECKING, Callable, List, Tuple, Union
-from __future__ import annotations
 
 import pint
 

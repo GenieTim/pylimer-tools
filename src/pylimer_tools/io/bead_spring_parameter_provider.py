@@ -276,13 +276,16 @@ def get_kg_lj_parameters_for_polymer(polymer_name: str) -> Parameters:
     )
 
 
-def get_kuhn_parameters_for_polymer(polymer_name: str) -> Parameters:
+def get_kuhn_parameters_for_polymer(
+    polymer_name: str, ureg: Union[UnitRegistry, None] = None
+) -> Parameters:
     """
     Returns a Parameters object containing
     the parameters for a Kuhn segment model
     for the specified polymer.
     """
-    ureg = UnitRegistry()
+    if ureg is None:
+        ureg = UnitRegistry()
 
     row = _get_relevant_everaers_row(polymer_name)
 
@@ -310,14 +313,17 @@ def get_kuhn_parameters_for_polymer(polymer_name: str) -> Parameters:
     )
 
 
-def get_gaussian_parameters_for_polymer(polymer_name: str) -> Parameters:
+def get_gaussian_parameters_for_polymer(
+    polymer_name: str, ureg: Union[UnitRegistry, None] = None
+) -> Parameters:
     """
     Returns a Parameters object containing
     the parameters for a Gaussian chain model,
     (the ideal bead-spring polymer chain model)
     for the specified polymer.
     """
-    ureg = UnitRegistry()
+    if ureg is None:
+        ureg = UnitRegistry()
 
     row = _get_relevant_everaers_row(polymer_name)
 
@@ -343,11 +349,12 @@ def get_supported_polymer_names() -> list[str]:
     """
     Returns a list of supported polymer names based on the Everaers et al. data.
     """
-    unit_style_factory = UnitStyleFactory()
-    everaers_data = unit_style_factory.get_everares_et_al_data()
+    from .polymer_data import get_available_polymers
+
+    # Convert to the format used by this module
+    available_polymers = get_available_polymers()
     return [
-        "".join(filter(str.isalnum, str(row.name))).lower()
-        for row in everaers_data.itertuples()
+        "".join(filter(str.isalnum, str(name))).lower() for name in available_polymers
     ]
 
 
@@ -355,16 +362,22 @@ def _get_relevant_everaers_row(polymer_name: str) -> dict:
     """
     Returns the relevant row from the Everaers et al. data for the specified polymer name.
     """
-    unit_style_factory = UnitStyleFactory()
+    from .polymer_data import get_polymer_by_name
 
-    everaers_data = unit_style_factory.get_everares_et_al_data()
+    try:
+        polymer_data = get_polymer_by_name(polymer_name)
+        return polymer_data.to_dict()
+    except ValueError:
+        # Fallback to old method for backward compatibility
+        unit_style_factory = UnitStyleFactory()
+        everaers_data = unit_style_factory.get_everares_et_al_data()
 
-    for _, row in everaers_data.iterrows():
-        if (
-            "".join(filter(str.isalnum, polymer_name)).lower()
-            == "".join(filter(str.isalnum, str(row["name"]))).lower()
-        ):
-            return row.to_dict()
+        for _, row in everaers_data.iterrows():
+            if (
+                "".join(filter(str.isalnum, polymer_name)).lower()
+                == "".join(filter(str.isalnum, str(row["name"]))).lower()
+            ):
+                return row.to_dict()
 
-    raise ValueError(
-        f"Polymer '{polymer_name}' not found in Everaers et al. data.")
+        raise ValueError(
+            f"Polymer '{polymer_name}' not found in Everaers et al. data.")
