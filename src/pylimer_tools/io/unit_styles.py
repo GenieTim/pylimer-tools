@@ -2,8 +2,12 @@ import os
 import warnings
 from typing import Final
 
-import pandas as pd
 from pint import UnitRegistry
+from .polymer_data import (
+    load_everaers_et_al_data,
+    get_available_polymers,
+    get_polymer_by_name,
+)
 
 
 class UnitStyle(object):
@@ -117,20 +121,14 @@ class UnitStyleFactory(object):
         """
         return self.ureg
 
-    def get_everares_et_al_data(self) -> pd.DataFrame:
+    def get_everares_et_al_data(self):
         """
         Load the Everaers et al. (2020) unit properties data.
 
-        :return: DataFrame containing polymer properties from Everaers et al.
-        :rtype: pd.DataFrame
+        :return: PolymerDataFrame containing polymer properties from Everaers et al.
+        :rtype: PolymerDataFrame
         """
-        return pd.read_excel(
-            os.path.join(
-                os.path.dirname(__file__),
-                "..",
-                "data/everaers_et_al_unit_properties.xlsx",
-            )
-        )
+        return load_everaers_et_al_data()
 
     def get_available_polymers(self) -> list:
         """
@@ -139,7 +137,7 @@ class UnitStyleFactory(object):
         :return: List of polymer names
         :rtype: list
         """
-        return list(self.get_everares_et_al_data()["name"].unique())
+        return get_available_polymers()
 
     def get_unit_style(self, unit_type: str,
                        dimension: int = 3, **kwargs) -> UnitStyle:
@@ -185,14 +183,19 @@ class UnitStyleFactory(object):
                 )
             polymer_data = kwargs["polymer"]
             if isinstance(polymer_data, str):
-                all_polymer_data = self.get_everares_et_al_data()
-                for row in all_polymer_data.itertuples():
-                    if (
-                        "".join(filter(str.isalnum, polymer_data)).lower()
-                        == "".join(filter(str.isalnum, row.name)).lower()
-                    ):
-                        polymer_data = row
-                        break
+                try:
+                    polymer_data = get_polymer_by_name(polymer_data)
+                except ValueError:
+                    # Fallback to the old iteration method for backward
+                    # compatibility
+                    all_polymer_data = self.get_everares_et_al_data()
+                    for row in all_polymer_data.itertuples():
+                        if (
+                            "".join(filter(str.isalnum, polymer_data)).lower()
+                            == "".join(filter(str.isalnum, row.name)).lower()
+                        ):
+                            polymer_data = row
+                            break
             if not isinstance(polymer_data, dict) and not isinstance(
                 polymer_data, tuple
             ):
@@ -207,7 +210,7 @@ class UnitStyleFactory(object):
             )
             ureg.define("sigma = {} * nanometer".format(sigma_conversion))
             ureg.define("eps = {}e-21 joule".format(polymer_data.kB_Tref))
-            # time is most difficult in lj — let's keep tau
+            # time is most difficult in LJ — let's keep tau
             ureg.define("tau = 1 * tau")
             # NOTE: The formula in the LAMMPS documentation contains \epsilon_0.
             # BUT: it does not add up in terms of units, so... the implementation here

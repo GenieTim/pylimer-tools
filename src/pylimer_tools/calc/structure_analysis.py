@@ -5,11 +5,10 @@ This module provides functions to compute various quantities related to polymer 
 from __future__ import annotations
 
 import math
+import statistics
 import warnings
 from collections import Counter
 from typing import TYPE_CHECKING, Sequence, Tuple, Union
-
-import numpy as np
 
 from pylimer_tools_cpp import MoleculeType
 
@@ -81,7 +80,7 @@ def compute_stoichiometric_imbalance(
         [
             m
             for m in strands
-            if not np.all([a.get_type() in ignore_types for a in m.get_atoms()])
+            if not all([a.get_type() in ignore_types for a in m.get_atoms()])
         ]
     )
 
@@ -254,8 +253,10 @@ def compute_mean_end_to_end_distances(
     if len(r_tau_vectors) < 1:
         return {}
 
-    r_tau_vectors_array = np.array(list(r_tau_vectors.values()))
-    r_taus = np.linalg.norm(r_tau_vectors_array, axis=1)
+    def vector_norm(vector):
+        return math.sqrt(sum(x * x for x in vector))
+
+    r_taus = [vector_norm(vector) for vector in r_tau_vectors.values()]
 
     return dict(zip(r_tau_vectors.keys(), r_taus))
 
@@ -305,8 +306,8 @@ def compute_mean_end_to_end_vectors(
                 )
             key_counts[key] += 1
         iteration += 1
-    if len(key_counts) > 0 and not np.all(
-        [c == list(key_counts.values())[0] for c in key_counts.values()]
+    if len(key_counts) > 0 and not all(
+        c == list(key_counts.values())[0] for c in key_counts.values()
     ):
         raise ValueError("The networks contain different molecules.")
     return end_to_end_vectors
@@ -375,7 +376,7 @@ def compute_crosslinker_conversion(
             return 0.0
         f = functionality_per_type[crosslinker_type]
 
-    if f is None or f <= 0.0 or not np.isfinite(f):
+    if f is None or f <= 0.0 or not math.isfinite(f):
         raise ValueError(
             "Crosslinker functionality = {} is not reasonable.".format(f))
 
@@ -397,7 +398,7 @@ def compute_effective_crosslinker_functionality(
     junction_degrees = compute_effective_crosslinker_functionalities(
         network, crosslinker_type
     )
-    return float(np.mean(junction_degrees)) if len(
+    return statistics.mean(junction_degrees) if len(
         junction_degrees) > 0 else 0.0
 
 
@@ -524,15 +525,16 @@ def measure_weight_fraction_of_soluble_material(
         return 0.0
 
     fractions = network.get_clusters()
-    weights = np.array([f.compute_total_mass() for f in fractions])
-    total_weight = weights.sum()
+    weights = [f.compute_total_mass() for f in fractions]
+    total_weight = sum(weights)
     soluble_weight = 0
+    max_weight = max(weights) if weights else 0
     for w in weights:
         if abs_tol is not None:
             if w < abs_tol:
                 soluble_weight += w
         else:
-            if w < rel_tol * weights.max():
+            if w < rel_tol * max_weight:
                 soluble_weight += w
 
     if total_weight == 0:
@@ -564,24 +566,23 @@ def measure_lower_bound_weight_fraction_of_soluble_material(
 
     def is_soluble_cluster(cluster):
         chains = cluster.get_chains_with_crosslinker(crosslinker_type)
-        if np.any([c.get_strand_type() ==
-                  MoleculeType.PRIMARY_LOOP for c in chains]):
+        if any(c.get_strand_type() == MoleculeType.PRIMARY_LOOP for c in chains):
             return False
         loops = cluster.find_loops(crosslinker_type)
         return len(loops) == 0
 
     fractions = network.get_clusters()
-    weights = np.array([f.compute_total_mass() for f in fractions])
-    total_weight = weights.sum()
+    weights = [f.compute_total_mass() for f in fractions]
+    total_weight = sum(weights)
     soluble_weight = 0
+    max_weight = max(weights) if weights else 0
     for i in range(len(fractions)):
         w = weights[i]
         if abs_tol is not None:
             if w < abs_tol and is_soluble_cluster(fractions[i]):
                 soluble_weight += w
         else:
-            if w < rel_tol * \
-                    weights.max() and is_soluble_cluster(fractions[i]):
+            if w < rel_tol * max_weight and is_soluble_cluster(fractions[i]):
                 soluble_weight += w
 
     return soluble_weight / total_weight

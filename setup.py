@@ -152,7 +152,39 @@ class CMakeExtension(Extension):
 
 
 class CMakeBuild(build_ext):
+    def _convert_excel_to_json(self):
+        """Convert Excel data to JSON if needed during build."""
+        project_root = Path(__file__).parent
+        excel_path = project_root / "src" / "pylimer_tools" / "data" / "everaers_et_al_unit_properties.xlsx"
+        json_path = project_root / "src" / "pylimer_tools" / "data" / "everaers_et_al_unit_properties.json"
+        convert_script = project_root / "bin" / "convert-excel-to-json.py"
+        
+        # Check if conversion is needed (Excel newer than JSON or JSON doesn't exist)
+        if (not json_path.exists() or 
+            (excel_path.exists() and excel_path.stat().st_mtime > json_path.stat().st_mtime)):
+            
+            print("Converting Excel data to JSON...")
+            try:
+                subprocess.run([
+                    sys.executable, str(convert_script)
+                ], cwd=project_root, check=True, capture_output=True, text=True)
+                print("Excel to JSON conversion completed successfully.")
+            except subprocess.CalledProcessError as e:
+                print(f"Warning: Excel to JSON conversion failed: {e}")
+                print(f"stdout: {e.stdout}")
+                print(f"stderr: {e.stderr}")
+                # Don't fail the build if conversion fails and JSON already exists
+                if not json_path.exists():
+                    raise RuntimeError("JSON file doesn't exist and conversion failed")
+            except FileNotFoundError:
+                print("Warning: Conversion script not found, skipping Excel to JSON conversion")
+                if not json_path.exists():
+                    raise RuntimeError("JSON file doesn't exist and conversion script not found")
+
     def build_extension(self, ext: CMakeExtension) -> None:
+        # Convert Excel to JSON if needed before building
+        self._convert_excel_to_json()
+        
         # Must be in this form due to bug in .resolve() only fixed in Python
         # 3.10+
         ext_fullpath = Path.cwd() / self.get_ext_fullpath(ext.name)

@@ -82,7 +82,7 @@ if (NOT DEFINED igraph_LOADED)
                 PREFIX ${igraph_PREFIX_PATH}
                 PATCH_COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/patches/igraph.patch
                 INSTALL_DIR ${igraph_PREFIX_PATH}/igraphLib-install
-                CMAKE_ARGS ${igraph_EXTRA_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=${igraph_BUILD_TYPE} -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=OFF
+                CMAKE_ARGS ${igraph_EXTRA_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=${igraph_BUILD_TYPE} -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=OFF -DIGRAPH_ENABLE_LTO=AUTO
                 BUILD_COMMAND ${CMAKE_COMMAND} --build ${igraph_PREFIX_PATH}/src/igraphLib-build --config ${igraph_BUILD_TYPE}
                 BUILD_BYPRODUCTS ${EXPECTED_IGRAPH_LIB}
         )
