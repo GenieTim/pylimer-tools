@@ -22,6 +22,7 @@ requires = [
     "scikit-build",
     "pybind11",
     "cmake>=3.12",
+    "pandas>=2.3.0",
     "ninja; platform_system!='Windows'",
 ]
 build-backend = "setuptools.build_meta"
