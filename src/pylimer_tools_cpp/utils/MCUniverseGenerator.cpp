@@ -265,6 +265,48 @@ MCUniverseGenerator::addRandomlyFunctionalizedStrands(
     "crosslinker functionality must be 1.");
   INVALIDARG_EXP_IFN(nrOfStrands == beadsPerStrand.size(),
                      "Inconsistent sizes");
+
+  // Create a random crosslink selector lambda
+  std::uniform_real_distribution<double> randomDist(0., 1.);
+  int nRepeat = 1;
+  if (functionalizationProbability > 1.) {
+    nRepeat = static_cast<int>(std::ceil(functionalizationProbability));
+    functionalizationProbability /= static_cast<double>(nRepeat);
+  }
+
+  auto crosslinkSelector = [&](int strandIndex,
+                               int beadIndex,
+                               int totalBeads) -> std::pair<bool, int> {
+    bool convertThisBead = false;
+    int functionality = 0;
+    for (size_t j = 0; j < nRepeat; ++j) {
+      if (randomDist(this->rng) < functionalizationProbability) {
+        convertThisBead = true;
+        functionality += crosslinkerFunctionality;
+      }
+    }
+    return { convertThisBead, functionality };
+  };
+
+  this->addFunctionalizedStrandsImpl(nrOfStrands,
+                                     beadsPerStrand,
+                                     crosslinkSelector,
+                                     crosslinkerFunctionality,
+                                     crosslinkerAtomType,
+                                     strandAtomType,
+                                     whiteNoise);
+}
+
+void
+MCUniverseGenerator::addFunctionalizedStrandsImpl(
+  const int nrOfStrands,
+  const std::vector<int>& beadsPerStrand,
+  std::function<std::pair<bool, int>(int, int, int)> crosslinkSelector,
+  const int defaultCrosslinkFunctionality,
+  const int crosslinkerAtomType,
+  const int strandAtomType,
+  const bool whiteNoise)
+{
 #ifndef NDEBUG
   this->validateInternalState();
 #endif
@@ -273,32 +315,17 @@ MCUniverseGenerator::addRandomlyFunctionalizedStrands(
     this->remainingCrossLinkerFunctionality.size();
   const size_t nStrandsBefore = this->simplifiedUniverse.strandFrom.size();
 
-  std::uniform_real_distribution<double> randomDist(0., 1.);
   size_t nCrosslinks = 0;
   size_t nEffectiveStrands = 0;
 
   std::vector<int> strandIdOfCrosslink;
   std::vector<int> newCrosslinkFunctionality;
 
-  int nRepeat = 1;
-  if (functionalizationProbability > 1.) {
-    nRepeat = static_cast<int>(std::ceil(functionalizationProbability));
-    functionalizationProbability /= static_cast<double>(nRepeat);
-  }
-
   for (size_t strandI = 0; strandI < nrOfStrands; ++strandI) {
-    std::vector<int> partialStrandLengths;
-    std::vector<size_t> crosslinkIndicesInStrand;
     long int lastSampledBead = -1;
     for (long int i = 0; i < beadsPerStrand[strandI]; ++i) {
-      bool convertThisBead = false;
-      int functionality = 0;
-      for (size_t j = 0; j < nRepeat; ++j) {
-        if (randomDist(this->rng) < functionalizationProbability) {
-          convertThisBead = true;
-          functionality += crosslinkerFunctionality;
-        }
-      }
+      auto [convertThisBead, functionality] =
+        crosslinkSelector(strandI, i, beadsPerStrand[strandI]);
 
       if (convertThisBead) {
         // yes, we want to replace this bead `i` with a crosslink
@@ -359,8 +386,10 @@ MCUniverseGenerator::addRandomlyFunctionalizedStrands(
                   "Did not register the expected number of crosslinks.");
   RUNTIME_EXP_IFN(nCrosslinks == newCrosslinkFunctionality.size(),
                   "Did not register the expected number of crosslinks.");
-  this->addCrosslinkers(
-    nCrosslinks, crosslinkerFunctionality, crosslinkerAtomType, whiteNoise);
+  this->addCrosslinkers(nCrosslinks,
+                        defaultCrosslinkFunctionality,
+                        crosslinkerAtomType,
+                        whiteNoise);
   for (size_t newXlinkOffset = 0; newXlinkOffset < nCrosslinks;
        ++newXlinkOffset) {
     this->simplifiedUniverse.xlinkChainId[nCrosslinksBefore + newXlinkOffset] =
@@ -427,6 +456,50 @@ MCUniverseGenerator::addRandomlyFunctionalizedStrands(
 
   this->updateNeighbourListCoordinates();
   this->validateInternalState();
+}
+
+void
+MCUniverseGenerator::addRegularlySpacedFunctionalizedStrands(
+  const int nrOfStrands,
+  std::vector<int> beadsPerStrand,
+  const int spacingBetweenCrosslinks,
+  const int offsetToFirstCrosslink,
+  const int crosslinkerFunctionality,
+  const int crosslinkerAtomType,
+  const int strandAtomType,
+  const bool whiteNoise)
+{
+  INVALIDARG_EXP_IFN(nrOfStrands > 0, "Cannot add 0 or less strands");
+  INVALIDARG_EXP_IFN(spacingBetweenCrosslinks > 0,
+                     "Spacing between crosslinks must be positive");
+  INVALIDARG_EXP_IFN(offsetToFirstCrosslink >= 0,
+                     "Offset to first crosslink must be non-negative");
+  INVALIDARG_EXP_IFN(crosslinkerFunctionality >= 1,
+                     "Crosslinker functionality must be at least 1. Use "
+                     "normal chains instead for lower functionalities.");
+  INVALIDARG_EXP_IFN(nrOfStrands == beadsPerStrand.size(),
+                     "Inconsistent sizes");
+
+  // Create a regular spacing crosslink selector lambda
+  auto crosslinkSelector = [&](int strandIndex,
+                               int beadIndex,
+                               int totalBeads) -> std::pair<bool, int> {
+    bool convertThisBead = false;
+    // Check if this bead position should be a crosslink
+    if (beadIndex >= offsetToFirstCrosslink &&
+        (beadIndex - offsetToFirstCrosslink) % spacingBetweenCrosslinks == 0) {
+      convertThisBead = true;
+    }
+    return { convertThisBead, crosslinkerFunctionality };
+  };
+
+  this->addFunctionalizedStrandsImpl(nrOfStrands,
+                                     beadsPerStrand,
+                                     crosslinkSelector,
+                                     crosslinkerFunctionality,
+                                     crosslinkerAtomType,
+                                     strandAtomType,
+                                     whiteNoise);
 }
 
 void

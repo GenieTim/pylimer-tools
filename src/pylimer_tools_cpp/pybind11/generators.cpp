@@ -277,6 +277,75 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("crosslinker_type") = 2,
          py::arg("strand_atom_type") = 1,
          py::arg("white_noise") = true)
+    .def("add_regularly_spaced_functionalized_strands",
+         &MCUniverseGenerator::addRegularlySpacedFunctionalizedStrands,
+         R"pbdoc(
+          Add strands with regularly spaced crosslinkers in between.
+
+          :param nr_of_strands: Number of strands to add.
+          :param strand_length: Length of each strand.
+          :param spacing_between_crosslinks: Number of beads between crosslinks.
+          :param offset_to_first_crosslink: Offset from start of strand to first crosslink (0-based, default: 0).
+          :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
+          :param crosslinker_type: Atom type of the crosslinkers (default: 2).
+          :param strand_atom_type: Atom type of the beads that stay (default: 1).
+          :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).     
+     )pbdoc",
+         py::arg("nr_of_strands"),
+         py::arg("strand_length"),
+         py::arg("spacing_between_crosslinks"),
+         py::arg("offset_to_first_crosslink") = 0,
+         py::arg("crosslinker_functionality") = 4,
+         py::arg("crosslinker_type") = 2,
+         py::arg("strand_atom_type") = 1,
+         py::arg("white_noise") = true)
+    .def("add_functionalized_strands",
+         &MCUniverseGenerator::addFunctionalizedStrandsImpl,
+         R"pbdoc(
+          Add strands with custom crosslink placement using a selector function.
+
+          This is a general implementation that allows for flexible crosslink placement patterns.
+          The crosslink_selector function is called for each bead position and should return
+          a tuple (should_convert, functionality) indicating whether that bead should be
+          converted to a crosslink and what functionality it should have.
+
+          .. tip::
+
+             This method provides the most flexibility for creating custom crosslink patterns.
+             For common patterns, consider using the more specific methods like
+             :meth:`~pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands` or
+             :meth:`~pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands`.
+
+          Example usage::
+
+              # Create a custom pattern with crosslinks every 5 beads starting at position 2
+              def my_selector(bead_index, total_beads):
+                  if bead_index >= 2 and (bead_index - 2) % 5 == 0:
+                      return (True, 4)  # Convert to crosslink with functionality 4
+                  return (False, 0)     # Don't convert
+
+              generator.add_functionalized_strands(
+                  nr_of_strands=10,
+                  strand_length=[20] * 10,
+                  crosslink_selector=my_selector,
+                  default_crosslinker_functionality=4
+              )
+
+          :param nr_of_strands: Number of strands to add.
+          :param strand_length: Length of each strand (list of integers).
+          :param crosslink_selector: Function that takes (bead_index, total_beads) and returns (should_convert, functionality).
+          :param default_crosslinker_functionality: Default functionality for crosslinks (used for positioning).
+          :param crosslinker_type: Atom type of the crosslinkers (default: 2).
+          :param strand_atom_type: Atom type of the beads that stay (default: 1).
+          :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).     
+     )pbdoc",
+         py::arg("nr_of_strands"),
+         py::arg("strand_length"),
+         py::arg("crosslink_selector"),
+         py::arg("default_crosslinker_functionality"),
+         py::arg("crosslinker_type") = 2,
+         py::arg("strand_atom_type") = 1,
+         py::arg("white_noise") = true)
     .def("add_end_functionalized_strands",
          &MCUniverseGenerator::addCrosslinkStrands,
          R"pbdoc(

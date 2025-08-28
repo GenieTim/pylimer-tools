@@ -1517,6 +1517,45 @@ class MCUniverseGenerator:
                     :param strand_atom_type: Atom type of the beads that are not at the ends (default: 1).
                     :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).
         """
+    def add_functionalized_strands(self, nr_of_strands: typing.SupportsInt, strand_length: collections.abc.Sequence[typing.SupportsInt], crosslink_selector: collections.abc.Callable[[typing.SupportsInt, typing.SupportsInt], tuple[bool, int]], default_crosslinker_functionality: typing.SupportsInt, crosslinker_type: typing.SupportsInt = 2, strand_atom_type: typing.SupportsInt = 1, white_noise: bool = True) -> None:
+        """
+                  Add strands with custom crosslink placement using a selector function.
+        
+                  This is a general implementation that allows for flexible crosslink placement patterns.
+                  The crosslink_selector function is called for each bead position and should return
+                  a tuple (should_convert, functionality) indicating whether that bead should be
+                  converted to a crosslink and what functionality it should have.
+        
+                  .. tip::
+        
+                     This method provides the most flexibility for creating custom crosslink patterns.
+                     For common patterns, consider using the more specific methods like
+                     :meth:`~pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands` or
+                     :meth:`~pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands`.
+        
+                  Example usage::
+        
+                      # Create a custom pattern with crosslinks every 5 beads starting at position 2
+                      def my_selector(bead_index, total_beads):
+                          if bead_index >= 2 and (bead_index - 2) % 5 == 0:
+                              return (True, 4)  # Convert to crosslink with functionality 4
+                          return (False, 0)     # Don't convert
+        
+                      generator.add_functionalized_strands(
+                          nr_of_strands=10,
+                          strand_length=[20] * 10,
+                          crosslink_selector=my_selector,
+                          default_crosslinker_functionality=4
+                      )
+        
+                  :param nr_of_strands: Number of strands to add.
+                  :param strand_length: Length of each strand (list of integers).
+                  :param crosslink_selector: Function that takes (bead_index, total_beads) and returns (should_convert, functionality).
+                  :param default_crosslinker_functionality: Default functionality for crosslinks (used for positioning).
+                  :param crosslinker_type: Atom type of the crosslinkers (default: 2).
+                  :param strand_atom_type: Atom type of the beads that stay (default: 1).
+                  :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).     
+        """
     def add_monofunctional_strands(self, nr_of_monofunctional_strands: typing.SupportsInt, monofunctional_strand_length: collections.abc.Sequence[typing.SupportsInt], monofunctional_strand_atom_type: typing.SupportsInt = 4) -> None:
         """
                  Add multiple monofunctional strands with specified bead types.
@@ -1528,6 +1567,19 @@ class MCUniverseGenerator:
                   :param nr_of_strands: Number of strands to add.
                   :param strand_length: Length of each strand.
                   :param functionalization_probability: Proportion of beads that are made crosslink.
+                  :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
+                  :param crosslinker_type: Atom type of the crosslinkers (default: 2).
+                  :param strand_atom_type: Atom type of the beads that stay (default: 1).
+                  :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).     
+        """
+    def add_regularly_spaced_functionalized_strands(self, nr_of_strands: typing.SupportsInt, strand_length: collections.abc.Sequence[typing.SupportsInt], spacing_between_crosslinks: typing.SupportsInt, offset_to_first_crosslink: typing.SupportsInt = 0, crosslinker_functionality: typing.SupportsInt = 4, crosslinker_type: typing.SupportsInt = 2, strand_atom_type: typing.SupportsInt = 1, white_noise: bool = True) -> None:
+        """
+                  Add strands with regularly spaced crosslinkers in between.
+        
+                  :param nr_of_strands: Number of strands to add.
+                  :param strand_length: Length of each strand.
+                  :param spacing_between_crosslinks: Number of beads between crosslinks.
+                  :param offset_to_first_crosslink: Offset from start of strand to first crosslink (0-based, default: 0).
                   :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
                   :param crosslinker_type: Atom type of the crosslinkers (default: 2).
                   :param strand_atom_type: Atom type of the beads that stay (default: 1).

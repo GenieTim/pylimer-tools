@@ -120,8 +120,6 @@ target_link_libraries(test_sources
         PRIVATE
         Catch2::Catch2
         pylimer_tools
-        ${igraph_LIBRARIES}
-        ${nlopt_LIBRARIES}
 )
 
 add_executable(pylimer_tests pylimer_tools_cpp/test.cpp)
@@ -134,8 +132,6 @@ target_link_libraries(pylimer_tests
         Catch2::Catch2WithMain
         test_sources
         pylimer_tools
-        ${igraph_LIBRARIES}
-        ${nlopt_LIBRARIES}
 )
 
 if (LEAK_ANALYSIS)

@@ -1031,6 +1031,127 @@ TEST_CASE(
   }
 }
 
+TEST_CASE("Regularly spaced functionalized strands can be generated",
+          "[generator][MCUniverseGenerator]")
+{
+  std::cout << "Running test \"Regularly spaced functionalized strands can be "
+               "generated\""
+            << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);
+  generator.setSeed(8804);
+  generator.setBeadDistance(0.964);
+  generator.configNrOfMCSteps(10);
+
+  SECTION("Basic functionality")
+  {
+    // Add strands with crosslinks every 5 beads, starting at offset 2
+    std::vector<int> strandLengths = { 20, 25, 30 };
+    generator.addRegularlySpacedFunctionalizedStrands(
+      3, strandLengths, 5, 2, 4, 2, 1, true);
+
+    pe::Universe universe = generator.getUniverse();
+
+    // Check that we have the correct number of crosslinks
+    // For strand 0 (20 beads):
+    // crosslinks at positions 2, 7, 12, 17 = 4 crosslinks, 5 chains
+    // For strand 1 (25 beads):
+    // crosslinks at positions 2, 7, 12, 17, 22 = 5 crosslinks, 6 chains
+    // For strand 2 (30 beads):
+    // crosslinks at positions 2, 7, 12, 17, 22, 27 = 6 crosslinks, 7 chains
+    // Total: 4 + 5 + 6 = 15 crosslinks
+    CHECK(universe.getAtomsOfType(2).size() == 15);
+
+    CHECK(universe.getMolecules(3).size() == 3); // only three long chains
+    CHECK(universe.getMolecules(2).size() ==
+          5 + 6 + 7); // but more short chains
+
+    // Total atoms should be 20 + 25 + 30 = 75 (each bead is either crosslink or
+    // strand atom)
+    CHECK(universe.getNrOfAtoms() == 75);
+
+    CHECK(generator.getCurrentNrOfAvailableCrosslinkSites() == 4 * 15);
+  }
+
+  SECTION("Zero offset")
+  {
+    // Test with zero offset - crosslinks at positions 0, 3, 6, 9, ...
+    std::vector<int> strandLengths = { 10 };
+    generator.addRegularlySpacedFunctionalizedStrands(
+      1, strandLengths, 3, 0, 5, 2, 1, true);
+
+    pe::Universe universe = generator.getUniverse();
+
+    // For a 10-bead strand with spacing 3 and offset 0: crosslinks at 0, 3, 6,
+    // 9 = 4 crosslinks
+    CHECK(universe.getAtomsOfType(2).size() == 4);
+    CHECK(universe.getNrOfAtoms() == 10);
+    CHECK(universe.getMolecules(3).size() == 1);   // only one long chain
+    REQUIRE(universe.getMolecules(2).size() == 3); // three short chains
+
+    std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
+    CHECK(chains[0].getNrOfAtoms() == 4);
+    CHECK(chains[1].getNrOfAtoms() == 4);
+    CHECK(chains[2].getNrOfAtoms() == 4);
+
+    CHECK(generator.getCurrentNrOfAvailableCrosslinkSites() == 5 * 4);
+  }
+
+  SECTION("Large spacing")
+  {
+    // Test with large spacing - should have few crosslinks
+    std::vector<int> strandLengths = { 10 };
+    generator.addRegularlySpacedFunctionalizedStrands(
+      1, strandLengths, 20, 0, 4, 2, 1, true);
+
+    pe::Universe universe = generator.getUniverse();
+
+    // For a 10-bead strand with spacing 20: only crosslink at position 0 = 1
+    // crosslink
+    CHECK(universe.getAtomsOfType(2).size() == 1);
+    CHECK(universe.getNrOfAtoms() == 10);
+  }
+
+  SECTION("Large offset")
+  {
+    // Test with offset beyond strand length - should have no crosslinks
+    std::vector<int> strandLengths = { 10 };
+    generator.addRegularlySpacedFunctionalizedStrands(
+      1, strandLengths, 3, 15, 4, 2, 1, true);
+
+    pe::Universe universe = generator.getUniverse();
+
+    // No crosslinks should be created since offset is beyond strand length
+    CHECK(universe.getAtomsOfType(2).size() == 0);
+    CHECK(universe.getNrOfAtoms() == 10);
+  }
+
+  SECTION("Error handling")
+  {
+    std::vector<int> strandLengths = { 10, 10 };
+
+    // Test negative spacing
+    CHECK_THROWS(generator.addRegularlySpacedFunctionalizedStrands(
+      2, strandLengths, -1, 0, 4, 2, 1, true));
+
+    // Test negative offset
+    CHECK_THROWS(generator.addRegularlySpacedFunctionalizedStrands(
+      2, strandLengths, 3, -1, 4, 2, 1, true));
+
+    // Test zero spacing
+    CHECK_THROWS(generator.addRegularlySpacedFunctionalizedStrands(
+      2, strandLengths, 0, 0, 4, 2, 1, true));
+
+    // Test inconsistent sizes
+    CHECK_THROWS(generator.addRegularlySpacedFunctionalizedStrands(
+      3, strandLengths, 3, 0, 4, 2, 1, true));
+
+    // Test zero strands
+    CHECK_THROWS(generator.addRegularlySpacedFunctionalizedStrands(
+      0, {}, 3, 0, 4, 2, 1, true));
+  }
+}
+
 TEST_CASE(
   "Universe generator with randomly functionalized chains reach correct w_sol",
   "[generator][MCUniverseGenerator][long]")
@@ -1709,14 +1830,13 @@ TEST_CASE("linkStrandsToStrandsToConversion achieves target conversion through "
   }
 }
 
-
 TEST_CASE("linkStrandsToStrandsToConversion also works with free strands",
           "[generator][MCUniverseGenerator][tetra-peg]")
 {
- std::cout << "Running test \"linkStrandsToStrandsToConversion also works with free strands\""
-           << std::endl;
+  std::cout << "Running test \"linkStrandsToStrandsToConversion also works "
+               "with free strands\""
+            << std::endl;
 
-           
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(80.0, 80.0, 80.0);
   generator.setSeed(12345);
 
@@ -1724,15 +1844,9 @@ TEST_CASE("linkStrandsToStrandsToConversion also works with free strands",
 
   generator.configNrOfMCSteps(0);
 
-  generator.addStarCrosslinkers(
-    150, 4, 20, 2, 1
-  );
+  generator.addStarCrosslinkers(150, 4, 20, 2, 1);
 
-  generator.addStrands(
-    50, 15, 1
-  );
+  generator.addStrands(50, 15, 1);
 
-  CHECK_NOTHROW(
-    generator.linkStrandsToStrandsToConversion(0.9)
-  );
+  CHECK_NOTHROW(generator.linkStrandsToStrandsToConversion(0.9));
 }

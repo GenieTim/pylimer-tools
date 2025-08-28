@@ -126,7 +126,7 @@ print(
 
 # %%
 # Visualizing the Results
-# ----------------------
+# -----------------------
 #
 # Let's plot the evolution of crosslinker conversion
 # and soluble fraction over the steps.
