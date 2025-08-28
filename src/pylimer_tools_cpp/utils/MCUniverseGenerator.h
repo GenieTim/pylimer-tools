@@ -332,6 +332,29 @@ public:
                                         bool whiteNoise = true);
 
   /**
+   * @brief Add strands which contain crosslinks at regularly spaced positions
+   *
+   * @param nrOfStrands
+   * @param beadsPerStrand
+   * @param spacingBetweenCrosslinks the number of beads between crosslinks
+   * @param offsetToFirstCrosslink offset from start of strand to first
+   * crosslink (0-based)
+   * @param crosslinkerFunctionality the functionality of the crosslinkers,
+   * excl. connections to the strand
+   * @param crosslinkerAtomType
+   * @param strandAtomType
+   * @param whiteNoise
+   */
+  void addRegularlySpacedFunctionalizedStrands(int nrOfStrands,
+                                               std::vector<int> beadsPerStrand,
+                                               int spacingBetweenCrosslinks,
+                                               int offsetToFirstCrosslink = 0,
+                                               int crosslinkerFunctionality = 4,
+                                               int crosslinkerAtomType = 2,
+                                               int strandAtomType = 2,
+                                               bool whiteNoise = true);
+
+  /**
    * @brief add strands with crosslinks as ends
    *
    * @param nrOfCrosslinkStrands
@@ -598,6 +621,35 @@ public:
    * @return std::vector<size_t> vector of strand indices
    */
   std::vector<size_t> findFreeStrandEnds() const;
+
+  /**
+   * @brief General implementation for adding functionalized strands with
+   * customizable crosslink selection
+   *
+   * This method allows for flexible crosslink placement by accepting a custom
+   * selector function. The selector function is called for each bead position
+   * and returns whether that bead should be converted to a crosslink and what
+   * functionality it should have.
+   *
+   * @param nrOfStrands number of strands to add
+   * @param beadsPerStrand vector specifying beads per strand
+   * @param crosslinkSelector function that determines if a bead should be
+   * converted to crosslink. Takes (strandIndex, beadIndex, totalBeads) and returns
+   * (shouldConvert, functionality)
+   * @param defaultCrosslinkFunctionality default functionality for crosslinks
+   * (used for adding crosslinker atoms)
+   * @param crosslinkerAtomType atom type for crosslinkers
+   * @param strandAtomType atom type for strand beads
+   * @param whiteNoise whether to use white noise for positioning
+   */
+  void addFunctionalizedStrandsImpl(
+    int nrOfStrands,
+    const std::vector<int>& beadsPerStrand,
+    std::function<std::pair<bool, int>(int, int, int)> crosslinkSelector,
+    int defaultCrosslinkFunctionality,
+    int crosslinkerAtomType,
+    int strandAtomType,
+    bool whiteNoise);
 
 #ifdef CEREALIZABLE
   // This method lets cereal know which data members to serialize

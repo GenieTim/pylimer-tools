@@ -12,7 +12,7 @@
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
       "args": [
         //"[MEHPForceBalance2]"
-        "MEHP Force Balance2 correctly collapses melts even with random entanglements"
+        "Regularly spaced functionalized strands can be generated"
       ],
       "env": {
         "MallocNanoZone": "0",

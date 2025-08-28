@@ -4,6 +4,7 @@
 
 - More build & deploy system improvements (we got wasm now!)
 - Less expensive imports, use lazy importing of scipy
+- Add method to add regularly spaced cross-linker chains in `MCUniverseGenerator`
 
 ## v0.3.4
 
