@@ -77,14 +77,14 @@ napoleon_attr_annotations = True
 
 # opengraph settings
 ogp_site_url = "https://genietim.github.io/pylimer-tools"
-ogp_custom_meta_tags = [
+ogp_custom_meta_tags = (
     '<link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />',
     '<link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />',
     '<link rel="shortcut icon" href="/_static/favicon/favicon.ico" />',
     '<link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />',
     '<meta name="apple-mobile-web-app-title" content="pylimer-tools" />',
     '<link rel="manifest" href="/_static/favicon/site.webmanifest" />',
-]
+)
 
 # sphinx-gallery settings
 sphinx_gallery_conf = {
@@ -107,6 +107,9 @@ intersphinx_mapping = get_intersphinx_mapping(
         "python",
     },
 )
+
+# Add manual intersphinx mapping for pint
+intersphinx_mapping["pint"] = ("https://pint.readthedocs.io/en/stable/", None)
 
 # To avoid showing methods and attributes of classes multiple times.
 numpydoc_show_class_members = False
@@ -154,7 +157,7 @@ html_theme_options = {
     "source_repository": "https://github.com/GenieTim/pylimer-tools",
     "source_branch": "main",
     "source_directory": "docs/",
-    "secondary_sidebar_items": ["page-toc", "sg_download_links", "sg_launcher_links"],
+    # "secondary_sidebar_items": ["page-toc", "sg_download_links", "sg_launcher_links"],  # Disabled - not supported in this Furo version
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

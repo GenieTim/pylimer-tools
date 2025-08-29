@@ -634,8 +634,8 @@ public:
    * @param nrOfStrands number of strands to add
    * @param beadsPerStrand vector specifying beads per strand
    * @param crosslinkSelector function that determines if a bead should be
-   * converted to crosslink. Takes (strandIndex, beadIndex, totalBeads) and returns
-   * (shouldConvert, functionality)
+   * converted to crosslink. Takes (strandIndex, beadIndex, totalBeads) and
+   * returns (shouldConvert, functionality)
    * @param defaultCrosslinkFunctionality default functionality for crosslinks
    * (used for adding crosslinker atoms)
    * @param crosslinkerAtomType atom type for crosslinkers

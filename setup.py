@@ -12,12 +12,40 @@ from setuptools import Extension, find_namespace_packages, setup
 from setuptools.command.build_ext import build_ext
 
 
+def get_version_fallback():
+    """Fallback version detection using git directly."""
+    try:
+        # Try to get version directly from git
+        result = subprocess.run(
+            ["git", "describe", "--tags", "--abbrev=0"],
+            cwd=Path(__file__).parent,
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+        
+        if result.returncode == 0:
+            version = result.stdout.strip()
+            # Remove 'v' prefix if present
+            if version.startswith('v'):
+                version = version[1:]
+            return version
+            
+    except (subprocess.SubprocessError, FileNotFoundError, OSError) as e:
+        warnings.warn(f"Failed to get version from git: {e}")
+        print(e)
+        pass
+    
+    # Final fallback
+    return "0.0.0"
+
+
 def get_version_from_git():
     """Get version from git tag using our version script."""
     try:
         version_script = Path(__file__).parent / "bin" / "get-version.sh"
         if not version_script.exists():
-            return "0.0.0"  # Fallback
+            return get_version_fallback()  # Use fallback
             
         result = subprocess.run(
             [str(version_script)],
@@ -28,12 +56,15 @@ def get_version_from_git():
         )
         
         if result.returncode == 0:
-            return result.stdout.strip()
-        else:
-            return "0.0.0"  # Fallback
+            version = result.stdout.strip()
+            if version and version != "0.0.0" and version != "0.0.0-dev":
+                return version
+            
+        # If script failed or returned fallback, try direct git approach
+        return get_version_fallback()
             
     except (subprocess.SubprocessError, FileNotFoundError, OSError):
-        return "0.0.0"  # Fallback
+        return get_version_fallback()  # Use fallback
 
 
 VERSION = get_version_from_git()

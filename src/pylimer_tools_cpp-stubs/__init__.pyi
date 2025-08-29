@@ -1517,7 +1517,7 @@ class MCUniverseGenerator:
                     :param strand_atom_type: Atom type of the beads that are not at the ends (default: 1).
                     :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).
         """
-    def add_functionalized_strands(self, nr_of_strands: typing.SupportsInt, strand_length: collections.abc.Sequence[typing.SupportsInt], crosslink_selector: collections.abc.Callable[[typing.SupportsInt, typing.SupportsInt], tuple[bool, int]], default_crosslinker_functionality: typing.SupportsInt, crosslinker_type: typing.SupportsInt = 2, strand_atom_type: typing.SupportsInt = 1, white_noise: bool = True) -> None:
+    def add_functionalized_strands(self, nr_of_strands: typing.SupportsInt, strand_length: collections.abc.Sequence[typing.SupportsInt], crosslink_selector: collections.abc.Callable[[typing.SupportsInt, typing.SupportsInt, typing.SupportsInt], tuple[bool, int]], default_crosslinker_functionality: typing.SupportsInt, crosslinker_type: typing.SupportsInt = 2, strand_atom_type: typing.SupportsInt = 1, white_noise: bool = True) -> None:
         """
                   Add strands with custom crosslink placement using a selector function.
         
@@ -1536,7 +1536,7 @@ class MCUniverseGenerator:
                   Example usage::
         
                       # Create a custom pattern with crosslinks every 5 beads starting at position 2
-                      def my_selector(bead_index, total_beads):
+                      def my_selector(strand_index, bead_index, total_beads):
                           if bead_index >= 2 and (bead_index - 2) % 5 == 0:
                               return (True, 4)  # Convert to crosslink with functionality 4
                           return (False, 0)     # Don't convert
@@ -1550,7 +1550,7 @@ class MCUniverseGenerator:
         
                   :param nr_of_strands: Number of strands to add.
                   :param strand_length: Length of each strand (list of integers).
-                  :param crosslink_selector: Function that takes (bead_index, total_beads) and returns (should_convert, functionality).
+                  :param crosslink_selector: Function that takes (strand_index, bead_index, total_beads) and returns (should_convert, functionality).
                   :param default_crosslinker_functionality: Default functionality for crosslinks (used for positioning).
                   :param crosslinker_type: Atom type of the crosslinkers (default: 2).
                   :param strand_atom_type: Atom type of the beads that stay (default: 1).
@@ -4904,4 +4904,4 @@ def version_information() -> str:
 STOP: BackTrackStatus  # value = <BackTrackStatus.STOP: 0>
 TRACK_BACKWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_BACKWARD: 2>
 TRACK_FORWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_FORWARD: 1>
-__version__: str = '0.3.4'
+__version__: str = '0.3.5'

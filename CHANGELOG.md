@@ -1,8 +1,9 @@
 # Changelog
 
-## main
+## v0.3.6
 
-
+- Next attempt to improve CI (Windows did not properly read the version from git)
+- Fix an issue where certain unit styles could not be queried anymore
 
 ## v0.3.5
 
