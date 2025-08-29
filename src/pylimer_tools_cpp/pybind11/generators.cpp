@@ -319,7 +319,7 @@ init_pylimer_bound_generators(py::module_& m)
           Example usage::
 
               # Create a custom pattern with crosslinks every 5 beads starting at position 2
-              def my_selector(bead_index, total_beads):
+              def my_selector(strand_index, bead_index, total_beads):
                   if bead_index >= 2 and (bead_index - 2) % 5 == 0:
                       return (True, 4)  # Convert to crosslink with functionality 4
                   return (False, 0)     # Don't convert
@@ -333,7 +333,7 @@ init_pylimer_bound_generators(py::module_& m)
 
           :param nr_of_strands: Number of strands to add.
           :param strand_length: Length of each strand (list of integers).
-          :param crosslink_selector: Function that takes (bead_index, total_beads) and returns (should_convert, functionality).
+          :param crosslink_selector: Function that takes (strand_index, bead_index, total_beads) and returns (should_convert, functionality).
           :param default_crosslinker_functionality: Default functionality for crosslinks (used for positioning).
           :param crosslinker_type: Atom type of the crosslinkers (default: 2).
           :param strand_atom_type: Atom type of the beads that stay (default: 1).
