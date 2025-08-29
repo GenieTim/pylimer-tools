@@ -41,7 +41,7 @@ Convert `LAMMPS units <https://docs.lammps.org/units.html>`_ to SI or other unit
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.12.6/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:179: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
+    /opt/hostedtoolcache/Python/3.12.6/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:177: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
       warnings.warn(
     LJ 1 Pressure in Pascal: 101325.0
 
@@ -80,7 +80,7 @@ Convert `LAMMPS units <https://docs.lammps.org/units.html>`_ to SI or other unit
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.188 seconds)
+   **Total running time of the script:** (0 minutes 0.190 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_unit_conversion.py:

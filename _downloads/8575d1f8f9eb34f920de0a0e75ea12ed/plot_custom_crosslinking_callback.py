@@ -27,9 +27,10 @@ import matplotlib.pyplot as plt
 
 from pylimer_tools.calc.miller_macosko_theory import predict_gelation_point
 from pylimer_tools.io.bead_spring_parameter_provider import (
-    ParameterType, get_parameters_for_polymer)
-from pylimer_tools_cpp import (BackTrackStatus, MCUniverseGenerator,
-                               MEHPForceBalance2)
+    ParameterType,
+    get_parameters_for_polymer,
+)
+from pylimer_tools_cpp import BackTrackStatus, MCUniverseGenerator, MEHPForceBalance2
 
 # %%
 # Example 1: Stop at Conversion OR Soluble Fraction
@@ -40,7 +41,8 @@ from pylimer_tools_cpp import (BackTrackStatus, MCUniverseGenerator,
 
 
 # Get parameters for PDMS polymer density and bead distance
-params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer(
+    "PDMS", parameter_type=ParameterType.GAUSSIAN)
 
 n_xlinks = 500  # Number of crosslinkers
 n_strands = 1000  # Number of strands
@@ -79,9 +81,9 @@ def conversion_callback(gen, steps_remaining):
       Implement the search in a binary search fashion to improve efficiency
     """
     step = n_strands * 2 - steps_remaining
-    assert isinstance(
-        gen, MCUniverseGenerator
-    ), "Callback must receive a MCUniverseGenerator instance"
+    assert isinstance(gen, MCUniverseGenerator), (
+        "Callback must receive a MCUniverseGenerator instance"
+    )
     current_conversion = gen.get_current_crosslinker_conversion()
     conversions.append(current_conversion)
     steps.append(step)
@@ -93,9 +95,9 @@ def conversion_callback(gen, steps_remaining):
             math.isclose(prev_wsol, target_wsol, rel_tol=1e-1, abs_tol=5e-2)
         ):
             fb2 = gen.get_force_balance2()
-            assert isinstance(
-                fb2, MEHPForceBalance2
-            ), "Force balance must be MEHPForceBalance2"
+            assert isinstance(fb2, MEHPForceBalance2), (
+                "Force balance must be MEHPForceBalance2"
+            )
             fb2.run_force_relaxation()
             current_wsol = fb2.get_soluble_weight_fraction()
         else:
@@ -103,12 +105,13 @@ def conversion_callback(gen, steps_remaining):
     else:
         # skip running force balance while
         # we don't even expect to have a network
-        current_wsol = 1.
+        current_wsol = 1.0
     wsol_values.append(current_wsol)
 
     if current_conversion >= target_conversion or current_wsol <= target_wsol:
         print(
-            f"  Target conversion {target_conversion:.1%} or soluble fraction {target_wsol:.1%} reached at step {step}"
+            f"  Target conversion {target_conversion:.1%} or soluble fraction {
+                target_wsol:.1%} reached at step {step}"
         )
         return BackTrackStatus.STOP
     else:
@@ -118,11 +121,12 @@ def conversion_callback(gen, steps_remaining):
 generator.link_strands_callback(conversion_callback, 1.0)
 
 final_conversion = generator.get_current_crosslinker_conversion()
-print(f"  Final conversion: {final_conversion:.3f} and w_sol: {wsol_values[-1]:.3f}")
+print(
+    f"  Final conversion: {final_conversion:.3f} and w_sol: {wsol_values[-1]:.3f}")
 
 # %%
 # Visualizing the Results
-# ----------------------
+# -----------------------
 #
 # Let's plot the evolution of crosslinker conversion
 # and soluble fraction over the steps.

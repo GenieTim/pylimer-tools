@@ -374,12 +374,16 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for pylimer_tools.io.unit_styles</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pint</span><span class="w"> </span><span class="kn">import</span> <span class="n">UnitRegistry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.polymer_data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">load_everaers_et_al_data</span><span class="p">,</span>
+    <span class="n">get_available_polymers</span><span class="p">,</span>
+    <span class="n">get_polymer_by_name</span><span class="p">,</span>
+    <span class="n">PolymerData</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="UnitStyle">
@@ -512,20 +516,14 @@
 
 <div class="viewcode-block" id="UnitStyleFactory.get_everares_et_al_data">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_everares_et_al_data">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_everares_et_al_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_everares_et_al_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the Everaers et al. (2020) unit properties data.</span>
 
-<span class="sd">        :return: DataFrame containing polymer properties from Everaers et al.</span>
-<span class="sd">        :rtype: pd.DataFrame</span>
+<span class="sd">        :return: PolymerDataFrame containing polymer properties from Everaers et al.</span>
+<span class="sd">        :rtype: PolymerDataFrame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
-                <span class="s2">&quot;..&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;data/everaers_et_al_unit_properties.xlsx&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">load_everaers_et_al_data</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="UnitStyleFactory.get_available_polymers">
@@ -537,7 +535,7 @@
 <span class="sd">        :return: List of polymer names</span>
 <span class="sd">        :rtype: list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_everares_et_al_data</span><span class="p">()[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span></div>
+        <span class="k">return</span> <span class="n">get_available_polymers</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="UnitStyleFactory.get_unit_style">
@@ -586,17 +584,22 @@
                 <span class="p">)</span>
             <span class="n">polymer_data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;polymer&quot;</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">all_polymer_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_everares_et_al_data</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">all_polymer_data</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
-                    <span class="k">if</span> <span class="p">(</span>
-                        <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">isalnum</span><span class="p">,</span> <span class="n">polymer_data</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-                        <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">isalnum</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">name</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-                    <span class="p">):</span>
-                        <span class="n">polymer_data</span> <span class="o">=</span> <span class="n">row</span>
-                        <span class="k">break</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">polymer_data</span> <span class="o">=</span> <span class="n">get_polymer_by_name</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="c1"># Fallback to the old iteration method for backward</span>
+                    <span class="c1"># compatibility</span>
+                    <span class="n">all_polymer_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_everares_et_al_data</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">all_polymer_data</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="p">(</span>
+                            <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">isalnum</span><span class="p">,</span> <span class="n">polymer_data</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                            <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">isalnum</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">name</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                        <span class="p">):</span>
+                            <span class="n">polymer_data</span> <span class="o">=</span> <span class="n">row</span>
+                            <span class="k">break</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
                 <span class="n">polymer_data</span><span class="p">,</span> <span class="nb">tuple</span>
-            <span class="p">):</span>
+            <span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">,</span> <span class="n">PolymerData</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;No useable data for this polymer found to use for lj units. Check whether your usage is correct.&quot;</span>
                 <span class="p">)</span>
@@ -608,7 +611,7 @@
             <span class="p">)</span>
             <span class="n">ureg</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s2">&quot;sigma = </span><span class="si">{}</span><span class="s2"> * nanometer&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sigma_conversion</span><span class="p">))</span>
             <span class="n">ureg</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s2">&quot;eps = </span><span class="si">{}</span><span class="s2">e-21 joule&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">polymer_data</span><span class="o">.</span><span class="n">kB_Tref</span><span class="p">))</span>
-            <span class="c1"># time is most difficult in lj — let&#39;s keep tau</span>
+            <span class="c1"># time is most difficult in LJ — let&#39;s keep tau</span>
             <span class="n">ureg</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s2">&quot;tau = 1 * tau&quot;</span><span class="p">)</span>
             <span class="c1"># NOTE: The formula in the LAMMPS documentation contains \epsilon_0.</span>
             <span class="c1"># BUT: it does not add up in terms of units, so... the implementation here</span>

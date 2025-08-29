@@ -32,11 +32,11 @@ Create complex systems with multiple components:
 
  .. code-block:: none
 
-    Starting network generation at 2025-08-11 08:10:08.065586
+    Starting network generation at 2025-08-29 06:01:55.703660
     Adding crosslinkers...
     Adding solvent chains...
     Adding and linking polymer strands...
-    Network generation completed at 2025-08-11 08:10:08.471418
+    Network generation completed at 2025-08-29 06:01:56.110129
 
 
 
@@ -131,7 +131,7 @@ Create complex systems with multiple components:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.419 seconds)
+   **Total running time of the script:** (0 minutes 0.420 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_multi_component_system.py:

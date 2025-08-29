@@ -32,11 +32,11 @@ thermo_data = read_log_file(log_file)
 
 # Access thermodynamic properties
 print(
-    f"Temperature range: {thermo_data['Temp'].min():.2f} - {
-        thermo_data['Temp'].max():.2f
-    }"
+    "Temperature range: {:.2f} - {:.2f}".format(
+        thermo_data["Temp"].min(), thermo_data["Temp"].max()
+    )
 )
-print(f"Final pressure: {thermo_data['Press'].iloc[-1]:.6f}")
+print("Final pressure: {:.6f}".format(thermo_data["Press"].iloc[-1]))
 
 # Plot temperature evolution
 plt.plot(thermo_data["Step"], thermo_data["Temp"])

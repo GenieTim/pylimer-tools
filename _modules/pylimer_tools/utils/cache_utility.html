@@ -383,8 +383,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-
 
 <div class="viewcode-block" id="do_cache">
 <a class="viewcode-back" href="../../../pylimer_tools.utils.html#pylimer_tools.utils.cache_utility.do_cache">[docs]</a>
@@ -436,7 +434,7 @@
         <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">old_cache_file_name</span><span class="p">,</span> <span class="n">cache_file_name</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">old_cache_file_name</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cache_file_name</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">file</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">file</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">disable_warnings</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                     <span class="s2">&quot;Cache called for non-existent file. Make sure the key is time-restricted&quot;</span>
@@ -518,7 +516,7 @@
         <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">f</span><span class="p">))</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">dependencies</span>
     <span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">mtime_cache</span> <span class="o">&gt;</span> <span class="n">mt</span> <span class="k">for</span> <span class="n">mt</span> <span class="ow">in</span> <span class="n">mtimes_origin</span><span class="p">])</span></div>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">mtime_cache</span> <span class="o">&gt;</span> <span class="n">mt</span> <span class="k">for</span> <span class="n">mt</span> <span class="ow">in</span> <span class="n">mtimes_origin</span><span class="p">)</span></div>
 
 </pre></div>
         </article>

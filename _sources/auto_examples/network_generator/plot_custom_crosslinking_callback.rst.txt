@@ -38,7 +38,7 @@ And should return one of the BackTrackStatus values:
 - TRACK_FORWARD: Continue linking forward
 - TRACK_BACKWARD: Track backward in the linking process
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-34
+.. GENERATED FROM PYTHON SOURCE LINES 23-35
 
 .. code-block:: Python
 
@@ -49,9 +49,10 @@ And should return one of the BackTrackStatus values:
 
     from pylimer_tools.calc.miller_macosko_theory import predict_gelation_point
     from pylimer_tools.io.bead_spring_parameter_provider import (
-        ParameterType, get_parameters_for_polymer)
-    from pylimer_tools_cpp import (BackTrackStatus, MCUniverseGenerator,
-                                   MEHPForceBalance2)
+        ParameterType,
+        get_parameters_for_polymer,
+    )
+    from pylimer_tools_cpp import BackTrackStatus, MCUniverseGenerator, MEHPForceBalance2
 
 
 
@@ -60,7 +61,7 @@ And should return one of the BackTrackStatus values:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-40
+.. GENERATED FROM PYTHON SOURCE LINES 36-41
 
 Example 1: Stop at Conversion OR Soluble Fraction
 -------------------------------------------------
@@ -68,14 +69,15 @@ Example 1: Stop at Conversion OR Soluble Fraction
 Using a callback allows for more complex logic, such as
 stopping the process based on multiple criteria as illustrated here.
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-123
+.. GENERATED FROM PYTHON SOURCE LINES 41-127
 
 .. code-block:: Python
 
 
 
     # Get parameters for PDMS polymer density and bead distance
-    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer(
+        "PDMS", parameter_type=ParameterType.GAUSSIAN)
 
     n_xlinks = 500  # Number of crosslinkers
     n_strands = 1000  # Number of strands
@@ -114,9 +116,9 @@ stopping the process based on multiple criteria as illustrated here.
           Implement the search in a binary search fashion to improve efficiency
         """
         step = n_strands * 2 - steps_remaining
-        assert isinstance(
-            gen, MCUniverseGenerator
-        ), "Callback must receive a MCUniverseGenerator instance"
+        assert isinstance(gen, MCUniverseGenerator), (
+            "Callback must receive a MCUniverseGenerator instance"
+        )
         current_conversion = gen.get_current_crosslinker_conversion()
         conversions.append(current_conversion)
         steps.append(step)
@@ -128,9 +130,9 @@ stopping the process based on multiple criteria as illustrated here.
                 math.isclose(prev_wsol, target_wsol, rel_tol=1e-1, abs_tol=5e-2)
             ):
                 fb2 = gen.get_force_balance2()
-                assert isinstance(
-                    fb2, MEHPForceBalance2
-                ), "Force balance must be MEHPForceBalance2"
+                assert isinstance(fb2, MEHPForceBalance2), (
+                    "Force balance must be MEHPForceBalance2"
+                )
                 fb2.run_force_relaxation()
                 current_wsol = fb2.get_soluble_weight_fraction()
             else:
@@ -138,12 +140,13 @@ stopping the process based on multiple criteria as illustrated here.
         else:
             # skip running force balance while
             # we don't even expect to have a network
-            current_wsol = 1.
+            current_wsol = 1.0
         wsol_values.append(current_wsol)
 
         if current_conversion >= target_conversion or current_wsol <= target_wsol:
             print(
-                f"  Target conversion {target_conversion:.1%} or soluble fraction {target_wsol:.1%} reached at step {step}"
+                f"  Target conversion {target_conversion:.1%} or soluble fraction {
+                    target_wsol:.1%} reached at step {step}"
             )
             return BackTrackStatus.STOP
         else:
@@ -153,7 +156,8 @@ stopping the process based on multiple criteria as illustrated here.
     generator.link_strands_callback(conversion_callback, 1.0)
 
     final_conversion = generator.get_current_crosslinker_conversion()
-    print(f"  Final conversion: {final_conversion:.3f} and w_sol: {wsol_values[-1]:.3f}")
+    print(
+        f"  Final conversion: {final_conversion:.3f} and w_sol: {wsol_values[-1]:.3f}")
 
 
 
@@ -169,15 +173,15 @@ stopping the process based on multiple criteria as illustrated here.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-129
+.. GENERATED FROM PYTHON SOURCE LINES 128-133
 
 Visualizing the Results
-----------------------
+-----------------------
 
 Let's plot the evolution of crosslinker conversion
 and soluble fraction over the steps.
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-140
+.. GENERATED FROM PYTHON SOURCE LINES 133-144
 
 .. code-block:: Python
 
@@ -207,7 +211,7 @@ and soluble fraction over the steps.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.626 seconds)
+   **Total running time of the script:** (0 minutes 1.398 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_custom_crosslinking_callback.py:

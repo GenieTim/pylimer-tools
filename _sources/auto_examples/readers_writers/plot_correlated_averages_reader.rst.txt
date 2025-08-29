@@ -75,7 +75,7 @@ Read correlation functions from ``fix ave/correlate`` and ``fix ave/correlate/lo
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.059 seconds)
+   **Total running time of the script:** (0 minutes 0.060 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_correlated_averages_reader.py:
