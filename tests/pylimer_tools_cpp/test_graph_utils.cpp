@@ -73,4 +73,7 @@ TEST_CASE("Graph properties are copied correctly",
   pu::copyEdgeProperties(&graph, 0, &copyGraph, 0, { "test_edge_attr" });
 
   CHECK(pu::graphHasVertexWithProperty(&copyGraph, "test_attr", 1.0));
+
+  igraph_destroy(&graph);
+  igraph_destroy(&copyGraph);
 }

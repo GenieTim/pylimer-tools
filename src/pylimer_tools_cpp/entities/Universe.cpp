@@ -2576,6 +2576,7 @@ Universe::contractVerticesAlongBondType(const int bondType) const
     }
   }
 
+  igraph_vector_int_destroy(&edgesToCopy);
   result.NAtoms = igraph_vcount(&result.graph);
   result.NBonds = igraph_ecount(&result.graph);
   result.resetAtomIdMapping();

@@ -332,6 +332,9 @@ public:
                         const char* propertyName,
                         IN value)
   {
+    INVALIDINDEX_EXP_IFN(vertexId < this->getNrOfVertices(),
+                         "Index " + std::to_string(vertexId) +
+                           " is out of bounds");
     if (igraph_cattribute_VAN_set(
           &this->graph, propertyName, vertexId, value)) {
       throw std::runtime_error("Failed to set property value");
