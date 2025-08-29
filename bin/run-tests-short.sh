@@ -15,7 +15,7 @@ run_timed() {
   shift
   local start_time
   start_time=$(date +%s.%N)
-  echo "Running $name: $*"
+  echo "##[group]Running $name: $*"
   time "$@"
   local exit_code
   exit_code=$?
@@ -28,6 +28,7 @@ run_timed() {
   timing_names+=("$name")
   timing_values+=("$elapsed")
 
+  echo "##[endgroup]"
   return $exit_code
 }
 
