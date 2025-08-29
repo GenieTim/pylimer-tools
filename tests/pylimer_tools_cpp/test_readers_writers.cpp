@@ -12,8 +12,8 @@
 #include <cstdio>
 #include <filesystem>
 #include <iostream>
-#include <string>
 #include <random>
+#include <string>
 extern "C"
 {
 #include <igraph/igraph.h>
@@ -333,7 +333,7 @@ TEST_CASE("All atom types are supported",
           atomStyle == pu::AtomStyle::TRI) {
         // These styles include molecule-ID which is handled separately
         for (int atomId = 1; atomId <= 5; ++atomId) {
-          universe.setPropertyValue(atomId, "molecule_id", atomId % 3);
+          universe.setPropertyValue(atomId - 1, "molecule_id", atomId % 3);
         }
       }
 
