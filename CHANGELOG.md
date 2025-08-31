@@ -2,7 +2,7 @@
 
 ## main
 
-
+- Build system improvements (incl. missing files in tarball)
 
 ## v0.3.6
 
