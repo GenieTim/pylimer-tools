@@ -2,7 +2,11 @@
 
 ## main
 
+
+## v0.3.7
+
 - Build system improvements (incl. missing files in tarball)
+- Improve the documentation of the MCUniverseGenerator
 - Fix an issue where serialization to text files might not work
 
 ## v0.3.6

@@ -389,7 +389,7 @@ jobs:
 
       - name: Determine Changelog
         id: changelog_determiner
-        run: echo "##[set-output name=changelog;]$(./bin/extract-changelog.sh CHANGELOG.md $GIT_TAG)"
+        run: echo "##[set-output name=changelog;]$(./bin/extract-changelog.sh $GIT_TAG CHANGELOG.md)"
 
       - name: Create Release
         id: create_release
