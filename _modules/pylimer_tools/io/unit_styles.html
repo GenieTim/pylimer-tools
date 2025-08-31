@@ -597,9 +597,11 @@
                         <span class="p">):</span>
                             <span class="n">polymer_data</span> <span class="o">=</span> <span class="n">row</span>
                             <span class="k">break</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
-                <span class="n">polymer_data</span><span class="p">,</span> <span class="nb">tuple</span>
-            <span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">,</span> <span class="n">PolymerData</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">,</span> <span class="n">PolymerData</span><span class="p">)</span>
+            <span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;No useable data for this polymer found to use for lj units. Check whether your usage is correct.&quot;</span>
                 <span class="p">)</span>
