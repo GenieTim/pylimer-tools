@@ -25,7 +25,12 @@ init_pylimer_bound_generators(py::module_& m)
      )pbdoc")
     .def("get_max_distance",
          &MaxDistanceProvider::getMaxDistance,
-         "N",
+         R"pbdoc(
+         Get the maximum distance for a given N.
+
+         :param N: Number of segments.
+         :return: Maximum distance for sampling.
+         )pbdoc",
          py::arg("N"));
 
   py::class_<LinearMaxDistanceProvider,
@@ -81,7 +86,12 @@ init_pylimer_bound_generators(py::module_& m)
     .def(py::init<>())
     .def("get_max_distance",
          &NoMaxDistanceProvider::getMaxDistance,
-         "",
+         R"pbdoc(
+         Get the maximum distance for a given N (always returns -1 to disable).
+
+         :param N: Number of segments (ignored).
+         :return: Always returns -1 to disable maximum distance checks.
+         )pbdoc",
          py::arg("N"));
 
   py::enum_<BackTrackStatus>(m, "BackTrackStatus", R"pbdoc(
@@ -102,12 +112,23 @@ init_pylimer_bound_generators(py::module_& m)
        Please cite :cite:t:`gusev_molecular_2024` and/or :cite:t:`bernhard_phantom_2025` if you use this method in your work.
   )pbdoc")
     .def(py::init<const double, const double, const double>(),
+         R"pbdoc(
+         Initialize a new MCUniverseGenerator with specified box dimensions.
+
+         :param lx: Box length in x-direction (default: 10.0).
+         :param ly: Box length in y-direction (default: 10.0).
+         :param lz: Box length in z-direction (default: 10.0).
+         )pbdoc",
          py::arg("lx") = 10.,
          py::arg("ly") = 10.,
          py::arg("lz") = 10.)
     .def("set_seed",
          &MCUniverseGenerator::setSeed,
-         "Set the seed for the random generator.",
+         R"pbdoc(
+         Set the seed for the random generator.
+
+         :param seed: Random seed value for reproducible results.
+         )pbdoc",
          py::arg("seed"))
     .def("set_bead_distance",
          &MCUniverseGenerator::setBeadDistance,
@@ -190,7 +211,12 @@ init_pylimer_bound_generators(py::module_& m)
          Set to 0. to disable the formation of secondary loops.
          )pbdoc",
          py::arg("probability") = 1.0)
-    .def("disable_max_distance", &MCUniverseGenerator::disableMaxDistance)
+    .def("disable_max_distance",
+         &MCUniverseGenerator::disableMaxDistance,
+         R"pbdoc(
+         Disable the maximum distance provider to allow unlimited distance sampling.
+         This may slow down performance for large systems but ensures complete sampling.
+         )pbdoc")
     .def("use_linear_max_distance",
          &MCUniverseGenerator::useLinearMaxDistance,
          R"pbdoc(
@@ -236,7 +262,7 @@ init_pylimer_bound_generators(py::module_& m)
          R"pbdoc(
           Add crosslinkers at specific coordinates.
 
-          :param coordinates: Coordinates of the crosslinkers.
+          :param coordinates: Coordinates of the crosslinkers as a flat array [x1, y1, z1, x2, y2, z2, ...].
           :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
           :param crosslinker_type: Atom type of the crosslinkers (default: 2).
          )pbdoc",
@@ -368,6 +394,11 @@ init_pylimer_bound_generators(py::module_& m)
          &MCUniverseGenerator::addSolventChains,
          R"pbdoc(
             Randomly distribute additional, free chains.
+
+            :param nr_of_solvent_chains: Number of solvent chains to add.
+            :param solvent_chain_length: Length of each solvent chain in beads.
+            :param solvent_atom_type: Atom type for solvent chain beads (default: 3).
+            :param white_noise: Whether to use white noise (true) or blue noise (false) for positioning (default: true).
             )pbdoc",
          py::arg("nr_of_solvent_chains"),
          py::arg("solvent_chain_length"),
@@ -378,6 +409,10 @@ init_pylimer_bound_generators(py::module_& m)
            &MCUniverseGenerator::addMonofunctionalStrands),
          R"pbdoc(
          Add multiple monofunctional strands with specified bead types.
+
+         :param nr_of_monofunctional_strands: Number of monofunctional strands to add.
+         :param monofunctional_strand_length: Vector specifying the length of each strand in beads.
+         :param monofunctional_strand_atom_type: Atom type for the strand beads (default: 4).
          )pbdoc",
          py::arg("nr_of_monofunctional_strands"),
          py::arg("monofunctional_strand_length"),
@@ -431,7 +466,7 @@ init_pylimer_bound_generators(py::module_& m)
           as chosen by the parameters associated with the strand.
 
           :param strand_idx: Index of the strand to be linked.
-          :param c_infinity: As needed for the end-to-end distribution, given by :math:`\langle R^2\rangle_0 = C_{\infty} N b^2`.
+          :param c_infinity: As needed for the end-to-end distribution, given by :math:`\langle R^2\rangle_0 = C_{\infty} N b^2` (default: 1.0).
 )pbdoc",
          py::arg("strand_idx"),
          py::arg("c_infinity") = 1.)
@@ -469,8 +504,8 @@ init_pylimer_bound_generators(py::module_& m)
             Actually link the previously added strands to the previously added crosslinkers,
             until a certain soluble fraction is reached.
 
-            :param soluble_fraction: Target soluble_fraction (0: no connections to crosslinks; 1: all crosslinkers fully connected).
-            :param c_infinity: As needed for the end-to-end distribution, given by :math:`\langle R^2\rangle_0 = C_{\infty} N b^2`.
+            :param soluble_fraction: Target soluble fraction (0: all material is soluble; 1: no material is soluble).
+            :param c_infinity: As needed for the end-to-end distribution, given by :math:`\langle R^2\rangle_0 = C_{\infty} N b^2` (default: 1.0).
             )pbdoc",
          py::arg("soluble_fraction"),
          py::arg("c_infinity") = 1.)
@@ -536,6 +571,8 @@ init_pylimer_bound_generators(py::module_& m)
          &MCUniverseGenerator::removeSolubleFraction,
          R"pbdoc(
             Remove soluble fraction (as determined by phantom force relaxation) of the strands and crosslinks.
+
+            :param rescale_box: Whether to rescale the box dimensions to maintain constant density (default: true).
             )pbdoc",
          py::arg("rescale_box") = true)
     .def("relax_crosslinks",
@@ -544,46 +581,74 @@ init_pylimer_bound_generators(py::module_& m)
          Run force relaxation with the crosslinkers and their strands,
          to have the crosslinks in their statistically most probable position.
          )pbdoc")
-    .def("get_current_nr_of_atoms", &MCUniverseGenerator::getCurrentNrOfAtoms)
-    .def("get_current_nr_of_bonds", &MCUniverseGenerator::getCurrentNrOfBonds)
+    .def("get_current_nr_of_atoms",
+         &MCUniverseGenerator::getCurrentNrOfAtoms,
+         R"pbdoc(
+         Get the current number of atoms that the universe would/will have.
+
+         :return: Number of atoms in the generated universe.
+         )pbdoc")
+    .def("get_current_nr_of_bonds",
+         &MCUniverseGenerator::getCurrentNrOfBonds,
+         R"pbdoc(
+         Get the current number of bonds that the universe would/will have.
+
+         :return: Number of bonds in the generated universe.
+         )pbdoc")
     .def("get_current_crosslinker_conversion",
          &MCUniverseGenerator::getCurrentCrosslinkerConversion,
          R"pbdoc(
          Get the current conversion of crosslinkers, i.e., the fraction of crosslinkers
          that have been linked to strands.
+
+         :return: Crosslinker conversion as a fraction between 0 and 1.
     )pbdoc")
     .def("get_current_strand_conversion",
          &MCUniverseGenerator::getCurrentStrandsConversion,
          R"pbdoc(
          Get the current conversion of strands, i.e., the fraction of strand ends that have been consumed.
+
+         :return: Strand conversion as a fraction between 0 and 1.
          )pbdoc")
-    .def("validate", &MCUniverseGenerator::validateInternalState, R"pbdoc(
+    .def("validate",
+         &MCUniverseGenerator::validateInternalState,
+         R"pbdoc(
          Check whether the internal state of the generator is valid.
          Throws errors if not. 
          Should in principle always be valid when called from Python; if not, there is a bug in the code.
          )pbdoc")
-    .def("get_universe", &MCUniverseGenerator::getUniverse, R"pbdoc(
+    .def("get_universe",
+         &MCUniverseGenerator::getUniverse,
+         R"pbdoc(
             Fetch the current (or final) state of the universe.
 
             Use this method to actually (MC) place beads between the crosslinks and retrieve the generated structure.
+
+            :return: The generated Universe object containing all atoms, bonds, and their coordinates.
             )pbdoc")
     .def("get_force_relaxation",
          &MCUniverseGenerator::getForceRelaxation,
          R"pbdoc(
          Get an instance of the force relaxation procedure.
          This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
+
+         :return: Configured MEHPForceRelaxation instance.
          )pbdoc")
     .def("get_force_balance",
          &MCUniverseGenerator::getForceBalance,
          R"pbdoc(
          Get an instance of the force balance procedure.
          This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
+
+         :return: Configured MEHPForceBalance instance.
          )pbdoc")
     .def("get_force_balance2",
          &MCUniverseGenerator::getForceBalance2,
          R"pbdoc(
               Get an instance of the force balance procedure.
               This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
+
+              :return: Configured MEHPForceBalance2 instance.
               )pbdoc")
 #ifdef CEREALIZABLE
     .def(py::pickle(
@@ -605,6 +670,12 @@ init_pylimer_bound_generators(py::module_& m)
         py::overload_cast<int, double, double, std::string>(&doRandomWalkChain),
         R"pbdoc(
             Do a random walk, return the coordinates of each point visited.
+
+            :param chain_len: Length of the chain to generate.
+            :param bead_distance: Mean distance between consecutive beads (default: 1.0).
+            :param mean_squared_bead_distance: Mean squared distance between consecutive beads (default: 1.0).
+            :param seed: Random seed for reproducibility (default: empty string for random seed).
+            :return: Coordinates of each point as a flat array (i.e., [x1, y1, z1, x2, y2, z2, ...]).
             )pbdoc",
         py::arg("chain_len"),
         py::arg("bead_distance") = 1.,
@@ -625,6 +696,16 @@ init_pylimer_bound_generators(py::module_& m)
     R"pbdoc(
             Do a random walk from one point to another.
             Then, relax the points in between using a Metropolis-Monte Carlo simulation.
+
+            :param box: Simulation box for periodic boundary conditions.
+            :param from_coordinates: Starting coordinates as 3D vector.
+            :param to_coordinates: Target coordinates as 3D vector.
+            :param chain_len: Number of beads to place between start and end points.
+            :param bead_distance: Mean distance between consecutive beads (default: 1.0).
+            :param mean_squared_bead_distance: Mean squared distance between consecutive beads (default: 1.0).
+            :param seed: Random seed for reproducibility (default: empty string for no seed).
+            :param n_iterations: Number of Monte Carlo iterations for relaxation (default: 10000).
+            :return: Coordinates of the relaxed chain as a flat array (i.e., [x1, y1, z1, x2, y2, z2, ...]).
             )pbdoc",
     py::arg("box"),
     py::arg("from_coordinates"),
@@ -645,6 +726,15 @@ init_pylimer_bound_generators(py::module_& m)
        std::string s) { return doRandomWalkChainFromTo(b, f, t, c, l, l2, s); },
     R"pbdoc(
             Do a random walk from one point to another.
+
+            :param box: Simulation box for periodic boundary conditions.
+            :param from_coordinates: Starting coordinates as 3D vector.
+            :param to_coordinates: Target coordinates as 3D vector.
+            :param chain_len: Number of beads to place between start and end points.
+            :param bead_distance: Mean distance between consecutive beads (default: 1.0).
+            :param mean_squared_bead_distance: Mean squared distance between consecutive beads (default: 1.0).
+            :param seed: Random seed for reproducibility (default: empty string for no seed).
+            :return: Coordinates of the chain as a flat array (i.e., [x1, y1, z1, x2, y2, z2, ...]).
             )pbdoc",
     py::arg("box"),
     py::arg("from_coordinates"),

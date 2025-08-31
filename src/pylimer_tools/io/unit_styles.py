@@ -196,9 +196,11 @@ class UnitStyleFactory(object):
                         ):
                             polymer_data = row
                             break
-            if not isinstance(polymer_data, dict) and not isinstance(
-                polymer_data, tuple
-            ) and not isinstance(polymer_data, PolymerData):
+            if (
+                not isinstance(polymer_data, dict)
+                and not isinstance(polymer_data, tuple)
+                and not isinstance(polymer_data, PolymerData)
+            ):
                 raise ValueError(
                     "No useable data for this polymer found to use for lj units. Check whether your usage is correct."
                 )

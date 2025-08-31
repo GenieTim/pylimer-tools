@@ -159,6 +159,7 @@ public:
 class NoMaxDistanceProvider : public MaxDistanceProvider
 {
 public:
+
   double getMaxDistance(const double N) override { return -1.; }
 
   [[nodiscard]] std::unique_ptr<MaxDistanceProvider> clone() const override
@@ -170,7 +171,8 @@ public:
   template<class Archive>
   void serialize(Archive& archive)
   {
-    // No data to serialize
+    // No data to serialize – but needed for Cereal
+    // archive();
   }
 #endif
 };

@@ -8,6 +8,11 @@
 #include <random>
 #include <string>
 
+#ifdef CEREALIZABLE
+#include "../../src/pylimer_tools_cpp/utils/CerealUtils.h"
+#include <filesystem>
+#endif
+
 TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
 {
   std::cout << "Running test \"Eigen behaves as required\"" << std::endl;
@@ -151,3 +156,96 @@ TEST_CASE("Self adjoint check", "[Eigen]")
     CHECK_FALSE(Eigen::isSelfAdjoint(mat2));
   }
 }
+
+#ifdef CEREALIZABLE
+TEST_CASE("Eigen serialization with cereal", "[Eigen][serialization]")
+{
+  std::cout << "Running test \"Eigen serialization with cereal\"" << std::endl;
+
+  SECTION("VectorXd serialization to JSON and binary")
+  {
+    Eigen::VectorXd original(5);
+    original << 1.5, 2.7, -3.14, 0.0, 42.42;
+
+    // Test binary serialization
+    const std::string binaryFile = "test_vector.bin";
+    pylimer_tools::utils::serializeToFile(original, binaryFile);
+
+    Eigen::VectorXd deserializedFromBinary;
+    pylimer_tools::utils::deserializeFromFile(deserializedFromBinary,
+                                              binaryFile);
+
+    REQUIRE(deserializedFromBinary.size() == original.size());
+    for (int i = 0; i < original.size(); ++i) {
+      CHECK(deserializedFromBinary[i] == Catch::Approx(original[i]));
+    }
+
+    // Test JSON serialization
+    const std::string jsonFile = "test_vector.json";
+    pylimer_tools::utils::serializeToFile(original, jsonFile);
+
+    Eigen::VectorXd deserializedFromJson;
+    pylimer_tools::utils::deserializeFromFile(deserializedFromJson, jsonFile);
+
+    REQUIRE(deserializedFromJson.size() == original.size());
+    for (int i = 0; i < original.size(); ++i) {
+      CHECK(deserializedFromJson[i] == Catch::Approx(original[i]));
+    }
+
+    // Cleanup
+    std::filesystem::remove(jsonFile);
+    std::filesystem::remove(binaryFile);
+  }
+
+  SECTION("ArrayXi serialization to JSON and binary")
+  {
+    Eigen::ArrayXi original(6);
+    original << 1, -5, 0, 100, -999, 42;
+
+    // Test JSON serialization
+    const std::string jsonFile = "test_array.json";
+    pylimer_tools::utils::serializeToFile(original, jsonFile);
+
+    Eigen::ArrayXi deserializedFromJson;
+    pylimer_tools::utils::deserializeFromFile(deserializedFromJson, jsonFile);
+
+    REQUIRE(deserializedFromJson.size() == original.size());
+    for (int i = 0; i < original.size(); ++i) {
+      CHECK(deserializedFromJson[i] == original[i]);
+    }
+
+    // Test binary serialization
+    const std::string binaryFile = "test_array.bin";
+    pylimer_tools::utils::serializeToFile(original, binaryFile);
+
+    Eigen::ArrayXi deserializedFromBinary;
+    pylimer_tools::utils::deserializeFromFile(deserializedFromBinary,
+                                              binaryFile);
+
+    REQUIRE(deserializedFromBinary.size() == original.size());
+    for (int i = 0; i < original.size(); ++i) {
+      CHECK(deserializedFromBinary[i] == original[i]);
+    }
+
+    // Cleanup
+    std::filesystem::remove(jsonFile);
+    std::filesystem::remove(binaryFile);
+  }
+
+  SECTION("Empty vector serialization")
+  {
+    Eigen::VectorXd emptyVector = Eigen::VectorXd::Zero(0);
+
+    const std::string jsonFile = "test_empty.json";
+    pylimer_tools::utils::serializeToFile(emptyVector, jsonFile);
+
+    Eigen::VectorXd deserializedEmpty;
+    pylimer_tools::utils::deserializeFromFile(deserializedEmpty, jsonFile);
+
+    CHECK(deserializedEmpty.size() == 0);
+
+    // Cleanup
+    std::filesystem::remove(jsonFile);
+  }
+}
+#endif

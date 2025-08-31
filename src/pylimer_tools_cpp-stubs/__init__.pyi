@@ -1486,7 +1486,13 @@ class MCUniverseGenerator:
     def __getstate__(self) -> tuple:
         ...
     def __init__(self, lx: typing.SupportsFloat = 10.0, ly: typing.SupportsFloat = 10.0, lz: typing.SupportsFloat = 10.0) -> None:
-        ...
+        """
+                 Initialize a new MCUniverseGenerator with specified box dimensions.
+        
+                 :param lx: Box length in x-direction (default: 10.0).
+                 :param ly: Box length in y-direction (default: 10.0).
+                 :param lz: Box length in z-direction (default: 10.0).
+        """
     def __setstate__(self, arg0: tuple) -> None:
         ...
     def add_crosslinkers(self, nr_of_crosslinkers: typing.SupportsInt, crosslinker_functionality: typing.SupportsInt = 4, crosslinker_type: typing.SupportsInt = 2, white_noise: bool = True) -> None:
@@ -1502,7 +1508,7 @@ class MCUniverseGenerator:
         """
                   Add crosslinkers at specific coordinates.
         
-                  :param coordinates: Coordinates of the crosslinkers.
+                  :param coordinates: Coordinates of the crosslinkers as a flat array [x1, y1, z1, x2, y2, z2, ...].
                   :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
                   :param crosslinker_type: Atom type of the crosslinkers (default: 2).
         """
@@ -1559,6 +1565,10 @@ class MCUniverseGenerator:
     def add_monofunctional_strands(self, nr_of_monofunctional_strands: typing.SupportsInt, monofunctional_strand_length: collections.abc.Sequence[typing.SupportsInt], monofunctional_strand_atom_type: typing.SupportsInt = 4) -> None:
         """
                  Add multiple monofunctional strands with specified bead types.
+        
+                 :param nr_of_monofunctional_strands: Number of monofunctional strands to add.
+                 :param monofunctional_strand_length: Vector specifying the length of each strand in beads.
+                 :param monofunctional_strand_atom_type: Atom type for the strand beads (default: 4).
         """
     def add_randomly_functionalized_strands(self, nr_of_strands: typing.SupportsInt, strand_length: collections.abc.Sequence[typing.SupportsInt], functionalization_probability: typing.SupportsFloat, crosslinker_functionality: typing.SupportsInt = 4, crosslinker_type: typing.SupportsInt = 2, strand_atom_type: typing.SupportsInt = 1, white_noise: bool = True) -> None:
         """
@@ -1588,6 +1598,11 @@ class MCUniverseGenerator:
     def add_solvent_chains(self, nr_of_solvent_chains: typing.SupportsInt, solvent_chain_length: typing.SupportsInt, solvent_atom_type: typing.SupportsInt = 3, white_noise: bool = True) -> None:
         """
                     Randomly distribute additional, free chains.
+        
+                    :param nr_of_solvent_chains: Number of solvent chains to add.
+                    :param solvent_chain_length: Length of each solvent chain in beads.
+                    :param solvent_atom_type: Atom type for solvent chain beads (default: 3).
+                    :param white_noise: Whether to use white noise (true) or blue noise (false) for positioning (default: true).
         """
     def add_star_crosslinkers(self, nr_of_stars: typing.SupportsInt, functionality: typing.SupportsInt, beads_per_strand: typing.SupportsInt, crosslinker_atom_type: typing.SupportsInt = 2, strand_atom_type: typing.SupportsInt = 1, white_noise: bool = True) -> None:
         """
@@ -1642,34 +1657,55 @@ class MCUniverseGenerator:
                  Set to 0. to disable the formation of secondary loops.
         """
     def disable_max_distance(self) -> None:
-        ...
+        """
+                 Disable the maximum distance provider to allow unlimited distance sampling.
+                 This may slow down performance for large systems but ensures complete sampling.
+        """
     def get_current_crosslinker_conversion(self) -> float:
         """
                  Get the current conversion of crosslinkers, i.e., the fraction of crosslinkers
                  that have been linked to strands.
+        
+                 :return: Crosslinker conversion as a fraction between 0 and 1.
         """
     def get_current_nr_of_atoms(self) -> int:
-        ...
+        """
+                 Get the current number of atoms that the universe would/will have.
+        
+                 :return: Number of atoms in the generated universe.
+        """
     def get_current_nr_of_bonds(self) -> int:
-        ...
+        """
+                 Get the current number of bonds that the universe would/will have.
+        
+                 :return: Number of bonds in the generated universe.
+        """
     def get_current_strand_conversion(self) -> float:
         """
                  Get the current conversion of strands, i.e., the fraction of strand ends that have been consumed.
+        
+                 :return: Strand conversion as a fraction between 0 and 1.
         """
     def get_force_balance(self) -> ...:
         """
                  Get an instance of the force balance procedure.
                  This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
+        
+                 :return: Configured MEHPForceBalance instance.
         """
     def get_force_balance2(self) -> ...:
         """
                       Get an instance of the force balance procedure.
                       This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
+        
+                      :return: Configured MEHPForceBalance2 instance.
         """
     def get_force_relaxation(self) -> ...:
         """
                  Get an instance of the force relaxation procedure.
                  This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
+        
+                 :return: Configured MEHPForceRelaxation instance.
         """
     def get_mean_bead_distance(self) -> float:
         """
@@ -1700,6 +1736,8 @@ class MCUniverseGenerator:
                     Fetch the current (or final) state of the universe.
         
                     Use this method to actually (MC) place beads between the crosslinks and retrieve the generated structure.
+        
+                    :return: The generated Universe object containing all atoms, bonds, and their coordinates.
         """
     def link_strand(self, strand_idx: typing.SupportsInt, c_infinity: typing.SupportsFloat = 1.0) -> None:
         """
@@ -1708,7 +1746,7 @@ class MCUniverseGenerator:
                   as chosen by the parameters associated with the strand.
         
                   :param strand_idx: Index of the strand to be linked.
-                  :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
+                  :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2` (default: 1.0).
         """
     def link_strand_to(self, strand_idx: typing.SupportsInt, link_idx: typing.SupportsInt) -> None:
         """
@@ -1765,8 +1803,8 @@ class MCUniverseGenerator:
                     Actually link the previously added strands to the previously added crosslinkers,
                     until a certain soluble fraction is reached.
         
-                    :param soluble_fraction: Target soluble_fraction (0: no connections to crosslinks; 1: all crosslinkers fully connected).
-                    :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
+                    :param soluble_fraction: Target soluble fraction (0: all material is soluble; 1: no material is soluble).
+                    :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2` (default: 1.0).
         """
     def link_strands_to_strands_to_conversion(self, target_strand_conversion: typing.SupportsFloat, c_infinity: typing.SupportsFloat = 1.0) -> None:
         """
@@ -1796,6 +1834,8 @@ class MCUniverseGenerator:
     def remove_soluble_fraction(self, rescale_box: bool = True) -> None:
         """
                     Remove soluble fraction (as determined by phantom force relaxation) of the strands and crosslinks.
+        
+                    :param rescale_box: Whether to rescale the box dimensions to maintain constant density (default: true).
         """
     def set_bead_distance(self, distance: typing.SupportsFloat, update_mean_squared: bool = True) -> None:
         """
@@ -1816,7 +1856,9 @@ class MCUniverseGenerator:
         """
     def set_seed(self, seed: typing.SupportsInt) -> None:
         """
-        Set the seed for the random generator.
+                 Set the seed for the random generator.
+        
+                 :param seed: Random seed value for reproducible results.
         """
     def use_linear_max_distance(self, multiplier: typing.SupportsFloat) -> None:
         """
@@ -2955,7 +2997,10 @@ class MaxDistanceProvider:
     """
     def get_max_distance(self, N: typing.SupportsFloat) -> float:
         """
-        N
+                 Get the maximum distance for a given N.
+        
+                 :param N: Number of segments.
+                 :return: Maximum distance for sampling.
         """
 class Molecule:
     """
@@ -3396,7 +3441,12 @@ class NoMaxDistanceProvider(MaxDistanceProvider):
     def __init__(self) -> None:
         ...
     def get_max_distance(self, N: typing.SupportsFloat) -> float:
-        ...
+        """
+                 Get the maximum distance for a given N (always returns -1 to disable).
+        
+                 :param N: Number of segments (ignored).
+                 :return: Always returns -1 to disable maximum distance checks.
+        """
 class NonGaussianSpringForceEvaluator(MEHPForceEvaluator):
     """
     
@@ -4853,15 +4903,40 @@ def do_linear_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[nu
 def do_random_walk(chain_len: typing.SupportsInt, bead_distance: typing.SupportsFloat = 1.0, mean_squared_bead_distance: typing.SupportsFloat = 1.0, seed: str = '') -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
     """
                 Do a random walk, return the coordinates of each point visited.
+    
+                :param chain_len: Length of the chain to generate.
+                :param bead_distance: Mean distance between consecutive beads (default: 1.0).
+                :param mean_squared_bead_distance: Mean squared distance between consecutive beads (default: 1.0).
+                :param seed: Random seed for reproducibility (default: empty string for random seed).
+                :return: Coordinates of each point as a flat array (i.e., [x1, y1, z1, x2, y2, z2, ...]).
     """
 def do_random_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], to_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], chain_len: typing.SupportsInt, bead_distance: typing.SupportsFloat = 1.0, mean_squared_bead_distance: typing.SupportsFloat = 1.0, seed: str = '') -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
     """
                 Do a random walk from one point to another.
+    
+                :param box: Simulation box for periodic boundary conditions.
+                :param from_coordinates: Starting coordinates as 3D vector.
+                :param to_coordinates: Target coordinates as 3D vector.
+                :param chain_len: Number of beads to place between start and end points.
+                :param bead_distance: Mean distance between consecutive beads (default: 1.0).
+                :param mean_squared_bead_distance: Mean squared distance between consecutive beads (default: 1.0).
+                :param seed: Random seed for reproducibility (default: empty string for no seed).
+                :return: Coordinates of the chain as a flat array (i.e., [x1, y1, z1, x2, y2, z2, ...]).
     """
 def do_random_walk_chain_from_to_mc(box: Box, from_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], to_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], chain_len: typing.SupportsInt, bead_distance: typing.SupportsFloat = 1.0, mean_squared_bead_distance: typing.SupportsFloat = 1.0, seed: str = '', n_iterations: typing.SupportsInt = 10000) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
     """
                 Do a random walk from one point to another.
                 Then, relax the points in between using a Metropolis-Monte Carlo simulation.
+    
+                :param box: Simulation box for periodic boundary conditions.
+                :param from_coordinates: Starting coordinates as 3D vector.
+                :param to_coordinates: Target coordinates as 3D vector.
+                :param chain_len: Number of beads to place between start and end points.
+                :param bead_distance: Mean distance between consecutive beads (default: 1.0).
+                :param mean_squared_bead_distance: Mean squared distance between consecutive beads (default: 1.0).
+                :param seed: Random seed for reproducibility (default: empty string for no seed).
+                :param n_iterations: Number of Monte Carlo iterations for relaxation (default: 10000).
+                :return: Coordinates of the relaxed chain as a flat array (i.e., [x1, y1, z1, x2, y2, z2, ...]).
     """
 def inverse_langevin(x: typing.SupportsFloat) -> float:
     """
@@ -4904,4 +4979,4 @@ def version_information() -> str:
 STOP: BackTrackStatus  # value = <BackTrackStatus.STOP: 0>
 TRACK_BACKWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_BACKWARD: 2>
 TRACK_FORWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_FORWARD: 1>
-__version__: str = '0.3.5'
+__version__: str = '0.3.6'
