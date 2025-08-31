@@ -117,9 +117,10 @@ inline typename std::enable_if<
   void>::type
 CEREAL_SAVE_FUNCTION_NAME(Archive& ar, Eigen::PlainObjectBase<Derived> const& m)
 {
-  make_size_tag(m.rows());
+  ar(m.rows());
+  ar(m.cols());
+  
   for (Eigen::Index i = 0; i < m.rows(); ++i) {
-    make_size_tag(m.cols());
     for (Eigen::Index j = 0; j < m.cols(); ++j) {
       ar(m(i, j));
     }
@@ -133,17 +134,12 @@ inline typename std::enable_if<
   void>::type
 CEREAL_LOAD_FUNCTION_NAME(Archive& ar, Eigen::PlainObjectBase<Derived>& m)
 {
-  size_type rows;
-  ar(make_size_tag(rows));
-  size_type cols;
-  ar(make_size_tag(cols));
+  Eigen::Index rows;
+  ar(rows);
+  Eigen::Index cols;
+  ar(cols);
   m.resize(static_cast<Eigen::Index>(rows), static_cast<Eigen::Index>(cols));
   for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(rows); ++i) {
-    if (i != 0) {
-      size_type cols2;
-      ar(make_size_tag(cols2));
-      assert(cols2 == cols);
-    }
     for (Eigen::Index j = 0; j < static_cast<Eigen::Index>(cols); ++j) {
       ar(m(i, j));
     }
