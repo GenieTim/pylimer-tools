@@ -22,31 +22,41 @@ if (POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)  # find_package() uses PackageName_ROOT variables
 endif ()
 
-# Function to get version from git tag
-function(get_version_from_git VERSION_VAR)
-    # Try to get version from git tag
-    find_package(Git QUIET)
-    if (GIT_FOUND)
+# Function to get version from our Python script
+function(get_version_from_script VERSION_VAR)
+    find_package(Python3 QUIET COMPONENTS Interpreter)
+    if (Python3_Interpreter_FOUND)
         execute_process(
-            COMMAND ${CMAKE_CURRENT_LIST_DIR}/bin/get-version.sh
+            COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/bin/get_version.py --ensure-file
             WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-            OUTPUT_VARIABLE GIT_VERSION
+            OUTPUT_VARIABLE SCRIPT_VERSION
             OUTPUT_STRIP_TRAILING_WHITESPACE
             ERROR_QUIET
         )
-        if (GIT_VERSION)
-            set(${VERSION_VAR} ${GIT_VERSION} PARENT_SCOPE)
+        if (SCRIPT_VERSION)
+            set(${VERSION_VAR} ${SCRIPT_VERSION} PARENT_SCOPE)
         else()
             set(${VERSION_VAR} "0.0.0" PARENT_SCOPE)  # Fallback
         endif()
     else()
-        set(${VERSION_VAR} "0.0.0" PARENT_SCOPE)  # Fallback
+        # Fallback: try to read from version file directly
+        if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/_version.txt)
+            file(READ ${CMAKE_CURRENT_LIST_DIR}/_version.txt FILE_VERSION)
+            string(STRIP "${FILE_VERSION}" FILE_VERSION)
+            if (FILE_VERSION)
+                set(${VERSION_VAR} ${FILE_VERSION} PARENT_SCOPE)
+            else()
+                set(${VERSION_VAR} "0.0.0" PARENT_SCOPE)
+            endif()
+        else()
+            set(${VERSION_VAR} "0.0.0" PARENT_SCOPE)  # Final fallback
+        endif()
     endif()
 endfunction()
 
 # Project definition
 if (NOT DEFINED VERSION_NR)
-    get_version_from_git(AUTO_VERSION)
+    get_version_from_script(AUTO_VERSION)
     project(pylimer_tools VERSION ${AUTO_VERSION} LANGUAGES CXX)
 else ()
     project(pylimer_tools VERSION ${VERSION_NR} LANGUAGES CXX)
