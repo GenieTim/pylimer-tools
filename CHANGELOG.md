@@ -2,9 +2,9 @@
 
 ## main
 
-## v0.3.8
+## v0.3.7 - v0.3.9
 
-- Build system improvements (include version in sdist)
+- Build system improvements (include missing files in sdist) with objective to get [pyodide recipe](https://github.com/pyodide/pyodide-recipes/pull/349) working
 
 ## v0.3.7
 
