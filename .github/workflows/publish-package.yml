@@ -55,6 +55,9 @@ jobs:
         with:
           args: install -y winflexbison3 eigen
 
+      - name: Ensure version file exists
+        run: python bin/get_version.py --ensure-file
+
       - name: Build
         run: python -m build --wheel
         env:
@@ -114,6 +117,9 @@ jobs:
       - name: Install additional dependencies
         run: brew install bison flex libomp
 
+      - name: Ensure version file exists
+        run: python bin/get_version.py --ensure-file
+
       - name: Build
         run: ./bin/build-wheel.sh
         env:
@@ -158,6 +164,9 @@ jobs:
 
       - name: Set CMAKE_PREFIX_PATH
         run: echo "CMAKE_PREFIX_PATH=$(python3 -c 'import sys; print(sys.prefix)')" >> $GITHUB_ENV
+
+      - name: Ensure version file exists
+        run: python bin/get_version.py --ensure-file
 
       - name: Build wheel
         run: |
@@ -214,6 +223,9 @@ jobs:
       - name: Install cibuildwheel
         run: pip install cibuildwheel
 
+      - name: Ensure version file exists
+        run: python bin/get_version.py --ensure-file
+
       - name: Build manylinux Python wheels
         run: cibuildwheel --output-dir dist --platform linux
         env:
@@ -248,6 +260,9 @@ jobs:
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
+
+      - name: Ensure version file exists
+        run: python bin/get_version.py --ensure-file
 
       - name: Build Sdist
         run: ./bin/build-sdist.sh

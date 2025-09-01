@@ -4,6 +4,7 @@ include README.md
 include setup.py
 include pyproject.toml
 include requirements.txt
+include _version.txt
 include src/pylimer_tools_cpp/CMakeLists.txt
 include src/pylimer_tools_cpp/pybind11/CMakeLists.txt
 include src/pylimer_tools/data/everaers_et_al_unit_properties.json
@@ -12,7 +13,7 @@ include vendor/CMakeLists.txt
 include vendor/lapacke-extra
 include vendor/patches
 include vendor/pybind11
-include bin/get-version.sh
+include bin/get_version.py
 global-include src/**/CMakeLists.txt
 global-include src/pylimer_tools_cpp/**/*.cpp
 global-include src/pylimer_tools_cpp/**/*.h

@@ -2,6 +2,7 @@
 
 ## main
 
+- Build system improvements (include version in sdist)
 
 ## v0.3.7
 

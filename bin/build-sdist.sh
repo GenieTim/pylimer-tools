@@ -8,6 +8,8 @@ cd "$(dirname "$0")/.." || exit
 
 rm -rf dist/
 
+python bin/get_version.py --ensure-file
+
 pip install . --verbose || {
     echo "Failed to install the package. Please check the output for errors."
     exit 1

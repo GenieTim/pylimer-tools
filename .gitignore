@@ -166,3 +166,5 @@ docs/api
 
 docs/sg_execution_times.rst
 wheelhouse
+
+./_version.txt
