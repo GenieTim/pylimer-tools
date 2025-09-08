@@ -94,6 +94,10 @@ class PolymerDataFrame:
         """Get unique values from a column."""
         values = self[column]
         return list(set(value for value in values if value is not None))
+    
+    def __len__(self) -> int:
+        """Get number of polymers."""
+        return len(self._polymers)
 
 
 def load_everaers_et_al_data() -> PolymerDataFrame:
