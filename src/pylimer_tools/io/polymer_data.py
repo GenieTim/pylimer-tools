@@ -7,7 +7,7 @@ without requiring pandas or openpyxl as runtime dependencies.
 
 import json
 import os
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Union, Optional
 
 
 class PolymerData:
@@ -81,29 +81,94 @@ class PolymerDataFrame:
         for i, polymer in enumerate(self._polymers):
             yield i, PolymerData(polymer)
 
-    def __getitem__(self, column: str) -> List[Any]:
-        """Get a column as a list."""
-        return [polymer.get(column) for polymer in self._polymers]
+    def __getitem__(self, key: Union[str, List[str]]) -> Union[List[Any], 'PolymerDataFrame']:
+        """Enhanced getitem to support column selection."""
+        if isinstance(key, str):
+            return [polymer.get(key) for polymer in self._polymers]
+        elif isinstance(key, list):
+            # Multiple column selection
+            filtered_polymers = [{col: polymer.get(col) for col in key} for polymer in self._polymers]
+            return PolymerDataFrame(filtered_polymers, key)
+        else:
+            raise TypeError(f"Key must be string or list of strings, got {type(key)}")
 
     @property
     def columns(self) -> List[str]:
         """Get column names."""
         return self._columns.copy()
 
+    @property
+    def index(self) -> List[int]:
+        """Get index (row numbers)."""
+        return list(range(len(self._polymers)))
+
+    @property
+    def shape(self) -> tuple:
+        """Get shape as (rows, columns)."""
+        return (len(self._polymers), len(self._columns))
+
+    def head(self, n: int = 5) -> 'PolymerDataFrame':
+        """Get first n rows."""
+        return PolymerDataFrame(self._polymers[:n], self._columns)
+
+    def tail(self, n: int = 5) -> 'PolymerDataFrame':
+        """Get last n rows."""
+        return PolymerDataFrame(self._polymers[-n:], self._columns)
+
+    def query(self, expr: str) -> 'PolymerDataFrame':
+        """
+        Simple query functionality. Only supports basic column comparisons.
+        Example: df.query("name == 'PS'")
+        """
+        # Very basic implementation - in real use you might want a proper parser
+        filtered_polymers = []
+        
+        # Simple parsing for "column operator value" expressions
+        expr = expr.strip()
+        if "==" in expr:
+            col, value = expr.split("==", 1)
+            col = col.strip()
+            value = value.strip().strip("'\"")
+            
+            for polymer in self._polymers:
+                if str(polymer.get(col, "")) == value:
+                    filtered_polymers.append(polymer)
+        
+        return PolymerDataFrame(filtered_polymers, self._columns)
+
     def unique(self, column: str) -> List[Any]:
         """Get unique values from a column."""
         values = self[column]
         return list(set(value for value in values if value is not None))
-
-    def loc[self, idx: int] -> PolymerData:
-        """Get a row by index."""
-        if idx < 0 or idx >= len(self._polymers):
-            raise IndexError("Index out of range")
-        return PolymerData(self._polymers[idx])
     
     def __len__(self) -> int:
         """Get number of polymers."""
         return len(self._polymers)
+
+    def __repr__(self) -> str:
+        """String representation similar to pandas DataFrame."""
+        if len(self._polymers) == 0:
+            return f"Empty PolymerDataFrame\nColumns: {self._columns}"
+        
+        # Show first few rows
+        lines = []
+        lines.append(f"PolymerDataFrame ({self.shape[0]} rows x {self.shape[1]} columns)")
+        lines.append("   " + "  ".join(f"{col:>12}" for col in self._columns[:5]))
+        
+        for i, polymer in enumerate(self._polymers[:5]):
+            values = []
+            for col in self._columns[:5]:
+                val = polymer.get(col, "")
+                if isinstance(val, float):
+                    values.append(f"{val:>12.3f}")
+                else:
+                    values.append(f"{str(val):>12}")
+            lines.append(f"{i:2d} " + "  ".join(values))
+        
+        if len(self._polymers) > 5:
+            lines.append("...")
+        
+        return "\n".join(lines)
 
 
 def load_everaers_et_al_data() -> PolymerDataFrame:
