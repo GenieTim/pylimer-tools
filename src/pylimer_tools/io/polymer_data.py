@@ -81,16 +81,25 @@ class PolymerDataFrame:
         for i, polymer in enumerate(self._polymers):
             yield i, PolymerData(polymer)
 
-    def __getitem__(self, key: Union[str, List[str]]) -> Union[List[Any], 'PolymerDataFrame']:
-        """Enhanced getitem to support column selection."""
+    def __getitem__(self, key: Union[int, str, List[str]]) -> Union[List[PolymerData], 'PolymerDataFrame']:
+        """
+        Access columns by name or list of names.
+        Access rows by integer index.
+        """
         if isinstance(key, str):
             return [polymer.get(key) for polymer in self._polymers]
         elif isinstance(key, list):
             # Multiple column selection
             filtered_polymers = [{col: polymer.get(col) for col in key} for polymer in self._polymers]
             return PolymerDataFrame(filtered_polymers, key)
+        elif isinstance(key, int):
+            # Row selection by index
+            if 0 <= key < len(self._polymers):
+                return PolymerData(self._polymers[key])
+            else:
+                raise IndexError("Row index out of range")
         else:
-            raise TypeError(f"Key must be string or list of strings, got {type(key)}")
+            raise TypeError(f"Key must be string, list of strings, or int, got {type(key)}")
 
     @property
     def columns(self) -> List[str]:
