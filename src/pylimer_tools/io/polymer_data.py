@@ -94,6 +94,12 @@ class PolymerDataFrame:
         """Get unique values from a column."""
         values = self[column]
         return list(set(value for value in values if value is not None))
+
+    def loc[self, idx: int] -> PolymerData:
+        """Get a row by index."""
+        if idx < 0 or idx >= len(self._polymers):
+            raise IndexError("Index out of range")
+        return PolymerData(self._polymers[idx])
     
     def __len__(self) -> int:
         """Get number of polymers."""
