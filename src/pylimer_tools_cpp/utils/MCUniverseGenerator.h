@@ -159,7 +159,6 @@ public:
 class NoMaxDistanceProvider : public MaxDistanceProvider
 {
 public:
-
   double getMaxDistance(const double N) override { return -1.; }
 
   [[nodiscard]] std::unique_ptr<MaxDistanceProvider> clone() const override

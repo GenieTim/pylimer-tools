@@ -119,7 +119,7 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar, Eigen::PlainObjectBase<Derived> const& m)
 {
   ar(m.rows());
   ar(m.cols());
-  
+
   for (Eigen::Index i = 0; i < m.rows(); ++i) {
     for (Eigen::Index j = 0; j < m.cols(); ++j) {
       ar(m(i, j));
