@@ -81,7 +81,9 @@ class PolymerDataFrame:
         for i, polymer in enumerate(self._polymers):
             yield i, PolymerData(polymer)
 
-    def __getitem__(self, key: Union[int, str, List[str]]) -> Union[List[PolymerData], 'PolymerDataFrame']:
+    def __getitem__(
+        self, key: Union[int, str, List[str]]
+    ) -> Union[List[PolymerData], "PolymerDataFrame"]:
         """
         Access columns by name or list of names.
         Access rows by integer index.
@@ -90,7 +92,9 @@ class PolymerDataFrame:
             return [polymer.get(key) for polymer in self._polymers]
         elif isinstance(key, list):
             # Multiple column selection
-            filtered_polymers = [{col: polymer.get(col) for col in key} for polymer in self._polymers]
+            filtered_polymers = [
+                {col: polymer.get(col) for col in key} for polymer in self._polymers
+            ]
             return PolymerDataFrame(filtered_polymers, key)
         elif isinstance(key, int):
             # Row selection by index
@@ -99,7 +103,9 @@ class PolymerDataFrame:
             else:
                 raise IndexError("Row index out of range")
         else:
-            raise TypeError(f"Key must be string, list of strings, or int, got {type(key)}")
+            raise TypeError(
+                f"Key must be string, list of strings, or int, got {type(key)}"
+            )
 
     @property
     def columns(self) -> List[str]:
@@ -116,40 +122,41 @@ class PolymerDataFrame:
         """Get shape as (rows, columns)."""
         return (len(self._polymers), len(self._columns))
 
-    def head(self, n: int = 5) -> 'PolymerDataFrame':
+    def head(self, n: int = 5) -> "PolymerDataFrame":
         """Get first n rows."""
         return PolymerDataFrame(self._polymers[:n], self._columns)
 
-    def tail(self, n: int = 5) -> 'PolymerDataFrame':
+    def tail(self, n: int = 5) -> "PolymerDataFrame":
         """Get last n rows."""
         return PolymerDataFrame(self._polymers[-n:], self._columns)
 
-    def query(self, expr: str) -> 'PolymerDataFrame':
+    def query(self, expr: str) -> "PolymerDataFrame":
         """
         Simple query functionality. Only supports basic column comparisons.
         Example: df.query("name == 'PS'")
         """
-        # Very basic implementation - in real use you might want a proper parser
+        # Very basic implementation - in real use you might want a proper
+        # parser
         filtered_polymers = []
-        
+
         # Simple parsing for "column operator value" expressions
         expr = expr.strip()
         if "==" in expr:
             col, value = expr.split("==", 1)
             col = col.strip()
             value = value.strip().strip("'\"")
-            
+
             for polymer in self._polymers:
                 if str(polymer.get(col, "")) == value:
                     filtered_polymers.append(polymer)
-        
+
         return PolymerDataFrame(filtered_polymers, self._columns)
 
     def unique(self, column: str) -> List[Any]:
         """Get unique values from a column."""
         values = self[column]
         return list(set(value for value in values if value is not None))
-    
+
     def __len__(self) -> int:
         """Get number of polymers."""
         return len(self._polymers)
@@ -158,12 +165,17 @@ class PolymerDataFrame:
         """String representation similar to pandas DataFrame."""
         if len(self._polymers) == 0:
             return f"Empty PolymerDataFrame\nColumns: {self._columns}"
-        
+
         # Show first few rows
         lines = []
-        lines.append(f"PolymerDataFrame ({self.shape[0]} rows x {self.shape[1]} columns)")
-        lines.append("   " + "  ".join(f"{col:>12}" for col in self._columns[:5]))
-        
+        lines.append(
+            f"PolymerDataFrame ({
+                self.shape[0]} rows x {
+                self.shape[1]} columns)"
+        )
+        lines.append("   " +
+                     "  ".join(f"{col:>12}" for col in self._columns[:5]))
+
         for i, polymer in enumerate(self._polymers[:5]):
             values = []
             for col in self._columns[:5]:
@@ -173,10 +185,10 @@ class PolymerDataFrame:
                 else:
                     values.append(f"{str(val):>12}")
             lines.append(f"{i:2d} " + "  ".join(values))
-        
+
         if len(self._polymers) > 5:
             lines.append("...")
-        
+
         return "\n".join(lines)
 
 
