@@ -32,11 +32,11 @@ Create complex systems with multiple components:
 
  .. code-block:: none
 
-    Starting network generation at 2025-08-29 06:01:55.703660
+    Starting network generation at 2025-09-17 12:40:24.516009
     Adding crosslinkers...
     Adding solvent chains...
     Adding and linking polymer strands...
-    Network generation completed at 2025-08-29 06:01:56.110129
+    Network generation completed at 2025-09-17 12:40:24.921684
 
 
 
