@@ -84,7 +84,7 @@ public:
                                std::string dirPraefix,
                                std::string dirSuffix);
 
-  std::string getFile() const { return this->filePath; }
+  std::string getFilePath() const { return this->filePath; }
 
   std::vector<long int> readTimeSteps();
   std::vector<pylimer_tools::entities::Box> readBoxes();

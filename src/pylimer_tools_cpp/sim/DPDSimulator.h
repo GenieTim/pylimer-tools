@@ -138,6 +138,18 @@ namespace dpd {
     pylimer_tools::entities::EigenNeighbourList neighbourlist;
 
   public:
+    /**
+     * @brief Construct a DPD Simulator from a given Universe
+     *
+     * @param u The Universe containing the initial system configuration
+     * @param crossLinkerType The atom type representing crosslinkers (default:
+     * 2)
+     * @param slipspringBondType The bond type for slip-springs (default: 9)
+     * @param is2D Whether to run a 2D simulation (default: false, currently not
+     * supported)
+     * @param seed Random seed for reproducibility (default: empty string for
+     * random seed)
+     */
     DPDSimulator(const pylimer_tools::entities::Universe& u,
                  const int crossLinkerType = 2,
                  const int slipspringBondType = 9,
@@ -145,46 +157,76 @@ namespace dpd {
                  const std::string& seed = "");
 
     /**
-     * @brief actually do run the simulation
+     * @brief Run the main simulation loop with DPD and optionally Monte Carlo
+     * steps
      *
+     * @param nSteps Number of simulation steps to run
+     * @param withMC Whether to include Monte Carlo moves during simulation
+     * @param shouldInterrupt Function to check if simulation should be
+     * interrupted
+     * @param cleanupInterrupt Function to call when cleaning up after
+     * interruption
      */
     void runSimulation(const long int nSteps,
                        bool withMC,
                        const std::function<bool()>& shouldInterrupt,
                        const std::function<void()>& cleanupInterrupt);
 
+    /**
+     * @brief Run the simulation with default interrupt handlers
+     *
+     * @param nSteps Number of simulation steps to run
+     * @param withMC Whether to include Monte Carlo moves during simulation
+     * (default: false)
+     */
     void runSimulation(const long int nSteps, const bool withMC = false)
     {
       runSimulation(nSteps, withMC, []() { return false; }, []() {});
     }
 
     /**
-     * @brief re-calculate stress tensor & pressure
+     * @brief Re-calculate stress tensor and pressure from current system state
      *
+     * This method updates the current stress tensor and pressure based on the
+     * current coordinates and velocities, typically called after changing
+     * force field parameters.
      */
     void refreshCurrentState();
 
     /**
-     * @brief Set a new seed for the random generator
+     * @brief Set a new seed for the random number generator
      *
-     * @param seed
+     * @param seed Random seed string (empty string for random initialization)
      */
     void reseedRandomness(const std::string& seed);
 
     /**
      * @brief Create a new bond between two nodes
      *
-     * @param fromIdx
-     * @param toIdx
-     * @param bondType
+     * CAUTION: This is an expensive operation involving resizing of Eigen
+     * containers. Use sparingly.
+     *
+     * @param fromIdx Index of the first node
+     * @param toIdx Index of the second node
+     * @param bondType Type identifier for the bond
      */
     void addBond(const long int fromIdx,
                  const long int toIdx,
                  const int bondType);
 
     /**
-     * @brief Compute the force vector, and return the pressure
+     * @brief Compute all forces and stress tensor for the current system
+     * configuration
      *
+     * @param forces Output vector to store computed forces (modified in-place)
+     * @param stressTensor Output matrix to store computed stress tensor
+     * (modified in-place)
+     * @param coordinates Current particle coordinates
+     * @param velocities Current particle velocities
+     * @param timer Performance timer for profiling force computation
+     * @param dt Time step for force computation (default: 0.06)
+     * @param cutoff Cutoff distance for force interactions (default: 1.0)
+     * @return The computed pressure scalar value
      */
     double computeForces(
       Eigen::VectorXd& forces,
@@ -222,8 +264,8 @@ namespace dpd {
     /**
      * @brief Compute the length of one specific bond
      *
-     * @param bondIdx
-     * @return double
+     * @param bondIdx Index of the bond to measure
+     * @return The length of the specified bond
      */
     double computeBondLength(const int bondIdx) const
     {
@@ -233,32 +275,91 @@ namespace dpd {
     ////////////////////////////////////////////////////////////////
     // MC Procedures
     /**
-     * @brief Randomly add new slip-springs
+     * @brief Randomly add new slip-springs between neighboring nodes
+     *
+     * @param num Number of slip-springs to attempt to create
+     * @param bondType Type identifier for the slip-spring bonds (default: 0)
+     * @return Number of slip-springs actually created
      */
     int createSlipSprings(const int num, int bondType = 0);
 
+    /**
+     * @brief Perform Monte Carlo moves to shift slip-springs along polymer
+     * chains
+     *
+     * @param kbT Thermal energy scale for accepting/rejecting moves
+     * (default: 1.0)
+     * @return Number of successful shift moves performed
+     */
     int shiftSlipSprings(const double kbT = 1.);
 
+    /**
+     * @brief Perform Monte Carlo moves to relocate slip-springs to new
+     * positions
+     *
+     * @param kbT Thermal energy scale for accepting/rejecting moves
+     * (default: 1.0)
+     * @return Number of successful relocation moves performed
+     */
     int relocateSlipSprings(const double kbT = 1.);
 
     ////////////////////////////////////////////////////////////////
     // configuration
+
+    /**
+     * @brief Configure whether to assume the simulation box is large enough
+     *
+     * If bonds could get larger than half the box length, this must be kept
+     * false (default). If true, periodic boundary condition handling for bonds
+     * is disabled for performance.
+     */
     void configAssumeBoxLargeEnough()
     {
       this->assumeBoxLargeEnough = true;
       // this->bondBoxOffsets.setZero();
     }
 
+    /**
+     * @brief Check if the simulator assumes the box is large enough
+     *
+     * @return true if PBC handling for bonds is disabled, false otherwise
+     */
     bool assumesBoxLargeEnough() const { return this->assumeBoxLargeEnough; }
 
+    /**
+     * @brief Configure the simulation time step
+     *
+     * @param dt Time step size (default: 0.06)
+     */
     void configTimeStep(const double dt = 0.06) { this->dt = dt; }
 
+    /**
+     * @brief Configure the lambda parameter for modified velocity Verlet
+     * integration
+     *
+     * @param l Lambda parameter value (default: 0.65)
+     */
     void configLambda(const double l) { this->lambda = l; }
 
+    /**
+     * @brief Configure the spring constant for bond interactions
+     *
+     * @param nk Spring constant value (default: 2.0)
+     */
     void configSpringConstant(const double nk) { this->k = nk; }
 
+    /**
+     * @brief Get the current spring constant value
+     *
+     * @return Current spring constant
+     */
     double getSpringConstant() const { return this->k; }
 
+    /**
+     * @brief Configure the lower cutoff distance for slip-spring creation
+     *
+     * @param lowC Lower cutoff distance (must be less than high cutoff)
+     */
     void configSlipspringLowCutoff(const double lowC)
     {
       INVALIDARG_EXP_IFN(lowC < this->highCutoff,
@@ -266,6 +367,11 @@ namespace dpd {
       this->lowCutoff = lowC;
     }
 
+    /**
+     * @brief Configure the higher cutoff distance for slip-spring creation
+     *
+     * @param highC Higher cutoff distance (must be greater than low cutoff)
+     */
     void configSlipspringHighCutoff(const double highC)
     {
       INVALIDARG_EXP_IFN(this->lowCutoff < highC,
@@ -273,12 +379,24 @@ namespace dpd {
       this->highCutoff = highC;
     }
 
+    /**
+     * @brief Configure the sigma parameter for DPD interactions
+     *
+     * This also automatically updates gamma = 0.5 * sigma^2
+     *
+     * @param newSigma Sigma parameter value for noise strength
+     */
     void configSigma(const double newSigma)
     {
       this->sigma = newSigma;
       this->gamma = 0.5 * newSigma * newSigma;
     }
 
+    /**
+     * @brief Configure the A parameter for DPD repulsive interactions
+     *
+     * @param newA Repulsion strength parameter
+     */
     void configA(const double newA) { this->A = newA; }
 
     void configAllowRelocationInNetwork(const bool allowReloc)
@@ -422,56 +540,177 @@ namespace dpd {
     int getCurrentTimestep() const { return this->currentStep; }
 
     /**
-     * @brief Get access to the current stress-tensor
+     * @brief Get access to the current stress tensor
      *
-     * @return Eigen::Matrix3d
+     * @return Current 3x3 stress tensor matrix
      */
     Eigen::Matrix3d getStressTensor() override
     {
       return this->currentStressTensor;
     }
 
+    /**
+     * @brief Get the number of successful slip-spring shift moves performed
+     *
+     * @return Number of shifts performed
+     */
     int getNumShifts() override { return this->numShifts; }
 
+    /**
+     * @brief Get the number of successful slip-spring relocation moves
+     * performed
+     *
+     * @return Number of relocations performed
+     */
     int getNumRelocations() override { return this->numRelocations; }
 
+    /**
+     * @brief Get the total number of particles in the system
+     *
+     * @return Number of particles (same as getNumAtoms)
+     */
     size_t getNumParticles() override { return this->numAtoms; }
 
+    /**
+     * @brief Get the current number of slip-springs
+     *
+     * @return Number of slip-springs in the system
+     */
     size_t getNumSlipSprings() const { return this->numSlipSprings; }
 
+    /**
+     * @brief Get the number of regular bonds (excluding slip-springs)
+     *
+     * @return Number of regular bonds
+     */
     size_t getNumBonds() override { return this->numBonds; }
+
+    /**
+     * @brief Get the number of extra bonds (slip-springs)
+     *
+     * @return Number of slip-springs
+     */
     size_t getNumExtraBonds() override { return this->numSlipSprings; }
+
+    /**
+     * @brief Get the number of bonds to be formed during simulation
+     *
+     * @return Number of bonds to form
+     */
     long int getNumBondsToForm() override { return this->bondsToForm; }
 
+    /**
+     * @brief Get the total number of atoms in the system
+     *
+     * @return Number of atoms
+     */
     size_t getNumAtoms() override { return this->numAtoms; }
+
+    /**
+     * @brief Get the number of extra atoms (always 0 for DPD simulations)
+     *
+     * @return 0 (no extra atoms in DPD)
+     */
     size_t getNumExtraAtoms() override { return 0; }
 
+    /**
+     * @brief Get the current simulation box volume
+     *
+     * @return Simulation box volume
+     */
     double getVolume() override { return this->box.getVolume(); }
 
+    /**
+     * @brief Get gamma parameter (not used in DPD, returns -1)
+     *
+     * @return -1 (not applicable for DPD)
+     */
     double getGamma() override { return -1.; }
+
+    /**
+     * @brief Get residual (not used in DPD, returns -1)
+     *
+     * @return -1 (not applicable for DPD)
+     */
     double getResidual() override { return -1.; }
 
+    /**
+     * @brief Get the lengths of all bonds in the system
+     *
+     * @return Vector containing the length of each bond
+     */
     Eigen::VectorXd getBondLengths() override;
 
+    /**
+     * @brief Get the current particle coordinates
+     *
+     * @return Vector of particle coordinates (x1,y1,z1,x2,y2,z2,...)
+     */
     Eigen::VectorXd getCoordinates() override;
 
+    /**
+     * @brief Get the current particle velocities
+     *
+     * @return Vector of particle velocities (vx1,vy1,vz1,vx2,vy2,vz2,...)
+     */
     Eigen::VectorXd getVelocities() const;
 
+    /**
+     * @brief Get the current system temperature
+     *
+     * @return Current temperature computed from kinetic energy
+     */
     double getTemperature() override;
 
     ////////////////////////////////////////////////////////////////
     // validation
+
+    /**
+     * @brief Validate the current simulation state for debugging purposes
+     *
+     * Performs comprehensive checks on internal data structure consistency
+     * and throws exceptions if issues are found.
+     */
     void validateState();
+
+    /**
+     * @brief Static validation method for debugging (currently empty)
+     */
     static void validateDebugState();
+
+    /**
+     * @brief Validate the neighbor list consistency for debugging purposes
+     *
+     * @param cutoff Cutoff distance to check against neighbor list
+     */
     void validateNeighbourlist(double cutoff);
+
+    /**
+     * @brief Generate a random number from uniform distribution with mean 0,
+     * std 1
+     *
+     * @return Random number from uniform distribution
+     */
     double getUniformRandMean0Std1()
     {
       return this->uniform_rand_mean0std1(this->e2);
     }
+
+    /**
+     * @brief Generate a random number from uniform distribution between 0 and 1
+     *
+     * @return Random number between 0 and 1
+     */
     double getUniformRandBetween0And1()
     {
       return this->uniform_rand_between_0_1(this->e2);
     }
+
+    /**
+     * @brief Get the number of OpenMP threads being used
+     *
+     * @return Number of OpenMP threads (1 if OpenMP not available)
+     */
     int getNumOmpThreads() const
     {
 #ifdef OPENMP_FOUND
@@ -480,6 +719,11 @@ namespace dpd {
       return 1; // no OpenMP found, so only one thread
     }
 
+    /**
+     * @brief Set the number of OpenMP threads to use
+     *
+     * @param numThreads Number of threads (must be 1 if OpenMP not available)
+     */
     void setNumOmpThreads(int numThreads)
     {
 #ifdef OPENMP_FOUND

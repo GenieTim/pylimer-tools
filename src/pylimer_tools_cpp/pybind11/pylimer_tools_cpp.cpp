@@ -38,10 +38,10 @@ PYBIND11_MODULE(pylimer_tools_cpp, m)
   init_pylimer_bound_readers(m);
   init_pylimer_bound_entities(m);
   init_pylimer_bound_writers(m);
-  init_pylimer_bound_generators(m);
   init_pylimer_bound_topo(m);
   init_pylimer_bound_sim(m);
   init_pylimer_bound_calc(m);
+  init_pylimer_bound_generators(m);
 
   m.def(
     "version_information",

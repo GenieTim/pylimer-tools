@@ -51,7 +51,18 @@ init_pylimer_bound_generators(py::module_& m)
 
          :param N: Number of segments.
          )pbdoc",
-         py::arg("N"));
+         py::arg("N"))
+    .def(
+      "__repr__",
+      [](const LinearMaxDistanceProvider& provider) {
+        return "LinearMaxDistanceProvider(max_distance_multiplier=" +
+               std::to_string(provider.getMaxDistance(1)) + ")";
+      },
+      R"pbdoc(
+         Return a string representation of the LinearMaxDistanceProvider.
+         
+         :return: String representation
+         )pbdoc");
 
   py::class_<ZScoreMaxDistanceProvider,
              MaxDistanceProvider,
@@ -75,7 +86,20 @@ init_pylimer_bound_generators(py::module_& m)
 
          :param N: Number of segments.
          )pbdoc",
-         py::arg("N"));
+         py::arg("N"))
+    .def(
+      "__repr__",
+      [](const ZScoreMaxDistanceProvider& provider) {
+        return "ZScoreMaxDistanceProvider(std_multiplier=" +
+               std::to_string(provider.getStdMultiplier()) +
+               ", in_sqrt_multiplier=" +
+               std::to_string(provider.getInnerMultiplier()) + ")";
+      },
+      R"pbdoc(
+         Return a string representation of the ZScoreMaxDistanceProvider.
+         
+         :return: String representation
+         )pbdoc");
 
   py::class_<NoMaxDistanceProvider,
              MaxDistanceProvider,
@@ -92,7 +116,17 @@ init_pylimer_bound_generators(py::module_& m)
          :param N: Number of segments (ignored).
          :return: Always returns -1 to disable maximum distance checks.
          )pbdoc",
-         py::arg("N"));
+         py::arg("N"))
+    .def(
+      "__repr__",
+      [](const NoMaxDistanceProvider& provider) {
+        return "NoMaxDistanceProvider()";
+      },
+      R"pbdoc(
+         Return a string representation of the NoMaxDistanceProvider.
+         
+         :return: String representation
+         )pbdoc");
 
   py::enum_<BackTrackStatus>(m, "BackTrackStatus", R"pbdoc(
      Enum for controlling the strand linking process in linkStrandsCallback.
