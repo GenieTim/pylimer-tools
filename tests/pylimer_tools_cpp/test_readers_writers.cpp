@@ -32,7 +32,7 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
   {
     std::string inputFile = suspectedPath + "/lammps_dump_small.lammpstrj";
     pu::DumpFileParser parser = pu::DumpFileParser(inputFile);
-    CHECK(parser.getFile() == inputFile);
+    CHECK(parser.getFilePath() == inputFile);
     CHECK_THROWS(parser.hasKey("BOX BOUNDS"));
     CHECK(parser.getLength() == 1);
     CHECK_NOTHROW(parser.read());
