@@ -88,7 +88,7 @@ class MaxDistanceProvider
 public:
   virtual ~MaxDistanceProvider() = default;
 
-  virtual double getMaxDistance(double N) = 0;
+  virtual double getMaxDistance(double N) const = 0;
   [[nodiscard]] virtual std::unique_ptr<MaxDistanceProvider> clone() const = 0;
 };
 
@@ -103,7 +103,7 @@ public:
   {
   }
 
-  double getMaxDistance(const double N) override
+  double getMaxDistance(const double N) const override
   {
     return N * this->multiplier;
   }
@@ -136,10 +136,13 @@ public:
   {
   }
 
-  double getMaxDistance(const double N) override
+  double getMaxDistance(const double N) const override
   {
     return this->stdMultiplier * std::sqrt(N * this->innerMultiplier);
   }
+
+  double getStdMultiplier() const { return this->stdMultiplier; }
+  double getInnerMultiplier() const { return this->innerMultiplier; }
 
   [[nodiscard]] std::unique_ptr<MaxDistanceProvider> clone() const override
   {
@@ -159,7 +162,7 @@ public:
 class NoMaxDistanceProvider : public MaxDistanceProvider
 {
 public:
-  double getMaxDistance(const double N) override { return -1.; }
+  double getMaxDistance(const double N) const override { return -1.; }
 
   [[nodiscard]] std::unique_ptr<MaxDistanceProvider> clone() const override
   {

@@ -57,6 +57,12 @@ class Atom:
         
                  :param properties: Dictionary containing atom properties
         """
+    def __repr__(self) -> str:
+        """
+                 Return a string representation of the Atom.
+                 
+                 :return: String representation showing atom properties
+        """
     def __setstate__(self, arg0: tuple) -> None:
         """
         Provides support for pickling
@@ -353,7 +359,7 @@ class AveFileReader:
     """
     
               Alternative implementation of the data file reader implemented in 
-              :func:`pylimer_tools.read_lammps_output_file.read_averages_file`.
+              :func:`pylimer_tools.io.read_lammps_output_file.read_averages_file`.
     
               This implementation is better for certain use cases, worse for others.
               In the end, only performance and memory usage are different.
@@ -365,6 +371,12 @@ class AveFileReader:
                  Initialize the AveFileReader with a file path.
                  
                  :param file_path: Path to the averages file to read
+        """
+    def __repr__(self) -> str:
+        """
+                 Return a string representation of the AveFileReader.
+                 
+                 :return: String representation showing file dimensions
         """
     def autocorrelate_column(self, column_index: typing.SupportsInt, delta_indices: collections.abc.Sequence[typing.SupportsInt]) -> list[float]:
         """
@@ -472,6 +484,12 @@ class Box:
     @typing.overload
     def __init__(self, arg0: typing.SupportsFloat, arg1: typing.SupportsFloat, arg2: typing.SupportsFloat, arg3: typing.SupportsFloat, arg4: typing.SupportsFloat, arg5: typing.SupportsFloat) -> None:
         ...
+    def __repr__(self) -> str:
+        """
+                 Return a string representation of the Box.
+                 
+                 :return: String representation showing box dimensions and shear parameters
+        """
     def __setstate__(self, arg0: tuple) -> None:
         """
         Provides support for pickling.
@@ -856,11 +874,11 @@ class DPDSimulator:
         """
     def config_slipspring_high_cutoff(self, cutoff: typing.SupportsFloat = 2.0) -> None:
         """
-                  Configure the lower cut-off of how far a pair may be distanced for a slip-spring to be created.
+                  Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.
         """
     def config_slipspring_low_cutoff(self, cutoff: typing.SupportsFloat = 0.5) -> None:
         """
-                  Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.
+                  Configure the lower cut-off of how far a pair may be distanced for a slip-spring to be created.
         """
     def config_spring_constant(self, k: typing.SupportsFloat = 2.0) -> None:
         """
@@ -877,9 +895,17 @@ class DPDSimulator:
                   Randomly add the specified number of slip-springs to neighbours within the specified cut-offs.
         """
     def get_bond_lengths(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
-        ...
+        """
+                  Get the lengths of all bonds in the system.
+        
+                  :return: Vector containing the length of each bond
+        """
     def get_coordinates(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
-        ...
+        """
+                  Get the current particle coordinates.
+        
+                  :return: Vector of particle coordinates (x1,y1,z1,x2,y2,z2,...)
+        """
     def get_current_timestep(self) -> int:
         """
                   Get the current timestep number.
@@ -887,35 +913,87 @@ class DPDSimulator:
                   :return: The current timestep index
         """
     def get_nr_of_atoms(self) -> int:
-        ...
+        """
+                  Get the total number of atoms in the system.
+        
+                  :return: Total number of atoms
+        """
     def get_nr_of_bonds(self) -> int:
-        ...
+        """
+                  Get the number of regular bonds (excluding slip-springs).
+        
+                  :return: Number of regular bonds
+        """
     def get_nr_of_bonds_to_form(self) -> int:
         """
                   Get the number of bonds that are configured to have to be formed.
         """
     def get_nr_of_extra_atoms(self) -> int:
-        ...
+        """
+                  Get the number of extra atoms (always 0 for DPD simulations).
+        
+                  :return: Number of extra atoms
+        """
     def get_nr_of_extra_bonds(self) -> int:
-        ...
+        """
+                  Get the number of extra bonds (slip-springs).
+        
+                  :return: Number of slip-springs
+        """
     def get_nr_of_slip_springs(self) -> int:
-        ...
+        """
+                  Get the current number of slip-springs in the system.
+        
+                  :return: Number of slip-springs
+        """
     def get_nr_of_steps_dpd(self) -> int:
-        ...
+        """
+                  Get the configured number of DPD steps per sequence.
+        
+                  :return: Number of DPD steps
+        """
     def get_nr_of_steps_mc(self) -> int:
-        ...
+        """
+                  Get the configured number of Monte Carlo steps per sequence.
+        
+                  :return: Number of MC steps
+        """
     def get_shift_one_at_a_time(self) -> bool:
-        ...
+        """
+                  Get whether slip-springs are shifted one at a time.
+        
+                  :return: True if shifting one at a time, False otherwise
+        """
     def get_shift_possibility_empty(self) -> bool:
-        ...
+        """
+                  Get whether shifting to empty positions is allowed.
+        
+                  :return: True if shifting to empty positions is allowed
+        """
     def get_slip_spring_bond_type(self) -> int:
-        ...
+        """
+                  Get the bond type identifier used for slip-springs.
+        
+                  :return: Bond type for slip-springs
+        """
     def get_spring_constant(self) -> float:
-        ...
+        """
+                  Get the current spring constant value.
+        
+                  :return: The current spring constant for bond interactions
+        """
     def get_stress_tensor(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 3]"]:
-        ...
+        """
+                  Get the current stress tensor.
+        
+                  :return: 3x3 stress tensor matrix
+        """
     def get_temperature(self) -> float:
-        ...
+        """
+                  Get the current system temperature.
+        
+                  :return: The current temperature of the system
+        """
     def get_timestep(self) -> float:
         """
                   Get the timestep used in the simulation.
@@ -929,7 +1007,11 @@ class DPDSimulator:
              :param with_slipsprings: Whether to include slip-springs in the returned universe (default: True)
         """
     def get_volume(self) -> float:
-        ...
+        """
+                  Get the current system volume.
+        
+                  :return: Current simulation box volume
+        """
     def refresh_current_state(self) -> None:
         """
                   After re-configuring the force-field parameters,
@@ -941,17 +1023,17 @@ class DPDSimulator:
         """
                   Set a new origin for measuing the mean square displacement for a specified set of atoms
         """
-    def validate_neighbour_list(self, arg0: typing.SupportsFloat) -> None:
+    def validate_neighbour_list(self, cutoff: typing.SupportsFloat) -> None:
         """
-                  Validate the neighbor list consistency.
+                  Validate the neighbor list consistency for debugging purposes.
         
-                  :return: True if the neighbor list is valid
+                  :param cutoff: Cutoff distance for validation
         """
     def validate_state(self) -> None:
         """
-                  Validate the current simulation state.
-        
-                  :return: True if the simulation state is valid
+                  Validate the current simulation state for debugging purposes.
+                  
+                  Checks internal data structure consistency and throws exceptions if issues are found.
         """
     @typing.overload
     def write_restart_file(self, file: str) -> None:
@@ -1135,7 +1217,7 @@ class DataFileReader:
                  
                  :return: Number of bonds
         """
-    def read(self, path_of_file_to_read: str, atom_style: AtomStyle = ..., atom_style2: AtomStyle = ..., atom_style_3: AtomStyle = ...) -> None:
+    def read(self, path_of_file_to_read: str, atom_style: AtomStyle = ..., atom_style_2: AtomStyle = ..., atom_style_3: AtomStyle = ...) -> None:
         """
                Actually read a LAMMPS's `write_data` file.
         
@@ -1277,6 +1359,12 @@ class DumpFileReader:
                  
                  :param path_of_file_to_read: Path to the dump file to read
         """
+    def __repr__(self) -> str:
+        """
+                 Return a string representation of the DumpFileReader.
+                 
+                 :return: String representation showing number of sections
+        """
     def get_length(self) -> int:
         """
                  Get the number of sections (time-steps) in the file.
@@ -1410,6 +1498,12 @@ class LinearMaxDistanceProvider(MaxDistanceProvider):
     """
     def __init__(self, max_distance_multiplier: typing.SupportsFloat) -> None:
         ...
+    def __repr__(self) -> str:
+        """
+                 Return a string representation of the LinearMaxDistanceProvider.
+                 
+                 :return: String representation
+        """
     def get_max_distance(self, N: typing.SupportsFloat) -> float:
         """
                  Get the maximum distance for a given N.
@@ -1686,21 +1780,21 @@ class MCUniverseGenerator:
         
                  :return: Strand conversion as a fraction between 0 and 1.
         """
-    def get_force_balance(self) -> ...:
+    def get_force_balance(self) -> MEHPForceBalance:
         """
                  Get an instance of the force balance procedure.
                  This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
         
                  :return: Configured MEHPForceBalance instance.
         """
-    def get_force_balance2(self) -> ...:
+    def get_force_balance2(self) -> MEHPForceBalance2:
         """
                       Get an instance of the force balance procedure.
                       This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
         
                       :return: Configured MEHPForceBalance2 instance.
         """
-    def get_force_relaxation(self) -> ...:
+    def get_force_relaxation(self) -> MEHPForceRelaxation:
         """
                  Get an instance of the force relaxation procedure.
                  This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
@@ -3440,6 +3534,12 @@ class NoMaxDistanceProvider(MaxDistanceProvider):
     """
     def __init__(self) -> None:
         ...
+    def __repr__(self) -> str:
+        """
+                 Return a string representation of the NoMaxDistanceProvider.
+                 
+                 :return: String representation
+        """
     def get_max_distance(self, N: typing.SupportsFloat) -> float:
         """
                  Get the maximum distance for a given N (always returns -1 to disable).
@@ -4882,6 +4982,12 @@ class ZScoreMaxDistanceProvider(MaxDistanceProvider):
     """
     def __init__(self, std_multiplier: typing.SupportsFloat, in_sqrt_multiplier: typing.SupportsFloat) -> None:
         ...
+    def __repr__(self) -> str:
+        """
+                 Return a string representation of the ZScoreMaxDistanceProvider.
+                 
+                 :return: String representation
+        """
     def get_max_distance(self, N: typing.SupportsFloat) -> float:
         """
                  Get the maximum distance for a given N.

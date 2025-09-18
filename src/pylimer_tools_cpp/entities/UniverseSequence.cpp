@@ -589,7 +589,7 @@ UniverseSequence::computeDistanceAutocorrelationFromToAtoms(
                   << universe_idx << " (" << timeSteps[universe_idx] << ")"
                   << " and " << parent_universe_idx << " ("
                   << timeSteps[parent_universe_idx] << ") in file "
-                  << this->dumpFileParser.getFile() << std::endl;
+                  << this->dumpFileParser.getFilePath() << std::endl;
       }
 
       // verify
@@ -775,7 +775,7 @@ UniverseSequence::computeMsdForAtomProperties(
                   << universe_idx << " (" << timeSteps[universe_idx] << ")"
                   << " and " << parent_universe_idx << " ("
                   << timeSteps[parent_universe_idx] << ") in file "
-                  << this->dumpFileParser.getFile() << std::endl;
+                  << this->dumpFileParser.getFilePath() << std::endl;
       }
 
       // Skip if delta_t exceeds max_tau for better statistics
@@ -919,7 +919,7 @@ UniverseSequence::computeMsdForAtomsFromDumpFile(
                   << universe_idx << " (" << timeSteps[universe_idx] << ")"
                   << " and " << parent_universe_idx << " ("
                   << timeSteps[parent_universe_idx] << ") in file "
-                  << this->dumpFileParser.getFile() << std::endl;
+                  << this->dumpFileParser.getFilePath() << std::endl;
       }
 
       // Skip if delta_t exceeds max_tau for better statistics

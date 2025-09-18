@@ -24,6 +24,8 @@ public:
     int column2,
     const std::vector<size_t>& dts);
 
+  std::string getFilePath() const { return this->filePath; }
+
 private:
   std::string filePath;
   // "cache"

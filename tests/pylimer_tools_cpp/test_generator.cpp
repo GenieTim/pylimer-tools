@@ -1852,57 +1852,68 @@ TEST_CASE("linkStrandsToStrandsToConversion also works with free strands",
 }
 
 #ifdef CEREALIZABLE
-TEST_CASE("MaxDistanceProvider implementations can be serialized and deserialized",
-          "[generator][MaxDistanceProvider][serialization]")
+TEST_CASE(
+  "MaxDistanceProvider implementations can be serialized and deserialized",
+  "[generator][MaxDistanceProvider][serialization]")
 {
-  std::cout << "Running test \"MaxDistanceProvider implementations can be serialized and deserialized\"" << std::endl;
+  std::cout << "Running test \"MaxDistanceProvider implementations can be "
+               "serialized and deserialized\""
+            << std::endl;
 
   SECTION("LinearMaxDistanceProvider")
   {
     pu::LinearMaxDistanceProvider original = pu::LinearMaxDistanceProvider(2.5);
     CHECK(original.getMaxDistance(10.0) == Catch::Approx(25.0));
-    
+
     std::string serialized = pu::serializeToString(original);
     pu::LinearMaxDistanceProvider deserialized;
     pu::deserializeFromString(deserialized, serialized);
-    
+
     CHECK(deserialized.getMaxDistance(10.0) == Catch::Approx(25.0));
   }
 
   SECTION("ZScoreMaxDistanceProvider")
   {
-    pu::ZScoreMaxDistanceProvider original = pu::ZScoreMaxDistanceProvider(3.0, 1.5);
-    CHECK(original.getMaxDistance(16.0) == Catch::Approx(3.0 * std::sqrt(16.0 * 1.5)));
-    
+    pu::ZScoreMaxDistanceProvider original =
+      pu::ZScoreMaxDistanceProvider(3.0, 1.5);
+    CHECK(original.getStdMultiplier() == Catch::Approx(3.0));
+    CHECK(original.getInnerMultiplier() == Catch::Approx(1.5));
+    CHECK(original.getMaxDistance(16.0) ==
+          Catch::Approx(3.0 * std::sqrt(16.0 * 1.5)));
+
     std::string serialized = pu::serializeToString(original);
     pu::ZScoreMaxDistanceProvider deserialized;
     pu::deserializeFromString(deserialized, serialized);
-    
-    CHECK(deserialized.getMaxDistance(16.0) == Catch::Approx(3.0 * std::sqrt(16.0 * 1.5)));
+
+    CHECK(deserialized.getMaxDistance(16.0) ==
+          Catch::Approx(3.0 * std::sqrt(16.0 * 1.5)));
   }
 
   SECTION("NoMaxDistanceProvider")
   {
     pu::NoMaxDistanceProvider original = pu::NoMaxDistanceProvider();
     CHECK(original.getMaxDistance(10.0) == Catch::Approx(-1.0));
-    
+
     std::string serialized = pu::serializeToString(original);
     pu::NoMaxDistanceProvider deserialized;
     pu::deserializeFromString(deserialized, serialized);
-    
+
     CHECK(deserialized.getMaxDistance(10.0) == Catch::Approx(-1.0));
   }
 
   // SECTION("Polymorphic serialization")
   // {
-  //   pu::ZScoreMaxDistanceProvider original = pu::ZScoreMaxDistanceProvider(2.0, 0.8);
-  //   CHECK(original.getMaxDistance(25.0) == Catch::Approx(2.0 * std::sqrt(25.0 * 0.8)));
+  //   pu::ZScoreMaxDistanceProvider original =
+  //   pu::ZScoreMaxDistanceProvider(2.0, 0.8);
+  //   CHECK(original.getMaxDistance(25.0) == Catch::Approx(2.0 * std::sqrt(25.0
+  //   * 0.8)));
   //
   //   std::string serialized = pu::serializeToString(original);
   //   std::unique_ptr<pu::MaxDistanceProvider> deserialized;
   //   pu::deserializeFromString(deserialized, serialized);
   //
-  //   CHECK(deserialized->getMaxDistance(25.0) == Catch::Approx(2.0 * std::sqrt(25.0 * 0.8)));
+  //   CHECK(deserialized->getMaxDistance(25.0) == Catch::Approx(2.0 *
+  //   std::sqrt(25.0 * 0.8)));
   // }
 }
 #endif

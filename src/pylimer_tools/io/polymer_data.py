@@ -169,9 +169,9 @@ class PolymerDataFrame:
         # Show first few rows
         lines = []
         lines.append(
-            f"PolymerDataFrame ({
-                self.shape[0]} rows x {
-                self.shape[1]} columns)"
+            "PolymerDataFrame ({} rows x {} columns)".format(
+                self.shape[0], self.shape[1]
+            )
         )
         lines.append("   " +
                      "  ".join(f"{col:>12}" for col in self._columns[:5]))

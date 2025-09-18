@@ -964,12 +964,14 @@ A strand is a chain of connected links between two crosslinks.
       py::arg("max_nr_of_steps") = 250000,
       py::arg("x_tolerance") = 1e-12,
       py::arg("initial_residual_norm") = -1.0,
-      py::arg("simplification_mode") =
-        mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
+      py::arg_v("simplification_mode",
+                mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
+                "StructureSimplificationMode.NO_SIMPLIFICATION"),
       py::arg("inactive_removal_cutoff") = 1e-3,
       py::arg("do_inner_iterations") = false,
-      py::arg("allow_sliplinks_to_pass_each_other") =
-        mehp::LinkSwappingMode::NO_SWAPPING,
+      py::arg_v("allow_sliplinks_to_pass_each_other",
+                mehp::LinkSwappingMode::NO_SWAPPING,
+                "LinkSwappingMode.NO_SWAPPING"),
       py::arg("swapping_frequency") = 10,
       py::arg("one_over_strand_partition_upper_limit") = 1.0,
       py::arg("nr_of_crosslink_swaps_allowed_per_sliplink") = -1,
@@ -1638,10 +1640,11 @@ A strand is a chain of connected links between two crosslinks.
            :param tolerance: The stopping condition/tolerance for the SLE solver if it's an iterative one.
            :param max_iterations: The maximum number of iterations to perform if the SLE solver is an iterative one.
            )pbdoc",
-      py::arg("simplification_mode") =
-        mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
+      py::arg_v("simplification_mode",
+                mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
+                "StructureSimplificationMode.NO_SIMPLIFICATION"),
       py::arg("inactive_removal_cutoff") = 1e-6,
-      py::arg("sle_solver") = mehp::SLESolver::DEFAULT,
+      py::arg_v("sle_solver", mehp::SLESolver::DEFAULT, "SLESolver.DEFAULT"),
       py::arg("tolerance") = 1e-15,
       py::arg("max_iterations") = 10000)
     .def("deform_to",
@@ -2148,13 +2151,13 @@ A strand is a chain of connected links between two crosslinks.
     .def("config_slipspring_high_cutoff",
          &dpd::DPDSimulator::configSlipspringHighCutoff,
          R"pbdoc(
-          Configure the lower cut-off of how far a pair may be distanced for a slip-spring to be created.
+          Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.
      )pbdoc",
          py::arg("cutoff") = 2.)
     .def("config_slipspring_low_cutoff",
          &dpd::DPDSimulator::configSlipspringLowCutoff,
          R"pbdoc(
-          Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.
+          Configure the lower cut-off of how far a pair may be distanced for a slip-spring to be created.
      )pbdoc",
          py::arg("cutoff") = 0.5)
     .def("config_box_deformation",
@@ -2330,23 +2333,118 @@ A strand is a chain of connected links between two crosslinks.
 
           :return: The current timestep index
          )pbdoc")
-    .def("get_temperature", &dpd::DPDSimulator::getTemperature)
-    .def("get_bond_lengths", &dpd::DPDSimulator::getBondLengths)
-    .def("get_coordinates", &dpd::DPDSimulator::getCoordinates)
-    .def("get_spring_constant", &dpd::DPDSimulator::getSpringConstant)
-    .def("get_shift_one_at_a_time", &dpd::DPDSimulator::getShiftOneAtATime)
-    .def("get_nr_of_slip_springs", &dpd::DPDSimulator::getNumSlipSprings)
-    .def("get_nr_of_atoms", &dpd::DPDSimulator::getNumAtoms)
-    .def("get_nr_of_extra_atoms", &dpd::DPDSimulator::getNumExtraAtoms)
-    .def("get_nr_of_bonds", &dpd::DPDSimulator::getNumBonds)
-    .def("get_nr_of_extra_bonds", &dpd::DPDSimulator::getNumExtraBonds)
-    .def("get_stress_tensor", &dpd::DPDSimulator::getStressTensor)
-    .def("get_nr_of_steps_dpd", &dpd::DPDSimulator::getNumStepsDPD)
-    .def("get_nr_of_steps_mc", &dpd::DPDSimulator::getNumStepsMC)
-    .def("get_volume", &dpd::DPDSimulator::getVolume)
-    .def("get_slip_spring_bond_type", &dpd::DPDSimulator::getSlipSpringBondType)
+    .def("get_temperature",
+         &dpd::DPDSimulator::getTemperature,
+         R"pbdoc(
+          Get the current system temperature.
+
+          :return: The current temperature of the system
+         )pbdoc")
+    .def("get_bond_lengths",
+         &dpd::DPDSimulator::getBondLengths,
+         R"pbdoc(
+          Get the lengths of all bonds in the system.
+
+          :return: Vector containing the length of each bond
+         )pbdoc")
+    .def("get_coordinates",
+         &dpd::DPDSimulator::getCoordinates,
+         R"pbdoc(
+          Get the current particle coordinates.
+
+          :return: Vector of particle coordinates (x1,y1,z1,x2,y2,z2,...)
+         )pbdoc")
+    .def("get_spring_constant",
+         &dpd::DPDSimulator::getSpringConstant,
+         R"pbdoc(
+          Get the current spring constant value.
+
+          :return: The current spring constant for bond interactions
+         )pbdoc")
+    .def("get_shift_one_at_a_time",
+         &dpd::DPDSimulator::getShiftOneAtATime,
+         R"pbdoc(
+          Get whether slip-springs are shifted one at a time.
+
+          :return: True if shifting one at a time, False otherwise
+         )pbdoc")
+    .def("get_nr_of_slip_springs",
+         &dpd::DPDSimulator::getNumSlipSprings,
+         R"pbdoc(
+          Get the current number of slip-springs in the system.
+
+          :return: Number of slip-springs
+         )pbdoc")
+    .def("get_nr_of_atoms",
+         &dpd::DPDSimulator::getNumAtoms,
+         R"pbdoc(
+          Get the total number of atoms in the system.
+
+          :return: Total number of atoms
+         )pbdoc")
+    .def("get_nr_of_extra_atoms",
+         &dpd::DPDSimulator::getNumExtraAtoms,
+         R"pbdoc(
+          Get the number of extra atoms (always 0 for DPD simulations).
+
+          :return: Number of extra atoms
+         )pbdoc")
+    .def("get_nr_of_bonds",
+         &dpd::DPDSimulator::getNumBonds,
+         R"pbdoc(
+          Get the number of regular bonds (excluding slip-springs).
+
+          :return: Number of regular bonds
+         )pbdoc")
+    .def("get_nr_of_extra_bonds",
+         &dpd::DPDSimulator::getNumExtraBonds,
+         R"pbdoc(
+          Get the number of extra bonds (slip-springs).
+
+          :return: Number of slip-springs
+         )pbdoc")
+    .def("get_stress_tensor",
+         &dpd::DPDSimulator::getStressTensor,
+         R"pbdoc(
+          Get the current stress tensor.
+
+          :return: 3x3 stress tensor matrix
+         )pbdoc")
+    .def("get_nr_of_steps_dpd",
+         &dpd::DPDSimulator::getNumStepsDPD,
+         R"pbdoc(
+          Get the configured number of DPD steps per sequence.
+
+          :return: Number of DPD steps
+         )pbdoc")
+    .def("get_nr_of_steps_mc",
+         &dpd::DPDSimulator::getNumStepsMC,
+         R"pbdoc(
+          Get the configured number of Monte Carlo steps per sequence.
+
+          :return: Number of MC steps
+         )pbdoc")
+    .def("get_volume",
+         &dpd::DPDSimulator::getVolume,
+         R"pbdoc(
+          Get the current system volume.
+
+          :return: Current simulation box volume
+         )pbdoc")
+    .def("get_slip_spring_bond_type",
+         &dpd::DPDSimulator::getSlipSpringBondType,
+         R"pbdoc(
+          Get the bond type identifier used for slip-springs.
+
+          :return: Bond type for slip-springs
+         )pbdoc")
     .def("get_shift_possibility_empty",
-         &dpd::DPDSimulator::getShiftPossibilityEmpty)
+         &dpd::DPDSimulator::getShiftPossibilityEmpty,
+         R"pbdoc(
+          Get whether shifting to empty positions is allowed.
+
+          :return: True if shifting to empty positions is allowed
+         )pbdoc")
 #ifdef CEREALIZABLE
     .def("write_restart_file",
          &dpd::DPDSimulator::writeRestartFile,
@@ -2361,16 +2459,17 @@ A strand is a chain of connected links between two crosslinks.
     .def("validate_neighbour_list",
          &dpd::DPDSimulator::validateNeighbourlist,
          R"pbdoc(
-          Validate the neighbor list consistency.
+          Validate the neighbor list consistency for debugging purposes.
 
-          :return: True if the neighbor list is valid
-         )pbdoc")
+          :param cutoff: Cutoff distance for validation
+         )pbdoc",
+         py::arg("cutoff"))
     .def("validate_state",
          &dpd::DPDSimulator::validateState,
          R"pbdoc(
-          Validate the current simulation state.
-
-          :return: True if the simulation state is valid
+          Validate the current simulation state for debugging purposes.
+          
+          Checks internal data structure consistency and throws exceptions if issues are found.
          )pbdoc");
 }
 

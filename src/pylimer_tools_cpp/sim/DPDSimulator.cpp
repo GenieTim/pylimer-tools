@@ -143,12 +143,12 @@ DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe& u,
 }
 
 /**
- * @brief
+ * @brief Run the main simulation loop with DPD and optionally Monte Carlo steps
  *
- * @param nSteps
- * @param withMC
- * @param shouldInterrupt
- * @param cleanupInterrupt
+ * @param nSteps Number of simulation steps to run
+ * @param withMC Whether to include Monte Carlo moves during simulation
+ * @param shouldInterrupt Function to check if simulation should be interrupted
+ * @param cleanupInterrupt Function to call when cleaning up after interruption
  */
 void
 DPDSimulator::runSimulation(const long int nSteps,

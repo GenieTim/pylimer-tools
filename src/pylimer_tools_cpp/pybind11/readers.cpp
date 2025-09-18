@@ -8,6 +8,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <sstream>
 
 namespace py = pybind11;
 namespace pe = pylimer_tools::entities;
@@ -44,7 +45,7 @@ init_pylimer_bound_readers(py::module_& m)
 
   py::class_<AveFileReader>(m, "AveFileReader", R"pbdoc(
           Alternative implementation of the data file reader implemented in 
-          :func:`pylimer_tools.read_lammps_output_file.read_averages_file`.
+          :func:`pylimer_tools.io.read_lammps_output_file.read_averages_file`.
 
           This implementation is better for certain use cases, worse for others.
           In the end, only performance and memory usage are different.
@@ -104,7 +105,19 @@ init_pylimer_bound_readers(py::module_& m)
      )pbdoc",
          py::arg("column_index1"),
          py::arg("column_index2"),
-         py::arg("delta_indices"));
+         py::arg("delta_indices"))
+    .def(
+      "__repr__",
+      [](const AveFileReader& reader) {
+        std::ostringstream oss;
+        oss << "AveFileReader(file_path=\"" << reader.getFilePath() << "\")";
+        return oss.str();
+      },
+      R"pbdoc(
+         Return a string representation of the AveFileReader.
+         
+         :return: String representation showing file dimensions
+         )pbdoc");
 
   py::class_<DumpFileParser>(m, "DumpFileReader", R"pbdoc(
        A reader for LAMMPS's `dump` files.
@@ -184,7 +197,19 @@ init_pylimer_bound_readers(py::module_& m)
          )pbdoc",
          py::arg("header_key"),
          py::arg("dir_prefix") = "",
-         py::arg("dir_suffix") = "");
+         py::arg("dir_suffix") = "")
+    .def(
+      "__repr__",
+      [](const DumpFileParser& parser) {
+        std::ostringstream oss;
+        oss << "DumpFileReader(file_path=\"" << parser.getFilePath() << "\")";
+        return oss.str();
+      },
+      R"pbdoc(
+         Return a string representation of the DumpFileReader.
+         
+         :return: String representation showing number of sections
+         )pbdoc");
 
   py::class_<DataFileParser>(m, "DataFileReader", R"pbdoc(
        A reader for LAMMPS's `write_data` files.
@@ -203,9 +228,9 @@ init_pylimer_bound_readers(py::module_& m)
        :param atom_style_3: The format of the "Atoms" section if the second to last parameter is equal to AtomStyle::HYBRID
   )pbdoc",
          py::arg("path_of_file_to_read"),
-         py::arg("atom_style") = AtomStyle::ANGLE,
-         py::arg("atom_style2") = AtomStyle::NONE,
-         py::arg("atom_style_3") = AtomStyle::NONE)
+         py::arg_v("atom_style", AtomStyle::ANGLE, "AtomStyle.ANGLE"),
+         py::arg_v("atom_style_2", AtomStyle::NONE, "AtomStyle.NONE"),
+         py::arg_v("atom_style_3", AtomStyle::NONE, "AtomStyle.NONE"))
     .def("get_nr_of_atoms", &DataFileParser::getNrOfAtoms, R"pbdoc(
          Get the number of atoms in the data file.
          

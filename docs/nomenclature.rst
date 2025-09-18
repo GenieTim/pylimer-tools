@@ -25,7 +25,7 @@ Graph Theory Terms
 ------------------
 
 **Vertex**
-    In the internal graph representation, a vertex corresponds to a bead/atom. The graph uses its own numbering scheme for vertices, which may differ from atom IDs.
+    In the internal graph representation, a vertex corresponds to a bead/atom/particle. The graph uses its own numbering scheme for vertices, which may differ from atom IDs.
 
 **Edge**
     An edge in the graph represents the connectivity between two vertices (atoms). Note the distinction between "edge" and "bond":

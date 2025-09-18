@@ -99,7 +99,9 @@ init_pylimer_bound_writers(py::module_& m)
 
         :param atom_style: The LAMMPS atom style to use (default: AtomStyle.ANGLE)
         )pbdoc",
-         py::arg("atom_style") = pylimer_tools::utils::AtomStyle::ANGLE)
+         py::arg_v("atom_style",
+                   pylimer_tools::utils::AtomStyle::ANGLE,
+                   "AtomStyle.ANGLE"))
     .def("set_custom_atom_format",
          &DataFileWriter::setCustomAtomFormat,
          R"pbdoc(

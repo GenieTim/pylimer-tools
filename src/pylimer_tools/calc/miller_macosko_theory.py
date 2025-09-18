@@ -525,7 +525,7 @@ def compute_modulus_decomposition(
     :param b2: The mole fraction of reactive sites in B2 among all reactive sites
         in a mixture of B1 and B2
     :return: G_MMT_phantom: The phantom contribution to the MMT modulus;
-        see also :func:`pylimer_tools.calc.miller_macosko_theory.computeJunctionModulus`
+        see also :func:`pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus`
     :return: G_MMT_entanglement: The entanglement contribution to the MMT modulus
     :return: g_anm: The ANM estimate of the modulus
     :return: g_pnm: The PNM estimate of the modulus
@@ -725,7 +725,7 @@ def compute_trapping_factor(beta: float) -> float:
 
     Literature: :cite:t:`langley_elastically_1968`
 
-    :param beta: :math:`P(F_b^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`
+    :param beta: :math:`P(F_b^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities()`
     :return: The Langley trapping factor
     """
     # for long B2s reacting with small A_fs

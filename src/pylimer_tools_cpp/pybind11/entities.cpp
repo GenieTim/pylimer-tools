@@ -14,6 +14,7 @@
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <sstream>
 
 namespace py = pybind11;
 using namespace pylimer_tools::entities;
@@ -177,6 +178,24 @@ init_pylimer_bound_entities(py::module_& m)
      )pbdoc",
          py::arg("potential_offset"),
          py::arg("abs_precision") = 1e-5)
+    .def(
+      "__repr__",
+      [](const Box& b) {
+        std::ostringstream oss;
+        oss << "Box(lx=" << b.getLx() << ", ly=" << b.getLy()
+            << ", lz=" << b.getLz();
+        if (b.getShearMagnitude() != 0.0) {
+          oss << ", shear_magnitude=" << b.getShearMagnitude()
+              << ", shear_direction=" << b.getShearDirection();
+        }
+        oss << ")";
+        return oss.str();
+      },
+      R"pbdoc(
+         Return a string representation of the Box.
+         
+         :return: String representation showing box dimensions and shear parameters
+         )pbdoc")
 #ifdef CEREALIZABLE
     .def(py::pickle(
            [](const Box& b) { // __getstate__
@@ -431,6 +450,26 @@ init_pylimer_bound_entities(py::module_& m)
          :raises: std::out_of_range if the property doesn't exist
          )pbdoc",
          py::arg("property"))
+    .def(
+      "__repr__",
+      [](const Atom& a) {
+        std::ostringstream oss;
+        oss << "Atom(id=" << a.getId() << ", type=" << a.getType()
+            << ", x=" << a.getX() << ", y=" << a.getY() << ", z=" << a.getZ()
+            << ", nx=" << a.getNX() << ", ny=" << a.getNY()
+            << ", nz=" << a.getNZ();
+        auto extra = a.getExtraData();
+        if (!extra.empty()) {
+          oss << ", extra_properties=" << extra.size();
+        }
+        oss << ")";
+        return oss.str();
+      },
+      R"pbdoc(
+         Return a string representation of the Atom.
+         
+         :return: String representation showing atom properties
+         )pbdoc")
     .def(py::pickle(
            [](const Atom& b) { // __getstate__
              /* Return a tuple that fully encodes the state of the object */
