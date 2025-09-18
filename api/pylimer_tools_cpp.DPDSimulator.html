@@ -456,10 +456,10 @@ and <span id="id2">Schneider <em>et al.</em> [<a class="reference internal" href
 <td><p>Configure the force-field (pair-style) parameter <cite>sigma</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_slipspring_high_cutoff" title="pylimer_tools_cpp.DPDSimulator.config_slipspring_high_cutoff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_slipspring_high_cutoff</span></code></a>(self[, cutoff])</p></td>
-<td><p>Configure the lower cut-off of how far a pair may be distanced for a slip-spring to be created.</p></td>
+<td><p>Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_slipspring_low_cutoff" title="pylimer_tools_cpp.DPDSimulator.config_slipspring_low_cutoff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_slipspring_low_cutoff</span></code></a>(self[, cutoff])</p></td>
-<td><p>Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.</p></td>
+<td><p>Configure the lower cut-off of how far a pair may be distanced for a slip-spring to be created.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_spring_constant" title="pylimer_tools_cpp.DPDSimulator.config_spring_constant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_spring_constant</span></code></a>(self[, k])</p></td>
 <td><p>Configure the force-field (bond-style) parameter <cite>k</cite>, the spring constant.</p></td>
@@ -471,55 +471,55 @@ and <span id="id2">Schneider <em>et al.</em> [<a class="reference internal" href
 <td><p>Randomly add the specified number of slip-springs to neighbours within the specified cut-offs.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_bond_lengths" title="pylimer_tools_cpp.DPDSimulator.get_bond_lengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bond_lengths</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the lengths of all bonds in the system.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_coordinates" title="pylimer_tools_cpp.DPDSimulator.get_coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_coordinates</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the current particle coordinates.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_current_timestep" title="pylimer_tools_cpp.DPDSimulator.get_current_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current_timestep</span></code></a>(self)</p></td>
 <td><p>Get the current timestep number.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_atoms" title="pylimer_tools_cpp.DPDSimulator.get_nr_of_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_atoms</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the total number of atoms in the system.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_bonds" title="pylimer_tools_cpp.DPDSimulator.get_nr_of_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_bonds</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the number of regular bonds (excluding slip-springs).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_bonds_to_form" title="pylimer_tools_cpp.DPDSimulator.get_nr_of_bonds_to_form"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_bonds_to_form</span></code></a>(self)</p></td>
 <td><p>Get the number of bonds that are configured to have to be formed.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_extra_atoms" title="pylimer_tools_cpp.DPDSimulator.get_nr_of_extra_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_extra_atoms</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the number of extra atoms (always 0 for DPD simulations).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_extra_bonds" title="pylimer_tools_cpp.DPDSimulator.get_nr_of_extra_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_extra_bonds</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the number of extra bonds (slip-springs).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_slip_springs" title="pylimer_tools_cpp.DPDSimulator.get_nr_of_slip_springs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_slip_springs</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the current number of slip-springs in the system.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_steps_dpd" title="pylimer_tools_cpp.DPDSimulator.get_nr_of_steps_dpd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_steps_dpd</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the configured number of DPD steps per sequence.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_steps_mc" title="pylimer_tools_cpp.DPDSimulator.get_nr_of_steps_mc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_steps_mc</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the configured number of Monte Carlo steps per sequence.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_shift_one_at_a_time" title="pylimer_tools_cpp.DPDSimulator.get_shift_one_at_a_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_shift_one_at_a_time</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get whether slip-springs are shifted one at a time.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_shift_possibility_empty" title="pylimer_tools_cpp.DPDSimulator.get_shift_possibility_empty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_shift_possibility_empty</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get whether shifting to empty positions is allowed.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_slip_spring_bond_type" title="pylimer_tools_cpp.DPDSimulator.get_slip_spring_bond_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_slip_spring_bond_type</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the bond type identifier used for slip-springs.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_spring_constant" title="pylimer_tools_cpp.DPDSimulator.get_spring_constant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_spring_constant</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the current spring constant value.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_stress_tensor" title="pylimer_tools_cpp.DPDSimulator.get_stress_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_stress_tensor</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the current stress tensor.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_temperature" title="pylimer_tools_cpp.DPDSimulator.get_temperature"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_temperature</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the current system temperature.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_timestep" title="pylimer_tools_cpp.DPDSimulator.get_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_timestep</span></code></a>(self)</p></td>
 <td><p>Get the timestep used in the simulation.</p></td>
@@ -528,7 +528,7 @@ and <span id="id2">Schneider <em>et al.</em> [<a class="reference internal" href
 <td><p>Get a universe instance from the current coordinates (and connectivity).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_volume" title="pylimer_tools_cpp.DPDSimulator.get_volume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_volume</span></code></a>(self)</p></td>
-<td><p></p></td>
+<td><p>Get the current system volume.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.read_restart_file" title="pylimer_tools_cpp.DPDSimulator.read_restart_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_restart_file</span></code></a>(file)</p></td>
 <td><p>Read a restart file in order to continue a simulation.</p></td>
@@ -542,11 +542,11 @@ and <span id="id2">Schneider <em>et al.</em> [<a class="reference internal" href
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.start_measuring_msd_for_atoms" title="pylimer_tools_cpp.DPDSimulator.start_measuring_msd_for_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_measuring_msd_for_atoms</span></code></a>(self, atom_ids)</p></td>
 <td><p>Set a new origin for measuing the mean square displacement for a specified set of atoms</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.validate_neighbour_list" title="pylimer_tools_cpp.DPDSimulator.validate_neighbour_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_neighbour_list</span></code></a>(self, arg0)</p></td>
-<td><p>Validate the neighbor list consistency.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.validate_neighbour_list" title="pylimer_tools_cpp.DPDSimulator.validate_neighbour_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_neighbour_list</span></code></a>(self, cutoff)</p></td>
+<td><p>Validate the neighbor list consistency for debugging purposes.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.validate_state" title="pylimer_tools_cpp.DPDSimulator.validate_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_state</span></code></a>(self)</p></td>
-<td><p>Validate the current simulation state.</p></td>
+<td><p>Validate the current simulation state for debugging purposes.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator.write_restart_file" title="pylimer_tools_cpp.DPDSimulator.write_restart_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_restart_file</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Overloaded function.</p></td>
@@ -708,13 +708,13 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.config_slipspring_high_cutoff">
 <span class="sig-name descname"><span class="pre">config_slipspring_high_cutoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsFloat" title="(in Python v3.13)"><span class="pre">SupportsFloat</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.config_slipspring_high_cutoff" title="Link to this definition">¶</a></dt>
-<dd><p>Configure the lower cut-off of how far a pair may be distanced for a slip-spring to be created.</p>
+<dd><p>Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.config_slipspring_low_cutoff">
 <span class="sig-name descname"><span class="pre">config_slipspring_low_cutoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsFloat" title="(in Python v3.13)"><span class="pre">SupportsFloat</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.config_slipspring_low_cutoff" title="Link to this definition">¶</a></dt>
-<dd><p>Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.</p>
+<dd><p>Configure the lower cut-off of how far a pair may be distanced for a slip-spring to be created.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -743,12 +743,24 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_bond_lengths">
 <span class="sig-name descname"><span class="pre">get_bond_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">1]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_bond_lengths" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the lengths of all bonds in the system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector containing the length of each bond</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_coordinates">
 <span class="sig-name descname"><span class="pre">get_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">1]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_coordinates" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the current particle coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of particle coordinates (x1,y1,z1,x2,y2,z2,…)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_current_timestep">
@@ -764,12 +776,24 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_nr_of_atoms">
 <span class="sig-name descname"><span class="pre">get_nr_of_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_atoms" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the total number of atoms in the system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Total number of atoms</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_nr_of_bonds">
 <span class="sig-name descname"><span class="pre">get_nr_of_bonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_bonds" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the number of regular bonds (excluding slip-springs).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of regular bonds</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_nr_of_bonds_to_form">
@@ -780,57 +804,123 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_nr_of_extra_atoms">
 <span class="sig-name descname"><span class="pre">get_nr_of_extra_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_extra_atoms" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the number of extra atoms (always 0 for DPD simulations).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of extra atoms</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_nr_of_extra_bonds">
 <span class="sig-name descname"><span class="pre">get_nr_of_extra_bonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_extra_bonds" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the number of extra bonds (slip-springs).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of slip-springs</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_nr_of_slip_springs">
 <span class="sig-name descname"><span class="pre">get_nr_of_slip_springs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_slip_springs" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the current number of slip-springs in the system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of slip-springs</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_nr_of_steps_dpd">
 <span class="sig-name descname"><span class="pre">get_nr_of_steps_dpd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_steps_dpd" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the configured number of DPD steps per sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of DPD steps</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_nr_of_steps_mc">
 <span class="sig-name descname"><span class="pre">get_nr_of_steps_mc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_nr_of_steps_mc" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the configured number of Monte Carlo steps per sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of MC steps</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_shift_one_at_a_time">
 <span class="sig-name descname"><span class="pre">get_shift_one_at_a_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_shift_one_at_a_time" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get whether slip-springs are shifted one at a time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if shifting one at a time, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_shift_possibility_empty">
 <span class="sig-name descname"><span class="pre">get_shift_possibility_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_shift_possibility_empty" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get whether shifting to empty positions is allowed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if shifting to empty positions is allowed</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_slip_spring_bond_type">
 <span class="sig-name descname"><span class="pre">get_slip_spring_bond_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_slip_spring_bond_type" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the bond type identifier used for slip-springs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Bond type for slip-springs</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_spring_constant">
 <span class="sig-name descname"><span class="pre">get_spring_constant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_spring_constant" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the current spring constant value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current spring constant for bond interactions</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_stress_tensor">
 <span class="sig-name descname"><span class="pre">get_stress_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[3,</span> <span class="pre">3]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_stress_tensor" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the current stress tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>3x3 stress tensor matrix</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_temperature">
 <span class="sig-name descname"><span class="pre">get_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_temperature" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the current system temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current temperature of the system</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_timestep">
@@ -857,7 +947,13 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.get_volume">
 <span class="sig-name descname"><span class="pre">get_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.get_volume" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the current system volume.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Current simulation box volume</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.read_restart_file">
@@ -890,11 +986,11 @@ this method should be called to update the current stress tensor etc.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.validate_neighbour_list">
-<span class="sig-name descname"><span class="pre">validate_neighbour_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsFloat" title="(in Python v3.13)"><span class="pre">SupportsFloat</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.validate_neighbour_list" title="Link to this definition">¶</a></dt>
-<dd><p>Validate the neighbor list consistency.</p>
+<span class="sig-name descname"><span class="pre">validate_neighbour_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsFloat" title="(in Python v3.13)"><span class="pre">SupportsFloat</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.validate_neighbour_list" title="Link to this definition">¶</a></dt>
+<dd><p>Validate the neighbor list consistency for debugging purposes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True if the neighbor list is valid</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cutoff</strong> – Cutoff distance for validation</p>
 </dd>
 </dl>
 </dd></dl>
@@ -902,12 +998,8 @@ this method should be called to update the current stress tensor etc.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.DPDSimulator.validate_state">
 <span class="sig-name descname"><span class="pre">validate_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.DPDSimulator.validate_state" title="Link to this definition">¶</a></dt>
-<dd><p>Validate the current simulation state.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True if the simulation state is valid</p>
-</dd>
-</dl>
+<dd><p>Validate the current simulation state for debugging purposes.</p>
+<p>Checks internal data structure consistency and throws exceptions if issues are found.</p>
 </dd></dl>
 
 <dl class="py method">
