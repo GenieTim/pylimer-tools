@@ -7,7 +7,7 @@ without requiring pandas or openpyxl as runtime dependencies.
 
 import json
 import os
-from typing import Dict, List, Any, Union, Optional
+from typing import Dict, List, Any, Union
 
 
 class PolymerData:
