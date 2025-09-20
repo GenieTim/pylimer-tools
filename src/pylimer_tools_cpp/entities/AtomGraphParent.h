@@ -457,8 +457,9 @@ public:
    * @param loops
    * @return igraph_integer_t
    */
-  igraph_integer_t getVertexDegree(const igraph_integer_t vertexId,
-                                   const bool loops = true) const
+  igraph_integer_t getVertexDegree(
+    const igraph_integer_t vertexId,
+    const igraph_loops_t loops = IGRAPH_LOOPS_TWICE) const
   {
     igraph_integer_t degree;
     igraph_degree_1(&this->graph, &degree, vertexId, IGRAPH_ALL, loops);

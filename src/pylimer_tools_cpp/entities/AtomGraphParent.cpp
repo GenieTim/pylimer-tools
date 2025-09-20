@@ -116,8 +116,13 @@ AtomGraphParent::getShortestPath(const long int vertexIdxFrom,
   igraph_vector_int_t vertices;
   igraph_vector_int_init(&vertices, 0);
 
-  igraph_get_shortest_path(
-    &this->graph, &vertices, nullptr, vertexIdxFrom, vertexIdxTo, IGRAPH_ALL);
+  igraph_get_shortest_path(&this->graph,
+                           nullptr,
+                           &vertices,
+                           nullptr,
+                           vertexIdxFrom,
+                           vertexIdxTo,
+                           IGRAPH_ALL);
 
   result.reserve(igraph_vector_int_size(&vertices));
   for (igraph_integer_t i = 0; i < igraph_vector_int_size(&vertices); i++) {
@@ -231,7 +236,7 @@ std::vector<igraph_integer_t>
 AtomGraphParent::getIncidentEdgeIds(const igraph_integer_t vertexId) const
 {
   igraph_es_t edgeSelector;
-  igraph_es_incident(&edgeSelector, vertexId, IGRAPH_ALL);
+  igraph_es_incident(&edgeSelector, vertexId, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
   igraph_eit_t iterator;
   igraph_eit_create(&this->graph, edgeSelector, &iterator);
   std::vector<igraph_integer_t> results;
@@ -679,7 +684,8 @@ int
 AtomGraphParent::computeFunctionalityForVertex(const long int vertexId) const
 {
   igraph_integer_t degree;
-  if (igraph_degree_1(&this->graph, &degree, vertexId, IGRAPH_ALL, false)) {
+  if (igraph_degree_1(
+        &this->graph, &degree, vertexId, IGRAPH_ALL, IGRAPH_LOOPS_TWICE)) {
     throw std::runtime_error("Failed to determine degree of vertex");
   }
   return degree;
@@ -754,7 +760,7 @@ AtomGraphParent::getEdges() const
   igraph_vector_int_t allEdges;
   igraph_vector_int_init(&allEdges, this->getNrOfEdges());
   if (igraph_edges(
-        &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges)) {
+        &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges, false)) {
     throw std::runtime_error("Failed to get all edges");
   }
 
@@ -876,7 +882,8 @@ AtomGraphParent::getVerticesWithDegree(const igraph_t* someGraph,
   igraph_vs_t allVertexIds;
   igraph_vs_all(&allVertexIds);
   // complexity: O(|v|*d)
-  if (igraph_degree(someGraph, &degrees, allVertexIds, IGRAPH_ALL, false)) {
+  if (igraph_degree(
+        someGraph, &degrees, allVertexIds, IGRAPH_ALL, IGRAPH_NO_LOOPS)) {
     throw std::runtime_error("Failed to determine degree of vertices");
   }
 
