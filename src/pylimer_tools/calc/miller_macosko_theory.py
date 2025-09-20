@@ -894,10 +894,6 @@ def predict_p_from_w_sol(
         in a mixture of B1 and B2
     :return: The extent of reaction p
     """
-
-    if w_sol == 0.0:
-        return 0.0
-
     param = _compute_validate_parameters(
         {**locals()},
         ["functionality_per_type", "weight_fractions", "r", "b2"],
