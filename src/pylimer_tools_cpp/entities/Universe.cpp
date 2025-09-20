@@ -1116,8 +1116,12 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
         igraph_vector_int_t neighbors;
         igraph_vector_int_init(&neighbors, 0);
 
-        REQUIRE_IGRAPH_SUCCESS(igraph_neighbors(
-          &graph, &neighbors, originalEndNodeVertexId, IGRAPH_ALL));
+        REQUIRE_IGRAPH_SUCCESS(igraph_neighbors(&graph,
+                                                &neighbors,
+                                                originalEndNodeVertexId,
+                                                IGRAPH_ALL,
+                                                IGRAPH_LOOPS_TWICE,
+                                                true));
 
         // loop neighbors of this end node
         for (igraph_integer_t neighIdx = 0;
@@ -1515,8 +1519,13 @@ Universe::findLoops(const int crossLinkerType,
   igraph_vector_int_list_t e_results;
   igraph_vector_int_list_init(&e_results, 0);
 
-  REQUIRE_IGRAPH_SUCCESS(igraph_simple_cycles(
-    &this->graph, &v_results, &e_results, IGRAPH_ALL, -1, maxLength));
+  REQUIRE_IGRAPH_SUCCESS(igraph_simple_cycles(&this->graph,
+                                              &v_results,
+                                              &e_results,
+                                              IGRAPH_ALL,
+                                              -1,
+                                              maxLength,
+                                              IGRAPH_UNLIMITED));
 
   std::vector<std::vector<igraph_integer_t>> results;
 
@@ -1674,11 +1683,15 @@ Universe::findMinimalOrderLoopFrom(const long int loopStart,
   // it is of the order of O(n*n!)
   std::unordered_set<int> processedPathsKeys;
 
+  // TODO: refactor to use igraph's cycle detection algorithm?
+  // Currently, only internal use of
+  // simple_cycles_search_callback_from_one_vertex
+
   // loop neighbours
   int currentMaxLength = 4;
-  igraph_vector_int_t paths;
-  igraph_vector_int_init(&paths, 0);
-  while (igraph_vector_int_size(&paths) <= 4 &&
+  igraph_vector_int_list_t paths;
+  igraph_vector_int_list_init(&paths, 0);
+  while (igraph_vector_int_list_size(&paths) <= 4 &&
          (maxLength < 0 || currentMaxLength <= maxLength)) {
     // for this specified neighbour, we search the simple paths
     // (multiple times as we, for memory issue prevention, increase the )
@@ -1687,8 +1700,10 @@ Universe::findMinimalOrderLoopFrom(const long int loopStart,
                                   &paths,
                                   startingCrosslinkerVertexId,
                                   igraph_vss_1(nextStepVertexId),
+                                  IGRAPH_ALL,
+                                  -1,
                                   currentMaxLength,
-                                  IGRAPH_ALL));
+                                  IGRAPH_UNLIMITED));
     if (currentMaxLength == maxLength || currentMaxLength < 1) {
       break;
     }
@@ -1702,42 +1717,96 @@ Universe::findMinimalOrderLoopFrom(const long int loopStart,
   }
 
   // translate the paths we found
-  std::vector<Atom> currentPath;
   long int currentPathKey = 0;
-  size_t n = igraph_vector_int_size(&paths);
-  for (size_t i = 0; i < n; ++i) {
-    const long int currentVal = igraph_vector_int_get(&paths, i);
-    if (currentVal == -1) {
-      // skip self-loops and duplicates
-      bool allowedSelfLoop = (!skipSelfLoops || currentPath.size() > 2);
-      bool secondOrderLoopValid =
-        (currentPath.size() != 2 ||
-         this->getEdgeIdsFromTo(startingCrosslinkerVertexId, nextStepVertexId)
-             .size() > 1);
-      bool alreadyExistingLoop =
-        pylimer_tools::utils::map_has_key(processedPathsKeys, currentPathKey);
-      if (allowedSelfLoop && !alreadyExistingLoop && secondOrderLoopValid) {
-        bool pathIsNewMinimal = (currentPath.size() <= minimalPath.size() &&
-                                 currentPath.size() > 0) ||
-                                minimalPath.size() <= 1;
-        if (pathIsNewMinimal) {
-          minimalPath = currentPath;
+  igraph_integer_t n_paths = igraph_vector_int_list_size(&paths);
+  for (igraph_integer_t pathIdx = 0; pathIdx < n_paths; ++pathIdx) {
+    igraph_vector_int_t* path = igraph_vector_int_list_get_ptr(&paths, pathIdx);
+
+    // skip self-loops and duplicates
+    bool allowedSelfLoop = (!skipSelfLoops || igraph_vector_int_size(path) > 2);
+    bool secondOrderLoopValid =
+      (igraph_vector_int_size(path) != 2 ||
+       this->getEdgeIdsFromTo(startingCrosslinkerVertexId, nextStepVertexId)
+           .size() > 1);
+    if (allowedSelfLoop && secondOrderLoopValid) {
+      bool pathIsNewMinimal =
+        (igraph_vector_int_size(path) <= minimalPath.size() &&
+         igraph_vector_int_size(path) > 0) ||
+        minimalPath.size() <= 1;
+      if (pathIsNewMinimal) {
+        minimalPath.clear();
+        for (igraph_integer_t i = 0; i < igraph_vector_int_size(path); ++i) {
+          minimalPath.push_back(
+            this->getAtomByVertexIdx(igraph_vector_int_get(path, i)));
         }
-        processedPathsKeys.insert(currentPathKey);
       }
-      currentPath.clear();
-      currentPathKey = 0;
-    } else {
-      Atom newAtom = this->getAtomByVertexIdx(currentVal);
-      currentPathKey = currentPathKey xor currentVal; // compute hash
-      currentPath.push_back(newAtom);
     }
+    currentPathKey = 0;
   }
 
-  igraph_vector_int_destroy(&paths);
+  igraph_vector_int_list_destroy(&paths);
 
   return minimalPath;
 };
+
+struct InfiniteStrandCheckData
+{
+  const Universe* universe;
+  bool foundInfiniteStrand;
+};
+
+igraph_error_t
+check_infinite_strand_cycle(const igraph_vector_int_t* vertices,
+                            const igraph_vector_int_t* edges,
+                            void* arg)
+{
+  InfiniteStrandCheckData* data = static_cast<InfiniteStrandCheckData*>(arg);
+
+  if (igraph_vector_int_size(vertices) < 2) {
+    return IGRAPH_SUCCESS;
+  }
+
+  int nrOfTraversalsX = 0;
+  int nrOfTraversalsY = 0;
+  int nrOfTraversalsZ = 0;
+
+  // Check boundary crossings along the cycle
+  for (igraph_integer_t i = 0; i < igraph_vector_int_size(vertices); ++i) {
+    igraph_integer_t currentVertex = igraph_vector_int_get(vertices, i);
+    igraph_integer_t nextVertex = igraph_vector_int_get(
+      vertices, (i + 1) % igraph_vector_int_size(vertices));
+
+    Atom currentAtom = data->universe->getAtomByVertexIdx(currentVertex);
+    Atom nextAtom = data->universe->getAtomByVertexIdx(nextVertex);
+
+    double dx = nextAtom.getX() - currentAtom.getX();
+    nrOfTraversalsX +=
+      ((dx) > 0.5 * (data->universe->getBox().getLx()))
+        ? 1
+        : (dx < -0.5 * (data->universe->getBox().getLx()) ? -1 : 0);
+
+    double dy = nextAtom.getY() - currentAtom.getY();
+    nrOfTraversalsY +=
+      ((dy) > 0.5 * (data->universe->getBox().getLy()))
+        ? 1
+        : (dy < -0.5 * (data->universe->getBox().getLy()) ? -1 : 0);
+
+    double dz = nextAtom.getZ() - currentAtom.getZ();
+    nrOfTraversalsZ +=
+      ((dz) > 0.5 * (data->universe->getBox().getLz()))
+        ? 1
+        : (dz < -0.5 * (data->universe->getBox().getLz()) ? -1 : 0);
+  }
+
+  // We have an infinite strand if the cycle crosses boundaries an odd number of
+  // times
+  if (nrOfTraversalsX != 0 || nrOfTraversalsY != 0 || nrOfTraversalsZ != 0) {
+    data->foundInfiniteStrand = true;
+    return IGRAPH_STOP; // Stop searching once we find one
+  }
+
+  return IGRAPH_SUCCESS;
+}
 
 /**
  * @brief Check whether the universe contains a loop that crosses the periodic
@@ -1756,82 +1825,20 @@ bool
 Universe::hasInfiniteStrand(const int crossLinkerType,
                             const int maxLength) const
 {
-  // NOTE: There are exponentially many paths between two vertices of a graph,
-  // and you may run out of memory when using this function, if your graph is
-  // lattice-like.
-  std::vector<igraph_integer_t> startingCrosslinkers =
-    this->getIndicesWithAttribute("type", crossLinkerType);
+  InfiniteStrandCheckData checkData;
+  checkData.universe = this;
+  checkData.foundInfiniteStrand = false;
 
-  // note: this algorithm is not particularly efficient
-  // it is of the order of O(n*n!)
-  for (long int startingCrosslinkerVertexId : startingCrosslinkers) {
-    // select all neighbouring atoms as possible directions for the loop
-    igraph_vector_int_t neighbours;
-    igraph_vector_int_init(&neighbours, 0);
-
-    REQUIRE_IGRAPH_SUCCESS(igraph_neighbors(
-      &graph, &neighbours, startingCrosslinkerVertexId, IGRAPH_ALL));
-
-    // loop neighbours
-    igraph_vector_int_t paths;
-    igraph_vector_int_init(&paths, 0);
-    // for each neighbour, we search the simple paths
-    REQUIRE_IGRAPH_SUCCESS(
-      igraph_get_all_simple_paths(&this->graph,
-                                  &paths,
-                                  startingCrosslinkerVertexId,
-                                  igraph_vss_vector(&neighbours),
+  // Use igraph's cycle detection with callback
+  REQUIRE_IGRAPH_SUCCESS(
+    igraph_simple_cycles_callback(&this->graph,
+                                  IGRAPH_ALL,
+                                  -1,
                                   maxLength,
-                                  IGRAPH_ALL));
+                                  &check_infinite_strand_cycle,
+                                  &checkData));
 
-    igraph_vector_int_destroy(&neighbours);
-    // translate the paths we found
-    std::vector<Atom> currentPath;
-    int nrOfTraversalsX = 0;
-    int nrOfTraversalsY = 0;
-    int nrOfTraversalsZ = 0;
-    size_t n = igraph_vector_int_size(&paths);
-    for (int i = 0; i < n; ++i) {
-      const long int currentVal = igraph_vector_int_get(&paths, i);
-      if (currentVal == -1) {
-        // finished a loop. Check.
-        // we have an infinite loop if the box boundary was passed in one
-        // direction only NOTE: this neglects infinite networks (≠ infinite
-        // loops) such as ones caused by entanglement between images
-        if (nrOfTraversalsX != 0 || nrOfTraversalsY != 0 ||
-            nrOfTraversalsZ != 0) {
-          igraph_vector_int_destroy(&paths);
-          return true;
-        }
-        // then reset
-        currentPath.clear();
-        nrOfTraversalsX = 0;
-        nrOfTraversalsY = 0;
-        nrOfTraversalsZ = 0;
-      } else {
-        Atom newAtom = this->getAtomByVertexIdx(currentVal);
-        if (!currentPath.empty()) {
-          Atom lastAtom = currentPath.back();
-          double dx = newAtom.getX() - lastAtom.getX();
-          nrOfTraversalsX += ((dx) > 0.5 * (this->box.getLx()))
-                               ? 1
-                               : (dx < -0.5 * (this->box.getLx()) ? -1 : 0);
-          double dy = newAtom.getY() - lastAtom.getY();
-          nrOfTraversalsY += ((dx) > 0.5 * (this->box.getLy()))
-                               ? 1
-                               : (dy < -0.5 * (this->box.getLy()) ? -1 : 0);
-          double dz = newAtom.getZ() - lastAtom.getZ();
-          nrOfTraversalsZ += ((dz) > 0.5 * (this->box.getLz()))
-                               ? 1
-                               : (dz < -0.5 * (this->box.getLz()) ? -1 : 0);
-        }
-        currentPath.push_back(newAtom);
-      }
-    }
-    igraph_vector_int_destroy(&paths);
-  }
-
-  return false;
+  return checkData.foundInfiniteStrand;
 }
 
 /**
@@ -1848,8 +1855,8 @@ Universe::determineFunctionalityPerType() const
   igraph_vs_t allVertexIds;
   igraph_vs_all(&allVertexIds);
   // complexity: O(|v|*d)
-  REQUIRE_IGRAPH_SUCCESS(
-    igraph_degree(&this->graph, &degrees, allVertexIds, IGRAPH_ALL, false));
+  REQUIRE_IGRAPH_SUCCESS(igraph_degree(
+    &this->graph, &degrees, allVertexIds, IGRAPH_ALL, IGRAPH_NO_LOOPS));
 
   std::vector<int> types = this->getPropertyValues<int>("type");
   std::set<int> uniqueTypes(types.begin(), types.end());
@@ -1893,8 +1900,8 @@ Universe::determineEffectiveFunctionalityPerType() const
   igraph_vs_t allVertexIds;
   igraph_vs_all(&allVertexIds);
   // complexity: O(|v|*d)
-  REQUIRE_IGRAPH_SUCCESS(
-    igraph_degree(&this->graph, &degrees, allVertexIds, IGRAPH_ALL, false));
+  REQUIRE_IGRAPH_SUCCESS(igraph_degree(
+    &this->graph, &degrees, allVertexIds, IGRAPH_ALL, IGRAPH_NO_LOOPS));
 
   std::vector<int> types = this->getPropertyValues<int>("type");
   std::set<int> uniqueTypes(types.begin(), types.end());
@@ -2253,39 +2260,39 @@ Universe::detectDihedralAngles() const
   while (!IGRAPH_VIT_END(vit)) {
     const long int vertexIdx = static_cast<long int>(IGRAPH_VIT_GET(vit));
     // find the connected atoms
-    igraph_vector_int_t dihedral_paths_v;
-    igraph_vector_int_init(&dihedral_paths_v, 4);
+    igraph_vector_int_list_t dihedral_paths_v;
+    igraph_vector_int_list_init(&dihedral_paths_v, 4);
     REQUIRE_IGRAPH_SUCCESS(igraph_get_all_simple_paths(&this->graph,
                                                        &dihedral_paths_v,
                                                        vertexIdx,
                                                        igraph_vss_all(),
+                                                       IGRAPH_ALL,
+                                                       4,
                                                        5,
-                                                       IGRAPH_ALL));
+                                                       IGRAPH_UNLIMITED));
 
     std::vector<std::vector<int>> dihedral_sets;
     // std::cout << "Found paths: " <<
     // igraph_vector_int_size(&dihedral_paths_v)
     //           << std::endl;
-    dihedral_sets.reserve(igraph_vector_int_size(&dihedral_paths_v) / 4);
-    std::vector<int> current_dihedral_path;
-    current_dihedral_path.reserve(4);
-    for (size_t i = 0; i < igraph_vector_int_size(&dihedral_paths_v); i++) {
-      const int current_vertex = igraph_vector_int_get(&dihedral_paths_v, i);
-      if (current_vertex == -1) {
-        if (current_dihedral_path.size() == 4) {
-          // std::cout << "Found dihedral path of length 4" << std::endl;
-          dihedral_sets.push_back(current_dihedral_path);
-        }
-        current_dihedral_path.clear();
-      } else {
-        current_dihedral_path.push_back(current_vertex);
+    dihedral_sets.reserve(igraph_vector_int_list_size(&dihedral_paths_v));
+    for (size_t i = 0; i < igraph_vector_int_list_size(&dihedral_paths_v);
+         i++) {
+      igraph_vector_int_t* current_path =
+        igraph_vector_int_list_get_ptr(&dihedral_paths_v, i);
+      // we only want paths of length 4
+      if (igraph_vector_int_size(current_path) != 4) {
+        continue;
       }
-    }
-    if (current_dihedral_path.size() == 4) {
-      dihedral_sets.push_back(current_dihedral_path);
+      std::vector<int> current_path_vec;
+      current_path_vec.reserve(4);
+      for (size_t j = 0; j < igraph_vector_int_size(current_path); j++) {
+        current_path_vec.push_back(igraph_vector_int_get(current_path, j));
+      }
+      dihedral_sets.push_back(current_path_vec);
     }
 
-    igraph_vector_int_destroy(&dihedral_paths_v);
+    igraph_vector_int_list_destroy(&dihedral_paths_v);
 
     // std::cout << "Found dihedral paths: " << dihedral_sets.size() <<
     // std::endl;
@@ -2502,8 +2509,11 @@ Universe::contractVerticesAlongBondType(const int bondType) const
           edgesToDelete.push_back(edgeIdx);
         } else {
           // Get incident edges of vertex1 to redirect to vertex2
-          REQUIRE_IGRAPH_SUCCESS(igraph_incident(
-            &result.graph, &edgesToCopy, vertex1OfEdge, IGRAPH_ALL));
+          REQUIRE_IGRAPH_SUCCESS(igraph_incident(&result.graph,
+                                                 &edgesToCopy,
+                                                 vertex1OfEdge,
+                                                 IGRAPH_ALL,
+                                                 IGRAPH_LOOPS_TWICE));
 
           for (size_t i = 0; i < igraph_vector_int_size(&edgesToCopy); ++i) {
             igraph_integer_t edgeToCopy = VECTOR(edgesToCopy)[i];

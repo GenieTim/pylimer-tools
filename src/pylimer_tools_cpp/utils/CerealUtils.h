@@ -242,7 +242,7 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar,
 
   igraph_vector_int_t allEdges;
   igraph_vector_int_init(&allEdges, numEdges);
-  if (igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges)) {
+  if (igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges, false)) {
     throw std::runtime_error("Failed to get all edges");
   }
 

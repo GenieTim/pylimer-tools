@@ -3,6 +3,8 @@
 ## main
 
 - Documentation improvements
+- Upgrade igraph to 1.0
+- Fix an issue in `predict_p_from_w_sol`, which returned incorrect results for `w_sol = 0.`
 
 ## v0.3.7 - v0.3.9
 
