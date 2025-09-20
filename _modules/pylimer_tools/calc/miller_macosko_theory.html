@@ -1332,10 +1332,6 @@
 <span class="sd">        in a mixture of B1 and B2</span>
 <span class="sd">    :return: The extent of reaction p</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">w_sol</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mf">0.0</span>
-
     <span class="n">param</span> <span class="o">=</span> <span class="n">_compute_validate_parameters</span><span class="p">(</span>
         <span class="p">{</span><span class="o">**</span><span class="nb">locals</span><span class="p">()},</span>
         <span class="p">[</span><span class="s2">&quot;functionality_per_type&quot;</span><span class="p">,</span> <span class="s2">&quot;weight_fractions&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;b2&quot;</span><span class="p">],</span>
