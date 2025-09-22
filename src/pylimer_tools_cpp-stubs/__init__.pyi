@@ -3119,7 +3119,7 @@ class Molecule:
         """
                Access an atom by its vertex index.
         """
-    def __init__(self, arg0: Box, arg1: igraph_s, arg2: MoleculeType, arg3: collections.abc.Mapping[typing.SupportsInt, typing.SupportsFloat]) -> None:
+    def __init__(self, arg0: Box, arg1: igraph_t, arg2: MoleculeType, arg3: collections.abc.Mapping[typing.SupportsInt, typing.SupportsFloat]) -> None:
         """
                  Construct a molecule from a graph structure.
                  
@@ -5085,4 +5085,4 @@ def version_information() -> str:
 STOP: BackTrackStatus  # value = <BackTrackStatus.STOP: 0>
 TRACK_BACKWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_BACKWARD: 2>
 TRACK_FORWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_FORWARD: 1>
-__version__: str = '0.3.9'
+__version__: str = '0.3.10'
