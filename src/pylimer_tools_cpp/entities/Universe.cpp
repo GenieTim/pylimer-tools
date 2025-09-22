@@ -2267,7 +2267,7 @@ Universe::detectDihedralAngles() const
                                                        vertexIdx,
                                                        igraph_vss_all(),
                                                        IGRAPH_ALL,
-                                                       4,
+                                                       3,
                                                        5,
                                                        IGRAPH_UNLIMITED));
 
