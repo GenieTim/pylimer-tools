@@ -126,7 +126,7 @@ jobs:
           repository: GenieTim/pyodide-recipes
           token: ${{ secrets.PAT_TOKEN }}
           path: pyodide-recipes
-          fetch-depth: 1
+          fetch-depth: 0  # Fetch all history to check for existing branches
 
       - name: Check for existing PRs
         id: check_pr
@@ -184,9 +184,9 @@ jobs:
           git remote add upstream https://github.com/pyodide/pyodide-recipes.git
           git fetch upstream main
 
-          # Create new branch from upstream/main
+          # Create new branch from upstream/main (or checkout if it exists)
           BRANCH_NAME="update-pylimer-tools-${{ steps.release_info.outputs.version }}"
-          git checkout -b "${BRANCH_NAME}" upstream/main
+          ( git checkout "${BRANCH_NAME}" && git pull ) || git checkout -b "${BRANCH_NAME}" upstream/main
 
           # Check if pylimer-tools package exists
           if [ ! -f "packages/pylimer-tools/meta.yaml" ]; then
@@ -211,7 +211,7 @@ jobs:
           - Update source URL to new release wheel
           - Update SHA256 hash to ${{ steps.download_wheel.outputs.sha256 }}
 
-          Release: ${{ github.event.release.html_url }}"
+          Release: ${{ github.event.release.html_url }}" || echo "No changes to commit"
 
           # Save branch name for next step
           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
