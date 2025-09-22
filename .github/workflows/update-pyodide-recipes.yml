@@ -5,40 +5,101 @@ name: Update Pyodide Recipes
 
 on:
   release:
-    types: [published]
+    types: [released]
+  workflow_run:
+    workflows: ["Publish Different Version to PyPi"]
+    types: [completed]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
 
 jobs:
   update-pyodide-recipes:
     runs-on: ubuntu-latest
     name: Update meta.yaml in pyodide-recipes
-    
+
     # Permissions needed for GITHUB_TOKEN to work with external repositories
     permissions:
       contents: read
       pull-requests: write
       issues: write
 
-    # Only run if the release includes WASM wheels
-    if: contains(github.event.release.body, 'wasm') || contains(github.event.release.tag_name, 'v')
+    # Only run if the release includes WASM wheels or if manually triggered
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'workflow_run' ||
+      (github.event_name == 'release' && (
+        contains(github.event.release.body, 'wasm') || 
+        contains(github.event.release.body, 'WASM') ||
+        contains(github.event.release.body, 'pyodide') ||
+        contains(github.event.release.tag_name, 'v')
+      ))
 
     steps:
       - name: Checkout current repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0  # Fetch all history for tags
+          fetch-tags: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
       - name: Get release information
         id: release_info
         run: |
-          # Extract version from tag (remove 'v' prefix if present)
-          VERSION="${{ github.event.release.tag_name }}"
-          VERSION=${VERSION#v}
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "tag_name=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          # Determine version using multiple fallback methods
+          VERSION=""
+          TAG_NAME=""
           
+          # Method 1: Use get_version.py script (most robust)
+          if [ -f "bin/get_version.py" ]; then
+            echo "Attempting to get version from get_version.py..."
+            if VERSION_FROM_SCRIPT=$(python bin/get_version.py --git-only 2>/dev/null); then
+              if [ -n "$VERSION_FROM_SCRIPT" ] && [ "$VERSION_FROM_SCRIPT" != "0.0.0" ]; then
+                VERSION="$VERSION_FROM_SCRIPT"
+                echo "✓ Got version from get_version.py: $VERSION"
+              fi
+            fi
+          fi
+          
+          # Method 2: Extract from release tag (for release events)
+          if [ -z "$VERSION" ] && [ -n "${{ github.event.release.tag_name }}" ]; then
+            echo "Attempting to get version from release tag..."
+            TAG_VERSION="${{ github.event.release.tag_name }}"
+            TAG_VERSION=${TAG_VERSION#v}  # Remove 'v' prefix if present
+            if [[ "$TAG_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+              VERSION="$TAG_VERSION"
+              TAG_NAME="${{ github.event.release.tag_name }}"
+              echo "✓ Got version from release tag: $VERSION"
+            fi
+          fi
+          
+          # Validate we have a valid version
+          if [ -z "$VERSION" ] || [ "$VERSION" = "0.0.0" ]; then
+            echo "❌ Could not determine valid version"
+            exit 1
+          fi
+          
+          # Ensure we have a tag name
+          if [ -z "$TAG_NAME" ]; then
+            TAG_NAME="v$VERSION"
+          fi
+          
+          echo "Final version: $VERSION"
+          echo "Final tag: $TAG_NAME"
+          
+          # Set outputs
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "tag_name=${TAG_NAME}" >> $GITHUB_OUTPUT
+
           # Construct expected wheel filename
           WHEEL_NAME="pylimer_tools-${VERSION}-cp313-cp313-pyodide_2025_0_wasm32.whl"
-          WHEEL_URL="https://github.com/GenieTim/pylimer-tools/releases/download/${{ github.event.release.tag_name }}/${WHEEL_NAME}"
+          WHEEL_URL="https://github.com/GenieTim/pylimer-tools/releases/download/${TAG_NAME}/${WHEEL_NAME}"
           echo "wheel_url=${WHEEL_URL}" >> $GITHUB_OUTPUT
           echo "wheel_name=${WHEEL_NAME}" >> $GITHUB_OUTPUT
 
@@ -47,13 +108,13 @@ jobs:
         run: |
           # Download the wheel file
           curl -L -o "${{ steps.release_info.outputs.wheel_name }}" "${{ steps.release_info.outputs.wheel_url }}"
-          
+
           # Check if download was successful
           if [ ! -f "${{ steps.release_info.outputs.wheel_name }}" ]; then
             echo "Error: Failed to download WASM wheel from ${{ steps.release_info.outputs.wheel_url }}"
             exit 1
           fi
-          
+
           # Calculate SHA256
           SHA256=$(sha256sum "${{ steps.release_info.outputs.wheel_name }}" | cut -d' ' -f1)
           echo "sha256=${SHA256}" >> $GITHUB_OUTPUT
@@ -67,36 +128,81 @@ jobs:
           path: pyodide-recipes
           fetch-depth: 1
 
+      - name: Check for existing PRs
+        id: check_pr
+        working-directory: pyodide-recipes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check for existing open PRs for this version
+          VERSION="${{ steps.release_info.outputs.version }}"
+          echo "Checking for existing PRs for version $VERSION..."
+          
+          # Search for open PRs with the version in title or branch name
+          EXISTING_PRS=$(gh pr list \
+            --repo pyodide/pyodide-recipes \
+            --state open \
+            --search "pylimer-tools $VERSION in:title" \
+            --json number,title,headRefName \
+            --jq '.[] | select(.title | test("pylimer-tools.*'"$VERSION"'")) | .number' 2>/dev/null || echo "")
+          
+          # Also check for PRs with branch names containing the version
+          BRANCH_PRS=$(gh pr list \
+            --repo pyodide/pyodide-recipes \
+            --state open \
+            --json number,title,headRefName \
+            --jq '.[] | select(.headRefName | test("update-pylimer-tools-'"$VERSION"'")) | .number' 2>/dev/null || echo "")
+          
+          # Combine results
+          ALL_PRS="$EXISTING_PRS"$'\n'"$BRANCH_PRS"
+          EXISTING_PR_COUNT=$(echo "$ALL_PRS" | grep -v '^$' | wc -l)
+          
+          if [ "$EXISTING_PR_COUNT" -gt 0 ]; then
+            PR_NUMBERS=$(echo "$ALL_PRS" | grep -v '^$' | tr '\n' ',' | sed 's/,$//')
+            echo "Found existing PR(s) for version $VERSION: #$PR_NUMBERS"
+            echo "existing_pr=true" >> $GITHUB_OUTPUT
+            echo "pr_numbers=$PR_NUMBERS" >> $GITHUB_OUTPUT
+            
+            # Get the first PR details for the summary
+            FIRST_PR=$(echo "$ALL_PRS" | grep -v '^$' | head -1)
+            PR_URL="https://github.com/pyodide/pyodide-recipes/pull/$FIRST_PR"
+            echo "pr_url=$PR_URL" >> $GITHUB_OUTPUT
+          else
+            echo "No existing PRs found for version $VERSION"
+            echo "existing_pr=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create branch and update meta.yaml
+        if: steps.check_pr.outputs.existing_pr == 'false'
         working-directory: pyodide-recipes
         run: |
           # Configure git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
           # Add upstream remote
           git remote add upstream https://github.com/pyodide/pyodide-recipes.git
           git fetch upstream main
-          
+
           # Create new branch from upstream/main
           BRANCH_NAME="update-pylimer-tools-${{ steps.release_info.outputs.version }}"
           git checkout -b "${BRANCH_NAME}" upstream/main
-          
+
           # Check if pylimer-tools package exists
           if [ ! -f "packages/pylimer-tools/meta.yaml" ]; then
             echo "Error: packages/pylimer-tools/meta.yaml not found"
             exit 1
           fi
-          
+
           # Update meta.yaml using sed (Linux syntax)
           sed -i "s/version: .*/version: ${{ steps.release_info.outputs.version }}/" packages/pylimer-tools/meta.yaml
           sed -i "s|url: .*|url: ${{ steps.release_info.outputs.wheel_url }}|" packages/pylimer-tools/meta.yaml
           sed -i "s/sha256: .*/sha256: ${{ steps.download_wheel.outputs.sha256 }}/" packages/pylimer-tools/meta.yaml
-          
+
           # Verify changes
           echo "Updated meta.yaml contents:"
           cat packages/pylimer-tools/meta.yaml
-          
+
           # Stage and commit changes
           git add packages/pylimer-tools/meta.yaml
           git commit -m "Update pylimer-tools to version ${{ steps.release_info.outputs.version }}
@@ -104,20 +210,21 @@ jobs:
           - Update package version to ${{ steps.release_info.outputs.version }}
           - Update source URL to new release wheel
           - Update SHA256 hash to ${{ steps.download_wheel.outputs.sha256 }}
-          
+
           Release: ${{ github.event.release.html_url }}"
-          
+
           # Save branch name for next step
           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
 
       - name: Create Pull Request
+        if: steps.check_pr.outputs.existing_pr == 'false'
         working-directory: pyodide-recipes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Push the branch to fork
           git push origin "${BRANCH_NAME}"
-          
+
           # Create PR against upstream repository
           gh pr create \
             --repo pyodide/pyodide-recipes \
@@ -144,11 +251,26 @@ jobs:
         run: |
           echo "## 🚀 Pyodide Recipes Update Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Successfully created PR to update pylimer-tools in pyodide-recipes:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version**: ${{ steps.release_info.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Wheel URL**: ${{ steps.release_info.outputs.wheel_url }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **SHA256**: \`${{ steps.download_wheel.outputs.sha256 }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch**: \`${BRANCH_NAME}\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The PR has been created and is ready for review by the pyodide-recipes maintainers." >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.check_pr.outputs.existing_pr }}" = "true" ]; then
+            echo "⚠️ **PR Already Exists**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "A PR for pylimer-tools version ${{ steps.release_info.outputs.version }} already exists:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Version**: ${{ steps.release_info.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Existing PR(s)**: #${{ steps.check_pr.outputs.pr_numbers }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **First PR URL**: ${{ steps.check_pr.outputs.pr_url }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "No new PR was created to avoid duplicates." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ **New PR Created Successfully**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Successfully created PR to update pylimer-tools in pyodide-recipes:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Version**: ${{ steps.release_info.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Wheel URL**: ${{ steps.release_info.outputs.wheel_url }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **SHA256**: \`${{ steps.download_wheel.outputs.sha256 }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **Branch**: \`${BRANCH_NAME}\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The PR has been created and is ready for review by the pyodide-recipes maintainers." >> $GITHUB_STEP_SUMMARY
+          fi
