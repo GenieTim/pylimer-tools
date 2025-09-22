@@ -61,7 +61,7 @@ if (HIGH_PERFORMANCE)
     else ()
         # Enable aggressive optimizations, but be careful with -march=native in CI/packaging
         add_compile_options(-O3 -ffast-math)
-        
+
         # Only use -march=native if not cross-compiling and not in CI
         if (NOT CMAKE_CROSSCOMPILING AND NOT DEFINED ENV{CI})
             add_compile_options(-march=native)
@@ -77,97 +77,159 @@ endif ()
 # Compiler-specific optimizations and warnings
 # ==============================================================================
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR
+        CMAKE_C_COMPILER MATCHES "emcc" OR
+        CMAKE_CXX_COMPILER MATCHES "em\\+\\+" OR
+        DEFINED ENV{PYODIDE_BUILD} OR
+        PYODIDE_BUILD OR
+        BUILDING_WITH_PYODIDE)
+    # Emscripten/WebAssembly/Pyodide-specific optimizations
+    message(STATUS "Configuring Emscripten/WebAssembly optimizations")
+
+    # Enable WebAssembly SIMD instructions for vector operations
+    add_compile_options(-msimd128)
+    add_compile_options(-mrelaxed-simd)
+
+    # Aggressive optimizations for numerical computations
+    add_compile_options(-ffast-math)  # Fast floating-point math
+
+    # Conditionally disable RTTI to reduce binary size, but only if Cereal is disabled
+    # since Cereal's polymorphic serialization requires RTTI (uses typeid())
+    if (NOT DEFINED CEREALIZABLE)
+        # Default: check if CEREALIZABLE option will be enabled (it defaults to ON)
+        option(CEREALIZABLE "Enable serialisation of various classes" ON)
+    endif ()
+
+    if (NOT CEREALIZABLE)
+        add_compile_options(-fno-rtti)
+        message(STATUS "Emscripten: Disabled RTTI for smaller binary size (Cereal serialization disabled)")
+    else ()
+        message(STATUS "Emscripten: Keeping RTTI enabled for Cereal serialization")
+    endif ()
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+        # Maximum optimization for release builds
+        add_compile_options(-O3)
+
+        # Link-time optimization
+        add_compile_options(-flto)
+        add_link_options(-flto)
+
+        # Disable assertions and other runtime checks for maximum performance
+        add_compile_options(-DNDEBUG)
+        add_link_options(-s ASSERTIONS=0)
+
+        message(STATUS "Emscripten Release: Enabled maximum optimizations with SIMD")
+    else ()
+        # Debug builds: moderate optimization with debug info
+        add_compile_options(-O1 -g)
+        add_link_options(
+            "SHELL:-s ASSERTIONS=1"
+            "SHELL:-s SAFE_HEAP=1"
+        )
+
+        message(STATUS "Emscripten Debug: Enabled debug optimizations")
+    endif ()
+
+    # Essential Emscripten link options for pybind11 modules
+#         "SHELL:-s DISABLE_EXCEPTION_CATCHING=0"
+    add_link_options(
+        "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+        "SHELL:-s MAXIMUM_MEMORY=8GB"
+        "SHELL:-s MODULARIZE=1"
+        "SHELL:-s EXPORT_ES6=1"
+    )
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     # GCC-specific optimizations and warnings
     if (DEFINED ENV{CI})
         # Reduced warning set for CI to avoid hiding actual errors
         add_compile_options(
-            -Wall -Wextra
-            -Wformat=2 -Winit-self
-            -Wmissing-declarations -Woverloaded-virtual
-            -Wshadow -Wswitch-default -Wundef
-            -Wno-unused-parameter  # Common in template-heavy code
+                -Wall -Wextra
+                -Wformat=2 -Winit-self
+                -Wmissing-declarations -Woverloaded-virtual
+                -Wshadow -Wswitch-default -Wundef
+                -Wno-unused-parameter  # Common in template-heavy code
         )
         message(STATUS "CI environment detected: Using reduced warning set for GCC")
     else ()
         # Full warning set for development
         add_compile_options(
-            -Wall -Wextra -Wpedantic
-            -Wcast-align -Wcast-qual -Wctor-dtor-privacy
-            -Wdisabled-optimization -Wformat=2 -Winit-self
-            -Wmissing-declarations -Wmissing-include-dirs
-            -Wold-style-cast -Woverloaded-virtual -Wredundant-decls
-            -Wshadow -Wsign-conversion -Wsign-promo
-            -Wstrict-overflow=5 -Wswitch-default -Wundef
-            -Wno-unused-parameter  # Common in template-heavy code
+                -Wall -Wextra -Wpedantic
+                -Wcast-align -Wcast-qual -Wctor-dtor-privacy
+                -Wdisabled-optimization -Wformat=2 -Winit-self
+                -Wmissing-declarations -Wmissing-include-dirs
+                -Wold-style-cast -Woverloaded-virtual -Wredundant-decls
+                -Wshadow -Wsign-conversion -Wsign-promo
+                -Wstrict-overflow=5 -Wswitch-default -Wundef
+                -Wno-unused-parameter  # Common in template-heavy code
         )
     endif ()
-    
-    
+
+
     # Enable more aggressive optimization for Release builds
     if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         add_compile_options(-flto)  # Link-time optimization
         set(CMAKE_AR gcc-ar)
         set(CMAKE_RANLIB gcc-ranlib)
     endif ()
-    
+
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # Clang-specific optimizations and warnings
     if (DEFINED ENV{CI})
         # Reduced warning set for CI to avoid hiding actual errors
         add_compile_options(
-            -Wall -Wextra
-            -Wformat=2 -Winit-self
-            -Wmissing-declarations -Woverloaded-virtual
-            -Wshadow -Wswitch-default -Wundef
-            -Wno-unused-parameter
+                -Wall -Wextra
+                -Wformat=2 -Winit-self
+                -Wmissing-declarations -Woverloaded-virtual
+                -Wshadow -Wswitch-default -Wundef
+                -Wno-unused-parameter
         )
         message(STATUS "CI environment detected: Using reduced warning set for Clang")
     else ()
         # Full warning set for development
         add_compile_options(
-            -Wall -Wextra -Wpedantic
-            -Wcast-align -Wcast-qual -Wctor-dtor-privacy
-            -Wdisabled-optimization -Wformat=2 -Winit-self
-            -Wmissing-declarations -Wold-style-cast -Woverloaded-virtual
-            -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo
-            -Wstrict-overflow=5 -Wswitch-default -Wundef
-            -Wno-unused-parameter
+                -Wall -Wextra -Wpedantic
+                -Wcast-align -Wcast-qual -Wctor-dtor-privacy
+                -Wdisabled-optimization -Wformat=2 -Winit-self
+                -Wmissing-declarations -Wold-style-cast -Woverloaded-virtual
+                -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo
+                -Wstrict-overflow=5 -Wswitch-default -Wundef
+                -Wno-unused-parameter
         )
     endif ()
-    
-    
+
+
     # Enable LTO for Release builds
     if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         add_compile_options(-flto)
     endif ()
-    
+
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     # MSVC-specific optimizations
     if (DEFINED ENV{CI})
         # Reduced warning set for CI to avoid hiding actual errors
         add_compile_options(
-            /W3                # Standard warning level instead of W4
-            /permissive-       # Strict conformance
-            /Zc:__cplusplus   # Correct __cplusplus macro
+                /W3                # Standard warning level instead of W4
+                /permissive-       # Strict conformance
+                /Zc:__cplusplus   # Correct __cplusplus macro
         )
         message(STATUS "CI environment detected: Using reduced warning set for MSVC")
     else ()
         # Full warning set for development
         add_compile_options(
-            /W4                # High warning level
-            /permissive-       # Strict conformance
-            /Zc:__cplusplus   # Correct __cplusplus macro
+                /W4                # High warning level
+                /permissive-       # Strict conformance
+                /Zc:__cplusplus   # Correct __cplusplus macro
         )
     endif ()
-    
-    
+
+
     # Suppress some noisy MSVC warnings
     add_compile_options(
-        /wd4251  # 'identifier' : class 'type' needs to have dll-interface
-        /wd4275  # non dll-interface class used as base for dll-interface class
+            /wd4251  # 'identifier' : class 'type' needs to have dll-interface
+            /wd4275  # non dll-interface class used as base for dll-interface class
     )
-    
+
     # Enable whole program optimization for Release
     if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         add_compile_options(/GL)  # Whole program optimization
@@ -175,55 +237,6 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
         set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG")
     endif ()
 
-elseif (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR 
-        CMAKE_C_COMPILER MATCHES "emcc" OR 
-        CMAKE_CXX_COMPILER MATCHES "em\\+\\+" OR
-        DEFINED ENV{PYODIDE_BUILD} OR
-        PYODIDE_BUILD OR
-        BUILDING_WITH_PYODIDE)
-    # Emscripten/WebAssembly/Pyodide-specific optimizations
-    message(STATUS "Configuring Emscripten/WebAssembly optimizations")
-    
-    # Enable WebAssembly SIMD instructions for vector operations
-    add_compile_options(-msimd128)
-    
-    # Aggressive optimizations for numerical computations
-    add_compile_options(
-        -ffast-math          # Fast floating-point math
-        -fno-rtti           # Disable RTTI if not needed (reduces binary size)
-    )
-    
-    if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-        # Maximum optimization for release builds
-        add_compile_options(-O3)
-        
-        # Link-time optimization
-        add_compile_options(-flto)
-        add_link_options(-flto)
-        
-        # Disable assertions and other runtime checks for maximum performance
-        add_compile_options(-DNDEBUG)
-        add_link_options(-s ASSERTIONS=0)
-        
-        message(STATUS "Emscripten Release: Enabled maximum optimizations with SIMD")
-    else ()
-        # Debug builds: moderate optimization with debug info
-        add_compile_options(-O1 -g)
-        add_link_options(-s ASSERTIONS=1)
-        add_link_options(-s SAFE_HEAP=1)  # Memory debugging
-        
-        message(STATUS "Emscripten Debug: Enabled debug optimizations")
-    endif ()
-    
-    # Essential Emscripten link options for pybind11 modules
-    add_link_options(
-        -s DISABLE_EXCEPTION_CATCHING=0    # Keep C++ exceptions for pybind11
-        -s ALLOW_MEMORY_GROWTH=1           # Dynamic memory allocation
-        -s MAXIMUM_MEMORY=8GB               # Large memory limit for simulations
-        -s MODULARIZE=1                     # Generate modular output
-        -s EXPORT_ES6=1                     # ES6 module export
-    )
-    
 endif ()
 
 # Enable position-independent code for shared libraries
@@ -238,23 +251,23 @@ function(OUTPUT_FLAGS target_name)
         message(WARNING "OUTPUT_FLAGS called with non-existent target: ${target_name}")
         return()
     endif ()
-    
+
     get_target_property(COMPILE_OPTIONS ${target_name} COMPILE_OPTIONS)
     get_target_property(COMPILE_DEFS ${target_name} COMPILE_DEFINITIONS)
     get_target_property(INCLUDE_DIRS ${target_name} INCLUDE_DIRECTORIES)
-    
+
     message(STATUS "=== ${target_name} Configuration ===")
     message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
     message(STATUS "Compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
-    
+
     if (COMPILE_OPTIONS)
         message(STATUS "Compile options: ${COMPILE_OPTIONS}")
     endif ()
-    
+
     if (COMPILE_DEFS)
         message(STATUS "Compile definitions: ${COMPILE_DEFS}")
     endif ()
-    
+
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         message(STATUS "Debug flags: ${CMAKE_CXX_FLAGS_DEBUG}")
     elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -262,7 +275,7 @@ function(OUTPUT_FLAGS target_name)
     elseif (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         message(STATUS "RelWithDebInfo flags: ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
     endif ()
-    
+
     message(STATUS "==================================")
 endfunction()
 
