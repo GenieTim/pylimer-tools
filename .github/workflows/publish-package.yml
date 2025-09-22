@@ -404,7 +404,11 @@ jobs:
 
       - name: Determine Changelog
         id: changelog_determiner
-        run: echo "##[set-output name=changelog;]$(./bin/extract-changelog.sh $GIT_TAG CHANGELOG.md)"
+        run: |
+          changelog_content="$(./bin/extract-changelog.sh $GIT_TAG CHANGELOG.md)"
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$changelog_content" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create Release
         id: create_release

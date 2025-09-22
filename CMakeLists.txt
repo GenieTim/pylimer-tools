@@ -206,14 +206,6 @@ if (COMMAND OUTPUT_FLAGS)
     OUTPUT_FLAGS(pylimer_tools_cpp)
 endif ()
 
-# Pyodide/Emscripten specific link flags
-if (BUILDING_WITH_PYODIDE)
-    set_target_properties(pylimer_tools_cpp PROPERTIES
-        LINK_FLAGS
-        "-flto -s ALLOW_MEMORY_GROWTH=1 -s MAXIMUM_MEMORY=8GB -s MODULARIZE=1"
-    )
-endif ()
-
 # Platform-specific linking
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Intel")
     target_link_libraries(pylimer_tools_cpp PRIVATE stdc++fs)

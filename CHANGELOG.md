@@ -1,10 +1,13 @@
 # Changelog
 
-## main
+## master
+
+## v0.3.10
 
 - Documentation improvements
 - Upgrade igraph to 1.0
 - Fix an issue in `predict_p_from_w_sol`, which returned incorrect results for `w_sol = 0.`
+- Improve performance of webassembly
 
 ## v0.3.7 - v0.3.9
 

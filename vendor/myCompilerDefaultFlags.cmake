@@ -174,6 +174,56 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
         set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG")
         set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG")
     endif ()
+
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR 
+        CMAKE_C_COMPILER MATCHES "emcc" OR 
+        CMAKE_CXX_COMPILER MATCHES "em\\+\\+" OR
+        DEFINED ENV{PYODIDE_BUILD} OR
+        PYODIDE_BUILD OR
+        BUILDING_WITH_PYODIDE)
+    # Emscripten/WebAssembly/Pyodide-specific optimizations
+    message(STATUS "Configuring Emscripten/WebAssembly optimizations")
+    
+    # Enable WebAssembly SIMD instructions for vector operations
+    add_compile_options(-msimd128)
+    
+    # Aggressive optimizations for numerical computations
+    add_compile_options(
+        -ffast-math          # Fast floating-point math
+        -fno-rtti           # Disable RTTI if not needed (reduces binary size)
+    )
+    
+    if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+        # Maximum optimization for release builds
+        add_compile_options(-O3)
+        
+        # Link-time optimization
+        add_compile_options(-flto)
+        add_link_options(-flto)
+        
+        # Disable assertions and other runtime checks for maximum performance
+        add_compile_options(-DNDEBUG)
+        add_link_options(-s ASSERTIONS=0)
+        
+        message(STATUS "Emscripten Release: Enabled maximum optimizations with SIMD")
+    else ()
+        # Debug builds: moderate optimization with debug info
+        add_compile_options(-O1 -g)
+        add_link_options(-s ASSERTIONS=1)
+        add_link_options(-s SAFE_HEAP=1)  # Memory debugging
+        
+        message(STATUS "Emscripten Debug: Enabled debug optimizations")
+    endif ()
+    
+    # Essential Emscripten link options for pybind11 modules
+    add_link_options(
+        -s DISABLE_EXCEPTION_CATCHING=0    # Keep C++ exceptions for pybind11
+        -s ALLOW_MEMORY_GROWTH=1           # Dynamic memory allocation
+        -s MAXIMUM_MEMORY=8GB               # Large memory limit for simulations
+        -s MODULARIZE=1                     # Generate modular output
+        -s EXPORT_ES6=1                     # ES6 module export
+    )
+    
 endif ()
 
 # Enable position-independent code for shared libraries
