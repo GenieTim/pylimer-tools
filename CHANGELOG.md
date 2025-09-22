@@ -1,8 +1,11 @@
 # Changelog
 
-## master
+## main
 
-- Improve performance of webassembly
+## v0.3.11
+
+- Improve performance of webassembly by compiling SIMD
+- (Possibly) improve deployment
 
 ## v0.3.10
 
