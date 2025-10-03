@@ -14,6 +14,7 @@ include vendor/CMakeLists.txt
 recursive-include vendor/lapacke-extra *
 recursive-include vendor/patches *
 recursive-include vendor/pybind11 *
+recursive-include vendor/cmake-modules *
 include bin/get_version.py
 global-include src/**/CMakeLists.txt
 global-include src/pylimer_tools_cpp/**/*.cpp

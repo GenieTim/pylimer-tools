@@ -2,6 +2,8 @@
 
 ## main
 
+- More build system improvements
+
 ## v0.3.11
 
 - Improve performance of webassembly by compiling SIMD

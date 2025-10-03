@@ -150,7 +150,8 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/vendor/pybind11)
 add_subdirectory(src/pylimer_tools_cpp)
 
 # Add tests unless disabled for Pyodide cross build (tests depend on full libc++)
-if (NOT BUILDING_WITH_PYODIDE AND (BUILD_TESTING OR CMAKE_BUILD_TYPE STREQUAL "Debug"))
+# Also check if tests directory exists (it's excluded from pip distribution)
+if (NOT BUILDING_WITH_PYODIDE AND (BUILD_TESTING OR CMAKE_BUILD_TYPE STREQUAL "Debug") AND EXISTS ${CMAKE_CURRENT_LIST_DIR}/tests)
     add_subdirectory(tests)
 endif ()
 
