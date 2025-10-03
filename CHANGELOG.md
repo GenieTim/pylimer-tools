@@ -2,6 +2,8 @@
 
 ## main
 
+## v0.3.12
+
 - More build system improvements
 
 ## v0.3.11
