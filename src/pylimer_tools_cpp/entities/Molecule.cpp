@@ -4,6 +4,7 @@
 #include "Atom.h"
 #include <Eigen/Dense>
 #include <algorithm>
+#include <cassert>
 #include <iostream>
 #include <numeric>
 extern "C"

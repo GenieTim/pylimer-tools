@@ -15,6 +15,7 @@
 #include <nlopt.hpp>
 #include <string>
 #include <vector>
+#include <cassert>
 #ifdef CEREALIZABLE
 #include "../utils/CerealUtils.h"
 #include <cereal/access.hpp>
