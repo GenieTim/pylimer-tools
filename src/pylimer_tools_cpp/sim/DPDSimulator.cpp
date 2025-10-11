@@ -1866,8 +1866,7 @@ DPDSimulator::validateState()
       }
       RUNTIME_EXP_IFN(
         this->bondDuplicationPenalty.segment(3 * bondIdx, 3)
-          .isApprox(expectZero ? Eigen::Array3d::Zero()
-                               : Eigen::Array3d::Constant(1.)),
+          .isApprox(Eigen::Array3d::Constant(expectZero ? 0. : 1.)),
         "Incorrect bondDuplicationPenalty: found bond " +
           std::to_string(bondIdx) + " of " + std::to_string(this->numBonds) +
           " (+ " + std::to_string(this->numSlipSprings) + ") to should have " +

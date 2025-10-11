@@ -1,6 +1,6 @@
 # load the Eigen library
 if (NOT DEFINED eigen_LOADED)
-    find_package(Eigen3 3.4 NO_MODULE) # 3.4
+    find_package(Eigen3 5.0 NO_MODULE) # 3.4
     if (TARGET Eigen3::Eigen)  #(${Eigen3_FOUND}) # AND (${Eigen3_VERSION} VERSION_GREATER_EQUAL 3.4)
         message(STATUS "Found Eigen3 Version: ${Eigen3_VERSION} Path: ${Eigen3_DIR}")
     else ()
@@ -9,7 +9,7 @@ if (NOT DEFINED eigen_LOADED)
         FetchContent_Declare(
                 Eigen
                 GIT_REPOSITORY https://gitlab.com/libeigen/eigen
-                GIT_TAG 3.4.0
+                GIT_TAG 5.0.0
                 GIT_SHALLOW TRUE
                 GIT_PROGRESS TRUE
         )
@@ -21,29 +21,30 @@ if (NOT DEFINED eigen_LOADED)
         FetchContent_MakeAvailable(Eigen)
 
         # Create alias target if it doesn't exist
-        if(NOT TARGET Eigen3::Eigen)
+        if (NOT TARGET Eigen3::Eigen)
             add_library(Eigen3::Eigen ALIAS eigen)
-        endif()
+        endif ()
 
         # Synchronize Eigen3_* variables from Eigen_* variables if needed
         get_cmake_property(_allVariables VARIABLES)
-        foreach(_var ${_allVariables})
-            if(_var MATCHES "^Eigen_(.+)$")
+        foreach (_var ${_allVariables})
+            if (_var MATCHES "^Eigen_(.+)$")
                 set(_suffix ${CMAKE_MATCH_1})
                 set(_eigen3_var "Eigen3_${_suffix}")
 
                 # Check if Eigen3_* variable needs to be set
-                if(NOT DEFINED ${_eigen3_var} OR
-                   "${${_eigen3_var}}" STREQUAL "" OR
-                   "${${_eigen3_var}}" STREQUAL "OFF" OR
-                   "${${_eigen3_var}}" MATCHES ".*-NOTFOUND$")
+                if (NOT DEFINED ${_eigen3_var} OR
+                        "${${_eigen3_var}}" STREQUAL "" OR
+                        "${${_eigen3_var}}" STREQUAL "OFF" OR
+                        "${${_eigen3_var}}" MATCHES ".*-NOTFOUND$")
                     set(${_eigen3_var} ${${_var}})
                     message(STATUS "Set ${_eigen3_var} to ${${_var}}")
-                endif()
-            endif()
-        endforeach()
+                endif ()
+            endif ()
+        endforeach ()
 
-        if (NOT EXISTS ${CMAKE_FIND_PACKAGE_REDIRECTS_DIR}/eigen3-config.cmake AND
+        if (CMAKE_FIND_PACKAGE_REDIRECTS_DIR AND
+                NOT EXISTS ${CMAKE_FIND_PACKAGE_REDIRECTS_DIR}/eigen3-config.cmake AND
                 NOT EXISTS ${CMAKE_FIND_PACKAGE_REDIRECTS_DIR}/Eigen3Config.cmake)
             file(WRITE ${CMAKE_FIND_PACKAGE_REDIRECTS_DIR}/eigen3-config.cmake
                     [=[

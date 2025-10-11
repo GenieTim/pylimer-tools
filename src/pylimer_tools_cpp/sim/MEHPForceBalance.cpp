@@ -1202,10 +1202,10 @@ MEHPForceBalance::addSliplinksBasedOnCycles(const int maxLoopLength)
 
     for (int i = 0; i < 3; ++i) {
       minCoords[i] =
-        alignedLoopCoordinates(Eigen::seq(i, Eigen::last - 2 + i, 3))
+        alignedLoopCoordinates(Eigen::seq(i, Eigen::placeholders::last - 2 + i, 3))
           .minCoeff();
       maxCoords[i] =
-        alignedLoopCoordinates(Eigen::seq(i, Eigen::last - 2 + i, 3))
+        alignedLoopCoordinates(Eigen::seq(i, Eigen::placeholders::last - 2 + i, 3))
           .maxCoeff();
       // want to see later that this direction is spanned fully
       // that's why we just push it so far that it is within the box
