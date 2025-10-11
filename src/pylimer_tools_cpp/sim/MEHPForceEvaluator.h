@@ -2,6 +2,7 @@
 #define MEHP_FORCE_EVAL_H
 #include "./MEHPUtilityStructures.h"
 // #include <iostream>
+#include <cassert>
 
 namespace pylimer_tools::sim::mehp {
 double

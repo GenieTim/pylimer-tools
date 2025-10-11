@@ -7,6 +7,7 @@
 #include <Spectra/MatOp/SparseGenMatProd.h>
 #include <Spectra/SymEigsSolver.h>
 #include <algorithm>
+#include <cassert>
 #include <iostream>
 #include <vector>
 #ifdef EIGEN_USE_LAPACKE

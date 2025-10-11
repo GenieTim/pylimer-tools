@@ -11,6 +11,7 @@ extern "C"
 #include "Atom.h"
 #include <Eigen/Dense>
 #include <climits>
+#include <cassert>
 #include <functional>
 #include <map>
 #include <vector>

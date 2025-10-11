@@ -9,6 +9,7 @@
 #include <map>
 #include <set>
 #include <unordered_map>
+#include <cassert>
 #include <vector>
 
 namespace pylimer_tools {

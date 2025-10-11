@@ -7,6 +7,7 @@
 #include <fstream> // std::ifstream
 #include <map>
 #include <string>
+#include <cassert>
 #include <vector>
 
 namespace pylimer_tools::utils {

@@ -8,6 +8,7 @@
 #include "../sim/MEHPForceEvaluator.h"
 #include "../sim/MEHPForceRelaxation.h"
 
+#include <cassert>
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
