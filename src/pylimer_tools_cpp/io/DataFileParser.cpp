@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <cassert>
 
 namespace pylimer_tools::utils {
 
