@@ -413,6 +413,12 @@ Assumes the precursor-chains to be bifunctional.</p>
 <li><p>nu &amp; mu</p></li>
 <li><p>network, abs_tol, rel_tol, crosslinker_type</p></li>
 </ul>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>With high certainty, you should not use this function,
+and instead the <cite>MEHPForceBalance</cite>, <cite>MEHPForceBalance2</cite>
+or <cite>MEHPForceRelaxation</cite> classes from <cite>pylimer_tools_cpp</cite>.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -480,6 +486,12 @@ upon network deformation, resp. the effective number density of network strands.
 </ul>
 </dd>
 </dl>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>With high certainty, you should not use this function,
+and instead the <cite>MEHPForceBalance</cite>, <cite>MEHPForceBalance2</cite>
+or <cite>MEHPForceRelaxation</cite> classes from <cite>pylimer_tools_cpp</cite>.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -569,6 +581,12 @@ Set to None to use only rel_tol</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>With high certainty, you should not use this function,
+and instead the <cite>MEHPForceBalance</cite>, <cite>MEHPForceBalance2</cite>
+or <cite>MEHPForceRelaxation</cite> classes from <cite>pylimer_tools_cpp</cite>.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1355,6 +1373,28 @@ or the maximum functionality of the crosslinkers.</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.compute_strand_number_density">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">compute_strand_number_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mw_bifunctional</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.25rc3.dev1+g20e3dd3)"><span class="pre">Quantity</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.25rc3.dev1+g20e3dd3)"><span class="pre">Quantity</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mw_monofunctional</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.25rc3.dev1+g20e3dd3)"><span class="pre">Quantity</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.25rc3.dev1+g20e3dd3)"><span class="pre">Quantity</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/calc/structure_analysis.html#compute_strand_number_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.compute_strand_number_density" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the strand number density of the polymer network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mw_bifunctional</strong> – The molecular weight of the bifunctional strands</p></li>
+<li><p><strong>density</strong> – The density of the polymer network</p></li>
+<li><p><strong>mw_monofunctional</strong> – The molecular weight of the monofunctional strands. None if not present</p></li>
+<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The strand number density</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.25rc3.dev1+g20e3dd3)">pint.Quantity</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.compute_weight_fractions">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">compute_weight_fractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/calc/structure_analysis.html#compute_weight_fractions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.compute_weight_fractions" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the weight fractions of each atom type in the network.
@@ -1578,6 +1618,7 @@ that have a weight less than a certain fraction of the total weight.</p>
 <li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_distances"><code class="docutils literal notranslate"><span class="pre">compute_mean_end_to_end_distances()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_vectors"><code class="docutils literal notranslate"><span class="pre">compute_mean_end_to_end_vectors()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance"><code class="docutils literal notranslate"><span class="pre">compute_stoichiometric_imbalance()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.compute_strand_number_density"><code class="docutils literal notranslate"><span class="pre">compute_strand_number_density()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.compute_weight_fractions"><code class="docutils literal notranslate"><span class="pre">compute_weight_fractions()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material"><code class="docutils literal notranslate"><span class="pre">measure_lower_bound_weight_fraction_of_soluble_material()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone"><code class="docutils literal notranslate"><span class="pre">measure_weight_fraction_of_backbone()</span></code></a></li>

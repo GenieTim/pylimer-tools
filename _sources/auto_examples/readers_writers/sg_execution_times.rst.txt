@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:21.058** total execution time for 13 files **from auto_examples/readers_writers**:
+**00:20.960** total execution time for 13 files **from auto_examples/readers_writers**:
 
 .. container::
 
@@ -33,16 +33,16 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_memory_efficient_dump_file_reading.py` (``plot_memory_efficient_dump_file_reading.py``)
-     - 00:20.147
+     - 00:20.043
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_reader.py` (``plot_data_file_reader.py``)
-     - 00:00.211
+     - 00:00.212
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_unit_conversion.py` (``plot_unit_conversion.py``)
-     - 00:00.187
+     - 00:00.186
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_convert_trajectory_to_frame.py` (``plot_convert_trajectory_to_frame.py``)
-     - 00:00.127
+     - 00:00.136
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_time_averaged_data_reader.py` (``plot_time_averaged_data_reader.py``)
      - 00:00.068
@@ -63,7 +63,7 @@ Computation times
      - 00:00.046
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_performance_caching.py` (``plot_performance_caching.py``)
-     - 00:00.042
+     - 00:00.039
      - 0.0
    * - :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_writer.py` (``plot_data_file_writer.py``)
      - 00:00.004

@@ -375,7 +375,9 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">statistics</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pint</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">MoleculeType</span>
 
@@ -517,8 +519,7 @@
 
     <span class="c1"># assuming strand has functionality 2</span>
     <span class="n">max_formable_bonds</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
-        <span class="n">num_strands</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">num_crosslinkers</span> <span class="o">*</span>
-        <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span>
+        <span class="n">num_strands</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">num_crosslinkers</span> <span class="o">*</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">max_formable_bonds</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -557,8 +558,7 @@
     <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">determine_functionality_per_type</span><span class="p">()</span>
 
-    <span class="n">monofunctional_types</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">functionality_per_type</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">monofunctional_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">functionality_per_type</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">monofunctional_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assume the whole monofunctional chain has the same atom type</span>
@@ -567,8 +567,7 @@
             <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">crosslinker_type</span>
         <span class="p">)</span>
         <span class="n">all_atom_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">get_atom_types</span><span class="p">())</span>
-        <span class="n">atom_type_has_only_monofunctional</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">atype</span><span class="p">:</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">atype</span> <span class="ow">in</span> <span class="n">all_atom_types</span><span class="p">}</span>
+        <span class="n">atom_type_has_only_monofunctional</span> <span class="o">=</span> <span class="p">{</span><span class="n">atype</span><span class="p">:</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">atype</span> <span class="ow">in</span> <span class="n">all_atom_types</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains_with_crosslinks</span><span class="p">:</span>
             <span class="n">n_xlinks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">get_atoms_by_type</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">))</span>
             <span class="n">atom_types_in_chain</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">get_atom_types</span><span class="p">())</span>
@@ -697,8 +696,7 @@
 
 <div class="viewcode-block" id="compute_end_to_end_vectors">
 <a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_end_to_end_vectors">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">compute_end_to_end_vectors</span><span class="p">(</span>
-        <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_end_to_end_vectors</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the end to end vectors between each pair of (indirectly) connected crosslinker</span>
 
@@ -764,11 +762,9 @@
         <span class="n">f</span> <span class="o">=</span> <span class="n">functionality_per_type</span><span class="p">[</span><span class="n">crosslinker_type</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">f</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Crosslinker functionality = </span><span class="si">{}</span><span class="s2"> is not reasonable.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Crosslinker functionality = </span><span class="si">{}</span><span class="s2"> is not reasonable.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">compute_effective_crosslinker_functionality</span><span class="p">(</span>
-        <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span></div>
+    <span class="k">return</span> <span class="n">compute_effective_crosslinker_functionality</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span></div>
 
 
 
@@ -788,8 +784,7 @@
     <span class="n">junction_degrees</span> <span class="o">=</span> <span class="n">compute_effective_crosslinker_functionalities</span><span class="p">(</span>
         <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">junction_degrees</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span>
-        <span class="n">junction_degrees</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span></div>
+    <span class="k">return</span> <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">junction_degrees</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">junction_degrees</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span></div>
 
 
 
@@ -810,8 +805,7 @@
         <span class="k">return</span> <span class="p">[]</span>
     <span class="n">junctions</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_atoms_by_type</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
     <span class="n">junction_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">junctions</span><span class="p">]</span>
-    <span class="n">junction_degrees</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_bonds_of_atom</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">junction_ids</span><span class="p">]</span>
+    <span class="n">junction_degrees</span> <span class="o">=</span> <span class="p">[</span><span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_bonds_of_atom</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">junction_ids</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">junction_degrees</span></div>
 
 
@@ -832,10 +826,61 @@
 
 
 
+<div class="viewcode-block" id="compute_strand_number_density">
+<a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_strand_number_density">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_strand_number_density</span><span class="p">(</span>
+    <span class="n">mw_bifunctional</span><span class="p">:</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">density</span><span class="p">:</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">mw_monofunctional</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">b2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the strand number density of the polymer network.</span>
+
+<span class="sd">    :param mw_bifunctional: The molecular weight of the bifunctional strands</span>
+<span class="sd">    :param density: The density of the polymer network</span>
+<span class="sd">    :param mw_monofunctional: The molecular weight of the monofunctional strands. None if not present</span>
+<span class="sd">    :param b2: The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</span>
+<span class="sd">    :return: The strand number density</span>
+<span class="sd">    :rtype: pint.Quantity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mw_monofunctional</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">b2</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;If no monofunctional strands are present, b2 must be 1.0.&quot;</span>
+        <span class="k">return</span> <span class="n">density</span> <span class="o">/</span> <span class="n">mw_bifunctional</span>
+
+    <span class="k">assert</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">b2</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;b2 must be between 0 and 1.&quot;</span>
+
+    <span class="n">n_total_strands</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="mf">1e3</span>  <span class="c1"># irrelevant, cancels out, but makes the calculation easier to read</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    b2 = (2 * n_bifunctional) / (n_monofunctional + 2 * n_bifunctional)</span>
+<span class="sd">    n_total = n_bifunctional + n_monofunctional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_bifunctional</span> <span class="o">=</span> <span class="o">-</span><span class="n">b2</span> <span class="o">*</span> <span class="n">n_total_strands</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">+</span> <span class="n">b2</span><span class="p">)</span>
+    <span class="n">n_monofunctional</span> <span class="o">=</span> <span class="n">n_total_strands</span> <span class="o">-</span> <span class="n">n_bifunctional</span>
+    <span class="k">assert</span> <span class="n">math</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>
+        <span class="n">n_monofunctional</span><span class="p">,</span>
+        <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">n_total_strands</span> <span class="o">+</span> <span class="n">b2</span> <span class="o">*</span> <span class="n">n_total_strands</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">+</span> <span class="n">b2</span><span class="p">),</span>
+        <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">bifunctional_fraction</span> <span class="o">=</span> <span class="n">n_bifunctional</span> <span class="o">/</span> <span class="n">n_total_strands</span>
+    <span class="n">monofunctional_fraction</span> <span class="o">=</span> <span class="n">n_monofunctional</span> <span class="o">/</span> <span class="n">n_total_strands</span>
+
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
+        <span class="n">pint</span><span class="o">.</span><span class="n">Quantity</span><span class="p">,</span>
+        <span class="p">(</span>
+            <span class="n">bifunctional_fraction</span> <span class="o">*</span> <span class="n">density</span> <span class="o">/</span> <span class="n">mw_bifunctional</span>
+            <span class="o">+</span> <span class="n">monofunctional_fraction</span> <span class="o">*</span> <span class="n">density</span> <span class="o">/</span> <span class="n">mw_monofunctional</span>
+        <span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="measure_weight_fraction_of_backbone">
 <a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">measure_weight_fraction_of_backbone</span><span class="p">(</span>
-        <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">measure_weight_fraction_of_backbone</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the weight fraction of network backbone in infinite network</span>
 
@@ -855,8 +900,7 @@
         <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span>
     <span class="p">)</span>
 
-    <span class="n">weight_fraction_soluble</span> <span class="o">=</span> <span class="n">measure_weight_fraction_of_soluble_material</span><span class="p">(</span>
-        <span class="n">network</span><span class="p">)</span>
+    <span class="n">weight_fraction_soluble</span> <span class="o">=</span> <span class="n">measure_weight_fraction_of_soluble_material</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">weight_fraction_dangling</span> <span class="o">-</span> <span class="n">weight_fraction_soluble</span></div>
 
