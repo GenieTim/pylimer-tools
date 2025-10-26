@@ -8,7 +8,9 @@ import math
 import statistics
 import warnings
 from collections import Counter
-from typing import TYPE_CHECKING, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Sequence, Tuple, Union, cast
+
+import pint
 
 from pylimer_tools_cpp import MoleculeType
 
@@ -145,8 +147,7 @@ def compute_extent_of_reaction(
 
     # assuming strand has functionality 2
     max_formable_bonds = min(
-        num_strands * 2, num_crosslinkers *
-        functionality_per_type[crosslinker_type]
+        num_strands * 2, num_crosslinkers * functionality_per_type[crosslinker_type]
     )
 
     if max_formable_bonds == 0:
@@ -182,8 +183,7 @@ def compute_fraction_of_bifunctional_reactive_sites(
     if functionality_per_type is None:
         functionality_per_type = network.determine_functionality_per_type()
 
-    monofunctional_types = [
-        t for t, f in functionality_per_type.items() if f == 1]
+    monofunctional_types = [t for t, f in functionality_per_type.items() if f == 1]
     if len(monofunctional_types) == 0:
         """
         Assume the whole monofunctional chain has the same atom type
@@ -192,8 +192,7 @@ def compute_fraction_of_bifunctional_reactive_sites(
             crosslinker_type=crosslinker_type
         )
         all_atom_types = set(network.get_atom_types())
-        atom_type_has_only_monofunctional = {
-            atype: True for atype in all_atom_types}
+        atom_type_has_only_monofunctional = {atype: True for atype in all_atom_types}
         for chain in chains_with_crosslinks:
             n_xlinks = len(chain.get_atoms_by_type(crosslinker_type))
             atom_types_in_chain = set(chain.get_atom_types())
@@ -313,8 +312,7 @@ def compute_mean_end_to_end_vectors(
     return end_to_end_vectors
 
 
-def compute_end_to_end_vectors(
-        network: Universe, crosslinker_type: int = 2) -> dict:
+def compute_end_to_end_vectors(network: Universe, crosslinker_type: int = 2) -> dict:
     """
     Compute the end to end vectors between each pair of (indirectly) connected crosslinker
 
@@ -377,11 +375,9 @@ def compute_crosslinker_conversion(
         f = functionality_per_type[crosslinker_type]
 
     if f is None or f <= 0.0 or not math.isfinite(f):
-        raise ValueError(
-            "Crosslinker functionality = {} is not reasonable.".format(f))
+        raise ValueError("Crosslinker functionality = {} is not reasonable.".format(f))
 
-    return compute_effective_crosslinker_functionality(
-        network, crosslinker_type) / f
+    return compute_effective_crosslinker_functionality(network, crosslinker_type) / f
 
 
 def compute_effective_crosslinker_functionality(
@@ -398,8 +394,7 @@ def compute_effective_crosslinker_functionality(
     junction_degrees = compute_effective_crosslinker_functionalities(
         network, crosslinker_type
     )
-    return statistics.mean(junction_degrees) if len(
-        junction_degrees) > 0 else 0.0
+    return statistics.mean(junction_degrees) if len(junction_degrees) > 0 else 0.0
 
 
 def compute_effective_crosslinker_functionalities(
@@ -417,8 +412,7 @@ def compute_effective_crosslinker_functionalities(
         return []
     junctions = network.get_atoms_by_type(crosslinker_type)
     junction_ids = [v.get_id() for v in junctions]
-    junction_degrees = [
-        network.get_nr_of_bonds_of_atom(id) for id in junction_ids]
+    junction_degrees = [network.get_nr_of_bonds_of_atom(id) for id in junction_ids]
     return junction_degrees
 
 
@@ -435,8 +429,56 @@ def compute_weight_fractions(network: Universe) -> dict:
     return network.compute_weight_fractions()
 
 
-def measure_weight_fraction_of_backbone(
-        network: Universe, crosslinker_type: int = 2):
+def compute_strand_number_density(
+    mw_bifunctional: pint.Quantity,
+    density: pint.Quantity,
+    mw_monofunctional: Union[pint.Quantity, None] = None,
+    b2: float = 1.0,
+) -> pint.Quantity:
+    """
+    Compute the strand number density of the polymer network.
+
+    :param mw_bifunctional: The molecular weight of the bifunctional strands
+    :param density: The density of the polymer network
+    :param mw_monofunctional: The molecular weight of the monofunctional strands. None if not present
+    :param b2: The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2
+    :return: The strand number density
+    :rtype: pint.Quantity
+    """
+    if mw_monofunctional is None:
+        assert b2 == 1.0, "If no monofunctional strands are present, b2 must be 1.0."
+        return density / mw_bifunctional
+
+    assert 0.0 <= b2 <= 1.0, "b2 must be between 0 and 1."
+
+    n_total_strands = (
+        1e3  # irrelevant, cancels out, but makes the calculation easier to read
+    )
+    """
+    b2 = (2 * n_bifunctional) / (n_monofunctional + 2 * n_bifunctional)
+    n_total = n_bifunctional + n_monofunctional
+    """
+    n_bifunctional = -b2 * n_total_strands / (-2 + b2)
+    n_monofunctional = n_total_strands - n_bifunctional
+    assert math.isclose(
+        n_monofunctional,
+        2 * (-n_total_strands + b2 * n_total_strands) / (-2 + b2),
+        abs_tol=1e-6,
+    )
+
+    bifunctional_fraction = n_bifunctional / n_total_strands
+    monofunctional_fraction = n_monofunctional / n_total_strands
+
+    return cast(
+        pint.Quantity,
+        (
+            bifunctional_fraction * density / mw_bifunctional
+            + monofunctional_fraction * density / mw_monofunctional
+        ),
+    )
+
+
+def measure_weight_fraction_of_backbone(network: Universe, crosslinker_type: int = 2):
     """
     Compute the weight fraction of network backbone in infinite network
 
@@ -456,8 +498,7 @@ def measure_weight_fraction_of_backbone(
         network, crosslinker_type
     )
 
-    weight_fraction_soluble = measure_weight_fraction_of_soluble_material(
-        network)
+    weight_fraction_soluble = measure_weight_fraction_of_soluble_material(network)
 
     return 1.0 - weight_fraction_dangling - weight_fraction_soluble
 
