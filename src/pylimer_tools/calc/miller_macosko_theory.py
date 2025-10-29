@@ -48,8 +48,7 @@ def predict_shear_modulus(**kwargs) -> pint.Quantity:
     ToDo:
       - Support more than one crosslinker type (as is supported by original formula)
     """
-    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(
-        **kwargs)
+    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(**kwargs)
     return g_mmt_phantom + g_mmt_entanglement  # type: ignore
 
 
@@ -386,12 +385,10 @@ def compute_weight_fraction_of_soluble_material_from_weight_fractions(
     :param g: The functionality of the ordinary chains
     """
     alpha, _ = compute_miller_macosko_probabilities(r, p, f)
-    return w_f * (alpha**f) + w_g * \
-        ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
+    return w_f * (alpha**f) + w_g * ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
 
 
-def compute_miller_macosko_probabilities(
-        r: float, p: float, f: int, b2: float = 1.0):
+def compute_miller_macosko_probabilities(r: float, p: float, f: int, b2: float = 1.0):
     """
     Compute Macosko and Miller's probabilities :math:`P(F_A)` and :math:`P(F_B)`
     i.e., the probability that a randomly chosen A (crosslink) or B (strand-end),
@@ -437,8 +434,7 @@ def compute_miller_macosko_probabilities(
     if f == 3:
         alpha = (1 - r * p * p * b2) / (r * p * p * b2)
     elif f == 4:
-        alpha = ((1.0 / (r * p * p * b2)) - 3.0 /
-                 4.0) ** (1.0 / 2.0) - (1.0 / 2.0)
+        alpha = ((1.0 / (r * p * p * b2)) - 3.0 / 4.0) ** (1.0 / 2.0) - (1.0 / 2.0)
     else:
         if not (f > 4):
             raise NotImplementedError(
@@ -454,8 +450,7 @@ def compute_miller_macosko_probabilities(
             )
 
         def fun_to_root_for_alpha(alpha):
-            return r * b2 * p**2 * \
-                alpha ** (f - 1) - alpha - r * b2 * (p**2) + 1
+            return r * b2 * p**2 * alpha ** (f - 1) - alpha - r * b2 * (p**2) + 1
 
         def fun_to_root_for_alpha_prime(alpha):
             return -1 + alpha ** (f - 2) * (-1 + f) * (p**2) * r * b2
@@ -499,7 +494,7 @@ def compute_modulus_decomposition(
     r: Union[float, None] = None,
     p: Union[float, None] = None,
     f: Union[int, None] = None,
-    nu: Union[float, None] = None,
+    nu: Union[pint.Quantity, None] = None,
     temperature: Union[pint.Quantity, None] = None,
     functionality_per_type: Union[dict, None] = None,
     g_e_1: Union[float, None] = None,
@@ -561,7 +556,7 @@ def compute_modulus_decomposition(
 
     if temperature is None:
         temperature = (273.15 + 25) * ureg.kelvin  # Temperature in Kelvin
-    assert isinstance(temperature, ureg.Quantity)
+    assert isinstance(temperature, ureg.Quantity) and temperature.check("[temperature]")
     if g_e_1 is None:
         g_e_1 = (
             8.3145  # gas constant, J/(mol*K)
@@ -570,7 +565,18 @@ def compute_modulus_decomposition(
             * 94.79281
         ) * ureg("MPa")
         # -> MPa, melt entanglement modulus of PDMS
-    assert isinstance(g_e_1, ureg.Quantity)
+    assert isinstance(g_e_1, ureg.Quantity) and g_e_1.check("[pressure]")
+
+    # Ensure nu is a pint.Quantity.
+    if not isinstance(nu, pint.Quantity):
+        raise ValueError("nu must be a pint.Quantity.")
+
+    # If given as molar concentration, convert to number density (molecules per volume)
+    if nu.check("[substance]/[volume]"):
+        nu = nu.to("mol/meter**3").magnitude * ureg("1/meter**3") * 6.02214076e23
+
+    if not nu.check("1/[volume]"):
+        raise ValueError("nu must have dimensionality of number density (1/volume).")
 
     # Boltzmann constant
     kb = 1.380649e-23 * ureg.joule / ureg.kelvin
@@ -584,6 +590,7 @@ def compute_modulus_decomposition(
         gamma_mmt_sum += (
             (m - 2) / 2
         ) * compute_probability_that_crosslink_is_effective(f, m, alpha)
+        assert math.isfinite(gamma_mmt_sum), "Non-finite gamma_mmt_sum computed for f = {}.".format(m)
     gamma_mmt = (2 * r * b2 / f) * gamma_mmt_sum if f != 0 else 0.0
     g_mmt_phantom = gamma_mmt * nu * kb * temperature
     # fraction of elastically effective strands.
@@ -968,8 +975,7 @@ def _validate_r_and_p(r: float, p: float, f: int):
         )
     if r < 0:
         raise ValueError(
-            "The stoichiometric imbalance `r` must be positive, got {}".format(
-                r)
+            "The stoichiometric imbalance `r` must be positive, got {}".format(r)
         )
     if f < 2:
         raise ValueError(
@@ -1032,9 +1038,7 @@ _validators_assembler = [
     ),
     _ParamValidatorAssembler(
         "crosslinker_type",
-        lambda p: max(
-            p["functionality_per_type"],
-            key=p["functionality_per_type"].get),
+        lambda p: max(p["functionality_per_type"], key=p["functionality_per_type"].get),
         lambda x: isinstance(x, int) and x >= 0,
         ["functionality_per_type"],
     ),
@@ -1128,8 +1132,7 @@ def _compute_validate_parameters(
         return all(_param_is_ready(dep) for dep in param.dependencies)
 
     def _validate(param_name: str):
-        if not _validator_per_name[param_name].param_validator(
-                given_parameters[p]):
+        if not _validator_per_name[param_name].param_validator(given_parameters[p]):
             raise ValueError(
                 "Invalid value for parameter '{}' (got {}).".format(
                     param_name, given_parameters[param_name]
@@ -1142,8 +1145,7 @@ def _compute_validate_parameters(
         _validate(p)
 
     # first, determine all parameters to compute
-    to_compute = set(
-        [d for d in required_parameters if not _param_is_ready(d)])
+    to_compute = set([d for d in required_parameters if not _param_is_ready(d)])
     # add dependencies
     found_last_iteration = True
     while found_last_iteration:

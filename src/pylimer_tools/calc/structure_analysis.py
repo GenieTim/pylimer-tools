@@ -429,55 +429,6 @@ def compute_weight_fractions(network: Universe) -> dict:
     return network.compute_weight_fractions()
 
 
-def compute_strand_number_density(
-    mw_bifunctional: pint.Quantity,
-    density: pint.Quantity,
-    mw_monofunctional: Union[pint.Quantity, None] = None,
-    b2: float = 1.0,
-) -> pint.Quantity:
-    """
-    Compute the strand number density of the polymer network.
-
-    :param mw_bifunctional: The molecular weight of the bifunctional strands
-    :param density: The density of the polymer network
-    :param mw_monofunctional: The molecular weight of the monofunctional strands. None if not present
-    :param b2: The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2
-    :return: The strand number density
-    :rtype: pint.Quantity
-    """
-    if mw_monofunctional is None:
-        assert b2 == 1.0, "If no monofunctional strands are present, b2 must be 1.0."
-        return density / mw_bifunctional
-
-    assert 0.0 <= b2 <= 1.0, "b2 must be between 0 and 1."
-
-    n_total_strands = (
-        1e3  # irrelevant, cancels out, but makes the calculation easier to read
-    )
-    """
-    b2 = (2 * n_bifunctional) / (n_monofunctional + 2 * n_bifunctional)
-    n_total = n_bifunctional + n_monofunctional
-    """
-    n_bifunctional = -b2 * n_total_strands / (-2 + b2)
-    n_monofunctional = n_total_strands - n_bifunctional
-    assert math.isclose(
-        n_monofunctional,
-        2 * (-n_total_strands + b2 * n_total_strands) / (-2 + b2),
-        abs_tol=1e-6,
-    )
-
-    bifunctional_fraction = n_bifunctional / n_total_strands
-    monofunctional_fraction = n_monofunctional / n_total_strands
-
-    return cast(
-        pint.Quantity,
-        (
-            bifunctional_fraction * density / mw_bifunctional
-            + monofunctional_fraction * density / mw_monofunctional
-        ),
-    )
-
-
 def measure_weight_fraction_of_backbone(network: Universe, crosslinker_type: int = 2):
     """
     Compute the weight fraction of network backbone in infinite network
