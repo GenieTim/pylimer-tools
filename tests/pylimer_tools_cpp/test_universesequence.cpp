@@ -295,8 +295,10 @@ TEST_CASE("Universe sequence can compute things", "[UniverseSequence][entity]")
     CHECK(msdResLimited.find(1) != msdResLimited.end());
     CHECK(msdResLimited.find(2) == msdResLimited.end());
 
-    // Test with max_tau = -1 (unlimited) - should compute all possible tau values
-    auto msdResUnlimited = universeSeq.computeMsdForAtoms({ 90000 }, 1, true, -1);
+    // Test with max_tau = -1 (unlimited) - should compute all possible tau
+    // values
+    auto msdResUnlimited =
+      universeSeq.computeMsdForAtoms({ 90000 }, 1, true, -1);
     CHECK(msdResUnlimited.size() == 2);
     CHECK(msdResUnlimited.find(1) != msdResUnlimited.end());
     CHECK(msdResUnlimited.find(2) != msdResUnlimited.end());

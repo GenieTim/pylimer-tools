@@ -978,7 +978,11 @@ TEST_CASE("MEHP Force Balance2 correctly collapses melts even with random "
     CHECK(forceBalancer.getNetwork().nrOfSprings >
           forceBalancer.getNetwork().nrOfStrands);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F, 1e-6, pcm::SLESolver::DEFAULT, 1e-10, 50000));
+      pcm::StructureSimplificationMode::INACTIVE_THEN_X2F,
+      1e-6,
+      pcm::SLESolver::DEFAULT,
+      1e-10,
+      50000));
     pcm::ForceBalance2Network net = forceBalancer.getNetwork();
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
@@ -2686,7 +2690,9 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple melt systems",
          pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG,
          pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM,
        }) {
-    INFO("Testing solver: " << solver << " (" << pcm::SLESolverNames[static_cast<int>(solver)] << ")");
+    INFO("Testing solver: " << solver << " ("
+                            << pcm::SLESolverNames[static_cast<int>(solver)]
+                            << ")");
     pcm::MEHPForceBalance2 forceBalancer =
       pcm::MEHPForceBalance2(universe, 2, false);
     CHECK(forceBalancer.getNrOfSprings() == nrOfChains + 5);
