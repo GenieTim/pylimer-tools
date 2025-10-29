@@ -31,7 +31,6 @@ TEST_CASE("Atoms persist state", "[entity][Atom][header_tests]")
   REQUIRE(atom3.getType() == 2);
 }
 
-
 TEST_CASE("Atoms can calculate distances", "[entity][Atom][header_tests]")
 {
   std::cout << "Running test \"Atoms can calculate distances\"" << std::endl;
@@ -119,7 +118,8 @@ TEST_CASE("Atoms can calculate distances", "[entity][Atom][header_tests]")
   }
 }
 
-TEST_CASE("LAMMPS Atom styles resolve to correct name", "[entity][Atom][header_tests]")
+TEST_CASE("LAMMPS Atom styles resolve to correct name",
+          "[entity][Atom][header_tests]")
 {
   std::cout << "Running test \"LAMMPS Atom styles resolve to correct name\""
             << std::endl;

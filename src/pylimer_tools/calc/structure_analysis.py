@@ -8,9 +8,8 @@ import math
 import statistics
 import warnings
 from collections import Counter
-from typing import TYPE_CHECKING, Sequence, Tuple, Union, cast
+from typing import TYPE_CHECKING, Sequence, Tuple, Union
 
-import pint
 
 from pylimer_tools_cpp import MoleculeType
 

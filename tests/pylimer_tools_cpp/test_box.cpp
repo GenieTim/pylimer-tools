@@ -136,7 +136,8 @@ TEST_CASE("Box can do PBC computations", "[entity][Box][header_tests]")
   }
 }
 
-TEST_CASE("Atoms compute distances PBC correctly", "[entity][Atoms][Box][header_tests]")
+TEST_CASE("Atoms compute distances PBC correctly",
+          "[entity][Atoms][Box][header_tests]")
 {
   // related to test "Universe can be used" > "Local Density Computation"
   std::cout << "Running test \"Atoms compute distances PBC correctly\""

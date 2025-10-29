@@ -16,7 +16,6 @@ extern "C"
 namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 
-
 TEST_CASE("CsvTokenizer works", "[utils][StringUtil]")
 {
   std::cout << "Running test \"CsvTokenizer works\"" << std::endl;

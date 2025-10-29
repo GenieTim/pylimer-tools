@@ -629,8 +629,8 @@ TEST_CASE("For large systems the PBC method does not matter",
 {
   /**
    * @brief Currently, this test fails.
-   * 
-   * This might be ok, 
+   *
+   * This might be ok,
    * demonstrating that the PBC method *does* matter.
    */
   std::cout
@@ -704,13 +704,13 @@ TEST_CASE("For large systems the PBC method does not matter",
     simulator2.refreshCurrentState();
 
     REQUIRE(simulator.getUniformRandBetween0And1() ==
-          simulator2.getUniformRandBetween0And1());
+            simulator2.getUniformRandBetween0And1());
     CHECK_THAT(simulator.getTemperature(),
                Catch::Matchers::WithinRel(simulator2.getTemperature()));
     REQUIRE(simulator.getBondLengths().isApprox(simulator2.getBondLengths()));
     REQUIRE(simulator.getStressTensor().isApprox(simulator2.getStressTensor()));
     REQUIRE(simulator.getUniformRandBetween0And1() ==
-          simulator2.getUniformRandBetween0And1());
+            simulator2.getUniformRandBetween0And1());
 
     // not sure what value is sensible here...
     simulator.runSimulation(50, true);
@@ -769,7 +769,6 @@ TEST_CASE("DPD Simulator's restart files are accurate",
     simulator.setNumOmpThreads(1);
     sim2.setNumOmpThreads(1);
 #endif
-
 
     CHECK(simulator.getCoordinates().isApprox(sim2.getCoordinates()));
     CHECK(simulator.getBondLengths().isApprox(sim2.getBondLengths()));

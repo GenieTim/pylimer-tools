@@ -4,7 +4,7 @@ cd "$(dirname "$0")/.." || exit
 
 # Format C++ code
 find ./src/pylimer_tools_cpp \( -name "*.cpp" -o -name "*.h" \) -exec clang-format --style=file --fallback-style="Mozilla" -i {} \;
-find ./tests/pylimer_tools \( -name "*.cpp" -o -name "*.h" \) -exec clang-format --style=file --fallback-style="Mozilla" -i {} \;
+find ./tests/pylimer_tools_cpp \( -name "*.cpp" -o -name "*.h" \) -exec clang-format --style=file --fallback-style="Mozilla" -i {} \;
 
 # Format Python code
 python -m ruff format ./src/pylimer_tools
