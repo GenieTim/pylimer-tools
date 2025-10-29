@@ -1,13 +1,13 @@
 #include "DataFileParser.h"
 #include "../utils/StringUtils.h"
 #include "../utils/utilityMacros.h"
+#include <cassert>
 #include <filesystem>
 #include <fstream> // std::ifstream
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
-#include <cassert>
 
 namespace pylimer_tools::utils {
 

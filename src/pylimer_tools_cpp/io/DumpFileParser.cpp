@@ -2,12 +2,12 @@
 #include "../utils/StringUtils.h"
 #include "../utils/VectorUtils.h"
 #include <any>
+#include <cassert>
 #include <cstring>
 #include <filesystem>
 #include <fstream> // std::ifstream
 #include <map>
 #include <string>
-#include <cassert>
 #include <vector>
 
 namespace pylimer_tools::utils {

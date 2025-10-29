@@ -258,7 +258,8 @@ def compute_effective_nr_density_of_junctions(
     mean_volume = compute_mean_universe_volume(networks)
 
     if min_num_effective_strands == 0:
-        return len(networks[0].get_atoms_by_type(crosslinker_type)) / mean_volume
+        return len(networks[0].get_atoms_by_type(
+            crosslinker_type)) / mean_volume
 
     # get the mean end to end distances
     r_taus = compute_mean_end_to_end_distances(networks, crosslinker_type)
@@ -271,7 +272,8 @@ def compute_effective_nr_density_of_junctions(
         abs_tol = r_tau_max
 
     key_to_molecule = {}
-    for molecule in list(networks)[0].get_chains_with_crosslinker(crosslinker_type):
+    for molecule in list(networks)[
+            0].get_chains_with_crosslinker(crosslinker_type):
         key_to_molecule[molecule.get_key()] = molecule
 
     # count how many active connections each junction has
@@ -350,7 +352,8 @@ def compute_topological_factor(
         crosslinkers.sort(key=lambda a: a.get_id())
         key = molecule.get_key()
         gamma_sum += (
-            r_taus[key] * r_taus[key] / ((molecule.get_nr_of_atoms() - 2) * b * b)
+            r_taus[key] * r_taus[key] /
+            ((molecule.get_nr_of_atoms() - 2) * b * b)
         )  # -2: remove crosslinkers again (assumption 3)
 
     return gamma_sum / total_mass

@@ -6,6 +6,7 @@
 #include "../utils/LammpsAtomStyle.h"
 #include "../utils/StringUtils.h"
 #include <algorithm>
+#include <cassert>
 #include <ctime>
 #include <filesystem>
 #include <fstream>
@@ -14,7 +15,6 @@
 #include <map>
 #include <regex>
 #include <string>
-#include <cassert>
 #include <vector>
 
 namespace pylimer_tools {

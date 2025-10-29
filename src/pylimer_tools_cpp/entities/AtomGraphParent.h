@@ -10,8 +10,8 @@ extern "C"
 #include "../utils/VectorUtils.h"
 #include "Atom.h"
 #include <Eigen/Dense>
-#include <climits>
 #include <cassert>
+#include <climits>
 #include <functional>
 #include <map>
 #include <vector>
