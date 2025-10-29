@@ -110,8 +110,9 @@ def conversion_callback(gen, steps_remaining):
 
     if current_conversion >= target_conversion or current_wsol <= target_wsol:
         print(
-            f"  Target conversion {target_conversion:.1%} or soluble fraction {
-                target_wsol:.1%} reached at step {step}"
+            "  Target conversion {:.1f} or soluble fraction {:.1f} reached at step {}.".format(
+                target_conversion, target_wsol, step
+            )
         )
         return BackTrackStatus.STOP
     else:

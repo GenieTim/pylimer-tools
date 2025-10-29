@@ -80,7 +80,7 @@ Apart from the z-score, there are two more methods to configure the limit used:
 - :meth:`~pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance`
 - :meth:`~pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance`
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-104
+.. GENERATED FROM PYTHON SOURCE LINES 52-102
 
 .. code-block:: Python
 
@@ -115,9 +115,7 @@ Apart from the z-score, there are two more methods to configure the limit used:
         crosslinker_conversion=0.925)
     end_time_without = time.time()
     print(
-        f"Time without max distance: {
-            end_time_without -
-            start_time_without: .2f} seconds"
+        f"Time without max distance: {end_time_without - start_time_without: .2f} seconds"
     )
 
     generator_with_zscore.use_zscore_max_distance(3.0)
@@ -149,8 +147,8 @@ Apart from the z-score, there are two more methods to configure the limit used:
 
  .. code-block:: none
 
-    Time without max distance:  34.26 seconds
-    Time with z-score max distance: 1.57 seconds
+    Time without max distance:  34.24 seconds
+    Time with z-score max distance: 1.60 seconds
 
 
 
@@ -158,7 +156,7 @@ Apart from the z-score, there are two more methods to configure the limit used:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 36.068 seconds)
+   **Total running time of the script:** (0 minutes 36.091 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_monte_carlo_configuration.py:

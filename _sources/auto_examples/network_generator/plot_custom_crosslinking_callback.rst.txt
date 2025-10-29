@@ -69,7 +69,7 @@ Example 1: Stop at Conversion OR Soluble Fraction
 Using a callback allows for more complex logic, such as
 stopping the process based on multiple criteria as illustrated here.
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-127
+.. GENERATED FROM PYTHON SOURCE LINES 41-128
 
 .. code-block:: Python
 
@@ -145,8 +145,9 @@ stopping the process based on multiple criteria as illustrated here.
 
         if current_conversion >= target_conversion or current_wsol <= target_wsol:
             print(
-                f"  Target conversion {target_conversion:.1%} or soluble fraction {
-                    target_wsol:.1%} reached at step {step}"
+                "  Target conversion {:.1f} or soluble fraction {:.1f} reached at step {}.".format(
+                    target_conversion, target_wsol, step
+                )
             )
             return BackTrackStatus.STOP
         else:
@@ -167,13 +168,13 @@ stopping the process based on multiple criteria as illustrated here.
 
  .. code-block:: none
 
-      Target conversion 90.0% or soluble fraction 20.0% reached at step 1550
+      Target conversion 0.9 or soluble fraction 0.2 reached at step 1550.
       Final conversion: 0.775 and w_sol: 0.200
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-133
+.. GENERATED FROM PYTHON SOURCE LINES 129-134
 
 Visualizing the Results
 -----------------------
@@ -181,7 +182,7 @@ Visualizing the Results
 Let's plot the evolution of crosslinker conversion
 and soluble fraction over the steps.
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-144
+.. GENERATED FROM PYTHON SOURCE LINES 134-145
 
 .. code-block:: Python
 
@@ -211,7 +212,7 @@ and soluble fraction over the steps.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.291 seconds)
+   **Total running time of the script:** (0 minutes 1.322 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_custom_crosslinking_callback.py:
