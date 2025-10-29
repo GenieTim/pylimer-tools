@@ -5,11 +5,11 @@
 #include "Box.h"
 #include <Eigen/Dense>
 #include <algorithm>
+#include <cassert>
 #include <iostream>
 #include <map>
 #include <set>
 #include <unordered_map>
-#include <cassert>
 #include <vector>
 
 namespace pylimer_tools {

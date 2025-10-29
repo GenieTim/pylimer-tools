@@ -8,6 +8,7 @@ that analyze polymer network structures, including:
 - Weight fractions of network components (backbone, dangling chains, soluble material)
 - End-to-end distance and vector computations
 """
+
 import os
 import sys
 import unittest
@@ -18,10 +19,12 @@ from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
     compute_effective_crosslinker_functionalities,
     compute_effective_crosslinker_functionality,
-    compute_mean_end_to_end_distances, compute_mean_end_to_end_vectors,
+    compute_mean_end_to_end_distances,
+    compute_mean_end_to_end_vectors,
     measure_weight_fraction_of_backbone,
     measure_weight_fraction_of_dangling_chains,
-    measure_weight_fraction_of_soluble_material)
+    measure_weight_fraction_of_soluble_material,
+)
 from pylimer_tools_cpp import MoleculeType
 
 if __name__ == "__main__":

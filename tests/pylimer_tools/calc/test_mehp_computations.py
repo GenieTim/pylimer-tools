@@ -5,9 +5,13 @@ import unittest
 import numpy as np
 
 from pylimer_tools.calc.mehp_utilities import (
-    compute_cycle_rank, compute_effective_nr_density_of_junctions,
-    compute_effective_nr_density_of_network, compute_mean_universe_volume,
-    compute_topological_factor, predict_shear_modulus)
+    compute_cycle_rank,
+    compute_effective_nr_density_of_junctions,
+    compute_effective_nr_density_of_network,
+    compute_mean_universe_volume,
+    compute_topological_factor,
+    predict_shear_modulus,
+)
 from pylimer_tools_cpp import Universe
 
 if __name__ == "__main__":

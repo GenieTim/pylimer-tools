@@ -80,9 +80,7 @@ generator_without_zscore.link_strands_to_conversion(
     crosslinker_conversion=0.925)
 end_time_without = time.time()
 print(
-    f"Time without max distance: {
-        end_time_without -
-        start_time_without: .2f} seconds"
+    f"Time without max distance: {end_time_without - start_time_without: .2f} seconds"
 )
 
 generator_with_zscore.use_zscore_max_distance(3.0)
