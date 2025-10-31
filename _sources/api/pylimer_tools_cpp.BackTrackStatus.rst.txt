@@ -13,13 +13,9 @@ BackTrackStatus
       ~BackTrackStatus.STOP
       ~BackTrackStatus.TRACK_BACKWARD
       ~BackTrackStatus.TRACK_FORWARD
-      ~BackTrackStatus.name
-      ~BackTrackStatus.value
 
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: STOP
    .. autoattribute:: TRACK_BACKWARD
    .. autoattribute:: TRACK_FORWARD
-   .. autoattribute:: name
-   .. autoattribute:: value

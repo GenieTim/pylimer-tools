@@ -29,8 +29,22 @@ ComputedDoubleValues
       ~ComputedDoubleValues.TIME
       ~ComputedDoubleValues.TIMESTEP
       ~ComputedDoubleValues.VOLUME
-      ~ComputedDoubleValues.name
-      ~ComputedDoubleValues.value
+      ~ComputedDoubleValues.denominator
+      ~ComputedDoubleValues.imag
+      ~ComputedDoubleValues.numerator
+      ~ComputedDoubleValues.real
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ComputedDoubleValues.as_integer_ratio
+      ~ComputedDoubleValues.bit_count
+      ~ComputedDoubleValues.bit_length
+      ~ComputedDoubleValues.conjugate
+      ~ComputedDoubleValues.from_bytes
+      ~ComputedDoubleValues.is_integer
+      ~ComputedDoubleValues.to_bytes
 
    .. rubric:: Attributes Documentation
 
@@ -53,5 +67,17 @@ ComputedDoubleValues
    .. autoattribute:: TIME
    .. autoattribute:: TIMESTEP
    .. autoattribute:: VOLUME
-   .. autoattribute:: name
-   .. autoattribute:: value
+   .. autoattribute:: denominator
+   .. autoattribute:: imag
+   .. autoattribute:: numerator
+   .. autoattribute:: real
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: as_integer_ratio
+   .. automethod:: bit_count
+   .. automethod:: bit_length
+   .. automethod:: conjugate
+   .. automethod:: from_bytes
+   .. automethod:: is_integer
+   .. automethod:: to_bytes

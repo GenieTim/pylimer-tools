@@ -18,8 +18,6 @@ LinkSwappingMode
       ~LinkSwappingMode.ALL_MC_TRY_CYCLE
       ~LinkSwappingMode.NO_SWAPPING
       ~LinkSwappingMode.SLIPLINKS_ONLY
-      ~LinkSwappingMode.name
-      ~LinkSwappingMode.value
 
    .. rubric:: Attributes Documentation
 
@@ -31,5 +29,3 @@ LinkSwappingMode
    .. autoattribute:: ALL_MC_TRY_CYCLE
    .. autoattribute:: NO_SWAPPING
    .. autoattribute:: SLIPLINKS_ONLY
-   .. autoattribute:: name
-   .. autoattribute:: value

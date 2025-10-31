@@ -15,8 +15,6 @@ StructureSimplificationMode
       ~StructureSimplificationMode.NO_SIMPLIFICATION
       ~StructureSimplificationMode.X1F_X2F_THEN_INACTIVE
       ~StructureSimplificationMode.X2F_ONLY
-      ~StructureSimplificationMode.name
-      ~StructureSimplificationMode.value
 
    .. rubric:: Attributes Documentation
 
@@ -25,5 +23,3 @@ StructureSimplificationMode
    .. autoattribute:: NO_SIMPLIFICATION
    .. autoattribute:: X1F_X2F_THEN_INACTIVE
    .. autoattribute:: X2F_ONLY
-   .. autoattribute:: name
-   .. autoattribute:: value

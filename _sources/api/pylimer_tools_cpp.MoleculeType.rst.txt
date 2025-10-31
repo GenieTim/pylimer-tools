@@ -15,8 +15,6 @@ MoleculeType
       ~MoleculeType.NETWORK_STRAND
       ~MoleculeType.PRIMARY_LOOP
       ~MoleculeType.UNDEFINED
-      ~MoleculeType.name
-      ~MoleculeType.value
 
    .. rubric:: Attributes Documentation
 
@@ -25,5 +23,3 @@ MoleculeType
    .. autoattribute:: NETWORK_STRAND
    .. autoattribute:: PRIMARY_LOOP
    .. autoattribute:: UNDEFINED
-   .. autoattribute:: name
-   .. autoattribute:: value

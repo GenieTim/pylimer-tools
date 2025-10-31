@@ -18,8 +18,22 @@ ComputedIntValues
       ~ComputedIntValues.NUM_RELOC
       ~ComputedIntValues.NUM_SHIFT
       ~ComputedIntValues.STEP
-      ~ComputedIntValues.name
-      ~ComputedIntValues.value
+      ~ComputedIntValues.denominator
+      ~ComputedIntValues.imag
+      ~ComputedIntValues.numerator
+      ~ComputedIntValues.real
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ComputedIntValues.as_integer_ratio
+      ~ComputedIntValues.bit_count
+      ~ComputedIntValues.bit_length
+      ~ComputedIntValues.conjugate
+      ~ComputedIntValues.from_bytes
+      ~ComputedIntValues.is_integer
+      ~ComputedIntValues.to_bytes
 
    .. rubric:: Attributes Documentation
 
@@ -31,5 +45,17 @@ ComputedIntValues
    .. autoattribute:: NUM_RELOC
    .. autoattribute:: NUM_SHIFT
    .. autoattribute:: STEP
-   .. autoattribute:: name
-   .. autoattribute:: value
+   .. autoattribute:: denominator
+   .. autoattribute:: imag
+   .. autoattribute:: numerator
+   .. autoattribute:: real
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: as_integer_ratio
+   .. automethod:: bit_count
+   .. automethod:: bit_length
+   .. automethod:: conjugate
+   .. automethod:: from_bytes
+   .. automethod:: is_integer
+   .. automethod:: to_bytes

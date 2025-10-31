@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:37.503** total execution time for 9 files **from auto_examples/network_generator**:
+**00:01.282** total execution time for 9 files **from auto_examples/network_generator**:
 
 .. container::
 
@@ -32,16 +32,13 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_examples_network_generator_plot_monte_carlo_configuration.py` (``plot_monte_carlo_configuration.py``)
-     - 00:36.091
-     - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_custom_crosslinking_callback.py` (``plot_custom_crosslinking_callback.py``)
-     - 00:01.322
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_network_generator_plot_tetra_peg_network.py` (``plot_tetra_peg_network.py``)
-     - 00:00.090
+     - 00:01.282
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_add_angles.py` (``plot_add_angles.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_network_generator_plot_monte_carlo_configuration.py` (``plot_monte_carlo_configuration.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_multi_component_system.py` (``plot_multi_component_system.py``)
@@ -54,6 +51,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_simple_crosslinked_network.py` (``plot_simple_crosslinked_network.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_network_generator_plot_tetra_peg_network.py` (``plot_tetra_peg_network.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_vulcanized_network.py` (``plot_vulcanized_network.py``)

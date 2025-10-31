@@ -58,23 +58,6 @@ Here, we distinguish the following three different implementations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation (see :citegusev_numerical_2019) without slip-links or entanglements.">
-
-.. only:: html
-
-  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Maximum Entropy Homogenization Procedure (MEHP)</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of polydispersity on the shear modulus of end-linked polymer networks.">
 
 .. only:: html
@@ -107,6 +90,23 @@ Here, we distinguish the following three different implementations:
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation (see :citegusev_numerical_2019) without slip-links or entanglements.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Maximum Entropy Homogenization Procedure (MEHP)</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -119,7 +119,7 @@ Here, we distinguish the following three different implementations:
 
    /auto_examples/force_balance/plot_force_balance_2
    /auto_examples/force_balance/plot_force_balance
-   /auto_examples/force_balance/plot_force_relaxation
    /auto_examples/force_balance/plot_polydispersity_study
    /auto_examples/force_balance/plot_fb_deformation_exp
+   /auto_examples/force_balance/plot_force_relaxation
 

@@ -17,7 +17,9 @@ NonGaussianSpringForceEvaluator
 
    .. autosummary::
 
+      ~NonGaussianSpringForceEvaluator.evaluate_force_set_gradient
       ~NonGaussianSpringForceEvaluator.evaluate_stress_contribution
+      ~NonGaussianSpringForceEvaluator.prepare_for_evaluations
 
    .. rubric:: Attributes Documentation
 
@@ -26,4 +28,6 @@ NonGaussianSpringForceEvaluator
 
    .. rubric:: Methods Documentation
 
+   .. automethod:: evaluate_force_set_gradient
    .. automethod:: evaluate_stress_contribution
+   .. automethod:: prepare_for_evaluations

@@ -18,8 +18,22 @@ ExitReason
       ~ExitReason.OTHER
       ~ExitReason.UNSET
       ~ExitReason.X_TOLERANCE
-      ~ExitReason.name
-      ~ExitReason.value
+      ~ExitReason.denominator
+      ~ExitReason.imag
+      ~ExitReason.numerator
+      ~ExitReason.real
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ExitReason.as_integer_ratio
+      ~ExitReason.bit_count
+      ~ExitReason.bit_length
+      ~ExitReason.conjugate
+      ~ExitReason.from_bytes
+      ~ExitReason.is_integer
+      ~ExitReason.to_bytes
 
    .. rubric:: Attributes Documentation
 
@@ -31,5 +45,17 @@ ExitReason
    .. autoattribute:: OTHER
    .. autoattribute:: UNSET
    .. autoattribute:: X_TOLERANCE
-   .. autoattribute:: name
-   .. autoattribute:: value
+   .. autoattribute:: denominator
+   .. autoattribute:: imag
+   .. autoattribute:: numerator
+   .. autoattribute:: real
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: as_integer_ratio
+   .. automethod:: bit_count
+   .. automethod:: bit_length
+   .. automethod:: conjugate
+   .. automethod:: from_bytes
+   .. automethod:: is_integer
+   .. automethod:: to_bytes

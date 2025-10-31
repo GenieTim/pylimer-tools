@@ -30,8 +30,6 @@ SLESolver
       ~SLESolver.SIMPLICIAL_LLT
       ~SLESolver.SPARSE_LU
       ~SLESolver.SPARSE_QR
-      ~SLESolver.name
-      ~SLESolver.value
 
    .. rubric:: Attributes Documentation
 
@@ -55,5 +53,3 @@ SLESolver
    .. autoattribute:: SIMPLICIAL_LLT
    .. autoattribute:: SPARSE_LU
    .. autoattribute:: SPARSE_QR
-   .. autoattribute:: name
-   .. autoattribute:: value

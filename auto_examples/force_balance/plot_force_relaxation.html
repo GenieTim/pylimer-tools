@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/force_balance/plot_force_relaxation.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="This example demonstrates how to use the “original” MEHP implementation (see Gusev [ Gus19]) without slip-links or entanglements., Total running time of the script:(0 minutes 0.309 seconds) Downloa..." />
+<meta property="og:description" content="This example demonstrates how to use the “original” MEHP implementation (see Gusev [ Gus19]) without slip-links or entanglements., Total running time of the script:(0 minutes 4.425 seconds) Downloa..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
 <meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_force_balance_plot_force_relaxation_e8591cb8.png" />
-<meta property="og:image:alt" content="This example demonstrates how to use the “original” MEHP implementation (see Gusev [ Gus19]) without slip-links or entanglements., Total running time of the script:(0 minutes 0.309 seconds) Downloa..." />
-<meta name="description" content="This example demonstrates how to use the “original” MEHP implementation (see Gusev [ Gus19]) without slip-links or entanglements., Total running time of the script:(0 minutes 0.309 seconds) Downloa..." />
+<meta property="og:image:alt" content="This example demonstrates how to use the “original” MEHP implementation (see Gusev [ Gus19]) without slip-links or entanglements., Total running time of the script:(0 minutes 4.425 seconds) Downloa..." />
+<meta name="description" content="This example demonstrates how to use the “original” MEHP implementation (see Gusev [ Gus19]) without slip-links or entanglements., Total running time of the script:(0 minutes 4.425 seconds) Downloa..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -20,7 +20,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="pylimer-tools" />
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
-<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Polydispersity Study" href="plot_polydispersity_study.html"><link rel="prev" title="Force Balance" href="plot_force_balance.html">
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Network Generation" href="../network_generator/index.html"><link rel="prev" title="Deformation Experiment" href="plot_fb_deformation_exp.html">
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
         <title>Maximum Entropy Homogenization Procedure (MEHP) - pylimer-tools</title>
@@ -233,9 +233,9 @@
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="plot_force_balance_2.html">Force Balance 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_force_balance.html">Force Balance</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -403,7 +403,8 @@ to download the full example code.</p>
 the “original” MEHP implementation (see <span id="id1">Gusev [<a class="reference internal" href="../../acknowledgements.html#id7" title="Andrei A. Gusev. Numerical Estimates of the Topological Effects in the Elasticity of Gaussian Polymer Networks and Their Exact Theoretical Description. Macromolecules, 52(9):3244–3251, May 2019. doi:10.1021/acs.macromol.9b00262.">Gus19</a>]</span>)
 without slip-links or entanglements.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Phantom Shear Modulus [MPa]:  0.006117500031984316
-Phantom Shear Modulus [MPa]:  0.006117508589323436
+Phantom Shear Modulus [MPa] (Langevin):  0.006117508589323436
+Phantom Shear Modulus [MPa] (Custom Evaluator):  0.006117500021057896
 </pre></div>
 </div>
 <div class="line-block">
@@ -423,7 +424,59 @@ Phantom Shear Modulus [MPa]:  0.006117508589323436
     <a href="../../api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html#pylimer_tools_cpp.NonGaussianSpringForceEvaluator" title="pylimer_tools_cpp.NonGaussianSpringForceEvaluator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">NonGaussianSpringForceEvaluator</span></a><span class="p">,</span>
     <a href="../../api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator" title="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">SimpleSpringMEHPForceEvaluator</span></a><span class="p">,</span>
     <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">Universe</span></a><span class="p">,</span>
+    <a href="../../api/pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.MEHPForceEvaluator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">MEHPForceEvaluator</span></a><span class="p">,</span>
 <span class="p">)</span>
+
+
+<span class="c1"># Example: Custom Force Evaluator (see also tests)</span>
+<span class="c1"># This particular example is insofar a bad example, as it is already</span>
+<span class="c1"># implemented faster (no Python&lt;&gt;C++ back &amp; forth every time) in the</span>
+<span class="c1"># SimpleSpringMEHPForceEvaluator.</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomForceEvaluator</span><span class="p">(</span><a href="../../api/pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.MEHPForceEvaluator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">MEHPForceEvaluator</span></a><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A custom force evaluator that implements a simple harmonic spring.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kappa</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span> <span class="o">=</span> <span class="n">kappa</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_force_set_gradient</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">spring_distances</span><span class="p">,</span> <span class="n">compute_gradient</span><span class="p">):</span>
+        <span class="n">network</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span>
+        <span class="n">nr_springs</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">nr_of_springs</span>
+        <span class="n">force</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nr_springs</span><span class="p">):</span>
+            <span class="n">spring_vec</span> <span class="o">=</span> <span class="n">spring_distances</span><span class="p">[</span><span class="mi">3</span> <span class="o">*</span> <span class="n">i</span><span class="p">:</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span>
+            <span class="n">r_squared</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.sum.html#numpy.sum" title="numpy.sum" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">sum</span></a><span class="p">(</span><span class="n">spring_vec</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">contour_length</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">spring_contour_length</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">force</span> <span class="o">+=</span> <span class="n">r_squared</span> <span class="o">/</span> <span class="n">contour_length</span>
+        <span class="n">force</span> <span class="o">*=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span>
+        <span class="n">gradient</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">compute_gradient</span><span class="p">:</span>
+            <span class="n">gradient</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
+            <span class="n">nrOfDim</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_2d</span> <span class="k">else</span> <span class="mi">3</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nr_springs</span><span class="p">):</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">spring_index_a</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">spring_index_b</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">contour_length</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">spring_contour_length</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">dir_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nrOfDim</span><span class="p">):</span>
+                    <span class="n">spring_dist</span> <span class="o">=</span> <span class="n">spring_distances</span><span class="p">[</span><span class="mi">3</span> <span class="o">*</span> <span class="n">j</span> <span class="o">+</span> <span class="n">dir_idx</span><span class="p">]</span>
+                    <span class="n">grad_term</span> <span class="o">=</span> <span class="n">spring_dist</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span> <span class="o">/</span> <span class="n">contour_length</span>
+                    <span class="n">gradient</span><span class="p">[</span><span class="mi">3</span> <span class="o">*</span> <span class="n">a</span> <span class="o">+</span> <span class="n">dir_idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">grad_term</span>
+                    <span class="n">gradient</span><span class="p">[</span><span class="mi">3</span> <span class="o">*</span> <span class="n">b</span> <span class="o">+</span> <span class="n">dir_idx</span><span class="p">]</span> <span class="o">-=</span> <span class="n">grad_term</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">gradient</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_stress_contribution</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spring_distances</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">spring_index</span><span class="p">):</span>
+        <span class="n">network</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span>
+        <span class="n">contour_length</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">spring_contour_length</span><span class="p">[</span><span class="n">spring_index</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span> <span class="o">*</span> <span class="n">spring_distances</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> \
+            <span class="n">spring_distances</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">contour_length</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_for_evaluations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
 
 <span class="c1"># Load your network (replace with your file)</span>
 <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">universe</span></a> <span class="o">=</span> <a href="../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_data_file" title="pylimer_tools.io.read_lammps_output_file.read_data_file" class="sphx-glr-backref-module-pylimer_tools-io-read_lammps_output_file sphx-glr-backref-type-py-function"><span class="n">read_data_file</span></a><span class="p">(</span>
@@ -473,12 +526,28 @@ Phantom Shear Modulus [MPa]:  0.006117508589323436
     <span class="o">/</span> <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_volume" title="pylimer_tools_cpp.Universe.get_volume" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">universe</span><span class="o">.</span><span class="n">get_volume</span></a><span class="p">()</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span>
-    <span class="s2">&quot;Phantom Shear Modulus [MPa]: &quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Phantom Shear Modulus [MPa] (Langevin): &quot;</span><span class="p">,</span>
+    <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">shear_modulus</span></a><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># 3. MEHPForceRelaxation with Custom Force Evaluator</span>
+<span class="n">custom_evaluator</span> <span class="o">=</span> <a href="../../api/pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.MEHPForceEvaluator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">CustomForceEvaluator</span></a><span class="p">(</span><span class="n">kappa</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<a href="../../api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mehp_relax</span></a> <span class="o">=</span> <a href="../../api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">MEHPForceRelaxation</span></a><span class="p">(</span><a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">universe</span></a><span class="p">)</span>
+<a href="../../api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.set_force_evaluator" title="pylimer_tools_cpp.MEHPForceRelaxation.set_force_evaluator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">mehp_relax</span><span class="o">.</span><span class="n">set_force_evaluator</span></a><span class="p">(</span><span class="n">custom_evaluator</span><span class="p">)</span>
+<span class="k">while</span> <a href="../../api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.requires_another_run" title="pylimer_tools_cpp.MEHPForceRelaxation.requires_another_run" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">mehp_relax</span><span class="o">.</span><span class="n">requires_another_run</span></a><span class="p">():</span>
+    <a href="../../api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation" title="pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">mehp_relax</span><span class="o">.</span><span class="n">run_force_relaxation</span></a><span class="p">()</span>
+<a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">shear_modulus</span></a> <span class="o">=</span> <span class="p">(</span>
+    <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gamma_conversion_factor</span></a>
+    <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.sum.html#numpy.sum" title="numpy.sum" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">sum</span></a><span class="p">(</span><a href="../../api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factors" title="pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factors" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">mehp_relax</span><span class="o">.</span><span class="n">get_gamma_factors</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">r02_slope_magnitude</span></a><span class="p">))</span>
+    <span class="o">/</span> <a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_volume" title="pylimer_tools_cpp.Universe.get_volume" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">universe</span><span class="o">.</span><span class="n">get_volume</span></a><span class="p">()</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Phantom Shear Modulus [MPa] (Custom Evaluator): &quot;</span><span class="p">,</span>
     <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">shear_modulus</span></a><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.309 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 4.425 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-force-balance-plot-force-relaxation-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/8a3b73ff619f54b0e90bf2cc3f37e6a9/plot_force_relaxation.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_force_relaxation.ipynb</span></code></a></p>
@@ -498,23 +567,23 @@ Phantom Shear Modulus [MPa]:  0.006117508589323436
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="plot_polydispersity_study.html">
+          <a class="next-page" href="../network_generator/index.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Polydispersity Study</div>
+                <div class="title">Network Generation</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="plot_force_balance.html">
+          <a class="prev-page" href="plot_fb_deformation_exp.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Force Balance</div>
+                <div class="title">Deformation Experiment</div>
                 
               </div>
             </a>

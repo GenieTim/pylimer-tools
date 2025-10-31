@@ -231,9 +231,9 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -430,8 +430,14 @@ and <span class="math notranslate nohighlight">\(\scriptL^{-1}\)</span> the inve
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution" title="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_stress_contribution</span></code></a>(self, ...)</p></td>
-<td><p>An evaluation of the stress-contribution.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_force_set_gradient" title="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_force_set_gradient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_force_set_gradient</span></code></a>(self, n, ...[, ...])</p></td>
+<td><p>Evaluate the force and optionally compute its gradient.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution" title="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_stress_contribution</span></code></a>(self, ...)</p></td>
+<td><p>Evaluate the stress-contribution for a single spring.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.prepare_for_evaluations" title="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.prepare_for_evaluations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_for_evaluations</span></code></a>(self)</p></td>
+<td><p>Prepare the evaluator for a series of evaluations.</p></td>
 </tr>
 </tbody>
 </table>
@@ -449,18 +455,66 @@ and <span class="math notranslate nohighlight">\(\scriptL^{-1}\)</span> the inve
 
 <p class="rubric">Methods Documentation</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution">
-<span class="sig-name descname"><span class="pre">evaluate_stress_contribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.MEHPForceEvaluator"><span class="pre">pylimer_tools_cpp.MEHPForceEvaluator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_distances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsFloat" title="(in Python v3.14)"><span class="pre">SupportsFloat</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.14)"><span class="pre">SupportsInt</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.14)"><span class="pre">SupportsInt</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.14)"><span class="pre">SupportsInt</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution" title="Link to this definition">¶</a></dt>
-<dd><p>An evaluation of the stress-contribution.</p>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_force_set_gradient">
+<span class="sig-name descname"><span class="pre">evaluate_force_set_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.MEHPForceEvaluator"><span class="pre">pylimer_tools_cpp.MEHPForceEvaluator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.14)"><span class="pre">SupportsInt</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_distances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.ArrayLike</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.float64</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">1]'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_gradient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_force_set_gradient" title="Link to this definition">¶</a></dt>
+<dd><p>Evaluate the force and optionally compute its gradient.</p>
+<p>This is one of the primary methods to override when creating a
+custom force evaluator. Override this in Python by defining a method
+that returns a tuple of (force, gradient).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>springDistances</strong> – The three coordinate differences for one spring.</p></li>
-<li><p><strong>i</strong> – The row index of the stress tensor</p></li>
-<li><p><strong>j</strong> – The column index of the stress tensor</p></li>
+<li><p><strong>n</strong> – The dimensionality of the problem (the number of coordinates)</p></li>
+<li><p><strong>spring_distances</strong> – The sequential (x, y, z) spring distances as a vector</p></li>
+<li><p><strong>compute_gradient</strong> – If True, the gradient should be computed and returned</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple (force, gradient) where:
+- force: The computed force value (float)
+- gradient: The gradient as a list (or None if compute_gradient was False)</p>
+</dd>
 </dl>
+<p>Example implementation in Python:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">evaluate_force_set_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">spring_distances</span><span class="p">,</span> <span class="n">compute_gradient</span><span class="p">):</span>
+    <span class="n">force</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="c1"># ... compute force ...</span>
+
+    <span class="n">gradient</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">compute_gradient</span><span class="p">:</span>
+        <span class="n">gradient</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
+        <span class="c1"># ... compute gradient ...</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">gradient</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution">
+<span class="sig-name descname"><span class="pre">evaluate_stress_contribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.MEHPForceEvaluator"><span class="pre">pylimer_tools_cpp.MEHPForceEvaluator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_distances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsFloat" title="(in Python v3.14)"><span class="pre">SupportsFloat</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.14)"><span class="pre">SupportsInt</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.14)"><span class="pre">SupportsInt</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.14)"><span class="pre">SupportsInt</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution" title="Link to this definition">¶</a></dt>
+<dd><p>Evaluate the stress-contribution for a single spring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spring_distances</strong> – The three coordinate differences for one spring (list of 3 floats)</p></li>
+<li><p><strong>i</strong> – The row index of the stress tensor</p></li>
+<li><p><strong>j</strong> – The column index of the stress tensor</p></li>
+<li><p><strong>spring_index</strong> – The index of the spring being evaluated</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The stress contribution value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.prepare_for_evaluations">
+<span class="sig-name descname"><span class="pre">prepare_for_evaluations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.MEHPForceEvaluator"><span class="pre">pylimer_tools_cpp.MEHPForceEvaluator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.prepare_for_evaluations" title="Link to this definition">¶</a></dt>
+<dd><p>Prepare the evaluator for a series of evaluations.
+This method is called before a batch of force evaluations,
+allowing for any necessary setup or precomputation.</p>
 </dd></dl>
 
 </dd></dl>
@@ -526,7 +580,9 @@ and <span class="math notranslate nohighlight">\(\scriptL^{-1}\)</span> the inve
 <li><a class="reference internal" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator"><code class="docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator</span></code></a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.is_2d"><code class="docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator.is_2d</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.network"><code class="docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator.network</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_force_set_gradient"><code class="docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator.evaluate_force_set_gradient()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluate_stress_contribution"><code class="docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator.evaluate_stress_contribution()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NonGaussianSpringForceEvaluator.prepare_for_evaluations"><code class="docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator.prepare_for_evaluations()</span></code></a></li>
 </ul>
 </li>
 </ul>

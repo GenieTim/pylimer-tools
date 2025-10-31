@@ -17,7 +17,9 @@ SimpleSpringMEHPForceEvaluator
 
    .. autosummary::
 
+      ~SimpleSpringMEHPForceEvaluator.evaluate_force_set_gradient
       ~SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution
+      ~SimpleSpringMEHPForceEvaluator.prepare_for_evaluations
 
    .. rubric:: Attributes Documentation
 
@@ -26,4 +28,6 @@ SimpleSpringMEHPForceEvaluator
 
    .. rubric:: Methods Documentation
 
+   .. automethod:: evaluate_force_set_gradient
    .. automethod:: evaluate_stress_contribution
+   .. automethod:: prepare_for_evaluations

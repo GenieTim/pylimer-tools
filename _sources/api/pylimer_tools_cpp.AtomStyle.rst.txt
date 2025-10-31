@@ -39,8 +39,6 @@ AtomStyle
       ~AtomStyle.TEMPLATE
       ~AtomStyle.TRI
       ~AtomStyle.WAVEPACKET
-      ~AtomStyle.name
-      ~AtomStyle.value
 
    .. rubric:: Attributes Documentation
 
@@ -73,5 +71,3 @@ AtomStyle
    .. autoattribute:: TEMPLATE
    .. autoattribute:: TRI
    .. autoattribute:: WAVEPACKET
-   .. autoattribute:: name
-   .. autoattribute:: value

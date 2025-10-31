@@ -231,9 +231,9 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -394,32 +394,9 @@
 <h1>SLESolver<a class="headerlink" href="#slesolver" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">SLESolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.SLESolver" title="pylimer_tools_cpp.SLESolver"><span class="pre">pylimer_tools_cpp.SLESolver</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.SupportsInt" title="(in Python v3.14)"><span class="pre">SupportsInt</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.SLESolver" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">SLESolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.SLESolver" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>Solver for sparse linear equation systems</p>
-<p>Members:</p>
-<blockquote>
-<div><p>DEFAULT : default</p>
-<p>SIMPLICIAL_LLT : SimplicialLLT</p>
-<p>SIMPLICIAL_LDLT : SimplicialLDLT</p>
-<p>SPARSE_LU : SparseLU</p>
-<p>SPARSE_QR : SparseQR</p>
-<p>CONJUGATE_GRADIENT : ConjugateGradient</p>
-<p>CONJUGATE_GRADIENT_DIAGONALIZED : ConjugateGradient, DiagonalPreconditioner</p>
-<p>CONJUGATE_GRADIENT_IDENTITY : ConjugateGradient, IdentityPreconditioner</p>
-<p>CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY : ConjugateGradient, IncompleteCholeskyPreconditioner</p>
-<p>LEAST_SQUARES_CONJUGATE_GRADIENT : LeastSquaresConjugateGradient</p>
-<p>LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED : LeastSquaresConjugateGradient, DiagonalPreconditioner</p>
-<p>LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY : LeastSquaresConjugateGradient, IdentityPreconditioner</p>
-<p>BICGSTAB : BiCGSTAB</p>
-<p>BICGSTAB_DIAGONALIZED : BiCGSTAB, DiagonalPreconditioner</p>
-<p>BICGSTAB_IDENTITY : BiCGSTAB, IdentityPreconditioner</p>
-<p>BICGSTAB_INCOMPLETE_LU : BiCGSTAB, IncompleteLUTPreconditioner</p>
-<p>GRADIENT_DESCENT : GradientDescent</p>
-<p>GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT : GradientDescent (Barzilai-Borwein method, short time-step)</p>
-<p>GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG : GradientDescent (Barzilai-Borwein method, long time-step)</p>
-<p>GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM : GradientDescent (Barzilai-Borwein &amp; heavy ball method, selective time-step)</p>
-</div></blockquote>
 <p class="rubric">Attributes Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -484,124 +461,108 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SPARSE_QR" title="pylimer_tools_cpp.SLESolver.SPARSE_QR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPARSE_QR</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.name" title="pylimer_tools_cpp.SLESolver.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.value" title="pylimer_tools_cpp.SLESolver.value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code></a></p></td>
-<td><p></p></td>
-</tr>
 </tbody>
 </table>
 </div>
 <p class="rubric">Attributes Documentation</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.BICGSTAB">
-<span class="sig-name descname"><span class="pre">BICGSTAB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.BICGSTAB:</span> <span class="pre">12&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BICGSTAB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.BICGSTAB_DIAGONALIZED">
-<span class="sig-name descname"><span class="pre">BICGSTAB_DIAGONALIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.BICGSTAB_DIAGONALIZED:</span> <span class="pre">13&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_DIAGONALIZED" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BICGSTAB_DIAGONALIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">13</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_DIAGONALIZED" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.BICGSTAB_IDENTITY">
-<span class="sig-name descname"><span class="pre">BICGSTAB_IDENTITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.BICGSTAB_IDENTITY:</span> <span class="pre">14&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_IDENTITY" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BICGSTAB_IDENTITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">14</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_IDENTITY" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.BICGSTAB_INCOMPLETE_LU">
-<span class="sig-name descname"><span class="pre">BICGSTAB_INCOMPLETE_LU</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.BICGSTAB_INCOMPLETE_LU:</span> <span class="pre">15&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_INCOMPLETE_LU" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BICGSTAB_INCOMPLETE_LU</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.BICGSTAB_INCOMPLETE_LU" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT">
-<span class="sig-name descname"><span class="pre">CONJUGATE_GRADIENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.CONJUGATE_GRADIENT:</span> <span class="pre">5&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">CONJUGATE_GRADIENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED">
-<span class="sig-name descname"><span class="pre">CONJUGATE_GRADIENT_DIAGONALIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED:</span> <span class="pre">6&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">CONJUGATE_GRADIENT_DIAGONALIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_IDENTITY">
-<span class="sig-name descname"><span class="pre">CONJUGATE_GRADIENT_IDENTITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.CONJUGATE_GRADIENT_IDENTITY:</span> <span class="pre">7&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_IDENTITY" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">CONJUGATE_GRADIENT_IDENTITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_IDENTITY" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY">
-<span class="sig-name descname"><span class="pre">CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY:</span> <span class="pre">8&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.DEFAULT">
-<span class="sig-name descname"><span class="pre">DEFAULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.DEFAULT:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.DEFAULT" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DEFAULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.DEFAULT" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT">
-<span class="sig-name descname"><span class="pre">GRADIENT_DESCENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.GRADIENT_DESCENT:</span> <span class="pre">16&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GRADIENT_DESCENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">16</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG">
-<span class="sig-name descname"><span class="pre">GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG:</span> <span class="pre">18&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">18</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM">
-<span class="sig-name descname"><span class="pre">GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM:</span> <span class="pre">19&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">19</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT">
-<span class="sig-name descname"><span class="pre">GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT:</span> <span class="pre">17&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">17</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT">
-<span class="sig-name descname"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT:</span> <span class="pre">9&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED">
-<span class="sig-name descname"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED:</span> <span class="pre">10&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY">
-<span class="sig-name descname"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY:</span> <span class="pre">11&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">11</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.SIMPLICIAL_LDLT">
-<span class="sig-name descname"><span class="pre">SIMPLICIAL_LDLT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.SIMPLICIAL_LDLT:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LDLT" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SIMPLICIAL_LDLT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LDLT" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT">
-<span class="sig-name descname"><span class="pre">SIMPLICIAL_LLT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.SIMPLICIAL_LLT:</span> <span class="pre">1&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SIMPLICIAL_LLT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.SPARSE_LU">
-<span class="sig-name descname"><span class="pre">SPARSE_LU</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.SPARSE_LU:</span> <span class="pre">3&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SPARSE_LU" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SPARSE_LU</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SPARSE_LU" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.SPARSE_QR">
-<span class="sig-name descname"><span class="pre">SPARSE_QR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SLESolver.SPARSE_QR:</span> <span class="pre">4&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SPARSE_QR" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.name">
-<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.name" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.SLESolver.value">
-<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.value" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SPARSE_QR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#pylimer_tools_cpp.SLESolver.SPARSE_QR" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -685,8 +646,6 @@
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT"><code class="docutils literal notranslate"><span class="pre">SLESolver.SIMPLICIAL_LLT</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SPARSE_LU"><code class="docutils literal notranslate"><span class="pre">SLESolver.SPARSE_LU</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.SPARSE_QR"><code class="docutils literal notranslate"><span class="pre">SLESolver.SPARSE_QR</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.name"><code class="docutils literal notranslate"><span class="pre">SLESolver.name</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.SLESolver.value"><code class="docutils literal notranslate"><span class="pre">SLESolver.value</span></code></a></li>
 </ul>
 </li>
 </ul>
