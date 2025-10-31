@@ -15,7 +15,7 @@ using namespace pylimer_tools::topo::entanglement_detection;
 void
 init_pylimer_bound_topo(py::module_& m)
 {
-  py::class_<AtomPairEntanglements>(
+  py::class_<AtomPairEntanglements, py::smart_holder>(
     m, "AtomPairEntanglements", py::module_local(), R"pbdoc(
       A struct to store pairs of atoms that are close together and could be entanglements.
     )pbdoc")

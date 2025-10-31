@@ -23,11 +23,12 @@ class CustomForceEvaluator(MEHPForceEvaluator):
         super().__init__()
         self.kappa = kappa
 
-    def evaluate_force_set_gradient(self, n, spring_distances, compute_gradient):
+    def evaluate_force_set_gradient(
+            self, n, spring_distances, compute_gradient):
         """
         Evaluate force as 0.5 * kappa * sum(r_i^2 / N_i)
         where r_i is the spring length and N_i is the contour length.
-        
+
         Returns a tuple (force, gradient) where gradient is a list or None.
         """
         network = self.network
@@ -36,7 +37,7 @@ class CustomForceEvaluator(MEHPForceEvaluator):
         # Compute force
         force = 0.0
         for i in range(nr_springs):
-            spring_vec = spring_distances[3 * i:3 * i + 3]
+            spring_vec = spring_distances[3 * i: 3 * i + 3]
             r_squared = np.sum(spring_vec**2)
             contour_length = network.spring_contour_length[i]
             force += r_squared / contour_length
@@ -61,13 +62,15 @@ class CustomForceEvaluator(MEHPForceEvaluator):
 
         return (force, gradient)
 
-    def evaluate_stress_contribution(self, spring_distances, i, j, spring_index):
+    def evaluate_stress_contribution(
+            self, spring_distances, i, j, spring_index):
         """
         Evaluate stress contribution for spring at given indices.
         """
         network = self.network
         contour_length = network.spring_contour_length[spring_index]
-        return self.kappa * spring_distances[i] * spring_distances[j] / contour_length
+        return self.kappa * spring_distances[i] * \
+            spring_distances[j] / contour_length
 
     def prepare_for_evaluations(self):
         """Prepare any necessary data before evaluations."""

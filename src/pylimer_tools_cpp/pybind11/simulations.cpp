@@ -13,6 +13,7 @@
 #include <cassert>
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
+#include <pybind11/native_enum.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -27,49 +28,53 @@ class PyMEHPForceEvaluator
   , public py::trampoline_self_life_support
 {
 public:
-  using MEHPForceEvaluator::MEHPForceEvaluator;
   using MEHPForceEvaluator::getNetwork;
+  using MEHPForceEvaluator::MEHPForceEvaluator;
 
   /* Trampoline for evaluateForceSetGradient with signature adaptation */
   double evaluateForceSetGradient(const size_t n,
                                   const Eigen::VectorXd& springDistances,
                                   double* grad) const override
   {
-    py::function override = py::get_override(this, "evaluate_force_set_gradient");
-    
+    py::function override =
+      py::get_override(this, "evaluate_force_set_gradient");
+
     if (override) {
       // Call the Python method which returns (force, gradient) tuple
       py::object result = override(n, springDistances, grad != nullptr);
-      
+
       if (py::isinstance<py::tuple>(result)) {
         py::tuple t = result.cast<py::tuple>();
         if (t.size() != 2) {
-          throw std::runtime_error("evaluate_force_set_gradient must return a tuple of (force, gradient)");
+          throw std::runtime_error("evaluate_force_set_gradient must return a "
+                                   "tuple of (force, gradient)");
         }
-        
+
         double force = t[0].cast<double>();
-        
+
         // If gradient is requested and provided in the tuple
         if (grad != nullptr && !t[1].is_none()) {
           py::list grad_list = t[1].cast<py::list>();
           if (grad_list.size() != n) {
-            throw std::runtime_error("Gradient size mismatch: expected " + 
-                                   std::to_string(n) + ", got " + 
-                                   std::to_string(grad_list.size()));
+            throw std::runtime_error("Gradient size mismatch: expected " +
+                                     std::to_string(n) + ", got " +
+                                     std::to_string(grad_list.size()));
           }
           for (size_t i = 0; i < n; ++i) {
             grad[i] = grad_list[i].cast<double>();
           }
         }
-        
+
         return force;
       } else {
-        throw std::runtime_error("evaluate_force_set_gradient must return a tuple of (force, gradient)");
+        throw std::runtime_error("evaluate_force_set_gradient must return a "
+                                 "tuple of (force, gradient)");
       }
     }
-    
+
     // If no override found, this is an error since it's a pure virtual function
-    pybind11::pybind11_fail("Tried to call pure virtual function \"MEHPForceEvaluator::evaluateForceSetGradient\"");
+    pybind11::pybind11_fail("Tried to call pure virtual function "
+                            "\"MEHPForceEvaluator::evaluateForceSetGradient\"");
   }
 
   /* Trampoline for stress contribution */
@@ -105,26 +110,26 @@ init_pylimer_bound_sim(py::module_& m)
   ////////////////////////////////////////////////////////////////
   // MARK: Output Quantities
 
-  py::enum_<ComputedIntValues>(
-    m, "ComputedIntValues", "Integer output quantities")
+  py::native_enum<ComputedIntValues>(
+    m, "ComputedIntValues", "enum.IntEnum", "Integer output quantities")
 #define X(e, n)                                                                \
   .value(#e, ComputedIntValues::e, "Results in the output column " #n ".")
     COMPUTED_INT_VALUES
 #undef X
-    ;
+      .finalize();
 
-  py::enum_<ComputedDoubleValues>(
-    m, "ComputedDoubleValues", "Floating point output quantities")
+  py::native_enum<ComputedDoubleValues>(
+    m, "ComputedDoubleValues", "enum.IntEnum", "Floating point output quantities")
 #define X(e, n)                                                                \
   .value(#e, ComputedDoubleValues::e, "Results in the output column " #n ".")
     COMPUTED_DOUBLE_VALUES
 #undef X
-    ;
+      .finalize();
 
-  py::class_<OutputConfiguration>(m,
-                                  "OutputConfiguration",
-                                  py::module_local(),
-                                  R"pbdoc(
+  py::class_<OutputConfiguration, py::smart_holder>(m,
+                                                    "OutputConfiguration",
+                                                    py::module_local(),
+                                                    R"pbdoc(
      A configuration object to configure the output values and frequency
      for simulation classes in this package.
 
@@ -185,15 +190,15 @@ init_pylimer_bound_sim(py::module_& m)
    * ////////////////////////////////////////////////////////////////
    */
 
-  py::enum_<mehp::ExitReason>(m,
-                              "ExitReason",
-                              R"pbdoc(
+  py::native_enum<mehp::ExitReason>(m,
+                                    "ExitReason", "enum.IntEnum",
+                                    R"pbdoc(
 An enum representing the reason for exiting
 the simulation or optimization procedure.)pbdoc")
 #define X(e, n) .value(#e, mehp::ExitReason::e, "Exit reason: " #n ".")
     EXIT_REASONS
 #undef X
-    ;
+      .finalize();
 
   m.def("inverse_langevin",
         &mehp::langevin_inv,
@@ -209,9 +214,9 @@ the simulation or optimization procedure.)pbdoc")
 
   ////////////////////////////////////////////////////////////////
   // MARK: Network structures
-  py::class_<mehp::Network>(m,
-                            "SimplifiedNetwork",
-                            R"pbdoc(
+  py::class_<mehp::Network, py::smart_holder>(m,
+                                              "SimplifiedNetwork",
+                                              R"pbdoc(
      A more efficient structure of the network for use in MEHP,
      namely :obj:`~pylimer_tools_cpp.MEHPForceRelaxation`.
      Consists usually only of the crosslinkers.
@@ -236,9 +241,10 @@ the simulation or optimization procedure.)pbdoc")
                   &mehp::Network::assumeBoxLargeEnough)
     .def_readonly("assume_complete", &mehp::Network::assumeComplete);
 
-  py::class_<mehp::ForceBalanceNetwork>(m,
-                                        "SimplifiedBalanceNetwork",
-                                        R"pbdoc(
+  py::class_<mehp::ForceBalanceNetwork, py::smart_holder>(
+    m,
+    "SimplifiedBalanceNetwork",
+    R"pbdoc(
      A more efficient structure of the network for use in MEHP force balance,
      namely :obj:`~pylimer_tools_cpp.MEHPForceBalance`, though also passable to
      namely :obj:`~pylimer_tools_cpp.MEHPForceBalance2`.
@@ -292,9 +298,10 @@ the simulation or optimization procedure.)pbdoc")
     // .def_readonly("springIsActive", &mehp::Network::springIsActive)
     ;
 
-  py::class_<mehp::ForceBalance2Network>(m,
-                                         "SimplifiedBalance2Network",
-                                         R"pbdoc(
+  py::class_<mehp::ForceBalance2Network, py::smart_holder>(
+    m,
+    "SimplifiedBalance2Network",
+    R"pbdoc(
 A more efficient structure of the network for use in
 :obj:`~pylimer_tools_cpp.MEHPForceBalance2`.
 Consists usually only of the cross- and slip-links (and their connectivity),
@@ -356,32 +363,33 @@ A strand is a chain of connected links between two crosslinks.
     .def_property("is_2d",
                   &mehp::MEHPForceEvaluator::getIs2D,
                   &mehp::MEHPForceEvaluator::setIs2D)
-    .def("evaluate_force_set_gradient",
-         [](const mehp::MEHPForceEvaluator& self,
-            const size_t n,
-            const Eigen::VectorXd& springDistances,
-            bool compute_gradient) {
-           std::vector<double> grad_vec;
-           double* grad = nullptr;
-           
-           if (compute_gradient) {
-             grad_vec.resize(n);
-             grad = grad_vec.data();
-           }
-           
-           double force = self.evaluateForceSetGradient(n, springDistances, grad);
-           
-           if (compute_gradient) {
-             py::list grad_list;
-             for (size_t i = 0; i < n; ++i) {
-               grad_list.append(grad_vec[i]);
-             }
-             return py::make_tuple(force, grad_list);
-           } else {
-             return py::make_tuple(force, py::none());
-           }
-         },
-         R"pbdoc(
+    .def(
+      "evaluate_force_set_gradient",
+      [](const mehp::MEHPForceEvaluator& self,
+         const size_t n,
+         const Eigen::VectorXd& springDistances,
+         bool compute_gradient) {
+        std::vector<double> grad_vec;
+        double* grad = nullptr;
+
+        if (compute_gradient) {
+          grad_vec.resize(n);
+          grad = grad_vec.data();
+        }
+
+        double force = self.evaluateForceSetGradient(n, springDistances, grad);
+
+        if (compute_gradient) {
+          py::list grad_list;
+          for (size_t i = 0; i < n; ++i) {
+            grad_list.append(grad_vec[i]);
+          }
+          return py::make_tuple(force, grad_list);
+        } else {
+          return py::make_tuple(force, py::none());
+        }
+      },
+      R"pbdoc(
           Evaluate the force and optionally compute its gradient.
 
           This is one of the primary methods to override when creating a
@@ -408,9 +416,9 @@ A strand is a chain of connected links between two crosslinks.
                   
                   return (force, gradient)
          )pbdoc",
-         py::arg("n"),
-         py::arg("spring_distances"),
-         py::arg("compute_gradient") = false)
+      py::arg("n"),
+      py::arg("spring_distances"),
+      py::arg("compute_gradient") = false)
     .def("evaluate_stress_contribution",
          &mehp::MEHPForceEvaluator::evaluateStressContribution,
          R"pbdoc(
@@ -479,9 +487,9 @@ A strand is a chain of connected links between two crosslinks.
 
   ////////////////////////////////////////////////////////////////
   // MARK: Force Relaxation
-  py::class_<mehp::MEHPForceRelaxation>(m,
-                                        "MEHPForceRelaxation",
-                                        R"pbdoc(
+  py::class_<mehp::MEHPForceRelaxation, py::smart_holder>(m,
+                                                          "MEHPForceRelaxation",
+                                                          R"pbdoc(
     A small simulation tool for quickly minimizing the force between the crosslinker beads.
 
     This is the first of three force relaxation methods available in this library.
@@ -889,35 +897,38 @@ A strand is a chain of connected links between two crosslinks.
 
   ////////////////////////////////////////////////////////////////
   // MARK: Configuration Enums
-  py::enum_<mehp::StructureSimplificationMode>(
+  py::native_enum<mehp::StructureSimplificationMode>(
     m,
-    "StructureSimplificationMode",
+    "StructureSimplificationMode", "enum.Enum",
     "How the structure shall be simplified during the optimization in order to "
     "remove non-trapped entanglement links.")
 #define X(e, name)                                                             \
   .value(STRINGINFY(e), mehp::StructureSimplificationMode::e, name)
-    STRUCTURE_SIMPLIFICATION_MODES;
+    STRUCTURE_SIMPLIFICATION_MODES
 #undef X
+      .finalize();
 
-  py::enum_<mehp::LinkSwappingMode>(
+  py::native_enum<mehp::LinkSwappingMode>(
     m,
-    "LinkSwappingMode",
+    "LinkSwappingMode", "enum.Enum",
     "How slip-links may act when they reach each-other or even a crosslink.")
 #define X(e, name) .value(STRINGINFY(e), mehp::LinkSwappingMode::e, name)
-    LINK_SWAPPING_MODES;
+    LINK_SWAPPING_MODES
 #undef X
+      .finalize();
 
-  py::enum_<mehp::SLESolver>(
-    m, "SLESolver", "Solver for sparse linear equation systems")
+  py::native_enum<mehp::SLESolver>(
+    m, "SLESolver", "enum.Enum", "Solver for sparse linear equation systems")
 #define X(e, name) .value(STRINGINFY(e), mehp::SLESolver::e, name)
-    SLE_SOLVERS;
+    SLE_SOLVERS
 #undef X
+      .finalize();
 
   ////////////////////////////////////////////////////////////////
   // MARK: Force Balance
-  py::class_<mehp::MEHPForceBalance>(m,
-                                     "MEHPForceBalance",
-                                     R"pbdoc(
+  py::class_<mehp::MEHPForceBalance, py::smart_holder>(m,
+                                                       "MEHPForceBalance",
+                                                       R"pbdoc(
     A small simulation tool for quickly minimizing the force between the crosslinker beads.
 
     This is the second implementation in the group of MEHP provided by this package.
@@ -1574,9 +1585,9 @@ A strand is a chain of connected links between two crosslinks.
 
   ////////////////////////////////////////////////////////////////
   // MARK: Force Balance 2
-  py::class_<mehp::MEHPForceBalance2>(m,
-                                      "MEHPForceBalance2",
-                                      R"pbdoc(
+  py::class_<mehp::MEHPForceBalance2, py::smart_holder>(m,
+                                                        "MEHPForceBalance2",
+                                                        R"pbdoc(
      A small simulation tool for quickly minimizing the force between the crosslinker beads.
 
      This is the third implementation of the MEHP. 
@@ -2131,9 +2142,9 @@ A strand is a chain of connected links between two crosslinks.
 
   ////////////////////////////////////////////////////////////////
   // MARK: DPD Simulator
-  py::class_<dpd::DPDSimulator>(m,
-                                "DPDSimulator",
-                                R"pbdoc(
+  py::class_<dpd::DPDSimulator, py::smart_holder>(m,
+                                                  "DPDSimulator",
+                                                  R"pbdoc(
      A quick-and-dirty implementation of the dissipative particle dynamics (DPD) simulation
      with slip-springs as presented by :cite:t:`langeloth_recovering_2013` 
      and :cite:t:`schneider_simulation_2021`.

@@ -6,8 +6,10 @@
 #include "../io/DataFileParser.h"
 #include "../io/DumpFileParser.h"
 
+#include <pybind11/native_enum.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+
 #include <sstream>
 
 namespace py = pybind11;
@@ -36,14 +38,14 @@ void
 init_pylimer_bound_readers(py::module_& m)
 {
 
-  py::enum_<AtomStyle>(
-    m, "AtomStyle", "An enumeration of the LAMMPS atom styles.")
+  py::native_enum<AtomStyle>(
+    m, "AtomStyle","enum.Enum", "An enumeration of the LAMMPS atom styles.")
 #define X(e, n) .value(#e, AtomStyle::e, "LAMMPS atom style '" n "'")
     LAMMPS_ATOM_STYLES
 #undef X
-    ;
+      .finalize();
 
-  py::class_<AveFileReader>(m, "AveFileReader", R"pbdoc(
+  py::class_<AveFileReader, py::smart_holder>(m, "AveFileReader", R"pbdoc(
           Alternative implementation of the data file reader implemented in 
           :func:`pylimer_tools.io.read_lammps_output_file.read_averages_file`.
 
@@ -119,7 +121,7 @@ init_pylimer_bound_readers(py::module_& m)
          :return: String representation showing file dimensions
          )pbdoc");
 
-  py::class_<DumpFileParser>(m, "DumpFileReader", R"pbdoc(
+  py::class_<DumpFileParser, py::smart_holder>(m, "DumpFileReader", R"pbdoc(
        A reader for LAMMPS's `dump` files.
   )pbdoc")
     .def(py::init<const std::string>(),
@@ -211,7 +213,7 @@ init_pylimer_bound_readers(py::module_& m)
          :return: String representation showing number of sections
          )pbdoc");
 
-  py::class_<DataFileParser>(m, "DataFileReader", R"pbdoc(
+  py::class_<DataFileParser, py::smart_holder>(m, "DataFileReader", R"pbdoc(
        A reader for LAMMPS's `write_data` files.
   )pbdoc")
     .def(py::init<>(), R"pbdoc(

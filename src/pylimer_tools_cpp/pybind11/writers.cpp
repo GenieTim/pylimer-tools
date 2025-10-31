@@ -13,10 +13,10 @@ using namespace pylimer_tools::utils;
 void
 init_pylimer_bound_writers(py::module_& m)
 {
-  py::class_<DataFileWriter>(m,
-                             "DataFileWriter",
-                             py::module_local(),
-                             R"pbdoc(
+  py::class_<DataFileWriter, py::smart_holder>(m,
+                                               "DataFileWriter",
+                                               py::module_local(),
+                                               R"pbdoc(
     A class to write a LAMMPS data file from a universe.
     
     .. attention::
