@@ -14,14 +14,14 @@
 // for any optimisation
 #define INVALIDINDEX_EXP_IFN(condition, message)                               \
   if (!(condition)) {                                                          \
-    std::cerr << "Argument error: " << message << std::endl;                   \
+    std::cerr << "Incorrect Arguments: " << message << std::endl;              \
     throw std::out_of_range(std::string(message) +                             \
                             std::string("\nFailed condition: " #condition));   \
   }
 
 #define INVALIDARG_EXP_IFN(condition, message)                                 \
   if (!(condition)) {                                                          \
-    std::cerr << "Argument error: " << message << std::endl;                   \
+    std::cerr << "Incorrect Arguments: " << message << std::endl;              \
     throw std::invalid_argument(                                               \
       std::string(message) + std::string("\nFailed condition: " #condition));  \
   }
@@ -40,14 +40,14 @@
 #define RUNTIME_EXP_IFN(condition, message)                                    \
   if (!(condition)) {                                                          \
     (void)("LCOV_EXCL_START");                                                 \
-    std::cerr << "Runtime error: " << message << std::endl;                    \
+    std::cerr << "A problem occurred: " << message << std::endl;               \
     throw std::runtime_error(std::string(message) +                            \
                              std::string("\nFailed condition: " #condition));  \
     (void)("LCOV_EXCL_STOP");                                                  \
   }
 #endif
 #define RUNTIME_EXP(message)                                                   \
-  std::cerr << "Runtime error: " << message << std::endl;                      \
+  std::cerr << "A problem occurred: " << message << std::endl;                 \
   throw std::runtime_error(std::string(message));
 
 #define SHOULD_NOT_REACH_HERE(message) RUNTIME_EXP(message)

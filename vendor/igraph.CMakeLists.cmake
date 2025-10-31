@@ -130,7 +130,7 @@ if (NOT DEFINED igraph_LOADED)
 
             set_target_properties(igraph::igraph PROPERTIES
                     IMPORTED_LOCATION "${igraph_LIBRARIES}"
-                    #             INTERFACE_INCLUDE_DIRECTORIES "${igraph_INCLUDE_DIRS}"
+                    # INTERFACE_INCLUDE_DIRECTORIES "${igraph_INCLUDE_DIRS}"
             )
 
             set(igraph_LOADED ON)

@@ -1,6 +1,8 @@
 #ifndef PYBIND_SIM_H
 #define PYBIND_SIM_H
 
+#include <functional>
+
 #include "../entities/Universe.h"
 #include "../sim/DPDSimulator.h"
 #include "../sim/MEHPForceBalance.h"
@@ -10,6 +12,7 @@
 
 #include <cassert>
 #include <pybind11/eigen.h>
+#include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -19,67 +22,80 @@ namespace pe = pylimer_tools::entities;
 using namespace pylimer_tools::sim;
 
 namespace pylimer_tools::sim::mehp {
-class PyMEHPForceEvaluator : public MEHPForceEvaluator
+class PyMEHPForceEvaluator
+  : public MEHPForceEvaluator
+  , public py::trampoline_self_life_support
 {
 public:
+  using MEHPForceEvaluator::MEHPForceEvaluator;
   using MEHPForceEvaluator::getNetwork;
 
-  /* Trampoline */
-  virtual double evaluateStressContribution(double springDistances[3],
-                                            size_t i,
-                                            size_t j,
-                                            size_t springIndex) const override
-  {
-    PYBIND11_OVERRIDE_PURE(double,
-                           /* Return type */
-                           MEHPForceEvaluator,
-                           /* Parent class */
-                           evaluateStressContribution,
-                           /* Name of function in C++ */
-                           springDistances,
-                           i,
-                           j,
-                           springIndex /* Arguments */
-    );
-  }
-
-  typedef std::pair<double, std::vector<double>> returntype;
-  /* Trampoline */
-  virtual returntype evaluateForceAndGradient(
-    const size_t n,
-    const Eigen::VectorXd& springDistances,
-    bool requiresGradient) const
-  {
-    PYBIND11_OVERRIDE_PURE(returntype,
-                           /* Return type */
-                           MEHPForceEvaluator,
-                           /* Parent class */
-                           evaluateForceSetGradient,
-                           /* Name of function in C++
-                              (must match Python name) */
-                           n,
-                           springDistances,
-                           requiresGradient /* Argument(s) */
-    );
-  }
-
-  // actually overriding function, but simplifying for python possibilities
+  /* Trampoline for evaluateForceSetGradient with signature adaptation */
   double evaluateForceSetGradient(const size_t n,
                                   const Eigen::VectorXd& springDistances,
                                   double* grad) const override
   {
-    std::pair<double, std::vector<double>> trampolineResult =
-      this->evaluateForceAndGradient(n, springDistances, grad != nullptr);
-    if (grad != nullptr) {
-      assert(trampolineResult.second.size() == n);
-      for (size_t i = 0; i < n; ++i) {
-        grad[i] = trampolineResult.second[i];
+    py::function override = py::get_override(this, "evaluate_force_set_gradient");
+    
+    if (override) {
+      // Call the Python method which returns (force, gradient) tuple
+      py::object result = override(n, springDistances, grad != nullptr);
+      
+      if (py::isinstance<py::tuple>(result)) {
+        py::tuple t = result.cast<py::tuple>();
+        if (t.size() != 2) {
+          throw std::runtime_error("evaluate_force_set_gradient must return a tuple of (force, gradient)");
+        }
+        
+        double force = t[0].cast<double>();
+        
+        // If gradient is requested and provided in the tuple
+        if (grad != nullptr && !t[1].is_none()) {
+          py::list grad_list = t[1].cast<py::list>();
+          if (grad_list.size() != n) {
+            throw std::runtime_error("Gradient size mismatch: expected " + 
+                                   std::to_string(n) + ", got " + 
+                                   std::to_string(grad_list.size()));
+          }
+          for (size_t i = 0; i < n; ++i) {
+            grad[i] = grad_list[i].cast<double>();
+          }
+        }
+        
+        return force;
+      } else {
+        throw std::runtime_error("evaluate_force_set_gradient must return a tuple of (force, gradient)");
       }
     }
-    return trampolineResult.first;
+    
+    // If no override found, this is an error since it's a pure virtual function
+    pybind11::pybind11_fail("Tried to call pure virtual function \"MEHPForceEvaluator::evaluateForceSetGradient\"");
   }
 
-  void prepareForEvaluations() override {};
+  /* Trampoline for stress contribution */
+  double evaluateStressContribution(double springDistances[3],
+                                    size_t i,
+                                    size_t j,
+                                    size_t springIndex) const override
+  {
+    PYBIND11_OVERRIDE_PURE_NAME(double,
+                                MEHPForceEvaluator,
+                                "evaluate_stress_contribution",
+                                evaluateStressContribution,
+                                springDistances,
+                                i,
+                                j,
+                                springIndex);
+  }
+
+  /* Trampoline for prepareForEvaluations */
+  void prepareForEvaluations() override
+  {
+    PYBIND11_OVERRIDE_PURE_NAME(void,
+                                MEHPForceEvaluator,
+                                "prepare_for_evaluations",
+                                prepareForEvaluations);
+  }
 };
 }
 
@@ -214,6 +230,7 @@ the simulation or optimization procedure.)pbdoc")
                   &mehp::Network::springCoordinateIndexB)
     .def_readonly("spring_index_a", &mehp::Network::springIndexA)
     .def_readonly("spring_index_b", &mehp::Network::springIndexB)
+    .def_readonly("spring_contour_length", &mehp::Network::springsContourLength)
     // .def_readonly("springIsActive", &mehp::Network::springIsActive)
     .def_readonly("assume_box_large_enough",
                   &mehp::Network::assumeBoxLargeEnough)
@@ -321,73 +338,107 @@ A strand is a chain of connected links between two crosslinks.
 
   ////////////////////////////////////////////////////////////////
   // MARK: Force evaluators
-  py::class_<mehp::MEHPForceEvaluator, mehp::PyMEHPForceEvaluator>(
-    m,
-    "MEHPForceEvaluator",
-    R"pbdoc(
+  py::class_<mehp::MEHPForceEvaluator,
+             mehp::PyMEHPForceEvaluator,
+             py::smart_holder>(m,
+                               "MEHPForceEvaluator",
+                               R"pbdoc(
      The base interface to change the way the force is evaluated during a MEHP run.
+     
+     To create a custom force evaluator in Python, subclass this class and implement:
+     
+     - :meth:`evaluate_force_set_gradient`: Compute the force and optionally its gradient
+     - :meth:`evaluate_stress_contribution`: Compute stress tensor contributions
+     - :meth:`prepare_for_evaluations`: Prepare for a batch of evaluations
     )pbdoc")
     .def(py::init<>())
     .def_property_readonly("network", &mehp::MEHPForceEvaluator::getNetwork)
     .def_property("is_2d",
                   &mehp::MEHPForceEvaluator::getIs2D,
                   &mehp::MEHPForceEvaluator::setIs2D)
-    //     .def("evaluateForceSetGradient",
-    //          py::overload_cast<const size_t,
-    //                            const Eigen::VectorXd&,
-    //                            const Eigen::VectorXd&,
-    //                            bool>(
-    //            &mehp::MEHPForceEvaluator::evaluateForceSetGradient))
+    .def("evaluate_force_set_gradient",
+         [](const mehp::MEHPForceEvaluator& self,
+            const size_t n,
+            const Eigen::VectorXd& springDistances,
+            bool compute_gradient) {
+           std::vector<double> grad_vec;
+           double* grad = nullptr;
+           
+           if (compute_gradient) {
+             grad_vec.resize(n);
+             grad = grad_vec.data();
+           }
+           
+           double force = self.evaluateForceSetGradient(n, springDistances, grad);
+           
+           if (compute_gradient) {
+             py::list grad_list;
+             for (size_t i = 0; i < n; ++i) {
+               grad_list.append(grad_vec[i]);
+             }
+             return py::make_tuple(force, grad_list);
+           } else {
+             return py::make_tuple(force, py::none());
+           }
+         },
+         R"pbdoc(
+          Evaluate the force and optionally compute its gradient.
+
+          This is one of the primary methods to override when creating a
+          custom force evaluator. Override this in Python by defining a method
+          that returns a tuple of (force, gradient).
+
+          :param n: The dimensionality of the problem (the number of coordinates)
+          :param spring_distances: The sequential (x, y, z) spring distances as a vector
+          :param compute_gradient: If True, the gradient should be computed and returned
+          :return: A tuple (force, gradient) where:
+              - force: The computed force value (float)
+              - gradient: The gradient as a list (or None if compute_gradient was False)
+              
+          Example implementation in Python::
+          
+              def evaluate_force_set_gradient(self, n, spring_distances, compute_gradient):
+                  force = 0.0
+                  # ... compute force ...
+                  
+                  gradient = None
+                  if compute_gradient:
+                      gradient = [0.0] * n
+                      # ... compute gradient ...
+                  
+                  return (force, gradient)
+         )pbdoc",
+         py::arg("n"),
+         py::arg("spring_distances"),
+         py::arg("compute_gradient") = false)
     .def("evaluate_stress_contribution",
          &mehp::MEHPForceEvaluator::evaluateStressContribution,
          R"pbdoc(
-          An evaluation of the stress-contribution.
+          Evaluate the stress-contribution for a single spring.
 
-          :param springDistances: The three coordinate differences for one spring.
+          :param spring_distances: The three coordinate differences for one spring (list of 3 floats)
           :param i: The row index of the stress tensor
           :param j: The column index of the stress tensor
+          :param spring_index: The index of the spring being evaluated
+          :return: The stress contribution value
     )pbdoc",
          py::arg("spring_distances"),
          py::arg("i"),
          py::arg("j"),
-         py::arg("spring_index"));
+         py::arg("spring_index"))
+    .def("prepare_for_evaluations",
+         &mehp::MEHPForceEvaluator::prepareForEvaluations,
+         R"pbdoc(
+     Prepare the evaluator for a series of evaluations.
+     This method is called before a batch of force evaluations,
+     allowing for any necessary setup or precomputation.
+     )pbdoc");
 
-  //   py::class_<mehp::PyMEHPForceEvaluator, mehp::MEHPForceEvaluator>(
-  //     m, "CustomMEHPForceEvaluator", R"pbdoc(
-  //      The Python access to implement a custom force to be evaluated during a
-  //      MEHP run.
-  //     )pbdoc")
-  //     .def(py::init<>())
-  //     .def("evaluateForceAndGradient",
-  //          &mehp::PyMEHPForceEvaluator::evaluateForceAndGradient,
-  //          R"pbdoc(
-  //      One of the two functions to override, the other being
-  //      :meth:`~pylimer_tools_cpp.MEHPForceEvaluator.evaluate_stress_contribution`.
-
-  //      :param n: The dimensionality of the problem (the nr. of spring
-  //      coordinates) :param springDistances: The sequential (x, y, z) spring
-  //      distances :param displacements: The displacements from the original
-  //      coordinates
-  //           (accessible by
-  //           :func:`~pylimer_tools_cpp.CustomMEHPForceEvaluator.getNetwork().coordinates`)
-  //      :param gradientNeeded: whether the gradient should be computed and
-  //      returned
-
-  //      Returns:
-  //           - force: The result of the force computation.
-  //           - gradient: The result of the gradient computation.
-  //                Only needed if the parameter `gradientNeeded` is true,
-  //                otherwise an empty list is sufficient.
-  //     )pbdoc",
-  //          py::arg("n"),
-  //          py::arg("springDistances"),
-  //          py::arg("displacements"),
-  //          py::arg("gradientNeeded"));
-
-  py::class_<mehp::SimpleSpringMEHPForceEvaluator, mehp::MEHPForceEvaluator>(
-    m,
-    "SimpleSpringMEHPForceEvaluator",
-    R"pbdoc(
+  py::class_<mehp::SimpleSpringMEHPForceEvaluator,
+             mehp::MEHPForceEvaluator,
+             py::smart_holder>(m,
+                               "SimpleSpringMEHPForceEvaluator",
+                               R"pbdoc(
      This is equal to a spring evaluator for Gaussian chains.
 
      The force for a certain spring is given by:
@@ -400,10 +451,11 @@ A strand is a chain of connected links between two crosslinks.
     )pbdoc")
     .def(py::init<double>(), py::arg("kappa") = 1.0);
 
-  py::class_<mehp::NonGaussianSpringForceEvaluator, mehp::MEHPForceEvaluator>(
-    m,
-    "NonGaussianSpringForceEvaluator",
-    R"pbdoc(
+  py::class_<mehp::NonGaussianSpringForceEvaluator,
+             mehp::MEHPForceEvaluator,
+             py::smart_holder>(m,
+                               "NonGaussianSpringForceEvaluator",
+                               R"pbdoc(
      This is equal to a spring evaluator for Langevin chains.
 
      The force for a certain spring is given by:
@@ -465,10 +517,20 @@ A strand is a chain of connected links between two crosslinks.
          py::arg("force_evaluator") = nullptr,
          py::arg("kappa") = 1.0,
          py::arg("remove_2functional_crosslinkers") = false,
-         py::arg("remove_dangling_chains") = false)
-    .def("run_force_relaxation",
-         &mehp::MEHPForceRelaxation::runForceRelaxation,
-         R"pbdoc(
+         py::arg("remove_dangling_chains") = false,
+         py::keep_alive<1, 4>()) // Keep force_evaluator alive with the
+                                 // MEHPForceRelaxation object
+    .def(
+      "run_force_relaxation",
+      [](mehp::MEHPForceRelaxation& self,
+         const std::string& algorithm,
+         long maxNrOfSteps,
+         double xtol,
+         double ftol) {
+        // Keep GIL for Python custom evaluators
+        self.runForceRelaxation(algorithm.c_str(), maxNrOfSteps, xtol, ftol);
+      },
+      R"pbdoc(
           Run the simulation.
           Note that the final state of the minimization is persisted and reused if you use this method again.
           This is useful if you want to run a global optimization first and add a local one afterwards.
@@ -480,10 +542,10 @@ A strand is a chain of connected links between two crosslinks.
           :param fTolerance: The tolerance of the force as an exit condition.
           :param is2d: Specify true if you want to evaluate the force relation only in x and y direction.
           )pbdoc",
-         py::arg("algorithm") = "LD_MMA",
-         py::arg("max_nr_of_steps") = 250000,
-         py::arg("x_tolerance") = 1e-12,
-         py::arg("f_tolerance") = 1e-9)
+      py::arg("algorithm") = "LD_MMA",
+      py::arg("max_nr_of_steps") = 250000,
+      py::arg("x_tolerance") = 1e-12,
+      py::arg("f_tolerance") = 1e-9)
     // .def("getForceEvaluator", &mehp::MEHPForceRelaxation::getForceEvaluator,
     // R"pbdoc(
     //      Query the currently used force evaluator.
@@ -495,7 +557,8 @@ A strand is a chain of connected links between two crosslinks.
           
           :param force_evaluator: The new force evaluator to use
      )pbdoc",
-         py::arg("force_evaluator"))
+         py::arg("force_evaluator"),
+         py::keep_alive<1, 2>())
     .def("config_rerun_epsilon",
          &mehp::MEHPForceRelaxation::configRerunEps,
          R"pbdoc(
