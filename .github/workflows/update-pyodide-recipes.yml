@@ -41,7 +41,7 @@ jobs:
       - name: Checkout current repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for tags
+          fetch-depth: 0 # Fetch all history for tags
           fetch-tags: true
 
       - name: Set up Python
@@ -55,7 +55,7 @@ jobs:
           # Determine version using multiple fallback methods
           VERSION=""
           TAG_NAME=""
-          
+
           # Method 1: Use get_version.py script (most robust)
           if [ -f "bin/get_version.py" ]; then
             echo "Attempting to get version from get_version.py..."
@@ -66,7 +66,7 @@ jobs:
               fi
             fi
           fi
-          
+
           # Method 2: Extract from release tag (for release events)
           if [ -z "$VERSION" ] && [ -n "${{ github.event.release.tag_name }}" ]; then
             echo "Attempting to get version from release tag..."
@@ -78,21 +78,21 @@ jobs:
               echo "✓ Got version from release tag: $VERSION"
             fi
           fi
-          
+
           # Validate we have a valid version
           if [ -z "$VERSION" ] || [ "$VERSION" = "0.0.0" ]; then
             echo "❌ Could not determine valid version"
             exit 1
           fi
-          
+
           # Ensure we have a tag name
           if [ -z "$TAG_NAME" ]; then
             TAG_NAME="v$VERSION"
           fi
-          
+
           echo "Final version: $VERSION"
           echo "Final tag: $TAG_NAME"
-          
+
           # Set outputs
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "tag_name=${TAG_NAME}" >> $GITHUB_OUTPUT
@@ -126,7 +126,7 @@ jobs:
           repository: GenieTim/pyodide-recipes
           token: ${{ secrets.PAT_TOKEN }}
           path: pyodide-recipes
-          fetch-depth: 0  # Fetch all history to check for existing branches
+          fetch-depth: 0 # Fetch all history to check for existing branches
 
       - name: Check for existing PRs
         id: check_pr
@@ -137,7 +137,7 @@ jobs:
           # Check for existing open PRs for this version
           VERSION="${{ steps.release_info.outputs.version }}"
           echo "Checking for existing PRs for version $VERSION..."
-          
+
           # Search for open PRs with the version in title or branch name
           EXISTING_PRS=$(gh pr list \
             --repo pyodide/pyodide-recipes \
@@ -145,18 +145,18 @@ jobs:
             --search "pylimer-tools $VERSION in:title" \
             --json number,title,headRefName \
             --jq '.[] | select(.title | test("pylimer-tools.*'"$VERSION"'")) | .number' 2>/dev/null || echo "")
-          
+
           # Also check for PRs with branch names containing the version
           BRANCH_PRS=$(gh pr list \
             --repo pyodide/pyodide-recipes \
             --state open \
             --json number,title,headRefName \
             --jq '.[] | select(.headRefName | test("update-pylimer-tools-'"$VERSION"'")) | .number' 2>/dev/null || echo "")
-          
+
           # Combine results
           ALL_PRS="$EXISTING_PRS"$'\n'"$BRANCH_PRS"
           EXISTING_PR_COUNT=$(echo "$ALL_PRS" | grep -v '^$' | wc -l)
-          
+
           if [ "$EXISTING_PR_COUNT" -gt 0 ]; then
             PR_NUMBERS=$(echo "$ALL_PRS" | grep -v '^$' | tr '\n' ',' | sed 's/,$//')
             echo "Found existing PR(s) for version $VERSION: #$PR_NUMBERS"
@@ -251,7 +251,7 @@ jobs:
         run: |
           echo "## 🚀 Pyodide Recipes Update Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ "${{ steps.check_pr.outputs.existing_pr }}" = "true" ]; then
             echo "⚠️ **PR Already Exists**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY

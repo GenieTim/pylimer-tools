@@ -13,16 +13,58 @@ import os
 import numpy as np
 
 from pylimer_tools.io.bead_spring_parameter_provider import (
-    ParameterType,
-    get_parameters_for_polymer,
-)
+    ParameterType, get_parameters_for_polymer)
 from pylimer_tools.io.read_lammps_output_file import read_data_file
-from pylimer_tools_cpp import (
-    MEHPForceRelaxation,
-    NonGaussianSpringForceEvaluator,
-    SimpleSpringMEHPForceEvaluator,
-    Universe,
-)
+from pylimer_tools_cpp import (MEHPForceRelaxation,
+                               NonGaussianSpringForceEvaluator,
+                               SimpleSpringMEHPForceEvaluator, Universe)
+
+
+# Example: Custom Force Evaluator (see also tests)
+# This particular example is insofar a bad example, as it is already
+# implemented faster (no Python<>C++ back & forth every time) in the SimpleSpringMEHPForceEvaluator.
+class CustomForceEvaluator(MEHPForceRelaxation.force_evaluator_class):
+    """
+    A custom force evaluator that implements a simple harmonic spring.
+    """
+
+    def __init__(self, kappa=1.0):
+        super().__init__()
+        self.kappa = kappa
+
+    def evaluate_force_set_gradient(self, n, spring_distances, compute_gradient):
+        network = self.network
+        nr_springs = network.nr_of_springs
+        force = 0.0
+        for i in range(nr_springs):
+            spring_vec = spring_distances[3 * i : 3 * i + 3]
+            r_squared = np.sum(spring_vec**2)
+            contour_length = network.spring_contour_length[i]
+            force += r_squared / contour_length
+        force *= 0.5 * self.kappa
+        gradient = None
+        if compute_gradient:
+            gradient = [0.0] * n
+            nrOfDim = 2 if self.is_2d else 3
+            for j in range(nr_springs):
+                a = network.spring_index_a[j]
+                b = network.spring_index_b[j]
+                contour_length = network.spring_contour_length[j]
+                for dir_idx in range(nrOfDim):
+                    spring_dist = spring_distances[3 * j + dir_idx]
+                    grad_term = spring_dist * self.kappa / contour_length
+                    gradient[3 * a + dir_idx] += grad_term
+                    gradient[3 * b + dir_idx] -= grad_term
+        return (force, gradient)
+
+    def evaluate_stress_contribution(self, spring_distances, i, j, spring_index):
+        network = self.network
+        contour_length = network.spring_contour_length[spring_index]
+        return self.kappa * spring_distances[i] * spring_distances[j] / contour_length
+
+    def prepare_for_evaluations(self):
+        pass
+
 
 # Load your network (replace with your file)
 universe = read_data_file(
@@ -35,8 +77,7 @@ universe = read_data_file(
 assert isinstance(universe, Universe)
 
 # Prepare parameters for conversion factors
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 r02_slope = params.get("R02")
 r02_slope_magnitude = r02_slope.to(params.get("distance_units") ** 2).magnitude
 kbt = params.get("T") * params.get("kb")
@@ -72,6 +113,22 @@ shear_modulus = (
     / universe.get_volume()
 )
 print(
-    "Phantom Shear Modulus [MPa]: ",
+    "Phantom Shear Modulus [MPa] (Langevin): ",
+    shear_modulus,
+)
+
+# 3. MEHPForceRelaxation with Custom Force Evaluator
+custom_evaluator = CustomForceEvaluator(kappa=1.0)
+mehp_relax = MEHPForceRelaxation(universe)
+mehp_relax.set_force_evaluator(custom_evaluator)
+while mehp_relax.requires_another_run():
+    mehp_relax.run_force_relaxation()
+shear_modulus = (
+    gamma_conversion_factor
+    * np.sum(mehp_relax.get_gamma_factors(r02_slope_magnitude))
+    / universe.get_volume()
+)
+print(
+    "Phantom Shear Modulus [MPa] (Custom Evaluator): ",
     shear_modulus,
 )

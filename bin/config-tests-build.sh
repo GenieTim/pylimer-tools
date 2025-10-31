@@ -35,7 +35,7 @@ ADDITIONALFLAGS=(-D CMAKE_BUILD_TYPE=Debug)
 if [ -n "$WITH_ERROR" ]; then
   ADDITIONALFLAGS=("${ADDITIONALFLAGS[@]}" -D WITH_ERROR="$WITH_ERROR")
 fi
-if (command -v clang++ || command -v g++) && ! ([ -z "$CCOMPILER" ] || [ -z "$CXXCOMPILER" ]) && ([ -z "${DIABLE_COVERAGE}" ]); then
+if (command -v clang++ || command -v g++) && ! ([ -z "$CCOMPILER" ] || [ -z "$CXXCOMPILER" ]) && ([ -z "${DISABLE_COVERAGE}" ]); then
   echo "Using compiler: $CCOMPILER and $CXXCOMPILER"
   # Disable LEAK_ANALYSIS on macOS due to AddressSanitizer compatibility issues
   if [[ $OSTYPE == 'darwin'* ]]; then
