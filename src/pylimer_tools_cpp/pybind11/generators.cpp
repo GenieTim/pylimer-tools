@@ -7,6 +7,7 @@
 
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
+#include <pybind11/native_enum.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <string>
@@ -128,7 +129,7 @@ init_pylimer_bound_generators(py::module_& m)
          :return: String representation
          )pbdoc");
 
-  py::enum_<BackTrackStatus>(m, "BackTrackStatus", R"pbdoc(
+  py::native_enum<BackTrackStatus>(m, "BackTrackStatus","enum.Enum", R"pbdoc(
      Enum for controlling the strand linking process in linkStrandsCallback.
      )pbdoc")
     .value("STOP", BackTrackStatus::STOP, "Stop the linking process")
@@ -138,9 +139,11 @@ init_pylimer_bound_generators(py::module_& m)
     .value("TRACK_BACKWARD",
            BackTrackStatus::TRACK_BACKWARD,
            "Track backward in the linking process")
-    .export_values();
+    .export_values()
+    .finalize();
 
-  py::class_<MCUniverseGenerator>(m, "MCUniverseGenerator", R"pbdoc(
+  py::class_<MCUniverseGenerator, py::smart_holder>(
+    m, "MCUniverseGenerator", R"pbdoc(
        A :obj:`pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
 
        Please cite :cite:t:`gusev_molecular_2024` and/or :cite:t:`bernhard_phantom_2025` if you use this method in your work.
