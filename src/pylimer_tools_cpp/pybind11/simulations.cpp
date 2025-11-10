@@ -118,8 +118,10 @@ init_pylimer_bound_sim(py::module_& m)
 #undef X
       .finalize();
 
-  py::native_enum<ComputedDoubleValues>(
-    m, "ComputedDoubleValues", "enum.IntEnum", "Floating point output quantities")
+  py::native_enum<ComputedDoubleValues>(m,
+                                        "ComputedDoubleValues",
+                                        "enum.IntEnum",
+                                        "Floating point output quantities")
 #define X(e, n)                                                                \
   .value(#e, ComputedDoubleValues::e, "Results in the output column " #n ".")
     COMPUTED_DOUBLE_VALUES
@@ -191,7 +193,8 @@ init_pylimer_bound_sim(py::module_& m)
    */
 
   py::native_enum<mehp::ExitReason>(m,
-                                    "ExitReason", "enum.IntEnum",
+                                    "ExitReason",
+                                    "enum.IntEnum",
                                     R"pbdoc(
 An enum representing the reason for exiting
 the simulation or optimization procedure.)pbdoc")
@@ -899,7 +902,8 @@ A strand is a chain of connected links between two crosslinks.
   // MARK: Configuration Enums
   py::native_enum<mehp::StructureSimplificationMode>(
     m,
-    "StructureSimplificationMode", "enum.Enum",
+    "StructureSimplificationMode",
+    "enum.Enum",
     "How the structure shall be simplified during the optimization in order to "
     "remove non-trapped entanglement links.")
 #define X(e, name)                                                             \
@@ -910,7 +914,8 @@ A strand is a chain of connected links between two crosslinks.
 
   py::native_enum<mehp::LinkSwappingMode>(
     m,
-    "LinkSwappingMode", "enum.Enum",
+    "LinkSwappingMode",
+    "enum.Enum",
     "How slip-links may act when they reach each-other or even a crosslink.")
 #define X(e, name) .value(STRINGINFY(e), mehp::LinkSwappingMode::e, name)
     LINK_SWAPPING_MODES

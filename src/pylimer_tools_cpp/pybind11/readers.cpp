@@ -39,7 +39,7 @@ init_pylimer_bound_readers(py::module_& m)
 {
 
   py::native_enum<AtomStyle>(
-    m, "AtomStyle","enum.Enum", "An enumeration of the LAMMPS atom styles.")
+    m, "AtomStyle", "enum.Enum", "An enumeration of the LAMMPS atom styles.")
 #define X(e, n) .value(#e, AtomStyle::e, "LAMMPS atom style '" n "'")
     LAMMPS_ATOM_STYLES
 #undef X
