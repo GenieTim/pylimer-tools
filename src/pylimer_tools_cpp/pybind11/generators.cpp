@@ -129,7 +129,7 @@ init_pylimer_bound_generators(py::module_& m)
          :return: String representation
          )pbdoc");
 
-  py::native_enum<BackTrackStatus>(m, "BackTrackStatus","enum.Enum", R"pbdoc(
+  py::native_enum<BackTrackStatus>(m, "BackTrackStatus", "enum.Enum", R"pbdoc(
      Enum for controlling the strand linking process in linkStrandsCallback.
      )pbdoc")
     .value("STOP", BackTrackStatus::STOP, "Stop the linking process")

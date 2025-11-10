@@ -12,6 +12,7 @@
 """
 from __future__ import annotations
 import collections.abc
+import enum
 import numpy
 import numpy.typing
 import scipy.sparse
@@ -235,69 +236,9 @@ class AtomPairEntanglements:
     @pairs_of_atoms.setter
     def pairs_of_atoms(self, arg0: collections.abc.Sequence[tuple[typing.SupportsInt, typing.SupportsInt]]) -> None:
         ...
-class AtomStyle:
+class AtomStyle(enum.Enum):
     """
     An enumeration of the LAMMPS atom styles.
-    
-    Members:
-    
-      NONE : LAMMPS atom style 'none'
-    
-      ANGLE : LAMMPS atom style 'angle'
-    
-      ATOMIC : LAMMPS atom style 'atomic'
-    
-      BODY : LAMMPS atom style 'body'
-    
-      BOND : LAMMPS atom style 'bond'
-    
-      BPM_SPHERE : LAMMPS atom style 'bpm/sphere'
-    
-      CHARGE : LAMMPS atom style 'charge'
-    
-      DIELECTRIC : LAMMPS atom style 'dielectric'
-    
-      DIPOLE : LAMMPS atom style 'dipole'
-    
-      DPD : LAMMPS atom style 'dpd'
-    
-      EDPD : LAMMPS atom style 'edpd'
-    
-      ELECTRON : LAMMPS atom style 'electron'
-    
-      ELLIPSOID : LAMMPS atom style 'ellipsoid'
-    
-      FULL : LAMMPS atom style 'full'
-    
-      LINE : LAMMPS atom style 'line'
-    
-      MDPD : LAMMPS atom style 'mdpd'
-    
-      MOLECULAR : LAMMPS atom style 'molecular'
-    
-      PERI : LAMMPS atom style 'peri'
-    
-      RHEO : LAMMPS atom style 'rheo'
-    
-      RHEO_THERMAL : LAMMPS atom style 'rheo/thermal'
-    
-      SMD : LAMMPS atom style 'smd'
-    
-      SPH : LAMMPS atom style 'sph'
-    
-      SPHERE : LAMMPS atom style 'sphere'
-    
-      SPIN : LAMMPS atom style 'spin'
-    
-      TDPD : LAMMPS atom style 'tdpd'
-    
-      TEMPLATE : LAMMPS atom style 'template'
-    
-      TRI : LAMMPS atom style 'tri'
-    
-      WAVEPACKET : LAMMPS atom style 'wavepacket'
-    
-      HYBRID : LAMMPS atom style 'hybrid'
     """
     ANGLE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.ANGLE: 1>
     ATOMIC: typing.ClassVar[AtomStyle]  # value = <AtomStyle.ATOMIC: 2>
@@ -328,33 +269,6 @@ class AtomStyle:
     TEMPLATE: typing.ClassVar[AtomStyle]  # value = <AtomStyle.TEMPLATE: 25>
     TRI: typing.ClassVar[AtomStyle]  # value = <AtomStyle.TRI: 26>
     WAVEPACKET: typing.ClassVar[AtomStyle]  # value = <AtomStyle.WAVEPACKET: 27>
-    __members__: typing.ClassVar[dict[str, AtomStyle]]  # value = {'NONE': <AtomStyle.NONE: 0>, 'ANGLE': <AtomStyle.ANGLE: 1>, 'ATOMIC': <AtomStyle.ATOMIC: 2>, 'BODY': <AtomStyle.BODY: 3>, 'BOND': <AtomStyle.BOND: 4>, 'BPM_SPHERE': <AtomStyle.BPM_SPHERE: 5>, 'CHARGE': <AtomStyle.CHARGE: 6>, 'DIELECTRIC': <AtomStyle.DIELECTRIC: 7>, 'DIPOLE': <AtomStyle.DIPOLE: 8>, 'DPD': <AtomStyle.DPD: 9>, 'EDPD': <AtomStyle.EDPD: 10>, 'ELECTRON': <AtomStyle.ELECTRON: 11>, 'ELLIPSOID': <AtomStyle.ELLIPSOID: 12>, 'FULL': <AtomStyle.FULL: 13>, 'LINE': <AtomStyle.LINE: 14>, 'MDPD': <AtomStyle.MDPD: 15>, 'MOLECULAR': <AtomStyle.MOLECULAR: 16>, 'PERI': <AtomStyle.PERI: 17>, 'RHEO': <AtomStyle.RHEO: 18>, 'RHEO_THERMAL': <AtomStyle.RHEO_THERMAL: 19>, 'SMD': <AtomStyle.SMD: 20>, 'SPH': <AtomStyle.SPH: 21>, 'SPHERE': <AtomStyle.SPHERE: 22>, 'SPIN': <AtomStyle.SPIN: 23>, 'TDPD': <AtomStyle.TDPD: 24>, 'TEMPLATE': <AtomStyle.TEMPLATE: 25>, 'TRI': <AtomStyle.TRI: 26>, 'WAVEPACKET': <AtomStyle.WAVEPACKET: 27>, 'HYBRID': <AtomStyle.HYBRID: 28>}
-    def __eq__(self, other: typing.Any) -> bool:
-        ...
-    def __getstate__(self) -> int:
-        ...
-    def __hash__(self) -> int:
-        ...
-    def __index__(self) -> int:
-        ...
-    def __init__(self, value: typing.SupportsInt) -> None:
-        ...
-    def __int__(self) -> int:
-        ...
-    def __ne__(self, other: typing.Any) -> bool:
-        ...
-    def __repr__(self) -> str:
-        ...
-    def __setstate__(self, state: typing.SupportsInt) -> None:
-        ...
-    def __str__(self) -> str:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def value(self) -> int:
-        ...
 class AveFileReader:
     """
     
@@ -423,50 +337,15 @@ class AveFileReader:
                  
                  :return: Number of rows
         """
-class BackTrackStatus:
+class BackTrackStatus(enum.Enum):
     """
     
          Enum for controlling the strand linking process in linkStrandsCallback.
          
-    
-    Members:
-    
-      STOP : Stop the linking process
-    
-      TRACK_FORWARD : Continue linking forward
-    
-      TRACK_BACKWARD : Track backward in the linking process
     """
     STOP: typing.ClassVar[BackTrackStatus]  # value = <BackTrackStatus.STOP: 0>
     TRACK_BACKWARD: typing.ClassVar[BackTrackStatus]  # value = <BackTrackStatus.TRACK_BACKWARD: 2>
     TRACK_FORWARD: typing.ClassVar[BackTrackStatus]  # value = <BackTrackStatus.TRACK_FORWARD: 1>
-    __members__: typing.ClassVar[dict[str, BackTrackStatus]]  # value = {'STOP': <BackTrackStatus.STOP: 0>, 'TRACK_FORWARD': <BackTrackStatus.TRACK_FORWARD: 1>, 'TRACK_BACKWARD': <BackTrackStatus.TRACK_BACKWARD: 2>}
-    def __eq__(self, other: typing.Any) -> bool:
-        ...
-    def __getstate__(self) -> int:
-        ...
-    def __hash__(self) -> int:
-        ...
-    def __index__(self) -> int:
-        ...
-    def __init__(self, value: typing.SupportsInt) -> None:
-        ...
-    def __int__(self) -> int:
-        ...
-    def __ne__(self, other: typing.Any) -> bool:
-        ...
-    def __repr__(self) -> str:
-        ...
-    def __setstate__(self, state: typing.SupportsInt) -> None:
-        ...
-    def __str__(self) -> str:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def value(self) -> int:
-        ...
 class Box:
     """
     
@@ -609,49 +488,9 @@ class Box:
                   :param abs_precision: Absolute precision for the validation
                   :return: True if the offset is valid, False otherwise
         """
-class ComputedDoubleValues:
+class ComputedDoubleValues(enum.IntEnum):
     """
     Floating point output quantities
-    
-    Members:
-    
-      TIMESTEP : Results in the output column "TimeStep".
-    
-      TIME : Results in the output column "Time".
-    
-      VOLUME : Results in the output column "Volume".
-    
-      PRESSURE : Results in the output column "Pressure".
-    
-      TEMPERATURE : Results in the output column "Temperature".
-    
-      STRESS_XX : Results in the output column "Stress[0,0]".
-    
-      STRESS_YY : Results in the output column "Stress[1,1]".
-    
-      STRESS_ZZ : Results in the output column "Stress[2,2]".
-    
-      STRESS_XY : Results in the output column "Stress[0,1]".
-    
-      STRESS_YZ : Results in the output column "Stress[1,2]".
-    
-      STRESS_XZ : Results in the output column "Stress[0,2]".
-    
-      STRESS_NXY : Results in the output column "Stress[0,0]-Stress[1,1]".
-    
-      STRESS_NYZ : Results in the output column "Stress[1,1]-Stress[2,2]".
-    
-      STRESS_NXZ : Results in the output column "Stress[0,0]-Stress[2,2]".
-    
-      GAMMA : Results in the output column "Gamma".
-    
-      RESIDUAL : Results in the output column "Residual".
-    
-      MEAN_B : Results in the output column "<b>".
-    
-      MAX_B : Results in the output column "max(b)".
-    
-      MSD : Results in the output column "MSD".
     """
     GAMMA: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.GAMMA: 14>
     MAX_B: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.MAX_B: 17>
@@ -672,54 +511,16 @@ class ComputedDoubleValues:
     TIME: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.TIME: 1>
     TIMESTEP: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.TIMESTEP: 0>
     VOLUME: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.VOLUME: 2>
-    __members__: typing.ClassVar[dict[str, ComputedDoubleValues]]  # value = {'TIMESTEP': <ComputedDoubleValues.TIMESTEP: 0>, 'TIME': <ComputedDoubleValues.TIME: 1>, 'VOLUME': <ComputedDoubleValues.VOLUME: 2>, 'PRESSURE': <ComputedDoubleValues.PRESSURE: 3>, 'TEMPERATURE': <ComputedDoubleValues.TEMPERATURE: 4>, 'STRESS_XX': <ComputedDoubleValues.STRESS_XX: 5>, 'STRESS_YY': <ComputedDoubleValues.STRESS_YY: 6>, 'STRESS_ZZ': <ComputedDoubleValues.STRESS_ZZ: 7>, 'STRESS_XY': <ComputedDoubleValues.STRESS_XY: 8>, 'STRESS_YZ': <ComputedDoubleValues.STRESS_YZ: 9>, 'STRESS_XZ': <ComputedDoubleValues.STRESS_XZ: 10>, 'STRESS_NXY': <ComputedDoubleValues.STRESS_NXY: 11>, 'STRESS_NYZ': <ComputedDoubleValues.STRESS_NYZ: 12>, 'STRESS_NXZ': <ComputedDoubleValues.STRESS_NXZ: 13>, 'GAMMA': <ComputedDoubleValues.GAMMA: 14>, 'RESIDUAL': <ComputedDoubleValues.RESIDUAL: 15>, 'MEAN_B': <ComputedDoubleValues.MEAN_B: 16>, 'MAX_B': <ComputedDoubleValues.MAX_B: 17>, 'MSD': <ComputedDoubleValues.MSD: 18>}
-    def __eq__(self, other: typing.Any) -> bool:
+    @classmethod
+    def __new__(cls, value):
         ...
-    def __getstate__(self) -> int:
-        ...
-    def __hash__(self) -> int:
-        ...
-    def __index__(self) -> int:
-        ...
-    def __init__(self, value: typing.SupportsInt) -> None:
-        ...
-    def __int__(self) -> int:
-        ...
-    def __ne__(self, other: typing.Any) -> bool:
-        ...
-    def __repr__(self) -> str:
-        ...
-    def __setstate__(self, state: typing.SupportsInt) -> None:
-        ...
-    def __str__(self) -> str:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def value(self) -> int:
-        ...
-class ComputedIntValues:
+    def __format__(self, format_spec):
+        """
+        Convert to a string according to format_spec.
+        """
+class ComputedIntValues(enum.IntEnum):
     """
     Integer output quantities
-    
-    Members:
-    
-      STEP : Results in the output column "Step".
-    
-      NUM_SHIFT : Results in the output column "numShift".
-    
-      NUM_RELOC : Results in the output column "numReloc".
-    
-      NUM_ATOMS : Results in the output column "numAtoms".
-    
-      NUM_EXTRA_ATOMS : Results in the output column "numExtraAtoms".
-    
-      NUM_BONDS : Results in the output column "numBonds".
-    
-      NUM_EXTRA_BONDS : Results in the output column "numExtraBonds".
-    
-      NUM_BONDS_TO_FORM : Results in the output column "numBondsToForm".
     """
     NUM_ATOMS: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.NUM_ATOMS: 3>
     NUM_BONDS: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.NUM_BONDS: 5>
@@ -729,33 +530,13 @@ class ComputedIntValues:
     NUM_RELOC: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.NUM_RELOC: 2>
     NUM_SHIFT: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.NUM_SHIFT: 1>
     STEP: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.STEP: 0>
-    __members__: typing.ClassVar[dict[str, ComputedIntValues]]  # value = {'STEP': <ComputedIntValues.STEP: 0>, 'NUM_SHIFT': <ComputedIntValues.NUM_SHIFT: 1>, 'NUM_RELOC': <ComputedIntValues.NUM_RELOC: 2>, 'NUM_ATOMS': <ComputedIntValues.NUM_ATOMS: 3>, 'NUM_EXTRA_ATOMS': <ComputedIntValues.NUM_EXTRA_ATOMS: 4>, 'NUM_BONDS': <ComputedIntValues.NUM_BONDS: 5>, 'NUM_EXTRA_BONDS': <ComputedIntValues.NUM_EXTRA_BONDS: 6>, 'NUM_BONDS_TO_FORM': <ComputedIntValues.NUM_BONDS_TO_FORM: 7>}
-    def __eq__(self, other: typing.Any) -> bool:
+    @classmethod
+    def __new__(cls, value):
         ...
-    def __getstate__(self) -> int:
-        ...
-    def __hash__(self) -> int:
-        ...
-    def __index__(self) -> int:
-        ...
-    def __init__(self, value: typing.SupportsInt) -> None:
-        ...
-    def __int__(self) -> int:
-        ...
-    def __ne__(self, other: typing.Any) -> bool:
-        ...
-    def __repr__(self) -> str:
-        ...
-    def __setstate__(self, state: typing.SupportsInt) -> None:
-        ...
-    def __str__(self) -> str:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def value(self) -> int:
-        ...
+    def __format__(self, format_spec):
+        """
+        Convert to a string according to format_spec.
+        """
 class DPDSimulator:
     """
     
@@ -1417,29 +1198,11 @@ class DumpFileReader:
         """
                  Read the whole file.
         """
-class ExitReason:
+class ExitReason(enum.IntEnum):
     """
     
     An enum representing the reason for exiting
     the simulation or optimization procedure.
-    
-    Members:
-    
-      UNSET : Exit reason: "Unset".
-    
-      F_TOLERANCE : Exit reason: "F (force) tolerance reached".
-    
-      X_TOLERANCE : Exit reason: "X (displacement) tolerance reached".
-    
-      MAX_STEPS : Exit reason: "Maximum number of steps reached".
-    
-      NO_STEPS_POSSIBLE : Exit reason: "No (more) steps possible".
-    
-      FAILURE : Exit reason: "Failure".
-    
-      INTERRUPT : Exit reason: "Interrupt".
-    
-      OTHER : Exit reason: "Other".
     """
     FAILURE: typing.ClassVar[ExitReason]  # value = <ExitReason.FAILURE: 5>
     F_TOLERANCE: typing.ClassVar[ExitReason]  # value = <ExitReason.F_TOLERANCE: 1>
@@ -1449,33 +1212,13 @@ class ExitReason:
     OTHER: typing.ClassVar[ExitReason]  # value = <ExitReason.OTHER: 7>
     UNSET: typing.ClassVar[ExitReason]  # value = <ExitReason.UNSET: 0>
     X_TOLERANCE: typing.ClassVar[ExitReason]  # value = <ExitReason.X_TOLERANCE: 2>
-    __members__: typing.ClassVar[dict[str, ExitReason]]  # value = {'UNSET': <ExitReason.UNSET: 0>, 'F_TOLERANCE': <ExitReason.F_TOLERANCE: 1>, 'X_TOLERANCE': <ExitReason.X_TOLERANCE: 2>, 'MAX_STEPS': <ExitReason.MAX_STEPS: 3>, 'NO_STEPS_POSSIBLE': <ExitReason.NO_STEPS_POSSIBLE: 4>, 'FAILURE': <ExitReason.FAILURE: 5>, 'INTERRUPT': <ExitReason.INTERRUPT: 6>, 'OTHER': <ExitReason.OTHER: 7>}
-    def __eq__(self, other: typing.Any) -> bool:
+    @classmethod
+    def __new__(cls, value):
         ...
-    def __getstate__(self) -> int:
-        ...
-    def __hash__(self) -> int:
-        ...
-    def __index__(self) -> int:
-        ...
-    def __init__(self, value: typing.SupportsInt) -> None:
-        ...
-    def __int__(self) -> int:
-        ...
-    def __ne__(self, other: typing.Any) -> bool:
-        ...
-    def __repr__(self) -> str:
-        ...
-    def __setstate__(self, state: typing.SupportsInt) -> None:
-        ...
-    def __str__(self) -> str:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def value(self) -> int:
-        ...
+    def __format__(self, format_spec):
+        """
+        Convert to a string according to format_spec.
+        """
 class LazyUniverseSequenceIterator:
     """
     
@@ -1510,27 +1253,9 @@ class LinearMaxDistanceProvider(MaxDistanceProvider):
         
                  :param N: Number of segments.
         """
-class LinkSwappingMode:
+class LinkSwappingMode(enum.Enum):
     """
     How slip-links may act when they reach each-other or even a crosslink.
-    
-    Members:
-    
-      NO_SWAPPING : No Swapping
-    
-      SLIPLINKS_ONLY : Sliplinks only
-    
-      ALL : All
-    
-      ALL_CYCLE : All, restrict to cycles
-    
-      ALL_MC : All MC
-    
-      ALL_MC_CYCLE : All MC, restrict to cycles
-    
-      ALL_MC_TRY : All MC, attempt the move
-    
-      ALL_MC_TRY_CYCLE : All MC, restrict to cycles, attempt the move
     """
     ALL: typing.ClassVar[LinkSwappingMode]  # value = <LinkSwappingMode.ALL: 2>
     ALL_CYCLE: typing.ClassVar[LinkSwappingMode]  # value = <LinkSwappingMode.ALL_CYCLE: 3>
@@ -1540,33 +1265,6 @@ class LinkSwappingMode:
     ALL_MC_TRY_CYCLE: typing.ClassVar[LinkSwappingMode]  # value = <LinkSwappingMode.ALL_MC_TRY_CYCLE: 7>
     NO_SWAPPING: typing.ClassVar[LinkSwappingMode]  # value = <LinkSwappingMode.NO_SWAPPING: 0>
     SLIPLINKS_ONLY: typing.ClassVar[LinkSwappingMode]  # value = <LinkSwappingMode.SLIPLINKS_ONLY: 1>
-    __members__: typing.ClassVar[dict[str, LinkSwappingMode]]  # value = {'NO_SWAPPING': <LinkSwappingMode.NO_SWAPPING: 0>, 'SLIPLINKS_ONLY': <LinkSwappingMode.SLIPLINKS_ONLY: 1>, 'ALL': <LinkSwappingMode.ALL: 2>, 'ALL_CYCLE': <LinkSwappingMode.ALL_CYCLE: 3>, 'ALL_MC': <LinkSwappingMode.ALL_MC: 4>, 'ALL_MC_CYCLE': <LinkSwappingMode.ALL_MC_CYCLE: 5>, 'ALL_MC_TRY': <LinkSwappingMode.ALL_MC_TRY: 6>, 'ALL_MC_TRY_CYCLE': <LinkSwappingMode.ALL_MC_TRY_CYCLE: 7>}
-    def __eq__(self, other: typing.Any) -> bool:
-        ...
-    def __getstate__(self) -> int:
-        ...
-    def __hash__(self) -> int:
-        ...
-    def __index__(self) -> int:
-        ...
-    def __init__(self, value: typing.SupportsInt) -> None:
-        ...
-    def __int__(self) -> int:
-        ...
-    def __ne__(self, other: typing.Any) -> bool:
-        ...
-    def __repr__(self) -> str:
-        ...
-    def __setstate__(self, state: typing.SupportsInt) -> None:
-        ...
-    def __str__(self) -> str:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def value(self) -> int:
-        ...
 class MCUniverseGenerator:
     """
     
@@ -2753,18 +2451,60 @@ class MEHPForceEvaluator:
     """
     
          The base interface to change the way the force is evaluated during a MEHP run.
+         
+         To create a custom force evaluator in Python, subclass this class and implement:
+         
+         - :meth:`evaluate_force_set_gradient`: Compute the force and optionally its gradient
+         - :meth:`evaluate_stress_contribution`: Compute stress tensor contributions
+         - :meth:`prepare_for_evaluations`: Prepare for a batch of evaluations
         
     """
     is_2d: bool
     def __init__(self) -> None:
         ...
+    def evaluate_force_set_gradient(self, n: typing.SupportsInt, spring_distances: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], compute_gradient: bool = False) -> tuple:
+        """
+                  Evaluate the force and optionally compute its gradient.
+        
+                  This is one of the primary methods to override when creating a
+                  custom force evaluator. Override this in Python by defining a method
+                  that returns a tuple of (force, gradient).
+        
+                  :param n: The dimensionality of the problem (the number of coordinates)
+                  :param spring_distances: The sequential (x, y, z) spring distances as a vector
+                  :param compute_gradient: If True, the gradient should be computed and returned
+                  :return: A tuple (force, gradient) where:
+                      - force: The computed force value (float)
+                      - gradient: The gradient as a list (or None if compute_gradient was False)
+                      
+                  Example implementation in Python::
+                  
+                      def evaluate_force_set_gradient(self, n, spring_distances, compute_gradient):
+                          force = 0.0
+                          # ... compute force ...
+                          
+                          gradient = None
+                          if compute_gradient:
+                              gradient = [0.0] * n
+                              # ... compute gradient ...
+                          
+                          return (force, gradient)
+        """
     def evaluate_stress_contribution(self, spring_distances: typing.SupportsFloat, i: typing.SupportsInt, j: typing.SupportsInt, spring_index: typing.SupportsInt) -> float:
         """
-                  An evaluation of the stress-contribution.
+                  Evaluate the stress-contribution for a single spring.
         
-                  :param springDistances: The three coordinate differences for one spring.
+                  :param spring_distances: The three coordinate differences for one spring (list of 3 floats)
                   :param i: The row index of the stress tensor
                   :param j: The column index of the stress tensor
+                  :param spring_index: The index of the spring being evaluated
+                  :return: The stress contribution value
+        """
+    def prepare_for_evaluations(self) -> None:
+        """
+             Prepare the evaluator for a series of evaluations.
+             This method is called before a batch of force evaluations,
+             allowing for any necessary setup or precomputation.
         """
     @property
     def network(self) -> SimplifiedNetwork:
@@ -3425,62 +3165,15 @@ class MoleculeIterator:
         ...
     def __next__(self) -> Atom:
         ...
-class MoleculeType:
+class MoleculeType(enum.Enum):
     """
     An enum representing the type of molecule/chain/strand.
-    
-    Members:
-    
-      UNDEFINED : This value indicates that either the property was not set or not discovered.
-    
-      NETWORK_STRAND : 
-               A network strand is a strand in a network.
-          
-    
-      PRIMARY_LOOP : 
-               A primary loop is a network strand looping from and to the same crosslinker.
-          
-    
-      DANGLING_CHAIN : 
-               A dangling chain is a network strand where only one end is attached to a crosslinker.
-          
-    
-      FREE_CHAIN : 
-               A free chain is a strand not connected to any crosslinker.
-          
     """
     DANGLING_CHAIN: typing.ClassVar[MoleculeType]  # value = <MoleculeType.DANGLING_CHAIN: 3>
     FREE_CHAIN: typing.ClassVar[MoleculeType]  # value = <MoleculeType.FREE_CHAIN: 4>
     NETWORK_STRAND: typing.ClassVar[MoleculeType]  # value = <MoleculeType.NETWORK_STRAND: 1>
     PRIMARY_LOOP: typing.ClassVar[MoleculeType]  # value = <MoleculeType.PRIMARY_LOOP: 2>
     UNDEFINED: typing.ClassVar[MoleculeType]  # value = <MoleculeType.UNDEFINED: 0>
-    __members__: typing.ClassVar[dict[str, MoleculeType]]  # value = {'UNDEFINED': <MoleculeType.UNDEFINED: 0>, 'NETWORK_STRAND': <MoleculeType.NETWORK_STRAND: 1>, 'PRIMARY_LOOP': <MoleculeType.PRIMARY_LOOP: 2>, 'DANGLING_CHAIN': <MoleculeType.DANGLING_CHAIN: 3>, 'FREE_CHAIN': <MoleculeType.FREE_CHAIN: 4>}
-    def __eq__(self, other: typing.Any) -> bool:
-        ...
-    def __getstate__(self) -> int:
-        ...
-    def __hash__(self) -> int:
-        ...
-    def __index__(self) -> int:
-        ...
-    def __init__(self, value: typing.SupportsInt) -> None:
-        ...
-    def __int__(self) -> int:
-        ...
-    def __ne__(self, other: typing.Any) -> bool:
-        ...
-    def __repr__(self) -> str:
-        ...
-    def __setstate__(self, state: typing.SupportsInt) -> None:
-        ...
-    def __str__(self) -> str:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def value(self) -> int:
-        ...
 class NeighbourList:
     """
     
@@ -3744,51 +3437,9 @@ class OutputConfiguration:
     @use_every.setter
     def use_every(self, arg0: typing.SupportsInt) -> None:
         ...
-class SLESolver:
+class SLESolver(enum.Enum):
     """
     Solver for sparse linear equation systems
-    
-    Members:
-    
-      DEFAULT : default
-    
-      SIMPLICIAL_LLT : SimplicialLLT
-    
-      SIMPLICIAL_LDLT : SimplicialLDLT
-    
-      SPARSE_LU : SparseLU
-    
-      SPARSE_QR : SparseQR
-    
-      CONJUGATE_GRADIENT : ConjugateGradient
-    
-      CONJUGATE_GRADIENT_DIAGONALIZED : ConjugateGradient, DiagonalPreconditioner
-    
-      CONJUGATE_GRADIENT_IDENTITY : ConjugateGradient, IdentityPreconditioner
-    
-      CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY : ConjugateGradient, IncompleteCholeskyPreconditioner
-    
-      LEAST_SQUARES_CONJUGATE_GRADIENT : LeastSquaresConjugateGradient
-    
-      LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED : LeastSquaresConjugateGradient, DiagonalPreconditioner
-    
-      LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY : LeastSquaresConjugateGradient, IdentityPreconditioner
-    
-      BICGSTAB : BiCGSTAB
-    
-      BICGSTAB_DIAGONALIZED : BiCGSTAB, DiagonalPreconditioner
-    
-      BICGSTAB_IDENTITY : BiCGSTAB, IdentityPreconditioner
-    
-      BICGSTAB_INCOMPLETE_LU : BiCGSTAB, IncompleteLUTPreconditioner
-    
-      GRADIENT_DESCENT : GradientDescent
-    
-      GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT : GradientDescent (Barzilai-Borwein method, short time-step)
-    
-      GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG : GradientDescent (Barzilai-Borwein method, long time-step)
-    
-      GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM : GradientDescent (Barzilai-Borwein & heavy ball method, selective time-step)
     """
     BICGSTAB: typing.ClassVar[SLESolver]  # value = <SLESolver.BICGSTAB: 12>
     BICGSTAB_DIAGONALIZED: typing.ClassVar[SLESolver]  # value = <SLESolver.BICGSTAB_DIAGONALIZED: 13>
@@ -3810,33 +3461,6 @@ class SLESolver:
     SIMPLICIAL_LLT: typing.ClassVar[SLESolver]  # value = <SLESolver.SIMPLICIAL_LLT: 1>
     SPARSE_LU: typing.ClassVar[SLESolver]  # value = <SLESolver.SPARSE_LU: 3>
     SPARSE_QR: typing.ClassVar[SLESolver]  # value = <SLESolver.SPARSE_QR: 4>
-    __members__: typing.ClassVar[dict[str, SLESolver]]  # value = {'DEFAULT': <SLESolver.DEFAULT: 0>, 'SIMPLICIAL_LLT': <SLESolver.SIMPLICIAL_LLT: 1>, 'SIMPLICIAL_LDLT': <SLESolver.SIMPLICIAL_LDLT: 2>, 'SPARSE_LU': <SLESolver.SPARSE_LU: 3>, 'SPARSE_QR': <SLESolver.SPARSE_QR: 4>, 'CONJUGATE_GRADIENT': <SLESolver.CONJUGATE_GRADIENT: 5>, 'CONJUGATE_GRADIENT_DIAGONALIZED': <SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED: 6>, 'CONJUGATE_GRADIENT_IDENTITY': <SLESolver.CONJUGATE_GRADIENT_IDENTITY: 7>, 'CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY': <SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY: 8>, 'LEAST_SQUARES_CONJUGATE_GRADIENT': <SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT: 9>, 'LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED': <SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED: 10>, 'LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY': <SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY: 11>, 'BICGSTAB': <SLESolver.BICGSTAB: 12>, 'BICGSTAB_DIAGONALIZED': <SLESolver.BICGSTAB_DIAGONALIZED: 13>, 'BICGSTAB_IDENTITY': <SLESolver.BICGSTAB_IDENTITY: 14>, 'BICGSTAB_INCOMPLETE_LU': <SLESolver.BICGSTAB_INCOMPLETE_LU: 15>, 'GRADIENT_DESCENT': <SLESolver.GRADIENT_DESCENT: 16>, 'GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT': <SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT: 17>, 'GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG': <SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG: 18>, 'GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM': <SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM: 19>}
-    def __eq__(self, other: typing.Any) -> bool:
-        ...
-    def __getstate__(self) -> int:
-        ...
-    def __hash__(self) -> int:
-        ...
-    def __index__(self) -> int:
-        ...
-    def __init__(self, value: typing.SupportsInt) -> None:
-        ...
-    def __int__(self) -> int:
-        ...
-    def __ne__(self, other: typing.Any) -> bool:
-        ...
-    def __repr__(self) -> str:
-        ...
-    def __setstate__(self, state: typing.SupportsInt) -> None:
-        ...
-    def __str__(self) -> str:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def value(self) -> int:
-        ...
 class SimpleSpringMEHPForceEvaluator(MEHPForceEvaluator):
     """
     
@@ -4044,6 +3668,9 @@ class SimplifiedNetwork:
     def old_atom_ids(self) -> typing.Annotated[numpy.typing.NDArray[numpy.int32], "[m, 1]"]:
         ...
     @property
+    def spring_contour_length(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        ...
+    @property
     def spring_coordinate_index_a(self) -> typing.Annotated[numpy.typing.NDArray[numpy.int32], "[m, 1]"]:
         ...
     @property
@@ -4058,54 +3685,15 @@ class SimplifiedNetwork:
     @property
     def volume(self) -> float:
         ...
-class StructureSimplificationMode:
+class StructureSimplificationMode(enum.Enum):
     """
     How the structure shall be simplified during the optimization in order to remove non-trapped entanglement links.
-    
-    Members:
-    
-      NO_SIMPLIFICATION : No Simplification
-    
-      X2F_ONLY : Removal of two-functional crosslinks only
-    
-      INACTIVE_ONLY : Removal of inactive entanglement- and crosslinks only
-    
-      INACTIVE_THEN_X2F : Removal of inactive, and then two-functional entanglement- and crosslinks, one after the other
-    
-      X1F_X2F_THEN_INACTIVE : Removal of one- and twofunctional crosslinks, and then inactive entanglements and crosslinks. Deprecated, use INACTIVE_THEN_X2F instead
     """
     INACTIVE_ONLY: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.INACTIVE_ONLY: 2>
     INACTIVE_THEN_X2F: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.INACTIVE_THEN_X2F: 3>
     NO_SIMPLIFICATION: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.NO_SIMPLIFICATION: 0>
     X1F_X2F_THEN_INACTIVE: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.X1F_X2F_THEN_INACTIVE: 4>
     X2F_ONLY: typing.ClassVar[StructureSimplificationMode]  # value = <StructureSimplificationMode.X2F_ONLY: 1>
-    __members__: typing.ClassVar[dict[str, StructureSimplificationMode]]  # value = {'NO_SIMPLIFICATION': <StructureSimplificationMode.NO_SIMPLIFICATION: 0>, 'X2F_ONLY': <StructureSimplificationMode.X2F_ONLY: 1>, 'INACTIVE_ONLY': <StructureSimplificationMode.INACTIVE_ONLY: 2>, 'INACTIVE_THEN_X2F': <StructureSimplificationMode.INACTIVE_THEN_X2F: 3>, 'X1F_X2F_THEN_INACTIVE': <StructureSimplificationMode.X1F_X2F_THEN_INACTIVE: 4>}
-    def __eq__(self, other: typing.Any) -> bool:
-        ...
-    def __getstate__(self) -> int:
-        ...
-    def __hash__(self) -> int:
-        ...
-    def __index__(self) -> int:
-        ...
-    def __init__(self, value: typing.SupportsInt) -> None:
-        ...
-    def __int__(self) -> int:
-        ...
-    def __ne__(self, other: typing.Any) -> bool:
-        ...
-    def __repr__(self) -> str:
-        ...
-    def __setstate__(self, state: typing.SupportsInt) -> None:
-        ...
-    def __str__(self) -> str:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def value(self) -> int:
-        ...
 class Universe:
     """
     
@@ -5085,4 +4673,4 @@ def version_information() -> str:
 STOP: BackTrackStatus  # value = <BackTrackStatus.STOP: 0>
 TRACK_BACKWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_BACKWARD: 2>
 TRACK_FORWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_FORWARD: 1>
-__version__: str = '0.3.10'
+__version__: str = '0.3.12'
