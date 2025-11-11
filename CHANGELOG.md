@@ -2,6 +2,8 @@
 
 ## main
 
+## v0.3.13
+
 - Implement new utility methods in `pylimer_tools.calc.stoichiometric_relationships` in particular to help with the parameter `b2`
 - Restructure Python tests a bit to better reflect the structure of the Python code
 - Finally re-implement possibility to use Python functions for determining the forces in `MEHPForceRelaxation`
