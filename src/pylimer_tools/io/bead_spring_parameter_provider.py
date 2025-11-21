@@ -36,7 +36,7 @@ class Parameters:
         data : dict
             A dictionary containing polymer-related quantities. Each value in the dictionary
             must be a Pint Quantity object. The dictionary must include the keys "Mw", "<b>",
-            "rho" and "<b^2>" as these are required parameters.
+            "rho", "<b^2>", and "C_inf" as these are required parameters.
 
         ureg : UnitRegistry
             A Pint UnitRegistry object used for unit conversions within the class.
@@ -48,7 +48,7 @@ class Parameters:
         -------
         AssertionError
             If any value in the data dictionary is not a Quantity object, or if any of the
-            required parameters ("Mw", "<b>", "<b^2>", "rho") are missing from the data dictionary.
+            required parameters ("Mw", "<b>", "<b^2>", "rho", "C_inf") are missing from the data dictionary.
 
         """
         for key, value in data.items():
@@ -57,7 +57,7 @@ class Parameters:
             )
 
         # validate parameters
-        required_params = ["Mw", "<b>", "<b^2>", "rho"]
+        required_params = ["Mw", "<b>", "<b^2>", "rho", "C_inf"]
         for param in required_params:
             assert param in data, f"Missing required parameter: {param}"
 
@@ -68,6 +68,7 @@ class Parameters:
         assert data["rho"].check("[mass]/[volume]") or data["rho"].check(
             "[substance]/[volume]"
         )
+        assert data["C_inf"].check("")
 
         if "R02" not in data:
             data["R02"] = data["<b^2>"]
@@ -96,6 +97,7 @@ class Parameters:
             ["rho", "density"],
             ["Ge", "g_e_1", "entanglement_modulus"],
             ["T", "temperature"],
+            ["C_inf", "characteristic_ratio"],
         ]
         for synonym_group in synonyms:
             if name in synonym_group:
@@ -131,6 +133,14 @@ class Parameters:
             # assert dimensionless density
             assert density.check("[dimensionless]")
             return density.magnitude
+    
+    def get_characteristic_ratio(self) -> float:
+        """
+        Returns the characteristic ratio of the polymer.
+        """
+        characteristic_ratio = self.get("C_inf")
+        assert characteristic_ratio.check("")
+        return characteristic_ratio.magnitude
 
     def get_base_distance_units(self) -> pint.Quantity:
         return self.get("distance_units")
@@ -187,6 +197,7 @@ def assemble_gaussian_parameters_from_kuhn(
     kuhn_mass: Quantity,
     density: Quantity,
     entanglement_modulus: Quantity,
+    characteristic_ratio: Quantity,
     temperature: Union[Quantity, None] = None,
     name: str = "",
 ) -> Parameters:
@@ -199,6 +210,7 @@ def assemble_gaussian_parameters_from_kuhn(
     - kuhn_mass (Quantity): The Kuhn mass of the polymer chain.
     - density (Quantity): The density of the polymer solution.
     - entanglement_modulus (Quantity): The entanglement modulus of the polymer.
+    - characteristic_ratio (Quantity): The characteristic ratio of the polymer.
     - temperature (Quantity, optional): The temperature of the polymer solution. Defaults to 298 Kelvin.
     - name (str, optional): An optional name for this set of parameters. Defaults to an empty string.
 
@@ -210,6 +222,7 @@ def assemble_gaussian_parameters_from_kuhn(
     assert kuhn_mass.check("[mass]/[substance]")
     assert density.check("[mass]/[volume]")
     assert entanglement_modulus.check("[pressure]")
+    assert characteristic_ratio.check("")
     return Parameters(
         {
             "R02": alpha * ((kuhn_length / alpha) ** 2),
@@ -221,6 +234,7 @@ def assemble_gaussian_parameters_from_kuhn(
             "distance_units": 1 * ureg.nanometer,
             "rho": density,
             "Ge": entanglement_modulus,
+            "C_inf": characteristic_ratio,
         },
         ureg,
         name,
@@ -270,6 +284,7 @@ def get_kg_lj_parameters_for_polymer(polymer_name: str) -> Parameters:
             "T": row["T_ref"] * ureg.kelvin,
             "kb": unit_style.kb,
             "Ge": row["G_e"] * ureg.megapascal,
+            "C_inf": row["C_inf"] * ureg(""),
         },
         ureg,
         name="kg-lj-{}".format(polymer_name),
@@ -294,6 +309,7 @@ def get_kuhn_parameters_for_polymer(
     ge_1 = row["G_e"] * ureg("MPa")  # MPa
     kuhn_length = row["l_K"] * ureg("angstrom")  # °A
     kuhn_bead_mass = row["M_k"] * ureg("g/mol")  # kg/mol
+    characteristic_ratio = row["C_inf"] * ureg("")
 
     return Parameters(
         {
@@ -306,6 +322,7 @@ def get_kuhn_parameters_for_polymer(
             "rho": density,
             "T": temperature,
             "Ge": ge_1,
+            "C_inf": characteristic_ratio,
             "distance_units": 1 * ureg.nanometer,
         },
         ureg,
@@ -333,6 +350,7 @@ def get_gaussian_parameters_for_polymer(
     ge_1 = row["G_e"] * ureg("MPa")  # MPa
     kuhn_length = row["l_K"] * ureg("angstrom")  # °A
     kuhn_bead_mass = row["M_k"] * ureg("g/mol")  # kg/mol
+    characteristic_ratio = row["C_inf"] * ureg("")
 
     return assemble_gaussian_parameters_from_kuhn(
         ureg,
@@ -340,6 +358,7 @@ def get_gaussian_parameters_for_polymer(
         kuhn_mass=kuhn_bead_mass,
         density=density,
         entanglement_modulus=ge_1,
+        characteristic_ratio=characteristic_ratio,
         temperature=temperature,
         name="si-{}".format(polymer_name),
     )

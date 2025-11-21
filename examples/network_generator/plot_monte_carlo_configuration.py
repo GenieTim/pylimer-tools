@@ -57,7 +57,7 @@ params = get_parameters_for_polymer(
 n_strands = 50000
 n_atoms_per_strand = 50
 
-volume = params.get_bead_density() * (n_strands * n_atoms_per_strand + 0.5 * n_strands)
+volume = (n_strands * n_atoms_per_strand + 0.5 * n_strands) / params.get_bead_density()
 
 generator_without_zscore = MCUniverseGenerator(
     volume ** (1 / 3),
