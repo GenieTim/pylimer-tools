@@ -23,7 +23,8 @@
       "Mb": 81.13,
       "kB_Tref": 4.11,
       "sigma": 0.5,
-      "kB_Tref_over_sigma_to_3": 32.0
+      "kB_Tref_over_sigma_to_3": 32.0,
+      "C_inf": 4.8
     },
     {
       "name": "PI-7",
@@ -48,7 +49,8 @@
       "Mb": 63.37,
       "kB_Tref": 4.11,
       "sigma": 0.46,
-      "kB_Tref_over_sigma_to_3": 41.3
+      "kB_Tref_over_sigma_to_3": 41.3,
+      "C_inf": 4.7
     },
     {
       "name": "PDMS*",
@@ -73,7 +75,8 @@
       "Mb": 161.05,
       "kB_Tref": 4.11,
       "sigma": 0.62,
-      "kB_Tref_over_sigma_to_3": 17.6
+      "kB_Tref_over_sigma_to_3": 17.6,
+      "C_inf": 5.78
     },
     {
       "name": "PI-20",
@@ -98,7 +101,8 @@
       "Mb": 70.5,
       "kB_Tref": 4.11,
       "sigma": 0.48,
-      "kB_Tref_over_sigma_to_3": 37.1
+      "kB_Tref_over_sigma_to_3": 37.1,
+      "C_inf": 4.96
     },
     {
       "name": "PI-34",
@@ -123,7 +127,8 @@
       "Mb": 78.86,
       "kB_Tref": 4.11,
       "sigma": 0.5,
-      "kB_Tref_over_sigma_to_3": 33.1
+      "kB_Tref_over_sigma_to_3": 33.1,
+      "C_inf": 5.26
     },
     {
       "name": "cis-PBd",
@@ -148,7 +153,8 @@
       "Mb": 42.87,
       "kB_Tref": 4.11,
       "sigma": 0.41,
-      "kB_Tref_over_sigma_to_3": 61.3
+      "kB_Tref_over_sigma_to_3": 61.3,
+      "C_inf": 4.61
     },
     {
       "name": "PIB(413)",
@@ -173,10 +179,11 @@
       "Mb": 125.69,
       "kB_Tref": 5.7,
       "sigma": 0.59,
-      "kB_Tref_over_sigma_to_3": 27.3
+      "kB_Tref_over_sigma_to_3": 27.3,
+      "C_inf": 6.58
     },
     {
-      "name": "cis-P1",
+      "name": "cis-PI",
       "T_ref": 298,
       "R_to_2_over_M_c": 0.679,
       "rho_bulk": 0.91,
@@ -198,7 +205,8 @@
       "Mb": 60.32,
       "kB_Tref": 4.11,
       "sigma": 0.45,
-      "kB_Tref_over_sigma_to_3": 44.0
+      "kB_Tref_over_sigma_to_3": 44.0,
+      "C_inf": 5.2
     },
     {
       "name": "a-PP(463)",
@@ -223,7 +231,8 @@
       "Mb": 85.25,
       "kB_Tref": 6.39,
       "sigma": 0.54,
-      "kB_Tref_over_sigma_to_3": 40.7
+      "kB_Tref_over_sigma_to_3": 40.7,
+      "C_inf": 6.0
     },
     {
       "name": "i-PP",
@@ -248,7 +257,8 @@
       "Mb": 85.96,
       "kB_Tref": 6.39,
       "sigma": 0.54,
-      "kB_Tref_over_sigma_to_3": 40.4
+      "kB_Tref_over_sigma_to_3": 40.4,
+      "C_inf": 6.15
     },
     {
       "name": "a-PP(413)",
@@ -273,7 +283,8 @@
       "Mb": 83.84,
       "kB_Tref": 5.7,
       "sigma": 0.53,
-      "kB_Tref_over_sigma_to_3": 38.2
+      "kB_Tref_over_sigma_to_3": 38.2,
+      "C_inf": 6.0
     },
     {
       "name": "a-PP(348)",
@@ -298,7 +309,8 @@
       "Mb": 82.08,
       "kB_Tref": 4.8,
       "sigma": 0.52,
-      "kB_Tref_over_sigma_to_3": 34.3
+      "kB_Tref_over_sigma_to_3": 34.3,
+      "C_inf": 6.0
     },
     {
       "name": "a-PP",
@@ -323,7 +335,8 @@
       "Mb": 80.84,
       "kB_Tref": 4.11,
       "sigma": 0.51,
-      "kB_Tref_over_sigma_to_3": 30.7
+      "kB_Tref_over_sigma_to_3": 30.7,
+      "C_inf": 6.0
     },
     {
       "name": "PIB",
@@ -348,7 +361,8 @@
       "Mb": 120.66,
       "kB_Tref": 4.11,
       "sigma": 0.57,
-      "kB_Tref_over_sigma_to_3": 22.2
+      "kB_Tref_over_sigma_to_3": 22.2,
+      "C_inf": 6.73
     },
     {
       "name": "a-PMMA",
@@ -373,7 +387,8 @@
       "Mb": 258.82,
       "kB_Tref": 5.7,
       "sigma": 0.69,
-      "kB_Tref_over_sigma_to_3": 17.6
+      "kB_Tref_over_sigma_to_3": 17.6,
+      "C_inf": 8.22
     },
     {
       "name": "i-PS*",
@@ -398,7 +413,8 @@
       "Mb": 297.22,
       "kB_Tref": 5.7,
       "sigma": 0.76,
-      "kB_Tref_over_sigma_to_3": 13.2
+      "kB_Tref_over_sigma_to_3": 13.2,
+      "C_inf": 9.34
     },
     {
       "name": "a-PMA",
@@ -423,7 +439,8 @@
       "Mb": 208.42,
       "kB_Tref": 4.11,
       "sigma": 0.64,
-      "kB_Tref_over_sigma_to_3": 15.6
+      "kB_Tref_over_sigma_to_3": 15.6,
+      "C_inf": 7.91
     },
     {
       "name": "PI-75",
@@ -448,7 +465,8 @@
       "Mb": 163.78,
       "kB_Tref": 4.11,
       "sigma": 0.64,
-      "kB_Tref_over_sigma_to_3": 15.9
+      "kB_Tref_over_sigma_to_3": 15.9,
+      "C_inf": 8.07
     },
     {
       "name": "PBd-20",
@@ -473,7 +491,8 @@
       "Mb": 50.16,
       "kB_Tref": 4.11,
       "sigma": 0.43,
-      "kB_Tref_over_sigma_to_3": 52.2
+      "kB_Tref_over_sigma_to_3": 52.2,
+      "C_inf": 5.61
     },
     {
       "name": "a-PS*",
@@ -498,7 +517,8 @@
       "Mb": 297.19,
       "kB_Tref": 5.7,
       "sigma": 0.76,
-      "kB_Tref_over_sigma_to_3": 13.2
+      "kB_Tref_over_sigma_to_3": 13.2,
+      "C_inf": 9.72
     },
     {
       "name": "PBd-98",
@@ -523,7 +543,8 @@
       "Mb": 113.08,
       "kB_Tref": 4.14,
       "sigma": 0.56,
-      "kB_Tref_over_sigma_to_3": 23.1
+      "kB_Tref_over_sigma_to_3": 23.1,
+      "C_inf": 7.39
     },
     {
       "name": "PEO*",
@@ -548,7 +569,8 @@
       "Mb": 45.77,
       "kB_Tref": 4.87,
       "sigma": 0.39,
-      "kB_Tref_over_sigma_to_3": 80.2
+      "kB_Tref_over_sigma_to_3": 80.2,
+      "C_inf": 5.51
     },
     {
       "name": "POM*",
@@ -573,7 +595,8 @@
       "Mb": 47.4,
       "kB_Tref": 6.53,
       "sigma": 0.39,
-      "kB_Tref_over_sigma_to_3": 111.5
+      "kB_Tref_over_sigma_to_3": 111.5,
+      "C_inf": 5.59
     },
     {
       "name": "a-PHMA",
@@ -598,7 +621,8 @@
       "Mb": 621.59,
       "kB_Tref": 5.15,
       "sigma": 0.97,
-      "kB_Tref_over_sigma_to_3": 5.7
+      "kB_Tref_over_sigma_to_3": 5.7,
+      "C_inf": 13.1
     },
     {
       "name": "a-PVA*",
@@ -623,7 +647,8 @@
       "Mb": 211.52,
       "kB_Tref": 4.6,
       "sigma": 0.65,
-      "kB_Tref_over_sigma_to_3": 16.7
+      "kB_Tref_over_sigma_to_3": 16.7,
+      "C_inf": 4.61
     },
     {
       "name": "SBR",
@@ -648,7 +673,8 @@
       "Mb": 65.62,
       "kB_Tref": 4.11,
       "sigma": 0.47,
-      "kB_Tref_over_sigma_to_3": 40.6
+      "kB_Tref_over_sigma_to_3": 40.6,
+      "C_inf": 6.41
     },
     {
       "name": "P6N*",
@@ -673,7 +699,8 @@
       "Mb": 51.98,
       "kB_Tref": 7.5,
       "sigma": 0.42,
-      "kB_Tref_over_sigma_to_3": 100.9
+      "kB_Tref_over_sigma_to_3": 100.9,
+      "C_inf": 6.02
     },
     {
       "name": "a-PaMS*",
@@ -698,7 +725,8 @@
       "Mb": 346.66,
       "kB_Tref": 6.53,
       "sigma": 0.78,
-      "kB_Tref_over_sigma_to_3": 13.9
+      "kB_Tref_over_sigma_to_3": 13.9,
+      "C_inf": 7.44
     },
     {
       "name": "a-PEA",
@@ -723,7 +751,8 @@
       "Mb": 259.56,
       "kB_Tref": 4.11,
       "sigma": 0.69,
-      "kB_Tref_over_sigma_to_3": 12.8
+      "kB_Tref_over_sigma_to_3": 12.8,
+      "C_inf": 9.76
     },
     {
       "name": "PET*",
@@ -748,7 +777,8 @@
       "Mb": 83.82,
       "kB_Tref": 7.57,
       "sigma": 0.49,
-      "kB_Tref_over_sigma_to_3": 63.4
+      "kB_Tref_over_sigma_to_3": 63.4,
+      "C_inf": 7.63
     },
     {
       "name": "s-PP",
@@ -773,7 +803,8 @@
       "Mb": 86.03,
       "kB_Tref": 6.39,
       "sigma": 0.54,
-      "kB_Tref_over_sigma_to_3": 40.5
+      "kB_Tref_over_sigma_to_3": 40.5,
+      "C_inf": 9.12
     },
     {
       "name": "PE(413)",
@@ -798,7 +829,8 @@
       "Mb": 46.15,
       "kB_Tref": 5.7,
       "sigma": 0.44,
-      "kB_Tref_over_sigma_to_3": 69.0
+      "kB_Tref_over_sigma_to_3": 69.0,
+      "C_inf": 7.38
     },
     {
       "name": "a-POA",
@@ -823,7 +855,8 @@
       "Mb": 693.22,
       "kB_Tref": 4.11,
       "sigma": 1.0,
-      "kB_Tref_over_sigma_to_3": 4.1
+      "kB_Tref_over_sigma_to_3": 4.1,
+      "C_inf": 17.1
     },
     {
       "name": "PC*",
@@ -848,7 +881,8 @@
       "Mb": 103.76,
       "kB_Tref": 6.53,
       "sigma": 0.5,
-      "kB_Tref_over_sigma_to_3": 51.0
+      "kB_Tref_over_sigma_to_3": 51.0,
+      "C_inf": 7.81
     },
     {
       "name": "PE",
@@ -873,7 +907,8 @@
       "Mb": 44.07,
       "kB_Tref": 4.11,
       "sigma": 0.42,
-      "kB_Tref_over_sigma_to_3": 56.4
+      "kB_Tref_over_sigma_to_3": 56.4,
+      "C_inf": 8.26
     },
     {
       "name": "PTFE*",
@@ -898,7 +933,8 @@
       "Mb": 227.7,
       "kB_Tref": 9.02,
       "sigma": 0.6,
-      "kB_Tref_over_sigma_to_3": 41.1
+      "kB_Tref_over_sigma_to_3": 41.1,
+      "C_inf": 12.78
     }
   ],
   "columns": [
@@ -924,11 +960,14 @@
     "Mb",
     "kB_Tref",
     "sigma",
-    "kB_Tref_over_sigma_to_3"
+    "kB_Tref_over_sigma_to_3",
+    "C_inf"
   ],
   "metadata": {
     "source": "Everaers et al. (2020)",
     "description": "Polymer unit properties for LJ unit conversions",
-    "generated_from": "everaers_et_al_unit_properties.xlsx"
+    "generated_from": "everaers_et_al_unit_properties.xlsx",
+    "conversion_note": "This file was generated from the Excel source. Do not edit manually.",
+    "reference": "https://doi.org/10.1021/acs.macromol.9b02428"
   }
 }
