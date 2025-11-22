@@ -8,6 +8,7 @@
 [![PyPI version](https://badge.fury.io/py/pylimer-tools.svg)](https://pypi.org/project/pylimer-tools/)
 [![Downloads](https://img.shields.io/pypi/dm/pylimer-tools.svg)](https://pypi.org/project/pylimer-tools/)
 [![License](https://img.shields.io/pypi/l/pylimer-tools.svg)](LICENSE)
+[![DOI](https://zenodo.org/badge/413754467.svg)](https://doi.org/10.5281/zenodo.17582030)
 
 Pronunciation: "pylimer” like "pü-limer”, with the "py” as in the German word "müde” (IPA: /ˈpyːlɪmɚ/).
 
