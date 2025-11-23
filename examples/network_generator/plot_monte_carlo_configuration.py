@@ -57,7 +57,8 @@ params = get_parameters_for_polymer(
 n_strands = 50000
 n_atoms_per_strand = 50
 
-volume = (n_strands * n_atoms_per_strand + 0.5 * n_strands) / params.get_bead_density()
+volume = (n_strands * n_atoms_per_strand + 0.5 *
+          n_strands) / params.get_bead_density()
 
 generator_without_zscore = MCUniverseGenerator(
     volume ** (1 / 3),
@@ -80,9 +81,7 @@ generator_without_zscore.link_strands_to_conversion(
     crosslinker_conversion=0.925)
 end_time_without = time.time()
 print(
-    f"Time without max distance: {
-        end_time_without -
-        start_time_without: .2f} seconds"
+    f"Time without max distance: {end_time_without - start_time_without: .2f} seconds"
 )
 
 generator_with_zscore.use_zscore_max_distance(3.0)

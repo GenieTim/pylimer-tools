@@ -133,14 +133,6 @@ class Parameters:
             # assert dimensionless density
             assert density.check("[dimensionless]")
             return density.magnitude
-    
-    def get_characteristic_ratio(self) -> float:
-        """
-        Returns the characteristic ratio of the polymer.
-        """
-        characteristic_ratio = self.get("C_inf")
-        assert characteristic_ratio.check("")
-        return characteristic_ratio.magnitude
 
     def get_base_distance_units(self) -> pint.Quantity:
         return self.get("distance_units")
@@ -189,6 +181,15 @@ class Parameters:
     def get_fb_stress_conversion(self) -> float:
         return (self.get_kappa() / (1 * self.get("distance_units"))
                 ).to("MPa").magnitude
+
+    def __getattr__(self, name: str):
+        if name.startswith("get_"):
+
+            def method(*args, **kwargs):
+                return self.get(name[4:])
+
+            return method
+        raise AttributeError(f"'Parameters' object has no attribute '{name}'")
 
 
 def assemble_gaussian_parameters_from_kuhn(
