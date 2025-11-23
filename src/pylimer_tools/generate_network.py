@@ -179,7 +179,7 @@ def prepare_structure_generation(
         assert target_wsol is not None
         universe_generator.link_strands_to_soluble_fraction(
             target_wsol,
-            c_infinity=params.get("C_inf").magnitude,
+            c_infinity=1.0,  # params.get("C_inf").magnitude,
         )
 
     if run_force_relaxation:
