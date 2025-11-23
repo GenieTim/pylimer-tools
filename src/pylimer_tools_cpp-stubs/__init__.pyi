@@ -511,13 +511,6 @@ class ComputedDoubleValues(enum.IntEnum):
     TIME: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.TIME: 1>
     TIMESTEP: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.TIMESTEP: 0>
     VOLUME: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.VOLUME: 2>
-    @classmethod
-    def __new__(cls, value):
-        ...
-    def __format__(self, format_spec):
-        """
-        Convert to a string according to format_spec.
-        """
 class ComputedIntValues(enum.IntEnum):
     """
     Integer output quantities
@@ -530,13 +523,6 @@ class ComputedIntValues(enum.IntEnum):
     NUM_RELOC: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.NUM_RELOC: 2>
     NUM_SHIFT: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.NUM_SHIFT: 1>
     STEP: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.STEP: 0>
-    @classmethod
-    def __new__(cls, value):
-        ...
-    def __format__(self, format_spec):
-        """
-        Convert to a string according to format_spec.
-        """
 class DPDSimulator:
     """
     
@@ -1212,13 +1198,6 @@ class ExitReason(enum.IntEnum):
     OTHER: typing.ClassVar[ExitReason]  # value = <ExitReason.OTHER: 7>
     UNSET: typing.ClassVar[ExitReason]  # value = <ExitReason.UNSET: 0>
     X_TOLERANCE: typing.ClassVar[ExitReason]  # value = <ExitReason.X_TOLERANCE: 2>
-    @classmethod
-    def __new__(cls, value):
-        ...
-    def __format__(self, format_spec):
-        """
-        Convert to a string according to format_spec.
-        """
 class LazyUniverseSequenceIterator:
     """
     
@@ -1269,6 +1248,20 @@ class MCUniverseGenerator:
     """
     
            A :obj:`pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
+           This generator creates phantom bead-spring polymer networks with crosslinkers and Gaussian chain and bond statistics.
+    
+           .. note::
+    
+              A note on the characteristic ratio :math:`C_{\\infty}` and the bead distance :math:`b`:
+              If you use parameters from :mod:`pylimer_tools.io.bead_spring_parameter_provider` with 
+              type :obj:`pylimer_tools.io.bead_spring_parameter_provider.ParameterType.GAUSSIAN`,
+              there is no need to set :math:`C_{\\infty}` in the MCUniverseGenerator methods,
+              as the bead distance :math:`b` you set via :meth:`~pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance`
+              from :meth:`pylimer_tools.io.bead_spring_parameter_provider.Parameters.get("<b>")`
+              already incorporates the characteristic ratio.
+    
+              This is the recommended way to use the MCUniverseGenerator, since using e.g.
+              Kuhn segment parameters conflicts with the generator producing Gaussian bond statistics.
     
            Please cite :cite:t:`gusev_molecular_2024` and/or :cite:t:`bernhard_phantom_2025` if you use this method in your work.
       
@@ -4673,4 +4666,4 @@ def version_information() -> str:
 STOP: BackTrackStatus  # value = <BackTrackStatus.STOP: 0>
 TRACK_BACKWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_BACKWARD: 2>
 TRACK_FORWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_FORWARD: 1>
-__version__: str = '0.3.12'
+__version__: str = '0.3.13'

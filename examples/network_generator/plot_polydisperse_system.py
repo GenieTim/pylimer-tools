@@ -22,7 +22,8 @@ from pylimer_tools.io.bead_spring_parameter_provider import (
 )
 from pylimer_tools_cpp import MCUniverseGenerator
 
-# Get parameters for PDMS polymer density, bead distance, and characteristic ratio
+# Get parameters for PDMS polymer density, bead distance, and
+# characteristic ratio
 params = get_parameters_for_polymer(
     "PDMS", parameter_type=ParameterType.GAUSSIAN)
 C_inf = params.get_characteristic_ratio()
@@ -57,10 +58,8 @@ generator.add_strands(nr_of_strands=n_strands, strand_lengths=strand_lengths)
 generator.add_crosslinkers(
     int(0.5 * n_strands), crosslinker_functionality=4, crosslinker_type=2
 )
-# Supply the characteristic ratio to the link_strands_to_conversion() function during network generation
 generator.link_strands_to_conversion(
     crosslinker_conversion=0.925,  # 92.5% of crosslinker sites used
-    c_infinity=C_inf  # characteristic ratio
 )
 
 universe = generator.get_universe()
