@@ -2,6 +2,13 @@
 
 ## main
 
+## v0.3.14
+
+Thank you to @jasonmulderrig for the contribution, see PR #7:
+
+- Add the characteristic ratio to the bead-spring parameter provider 
+- Fix some issues in the documentation, volumes being computed incorrectly in some examples
+
 ## v0.3.13
 
 - Implement new utility methods in `pylimer_tools.calc.stoichiometric_relationships` in particular to help with the parameter `b2`

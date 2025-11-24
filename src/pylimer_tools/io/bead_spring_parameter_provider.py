@@ -36,7 +36,11 @@ class Parameters:
         data : dict
             A dictionary containing polymer-related quantities. Each value in the dictionary
             must be a Pint Quantity object. The dictionary must include the keys "Mw", "<b>",
-            "rho", "<b^2>", and "C_inf" as these are required parameters.
+            "rho", "<b^2>", as these are required parameters.
+            Depending on the parametrization, additional parameters such as "R02", "kb", and "C_inf"
+            may also be included. If "R02" is not provided, it will be set to the value of "<b^2>".
+            If "kb" is not provided, it will be set to the Boltzmann constant value.
+            If "C_inf" is not provided, it will be set to 1.0.
 
         ureg : UnitRegistry
             A Pint UnitRegistry object used for unit conversions within the class.
@@ -48,7 +52,7 @@ class Parameters:
         -------
         AssertionError
             If any value in the data dictionary is not a Quantity object, or if any of the
-            required parameters ("Mw", "<b>", "<b^2>", "rho", "C_inf") are missing from the data dictionary.
+            required parameters ("Mw", "<b>", "<b^2>", "rho") are missing from the data dictionary.
 
         """
         for key, value in data.items():
@@ -57,7 +61,7 @@ class Parameters:
             )
 
         # validate parameters
-        required_params = ["Mw", "<b>", "<b^2>", "rho", "C_inf"]
+        required_params = ["Mw", "<b>", "<b^2>", "rho"]
         for param in required_params:
             assert param in data, f"Missing required parameter: {param}"
 
@@ -75,6 +79,9 @@ class Parameters:
 
         if "kb" not in data:
             data["kb"] = 1.380649e-23 * ureg.joule / ureg.kelvin
+
+        if "C_inf" not in data:
+            data["C_inf"] = Quantity(1.0, "")
 
         self.data = data
         self.name = name
