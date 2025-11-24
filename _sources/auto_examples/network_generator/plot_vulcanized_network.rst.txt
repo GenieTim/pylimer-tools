@@ -52,7 +52,7 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
 
     # Determine the required volume for this many strands
     # and this type of polymer
-    volume = params.get_bead_density() * n_strands * n_atoms_per_strand
+    volume = n_strands * n_atoms_per_strand / params.get_bead_density()
 
     # Create generator for simulation box corresponding to the volume
     generator = MCUniverseGenerator(
@@ -167,7 +167,7 @@ lengths:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 24.433 seconds)
+   **Total running time of the script:** (1 minutes 25.424 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_vulcanized_network.py:

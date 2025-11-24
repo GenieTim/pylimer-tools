@@ -253,23 +253,6 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MCUniverseGenerator to create a polydisperse end-linked polymer network with varying strand lengths.">
-
-.. only:: html
-
-  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_polydisperse_system_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Generate a Polydisperse Polymer Network</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="The generated networks can include topological information.">
 
 .. only:: html
@@ -282,6 +265,23 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Adding Topology Information</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MCUniverseGenerator to create a polydisperse end-linked polymer network with varying strand lengths.">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_polydisperse_system_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Generate a Polydisperse Polymer Network</div>
     </div>
 
 

@@ -28,7 +28,7 @@ For strand length distribution, in this example,
 we show how to use the log-normal distribution as proposed by :cite:t:`tsimouri_monte_2021`.
 Alternatives were proposed as well, such as the inverse Gaussian or a ternary distribution.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-72
+.. GENERATED FROM PYTHON SOURCE LINES 13-74
 
 .. code-block:: Python
 
@@ -44,9 +44,11 @@ Alternatives were proposed as well, such as the inverse Gaussian or a ternary di
     )
     from pylimer_tools_cpp import MCUniverseGenerator
 
-    # Get parameters for PDMS polymer density and bead distance
+    # Get parameters for PDMS polymer density, bead distance, and
+    # characteristic ratio
     params = get_parameters_for_polymer(
         "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    C_inf = params.get_characteristic_ratio()
 
     # setup strand lengths
     n_strands = 1000
@@ -62,7 +64,7 @@ Alternatives were proposed as well, such as the inverse Gaussian or a ternary di
     strand_lengths = [int(random.lognormvariate(m, s)) for _ in range(n_strands)]
 
     n_atoms_total = sum(strand_lengths) + 0.5 * n_strands  # add crosslinker sites
-    volume = params.get_bead_density() * n_atoms_total
+    volume = n_atoms_total / params.get_bead_density()
 
     generator = MCUniverseGenerator(
         volume ** (1 / 3),
@@ -98,14 +100,14 @@ Alternatives were proposed as well, such as the inverse Gaussian or a ternary di
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-77
+.. GENERATED FROM PYTHON SOURCE LINES 75-79
 
 Refer to :ref:`sphx_glr_auto_examples_readers_writers` for how you can save the universe to a file.
 
 For now, we will show that this produces a variety of different strand
 lengths:
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-88
+.. GENERATED FROM PYTHON SOURCE LINES 79-90
 
 .. code-block:: Python
 
@@ -135,7 +137,7 @@ lengths:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 6.587 seconds)
+   **Total running time of the script:** (0 minutes 6.576 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_polydisperse_system.py:

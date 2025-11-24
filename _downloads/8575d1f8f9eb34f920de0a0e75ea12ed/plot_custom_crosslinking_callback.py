@@ -49,7 +49,7 @@ n_strands = 1000  # Number of strands
 strand_length = 50  # Length of each strand
 
 n_atoms_total = n_strands * strand_length + n_xlinks
-volume = params.get_bead_density() * n_atoms_total
+volume = n_atoms_total / params.get_bead_density()
 
 generator = MCUniverseGenerator(
     volume ** (1 / 3),
