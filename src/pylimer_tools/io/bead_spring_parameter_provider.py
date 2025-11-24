@@ -98,6 +98,8 @@ class Parameters:
             ["Ge", "g_e_1", "entanglement_modulus"],
             ["T", "temperature"],
             ["C_inf", "characteristic_ratio"],
+            ["<b>", "bead_distance", "bond_length", "mean_bead_distance"],
+            ["<b^2>", "mean_squared_bead_distance"],
         ]
         for synonym_group in synonyms:
             if name in synonym_group:
