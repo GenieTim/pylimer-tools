@@ -22,9 +22,11 @@ from pylimer_tools.io.bead_spring_parameter_provider import (
 )
 from pylimer_tools_cpp import MCUniverseGenerator
 
-# Get parameters for PDMS polymer density and bead distance
+# Get parameters for PDMS polymer density, bead distance, and
+# characteristic ratio
 params = get_parameters_for_polymer(
     "PDMS", parameter_type=ParameterType.GAUSSIAN)
+C_inf = params.get_characteristic_ratio()
 
 # setup strand lengths
 n_strands = 1000
@@ -40,7 +42,7 @@ m = math.log(average_length) - 0.5 * s**2
 strand_lengths = [int(random.lognormvariate(m, s)) for _ in range(n_strands)]
 
 n_atoms_total = sum(strand_lengths) + 0.5 * n_strands  # add crosslinker sites
-volume = params.get_bead_density() * n_atoms_total
+volume = n_atoms_total / params.get_bead_density()
 
 generator = MCUniverseGenerator(
     volume ** (1 / 3),

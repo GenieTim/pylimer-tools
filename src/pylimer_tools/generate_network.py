@@ -164,7 +164,7 @@ def prepare_structure_generation(
             solvent_atom_type=solvent_chain_type,
         )
     universe_generator.use_zscore_max_distance(
-        z_score_std_mult,
+        z_score_std_mult,  # * params.get("C_inf").magnitude,
         params.get("<b^2>").to(params.get("distance_units") ** 2).magnitude,
     )
 
@@ -173,11 +173,13 @@ def prepare_structure_generation(
         assert target_wsol is None
         universe_generator.link_strands_to_conversion(
             crosslinker_conversion=target_p,
+            c_infinity=1.0,  # params.get("C_inf").magnitude,
         )
     else:
         assert target_wsol is not None
         universe_generator.link_strands_to_soluble_fraction(
             target_wsol,
+            c_infinity=1.0,  # params.get("C_inf").magnitude,
         )
 
     if run_force_relaxation:
