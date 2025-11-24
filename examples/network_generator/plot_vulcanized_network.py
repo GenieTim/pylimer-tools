@@ -30,7 +30,7 @@ n_atoms_per_strand = 50
 
 # Determine the required volume for this many strands
 # and this type of polymer
-volume = params.get_bead_density() * n_strands * n_atoms_per_strand
+volume = n_strands * n_atoms_per_strand / params.get_bead_density()
 
 # Create generator for simulation box corresponding to the volume
 generator = MCUniverseGenerator(

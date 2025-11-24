@@ -145,6 +145,20 @@ init_pylimer_bound_generators(py::module_& m)
   py::class_<MCUniverseGenerator, py::smart_holder>(
     m, "MCUniverseGenerator", R"pbdoc(
        A :obj:`pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
+       This generator creates phantom bead-spring polymer networks with crosslinkers and Gaussian chain and bond statistics.
+
+       .. note::
+
+          A note on the characteristic ratio :math:`C_{\infty}` and the bead distance :math:`b`:
+          If you use parameters from :mod:`pylimer_tools.io.bead_spring_parameter_provider` with 
+          type :obj:`pylimer_tools.io.bead_spring_parameter_provider.ParameterType.GAUSSIAN`,
+          there is no need to set :math:`C_{\infty}` in the MCUniverseGenerator methods,
+          as the bead distance :math:`b` you set via :meth:`~pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance`
+          from :meth:`pylimer_tools.io.bead_spring_parameter_provider.Parameters.get("<b>")`
+          already incorporates the characteristic ratio.
+
+          This is the recommended way to use the MCUniverseGenerator, since using e.g.
+          Kuhn segment parameters conflicts with the generator producing Gaussian bond statistics.
 
        Please cite :cite:t:`gusev_molecular_2024` and/or :cite:t:`bernhard_phantom_2025` if you use this method in your work.
   )pbdoc")
