@@ -511,6 +511,13 @@ class ComputedDoubleValues(enum.IntEnum):
     TIME: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.TIME: 1>
     TIMESTEP: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.TIMESTEP: 0>
     VOLUME: typing.ClassVar[ComputedDoubleValues]  # value = <ComputedDoubleValues.VOLUME: 2>
+    @classmethod
+    def __new__(cls, value):
+        ...
+    def __format__(self, format_spec):
+        """
+        Convert to a string according to format_spec.
+        """
 class ComputedIntValues(enum.IntEnum):
     """
     Integer output quantities
@@ -523,6 +530,13 @@ class ComputedIntValues(enum.IntEnum):
     NUM_RELOC: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.NUM_RELOC: 2>
     NUM_SHIFT: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.NUM_SHIFT: 1>
     STEP: typing.ClassVar[ComputedIntValues]  # value = <ComputedIntValues.STEP: 0>
+    @classmethod
+    def __new__(cls, value):
+        ...
+    def __format__(self, format_spec):
+        """
+        Convert to a string according to format_spec.
+        """
 class DPDSimulator:
     """
     
@@ -1198,6 +1212,13 @@ class ExitReason(enum.IntEnum):
     OTHER: typing.ClassVar[ExitReason]  # value = <ExitReason.OTHER: 7>
     UNSET: typing.ClassVar[ExitReason]  # value = <ExitReason.UNSET: 0>
     X_TOLERANCE: typing.ClassVar[ExitReason]  # value = <ExitReason.X_TOLERANCE: 2>
+    @classmethod
+    def __new__(cls, value):
+        ...
+    def __format__(self, format_spec):
+        """
+        Convert to a string according to format_spec.
+        """
 class LazyUniverseSequenceIterator:
     """
     
@@ -4666,4 +4687,4 @@ def version_information() -> str:
 STOP: BackTrackStatus  # value = <BackTrackStatus.STOP: 0>
 TRACK_BACKWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_BACKWARD: 2>
 TRACK_FORWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_FORWARD: 1>
-__version__: str = '0.3.13'
+__version__: str = '0.3.14'

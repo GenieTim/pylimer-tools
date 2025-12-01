@@ -5,6 +5,8 @@ include pyproject.toml
 include README.md
 include setup.py
 include requirements.txt
+include LICENSE
+include THIRD_PARTY_LICENSES.md
 include src/pylimer_tools_cpp/CMakeLists.txt
 include src/pylimer_tools_cpp/pybind11/CMakeLists.txt
 include src/pylimer_tools_cpp/version_config.h.in
