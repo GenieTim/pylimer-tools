@@ -180,6 +180,8 @@ The authors gratefully acknowledge financial support from the Swiss National Sci
 
 GPL-3.0-or-later. See [LICENSE](LICENSE).
 
+This project includes third-party code and libraries under various compatible licenses. See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for detailed information about all third-party dependencies and their licenses.
+
 ## Pronunciation Note
 
 "pylimer” resembles "polymer”; the playful spelling emphasizes Python integration.
