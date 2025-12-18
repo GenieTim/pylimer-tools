@@ -106,6 +106,7 @@ Basic usage example:
 - **Generating networks?** See :doc:`auto_examples/network_generator/index`
 - **Need examples?** Browse :doc:`auto_examples/index` for practical code samples
 - **Understanding limitations?** Review :doc:`assumptions` and :doc:`nomenclature`
+- **Like papers?** See :cite:t:`bernhard_pylimertools_2025` and :doc:`acknowledgements` for related publications
 
 🔗 **Useful Links**
 -------------------
