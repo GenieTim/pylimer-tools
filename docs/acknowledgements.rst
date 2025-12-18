@@ -24,7 +24,7 @@ Key dependencies include:
 - **cereal** (BSD-3-Clause) - Serialization library
 - **igraph** (GPL-2.0) - Graph analysis library
 - **NLopt** (LGPL-2.1/MIT) - Nonlinear optimization library
-- **Correlator** implementation by Jorge Ramirez (MIT license)
+- **Correlator** implementation by Jorge Ramírez (MIT license)
 
 .. _references:
 
