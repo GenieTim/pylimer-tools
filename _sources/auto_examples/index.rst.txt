@@ -62,7 +62,7 @@ Refer to the full documentation of the DPD simulator in the :class:`~pylimer_too
   .. image:: /auto_examples/dpd_simulations/images/thumb/sphx_glr_plot_dpd_simulation_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_dpd_simulations_plot_dpd_simulation.py`
+  :doc:`/auto_examples/dpd_simulations/plot_dpd_simulation`
 
 .. raw:: html
 
@@ -105,7 +105,7 @@ Here, we distinguish the following three different implementations:
   .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_2_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py`
+  :doc:`/auto_examples/force_balance/plot_force_balance_2`
 
 .. raw:: html
 
@@ -122,7 +122,7 @@ Here, we distinguish the following three different implementations:
   .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py`
+  :doc:`/auto_examples/force_balance/plot_force_balance`
 
 .. raw:: html
 
@@ -139,7 +139,7 @@ Here, we distinguish the following three different implementations:
   .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py`
+  :doc:`/auto_examples/force_balance/plot_polydispersity_study`
 
 .. raw:: html
 
@@ -156,7 +156,7 @@ Here, we distinguish the following three different implementations:
   .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_fb_deformation_exp_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py`
+  :doc:`/auto_examples/force_balance/plot_fb_deformation_exp`
 
 .. raw:: html
 
@@ -173,7 +173,7 @@ Here, we distinguish the following three different implementations:
   .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py`
+  :doc:`/auto_examples/force_balance/plot_force_relaxation`
 
 .. raw:: html
 
@@ -226,7 +226,7 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
   .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_save_network_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_network_generator_plot_save_network.py`
+  :doc:`/auto_examples/network_generator/plot_save_network`
 
 .. raw:: html
 
@@ -243,7 +243,7 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
   .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_simple_crosslinked_network_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_network_generator_plot_simple_crosslinked_network.py`
+  :doc:`/auto_examples/network_generator/plot_simple_crosslinked_network`
 
 .. raw:: html
 
@@ -260,7 +260,7 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
   .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_add_angles_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_network_generator_plot_add_angles.py`
+  :doc:`/auto_examples/network_generator/plot_add_angles`
 
 .. raw:: html
 
@@ -277,7 +277,7 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
   .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_polydisperse_system_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py`
+  :doc:`/auto_examples/network_generator/plot_polydisperse_system`
 
 .. raw:: html
 
@@ -294,7 +294,7 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
   .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_multi_component_system_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_network_generator_plot_multi_component_system.py`
+  :doc:`/auto_examples/network_generator/plot_multi_component_system`
 
 .. raw:: html
 
@@ -311,7 +311,7 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
   .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_monte_carlo_configuration_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_network_generator_plot_monte_carlo_configuration.py`
+  :doc:`/auto_examples/network_generator/plot_monte_carlo_configuration`
 
 .. raw:: html
 
@@ -328,7 +328,7 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
   .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_vulcanized_network_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_network_generator_plot_vulcanized_network.py`
+  :doc:`/auto_examples/network_generator/plot_vulcanized_network`
 
 .. raw:: html
 
@@ -345,7 +345,7 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
   .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_custom_crosslinking_callback_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_network_generator_plot_custom_crosslinking_callback.py`
+  :doc:`/auto_examples/network_generator/plot_custom_crosslinking_callback`
 
 .. raw:: html
 
@@ -362,7 +362,7 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
   .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_tetra_peg_network_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_network_generator_plot_tetra_peg_network.py`
+  :doc:`/auto_examples/network_generator/plot_tetra_peg_network`
 
 .. raw:: html
 
@@ -401,7 +401,7 @@ The corresponding class is :class:`~pylimer_tools_cpp.NormalModeAnalyzer`.
   .. image:: /auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_normal_mode_analysis_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py`
+  :doc:`/auto_examples/normal_mode_analysis/plot_normal_mode_analysis`
 
 .. raw:: html
 
@@ -444,7 +444,7 @@ The library supports four main file I/O operations:
   .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_pylimer_tools_output_reader_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_pylimer_tools_output_reader.py`
+  :doc:`/auto_examples/readers_writers/plot_pylimer_tools_output_reader`
 
 .. raw:: html
 
@@ -461,7 +461,7 @@ The library supports four main file I/O operations:
   .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_correlated_averages_reader_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_correlated_averages_reader.py`
+  :doc:`/auto_examples/readers_writers/plot_correlated_averages_reader`
 
 .. raw:: html
 
@@ -478,7 +478,7 @@ The library supports four main file I/O operations:
   .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_histogram_reader_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_histogram_reader.py`
+  :doc:`/auto_examples/readers_writers/plot_histogram_reader`
 
 .. raw:: html
 
@@ -495,7 +495,7 @@ The library supports four main file I/O operations:
   .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_performance_caching_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_performance_caching.py`
+  :doc:`/auto_examples/readers_writers/plot_performance_caching`
 
 .. raw:: html
 
@@ -512,7 +512,7 @@ The library supports four main file I/O operations:
   .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_unit_conversion_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_unit_conversion.py`
+  :doc:`/auto_examples/readers_writers/plot_unit_conversion`
 
 .. raw:: html
 
@@ -529,7 +529,7 @@ The library supports four main file I/O operations:
   .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_log_thermo_file_reader_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_log_thermo_file_reader.py`
+  :doc:`/auto_examples/readers_writers/plot_log_thermo_file_reader`
 
 .. raw:: html
 
@@ -546,7 +546,7 @@ The library supports four main file I/O operations:
   .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_trajectory_to_frame_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_convert_trajectory_to_frame.py`
+  :doc:`/auto_examples/readers_writers/plot_convert_trajectory_to_frame`
 
 .. raw:: html
 
@@ -563,7 +563,7 @@ The library supports four main file I/O operations:
   .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_dump_file_reader_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_dump_file_reader.py`
+  :doc:`/auto_examples/readers_writers/plot_dump_file_reader`
 
 .. raw:: html
 
@@ -580,7 +580,7 @@ The library supports four main file I/O operations:
   .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_time_averaged_data_reader_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_time_averaged_data_reader.py`
+  :doc:`/auto_examples/readers_writers/plot_time_averaged_data_reader`
 
 .. raw:: html
 
@@ -597,7 +597,7 @@ The library supports four main file I/O operations:
   .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_for_bond_swapping_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_convert_for_bond_swapping.py`
+  :doc:`/auto_examples/readers_writers/plot_convert_for_bond_swapping`
 
 .. raw:: html
 
@@ -614,7 +614,7 @@ The library supports four main file I/O operations:
   .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_data_file_reader_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_reader.py`
+  :doc:`/auto_examples/readers_writers/plot_data_file_reader`
 
 .. raw:: html
 
@@ -631,7 +631,7 @@ The library supports four main file I/O operations:
   .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_memory_efficient_dump_file_reading_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_memory_efficient_dump_file_reading.py`
+  :doc:`/auto_examples/readers_writers/plot_memory_efficient_dump_file_reading`
 
 .. raw:: html
 
@@ -648,7 +648,7 @@ The library supports four main file I/O operations:
   .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_data_file_writer_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_readers_writers_plot_data_file_writer.py`
+  :doc:`/auto_examples/readers_writers/plot_data_file_writer`
 
 .. raw:: html
 
@@ -717,7 +717,7 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
   .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_decompose_structure_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_structure_analysis_plot_decompose_structure.py`
+  :doc:`/auto_examples/structure_analysis/plot_decompose_structure`
 
 .. raw:: html
 
@@ -734,7 +734,7 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
   .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_loop_analysis_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_structure_analysis_plot_loop_analysis.py`
+  :doc:`/auto_examples/structure_analysis/plot_loop_analysis`
 
 .. raw:: html
 
@@ -751,7 +751,7 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
   .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_end_to_end_distribution_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_structure_analysis_plot_end_to_end_distribution.py`
+  :doc:`/auto_examples/structure_analysis/plot_end_to_end_distribution`
 
 .. raw:: html
 
@@ -768,7 +768,7 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
   .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_structure_analysis_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_structure_analysis_plot_structure_analysis.py`
+  :doc:`/auto_examples/structure_analysis/plot_structure_analysis`
 
 .. raw:: html
 
@@ -807,7 +807,7 @@ For more information, refer to the documentation of the :class:`~pylimer_tools_c
   .. image:: /auto_examples/trajectory_analysis/images/thumb/sphx_glr_plot_trajectory_analysis_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_trajectory_analysis_plot_trajectory_analysis.py`
+  :doc:`/auto_examples/trajectory_analysis/plot_trajectory_analysis`
 
 .. raw:: html
 

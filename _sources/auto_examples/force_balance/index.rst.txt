@@ -31,7 +31,7 @@ Here, we distinguish the following three different implementations:
   .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_2_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py`
+  :doc:`/auto_examples/force_balance/plot_force_balance_2`
 
 .. raw:: html
 
@@ -48,7 +48,7 @@ Here, we distinguish the following three different implementations:
   .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py`
+  :doc:`/auto_examples/force_balance/plot_force_balance`
 
 .. raw:: html
 
@@ -65,7 +65,7 @@ Here, we distinguish the following three different implementations:
   .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py`
+  :doc:`/auto_examples/force_balance/plot_polydispersity_study`
 
 .. raw:: html
 
@@ -82,7 +82,7 @@ Here, we distinguish the following three different implementations:
   .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_fb_deformation_exp_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py`
+  :doc:`/auto_examples/force_balance/plot_fb_deformation_exp`
 
 .. raw:: html
 
@@ -99,7 +99,7 @@ Here, we distinguish the following three different implementations:
   .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py`
+  :doc:`/auto_examples/force_balance/plot_force_relaxation`
 
 .. raw:: html
 

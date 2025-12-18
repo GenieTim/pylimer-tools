@@ -3,6 +3,7 @@ Acknowledgements
 
 Please refer to the `CITATION.cff <https://github.com/GenieTim/pylimer-tools/blob/main/CITATION.cff>`_ file,
 as well as to the references below for information on what and how to cite.
+The main publication corresponding to this toolbox is :cite:t:`bernhard_pylimertools_2025`.
 
 The authors gratefully acknowledge financial support from the
 Swiss National Science Foundation (SNSF project 200021_204196).
@@ -23,7 +24,7 @@ Key dependencies include:
 - **cereal** (BSD-3-Clause) - Serialization library
 - **igraph** (GPL-2.0) - Graph analysis library
 - **NLopt** (LGPL-2.1/MIT) - Nonlinear optimization library
-- **Correlator** implementation by Jorge Ramirez (MIT license)
+- **Correlator** implementation by Jorge Ramírez (MIT license)
 
 .. _references:
 

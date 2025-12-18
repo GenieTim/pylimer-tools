@@ -57,7 +57,7 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
   .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_decompose_structure_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_structure_analysis_plot_decompose_structure.py`
+  :doc:`/auto_examples/structure_analysis/plot_decompose_structure`
 
 .. raw:: html
 
@@ -74,7 +74,7 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
   .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_loop_analysis_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_structure_analysis_plot_loop_analysis.py`
+  :doc:`/auto_examples/structure_analysis/plot_loop_analysis`
 
 .. raw:: html
 
@@ -91,7 +91,7 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
   .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_end_to_end_distribution_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_structure_analysis_plot_end_to_end_distribution.py`
+  :doc:`/auto_examples/structure_analysis/plot_end_to_end_distribution`
 
 .. raw:: html
 
@@ -108,7 +108,7 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
   .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_structure_analysis_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_structure_analysis_plot_structure_analysis.py`
+  :doc:`/auto_examples/structure_analysis/plot_structure_analysis`
 
 .. raw:: html
 

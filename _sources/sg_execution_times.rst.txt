@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:46.537** total execution time for 34 files **from all galleries**:
+**00:46.536** total execution time for 34 files **from all galleries**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_monte_carlo_configuration.py` (``../examples/network_generator/plot_monte_carlo_configuration.py``)
-     - 00:46.447
+     - 00:46.446
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_tetra_peg_network.py` (``../examples/network_generator/plot_tetra_peg_network.py``)
      - 00:00.090
