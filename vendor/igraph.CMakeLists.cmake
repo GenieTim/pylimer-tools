@@ -7,7 +7,7 @@ endif ()
 
 # download, compile & install igraph
 if (NOT DEFINED igraph_LOADED)
-    find_package(igraph "1.0.0...<1.1.0")
+    find_package(igraph "1.0.1...<1.1.0")
 
     if (${igraph_FOUND} AND TARGET igraph::igraph AND NOT BUILDING_WITH_PYODIDE)
         message("Found igraph library")
@@ -78,10 +78,9 @@ if (NOT DEFINED igraph_LOADED)
 
             ExternalProject_Add(
                     igraphLib
-                    GIT_REPOSITORY https://github.com/igraph/igraph.git # https://github.com/igraph/igraph.git
-                    GIT_TAG b9b573902ccbe393a78252ab5e94c7876ed92597 # 0.10.15
+                    GIT_REPOSITORY https://github.com/igraph/igraph.git
+                    GIT_TAG 7b4ae766cbdee6b2017aa5b76752457db2a2972f # 1.0.1
                     PREFIX ${igraph_PREFIX_PATH}
-                    PATCH_COMMAND git apply --check ${CMAKE_CURRENT_LIST_DIR}/patches/igraph.patch && git apply ${CMAKE_CURRENT_LIST_DIR}/patches/igraph.patch || true
                     INSTALL_DIR ${igraph_PREFIX_PATH}/igraphLib-install
                     CMAKE_ARGS ${igraph_EXTRA_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=${igraph_BUILD_TYPE} -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=OFF
                     BUILD_COMMAND ${CMAKE_COMMAND} --build ${igraph_PREFIX_PATH}/src/igraphLib-build --config ${igraph_BUILD_TYPE}
