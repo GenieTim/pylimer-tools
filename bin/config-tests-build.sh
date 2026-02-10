@@ -7,8 +7,6 @@ mkdir -p "$ROOT_DIR/test-reports"
 
 cd "$ROOT_DIR/tests" || exit 2
 
-PATH="/usr/local/opt/llvm/bin:$PATH"
-
 # first, run cpp tests
 # rm -rf build; rm -rf vendor/igraph;
 mkdir -p build
@@ -21,8 +19,8 @@ GENERATOR_BIN="make"
 # or clang on MacOS, as g++ leak analysis is not supported there
 if [ -z "$CC" ] || [ -z "$CXX" ]; then
   if [[ $OSTYPE == 'darwin'* ]]; then
-    CXXCOMPILER=$(which clang++ || which g++)
-    CCOMPILER=$(which clang || which gcc)
+    CXXCOMPILER=$(xcrun --find clang++)
+    CCOMPILER=$(xcrun --find clang)
   else
     CXXCOMPILER=$(which g++ || which clang++)
     CCOMPILER=$(which gcc || which clang)
