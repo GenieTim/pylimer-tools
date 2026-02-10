@@ -7,6 +7,7 @@
 #include "../sim/OutputSupportingSimulation.h"
 #include "../topo/EntanglementDetector.h"
 #include <Eigen/Dense>
+#include <Eigen/SparseCore>
 #include <array>
 #include <cassert>
 #include <iostream>

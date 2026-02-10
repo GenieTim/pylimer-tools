@@ -733,20 +733,29 @@ MEHPForceBalance2::runForceRelaxation(
 
   this->prepareAllOutputs();
 
+  // reserve triplet list
+  std::vector<Eigen::Triplet<double>> triplets;
+  // diagonal + the lower of the two components of each spring
+  triplets.reserve(this->initialConfig.nrOfLinks * 3 +
+                   this->initialConfig.nrOfSprings * 3 * 2);
+  // reserve space for constants
+  Eigen::VectorXd constants =
+    Eigen::VectorXd(this->initialConfig.nrOfLinks * 3);
+  // it's a bit more efficient to sum the diagonal ourselves
+  Eigen::VectorXd diagonal = Eigen::VectorXd(this->initialConfig.nrOfLinks * 3);
+
   // actual loop
   bool wasInterrupted = false;
   size_t nRemovedInIteration;
   do {
     nRemovedInIteration = 0;
-    std::vector<Eigen::Triplet<double>> triplets;
-    // diagonal + the lower of the two components of each spring
-    triplets.reserve(this->initialConfig.nrOfLinks * 3 +
-                     this->initialConfig.nrOfSprings * 3 * 2);
-    Eigen::VectorXd constants =
-      Eigen::VectorXd::Zero(this->initialConfig.nrOfLinks * 3);
-    // it's a bit more efficient to sum the diagonal ourselves
-    Eigen::VectorXd diagonal =
-      Eigen::VectorXd::Zero(this->initialConfig.nrOfLinks * 3);
+
+    // reset after previous iteration
+    triplets.clear();
+    constants.resize(this->initialConfig.nrOfLinks * 3);
+    constants.setZero();
+    diagonal.resize(this->initialConfig.nrOfLinks * 3);
+    diagonal.setZero();
 
     for (size_t springIdx = 0; springIdx < this->initialConfig.nrOfSprings;
          ++springIdx) {

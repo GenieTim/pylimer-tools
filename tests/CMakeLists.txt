@@ -82,6 +82,7 @@ add_library(test_sources
         pylimer_tools_cpp/test_universesequence.cpp
         # headers
         pylimer_tools_cpp/test_extra_eigen.cpp
+        pylimer_tools_cpp/test_gradient_descent_benchmark.cpp
         pylimer_tools_cpp/test_atom.cpp
         pylimer_tools_cpp/test_box.cpp
         pylimer_tools_cpp/test_calc.cpp
