@@ -5,7 +5,7 @@
 # The library is linked against Python bindings and used in tests.
 # ==============================================================================
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.24)
 
 # Core library definition
 project(pylimer_tools_core VERSION ${CMAKE_PROJECT_VERSION} LANGUAGES CXX)
@@ -34,6 +34,65 @@ add_library(pylimer_tools
     sim/DPDSimulator.cpp
     utils/MCUniverseGenerator.cpp
 )
+
+# ==============================================================================
+# Public header sets (CMake >= 3.23)
+# ==============================================================================
+
+set(PYLIMER_TOOLS_PUBLIC_HEADERS
+    entities/AtomGraphParent.h
+    entities/NeighbourList.h
+    entities/Universe.h
+    entities/EigenNeighbourList.h
+    entities/Atom.h
+    entities/Molecule.h
+    entities/Box.h
+    entities/UniverseSequence.h
+    sim/OutputSupportingSimulation.h
+    sim/MEHPUtilityStructures.h
+    sim/MEHPForceBalance.h
+    sim/MCSimulator.h
+    sim/MEHPForceBalance2.h
+    sim/DPDSimulator.h
+    sim/MEHPForceEvaluator.h
+    sim/MEHPForceRelaxation.h
+    calc/Correlator.h
+    calc/MMTanalysis.h
+    calc/NormalModeAnalyzer.h
+    io/DumpFileParser.h
+    utils/MCUniverseGenerator.h
+    utils/Counter.h
+    io/AveFileReader.h
+    utils/ExtraEigenSolvers.h
+    io/DataFileParser.h
+    utils/CerealUtils.h
+    io/CSVSplitter.h
+    utils/MemoryUtil.h
+    utils/LammpsAtomStyle.h
+    io/DataFileWriter.h
+    utils/StringUtils.h
+    utils/BoolUtils.h
+    utils/PerformanceTimer.h
+    utils/utilityMacros.h
+    utils/RandomWalker.h
+    utils/ExtraEigenTypes.h
+    utils/GraphUtils.h
+    utils/LazyDistanceMatrix.h
+    utils/Logger.h
+    utils/VectorUtils.h
+    topo/TopologyCalc.h
+    topo/EntanglementDetector.h
+)
+
+target_sources(pylimer_tools
+    PUBLIC
+        FILE_SET public_headers
+        TYPE HEADERS
+        BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
+        FILES ${PYLIMER_TOOLS_PUBLIC_HEADERS}
+)
+
+set_property(TARGET pylimer_tools PROPERTY VERIFY_INTERFACE_HEADER_SETS ON)
 
 # Set target properties
 set_target_properties(pylimer_tools PROPERTIES
@@ -148,8 +207,13 @@ endif ()
 
 # LAPACK support
 if (LAPACKE_FOUND)
-    target_include_directories(pylimer_tools SYSTEM PUBLIC ${LAPACKE_LIBRARY_DIRS})
+    target_include_directories(pylimer_tools SYSTEM PUBLIC ${LAPACKE_INCLUDE_DIRS})
     target_link_libraries(pylimer_tools PUBLIC ${LAPACKE_LIBRARIES})
+    target_compile_definitions(pylimer_tools PUBLIC
+        EIGEN_USE_LAPACKE
+        HAVE_LAPACK_CONFIG_H
+        LAPACK_COMPLEX_CPP
+        LAPACK_DISABLE_NAN_CHECK)
     message(STATUS "LAPACKE found and linked")
 endif ()
 
