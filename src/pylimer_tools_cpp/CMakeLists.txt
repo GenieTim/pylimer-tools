@@ -35,65 +35,6 @@ add_library(pylimer_tools
     utils/MCUniverseGenerator.cpp
 )
 
-# ==============================================================================
-# Public header sets (CMake >= 3.23)
-# ==============================================================================
-
-set(PYLIMER_TOOLS_PUBLIC_HEADERS
-    entities/AtomGraphParent.h
-    entities/NeighbourList.h
-    entities/Universe.h
-    entities/EigenNeighbourList.h
-    entities/Atom.h
-    entities/Molecule.h
-    entities/Box.h
-    entities/UniverseSequence.h
-    sim/OutputSupportingSimulation.h
-    sim/MEHPUtilityStructures.h
-    sim/MEHPForceBalance.h
-    sim/MCSimulator.h
-    sim/MEHPForceBalance2.h
-    sim/DPDSimulator.h
-    sim/MEHPForceEvaluator.h
-    sim/MEHPForceRelaxation.h
-    calc/Correlator.h
-    calc/MMTanalysis.h
-    calc/NormalModeAnalyzer.h
-    io/DumpFileParser.h
-    utils/MCUniverseGenerator.h
-    utils/Counter.h
-    io/AveFileReader.h
-    utils/ExtraEigenSolvers.h
-    io/DataFileParser.h
-    utils/CerealUtils.h
-    io/CSVSplitter.h
-    utils/MemoryUtil.h
-    utils/LammpsAtomStyle.h
-    io/DataFileWriter.h
-    utils/StringUtils.h
-    utils/BoolUtils.h
-    utils/PerformanceTimer.h
-    utils/utilityMacros.h
-    utils/RandomWalker.h
-    utils/ExtraEigenTypes.h
-    utils/GraphUtils.h
-    utils/LazyDistanceMatrix.h
-    utils/Logger.h
-    utils/VectorUtils.h
-    topo/TopologyCalc.h
-    topo/EntanglementDetector.h
-)
-
-target_sources(pylimer_tools
-    PUBLIC
-        FILE_SET public_headers
-        TYPE HEADERS
-        BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
-        FILES ${PYLIMER_TOOLS_PUBLIC_HEADERS}
-)
-
-set_property(TARGET pylimer_tools PROPERTY VERIFY_INTERFACE_HEADER_SETS ON)
-
 # Set target properties
 set_target_properties(pylimer_tools PROPERTIES
     VERSION ${PROJECT_VERSION}
