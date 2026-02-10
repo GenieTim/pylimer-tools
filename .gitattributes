@@ -1,0 +1,2 @@
+tests/pylimer_tools/fixtures/structure/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out filter=lfs diff=lfs merge=lfs -text
+tests/pylimer_tools/fixtures/structure/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out filter=lfs diff=lfs merge=lfs -text
