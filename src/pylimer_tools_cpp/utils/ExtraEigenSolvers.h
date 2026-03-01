@@ -128,8 +128,8 @@ gradientDescentBarzilaiBorwein(
   double alpha = learningRate;          // Initial step size
 
   const double initialNorm =
-    initialResidual > 0.0 ? initialResidual : gradient.squaredNorm();
-  while ((gradient.squaredNorm() / initialNorm) > tolerance &&
+    initialResidual > 0.0 ? initialResidual : gradient.norm();
+  while ((gradient.norm() / initialNorm) > tolerance &&
          iteration < maxIterations) {
     Eigen::VectorXd nextX = x - alpha * gradient;
     Eigen::VectorXd nextGradient = A * nextX - b;
