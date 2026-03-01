@@ -18,6 +18,7 @@ import pandas as pd
 
 from pylimer_tools.io.extract_thermo_data import extract_thermo_params
 from pylimer_tools.utils.cache_utility import do_cache, load_cache
+from pylimer_tools.utils.data_utility import apply_to_numeric_ignore_compat
 from pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
 
 
@@ -221,7 +222,7 @@ def read_sectioned_averages_file(
     df = pd.concat(dfs_to_concat, ignore_index=True)
 
     # convert all columns of DataFrame
-    df = df.apply(pd.to_numeric, errors="ignore")
+    df = apply_to_numeric_ignore_compat(df)
     do_cache(df, filepath, cache_suffix)
 
     return df
@@ -343,7 +344,7 @@ def read_correlation_file(
 
     correlated_data = pd.DataFrame(correlated_data_assembled, columns=cols)
     # convert all columns of DataFrame
-    correlated_data = correlated_data.apply(pd.to_numeric, errors="ignore")
+    correlated_data = apply_to_numeric_ignore_compat(correlated_data)
     do_cache(correlated_data, filepath, cache_suffix)
 
     return correlated_data

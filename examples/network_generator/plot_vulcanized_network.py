@@ -64,7 +64,7 @@ sampled_crosslinks = randomly_sample_entanglements(
 )
 n_sampled_crosslinks = len(sampled_crosslinks.pairs_of_atoms)
 
-# Add sampled crosslinks to the universe
+# Add sampled crosslinks as bonds to the universe
 universe.add_bonds(
     n_sampled_crosslinks,
     [sampled_crosslinks.pairs_of_atoms[i][0]

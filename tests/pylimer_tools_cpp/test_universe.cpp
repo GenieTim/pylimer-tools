@@ -126,6 +126,21 @@ TEST_CASE("Universe can be created", "[entity][Universe]")
       CHECK(universe.getMolecules(2).size() == 2);
     }
 
+    SECTION("bond types remain valid when added late")
+    {
+      universe.addBonds({ 0, 1 }, { 1, 3 });
+      universe.addBonds({ 3, 4 }, { 4, 5 }, { 7, 7 });
+
+      std::map<std::string, std::vector<long int>> bonds = universe.getBonds();
+      CHECK(bonds.at("bond_type").size() == 4);
+      CHECK(std::count(bonds.at("bond_type").begin(),
+                       bonds.at("bond_type").end(),
+                       7) == 2);
+      CHECK(std::count(bonds.at("bond_type").begin(),
+                       bonds.at("bond_type").end(),
+                       -1) == 2);
+    }
+
     SECTION("Special constructors work")
     {
       pe::Universe universe2 = universe;
