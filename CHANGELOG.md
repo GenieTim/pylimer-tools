@@ -2,6 +2,8 @@
 
 ## main
 
+Fix an issue (#8) where the bond_types could be in an invalid state.
+
 ## v0.3.14
 
 Thank you to @jasonmulderrig for the contribution, see PR #7:

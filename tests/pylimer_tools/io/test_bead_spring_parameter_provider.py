@@ -23,10 +23,8 @@ class TestBeadSpringParameterProvider(unittest.TestCase):
         gaussian_params = get_parameters_for_polymer(
             polymer_name, ParameterType.GAUSSIAN
         )
-        kg_lj_params = get_parameters_for_polymer(
-            polymer_name, ParameterType.KG_LJ)
-        kuhn_params = get_parameters_for_polymer(
-            polymer_name, ParameterType.KUHN)
+        kg_lj_params = get_parameters_for_polymer(polymer_name, ParameterType.KG_LJ)
+        kuhn_params = get_parameters_for_polymer(polymer_name, ParameterType.KUHN)
 
         # Assert they are all Parameters objects
         self.assertIsNotNone(gaussian_params)
@@ -44,10 +42,8 @@ class TestBeadSpringParameterProvider(unittest.TestCase):
         gaussian_params = get_parameters_for_polymer(
             polymer_name, ParameterType.GAUSSIAN
         )
-        kg_lj_params = get_parameters_for_polymer(
-            polymer_name, ParameterType.KG_LJ)
-        kuhn_params = get_parameters_for_polymer(
-            polymer_name, ParameterType.KUHN)
+        kg_lj_params = get_parameters_for_polymer(polymer_name, ParameterType.KG_LJ)
+        kuhn_params = get_parameters_for_polymer(polymer_name, ParameterType.KUHN)
 
         # Compare some key values that should differ
         # For example, distance_units should be different
@@ -74,8 +70,7 @@ class TestBeadSpringParameterProvider(unittest.TestCase):
         polymer_names = get_supported_polymer_names()
         polymer_name = polymer_names[0]
 
-        params = get_parameters_for_polymer(
-            polymer_name, ParameterType.GAUSSIAN)
+        params = get_parameters_for_polymer(polymer_name, ParameterType.GAUSSIAN)
 
         # Test dynamic method for characteristic ratio
         c_inf_direct = params.get("characteristic_ratio")

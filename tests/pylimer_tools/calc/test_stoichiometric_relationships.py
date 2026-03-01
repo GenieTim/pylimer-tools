@@ -194,8 +194,7 @@ class TestComputeWeightFractions(unittest.TestCase):
                     compute_number_fractions(b2=b2)
                 )
 
-                self.assertAlmostEqual(
-                    w_bifunctional, bifunctional_fraction, places=10)
+                self.assertAlmostEqual(w_bifunctional, bifunctional_fraction, places=10)
                 self.assertAlmostEqual(
                     w_monofunctional, monofunctional_fraction, places=10
                 )
@@ -237,14 +236,8 @@ class TestComputeWeightFractions(unittest.TestCase):
         expected_w_bifunctional = 1000 / 1666.666667
         expected_w_monofunctional = 666.666667 / 1666.666667
 
-        self.assertAlmostEqual(
-            w_bifunctional,
-            expected_w_bifunctional,
-            places=5)
-        self.assertAlmostEqual(
-            w_monofunctional,
-            expected_w_monofunctional,
-            places=5)
+        self.assertAlmostEqual(w_bifunctional, expected_w_bifunctional, places=5)
+        self.assertAlmostEqual(w_monofunctional, expected_w_monofunctional, places=5)
 
     def test_compute_weight_fractions_realistic_values(self):
         """Test with realistic polymer values."""
@@ -450,8 +443,7 @@ class TestStrandNumberDensity(unittest.TestCase):
                 # Result should be positive
                 self.assertGreater(result.magnitude, 0)
 
-    def test_compute_strand_number_density_assertion_no_mono_with_b2_not_1(
-            self):
+    def test_compute_strand_number_density_assertion_no_mono_with_b2_not_1(self):
         """Test that assertion fails when no monofunctional strands but b2 != 1.0."""
         mw_bifunctional = 1000 * self.ureg("g/mol")
         density = 1.2 * self.ureg("g/cm^3")
@@ -482,8 +474,7 @@ class TestStrandNumberDensity(unittest.TestCase):
 
         self.assertIn("b2 must be between 0 and 1", str(context.exception))
 
-    def test_compute_strand_number_density_assertion_b2_out_of_range_high(
-            self):
+    def test_compute_strand_number_density_assertion_b2_out_of_range_high(self):
         """Test that assertion fails when b2 > 1."""
         mw_bifunctional = 1000 * self.ureg("g/mol")
         mw_monofunctional = 500 * self.ureg("g/mol")

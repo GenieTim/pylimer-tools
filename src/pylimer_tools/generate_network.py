@@ -75,8 +75,7 @@ def prepare_structure_generation(
     if target_p is None and target_wsol is None:
         raise ValueError("target_p or target_wsol must be provided")
     if target_p is not None and target_wsol is not None:
-        raise ValueError(
-            "Only one of target_p and target_wsol should be provided")
+        raise ValueError("Only one of target_p and target_wsol should be provided")
 
     n_crosslinks = n_chains_crosslinkers
 
@@ -239,8 +238,7 @@ def is_active_network(
             z_score_std_mult=z_score_std_mult,
         )
     except Exception as e:
-        print(
-            f"Error during structure generation for network activity assessment: {e}")
+        print(f"Error during structure generation for network activity assessment: {e}")
         return False
 
     try:
@@ -548,8 +546,7 @@ def cli(
             "Only one of --target-p and --target-wsol should be provided"
         )
     if target_p is None and target_wsol is None:
-        raise click.UsageError(
-            "Either --target-p or --target-wsol must be provided")
+        raise click.UsageError("Either --target-p or --target-wsol must be provided")
 
     params = get_parameters_for_polymer(
         polymer_name, parameter_type=ParameterType[parameter_type.upper()]

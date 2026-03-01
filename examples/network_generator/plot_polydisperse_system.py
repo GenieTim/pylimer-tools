@@ -24,8 +24,7 @@ from pylimer_tools_cpp import MCUniverseGenerator
 
 # Get parameters for PDMS polymer density, bead distance, and
 # characteristic ratio
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 C_inf = params.get_characteristic_ratio()
 
 # setup strand lengths
@@ -77,8 +76,7 @@ assert math.isclose(
 # For now, we will show that this produces a variety of different strand
 # lengths:
 
-strand_lengths = [m.get_nr_of_atoms()
-                  for m in universe.get_chains_with_crosslinker(2)]
+strand_lengths = [m.get_nr_of_atoms() for m in universe.get_chains_with_crosslinker(2)]
 
 # Plot the distribution of strand lengths
 plt.figure()

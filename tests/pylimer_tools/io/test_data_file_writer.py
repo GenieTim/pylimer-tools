@@ -8,18 +8,14 @@ from pylimer_tools_cpp import DataFileWriter, Universe
 
 
 class DataFileWriterTest(unittest.TestCase):
-    def check_image_flags_fixed(
-            self, universe: Universe, writer: DataFileWriter):
+    def check_image_flags_fixed(self, universe: Universe, writer: DataFileWriter):
         file = os.path.join(
-            os.path.dirname(
-                __file__), "..", "fixtures", "tmp-test-data-file.out"
+            os.path.dirname(__file__), "..", "fixtures", "tmp-test-data-file.out"
         )
         writer.write_to_file(file)
 
         read_universe = read_data_file(file)
-        self.assertEqual(
-            read_universe.get_nr_of_atoms(),
-            universe.get_nr_of_atoms())
+        self.assertEqual(read_universe.get_nr_of_atoms(), universe.get_nr_of_atoms())
 
         # then, assert that after writing with the new image flags, things are
         # correct
@@ -45,8 +41,7 @@ class DataFileWriterTest(unittest.TestCase):
             [random.randint(0, 10) for i in range(10)],
         )
 
-        universe.add_bonds([i + 1 for i in range(9)],
-                           [i + 2 for i in range(9)])
+        universe.add_bonds([i + 1 for i in range(9)], [i + 2 for i in range(9)])
 
         # first, make sure the random image flags actually
         # lead to what we expect not to be true

@@ -126,12 +126,7 @@ def read_one_group(
     """
     if len(header) == 0:
         raise ValueError("header must have more than zero characters")
-    assert isinstance(
-        header,
-        str) or (
-        isinstance(
-            header,
-            list) and len(header) > 0)
+    assert isinstance(header, str) or (isinstance(header, list) and len(header) > 0)
     csv_file_to_write = "{}/{}_{}".format(
         tempfile.gettempdir(),
         hashlib.md5(
@@ -147,8 +142,7 @@ def read_one_group(
         if isinstance(header, str):
             min_line_len = max(min_line_len, len(header.split()))
         else:
-            min_line_len = max(min_line_len,
-                               min([len(h.split()) for h in header]))
+            min_line_len = max(min_line_len, min([len(h.split()) for h in header]))
 
         def check_skip_line(line, header):
             return line and not line.startswith(header)
@@ -162,8 +156,7 @@ def read_one_group(
             return True
 
         skip_line_fun = (
-            check_skip_line_header_list if isinstance(
-                header, list) else check_skip_line
+            check_skip_line_header_list if isinstance(header, list) else check_skip_line
         )
         # skip lines up until header (or file ending)
         n_lines_skipped = 0
@@ -218,8 +211,7 @@ def read_one_group(
 
 
 def get_thermo_cache_name_suffix(
-    header: Union[str, List[str],
-                  None] = "Step Temp E_pair E_mol TotEng Press",
+    header: Union[str, List[str], None] = "Step Temp E_pair E_mol TotEng Press",
     texts_to_read: float = 50,
     min_line_len: float = 5,
 ) -> str:
@@ -249,8 +241,7 @@ def get_thermo_cache_name_suffix(
 
 def extract_thermo_params(
     file,
-    header: Union[str, List[str],
-                  None] = "Step Temp E_pair E_mol TotEng Press",
+    header: Union[str, List[str], None] = "Step Temp E_pair E_mol TotEng Press",
     texts_to_read: int = 50,
     min_line_len: int = 5,
     use_cache: bool = True,
@@ -323,15 +314,12 @@ def extract_thermo_params(
             try:
                 os.remove(filepath)
             except Exception as e:
-                warnings.warn(
-                    "Could not remove file {}: {}".format(
-                        filepath, e))
+                warnings.warn("Could not remove file {}: {}".format(filepath, e))
                 pass
             return tmp_df
         except Exception as e:
             warnings.warn(
-                "Error reading temporary CSV thermo file '{}': {}".format(
-                    filepath, e),
+                "Error reading temporary CSV thermo file '{}': {}".format(filepath, e),
                 source=e,
             )
             return pd.DataFrame()
@@ -483,8 +471,7 @@ def read_multi_section_separated_value_file(
             )
         for i, h in enumerate(headers):
             if h not in all_headers:
-                first_line_split = re.split(
-                    "{}+".format(separator), first_line.strip())
+                first_line_split = re.split("{}+".format(separator), first_line.strip())
                 if len(first_line_split) != len(headers):
                     raise ValueError(
                         "Headers and first line do not match in nr of values",
@@ -522,15 +509,12 @@ def read_multi_section_separated_value_file(
                 try:
                     os.remove(csv_file)
                 except OSError as e:
-                    warnings.warn(
-                        "Could not remove file {}: {}".format(
-                            csv_file, e))
+                    warnings.warn("Could not remove file {}: {}".format(csv_file, e))
                     pass
                 continue
             with open(csv_file, "r") as fp:
                 header_line = next(fp)
-                split_header = re.split(
-                    "{}+".format(separator), header_line.strip())
+                split_header = re.split("{}+".format(separator), header_line.strip())
                 map_to_col = []
                 n_found = 0
                 for i, col in enumerate(all_headers):
@@ -543,8 +527,7 @@ def read_multi_section_separated_value_file(
                 for line in fp:
                     if line == header_line or line.startswith("Step"):
                         continue
-                    split_line = re.split(
-                        "{}+".format(separator), line.strip())
+                    split_line = re.split("{}+".format(separator), line.strip())
                     str_to_write = separator.join(
                         [split_line[i] if i != -1 else "NaN" for i in map_to_col]
                     )
@@ -552,9 +535,7 @@ def read_multi_section_separated_value_file(
             try:
                 os.remove(csv_file)
             except OSError as e:
-                warnings.warn(
-                    "Could not remove file {}: {}".format(
-                        csv_file, e))
+                warnings.warn("Could not remove file {}: {}".format(csv_file, e))
                 pass
             print("File {} handled".format(csv_file))
     # read the csv files again
@@ -574,9 +555,7 @@ def read_multi_section_separated_value_file(
     try:
         os.remove(csv_file_to_write)
     except OSError as e:
-        warnings.warn(
-            "Could not remove file {}: {}".format(
-                csv_file_to_write, e))
+        warnings.warn("Could not remove file {}: {}".format(csv_file_to_write, e))
         pass
     # doCache(reduce_mem_usage(df), file, suffix)
     # print("Read {} rows for file {}".format(len(df), file))

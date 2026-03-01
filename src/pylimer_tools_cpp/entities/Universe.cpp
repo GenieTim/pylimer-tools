@@ -546,6 +546,11 @@ Universe::addBonds(const size_t NNewBonds,
   // translate from atomId to VertexIdx
   igraph_vector_int_t newEdges;
   size_t actualNrOfBondsAdded = 0;
+  const bool hasExplicitBondTypes = (bondTypes.size() == NNewBonds);
+  std::vector<int> addedBondTypes;
+  if (hasExplicitBondTypes) {
+    addedBondTypes.reserve(NNewBonds);
+  }
   igraph_vector_int_init(&newEdges, edgesSize);
   int innerIndex = 0;
   for (size_t i = 1; i < edgesSize; i += 2) {
@@ -558,6 +563,9 @@ Universe::addBonds(const size_t NNewBonds,
       igraph_vector_int_set(&newEdges, innerIndex, vertexTo);
       innerIndex += 1;
       actualNrOfBondsAdded += 1;
+      if (hasExplicitBondTypes) {
+        addedBondTypes.push_back(bondTypes[i / 2]);
+      }
     } catch ([[maybe_unused]] std::out_of_range& ex) {
       if (!ignoreNonExistentAtoms) {
         igraph_vector_int_destroy(&newEdges);
@@ -578,22 +586,31 @@ Universe::addBonds(const size_t NNewBonds,
   igraph_vector_int_destroy(&newEdges);
   if (actualNrOfBondsAdded > 0) {
     // add attributes
-    if (bondTypes.size() == NNewBonds &&
-        this->NBonds == (igraph_ecount(&this->graph) - NNewBonds)) {
-      if (this->NBonds == 0) {
-        // fast track
+    if (hasExplicitBondTypes) {
+      const igraph_integer_t edgeCountAfter = igraph_ecount(&this->graph);
+      const igraph_integer_t edgeCountBefore =
+        edgeCountAfter - static_cast<igraph_integer_t>(actualNrOfBondsAdded);
+
+      const bool hasTypeAttribute =
+        igraph_cattribute_has_attr(&this->graph, IGRAPH_ATTRIBUTE_EDGE, "type");
+
+      if (!hasTypeAttribute) {
+        std::vector<int> allTypes(static_cast<size_t>(edgeCountAfter), -1);
+        for (size_t i = 0; i < actualNrOfBondsAdded; ++i) {
+          allTypes[static_cast<size_t>(edgeCountBefore) + i] =
+            addedBondTypes[i];
+        }
         igraph_vector_t types_igraph_vec;
-        igraph_vector_init(&types_igraph_vec, NNewBonds);
-        pylimer_tools::utils::StdVectorToIgraphVectorT(bondTypes,
+        igraph_vector_init(&types_igraph_vec, edgeCountAfter);
+        pylimer_tools::utils::StdVectorToIgraphVectorT(allTypes,
                                                        &types_igraph_vec);
         REQUIRE_IGRAPH_SUCCESS(
           igraph_cattribute_EAN_setv(&this->graph, "type", &types_igraph_vec));
         igraph_vector_destroy(&types_igraph_vec);
       } else {
-        for (size_t i = 0; i < NNewBonds; ++i) {
-          // append attributes
+        for (size_t i = 0; i < actualNrOfBondsAdded; ++i) {
           REQUIRE_IGRAPH_SUCCESS(igraph_cattribute_EAN_set(
-            &this->graph, "type", this->NBonds + i, bondTypes[i]));
+            &this->graph, "type", edgeCountBefore + i, addedBondTypes[i]));
         }
       }
     }

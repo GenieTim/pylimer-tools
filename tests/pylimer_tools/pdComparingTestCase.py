@@ -5,11 +5,9 @@ import pandas.testing as pd_testing
 
 
 class PandasComparingTestCase(unittest.TestCase):
-    def assertDataframeEqual(
-            self, a, b, msg="Dataframes are not equal", **kwargs):
+    def assertDataframeEqual(self, a, b, msg="Dataframes are not equal", **kwargs):
         try:
-            pd_testing.assert_frame_equal(
-                a, b, check_index_type=False, **kwargs)
+            pd_testing.assert_frame_equal(a, b, check_index_type=False, **kwargs)
         except AssertionError as e:
             raise self.failureException(msg) from e
 

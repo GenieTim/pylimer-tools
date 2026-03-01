@@ -73,8 +73,7 @@ def compute_strand_number_density(
         assert b2 == 1.0, "If no monofunctional strands are present, b2 must be 1.0."
         return density / mw_bifunctional
 
-    bifunctional_fraction, monofunctional_fraction = compute_number_fractions(
-        b2)
+    bifunctional_fraction, monofunctional_fraction = compute_number_fractions(b2)
 
     return cast(
         pint.Quantity,
@@ -100,15 +99,13 @@ def compute_weight_fractions(
     :return: A tuple containing the weight fractions (w_bifunctional, w_monofunctional)
     :rtype: tuple[float, float]
     """
-    if mw_monofunctional is None or not math.isfinite(
-            mw_monofunctional.magnitude):
+    if mw_monofunctional is None or not math.isfinite(mw_monofunctional.magnitude):
         assert b2 == 1.0, "If no monofunctional strands are present, b2 must be 1.0."
         return 1.0, 0.0
 
     assert 0.0 <= b2 <= 1.0, "b2 must be between 0 and 1."
 
-    bifunctional_fraction, monofunctional_fraction = compute_number_fractions(
-        b2)
+    bifunctional_fraction, monofunctional_fraction = compute_number_fractions(b2)
 
     mass_bifunctional = bifunctional_fraction * mw_bifunctional.magnitude
     mass_monofunctional = monofunctional_fraction * mw_monofunctional.magnitude

@@ -39,13 +39,12 @@ class CustomForceEvaluator(MEHPForceEvaluator):
         super().__init__()
         self.kappa = kappa
 
-    def evaluate_force_set_gradient(
-            self, n, spring_distances, compute_gradient):
+    def evaluate_force_set_gradient(self, n, spring_distances, compute_gradient):
         network = self.network
         nr_springs = network.nr_of_springs
         force = 0.0
         for i in range(nr_springs):
-            spring_vec = spring_distances[3 * i: 3 * i + 3]
+            spring_vec = spring_distances[3 * i : 3 * i + 3]
             r_squared = np.sum(spring_vec**2)
             contour_length = network.spring_contour_length[i]
             force += r_squared / contour_length
@@ -65,12 +64,10 @@ class CustomForceEvaluator(MEHPForceEvaluator):
                     gradient[3 * b + dir_idx] -= grad_term
         return (force, gradient)
 
-    def evaluate_stress_contribution(
-            self, spring_distances, i, j, spring_index):
+    def evaluate_stress_contribution(self, spring_distances, i, j, spring_index):
         network = self.network
         contour_length = network.spring_contour_length[spring_index]
-        return self.kappa * spring_distances[i] * \
-            spring_distances[j] / contour_length
+        return self.kappa * spring_distances[i] * spring_distances[j] / contour_length
 
     def prepare_for_evaluations(self):
         pass
@@ -87,8 +84,7 @@ universe = read_data_file(
 assert isinstance(universe, Universe)
 
 # Prepare parameters for conversion factors
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
 r02_slope = params.get("R02")
 r02_slope_magnitude = r02_slope.to(params.get("distance_units") ** 2).magnitude
 kbt = params.get("T") * params.get("kb")
