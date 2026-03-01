@@ -129,7 +129,7 @@ TEST_CASE("Universe can be created", "[entity][Universe]")
     SECTION("bond types remain valid when added late")
     {
       universe.addBonds({ 0, 1 }, { 1, 3 });
-      universe.addBonds({ 3, 4 }, { 4, 5 }, { 7, 7 });
+      universe.addBonds({ 3, 2 }, { 2, 3 }, { 7, 7 });
 
       std::map<std::string, std::vector<long int>> bonds = universe.getBonds();
       CHECK(bonds.at("bond_type").size() == 4);
