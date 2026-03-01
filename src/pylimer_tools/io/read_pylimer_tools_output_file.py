@@ -5,6 +5,7 @@ This module provides a few functions to read output from pylimer_tools_cpp's sim
 import pandas as pd
 
 from pylimer_tools.utils.cache_utility import do_cache, load_cache
+from pylimer_tools.utils.data_utility import apply_to_numeric_ignore_compat
 
 
 def read_avg_file(filename: str) -> pd.DataFrame:
@@ -45,7 +46,7 @@ def read_avg_file(filename: str) -> pd.DataFrame:
     if not len(data) == 0:
         data_frames.append(pd.DataFrame(data, columns=first_line_split))
     df = pd.concat(data_frames, ignore_index=True)
-    result = df.apply(pd.to_numeric, errors="ignore")
+    result = apply_to_numeric_ignore_compat(df)
     result = result.groupby("OutputStep", as_index=False).last()
     assert not result["OutputStep"].duplicated().any()
     do_cache(result, filename, "my-avg")

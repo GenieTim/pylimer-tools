@@ -3,6 +3,28 @@ import warnings
 import pandas as pd
 
 
+def apply_to_numeric_ignore_compat(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Convert DataFrame columns to numeric when possible.
+
+    This preserves the historical behavior of ``errors='ignore'`` from
+    ``pandas.to_numeric`` while remaining compatible with newer pandas versions.
+
+    :param df: DataFrame whose columns should be converted where possible
+    :type df: pd.DataFrame
+    :return: DataFrame with numeric-like columns converted
+    :rtype: pd.DataFrame
+    """
+
+    def _convert(series: pd.Series) -> pd.Series:
+        try:
+            return pd.to_numeric(series, errors="raise")
+        except (ValueError, TypeError):
+            return series
+
+    return df.apply(_convert)
+
+
 def get_tail(data, percentage=0.2, min_n=25, max_percentage=0.5):
     """
     Extract the last few entries of a list
