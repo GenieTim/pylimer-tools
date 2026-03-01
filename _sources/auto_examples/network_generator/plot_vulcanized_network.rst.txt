@@ -86,7 +86,7 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
     )
     n_sampled_crosslinks = len(sampled_crosslinks.pairs_of_atoms)
 
-    # Add sampled crosslinks to the universe
+    # Add sampled crosslinks as bonds to the universe
     universe.add_bonds(
         n_sampled_crosslinks,
         [sampled_crosslinks.pairs_of_atoms[i][0]
@@ -167,7 +167,7 @@ lengths:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 25.424 seconds)
+   **Total running time of the script:** (1 minutes 26.027 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_vulcanized_network.py:

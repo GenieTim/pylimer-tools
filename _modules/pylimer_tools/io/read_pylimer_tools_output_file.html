@@ -373,6 +373,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.utils.cache_utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">do_cache</span><span class="p">,</span> <span class="n">load_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.utils.data_utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_to_numeric_ignore_compat</span>
 
 
 <div class="viewcode-block" id="read_avg_file">
@@ -417,7 +418,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">data_frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">first_line_split</span><span class="p">))</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">data_frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">apply_to_numeric_ignore_compat</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;OutputStep&quot;</span><span class="p">,</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;OutputStep&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
     <span class="n">do_cache</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;my-avg&quot;</span><span class="p">)</span>

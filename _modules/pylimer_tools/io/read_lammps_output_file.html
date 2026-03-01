@@ -386,6 +386,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.io.extract_thermo_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">extract_thermo_params</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.utils.cache_utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">do_cache</span><span class="p">,</span> <span class="n">load_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.utils.data_utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_to_numeric_ignore_compat</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">AtomStyle</span><span class="p">,</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">UniverseSequence</span>
 
 
@@ -603,7 +604,7 @@
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs_to_concat</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># convert all columns of DataFrame</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">apply_to_numeric_ignore_compat</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">do_cache</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">cache_suffix</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">df</span></div>
@@ -731,7 +732,7 @@
 
     <span class="n">correlated_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">correlated_data_assembled</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
     <span class="c1"># convert all columns of DataFrame</span>
-    <span class="n">correlated_data</span> <span class="o">=</span> <span class="n">correlated_data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+    <span class="n">correlated_data</span> <span class="o">=</span> <span class="n">apply_to_numeric_ignore_compat</span><span class="p">(</span><span class="n">correlated_data</span><span class="p">)</span>
     <span class="n">do_cache</span><span class="p">(</span><span class="n">correlated_data</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">cache_suffix</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">correlated_data</span></div>

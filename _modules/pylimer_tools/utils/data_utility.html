@@ -371,6 +371,31 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 
+<div class="viewcode-block" id="apply_to_numeric_ignore_compat">
+<a class="viewcode-back" href="../../../pylimer_tools.utils.html#pylimer_tools.utils.data_utility.apply_to_numeric_ignore_compat">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_to_numeric_ignore_compat</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert DataFrame columns to numeric when possible.</span>
+
+<span class="sd">    This preserves the historical behavior of ``errors=&#39;ignore&#39;`` from</span>
+<span class="sd">    ``pandas.to_numeric`` while remaining compatible with newer pandas versions.</span>
+
+<span class="sd">    :param df: DataFrame whose columns should be converted where possible</span>
+<span class="sd">    :type df: pd.DataFrame</span>
+<span class="sd">    :return: DataFrame with numeric-like columns converted</span>
+<span class="sd">    :rtype: pd.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert</span><span class="p">(</span><span class="n">series</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">series</span>
+
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_convert</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="get_tail">
 <a class="viewcode-back" href="../../../pylimer_tools.utils.html#pylimer_tools.utils.data_utility.get_tail">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_tail</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">percentage</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">min_n</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">max_percentage</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>

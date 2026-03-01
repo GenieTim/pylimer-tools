@@ -150,8 +150,8 @@ Apart from the z-score, there are two more methods to configure the limit used:
 
  .. code-block:: none
 
-    Time without max distance:  34.61 seconds
-    Time with z-score max distance: 11.27 seconds
+    Time without max distance:  34.82 seconds
+    Time with z-score max distance: 11.48 seconds
 
 
 
@@ -159,7 +159,7 @@ Apart from the z-score, there are two more methods to configure the limit used:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 46.126 seconds)
+   **Total running time of the script:** (0 minutes 46.542 seconds)
 
 
 .. _sphx_glr_download_auto_examples_network_generator_plot_monte_carlo_configuration.py:
