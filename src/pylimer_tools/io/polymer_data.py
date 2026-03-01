@@ -173,7 +173,8 @@ class PolymerDataFrame:
                 self.shape[0], self.shape[1]
             )
         )
-        lines.append("   " + "  ".join(f"{col:>12}" for col in self._columns[:5]))
+        lines.append("   " +
+                     "  ".join(f"{col:>12}" for col in self._columns[:5]))
 
         for i, polymer in enumerate(self._polymers[:5]):
             values = []
@@ -249,7 +250,10 @@ def get_polymer_by_name(polymer_name: str) -> PolymerData:
 
     for polymer_dict in data._polymers:
         polymer_data_name = polymer_dict.get("name", "")
-        normalized_name = "".join(filter(str.isalnum, str(polymer_data_name))).lower()
+        normalized_name = "".join(
+            filter(
+                str.isalnum,
+                str(polymer_data_name))).lower()
 
         if normalized_input == normalized_name:
             return PolymerData(polymer_dict)

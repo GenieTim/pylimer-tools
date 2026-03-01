@@ -24,36 +24,51 @@ class TestUtilFunctions(PandasComparingTestCase):
         )
         half_df = test_dataframe.tail(2)
         self.assertEqual(get_tail(test_dataframe), half_df)
-        self.assertEqual(get_tail(test_dataframe, max_percentage=1), test_dataframe)
         self.assertEqual(
-            get_tail(test_dataframe, percentage=0.1, max_percentage=0.5), half_df
+            get_tail(
+                test_dataframe,
+                max_percentage=1),
+            test_dataframe)
+        self.assertEqual(
+            get_tail(test_dataframe, percentage=0.1,
+                     max_percentage=0.5), half_df
         )
         self.assertEqual(
-            get_tail(test_dataframe, percentage=0.5, max_percentage=1, min_n=1), half_df
+            get_tail(test_dataframe, percentage=0.5,
+                     max_percentage=1, min_n=1), half_df
         )
         self.assertEqual(
-            get_tail(test_dataframe, percentage=0.1, max_percentage=1, min_n=2), half_df
+            get_tail(test_dataframe, percentage=0.1,
+                     max_percentage=1, min_n=2), half_df
         )
 
         self.assertEqual(get_tail([0, 1, 2, 3]), [2, 3])
 
     def test_unify_step_sizes(self):
         test_dataframe = pd.DataFrame(
-            [{"a": 1, "b": 0}, {"a": 2, "b": 0}, {"a": 2.5, "b": 0}, {"a": 3, "b": 0}]
+            [{"a": 1, "b": 0}, {"a": 2, "b": 0}, {
+                "a": 2.5, "b": 0}, {"a": 3, "b": 0}]
         )
         expected_result = pd.DataFrame(
             [{"a": 1.0, "b": 0}, {"a": 2.0, "b": 0}, {"a": 3.0, "b": 0}]
         ).reset_index(drop=True)
 
-        res = unify_data_stepsizes(test_dataframe, key="a").reset_index(drop=True)
+        res = unify_data_stepsizes(
+            test_dataframe,
+            key="a").reset_index(
+            drop=True)
         self.assertEqual(expected_result, res)
 
         with self.assertWarns(Warning):
-            unify_data_stepsizes(test_dataframe, key="a", max_expected_step_size=0.5)
+            unify_data_stepsizes(
+                test_dataframe,
+                key="a",
+                max_expected_step_size=0.5)
 
     def test_cache_utility(self):
         test_dataframe = pd.DataFrame(
-            [{"a": 1, "b": 0}, {"a": 2, "b": 0}, {"a": 2.5, "b": 0}, {"a": 3, "b": 0}]
+            [{"a": 1, "b": 0}, {"a": 2, "b": 0}, {
+                "a": 2.5, "b": 0}, {"a": 3, "b": 0}]
         )
         # make suffix unique so subsequent test runs are consistent
         suffix = "test.out" + datetime.datetime.now().strftime("%d%m%Y%H%M%S%f")

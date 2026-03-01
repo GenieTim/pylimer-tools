@@ -41,7 +41,8 @@ from pylimer_tools_cpp import BackTrackStatus, MCUniverseGenerator, MEHPForceBal
 
 
 # Get parameters for PDMS polymer density and bead distance
-params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer(
+    "PDMS", parameter_type=ParameterType.GAUSSIAN)
 
 n_xlinks = 500  # Number of crosslinkers
 n_strands = 1000  # Number of strands
@@ -121,7 +122,8 @@ def conversion_callback(gen, steps_remaining):
 generator.link_strands_callback(conversion_callback, 1.0)
 
 final_conversion = generator.get_current_crosslinker_conversion()
-print(f"  Final conversion: {final_conversion:.3f} and w_sol: {wsol_values[-1]:.3f}")
+print(
+    f"  Final conversion: {final_conversion:.3f} and w_sol: {wsol_values[-1]:.3f}")
 
 # %%
 # Visualizing the Results

@@ -38,7 +38,9 @@ def read_avg_file(filename: str) -> pd.DataFrame:
                 continue
             stripped_line = line.removeprefix("#").strip()
             if stripped_line.startswith(first_line_split[0]):
-                data_frames.append(pd.DataFrame(data, columns=first_line_split))
+                data_frames.append(
+                    pd.DataFrame(
+                        data, columns=first_line_split))
                 first_line_split = stripped_line.split()
                 data = []
             elif stripped_line != "":

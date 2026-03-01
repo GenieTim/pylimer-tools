@@ -19,14 +19,22 @@ class UniverseUsingTestCase(unittest.TestCase):
     # *4
     testAtoms = pd.DataFrame(
         [
-            {"id": 1, "nx": 1, "ny": 1, "nz": 1, "type": 1, "x": 1, "y": 1, "z": 1},
-            {"id": 2, "nx": 1, "ny": 1, "nz": 1, "type": 1, "x": 2, "y": 1, "z": 1},
-            {"id": 3, "nx": 1, "ny": 1, "nz": 1, "type": 1, "x": 3, "y": 1, "z": 1},
-            {"id": 4, "nx": 1, "ny": 1, "nz": 1, "type": 2, "x": 2, "y": 2, "z": 1},
-            {"id": 5, "nx": 1, "ny": 1, "nz": 1, "type": 1, "x": 1, "y": 3, "z": 1},
-            {"id": 6, "nx": 1, "ny": 1, "nz": 1, "type": 2, "x": 1, "y": 1, "z": 2},
-            {"id": 7, "nx": 1, "ny": 1, "nz": 1, "type": 2, "x": 1, "y": 1, "z": 3},
-            {"id": 8, "nx": 1, "ny": 1, "nz": 1, "type": 1, "x": 2, "y": 2, "z": 2},
+            {"id": 1, "nx": 1, "ny": 1, "nz": 1,
+                "type": 1, "x": 1, "y": 1, "z": 1},
+            {"id": 2, "nx": 1, "ny": 1, "nz": 1,
+                "type": 1, "x": 2, "y": 1, "z": 1},
+            {"id": 3, "nx": 1, "ny": 1, "nz": 1,
+                "type": 1, "x": 3, "y": 1, "z": 1},
+            {"id": 4, "nx": 1, "ny": 1, "nz": 1,
+                "type": 2, "x": 2, "y": 2, "z": 1},
+            {"id": 5, "nx": 1, "ny": 1, "nz": 1,
+                "type": 1, "x": 1, "y": 3, "z": 1},
+            {"id": 6, "nx": 1, "ny": 1, "nz": 1,
+                "type": 2, "x": 1, "y": 1, "z": 2},
+            {"id": 7, "nx": 1, "ny": 1, "nz": 1,
+                "type": 2, "x": 1, "y": 1, "z": 3},
+            {"id": 8, "nx": 1, "ny": 1, "nz": 1,
+                "type": 1, "x": 2, "y": 2, "z": 2},
         ]
     )
     testBonds = pd.DataFrame(
@@ -50,12 +58,18 @@ class UniverseUsingTestCase(unittest.TestCase):
     """
     testAtomsSmall = pd.DataFrame(
         [
-            {"id": 1, "nx": 1, "ny": 1, "nz": 1, "type": 1, "x": 1, "y": 1, "z": 1},
-            {"id": 2, "nx": 1, "ny": 1, "nz": 1, "type": 1, "x": 2, "y": 1, "z": 1},
-            {"id": 3, "nx": 1, "ny": 1, "nz": 1, "type": 1, "x": 3, "y": 1, "z": 1},
-            {"id": 5, "nx": 1, "ny": 1, "nz": 1, "type": 1, "x": 1, "y": 3, "z": 1},
-            {"id": 6, "nx": 1, "ny": 1, "nz": 1, "type": 2, "x": 1, "y": 1, "z": 2},
-            {"id": 7, "nx": 1, "ny": 1, "nz": 1, "type": 2, "x": 1, "y": 1, "z": 3},
+            {"id": 1, "nx": 1, "ny": 1, "nz": 1,
+                "type": 1, "x": 1, "y": 1, "z": 1},
+            {"id": 2, "nx": 1, "ny": 1, "nz": 1,
+                "type": 1, "x": 2, "y": 1, "z": 1},
+            {"id": 3, "nx": 1, "ny": 1, "nz": 1,
+                "type": 1, "x": 3, "y": 1, "z": 1},
+            {"id": 5, "nx": 1, "ny": 1, "nz": 1,
+                "type": 1, "x": 1, "y": 3, "z": 1},
+            {"id": 6, "nx": 1, "ny": 1, "nz": 1,
+                "type": 2, "x": 1, "y": 1, "z": 2},
+            {"id": 7, "nx": 1, "ny": 1, "nz": 1,
+                "type": 2, "x": 1, "y": 1, "z": 3},
         ]
     )
     testBondsSmall = pd.DataFrame(
@@ -97,7 +111,9 @@ class UniverseUsingTestCase(unittest.TestCase):
             self.testAtoms["ny"],
             self.testAtoms["nz"],
         )
-        self.testUniverse.add_bonds(self.testBonds["bondFrom"], self.testBonds["to"])
+        self.testUniverse.add_bonds(
+            self.testBonds["bondFrom"],
+            self.testBonds["to"])
         # an additional larger test universe where the stoichiometric imbalance is < 1
         # even when imposing a crosslinker functionality of 1
         # in essence, it is one loop around 4 plus a connection to 6.
@@ -272,5 +288,7 @@ class UniverseUsingTestCase(unittest.TestCase):
             atomData["ny"].tolist(),
             atomData["nz"].tolist(),
         )
-        universe.add_bonds(bondData["bondFrom"].tolist(), bondData["to"].tolist())
+        universe.add_bonds(
+            bondData["bondFrom"].tolist(),
+            bondData["to"].tolist())
         return universe

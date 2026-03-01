@@ -50,7 +50,8 @@ def cli(files, crosslinker_type, polymer_name):
 
     for file_path in files:
         click.echo(
-            "\nAnalysing File with {} units ".format(params.get_name()) + file_path
+            "\nAnalysing File with {} units ".format(
+                params.get_name()) + file_path
         )
 
         universe = read_data_file(file_path)
@@ -74,7 +75,8 @@ def cli(files, crosslinker_type, polymer_name):
         )
         molecules = universe.get_molecules(crosslinker_type)
         bond_lengths = universe.compute_bond_lengths()
-        non_none_bond_lengths = [bl for bl in bond_lengths if bl is not None and bl > 0]
+        non_none_bond_lengths = [
+            bl for bl in bond_lengths if bl is not None and bl > 0]
         click.echo(
             "Bond length b: <b> = {} {}, (min: {}, max: {}, median: {}) {}, <b^2> = {} {}^2".format(
                 statistics.mean(non_none_bond_lengths),
@@ -83,7 +85,8 @@ def cli(files, crosslinker_type, polymer_name):
                 max(non_none_bond_lengths),
                 statistics.median(non_none_bond_lengths),
                 base_distance_unit,
-                statistics.mean(bl**2 for bl in bond_lengths if bl is not None),
+                statistics.mean(
+                    bl**2 for bl in bond_lengths if bl is not None),
                 base_distance_unit,
             )
         )

@@ -35,7 +35,8 @@ class TestEntities(UniverseUsingTestCase):
         self.assertRaises(IndexError, lambda: self.emptyUniverse.get_atom(1))
 
         self.assertCountEqual([], self.emptyUniverse.get_molecules(0))
-        self.assertCountEqual([], self.emptyUniverse.get_chains_with_crosslinker(0))
+        self.assertCountEqual(
+            [], self.emptyUniverse.get_chains_with_crosslinker(0))
         self.assertEqual(0, self.emptyUniverse.get_nr_of_atoms())
 
         atom = self.testUniverseSmall.get_atom(1)
@@ -62,7 +63,8 @@ class TestEntities(UniverseUsingTestCase):
         self.assertEqual(len(molecules), 2)
         self.assertEqual(molecules[0].get_nr_of_atoms(), 3)
         self.assertEqual(
-            np.sum([m.get_nr_of_atoms() for m in molecules]), len(self.testAtomsSmall)
+            np.sum([m.get_nr_of_atoms()
+                   for m in molecules]), len(self.testAtomsSmall)
         )
         molecules = universe.get_molecules(2)
         self.assertEqual(len(molecules), 2)
@@ -73,17 +75,23 @@ class TestEntities(UniverseUsingTestCase):
             self.assertIsInstance(molecule, Molecule)
         for molecule in universe.get_chains_with_crosslinker(0):
             self.assertIsInstance(molecule, Molecule)
-            self.assertEqual(molecule.get_strand_type(), MoleculeType.FREE_CHAIN)
+            self.assertEqual(
+                molecule.get_strand_type(),
+                MoleculeType.FREE_CHAIN)
 
         chains_with_crosslinker = universe.get_chains_with_crosslinker(2)
         self.assertEqual(
-            chains_with_crosslinker[0].get_strand_type(), MoleculeType.FREE_CHAIN
+            chains_with_crosslinker[0].get_strand_type(
+            ), MoleculeType.FREE_CHAIN
         )
         self.assertEqual(
-            chains_with_crosslinker[1].get_strand_type(), MoleculeType.DANGLING_CHAIN
+            chains_with_crosslinker[1].get_strand_type(
+            ), MoleculeType.DANGLING_CHAIN
         )
         universe_clone = copy.copy(universe)
-        self.assertEqual(universe.get_nr_of_atoms(), universe_clone.get_nr_of_atoms())
+        self.assertEqual(
+            universe.get_nr_of_atoms(),
+            universe_clone.get_nr_of_atoms())
 
     def test_molecule_entity_iterations(self):
         molecules = self.testUniverseSmall.get_molecules(0)

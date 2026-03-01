@@ -20,7 +20,8 @@ from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import MEHPForceBalance, Universe
 
 # Get parameters for conversion factors
-params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+params = get_parameters_for_polymer(
+    "PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
 
 # Load your network (replace with your file)

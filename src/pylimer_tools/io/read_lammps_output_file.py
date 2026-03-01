@@ -22,7 +22,8 @@ from pylimer_tools.utils.data_utility import apply_to_numeric_ignore_compat
 from pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
 
 
-def read_log_file(filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:
+def read_log_file(
+        filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:
     """
     Read a LAMMPS' log (thermo output) file.
 
@@ -78,7 +79,8 @@ def read_data_file(
     :raises FileNotFoundError: If the structure file does not exist
     """
     if not (os.path.isfile(structure_file)):
-        raise FileNotFoundError(f"Structure-file '{structure_file}' not found.")
+        raise FileNotFoundError(
+            f"Structure-file '{structure_file}' not found.")
     u_s = UniverseSequence()
     if atom_style is not None:
         u_s.set_data_file_atom_style(atom_style)
@@ -88,7 +90,8 @@ def read_data_file(
     return universe
 
 
-def read_averages_file(filepath, use_cache: bool = True, sep=" ") -> pd.DataFrame:
+def read_averages_file(filepath, use_cache: bool = True,
+                       sep=" ") -> pd.DataFrame:
     """
     Read a file written by a `fix ave/time` command.
 
@@ -124,14 +127,19 @@ def read_averages_file(filepath, use_cache: bool = True, sep=" ") -> pd.DataFram
     header_line = header_line.removeprefix("#").strip()
 
     try:
-        data = pd.read_csv(filepath, comment="#", names=header_line.split(), sep=sep)
+        data = pd.read_csv(
+            filepath,
+            comment="#",
+            names=header_line.split(),
+            sep=sep)
     except pd.errors.EmptyDataError:
         return pd.DataFrame()
 
     return data
 
 
-def read_sectioned_averages_file(filepath, use_cache: bool = True) -> pd.DataFrame:
+def read_sectioned_averages_file(
+        filepath, use_cache: bool = True) -> pd.DataFrame:
     """
     Read a file written by a `fix ave/time` command with multiple sections.
 

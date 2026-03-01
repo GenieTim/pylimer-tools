@@ -57,8 +57,17 @@ for universe in sequence:
 fig, axs = plt.subplots(2, 1, figsize=(10, 10), sharex=False)
 
 # Panel 1: MSD
-axs[0].plot(list(msd.keys()), list(msd.values()), label="Mean Square Displacement")
-axs[0].axhline(np.mean(list(msd.values())), color="black", linestyle="--", label="Mean")
+axs[0].plot(
+    list(
+        msd.keys()), list(
+            msd.values()), label="Mean Square Displacement")
+axs[0].axhline(
+    np.mean(
+        list(
+            msd.values())),
+    color="black",
+    linestyle="--",
+    label="Mean")
 # add cumulative mean
 axs[0].plot(
     list(msd.keys()),

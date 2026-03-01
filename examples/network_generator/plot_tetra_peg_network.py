@@ -77,7 +77,9 @@ print(f"  Total atoms: {generator.get_current_nr_of_atoms()}")
 print(f"  Total bonds: {generator.get_current_nr_of_bonds()}")
 
 # Now link free strand ends to each other to form the final network
-print(f"Linking strand ends to achieve {strand_to_strand_conversion:.1%} conversion...")
+print(
+    f"Linking strand ends to achieve {
+        strand_to_strand_conversion:.1%} conversion...")
 generator.link_strands_to_strands_to_conversion(
     target_strand_conversion=strand_to_strand_conversion
 )
@@ -85,7 +87,9 @@ generator.link_strands_to_strands_to_conversion(
 print("System after strand-strand linking:")
 print(f"  Total atoms: {generator.get_current_nr_of_atoms()}")
 print(f"  Total bonds: {generator.get_current_nr_of_bonds()}")
-print(f"  Final strand conversion: {generator.get_current_strand_conversion():.3f}")
+print(
+    f"  Final strand conversion: {
+        generator.get_current_strand_conversion():.3f}")
 
 # Optional: Relax crosslink positions for better equilibration
 print("Relaxing crosslink positions...")
@@ -105,7 +109,11 @@ print("Final network statistics:")
 print(f"  Total atoms: {universe.get_nr_of_atoms()}")
 print(f"  Total bonds: {universe.get_nr_of_bonds()}")
 box = universe.get_box()
-print(f"  Box dimensions: {box.get_lx():.1f} × {box.get_ly():.1f} × {box.get_lz():.1f}")
+print(
+    f"  Box dimensions: {
+        box.get_lx():.1f} × {
+            box.get_ly():.1f} × {
+                box.get_lz():.1f}")
 
 # Estimate network properties
 total_star_arms = n_star_crosslinkers * star_functionality

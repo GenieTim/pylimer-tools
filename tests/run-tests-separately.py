@@ -42,7 +42,10 @@ for i, line in enumerate(all_lines):
     )
     if test_out.returncode != 0:
         n_tests_failed += 1
-    print("Test {}: {}".format(line, "PASS" if test_out.returncode == 0 else "FAIL"))
+    print(
+        "Test {}: {}".format(
+            line,
+            "PASS" if test_out.returncode == 0 else "FAIL"))
     tests_output[line] = test_out
 
 print("Ran {} tests, {} failed.".format(n_tests, n_tests_failed))

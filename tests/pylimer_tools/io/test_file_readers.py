@@ -32,7 +32,8 @@ class TestFileReader(PandasComparingTestCase):
         )
         # this header does not include "Volume"
         header = "Step Temp E_pair E_mol TotEng Press"
-        read_data = extract_thermo_params(thermo_file, header=header, use_cache=False)
+        read_data = extract_thermo_params(
+            thermo_file, header=header, use_cache=False)
         self.assertIsInstance(read_data, pd.DataFrame)
         self.assertTrue("Volume" in read_data.columns)
         # read again. this time from cache
@@ -50,23 +51,32 @@ class TestFileReader(PandasComparingTestCase):
         self.assertFalse(reduced_df.empty)
         # cleanup: delete cache file
         os.remove(
-            get_cache_file_name(thermo_file, get_thermo_cache_name_suffix(header))
+            get_cache_file_name(
+                thermo_file, get_thermo_cache_name_suffix(header))
         )
         # test: empty file
         empty_data = extract_thermo_params(
-            os.path.join(os.path.dirname(__file__), "../fixtures/empty_file.txt")
+            os.path.join(
+                os.path.dirname(__file__),
+                "../fixtures/empty_file.txt")
         )
         self.assertTrue(empty_data.empty)
 
         # test: check if we can deduce the header
-        detected_headers = detect_headers(thermo_file, max_nr_of_lines_to_read=150)
-        self.assertListEqual(detected_headers, ["Step Temp E_pair E_mol TotEng Press"])
+        detected_headers = detect_headers(
+            thermo_file, max_nr_of_lines_to_read=150)
+        self.assertListEqual(
+            detected_headers,
+            ["Step Temp E_pair E_mol TotEng Press"])
         # again, this time from cache
-        detected_headers2 = detect_headers(thermo_file, max_nr_of_lines_to_read=150)
+        detected_headers2 = detect_headers(
+            thermo_file, max_nr_of_lines_to_read=150)
         self.assertListEqual(detected_headers2, detected_headers)
         # use them to read the file
-        read_data5 = extract_thermo_params(thermo_file, header=detected_headers)
-        detected_headers = detect_headers(thermo_file, max_nr_of_lines_to_read=1500000)
+        read_data5 = extract_thermo_params(
+            thermo_file, header=detected_headers)
+        detected_headers = detect_headers(
+            thermo_file, max_nr_of_lines_to_read=1500000)
         self.assertListEqual(
             detected_headers,
             [
@@ -77,8 +87,12 @@ class TestFileReader(PandasComparingTestCase):
                 "Step Temp PotEng 2",
             ],
         )
-        read_data4 = read_log_file(thermo_file, lines_to_read_to_detect_header=500)
-        self.assertListEqual(list(read_data4.columns), list(read_data5.columns))
+        read_data4 = read_log_file(
+            thermo_file, lines_to_read_to_detect_header=500)
+        self.assertListEqual(
+            list(
+                read_data4.columns), list(
+                read_data5.columns))
         self.assertListEqual(list(read_data.columns), list(read_data4.columns))
         self.assertDataframeEqual(read_data4, read_data5, check_dtype=False)
         self.assertDataframeEqual(
@@ -92,7 +106,8 @@ class TestFileReader(PandasComparingTestCase):
             os.path.dirname(__file__), "../fixtures/thermo_file.dat"
         )
         header = "Step Temp E_pair E_mol TotEng Press Volume"
-        read_data = extract_thermo_params(thermo_file, header=header, use_cache=False)
+        read_data = extract_thermo_params(
+            thermo_file, header=header, use_cache=False)
         self.assertIsInstance(read_data, pd.DataFrame)
         self.assertEqual(" ".join(read_data.columns), header)
         self.assertTrue(mock_os_remove.called)
@@ -135,7 +150,8 @@ class TestFileReader(PandasComparingTestCase):
             os.path.dirname(__file__), "../fixtures/lammps_data_file_small.out"
         )
         dump_file = os.path.join(
-            os.path.dirname(__file__), "../fixtures/lammps_dump_small.lammpstrj"
+            os.path.dirname(
+                __file__), "../fixtures/lammps_dump_small.lammpstrj"
         )
         universe_sequence = read_dump_file(data_file, dump_file)
         self.assertIsInstance(universe_sequence, UniverseSequence)
@@ -145,14 +161,16 @@ class TestFileReader(PandasComparingTestCase):
         self.assertEqual(len(universe_sequence), 1)
         universe = universe_sequence.at_index(0)
         self.assertEqual(universe.get_nr_of_atoms(), 12)
-        universe_sequence2 = read_dump_file(data_file, dump_file, [AtomStyle.BOND])
+        universe_sequence2 = read_dump_file(
+            data_file, dump_file, [AtomStyle.BOND])
         self.assertIsInstance(universe_sequence2, UniverseSequence)
         universe = universe_sequence2.at_index(0)
         self.assertEqual(universe.get_nr_of_atoms(), 12)
 
     def test_averages_reader(self):
         data_file = os.path.join(
-            os.path.dirname(__file__), "../fixtures/example_avg_file.out.avg.txt"
+            os.path.dirname(
+                __file__), "../fixtures/example_avg_file.out.avg.txt"
         )
         data = read_averages_file(data_file)
         self.assertEqual(len(data), 5)
@@ -191,7 +209,8 @@ class TestFileReader(PandasComparingTestCase):
 
     def test_multisection_file(self):
         data_file = os.path.join(
-            os.path.dirname(__file__), "../fixtures/example_multisection_value.txt"
+            os.path.dirname(
+                __file__), "../fixtures/example_multisection_value.txt"
         )
         data = read_multi_section_separated_value_file(data_file)
         self.assertIsInstance(data, pd.DataFrame)
