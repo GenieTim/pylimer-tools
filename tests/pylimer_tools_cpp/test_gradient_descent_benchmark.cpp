@@ -15,13 +15,14 @@ createSPDMatrix(int n, double conditionNumber = 100.0, unsigned seed = 42)
   std::uniform_real_distribution<> dis(0.0, 1.0);
 
   // Generate random orthogonal matrix using QR decomposition
-  Eigen::MatrixXd randomMat = Eigen::MatrixXd::NullaryExpr(
-    n, n, [&]() { return dis(gen) - 0.5; });
+  Eigen::MatrixXd randomMat =
+    Eigen::MatrixXd::NullaryExpr(n, n, [&]() { return dis(gen) - 0.5; });
   Eigen::HouseholderQR<Eigen::MatrixXd> qr(randomMat);
   Eigen::MatrixXd Q = qr.householderQ();
 
   // Create diagonal matrix with controlled eigenvalues
-  Eigen::VectorXd eigenvalues = Eigen::VectorXd::LinSpaced(n, 1.0, conditionNumber);
+  Eigen::VectorXd eigenvalues =
+    Eigen::VectorXd::LinSpaced(n, 1.0, conditionNumber);
   Eigen::MatrixXd D = eigenvalues.asDiagonal();
 
   // A = Q * D * Q^T is SPD with known condition number
@@ -35,14 +36,14 @@ createGeneralMatrix(int n, unsigned seed = 42)
   std::mt19937 gen(seed);
   std::normal_distribution<> dis(0.0, 1.0);
 
-  Eigen::MatrixXd A = Eigen::MatrixXd::NullaryExpr(
-    n, n, [&]() { return dis(gen); });
-  
+  Eigen::MatrixXd A =
+    Eigen::MatrixXd::NullaryExpr(n, n, [&]() { return dis(gen); });
+
   // Make it diagonally dominant to ensure convergence
   for (int i = 0; i < n; ++i) {
     A(i, i) = std::abs(A(i, i)) + n * 2.0;
   }
-  
+
   return A;
 }
 
@@ -75,8 +76,8 @@ TEST_CASE("Gradient Descent Solvers - Correctness Tests",
     Eigen::VectorXd b = A * xTrue;
 
     int iterations = 0;
-    Eigen::VectorXd xSolved = Eigen::gradientDescent(
-      A, b, 0.01, tolerance, maxIterations, iterations);
+    Eigen::VectorXd xSolved =
+      Eigen::gradientDescent(A, b, 0.01, tolerance, maxIterations, iterations);
 
     double relResidual = computeRelativeResidual(A, xSolved, b);
     std::cout << "  Steepest Descent: iterations=" << iterations
@@ -161,8 +162,8 @@ TEST_CASE("Gradient Descent Solvers - Correctness Tests",
 
     int iterSD = 0, iterBB1 = 0, iterBB2 = 0, iterHB = 0;
 
-    Eigen::VectorXd xSD = Eigen::gradientDescent(
-      A, b, 0.01, tolerance, maxIterations, iterSD);
+    Eigen::VectorXd xSD =
+      Eigen::gradientDescent(A, b, 0.01, tolerance, maxIterations, iterSD);
     Eigen::VectorXd xBB1 = Eigen::gradientDescentBarzilaiBorwein(
       A, b, 0.01, tolerance, maxIterations, iterBB1, true);
     Eigen::VectorXd xBB2 = Eigen::gradientDescentBarzilaiBorwein(
@@ -171,10 +172,14 @@ TEST_CASE("Gradient Descent Solvers - Correctness Tests",
       A, b, 0.01, tolerance, maxIterations, iterHB);
 
     std::cout << "  Well-conditioned SPD (cond=10):" << std::endl;
-    std::cout << "    Steepest Descent: " << iterSD << " iterations" << std::endl;
-    std::cout << "    BB1 (short):      " << iterBB1 << " iterations" << std::endl;
-    std::cout << "    BB2 (long):       " << iterBB2 << " iterations" << std::endl;
-    std::cout << "    Heavy Ball BB:    " << iterHB << " iterations" << std::endl;
+    std::cout << "    Steepest Descent: " << iterSD << " iterations"
+              << std::endl;
+    std::cout << "    BB1 (short):      " << iterBB1 << " iterations"
+              << std::endl;
+    std::cout << "    BB2 (long):       " << iterBB2 << " iterations"
+              << std::endl;
+    std::cout << "    Heavy Ball BB:    " << iterHB << " iterations"
+              << std::endl;
 
     REQUIRE(computeRelativeResidual(A, xSD, b) < 1e-5);
     REQUIRE(computeRelativeResidual(A, xBB1, b) < 1e-5);
@@ -190,8 +195,8 @@ TEST_CASE("Gradient Descent Solvers - Correctness Tests",
 
     int iterSD = 0, iterBB1 = 0, iterBB2 = 0, iterHB = 0;
 
-    Eigen::VectorXd xSD = Eigen::gradientDescent(
-      A, b, 0.01, tolerance, maxIterations, iterSD);
+    Eigen::VectorXd xSD =
+      Eigen::gradientDescent(A, b, 0.01, tolerance, maxIterations, iterSD);
     Eigen::VectorXd xBB1 = Eigen::gradientDescentBarzilaiBorwein(
       A, b, 0.01, tolerance, maxIterations, iterBB1, true);
     Eigen::VectorXd xBB2 = Eigen::gradientDescentBarzilaiBorwein(
@@ -200,10 +205,14 @@ TEST_CASE("Gradient Descent Solvers - Correctness Tests",
       A, b, 0.01, tolerance, maxIterations, iterHB);
 
     std::cout << "  Ill-conditioned SPD (cond=1000):" << std::endl;
-    std::cout << "    Steepest Descent: " << iterSD << " iterations" << std::endl;
-    std::cout << "    BB1 (short):      " << iterBB1 << " iterations" << std::endl;
-    std::cout << "    BB2 (long):       " << iterBB2 << " iterations" << std::endl;
-    std::cout << "    Heavy Ball BB:    " << iterHB << " iterations" << std::endl;
+    std::cout << "    Steepest Descent: " << iterSD << " iterations"
+              << std::endl;
+    std::cout << "    BB1 (short):      " << iterBB1 << " iterations"
+              << std::endl;
+    std::cout << "    BB2 (long):       " << iterBB2 << " iterations"
+              << std::endl;
+    std::cout << "    Heavy Ball BB:    " << iterHB << " iterations"
+              << std::endl;
 
     REQUIRE(computeRelativeResidual(A, xSD, b) < 1e-5);
     REQUIRE(computeRelativeResidual(A, xBB1, b) < 1e-5);
@@ -215,8 +224,9 @@ TEST_CASE("Gradient Descent Solvers - Correctness Tests",
 TEST_CASE("Gradient Descent Solvers - Small System Benchmarks",
           "[GradientDescent][benchmark][small]")
 {
-  std::cout << "Running test \"Gradient Descent Solvers - Small System Benchmarks\""
-            << std::endl;
+  std::cout
+    << "Running test \"Gradient Descent Solvers - Small System Benchmarks\""
+    << std::endl;
 
   const int n = 100;
   const double tolerance = 1e-8;
@@ -252,8 +262,16 @@ TEST_CASE("Gradient Descent Solvers - Small System Benchmarks",
     BENCHMARK("Heavy Ball BB (momentum=0.7)")
     {
       int iterations = 0;
-      return Eigen::gradientDescentHeavyBallBarzilaiBorwein(
-        A, b, 0.01, tolerance, maxIterations, iterations, Eigen::VectorXd(), -1.0, nullptr, 0.7);
+      return Eigen::gradientDescentHeavyBallBarzilaiBorwein(A,
+                                                            b,
+                                                            0.01,
+                                                            tolerance,
+                                                            maxIterations,
+                                                            iterations,
+                                                            Eigen::VectorXd(),
+                                                            -1.0,
+                                                            nullptr,
+                                                            0.7);
     };
 
     BENCHMARK("Eigen BiCGSTAB (reference)")
@@ -316,8 +334,9 @@ TEST_CASE("Gradient Descent Solvers - Small System Benchmarks",
 TEST_CASE("Gradient Descent Solvers - Medium System Benchmarks",
           "[GradientDescent][benchmark][medium]")
 {
-  std::cout << "Running test \"Gradient Descent Solvers - Medium System Benchmarks\""
-            << std::endl;
+  std::cout
+    << "Running test \"Gradient Descent Solvers - Medium System Benchmarks\""
+    << std::endl;
 
   const int n = 500;
   const double tolerance = 1e-6;
@@ -353,8 +372,16 @@ TEST_CASE("Gradient Descent Solvers - Medium System Benchmarks",
     BENCHMARK("Heavy Ball BB (momentum=0.7)")
     {
       int iterations = 0;
-      return Eigen::gradientDescentHeavyBallBarzilaiBorwein(
-        A, b, 0.01, tolerance, maxIterations, iterations, Eigen::VectorXd(), -1.0, nullptr, 0.7);
+      return Eigen::gradientDescentHeavyBallBarzilaiBorwein(A,
+                                                            b,
+                                                            0.01,
+                                                            tolerance,
+                                                            maxIterations,
+                                                            iterations,
+                                                            Eigen::VectorXd(),
+                                                            -1.0,
+                                                            nullptr,
+                                                            0.7);
     };
 
     BENCHMARK("Eigen ConjugateGradient (reference)")
@@ -371,8 +398,9 @@ TEST_CASE("Gradient Descent Solvers - Medium System Benchmarks",
 TEST_CASE("Gradient Descent Solvers - Large System Benchmarks",
           "[GradientDescent][benchmark][large][long]")
 {
-  std::cout << "Running test \"Gradient Descent Solvers - Large System Benchmarks\""
-            << std::endl;
+  std::cout
+    << "Running test \"Gradient Descent Solvers - Large System Benchmarks\""
+    << std::endl;
 
   const int n = 1000;
   const double tolerance = 1e-6;
@@ -401,8 +429,16 @@ TEST_CASE("Gradient Descent Solvers - Large System Benchmarks",
     BENCHMARK("Heavy Ball BB (momentum=0.7)")
     {
       int iterations = 0;
-      return Eigen::gradientDescentHeavyBallBarzilaiBorwein(
-        A, b, 0.01, tolerance, maxIterations, iterations, Eigen::VectorXd(), -1.0, nullptr, 0.7);
+      return Eigen::gradientDescentHeavyBallBarzilaiBorwein(A,
+                                                            b,
+                                                            0.01,
+                                                            tolerance,
+                                                            maxIterations,
+                                                            iterations,
+                                                            Eigen::VectorXd(),
+                                                            -1.0,
+                                                            nullptr,
+                                                            0.7);
     };
 
     BENCHMARK("Eigen ConjugateGradient (reference)")
@@ -449,8 +485,9 @@ TEST_CASE("Gradient Descent Solvers - Large System Benchmarks",
 TEST_CASE("Gradient Descent Solvers - Sparse System Benchmarks",
           "[GradientDescent][benchmark][sparse]")
 {
-  std::cout << "Running test \"Gradient Descent Solvers - Sparse System Benchmarks\""
-            << std::endl;
+  std::cout
+    << "Running test \"Gradient Descent Solvers - Sparse System Benchmarks\""
+    << std::endl;
 
   const int n = 500;
   const double tolerance = 1e-6;
@@ -464,7 +501,7 @@ TEST_CASE("Gradient Descent Solvers - Sparse System Benchmarks",
     // Create sparse SPD matrix (tridiagonal with diagonal dominance)
     Eigen::SparseMatrix<double> Asparse(n, n);
     std::vector<Eigen::Triplet<double>> triplets;
-    
+
     for (int i = 0; i < n; ++i) {
       triplets.push_back(Eigen::Triplet<double>(i, i, 4.0 + dis(gen)));
       if (i > 0) {
@@ -523,8 +560,9 @@ TEST_CASE("Gradient Descent Solvers - Sparse System Benchmarks",
 TEST_CASE("Gradient Descent Solvers - Convergence Analysis",
           "[GradientDescent][convergence]")
 {
-  std::cout << "Running test \"Gradient Descent Solvers - Convergence Analysis\""
-            << std::endl;
+  std::cout
+    << "Running test \"Gradient Descent Solvers - Convergence Analysis\""
+    << std::endl;
 
   const int n = 100;
   const double tolerance = 1e-10;
@@ -537,49 +575,78 @@ TEST_CASE("Gradient Descent Solvers - Convergence Analysis",
     Eigen::VectorXd b = A * xTrue;
 
     std::vector<double> residuals;
-    
+
     // Test each method and track convergence
     auto testMethod = [&](auto solver, const std::string& name) {
       int iter = 0;
       residuals.clear();
-      
+
       auto callback = [&](int iteration, const Eigen::VectorXd& x) {
         double relResidual = computeRelativeResidual(A, x, b);
         residuals.push_back(relResidual);
         return false; // Continue
       };
-      
+
       Eigen::VectorXd xSolved = solver(A, b, callback, iter);
-      
+
       std::cout << "  " << name << ": " << iter << " iterations, "
                 << "final residual=" << residuals.back() << std::endl;
-      
+
       return iter;
     };
 
     int iterSD = testMethod(
-      [&](const Eigen::MatrixXd& A, const Eigen::VectorXd& b, auto callback, int& iter) {
-        return Eigen::gradientDescent(
-          A, b, 0.01, tolerance, maxIterations, iter, Eigen::VectorXd(), -1.0, callback);
+      [&](const Eigen::MatrixXd& A,
+          const Eigen::VectorXd& b,
+          auto callback,
+          int& iter) {
+        return Eigen::gradientDescent(A,
+                                      b,
+                                      0.01,
+                                      tolerance,
+                                      maxIterations,
+                                      iter,
+                                      Eigen::VectorXd(),
+                                      -1.0,
+                                      callback);
       },
-      "Steepest Descent"
-    );
+      "Steepest Descent");
 
     int iterBB2 = testMethod(
-      [&](const Eigen::MatrixXd& A, const Eigen::VectorXd& b, auto callback, int& iter) {
-        return Eigen::gradientDescentBarzilaiBorwein(
-          A, b, 0.01, tolerance, maxIterations, iter, false, Eigen::VectorXd(), -1.0, callback);
+      [&](const Eigen::MatrixXd& A,
+          const Eigen::VectorXd& b,
+          auto callback,
+          int& iter) {
+        return Eigen::gradientDescentBarzilaiBorwein(A,
+                                                     b,
+                                                     0.01,
+                                                     tolerance,
+                                                     maxIterations,
+                                                     iter,
+                                                     false,
+                                                     Eigen::VectorXd(),
+                                                     -1.0,
+                                                     callback);
       },
-      "BB2 (long)"
-    );
+      "BB2 (long)");
 
     int iterHB = testMethod(
-      [&](const Eigen::MatrixXd& A, const Eigen::VectorXd& b, auto callback, int& iter) {
-        return Eigen::gradientDescentHeavyBallBarzilaiBorwein(
-          A, b, 0.01, tolerance, maxIterations, iter, Eigen::VectorXd(), -1.0, callback, 0.7);
+      [&](const Eigen::MatrixXd& A,
+          const Eigen::VectorXd& b,
+          auto callback,
+          int& iter) {
+        return Eigen::gradientDescentHeavyBallBarzilaiBorwein(A,
+                                                              b,
+                                                              0.01,
+                                                              tolerance,
+                                                              maxIterations,
+                                                              iter,
+                                                              Eigen::VectorXd(),
+                                                              -1.0,
+                                                              callback,
+                                                              0.7);
       },
-      "Heavy Ball BB"
-    );
+      "Heavy Ball BB");
 
     // All should converge
     REQUIRE(iterSD < maxIterations);
