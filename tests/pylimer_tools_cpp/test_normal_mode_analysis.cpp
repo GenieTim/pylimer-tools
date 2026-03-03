@@ -42,12 +42,29 @@ TEST_CASE("NormalModeAnalyzer computes correct eigenvalues",
   CHECK_THAT(eigenvalues[2], Catch::Matchers::WithinRel(3.));
 
   Eigen::MatrixXd eigenvectors = normalModeAnalyzer.getEigenvectors();
-  Eigen::Matrix3d expectedEigenvectors;
-  expectedEigenvectors << -0.57735026918962584, 0, 0.81649658092772615, //
-    -0.57735026918962562, -0.70710678118654746, -0.40824829046386291,   //
-    -0.57735026918962584, 0.70710678118654746, -0.40824829046386302;
+  // Verify eigenvectors are orthonormal
+  Eigen::MatrixXd shouldBeIdentity =
+    eigenvectors.transpose() * eigenvectors;
+  CHECK(shouldBeIdentity.isApprox(Eigen::Matrix3d::Identity(), 1e-10));
 
-  CHECK(eigenvectors.isApprox(expectedEigenvectors, 1e-10));
+  // Verify each column is a valid eigenvector of A by checking the Rayleigh
+  // quotient matches one of the known eigenvalues (0 or 3)
+  for (int i = 0; i < 3; ++i) {
+    Eigen::VectorXd v = eigenvectors.col(i);
+    double rayleighQuotient = v.dot(assembledMatrix * v);
+    Eigen::VectorXd Av = assembledMatrix * v;
+    // A*v should be parallel to v (i.e. A*v = rayleighQuotient * v)
+    CHECK((Av - rayleighQuotient * v).norm() < 1e-9);
+    // Rayleigh quotient should match one of the eigenvalues
+    bool matchesAnEigenvalue = false;
+    for (int j = 0; j < eigenvalues.size(); ++j) {
+      if (std::abs(rayleighQuotient - eigenvalues[j]) < 1e-9) {
+        matchesAnEigenvalue = true;
+        break;
+      }
+    }
+    CHECK(matchesAnEigenvalue);
+  }
 
   Eigen::Array3d t;
   t << 0., 1., 10.;

@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cmath>
 #include <future>
 #include <iostream>
 #include <string>
@@ -985,12 +986,12 @@ MEHPForceBalance2::runForceRelaxation(
         finalCoordinates = Eigen::gradientDescent(sysMatrix,
                                                   constants,
                                                   gradientDescentLearningRate,
-                                                  residualReduction,
+                                                  std::sqrt(residualReduction),
                                                   maxIterations,
                                                   solverIterations,
                                                   initialSolution,
                                                   // initial solution
-                                                  initialResidual,
+                                                  std::sqrt(initialResidual),
                                                   // initial residual
                                                   callback);
 
@@ -1007,13 +1008,13 @@ MEHPForceBalance2::runForceRelaxation(
           sysMatrix,
           constants,
           gradientDescentLearningRate,
-          residualReduction,
+          std::sqrt(residualReduction),
           maxIterations,
           solverIterations,
           solverChoice == SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT,
           initialSolution,
           // initial solution
-          initialResidual,
+          std::sqrt(initialResidual),
           // initial residual
           callback);
 
@@ -1028,12 +1029,12 @@ MEHPForceBalance2::runForceRelaxation(
           sysMatrix,
           constants,
           gradientDescentLearningRate,
-          residualReduction,
+          std::sqrt(residualReduction),
           maxIterations,
           solverIterations,
           initialSolution,
           // initial solution
-          initialResidual,
+          std::sqrt(initialResidual),
           // initial residual
           callback);
 
