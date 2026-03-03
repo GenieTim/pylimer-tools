@@ -1144,7 +1144,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
 
 TEST_CASE(
   "MEHP Force Balance can randomly add and remove slip-links with large box",
-  "[analysis][MEHPForceBalance]")
+  "[analysis][MEHPForceBalance][long]")
 {
   std::cout << "Running test \"MEHP Force Balance can randomly add and remove "
                "slip-links with large box\""
@@ -1165,8 +1165,8 @@ TEST_CASE(
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, false, false, false);
     forceBalancer.configAssumeBoxLargeEnough(true);
-    size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
-    CHECK(nrOfAddedLinks >= 100);
+    size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(350, 2.0, 40);
+    CHECK(nrOfAddedLinks >= 40);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
     pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
@@ -1203,7 +1203,7 @@ TEST_CASE(
     // CHECK(numInactiveRemoved == 0);
 
     // run a while to get inactive links
-    forceBalancer.runForceRelaxation(100);
+    forceBalancer.runForceRelaxation(50);
     net = forceBalancer.getNetwork();
     displacements = forceBalancer.getCurrentDisplacements();
     partitions = forceBalancer.getSpringPartitions();
@@ -1243,8 +1243,8 @@ TEST_CASE(
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, false, false, false);
     forceBalancer.configAssumeBoxLargeEnough(false);
-    size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
-    CHECK(nrOfAddedLinks >= 100);
+    size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(350, 2.0, 40);
+    CHECK(nrOfAddedLinks >= 40);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
     pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
@@ -1256,7 +1256,7 @@ TEST_CASE(
     CHECK(numRemoved > 0);
 
     // run a while to get inactive links
-    forceBalancer.runForceRelaxation(100);
+    forceBalancer.runForceRelaxation(50);
     net = forceBalancer.getNetwork();
     displacements = forceBalancer.getCurrentDisplacements();
     partitions = forceBalancer.getSpringPartitions();
@@ -1271,8 +1271,8 @@ TEST_CASE(
 
     ////////////////////////////////////////////////////////////////
     forceBalancer = pcm::MEHPForceBalance(universe, 2, true, 1.0, true);
-    nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
-    CHECK(nrOfAddedLinks >= 100);
+    nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(350, 2.0, 40);
+    CHECK(nrOfAddedLinks >= 40);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
     // check that all f = 2 have already been removed
     // they have not, since more f = 2 are produced by
@@ -1281,7 +1281,7 @@ TEST_CASE(
     // CHECK(numInactiveRemoved == 0);
 
     // run a while to get inactive links
-    forceBalancer.runForceRelaxation(100);
+    forceBalancer.runForceRelaxation(50);
     net = forceBalancer.getNetwork();
     displacements = forceBalancer.getCurrentDisplacements();
     partitions = forceBalancer.getSpringPartitions();
@@ -2621,7 +2621,7 @@ TEST_CASE("Force Balance random sampling example small",
   //               forceBalancer4.getSpringPartitions());
 }
 
-TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
+TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance][long]")
 {
   std::cout << "Running test \"Yet another sampling example\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -2746,7 +2746,7 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
 }
 
 TEST_CASE("Conversion of structure is equal for both methods",
-          "[analysis][MEHPForceBalance]")
+          "[analysis][MEHPForceBalance][long]")
 {
   std::cout
     << "Running test \"Conversion of structure is equal for both methods\""

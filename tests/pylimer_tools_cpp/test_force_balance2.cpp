@@ -625,7 +625,7 @@ TEST_CASE("MEHP Force Balance2 fully active chains are fully active",
 
 TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
           "& springs in diamond network",
-          "[analysis][MEHPForceBalance2]")
+          "[analysis][MEHPForceBalance2][long]")
 {
   std::cout << "Running test \"MEHPForceBalance2 gives approx. same results "
                "for entanglement links & springs in diamond network\""

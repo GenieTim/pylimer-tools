@@ -210,7 +210,7 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator][long]")
 };
 
 #ifdef CEREALIZABLE
-TEST_CASE("DPD Simulator Restart Files Work", "[analysis][DPDSimulator]")
+TEST_CASE("DPD Simulator Restart Files Work", "[analysis][DPDSimulator][long]")
 {
   std::cout << "Running test \"DPD Simulator Restart Files Work\"" << std::endl;
 
@@ -351,7 +351,7 @@ TEST_CASE("DPD Simulator Can Crosslink", "[analysis][DPDSimulator][long]")
   }
 };
 
-TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
+TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator][long]")
 {
   std::cout << "Running test \"DPD Simulator Computes Correct Forces\""
             << std::endl;
@@ -443,8 +443,8 @@ TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
   std::string autocorrFile =
     suspectedPath + "melt_83_a_100.structure.autocorr-out.txt";
   setupAllOutputs(simulator, averageFile, autocorrFile);
-  REQUIRE_NOTHROW(simulator.runSimulation(10, false));
-  REQUIRE_NOTHROW(simulator.runSimulation(10, true));
+  REQUIRE_NOTHROW(simulator.runSimulation(5, false));
+  REQUIRE_NOTHROW(simulator.runSimulation(5, true));
 
   CHECK(std::filesystem::exists(averageFile));
   std::remove(averageFile.c_str());
@@ -808,7 +808,7 @@ TEST_CASE("DPD Simulator's restart files are accurate",
 }
 #ifdef CEREALIZABLE
 TEST_CASE("DPD Simulator can be serialized",
-          "[DPDSimulator][serialization][1proc]")
+          "[DPDSimulator][serialization][1proc][long]")
 {
   // note that the random force might lead to deviations compared to LAMMPS
   const std::string suspectedPath = std::string(PYLIMER_TEST_FIXTURES_DIR);

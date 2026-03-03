@@ -33,6 +33,7 @@ jobs:
             ./vendor/cereal
             ./vendor/cereal-skbuild
             ./tests/build
+            ~/.cache/ccache
           key: pt-${{ runner.os }}-py-3.13
           restore-keys: |
             pt-${{ runner.os }}-py-3.13
@@ -46,13 +47,16 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Install dev dependencies
-        run: sudo apt-get install bison flex lcov libeigen3-dev
+        run: sudo apt-get install bison flex lcov libeigen3-dev ccache
 
       - name: Run Tests
         run: ./bin/run-tests-short.sh
         env:
           CI: true
-          CMAKE_BUILD_TYPE: Release
+          CMAKE_BUILD_TYPE: RelWithDebInfo
+          ENABLE_LEAK_ANALYSIS: "1"
+          CCACHE_DIR: ~/.cache/ccache
+          CCACHE_MAXSIZE: 500M
 
       # Generate Coverage Badge
       - name: Install Badge Generator

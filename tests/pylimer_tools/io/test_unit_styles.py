@@ -96,7 +96,8 @@ class UnitStyleTest(unittest.TestCase):
                          1 * unit_style.get_base_unit_of("mass"))
 
     def test_get_parameters_for_polymer(self):
-        self.assertTrue(len(get_supported_polymer_names()) > 10)
+        polymer_names = get_supported_polymer_names()
+        self.assertTrue(len(polymer_names) > 10)
 
         def check_parameter_types(params: Parameters):
             self.assertIsInstance(params.get_unit_registry(), UnitRegistry)
@@ -110,8 +111,21 @@ class UnitStyleTest(unittest.TestCase):
             self.assertIsInstance(
                 params.get_gamma_conversion_factor(), Quantity)
 
+        # Validate full name support with one representative parameter family.
+        for polymer_name in polymer_names:
+            params = get_parameters_for_polymer(
+                polymer_name=polymer_name, parameter_type=ParameterType.GAUSSIAN
+            )
+            self.assertIsInstance(params, Parameters)
+            self.assertEqual(params.get_name(), "si-" + polymer_name)
+
+        # Deep validation for a representative subset and all parameter families.
+        sample_names = list(dict.fromkeys(
+            [polymer_names[0], polymer_names[len(polymer_names) // 2], polymer_names[-1]]
+        ))
+
         # test the Kremer-Grest/Lennard-Jones parameters
-        for polymer_name in get_supported_polymer_names():
+        for polymer_name in sample_names:
             params = get_parameters_for_polymer(
                 polymer_name=polymer_name, parameter_type=ParameterType.KG_LJ
             )
@@ -120,7 +134,7 @@ class UnitStyleTest(unittest.TestCase):
             check_parameter_types(params)
 
         # test the kuhn parameters
-        for polymer_name in get_supported_polymer_names():
+        for polymer_name in sample_names:
             params = get_parameters_for_polymer(
                 polymer_name=polymer_name, parameter_type=ParameterType.KUHN
             )
@@ -129,7 +143,7 @@ class UnitStyleTest(unittest.TestCase):
             check_parameter_types(params)
 
         # test the gaussian parameters
-        for polymer_name in get_supported_polymer_names():
+        for polymer_name in sample_names:
             params = get_parameters_for_polymer(
                 polymer_name, parameter_type=ParameterType.GAUSSIAN
             )

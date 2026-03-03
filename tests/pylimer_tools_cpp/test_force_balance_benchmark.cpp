@@ -226,7 +226,7 @@ TEST_CASE("Force Balance Benchmarks randomly functionalized",
 }
 
 TEST_CASE("Temporary entanglement sampling benchmark",
-          "[EntanglementDetector][benchmark]")
+          "[EntanglementDetector][benchmark][long]")
 {
   std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
   std::vector<std::string> files = {

@@ -330,7 +330,7 @@ TEST_CASE("MCUniverseGenerator can generate without primary loops",
 
 TEST_CASE("Universe can crosslink up to w_sol",
           "[generator][MCUniverseGenerator][MEHPForceRelaxation]["
-          "MEHPForceBalance][MEHPForceBalance2]")
+          "MEHPForceBalance][MEHPForceBalance2][long]")
 {
   std::cout << "Running test \"Universe can crosslink up to w_sol\""
             << std::endl;
@@ -504,7 +504,7 @@ TEST_CASE("Universe can crosslink up to w_sol",
 }
 
 TEST_CASE("Generator can return force balance and relaxation",
-          "[generator][MCUniverseGenerator]")
+          "[generator][MCUniverseGenerator][long]")
 {
   std::cout
     << "Running test \"Generator can return force balance and relaxation\""
