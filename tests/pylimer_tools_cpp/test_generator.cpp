@@ -198,7 +198,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
       2, { 10, 10 }, 7, 3, 2, 2, true));
     CHECK_THROWS(generator.addRandomlyFunctionalizedStrands(0, {}, 2));
     CHECK_THROWS(generator.addRandomlyFunctionalizedStrands(1, {}, 2));
-    CHECK_THROWS(generator.addMonofunctionalStrands(1, {}, -1));
+    CHECK_THROWS(generator.addMonofunctionalStrands(1, std::vector<int>{}, -1));
     CHECK_THROWS(generator.addCrosslinkersAt(Eigen::VectorXd::Zero(2)));
     CHECK_THROWS(generator.addCrosslinkersAt(Eigen::VectorXd::Zero(6), -1));
   }
