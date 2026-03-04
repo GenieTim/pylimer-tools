@@ -351,7 +351,8 @@ TEST_CASE("DPD Simulator Can Crosslink", "[analysis][DPDSimulator][long]")
   }
 };
 
-TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator][long]")
+TEST_CASE("DPD Simulator Computes Correct Forces",
+          "[analysis][DPDSimulator][long]")
 {
   std::cout << "Running test \"DPD Simulator Computes Correct Forces\""
             << std::endl;

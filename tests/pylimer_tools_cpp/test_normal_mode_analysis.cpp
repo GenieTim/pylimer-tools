@@ -43,8 +43,7 @@ TEST_CASE("NormalModeAnalyzer computes correct eigenvalues",
 
   Eigen::MatrixXd eigenvectors = normalModeAnalyzer.getEigenvectors();
   // Verify eigenvectors are orthonormal
-  Eigen::MatrixXd shouldBeIdentity =
-    eigenvectors.transpose() * eigenvectors;
+  Eigen::MatrixXd shouldBeIdentity = eigenvectors.transpose() * eigenvectors;
   CHECK(shouldBeIdentity.isApprox(Eigen::Matrix3d::Identity(), 1e-10));
 
   // Verify each column is a valid eigenvector of A by checking the Rayleigh
