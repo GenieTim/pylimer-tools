@@ -2,6 +2,9 @@
 
 ## main
 
+
+## v0.3.15
+
 - Fix an issue (#8) where the bond_types could be in an invalid state.
 - Improve compatibility with newer versions of pandas
 
