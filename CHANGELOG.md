@@ -2,6 +2,9 @@
 
 ## main
 
+## v0.3.16
+
+- Deployment improvements, in particular for manylinux
 
 ## v0.3.15
 

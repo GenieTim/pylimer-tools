@@ -147,8 +147,10 @@ if (NOT DEFINED CODE_COVERAGE)
 endif ()
 
 # LAPACK support
-if (LAPACKE_FOUND)
-    target_include_directories(pylimer_tools SYSTEM PUBLIC ${LAPACKE_INCLUDE_DIRS})
+if (LAPACKE_FOUND AND LAPACKE_INCLUDE_DIRS)
+    target_include_directories(pylimer_tools SYSTEM PUBLIC
+        ${LAPACKE_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/lapacke-extra)
     target_link_libraries(pylimer_tools PUBLIC ${LAPACKE_LIBRARIES})
     target_compile_definitions(pylimer_tools PUBLIC
         EIGEN_USE_LAPACKE
@@ -156,6 +158,8 @@ if (LAPACKE_FOUND)
         LAPACK_COMPLEX_CPP
         LAPACK_DISABLE_NAN_CHECK)
     message(STATUS "LAPACKE found and linked")
+elseif (LAPACKE_FOUND)
+    message(WARNING "LAPACKE found but LAPACKE_INCLUDE_DIRS is empty; skipping LAPACKE compile definitions")
 endif ()
 
 # OpenMP support
