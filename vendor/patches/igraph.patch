@@ -1,0 +1,130 @@
+diff --git a/vendor/lapack/dhseqr.c b/vendor/lapack/dhseqr.c
+index 24af3013a..9cd83aee9 100644
+--- a/vendor/lapack/dhseqr.c
++++ b/vendor/lapack/dhseqr.c
+@@ -346,7 +346,7 @@ f">
+     char ch__1[2];
+ 
+     /* Builtin functions   
+-       Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
++       Subroutine */ void s_cat(char *, char **, integer *, integer *, ftnlen);
+ 
+     /* Local variables */
+     integer i__;
+diff --git a/vendor/lapack/dnaup2.c b/vendor/lapack/dnaup2.c
+index 85613a0fe..b6a099d5c 100644
+--- a/vendor/lapack/dnaup2.c
++++ b/vendor/lapack/dnaup2.c
+@@ -209,7 +209,7 @@ static integer c__2 = 2;
+     /* Builtin functions */
+     double pow_dd(doublereal *, doublereal *);
+     integer s_cmp(char *, char *, ftnlen, ftnlen);
+-    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
++    /* Subroutine */ void s_copy(char *, char *, ftnlen, ftnlen);
+     double sqrt(doublereal);
+ 
+     /* Local variables */
+diff --git a/vendor/lapack/dneupd.c b/vendor/lapack/dneupd.c
+index 108381378..3a84fd4cf 100644
+--- a/vendor/lapack/dneupd.c
++++ b/vendor/lapack/dneupd.c
+@@ -337,7 +337,7 @@ static doublereal c_b64 = -1.;
+     /* Builtin functions */
+     double pow_dd(doublereal *, doublereal *);
+     integer s_cmp(char *, char *, ftnlen, ftnlen);
+-    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
++    /* Subroutine */ void s_copy(char *, char *, ftnlen, ftnlen);
+ 
+     /* Local variables */
+     integer j, k, ih, jj, np;
+diff --git a/vendor/lapack/dormhr.c b/vendor/lapack/dormhr.c
+index 71b68ae05..645bb1f13 100644
+--- a/vendor/lapack/dormhr.c
++++ b/vendor/lapack/dormhr.c
+@@ -205,7 +205,7 @@ f">
+     char ch__1[2];
+ 
+     /* Builtin functions   
+-       Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
++       Subroutine */ void s_cat(char *, char **, integer *, integer *, ftnlen);
+ 
+     /* Local variables */
+     integer i1, i2, nb, mi, nh, ni, nq, nw;
+diff --git a/vendor/lapack/dormql.c b/vendor/lapack/dormql.c
+index 555ee521e..0ead56fae 100644
+--- a/vendor/lapack/dormql.c
++++ b/vendor/lapack/dormql.c
+@@ -197,7 +197,7 @@ f">
+     char ch__1[2];
+ 
+     /* Builtin functions   
+-       Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
++       Subroutine */ void s_cat(char *, char **, integer *, integer *, ftnlen);
+ 
+     /* Local variables */
+     integer i__;
+diff --git a/vendor/lapack/dormqr.c b/vendor/lapack/dormqr.c
+index a33d25684..c4c3ad564 100644
+--- a/vendor/lapack/dormqr.c
++++ b/vendor/lapack/dormqr.c
+@@ -197,7 +197,7 @@ f">
+     char ch__1[2];
+ 
+     /* Builtin functions   
+-       Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
++       Subroutine */ void s_cat(char *, char **, integer *, integer *, ftnlen);
+ 
+     /* Local variables */
+     integer i__;
+diff --git a/vendor/lapack/dormtr.c b/vendor/lapack/dormtr.c
+index 540494223..dd2e83faa 100644
+--- a/vendor/lapack/dormtr.c
++++ b/vendor/lapack/dormtr.c
+@@ -197,7 +197,7 @@ f">
+     char ch__1[2];
+ 
+     /* Builtin functions   
+-       Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
++       Subroutine */ void s_cat(char *, char **, integer *, integer *, ftnlen);
+ 
+     /* Local variables */
+     integer i1, i2, nb, mi, ni, nq, nw;
+diff --git a/vendor/lapack/dsaup2.c b/vendor/lapack/dsaup2.c
+index 75e5d5643..094737407 100644
+--- a/vendor/lapack/dsaup2.c
++++ b/vendor/lapack/dsaup2.c
+@@ -214,7 +214,7 @@ static integer c__2 = 2;
+     /* Builtin functions */
+     double pow_dd(doublereal *, doublereal *);
+     integer s_cmp(char *, char *, ftnlen, ftnlen);
+-    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
++    /* Subroutine */ void s_copy(char *, char *, ftnlen, ftnlen);
+     double sqrt(doublereal);
+ 
+     /* Local variables */
+diff --git a/vendor/lapack/dseupd.c b/vendor/lapack/dseupd.c
+index 1cc08d5d1..a8890bac9 100644
+--- a/vendor/lapack/dseupd.c
++++ b/vendor/lapack/dseupd.c
+@@ -248,7 +248,7 @@ static doublereal c_b111 = 1.;
+ 
+     /* Builtin functions */
+     integer s_cmp(char *, char *, ftnlen, ftnlen);
+-    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
++    /* Subroutine */ void s_copy(char *, char *, ftnlen, ftnlen);
+     double pow_dd(doublereal *, doublereal *);
+ 
+     /* Local variables */
+diff --git a/vendor/lapack/ilaenv.c b/vendor/lapack/ilaenv.c
+index 113c4c31f..f49ec0835 100644
+--- a/vendor/lapack/ilaenv.c
++++ b/vendor/lapack/ilaenv.c
+@@ -190,7 +190,7 @@ integer igraphilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
+     integer ret_val;
+ 
+     /* Builtin functions   
+-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
++       Subroutine */ void s_copy(char *, char *, ftnlen, ftnlen);
+     integer s_cmp(char *, char *, ftnlen, ftnlen);
+ 
+     /* Local variables */

@@ -82,6 +82,7 @@ if (NOT DEFINED igraph_LOADED)
                     GIT_TAG 7b4ae766cbdee6b2017aa5b76752457db2a2972f # 1.0.1
                     PREFIX ${igraph_PREFIX_PATH}
                     INSTALL_DIR ${igraph_PREFIX_PATH}/igraphLib-install
+                    PATCH_COMMAND git apply --check ${CMAKE_CURRENT_LIST_DIR}/patches/igraph.patch && git apply ${CMAKE_CURRENT_LIST_DIR}/patches/igraph.patch || true
                     CMAKE_ARGS ${igraph_EXTRA_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=${igraph_BUILD_TYPE} -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=OFF
                     BUILD_COMMAND ${CMAKE_COMMAND} --build ${igraph_PREFIX_PATH}/src/igraphLib-build --config ${igraph_BUILD_TYPE}
                     BUILD_BYPRODUCTS ${EXPECTED_IGRAPH_LIB}
