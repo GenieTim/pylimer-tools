@@ -2,7 +2,7 @@
 
 ## main
 
-## v0.3.16-v0.3.18
+## v0.3.16-v0.3.19
 
 - New attempts to fix webassembly deployment
 - Deployment improvements, in particular for manylinux

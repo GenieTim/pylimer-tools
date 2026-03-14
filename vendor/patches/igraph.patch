@@ -1,3 +1,47 @@
+diff --git a/vendor/f2c/s_cat.c b/vendor/f2c/s_cat.c
+index 5869dfeca..34729f0f3 100644
+--- a/vendor/f2c/s_cat.c
++++ b/vendor/f2c/s_cat.c
+@@ -28,7 +28,7 @@ extern
+ extern "C" {
+ #endif
+ 
+-int
++void
+ #ifdef KR_headers
+ s_cat(lp, rpp, rnp, np, ll) char *lp, *rpp[]; ftnint rnp[], *np; ftnlen ll;
+ #else
+@@ -80,7 +80,7 @@ s_cat(char *lp, char *rpp[], ftnint rnp[], ftnint *np, ftnlen ll)
+ 		free(lp1);
+ 		}
+ #endif
+-		return 0;
++		return;
+ 	}
+ #ifdef __cplusplus
+ }
+diff --git a/vendor/f2c/s_copy.c b/vendor/f2c/s_copy.c
+index d6f03214f..cad2d14de 100644
+--- a/vendor/f2c/s_copy.c
++++ b/vendor/f2c/s_copy.c
+@@ -11,7 +11,7 @@ extern "C" {
+ 
+ /* assign strings:  a = b */
+ 
+-int
++void
+ #ifdef KR_headers
+ s_copy(a, b, la, lb) register char *a, *b; ftnlen la, lb;
+ #else
+@@ -52,7 +52,7 @@ s_copy(register char *a, register char *b, ftnlen la, ftnlen lb)
+ 		while(a < aend)
+ 			*a++ = ' ';
+ 		}
+-		return 0;
++		return;
+ 	}
+ #ifdef __cplusplus
+ }
 diff --git a/vendor/lapack/dhseqr.c b/vendor/lapack/dhseqr.c
 index 24af3013a..9cd83aee9 100644
 --- a/vendor/lapack/dhseqr.c
@@ -128,29 +172,3 @@ index 113c4c31f..f49ec0835 100644
      integer s_cmp(char *, char *, ftnlen, ftnlen);
  
      /* Local variables */
-diff --git a/vendor/f2c/s_cat.c b/vendor/f2c/s_cat.c
-index 5869dfeca..34729f0f3 100644
---- a/vendor/f2c/s_cat.c
-+++ b/vendor/f2c/s_cat.c
-@@ -28,7 +28,7 @@ extern
- extern "C" {
- #endif
- 
--int
-+void
- #ifdef KR_headers
- s_cat(lp, rpp, rnp, np, ll) char *lp, *rpp[]; ftnint rnp[], *np; ftnlen ll;
- #else
-diff --git a/vendor/f2c/s_copy.c b/vendor/f2c/s_copy.c
-index d6f03214f..cad2d14de 100644
---- a/vendor/f2c/s_copy.c
-+++ b/vendor/f2c/s_copy.c
-@@ -11,7 +11,7 @@ extern "C" {
- 
- /* assign strings:  a = b */
- 
--int
-+void
- #ifdef KR_headers
- s_copy(a, b, la, lb) register char *a, *b; ftnlen la, lb;
- #else
