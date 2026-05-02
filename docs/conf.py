@@ -6,10 +6,6 @@
 
 # -- Path setup --------------------------------------------------------------
 
-import os
-import sys
-import sysconfig
-import warnings
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -51,6 +47,7 @@ extensions = [
     "sphinxext.opengraph",
     "sphinx_click",
     "sphinxcontrib.bibtex",
+    "sphinx_llm.txt",
 ]
 
 bibtex_bibfiles = ["references.bib"]
