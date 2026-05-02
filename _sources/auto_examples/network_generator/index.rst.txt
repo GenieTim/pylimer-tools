@@ -25,6 +25,10 @@ The initial method was introduced in :cite:t:`gusev_numerical_2019`,
 the current implementation is more powerful, as needed for :cite:t:`bernhard_phantom_2025`.
 
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 

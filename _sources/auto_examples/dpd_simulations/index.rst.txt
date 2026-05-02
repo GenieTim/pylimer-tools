@@ -12,6 +12,10 @@ The implementation is based on :cite:t:`langeloth_recovering_2013`, :cite:t:`sch
 Refer to the full documentation of the DPD simulator in the :class:`~pylimer_tools_cpp.DPDSimulator` class for more details.
 
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 

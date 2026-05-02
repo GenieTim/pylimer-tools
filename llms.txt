@@ -1,0 +1,313 @@
+# pylimer-tools
+
+> # pylimer-tools
+> 
+> [![Run Tests](https://github.com/GenieTim/pylimer-tools/actions/workflows/run-tests.yml/badge.svg)](https://github.com/GenieTim/pylimer-tools/actions/workflows/run-tests.yml)
+> [![Test Coverage (Python)](https://github.com/GenieTim/pylimer-tools/blob/main/.github/coverage.svg?raw=true)](https://github.com/GenieTim/pylimer-tools/actions/workflows/run-tests.yml)
+> [![Test Coverage (C++)](https://github.com/GenieTim/pylimer-tools/blob/main/.github/cpp-coverage.svg?raw=true)](https://github.com/GenieTim/pylimer-tools/actions/workflows/run-tests.yml)
+> [![Total Coverage](https://codecov.io/gh/GenieTim/pylimer-tools/branch/main/graph/badge.svg?token=5ZE1VSDXJQ)](https://codecov.io/gh/GenieTim/pylimer-tools)
+> [![Docs](https://github.com/GenieTim/pylimer-tools/actions/workflows/publish-documentation-html.yml/badge.svg)](https://github.com/GenieTim/pylimer-tools/actions/workflows/publish-documentation-html.yml)
+> [![PyPI version](https://badge.fury.io/py/pylimer-tools.svg)](https://pypi.org/project/pylimer-tools/)
+> [![Downloads](https://img.shields.io/pypi/dm/pylimer-tools.svg)](https://pypi.org/project/pylimer-tools/)
+> [![License](https://img.shields.io/pypi/l/pylimer-tools.svg)](LICENSE)
+> [![DOI](https://zenodo.org/badge/413754467.svg)](https://doi.org/10.5281/zenodo.17582030)
+> 
+> Pronunciation: "pylimer” like "pü-limer”, with the "py” as in the German word "müde” (IPA: /ˈpyːlɪmɚ/).
+> 
+> `pylimer-tools` is a toolkit for simulation, analysis, and data handling of bead–spring polymer systems in Python and C++. It combines high-level Python utilities with performant C++ extensions for common tasks in computational polymer science.
+> 
+> ## Table of Contents
+> 
+> - [pylimer-tools](#pylimer-tools)
+>   - [Table of Contents](#table-of-contents)
+>   - [1. Features](#1-features)
+>   - [2. Installation](#2-installation)
+>     - [Requirements](#requirements)
+>     - [Stable Release](#stable-release)
+>     - [Build from Source](#build-from-source)
+>       - [Requirements](#requirements-1)
+>       - [Build](#build)
+>   - [3. Test Installation](#3-test-installation)
+>   - [4. CLI Tools](#4-cli-tools)
+>   - [5. Documentation](#5-documentation)
+>   - [6. Development \& Testing](#6-development--testing)
+>     - [Adding Features](#adding-features)
+>   - [7. Citing](#7-citing)
+>   - [8. Contributing](#8-contributing)
+>   - [9. Code of Conduct](#9-code-of-conduct)
+>   - [10. Acknowledgements](#10-acknowledgements)
+>   - [11. License](#11-license)
+>   - [Pronunciation Note](#pronunciation-note)
+> 
+> ## 1. Features
+> 
+> A selection of features includes:
+> 
+> - Monte Carlo structure (network "universe”) generation
+> - Dissipative Particle Dynamics (DPD) simulation with slip-springs
+> - Maximum Entropy Homogenization Procedure (MEHP) with and without slip-links
+> - LAMMPS output readers: data, dump, thermodynamic outputs
+> - Network analysis: loops, chain reconstruction, degree statistics
+> - Structural metrics: radius of gyration, end-to-end distance, distributions
+> - Normal mode analysis for stress autocorrelation, loss and storage modulus
+> - Command line interfaces for batch workflows
+> 
+> ## 2. Installation
+> 
+> ### Requirements
+> 
+> Python >= 3.9.
+> 
+> ### Stable Release
+> 
+> Stable release from PyPI:
+> 
+> ```
+> pip install pylimer-tools
+> ```
+> 
+> ### Build from Source
+> 
+> #### Requirements
+> 
+> Build requires CMake, a C++17 compiler, and (optionally) Ninja for faster builds.
+> 
+> Additionally, the system packages `flex` and `bison` are required (`winflexbison` on Windows using `choco`) to build the dependency `igraph`.
+> 
+> #### Build
+> 
+> To build from source (compiles C++ extension):
+> 
+> ```
+> git clone https://github.com/GenieTim/pylimer-tools.git
+> cd pylimer-tools
+> pip install -e .
+> ```
+> 
+> Optional: Use provided helper scripts in `./bin` (e.g. `./bin/build-wheel.sh`, `./bin/build-tests.sh`).
+> 
+> ## 3. Test Installation
+> 
+> ```python
+> import pylimer_tools
+> import pylimer_tools_cpp
+> 
+> print("Installed version: {} == {}".format(
+>   pylimer_tools.__version__,
+>   pylimer_tools_cpp.__version__
+> ))
+> 
+> ```
+> 
+> More examples: see the [examples in the documentation](https://genietim.github.io/pylimer-tools/auto_examples/index.html) and [their code in `examples/`](examples/).
+> Additionally, the [tests](tests/) and the [CLI Tools](src/pylimer_tools/) may serve as examples.
+> 
+> ## 4. CLI Tools
+> 
+> Installed console scripts:
+> 
+> - `pylimer-generate-network` – generate random bead-spring networks using our MC generation procedure
+> - `pylimer-analyse-networks` – batch analysis / statistics given LAMMPS data (structure) files
+> - `pylimer-basic-lammps-stats` – quick structural stats from LAMMPS data (structure) file
+> - `pylimer-displace-randomly` – random displacement utility
+> 
+> Run any with `--help` for usage.
+> 
+> ## 5. Documentation
+> 
+> Full documentation (API reference, tutorials, examples):
+> [https://genietim.github.io/pylimer-tools](https://genietim.github.io/pylimer-tools)
+> 
+> ## 6. Development & Testing
+> 
+> Clone and install in editable mode (see Installation). Then:
+> 
+> ```
+> ./bin/run-tests.sh       # full test suite (Python + C++), includes benchmarks & tests that may fail
+> ./bin/run-tests-short.sh # quicker subset, generates coverage, is what's run in the CI
+> ./bin/format-code.sh     # apply formatting & style (run before PR)
+> ```
+> 
+> Generate docs:
+> 
+> ```
+> ./bin/make-stubs.sh      # builds the stubs for the C++ module
+> ./bin/make-docs.sh       # build Sphinx HTML docs
+> ```
+> 
+> ### Adding Features
+> 
+> - Add tests in `tests/` (unit or integration). New functionality without tests may be deferred.
+> - Keep public APIs documented in docstrings so they surface in Sphinx.
+> - If a change alters behavior, update existing tests rather than deleting them. Explain rationale in the PR.
+> 
+> ## 7. Citing
+> 
+> If you use `pylimer-tools` in published work, please cite it. A minimal BibTeX example:
+> 
+> ```bibtex
+> @software{pylimer-tools,
+> 	title = {pylimer-tools},
+> 	author = {Bernhard, Tim},
+> 	url = {https://github.com/GenieTim/pylimer-tools},
+> 	year = {2025},
+> 	note = {See CITATION.cff for full metadata and related method references}
+> }
+> ```
+> 
+> Also cite the specific theoretical / methodological papers corresponding to the components you use (listed in `CITATION.cff`).
+> 
+> ## 8. Contributing
+> 
+> We welcome contributions on GitHub via Issues and Pull Requests.
+> 
+> 1. Discuss larger ideas in an Issue first (helps align scope).
+> 2. Fork, branch, implement, add tests & docs.
+> 3. Run formatting and tests locally.
+> 4. Submit PR referencing the Issue (if any).
+> 
+> See also: [Code of Conduct](CODE_OF_CONDUCT.md).
+> 
+> ## 9. Code of Conduct
+> 
+> We strive for an inclusive, respectful environment. 
+> By participating you agree to uphold the [Code of Conduct](CODE_OF_CONDUCT.md). 
+> Report concerns to the maintainer email specified there.
+> 
+> ## 10. Acknowledgements
+> 
+> The authors gratefully acknowledge financial support from the Swiss National Science Foundation (SNSF project 200021_204196).
+> 
+> ## 11. License
+> 
+> GPL-3.0-or-later. See [LICENSE](LICENSE).
+> 
+> This project includes third-party code and libraries under various compatible licenses. See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for detailed information about all third-party dependencies and their licenses.
+> 
+> ## Pronunciation Note
+> 
+> "pylimer” resembles "polymer”; the playful spelling emphasizes Python integration.
+
+
+2021-2026, Tim Bernhard
+
+## Pages
+
+- [pylimer-tools Documentation](index.html.md): [![Test Coverage of Python Code](https://github.com/GenieTim/pylimer-tools/blob/main/.github/coverag...
+- [Examples](auto_examples/index.html.md): The following gallery contains example scripts demonstrating the usage of various features in pylime...
+- [Network Generation](auto_examples/network_generator/index.html.md): pylimer-tools includes a powerful Monte Carlo-based network generator for creating realistic polymer...
+- [File I/O: Readers & Writers](auto_examples/readers_writers/index.html.md): pylimer-tools provides comprehensive support for reading and writing various LAMMPS file formats, en...
+- [Structure Analysis](auto_examples/structure_analysis/index.html.md): pylimer-tools offers various tools to manipulate and analyze the topology of polymer networks.
+- [Dissipative Particle Dynamics (DPD) Simulations](auto_examples/dpd_simulations/index.html.md): pylimer-tools provides a powerful framework for simulating coarse-grained polymer systems using Diss...
+- [Force Balance, Maximum Entropy Homogenization Procedures](auto_examples/force_balance/index.html.md): pylimer-tools provides three implementations of the Force Balance:cite:p:bernhard_phantom_2025, Maxi...
+- [Trajectory Analysis](auto_examples/trajectory_analysis/index.html.md): pylimer-tools provides advanced tools for analyzing molecular dynamics trajectories, particularly fo...
+- [Normal Mode Analysis](auto_examples/normal_mode_analysis/index.html.md): pylimer-tools provides a normal mode analysis (NMA) implementation to predict the loss and storage m...
+- [Acknowledgements](acknowledgements.html.md): Please refer to the [CITATION.cff](https://github.com/GenieTim/pylimer-tools/blob/main/CITATION.cff)...
+- [Assumptions](assumptions.html.md): Quite a few assumptions were made in the making of this library,
+- [Command Line Interface](cli.html.md): Apart from the Python API, pylimer-tools provides a command line interface (CLI) for various functio...
+- [Installation Guide](installation.html.md): pylimer-tools can be installed in several ways depending on your needs and system configuration.
+- [src](modules.html.md): * [pylimer_tools package](pylimer_tools.md)
+- [Nomenclature](nomenclature.html.md): This section defines key terms used throughout pylimer-tools documentation and the library itself.
+- [Adding Topology Information](auto_examples/network_generator/plot_add_angles.html.md): The generated networks can include topological information.
+- [Convert for Bond Swapping](auto_examples/readers_writers/plot_convert_for_bond_swapping.html.md): LAMMPS bond swapping can significantly speed up equilibration for polymer networks.
+- [Extract Trajectory Frame to Data File](auto_examples/readers_writers/plot_convert_trajectory_to_frame.html.md): Take a later entry from a LAMMPS trajectory and save it as a data file.
+- [Correlated Averages Reader](auto_examples/readers_writers/plot_correlated_averages_reader.html.md): Read correlation functions from `fix ave/correlate` and `fix ave/correlate/long` commands.
+- [Custom Crosslinking with Callback Functions](auto_examples/network_generator/plot_custom_crosslinking_callback.html.md): This example demonstrates how to use the [`link_strands_callback()`](../../api/pylimer_tools_cpp.MCU...
+- [Data File Reader](auto_examples/readers_writers/plot_data_file_reader.html.md): The `DataFileParser` handles LAMMPS data files containing complete system definitions.
+- [Data File Writer](auto_examples/readers_writers/plot_data_file_writer.html.md): The [`DataFileWriter`](../../api/pylimer_tools_cpp.DataFileWriter.md#pylimer_tools_cpp.DataFileWrite...
+- [Decompose/Split Structure](auto_examples/structure_analysis/plot_decompose_structure.html.md): This example demonstrates how to decompose a crosslinked polymer network into chains
+- [Dissipative Particle Dynamics (DPD) Simulations](auto_examples/dpd_simulations/plot_dpd_simulation.html.md): This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-too...
+- [Dump File Reader](auto_examples/readers_writers/plot_dump_file_reader.html.md): The [`DumpFileReader`](../../api/pylimer_tools_cpp.DumpFileReader.md#pylimer_tools_cpp.DumpFileReade...
+- [End-to-End Distribution](auto_examples/structure_analysis/plot_end_to_end_distribution.html.md): This example demonstrates how to analyze the end-to-end distribution of polymer chains
+- [Deformation Experiment](auto_examples/force_balance/plot_fb_deformation_exp.html.md): This example shows how to use the MEHPForceBalance2 class in a deformation experiment.
+- [Force Balance](auto_examples/force_balance/plot_force_balance.html.md): This example demonstrates how to use the MEHP implementation with slip-springs
+- [Force Balance 2](auto_examples/force_balance/plot_force_balance_2.html.md): MEHPForceBalance2 is a faster implementation of the MEHP force balance method,
+- [Maximum Entropy Homogenization Procedure (MEHP)](auto_examples/force_balance/plot_force_relaxation.html.md): This example demonstrates how to use
+- [Histogram Reader](auto_examples/readers_writers/plot_histogram_reader.html.md): Process histogram data from `fix ave/hist` commands.
+- [Log & Thermo File Reader](auto_examples/readers_writers/plot_log_thermo_file_reader.html.md): Read LAMMPS log files containing thermodynamic output from the `thermo` command.
+- [Loop Finding and Analysis](auto_examples/structure_analysis/plot_loop_analysis.html.md): This example demonstrates how to find and analyze loops in polymer networks using pylimer-tools.
+- [Memory-Efficient Dump File Reading](auto_examples/readers_writers/plot_memory_efficient_dump_file_reading.html.md): The [`UniverseSequence`](../../api/pylimer_tools_cpp.UniverseSequence.md#pylimer_tools_cpp.UniverseS...
+- [Monte Carlo Configuration](auto_examples/network_generator/plot_monte_carlo_configuration.html.md): In the following, there are a few calls showing how to
+- [Multi-Component System](auto_examples/network_generator/plot_multi_component_system.html.md): Create complex systems with multiple components:
+- [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md): This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools
+- [Performance and Caching](auto_examples/readers_writers/plot_performance_caching.html.md): All readers support automatic caching for improved performance.
+- [Generate a Polydisperse Polymer Network](auto_examples/network_generator/plot_polydisperse_system.html.md): This example demonstrates how to use the [`MCUniverseGenerator`](../../api/pylimer_tools_cpp.MCUnive...
+- [Polydispersity Study](auto_examples/force_balance/plot_polydispersity_study.html.md): In this example, we study the effect of polydispersity on the shear modulus
+- [pylimer-tools Output Reader](auto_examples/readers_writers/plot_pylimer_tools_output_reader.html.md): Read output from pylimer-tools’ own simulators.
+- [Save Generated Network](auto_examples/network_generator/plot_save_network.html.md): This example shows how to save a generated polymer network to a LAMMPS data file.
+- [Simple Crosslinked Network](auto_examples/network_generator/plot_simple_crosslinked_network.html.md): Here’s a minimal example of creating a crosslinked polymer network:
+- [Extract Synthesis Parameters](auto_examples/structure_analysis/plot_structure_analysis.html.md): This example demonstrates how to analyze the structure of a crosslinked polymer network
+- [Tetra-PEG Network Generation](auto_examples/network_generator/plot_tetra_peg_network.html.md): This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol)
+- [Time-Averaged Data Reader](auto_examples/readers_writers/plot_time_averaged_data_reader.html.md): Read output from LAMMPS `fix ave/time` commands.
+- [Trajectory Analysis](auto_examples/trajectory_analysis/plot_trajectory_analysis.html.md): This example demonstrates how to analyze a polymer trajectory using pylimer-tools,
+- [Unit Conversion](auto_examples/readers_writers/plot_unit_conversion.html.md): Convert [LAMMPS units](https://docs.lammps.org/units.html) to SI or other unit systems:
+- [Generate Vulcanized Networks](auto_examples/network_generator/plot_vulcanized_network.html.md): In this example, we create a vulcanized network using the pylimer-tools library.
+- [pylimer_tools.calc package](pylimer_tools.calc.html.md): This module is deprecated.
+- [pylimer_tools package](pylimer_tools.html.md): * [pylimer_tools.calc package](pylimer_tools.calc.md)
+- [pylimer_tools.io package](pylimer_tools.io.html.md): Read max_nr_of_lines_to_read lines from the given file and return all possible header lines.
+- [pylimer_tools.utils package](pylimer_tools.utils.html.md): Store the object in the cache.
+- [Atom](api/pylimer_tools_cpp.Atom.html.md): Bases: `pybind11_object`
+- [AtomPairEntanglements](api/pylimer_tools_cpp.AtomPairEntanglements.html.md): Bases: `pybind11_object`
+- [AtomStyle](api/pylimer_tools_cpp.AtomStyle.html.md): Bases: [`Enum`](https://docs.python.org/3/library/enum.html#enum.Enum)
+- [AveFileReader](api/pylimer_tools_cpp.AveFileReader.html.md): Bases: `pybind11_object`
+- [BackTrackStatus](api/pylimer_tools_cpp.BackTrackStatus.html.md): Bases: [`Enum`](https://docs.python.org/3/library/enum.html#enum.Enum)
+- [Box](api/pylimer_tools_cpp.Box.html.md): Bases: `pybind11_object`
+- [ComputedDoubleValues](api/pylimer_tools_cpp.ComputedDoubleValues.html.md): Bases: [`IntEnum`](https://docs.python.org/3/library/enum.html#enum.IntEnum)
+- [ComputedIntValues](api/pylimer_tools_cpp.ComputedIntValues.html.md): Bases: [`IntEnum`](https://docs.python.org/3/library/enum.html#enum.IntEnum)
+- [DPDSimulator](api/pylimer_tools_cpp.DPDSimulator.html.md): Bases: `pybind11_object`
+- [DataFileReader](api/pylimer_tools_cpp.DataFileReader.html.md): Bases: `pybind11_object`
+- [DataFileWriter](api/pylimer_tools_cpp.DataFileWriter.html.md): Bases: `pybind11_object`
+- [DumpFileReader](api/pylimer_tools_cpp.DumpFileReader.html.md): Bases: `pybind11_object`
+- [ExitReason](api/pylimer_tools_cpp.ExitReason.html.md): Bases: [`IntEnum`](https://docs.python.org/3/library/enum.html#enum.IntEnum)
+- [LazyUniverseSequenceIterator](api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html.md): Bases: `pybind11_object`
+- [LinearMaxDistanceProvider](api/pylimer_tools_cpp.LinearMaxDistanceProvider.html.md): Bases: [`MaxDistanceProvider`](pylimer_tools_cpp.MaxDistanceProvider.md#pylimer_tools_cpp.MaxDistanc...
+- [LinkSwappingMode](api/pylimer_tools_cpp.LinkSwappingMode.html.md): Bases: [`Enum`](https://docs.python.org/3/library/enum.html#enum.Enum)
+- [MCUniverseGenerator](api/pylimer_tools_cpp.MCUniverseGenerator.html.md): Bases: `pybind11_object`
+- [MEHPForceBalance](api/pylimer_tools_cpp.MEHPForceBalance.html.md): Bases: `pybind11_object`
+- [MEHPForceBalance2](api/pylimer_tools_cpp.MEHPForceBalance2.html.md): Bases: `pybind11_object`
+- [MEHPForceEvaluator](api/pylimer_tools_cpp.MEHPForceEvaluator.html.md): Bases: `pybind11_object`
+- [MEHPForceRelaxation](api/pylimer_tools_cpp.MEHPForceRelaxation.html.md): Bases: `pybind11_object`
+- [MaxDistanceProvider](api/pylimer_tools_cpp.MaxDistanceProvider.html.md): Bases: `pybind11_object`
+- [Molecule](api/pylimer_tools_cpp.Molecule.html.md): Bases: `pybind11_object`
+- [MoleculeIterator](api/pylimer_tools_cpp.MoleculeIterator.html.md): Bases: `pybind11_object`
+- [MoleculeType](api/pylimer_tools_cpp.MoleculeType.html.md): Bases: [`Enum`](https://docs.python.org/3/library/enum.html#enum.Enum)
+- [NeighbourList](api/pylimer_tools_cpp.NeighbourList.html.md): Bases: `pybind11_object`
+- [NoMaxDistanceProvider](api/pylimer_tools_cpp.NoMaxDistanceProvider.html.md): Bases: [`MaxDistanceProvider`](pylimer_tools_cpp.MaxDistanceProvider.md#pylimer_tools_cpp.MaxDistanc...
+- [NonGaussianSpringForceEvaluator](api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html.md): Bases: [`MEHPForceEvaluator`](pylimer_tools_cpp.MEHPForceEvaluator.md#pylimer_tools_cpp.MEHPForceEva...
+- [NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md): Bases: `pybind11_object`
+- [OutputConfiguration](api/pylimer_tools_cpp.OutputConfiguration.html.md): Bases: `pybind11_object`
+- [SLESolver](api/pylimer_tools_cpp.SLESolver.html.md): Bases: [`Enum`](https://docs.python.org/3/library/enum.html#enum.Enum)
+- [STOP](api/pylimer_tools_cpp.STOP.html.md): Stop the linking process
+- [SimpleSpringMEHPForceEvaluator](api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html.md): Bases: [`MEHPForceEvaluator`](pylimer_tools_cpp.MEHPForceEvaluator.md#pylimer_tools_cpp.MEHPForceEva...
+- [SimplifiedBalance2Network](api/pylimer_tools_cpp.SimplifiedBalance2Network.html.md): Bases: `pybind11_object`
+- [SimplifiedBalanceNetwork](api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html.md): Bases: `pybind11_object`
+- [SimplifiedNetwork](api/pylimer_tools_cpp.SimplifiedNetwork.html.md): Bases: `pybind11_object`
+- [StructureSimplificationMode](api/pylimer_tools_cpp.StructureSimplificationMode.html.md): Bases: [`Enum`](https://docs.python.org/3/library/enum.html#enum.Enum)
+- [TRACK_BACKWARD](api/pylimer_tools_cpp.TRACK_BACKWARD.html.md): Track backward in the linking process
+- [TRACK_FORWARD](api/pylimer_tools_cpp.TRACK_FORWARD.html.md): Continue linking forward
+- [Universe](api/pylimer_tools_cpp.Universe.html.md): Bases: `pybind11_object`
+- [UniverseSequence](api/pylimer_tools_cpp.UniverseSequence.html.md): Bases: `pybind11_object`
+- [ZScoreMaxDistanceProvider](api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html.md): Bases: [`MaxDistanceProvider`](pylimer_tools_cpp.MaxDistanceProvider.md#pylimer_tools_cpp.MaxDistanc...
+- [do_linear_walk_chain_from_to](api/pylimer_tools_cpp.do_linear_walk_chain_from_to.html.md): Get coordinates linearly interpolated from one point to another (both exclusive).
+- [do_random_walk](api/pylimer_tools_cpp.do_random_walk.html.md): Do a random walk, return the coordinates of each point visited.
+- [do_random_walk_chain_from_to](api/pylimer_tools_cpp.do_random_walk_chain_from_to.html.md): Do a random walk from one point to another.
+- [do_random_walk_chain_from_to_mc](api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html.md): Do a random walk from one point to another.
+- [pylimer_tools_cpp package](pylimer_tools_cpp.html.md): A collection of utility python functions for handling LAMMPS output and polymers in Python.
+- [inverse_langevin](api/pylimer_tools_cpp.inverse_langevin.html.md): A somewhat accurate (for $x \in (-1, 1)$) implementation of the inverse Langevin function.
+- [randomly_sample_entanglements](api/pylimer_tools_cpp.randomly_sample_entanglements.html.md): Randomly find pairs of atoms that are close together and could be
+- [split_csv](api/pylimer_tools_cpp.split_csv.html.md): Read a file containing a number of CSVs. Returns them split up.
+- [version_information](api/pylimer_tools_cpp.version_information.html.md): Returns  a string of the the current version, incl. git hash and date of compilation.
+- [Computation times](sg_execution_times.html.md): **17:56.066** total execution time for 34 files **from all galleries**:
+- [Computation times](auto_examples/sg_execution_times.html.md): **00:00.000** total execution time for 0 files **from auto_examples**:
+- [Computation times](auto_examples/network_generator/sg_execution_times.html.md): **02:21.468** total execution time for 9 files **from auto_examples/network_generator**:
+- [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): **00:20.133** total execution time for 13 files **from auto_examples/readers_writers**:
+- [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): **00:00.359** total execution time for 4 files **from auto_examples/structure_analysis**:
+- [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): **00:05.003** total execution time for 1 file **from auto_examples/dpd_simulations**:
+- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): **05:46.973** total execution time for 5 files **from auto_examples/force_balance**:
+- [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): **09:06.771** total execution time for 1 file **from auto_examples/trajectory_analysis**:
+- [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): **00:15.359** total execution time for 1 file **from auto_examples/normal_mode_analysis**:
+- [Getting Started Guide](usage.html.md): This guide will help you get started with pylimer-tools, covering basic usage patterns and common wo...
+
+---
+
+For more comprehensive documentation, see [llms-full.txt](llms-full.txt)

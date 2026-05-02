@@ -15,6 +15,10 @@ The library supports four main file I/O operations:
 4. **Writing LAMMPS data files** - Modified or generated systems
 
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 

@@ -28,7 +28,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -410,14 +410,14 @@ where you find them in in the folder <cite>tests/pylimer_tools/fixtures</cite>,
 in which case you will have to adjust the file paths in the examples accordingly,
 or you can clone the entire repository and switch to the directory of the example script you want to run.
 Then, run the script directly from there.</p>
-<div class="sphx-glr-thumbnails"></div></section>
+<div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"></div></section>
 <section id="dissipative-particle-dynamics-dpd-simulations">
 <h2>Dissipative Particle Dynamics (DPD) Simulations<a class="headerlink" href="#dissipative-particle-dynamics-dpd-simulations" title="Link to this heading">¶</a></h2>
 <p>pylimer-tools provides a powerful framework for simulating coarse-grained polymer systems using Dissipative Particle Dynamics (DPD) with slip-springs.
 This allows for realistic modeling of polymer behavior at a mesoscopic scale.
 The implementation is based on <span id="id1">Langeloth <em>et al.</em> [<a class="reference internal" href="../acknowledgements.html#id11" title="Michael Langeloth, Yuichi Masubuchi, Michael C. Böhm, and Florian Müller-Plathe. Recovering the reptation dynamics of polymer melts in dissipative particle dynamics simulations via slip-springs. The Journal of Chemical Physics, 138(10):104907, March 2013. doi:10.1063/1.4794156.">LMBohmMullerPlathe13</a>]</span>, <span id="id2">Schneider <em>et al.</em> [<a class="reference internal" href="../acknowledgements.html#id10" title="Jurek Schneider, Frank Fleck, Hossein Ali Karimi-Varzaneh, and Florian Müller-Plathe. Simulation of Elastomers by Slip-Spring Dissipative Particle Dynamics. Macromolecules, 54(11):5155–5166, June 2021. doi:10.1021/acs.macromol.1c00567.">SFKarimiVarzanehMullerPlathe21</a>]</span> and <span id="id3">Schneider and De Pablo [<a class="reference internal" href="../acknowledgements.html#id9" title="Ludwig Schneider and Juan J. De Pablo. Entanglements via Slip Springs with Soft, Coarse-Grained Models for Systems Having Explicit Liquid–Vapor Interfaces. Macromolecules, 56(18):7445–7453, September 2023. doi:10.1021/acs.macromol.3c00960.">SDP23</a>]</span>.</p>
 <p>Refer to the full documentation of the DPD simulator in the <a class="reference internal" href="../api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.DPDSimulator"><code class="xref py py-class docutils literal notranslate"><span class="pre">DPDSimulator</span></code></a> class for more details.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools."><img alt="" src="../_images/sphx_glr_plot_dpd_simulation_thumb.png" />
+<div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools."><img alt="" src="../_images/sphx_glr_plot_dpd_simulation_thumb.png" />
 <p><a class="reference internal" href="dpd_simulations/plot_dpd_simulation.html"><span class="doc">Dissipative Particle Dynamics (DPD) Simulations</span></a></p>
   <div class="sphx-glr-thumbnail-title">Dissipative Particle Dynamics (DPD) Simulations</div>
 </div></div></section>
@@ -431,7 +431,7 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
 <li><p><a class="reference internal" href="../api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><code class="xref py py-class docutils literal notranslate"><span class="pre">MEHPForceBalance</span></code></a>: A Force Balance implementation, which uses just Hookean springs, but allows the use of slip-links to model entanglements,</p></li>
 <li><p><a class="reference internal" href="../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><code class="xref py py-class docutils literal notranslate"><span class="pre">MEHPForceBalance2</span></code></a>: The faster implementation of the Force Balance procedure, without allowing for slip-links, but allowing the modelling of entanglements as static links, like tetrafunctional crosslinks.</p></li>
 </ul>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links to model entanglements instead of slip-links. See :citebernhard_phantom_2025"><img alt="" src="../_images/sphx_glr_plot_force_balance_2_thumb.png" />
+<div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links to model entanglements instead of slip-links. See :citebernhard_phantom_2025"><img alt="" src="../_images/sphx_glr_plot_force_balance_2_thumb.png" />
 <p><a class="reference internal" href="force_balance/plot_force_balance_2.html"><span class="doc">Force Balance 2</span></a></p>
   <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MEHP implementation with slip-springs to homogenize a polymer network and predict its equilibrium shear modulus."><img alt="" src="../_images/sphx_glr_plot_force_balance_thumb.png" />
@@ -465,7 +465,7 @@ and the <span class="xref std std-doc">modules</span> API reference, particularl
 <p>The <a class="reference internal" href="../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">MCUniverseGenerator</span></code></a> class is the main interface for network generation.
 The initial method was introduced in <span id="id4">Gusev [<a class="reference internal" href="../acknowledgements.html#id8" title="Andrei A. Gusev. Numerical Estimates of the Topological Effects in the Elasticity of Gaussian Polymer Networks and Their Exact Theoretical Description. Macromolecules, 52(9):3244–3251, May 2019. doi:10.1021/acs.macromol.9b00262.">Gus19</a>]</span>,
 the current implementation is more powerful, as needed for <span id="id5">Bernhard and Gusev [<a class="reference internal" href="../acknowledgements.html#id12" title="Tim Bernhard and Andrei A. Gusev. Phantom force balance procedure for predicting the modulus of entangled polymer networks. ACS Polymers Au, 2025. doi:10.1021/acspolymersau.5c00036.">BG25</a>]</span>.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to save a generated polymer network to a LAMMPS data file."><img alt="" src="../_images/sphx_glr_plot_save_network_thumb.png" />
+<div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to save a generated polymer network to a LAMMPS data file."><img alt="" src="../_images/sphx_glr_plot_save_network_thumb.png" />
 <p><a class="reference internal" href="network_generator/plot_save_network.html"><span class="doc">Save Generated Network</span></a></p>
   <div class="sphx-glr-thumbnail-title">Save Generated Network</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Here&#x27;s a minimal example of creating a crosslinked polymer network:"><img alt="" src="../_images/sphx_glr_plot_simple_crosslinked_network_thumb.png" />
@@ -499,7 +499,7 @@ the current implementation is more powerful, as needed for <span id="id5">Bernha
 as published in <span id="id6">Gusev and Bernhard [<a class="reference internal" href="../acknowledgements.html#id7" title="Andrei A. Gusev and Tim Bernhard. Molecular Model for Linear Viscoelastic Properties of Entangled Polymer Networks. Macromolecules, 57(21):10152–10163, November 2024. doi:10.1021/acs.macromol.4c01429.">GB24</a>]</span>.
 This is useful for understanding the viscoelastic properties of the network.
 The corresponding class is <a class="reference internal" href="../api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NormalModeAnalyzer</span></code></a>.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks."><img alt="" src="../_images/sphx_glr_plot_normal_mode_analysis_thumb.png" />
+<div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks."><img alt="" src="../_images/sphx_glr_plot_normal_mode_analysis_thumb.png" />
 <p><a class="reference internal" href="normal_mode_analysis/plot_normal_mode_analysis.html"><span class="doc">Normal Mode Analysis (NMA)</span></a></p>
   <div class="sphx-glr-thumbnail-title">Normal Mode Analysis (NMA)</div>
 </div></div></section>
@@ -513,7 +513,7 @@ The corresponding class is <a class="reference internal" href="../api/pylimer_to
 <li><p><strong>Reading LAMMPS output files</strong> - Measurements and simulation results</p></li>
 <li><p><strong>Writing LAMMPS data files</strong> - Modified or generated systems</p></li>
 </ol>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Read output from pylimer-tools&#x27; own simulators."><img alt="" src="../_images/sphx_glr_plot_pylimer_tools_output_reader_thumb.png" />
+<div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Read output from pylimer-tools&#x27; own simulators."><img alt="" src="../_images/sphx_glr_plot_pylimer_tools_output_reader_thumb.png" />
 <p><a class="reference internal" href="readers_writers/plot_pylimer_tools_output_reader.html"><span class="doc">pylimer-tools Output Reader</span></a></p>
   <div class="sphx-glr-thumbnail-title">pylimer-tools Output Reader</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Read correlation functions from fix ave/correlate and fix ave/correlate/long commands."><img alt="" src="../_images/sphx_glr_plot_correlated_averages_reader_thumb.png" />
@@ -578,7 +578,7 @@ The corresponding class is <a class="reference internal" href="../api/pylimer_to
 <p>There are exponentially many paths between two crosslinkers of a network,
 and you may run out of memory when using these functions, if your network is lattice-like.</p>
 </div>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to decompose a crosslinked polymer network into chains and analyze its structure using pylimer-tools."><img alt="" src="../_images/sphx_glr_plot_decompose_structure_thumb.png" />
+<div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to decompose a crosslinked polymer network into chains and analyze its structure using pylimer-tools."><img alt="" src="../_images/sphx_glr_plot_decompose_structure_thumb.png" />
 <p><a class="reference internal" href="structure_analysis/plot_decompose_structure.html"><span class="doc">Decompose/Split Structure</span></a></p>
   <div class="sphx-glr-thumbnail-title">Decompose/Split Structure</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to find and analyze loops in polymer networks using pylimer-tools."><img alt="" src="../_images/sphx_glr_plot_loop_analysis_thumb.png" />
@@ -597,7 +597,7 @@ and you may run out of memory when using these functions, if your network is lat
 <p>pylimer-tools provides advanced tools for analyzing molecular dynamics trajectories, particularly for polymer systems.
 This includes reading trajectory data and computing various properties.</p>
 <p>For more information, refer to the documentation of the <a class="reference internal" href="../api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">UniverseSequence</span></code></a> class and the <a class="reference internal" href="../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><code class="xref py py-class docutils literal notranslate"><span class="pre">Universe</span></code></a> class for a list of methods available for property computations.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to analyze a polymer trajectory using pylimer-tools, including mean square displacement (MSD) and radius of gyration calculation."><img alt="" src="../_images/sphx_glr_plot_trajectory_analysis_thumb.png" />
+<div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to analyze a polymer trajectory using pylimer-tools, including mean square displacement (MSD) and radius of gyration calculation."><img alt="" src="../_images/sphx_glr_plot_trajectory_analysis_thumb.png" />
 <p><a class="reference internal" href="trajectory_analysis/plot_trajectory_analysis.html"><span class="doc">Trajectory Analysis</span></a></p>
   <div class="sphx-glr-thumbnail-title">Trajectory Analysis</div>
 </div></div><div class="toctree-wrapper compound">
@@ -699,5 +699,6 @@ This includes reading trajectory data and computing various properties.</p>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     </body>
 </html>

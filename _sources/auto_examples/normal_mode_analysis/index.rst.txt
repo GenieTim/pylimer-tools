@@ -11,6 +11,10 @@ This is useful for understanding the viscoelastic properties of the network.
 The corresponding class is :class:`~pylimer_tools_cpp.NormalModeAnalyzer`.
 
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 

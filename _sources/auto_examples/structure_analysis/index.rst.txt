@@ -41,6 +41,10 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
 
 
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 

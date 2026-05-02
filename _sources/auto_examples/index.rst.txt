@@ -23,6 +23,10 @@ or you can clone the entire repository and switch to the directory of the exampl
 Then, run the script directly from there.
 
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 
@@ -45,6 +49,10 @@ The implementation is based on :cite:t:`langeloth_recovering_2013`, :cite:t:`sch
 
 Refer to the full documentation of the DPD simulator in the :class:`~pylimer_tools_cpp.DPDSimulator` class for more details.
 
+
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
 
 
 .. raw:: html
@@ -88,6 +96,10 @@ Here, we distinguish the following three different implementations:
 - :class:`~pylimer_tools_cpp.MEHPForceBalance`: A Force Balance implementation, which uses just Hookean springs, but allows the use of slip-links to model entanglements,
 - :class:`~pylimer_tools_cpp.MEHPForceBalance2`: The faster implementation of the Force Balance procedure, without allowing for slip-links, but allowing the modelling of entanglements as static links, like tetrafunctional crosslinks.
 
+
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
 
 
 .. raw:: html
@@ -209,6 +221,10 @@ The :class:`~pylimer_tools_cpp.MCUniverseGenerator` class is the main interface 
 The initial method was introduced in :cite:t:`gusev_numerical_2019`,
 the current implementation is more powerful, as needed for :cite:t:`bernhard_phantom_2025`.
 
+
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
 
 
 .. raw:: html
@@ -385,6 +401,10 @@ This is useful for understanding the viscoelastic properties of the network.
 The corresponding class is :class:`~pylimer_tools_cpp.NormalModeAnalyzer`.
 
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 
@@ -427,6 +447,10 @@ The library supports four main file I/O operations:
 3. **Reading LAMMPS output files** - Measurements and simulation results
 4. **Writing LAMMPS data files** - Modified or generated systems
 
+
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
 
 
 .. raw:: html
@@ -701,6 +725,10 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
 
 
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 
@@ -790,6 +818,10 @@ This includes reading trajectory data and computing various properties.
 
 For more information, refer to the documentation of the :class:`~pylimer_tools_cpp.UniverseSequence` class and the :class:`~pylimer_tools_cpp.Universe` class for a list of methods available for property computations.
 
+
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
 
 
 .. raw:: html

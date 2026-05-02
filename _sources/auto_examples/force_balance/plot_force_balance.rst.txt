@@ -33,8 +33,8 @@ to homogenize a polymer network and predict its equilibrium shear modulus.
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 3.3277069582458315e-08
-    Shear Modulus [MPa]:  0.04239292739541462
+    Final residual (should be close to 0): 8.497925003733945e-08
+    Shear Modulus [MPa]:  0.06037892640503862
 
 
 
@@ -108,7 +108,7 @@ to homogenize a polymer network and predict its equilibrium shear modulus.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.315 seconds)
+   **Total running time of the script:** (0 minutes 0.320 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_force_balance.py:
