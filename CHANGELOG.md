@@ -9,7 +9,6 @@
 - Fix stress evaluation in `NonGaussianSpringForceEvaluator` to properly account for non-linear Langevin chain tension.
 - Prevent division by zero and NaN in `evaluateForceSetGradient` and `csch` when spring distance is zero.
 - Ensure safe move semantics and delete copy operations for `MEHPForceRelaxation` to prevent solver handle double-free.
-- Guard `std::clamp` limits in `MEHPForceBalance` when `limit > 0.5`.
 - Fix periodic boundary validation in `Box::validateOffset` for negative displacement offsets.
 - Prevent mutating input vectors in `median(Eigen::DenseBase)` and improve its performance with `std::nth_element`.
 - Support empty networks and direct crosslinker bonds in `compute_topological_factor`.

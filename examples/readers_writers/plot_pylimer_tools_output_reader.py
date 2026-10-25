@@ -16,15 +16,15 @@ import matplotlib.pyplot as plt
 
 from pylimer_tools.io.read_pylimer_tools_output_file import read_avg_file
 
-_examples_dir = (
-    Path(__file__).resolve().parent.parent
-    if "__file__" in globals()
-    else (
-        Path.cwd().parent / "examples"
-        if Path.cwd().name == "docs"
-        else Path("examples").resolve()
-    )
-)
+def _find_repo_root() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            if (p / "examples").is_dir() and (p / "src").is_dir():
+                return p
+    return Path.cwd()
+
+
+_examples_dir = _find_repo_root() / "examples"
 example_file = str(
     _examples_dir /
     "dpd_simulations/dpd_simulation_avg_output.txt")

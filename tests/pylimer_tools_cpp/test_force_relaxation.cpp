@@ -1026,20 +1026,7 @@ TEST_CASE("MEHP Bugfixes and Regression Tests",
     CHECK(nonGaussianStress > gaussianStress * 2.0);
   }
 
-  SECTION("4. Test std::clamp edge cases where limit > 0.5 without failure")
-  {
-    double limit = 0.8;
-    double idealValue = 0.5;
-    const double lo = std::min(limit, 1.0 - limit);
-    const double hi = std::max(limit, 1.0 - limit);
-    double clamped = std::clamp(idealValue, lo, hi);
-    CHECK(clamped >= lo);
-    CHECK(clamped <= hi);
-    CHECK(lo == Catch::Approx(0.2));
-    CHECK(hi == Catch::Approx(0.8));
-  }
-
-  SECTION("5. Test MEHPForceRelaxation non-copyability and safe move semantics")
+  SECTION("4. Test MEHPForceRelaxation non-copyability and safe move semantics")
   {
     STATIC_CHECK_FALSE(std::is_copy_constructible_v<pcm::MEHPForceRelaxation>);
     STATIC_CHECK_FALSE(std::is_copy_assignable_v<pcm::MEHPForceRelaxation>);

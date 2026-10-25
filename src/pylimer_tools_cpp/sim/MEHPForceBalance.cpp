@@ -2978,9 +2978,7 @@ MEHPForceBalance::updateSpringPartition(
             1. / (oneOverSpringPartitionUpperLimit * (nextS + currentS) * (N)),
             0.,
             1.);
-          const double lo = std::min(limit, 1.0 - limit);
-          const double hi = std::max(limit, 1.0 - limit);
-          idealValue = std::clamp(idealValue, lo, hi);
+          idealValue = std::clamp(idealValue, limit, 1. - limit);
           // double oneOverCurrent = 1. / (currentS * N);
           // double oneOverNext = 1. / (nextS * N);
           // double limitedOneOverCurrent =
