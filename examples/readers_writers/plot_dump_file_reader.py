@@ -16,16 +16,16 @@ from pylimer_tools_cpp import DumpFileReader, UniverseSequence
 
 # Load trajectory data
 sequence = UniverseSequence()
-_fixtures_dir = (
-    Path(__file__).resolve().parent.parent.parent /
-    "tests/pylimer_tools/fixtures"
-    if "__file__" in globals()
-    else (
-        Path.cwd().parent / "tests/pylimer_tools/fixtures"
-        if Path.cwd().name == "docs"
-        else Path("tests/pylimer_tools/fixtures").resolve()
-    )
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
 file_path = str(_fixtures_dir)
 sequence.initialize_from_dump_file(
     initial_data_file=os.path.join(file_path, "lammps_data_file_small.out"),

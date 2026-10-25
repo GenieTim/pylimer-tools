@@ -26,16 +26,16 @@ from pylimer_tools_cpp import Universe
 crosslinker_type = 2
 
 # Load your network (replace path accordingly)
-_fixtures_dir = (
-    Path(__file__).resolve().parent.parent.parent /
-    "tests/pylimer_tools/fixtures"
-    if "__file__" in globals()
-    else (
-        Path.cwd().parent / "tests/pylimer_tools/fixtures"
-        if Path.cwd().name == "docs"
-        else Path("tests/pylimer_tools/fixtures").resolve()
-    )
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
 universe = read_data_file(
     str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 )

@@ -72,6 +72,8 @@ nitpick_ignore_regex = [
     (r".*", r"igraph_t"),
 ]
 
+autodoc_mock_imports = ["termcolor"]
+
 # Configuration for specific extensions
 # napoleon settings
 napoleon_google_docstring = True

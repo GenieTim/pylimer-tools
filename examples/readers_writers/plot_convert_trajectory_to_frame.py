@@ -17,16 +17,16 @@ if not os.path.exists("generated_structures"):
 # %%
 # For large trajectories, frames are loaded on-demand
 # Load a LAMMPS dump trajectory file (replace with your file)
-_fixtures_dir = (
-    Path(__file__).resolve().parent.parent.parent /
-    "tests/pylimer_tools/fixtures"
-    if "__file__" in globals()
-    else (
-        Path.cwd().parent / "tests/pylimer_tools/fixtures"
-        if Path.cwd().name == "docs"
-        else Path("tests/pylimer_tools/fixtures").resolve()
-    )
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
 file_path = str(_fixtures_dir)
 sequence = UniverseSequence()
 sequence.initialize_from_dump_file(

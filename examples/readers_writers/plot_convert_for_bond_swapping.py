@@ -17,16 +17,16 @@ if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
 
 # Load original system
-_fixtures_dir = (
-    Path(__file__).resolve().parent.parent.parent /
-    "tests/pylimer_tools/fixtures"
-    if "__file__" in globals()
-    else (
-        Path.cwd().parent / "tests/pylimer_tools/fixtures"
-        if Path.cwd().name == "docs"
-        else Path("tests/pylimer_tools/fixtures").resolve()
-    )
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
 input_file = str(_fixtures_dir / "structure/melt_83_a_100.structure.out")
 sequence = UniverseSequence()
 sequence.initialize_from_data_sequence([input_file])
