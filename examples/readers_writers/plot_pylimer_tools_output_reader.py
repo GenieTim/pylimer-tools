@@ -16,8 +16,11 @@ import matplotlib.pyplot as plt
 
 from pylimer_tools.io.read_pylimer_tools_output_file import read_avg_file
 
+
 def _find_repo_root() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             if (p / "examples").is_dir() and (p / "src").is_dir():
                 return p

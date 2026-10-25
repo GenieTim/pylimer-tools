@@ -2,6 +2,18 @@
 
 ## main
 
+### Normal Mode Analysis & Rheology
+- Add `NormalModeSolver` enum (`AUTO`, `DENSE_LAPACK`, `DENSE_EIGEN`, `SPARSE_SLICING`) and solver string selection to `NormalModeAnalyzer.find_all_eigenvalues`.
+- Add connected component decomposition (`decompose_components`) with analytical solutions for simple linear Rouse chains and ring polymers.
+- Implement sparse slicing eigenvalue solver (`SPARSE_SLICING`) based on Sylvester's Law of Inertia with `Eigen::SimplicialLDLT` and `Spectra::SymEigsShiftSolver`.
+- Add Kernel Polynomial Method (KPM) for $O(N)$ spectral calculations without full matrix diagonalization:
+  - `compute_chebyshev_moments_kpm`: Chebyshev moment computation with Rademacher stochastic trace estimation and Jackson damping kernel.
+  - `compute_density_of_states_kpm`: continuous density of states (DOS) reconstruction.
+  - `evaluate_stress_autocorrelation_kpm`: direct evaluation of stress autocorrelation $G(t)$ via Gauss-Chebyshev quadrature.
+  - `evaluate_storage_modulus_kpm`: direct evaluation of storage modulus $G'(\omega)$ via Gauss-Chebyshev quadrature.
+  - `evaluate_loss_modulus_kpm`: direct evaluation of loss modulus $G''(\omega)$ via Gauss-Chebyshev quadrature.
+- Add comprehensive unit tests in Python and C++ covering all normal mode solvers, multigraph parallel bonds, component decomposition, and KPM viscoelastic moduli.
+
 ## v0.4.0
 
 ### Simulation & Physics

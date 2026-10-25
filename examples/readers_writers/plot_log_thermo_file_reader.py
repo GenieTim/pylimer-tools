@@ -23,9 +23,12 @@ import matplotlib.pyplot as plt
 
 from pylimer_tools.io.read_lammps_output_file import read_log_file
 
+
 # Read complete log file
 def _find_fixtures_dir() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             candidate = p / "tests" / "pylimer_tools" / "fixtures"
             if candidate.is_dir():

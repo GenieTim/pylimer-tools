@@ -16,8 +16,12 @@ from pylimer_tools_cpp import DumpFileReader, UniverseSequence
 
 # Load trajectory data
 sequence = UniverseSequence()
+
+
 def _find_fixtures_dir() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             candidate = p / "tests" / "pylimer_tools" / "fixtures"
             if candidate.is_dir():

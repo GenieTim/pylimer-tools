@@ -17,7 +17,7 @@ import numpy
 import numpy.typing
 import scipy.sparse
 import typing
-__all__: list[str] = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'BackTrackStatus', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NeighbourList', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'OutputConfiguration', 'SLESolver', 'STOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'TRACK_BACKWARD', 'TRACK_FORWARD', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'randomly_sample_entanglements', 'split_csv', 'version_information']
+__all__: list[str] = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'BackTrackStatus', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NeighbourList', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'NormalModeSolver', 'OutputConfiguration', 'SLESolver', 'STOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'TRACK_BACKWARD', 'TRACK_FORWARD', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'randomly_sample_entanglements', 'split_csv', 'version_information']
 class Atom:
     """
     
@@ -3319,12 +3319,13 @@ class NormalModeAnalyzer:
                  :param t: The time at which to evaluate the stress autocorrelation
                  :return: Stress autocorrelation values
         """
-    def find_all_eigenvalues(self, compute_eigenvectors: bool = False) -> None:
+    def find_all_eigenvalues(self, solver: NormalModeSolver | str = NormalModeSolver.AUTO, compute_eigenvectors: bool = False, decompose_components: bool = True) -> None:
         """
-                 Find all eigenvalues using a dense solver.
+                 Find all eigenvalues using the specified solver.
                  
+                 :param solver: Solver method to use (NormalModeSolver enum or string, default: NormalModeSolver.AUTO)
                  :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
-                 :return: True if computation was successful
+                 :param decompose_components: Whether to decompose the graph into connected components (default: True)
         """
     def find_sparse_eigenvalues(self, nr_of_eigenvalues: typing.SupportsInt, compute_eigenvectors: bool = False) -> None:
         """
@@ -3332,7 +3333,6 @@ class NormalModeAnalyzer:
                  
                  :param nr_of_eigenvalues: Number of smallest eigenvalues to find
                  :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
-                 :return: True if computation was successful
         """
     def get_eigenvalues(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
@@ -3376,6 +3376,62 @@ class NormalModeAnalyzer:
                  
                  :param eigenvectors: Matrix of eigenvectors to set
         """
+    def compute_chebyshev_moments_kpm(self, num_moments: int = 1024, num_random_vectors: int = 20) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+        Compute Chebyshev moments using the Kernel Polynomial Method (KPM).
+
+        :param num_moments: Number of moments to compute (default: 1024)
+        :param num_random_vectors: Number of random Rademacher vectors for trace estimation (default: 20)
+        :return: Vector of damped Chebyshev moments
+        """
+    def compute_density_of_states_kpm(self, lambda_grid: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], num_moments: int = 1024, num_random_vectors: int = 20) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+        Compute continuous density of states (DOS) using KPM.
+
+        :param lambda_grid: Eigenvalue points at which to evaluate DOS
+        :param num_moments: Number of Chebyshev moments (default: 1024)
+        :param num_random_vectors: Number of random vectors (default: 20)
+        :return: Density of states values on the grid
+        """
+    def evaluate_stress_autocorrelation_kpm(self, t: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], num_moments: int = 1024, num_random_vectors: int = 20, num_quadrature_points: int = 2048) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+        Evaluate stress autocorrelation directly using KPM without computing eigenvalues.
+
+        :param t: Time points to evaluate
+        :param num_moments: Number of Chebyshev moments (default: 1024)
+        :param num_random_vectors: Number of random vectors (default: 20)
+        :param num_quadrature_points: Number of Gauss-Chebyshev quadrature points (default: 2048)
+        :return: Stress autocorrelation values
+        """
+    def evaluate_storage_modulus_kpm(self, omega: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], num_moments: int = 1024, num_random_vectors: int = 20, num_quadrature_points: int = 2048) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+        Evaluate storage modulus G' directly using KPM without computing eigenvalues.
+
+        :param omega: Angular frequencies to evaluate
+        :param num_moments: Number of Chebyshev moments (default: 1024)
+        :param num_random_vectors: Number of random vectors (default: 20)
+        :param num_quadrature_points: Number of Gauss-Chebyshev quadrature points (default: 2048)
+        :return: Storage modulus values
+        """
+    def evaluate_loss_modulus_kpm(self, omega: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], num_moments: int = 1024, num_random_vectors: int = 20, num_quadrature_points: int = 2048) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+        Evaluate loss modulus G'' directly using KPM without computing eigenvalues.
+
+        :param omega: Angular frequencies to evaluate
+        :param num_moments: Number of Chebyshev moments (default: 1024)
+        :param num_random_vectors: Number of random vectors (default: 20)
+        :param num_quadrature_points: Number of Gauss-Chebyshev quadrature points (default: 2048)
+        :return: Loss modulus values
+        """
+class NormalModeSolver(enum.Enum):
+    """
+    Solver algorithms for normal mode analysis.
+    """
+    AUTO = ...
+    DENSE_LAPACK = ...
+    DENSE_EIGEN = ...
+    SPARSE_SLICING = ...
+
 class OutputConfiguration:
     """
     
