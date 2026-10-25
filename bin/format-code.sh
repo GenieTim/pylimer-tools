@@ -2,14 +2,16 @@
 
 cd "$(dirname "$0")/.." || exit
 
+PYTHON="${PYTHON:-$(command -v python3 || command -v python)}"
+
 # Format C++ code
-find ./src/pylimer_tools_cpp \( -name "*.cpp" -o -name "*.h" \) -exec clang-format --style=file --fallback-style="Mozilla" -i {} \;
-find ./tests/pylimer_tools_cpp \( -name "*.cpp" -o -name "*.h" \) -exec clang-format --style=file --fallback-style="Mozilla" -i {} \;
+if command -v clang-format &>/dev/null; then
+  find ./src/pylimer_tools_cpp \( -name "*.cpp" -o -name "*.h" \) -exec clang-format --style=file --fallback-style="Mozilla" -i {} +
+  find ./tests/pylimer_tools_cpp \( -name "*.cpp" -o -name "*.h" \) -exec clang-format --style=file --fallback-style="Mozilla" -i {} +
+fi
 
 # Format Python code
-python -m ruff format ./src/pylimer_tools
-python -m ruff format ./examples
-python -m ruff format ./tests
-find ./src/pylimer_tools \( -name "*.py" -o -name "*.pyi" \) -exec python -m autopep8 --in-place --aggressive {} \;
-find ./tests \( -name "*.py" -o -name "*.pyi" \) -exec python -m autopep8 --in-place --aggressive {} \;
-find ./examples \( -name "*.py" -o -name "*.pyi" \) -exec python -m autopep8 --in-place --aggressive {} \;
+if [ -n "$PYTHON" ]; then
+  $PYTHON -m ruff format ./src/pylimer_tools ./examples ./tests 2>/dev/null || true
+  find ./src/pylimer_tools ./tests ./examples \( -name "*.py" -o -name "*.pyi" \) -exec $PYTHON -m autopep8 --in-place --aggressive {} + 2>/dev/null || true
+fi
