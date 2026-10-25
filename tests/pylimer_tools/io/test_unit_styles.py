@@ -121,11 +121,15 @@ class UnitStyleTest(unittest.TestCase):
 
         # Deep validation for a representative subset and all parameter
         # families.
-        sample_names = list(dict.fromkeys(
-            [polymer_names[0],
-             polymer_names[len(polymer_names) // 2],
-             polymer_names[-1]]
-        ))
+        sample_names = list(
+            dict.fromkeys(
+                [
+                    polymer_names[0],
+                    polymer_names[len(polymer_names) // 2],
+                    polymer_names[-1],
+                ]
+            )
+        )
 
         # test the Kremer-Grest/Lennard-Jones parameters
         for polymer_name in sample_names:

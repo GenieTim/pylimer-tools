@@ -2,6 +2,12 @@
 
 ## main
 
+- Performance: switch to divide-and-conquer `LAPACKE_dsyevd` in `NormalModeAnalyzer` when computing both eigenvalues and eigenvectors, significantly speeding up dense decomposition.
+- Feature: add GPU-accelerated dense eigenvalue calculation via cuSOLVER (`computeAllEigenvaluesGPU`) with fallback to CPU if compiled without CUDA.
+- Build system: add `USE_CUDA` CMake option and improve LAPACKE discovery on macOS (Homebrew OpenBLAS/LAPACK search paths).
+- Build system: reuse pre-built vendor packages (`nlopt`, `cereal`, `spectra`) when available to accelerate rebuilds.
+- Tests: add Catch2 benchmarks for `NormalModeAnalyzer` and configure CTest to skip benchmarks during standard test discovery.
+
 ## v0.3.16-v0.3.19
 
 - New attempts to fix webassembly deployment

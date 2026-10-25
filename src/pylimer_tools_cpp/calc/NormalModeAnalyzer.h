@@ -21,6 +21,8 @@ public:
 
   void computeAllEigenvalues(const bool includeEigenvectors = false);
 
+  void computeAllEigenvaluesGPU(const bool includeEigenvectors = false);
+
   Eigen::VectorXd getEigenvalues() const;
   void setEigenvalues(Eigen::VectorXd e);
 

@@ -135,6 +135,31 @@ if (LAPACK_FOUND)
             if (LAPACK_LINKER_FLAGS)
                 set(LAPACKE_LINKER_FLAGS "${LAPACK_LINKER_FLAGS}")
             endif ()
+
+            # Ensure LAPACKE_INCLUDE_DIRS actually contains lapacke.h
+            if (NOT LAPACKE_INCLUDE_DIRS OR NOT EXISTS "${LAPACKE_INCLUDE_DIRS}/lapacke.h")
+                unset(_lapacke_inc_hints)
+                foreach (_lib ${LAPACKE_LIBRARIES})
+                    if (EXISTS "${_lib}")
+                        get_filename_component(_lib_dir "${_lib}" PATH)
+                        list(APPEND _lapacke_inc_hints "${_lib_dir}/../include" "${_lib_dir}/../include/openblas" "${_lib_dir}")
+                    endif ()
+                endforeach ()
+                list(APPEND _lapacke_inc_hints
+                    /opt/homebrew/opt/openblas/include
+                    /opt/homebrew/opt/lapack/include
+                    /usr/local/opt/openblas/include
+                    /usr/local/opt/lapack/include
+                )
+                find_path(LAPACKE_lapacke.h_DIRS
+                    NAMES lapacke.h
+                    HINTS ${_lapacke_inc_hints}
+                    PATH_SUFFIXES include openblas)
+                if (LAPACKE_lapacke.h_DIRS)
+                    set(LAPACKE_INCLUDE_DIRS "${LAPACKE_lapacke.h_DIRS}")
+                    set(LAPACKE_INCLUDE_DIRS_DEP "${LAPACKE_lapacke.h_DIRS}")
+                endif ()
+            endif ()
         endif ()
     endif (NOT LAPACKE_STANDALONE)
 
@@ -200,7 +225,12 @@ if (LAPACK_FOUND)
                 set(LAPACKE_lapacke.h_DIRS "LAPACKE_lapacke.h_DIRS-NOTFOUND")
                 find_path(LAPACKE_lapacke.h_DIRS
                         NAMES lapacke.h
-                        HINTS ${_inc_env})
+                        HINTS ${_inc_env}
+                              /opt/homebrew/opt/openblas/include
+                              /opt/homebrew/opt/lapack/include
+                              /usr/local/opt/openblas/include
+                              /usr/local/opt/lapack/include
+                        PATH_SUFFIXES "include" "include/lapacke" "openblas")
             endif ()
         endif ()
         mark_as_advanced(LAPACKE_lapacke.h_DIRS)
@@ -248,14 +278,14 @@ if (LAPACK_FOUND)
         # ----------------------------------------------
 
         # name of the lapacke library
-        set(LAPACKE_lapacke_NAMES "lapacke")
+        set(LAPACKE_lapacke_NAMES "openblas" "lapacke")
         if (LAPACKE_STATIC)
             if (WIN32)
-                set(LAPACKE_lapacke_NAMES "liblapacke.lib")
+                set(LAPACKE_lapacke_NAMES "openblas.lib" "libopenblas.lib" "liblapacke.lib")
             endif ()
 
             if (UNIX)
-                set(LAPACKE_lapacke_NAMES "liblapacke.a")
+                set(LAPACKE_lapacke_NAMES "libopenblas.a" "liblapacke.a")
             endif ()
         endif ()
 
@@ -276,7 +306,11 @@ if (LAPACK_FOUND)
                 set(LAPACKE_lapacke_LIBRARY "LAPACKE_lapacke_LIBRARY-NOTFOUND")
                 find_library(LAPACKE_lapacke_LIBRARY
                         NAMES ${LAPACKE_lapacke_NAMES}
-                        HINTS ${_lib_env})
+                        HINTS ${_lib_env}
+                              /opt/homebrew/opt/openblas/lib
+                              /opt/homebrew/opt/lapack/lib
+                              /usr/local/opt/openblas/lib
+                              /usr/local/opt/lapack/lib)
             endif ()
         endif ()
         mark_as_advanced(LAPACKE_lapacke_LIBRARY)
@@ -418,4 +452,5 @@ mark_as_advanced(LAPACKE_DIR_FOUND)
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(LAPACKE DEFAULT_MSG
         LAPACKE_LIBRARIES
+        LAPACKE_INCLUDE_DIRS
         LAPACKE_WORKS)

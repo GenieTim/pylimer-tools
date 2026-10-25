@@ -141,6 +141,15 @@ endif ()
 # Optional features and dependencies
 # ==============================================================================
 
+option(USE_CUDA "Enable CUDA acceleration (cuSOLVER)" OFF)
+
+if (USE_CUDA)
+    find_package(CUDAToolkit REQUIRED)
+    target_link_libraries(pylimer_tools PUBLIC CUDA::cusolver CUDA::cudart)
+    target_compile_definitions(pylimer_tools PUBLIC USE_CUDA)
+    message(STATUS "CUDA acceleration enabled")
+endif()
+
 # Code coverage option
 if (NOT DEFINED CODE_COVERAGE)
     option(CODE_COVERAGE "Collect coverage from test library" OFF)

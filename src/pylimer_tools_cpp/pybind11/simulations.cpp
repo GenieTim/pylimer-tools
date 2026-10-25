@@ -371,7 +371,7 @@ A strand is a chain of connected links between two crosslinks.
       [](const mehp::MEHPForceEvaluator& self,
          const size_t n,
          const Eigen::VectorXd& springDistances,
-         bool compute_gradient) {
+         bool compute_gradient) -> py::tuple {
         std::vector<double> grad_vec;
         double* grad = nullptr;
 

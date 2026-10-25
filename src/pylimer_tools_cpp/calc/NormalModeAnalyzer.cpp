@@ -16,6 +16,11 @@
 #define lapack_complex_double std::complex<double>
 #endif
 
+#ifdef USE_CUDA
+#include <cuda_runtime.h>
+#include <cusolverDn.h>
+#endif
+
 #define NORMAL_MODE_ZERO_TOLERANCE 1e-12
 
 namespace pylimer_tools::calc {
@@ -121,45 +126,181 @@ NormalModeAnalyzer::computeAllEigenvalues(const bool includeEigenvectors)
 #else
   // see also/alternative: igraph_lapack_dsyevr()
   Eigen::VectorXd eigenvaluesMemory = Eigen::VectorXd::Zero(nRows);
+  lapack_int size = static_cast<lapack_int>(nRows);
+
+  if (includeEigenvectors) {
+    // For all eigenvalues and eigenvectors of a dense symmetric matrix,
+    // LAPACKE_dsyevd (divide-and-conquer) is significantly faster than DSYEVR/DSYEV
+    // and parallelizes Level-3 BLAS operations efficiently.
+    // In DSYEVD with JOBZ='V', the input matrix A is overwritten with the orthonormal eigenvectors.
+    int info = LAPACKE_dsyevd(Eigen::MatrixXd::IsRowMajor
+                                ? LAPACK_ROW_MAJOR
+                                : LAPACK_COL_MAJOR,
+                              'V',
+                              'U',
+                              size,
+                              assembledConnectivityMatrixDense.data(),
+                              size,
+                              eigenvaluesMemory.data());
+
+    RUNTIME_EXP_IFN(info == 0,
+                    "Error in LAPACKE_dsyevd. Exit code " + std::to_string(info) +
+                      ".");
+    this->setEigenvalues(eigenvaluesMemory);
+    this->setEigenvectors(assembledConnectivityMatrixDense);
+  } else {
+    Eigen::MatrixXd dummyZ = Eigen::MatrixXd::Zero(nRows, 1);
+    lapack_int ldz = 1;
+    lapack_int il = 0;
+    lapack_int iu = 0;
+    double abstol = 1e-10;
+    lapack_int M = 0;
+    Eigen::Vector<lapack_int, Eigen::Dynamic> support =
+      Eigen::Vector<lapack_int, Eigen::Dynamic>::Zero(nRows * 2);
+
+    int info = LAPACKE_dsyevr(Eigen::MatrixXd::IsRowMajor
+                                ? LAPACK_ROW_MAJOR
+                                : LAPACK_COL_MAJOR,            // matrix_order
+                              'N',                             // JOBZ
+                              'A',                             // RANGE
+                              'U',                             // UPLO
+                              size,                            // N
+                              assembledConnectivityMatrixDense.data(), // A
+                              size,                                    // LDA
+                              0,                                       // VL
+                              0,                                       // VU
+                              il,                                      // IL
+                              iu,                                      // IU
+                              abstol,                                  // ABSTOL
+                              &M, // M, total number of eigenvalues found
+                              eigenvaluesMemory.data(),  // W
+                              dummyZ.data(),             // Z
+                              ldz,                       // LDZ
+                              support.data()             // ISUPPZ
+    );
+
+    RUNTIME_EXP_IFN(info == 0,
+                    "Error in LAPACK_dsyevr. Exit code " + std::to_string(info) +
+                      ".");
+    this->setEigenvalues(eigenvaluesMemory);
+  }
+#endif
+}
+
+void
+NormalModeAnalyzer::computeAllEigenvaluesGPU(const bool includeEigenvectors)
+{
+  RUNTIME_EXP_IFN(this->assembledConnectivityMatrix.rows() ==
+                    this->assembledConnectivityMatrix.cols(),
+                  "Expected square matrix");
+
+  Eigen::Index nRows = this->assembledConnectivityMatrix.rows();
+  if (nRows == 0) {
+    return;
+  }
+
+#ifdef USE_CUDA
+  Eigen::MatrixXd assembledConnectivityMatrixDense =
+    Eigen::MatrixXd(this->assembledConnectivityMatrix);
+
+  cusolverDnHandle_t cusolverH = nullptr;
+  cusolverStatus_t cusolver_status = cusolverDnCreate(&cusolverH);
+  RUNTIME_EXP_IFN(cusolver_status == CUSOLVER_STATUS_SUCCESS,
+                  "cuSOLVER initialization failed");
+
+  double* d_A = nullptr;
+  double* d_W = nullptr;
+  int* d_info = nullptr;
+
+  cudaError_t cuda_stat =
+    cudaMalloc((void**)&d_A, sizeof(double) * nRows * nRows);
+  RUNTIME_EXP_IFN(cuda_stat == cudaSuccess, "cudaMalloc failed for d_A");
+  cuda_stat = cudaMalloc((void**)&d_W, sizeof(double) * nRows);
+  RUNTIME_EXP_IFN(cuda_stat == cudaSuccess, "cudaMalloc failed for d_W");
+  cuda_stat = cudaMalloc((void**)&d_info, sizeof(int));
+  RUNTIME_EXP_IFN(cuda_stat == cudaSuccess, "cudaMalloc failed for d_info");
+
+  cuda_stat = cudaMemcpy(d_A,
+                         assembledConnectivityMatrixDense.data(),
+                         sizeof(double) * nRows * nRows,
+                         cudaMemcpyHostToDevice);
+  RUNTIME_EXP_IFN(cuda_stat == cudaSuccess, "cudaMemcpy failed to device");
+
+  int lwork = 0;
+  cusolver_status = cusolverDnDsyevd_bufferSize(
+    cusolverH,
+    CUSOLVER_EIG_MODE_VECTOR, // ALWAYS ask for vector size to be safe
+    CUBLAS_FILL_MODE_LOWER,
+    nRows,
+    d_A,
+    nRows,
+    d_W,
+    &lwork);
+  RUNTIME_EXP_IFN(cusolver_status == CUSOLVER_STATUS_SUCCESS,
+                  "cuSOLVER buffer size calculation failed");
+
+  double* d_work = nullptr;
+  cuda_stat = cudaMalloc((void**)&d_work, sizeof(double) * lwork);
+  RUNTIME_EXP_IFN(cuda_stat == cudaSuccess, "cudaMalloc failed for d_work");
+
+  cusolver_status = cusolverDnDsyevd(
+    cusolverH,
+    includeEigenvectors ? CUSOLVER_EIG_MODE_VECTOR : CUSOLVER_EIG_MODE_NOVECTOR,
+    CUBLAS_FILL_MODE_LOWER,
+    nRows,
+    d_A,
+    nRows,
+    d_W,
+    d_work,
+    lwork,
+    d_info);
+  RUNTIME_EXP_IFN(cusolver_status == CUSOLVER_STATUS_SUCCESS,
+                  "cuSOLVER dsyevd failed");
+
+  cuda_stat = cudaDeviceSynchronize();
+  RUNTIME_EXP_IFN(cuda_stat == cudaSuccess, "cudaDeviceSynchronize failed");
+
+  Eigen::VectorXd eigenvaluesMemory = Eigen::VectorXd::Zero(nRows);
   Eigen::MatrixXd eigenvectorsMemory = includeEigenvectors
                                          ? Eigen::MatrixXd::Zero(nRows, nRows)
                                          : Eigen::MatrixXd::Zero(nRows, 3);
-  lapack_int ldz = static_cast<lapack_int>(eigenvectorsMemory.cols());
-  lapack_int il = 0;
-  lapack_int iu = 0;
-  double abstol = 1e-10;
-  lapack_int M = 0;
-  lapack_int size = static_cast<lapack_int>(nRows);
 
-  Eigen::Vector<lapack_int, Eigen::Dynamic> support =
-    Eigen::Vector<lapack_int, Eigen::Dynamic>::Zero(nRows * 2);
+  cuda_stat = cudaMemcpy(eigenvaluesMemory.data(),
+                         d_W,
+                         sizeof(double) * nRows,
+                         cudaMemcpyDeviceToHost);
+  RUNTIME_EXP_IFN(cuda_stat == cudaSuccess,
+                  "cudaMemcpy failed to host (eigenvalues)");
 
-  int info = LAPACKE_dsyevr(Eigen::MatrixXd::IsRowMajor
-                              ? LAPACK_ROW_MAJOR
-                              : LAPACK_COL_MAJOR,            // matrix_order
-                            includeEigenvectors ? 'V' : 'N', // JOBZ
-                            'A',                             // RANGE
-                            'U',                             // UPLO
-                            size,                            // N
-                            assembledConnectivityMatrixDense.data(), // A
-                            size,                                    // LDA
-                            0,                                       // VL
-                            0,                                       // VU
-                            il,                                      // IL
-                            iu,                                      // IU
-                            abstol,                                  // ABSTOL
-                            &M, // M, total number of eigenvalues found
-                            eigenvaluesMemory.data(),  // W
-                            eigenvectorsMemory.data(), // Z
-                            ldz,                       // LDZ
-                            support.data()             // ISUPPZ
-  );
+  if (includeEigenvectors) {
+    cuda_stat = cudaMemcpy(eigenvectorsMemory.data(),
+                           d_A,
+                           sizeof(double) * nRows * nRows,
+                           cudaMemcpyDeviceToHost);
+    RUNTIME_EXP_IFN(cuda_stat == cudaSuccess,
+                    "cudaMemcpy failed to host (eigenvectors)");
+  }
 
-  RUNTIME_EXP_IFN(info == 0,
-                  "Error in LAPACK_dsyevr. Exit code " + std::to_string(info) +
-                    ".");
+  int info = 0;
+  cuda_stat = cudaMemcpy(&info, d_info, sizeof(int), cudaMemcpyDeviceToHost);
+  RUNTIME_EXP_IFN(
+    info == 0, "cuSOLVER dsyevd info return non-zero: " + std::to_string(info));
+
+  cudaFree(d_work);
+  cudaFree(d_info);
+  cudaFree(d_W);
+  cudaFree(d_A);
+  cusolverDnDestroy(cusolverH);
+
   this->setEigenvalues(eigenvaluesMemory);
-  this->setEigenvectors(eigenvectorsMemory);
+  if (includeEigenvectors) {
+    this->setEigenvectors(eigenvectorsMemory);
+  }
+#else
+  std::cerr << "GPU computation requested but neither USE_CUDA nor USE_METAL "
+               "was defined. Falling back to CPU..."
+            << std::endl;
+  this->computeAllEigenvalues(includeEigenvectors);
 #endif
 }
 

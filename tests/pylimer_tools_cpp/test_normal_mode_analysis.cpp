@@ -1,5 +1,6 @@
 #include "../../src/pylimer_tools_cpp/calc/NormalModeAnalyzer.h"
 
+#include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
@@ -97,4 +98,32 @@ TEST_CASE("NormalModeAnalyzer can compute some eigenvalues",
   CHECK(eigenvalues.size() == 1);
 
   CHECK_THAT(eigenvalues[0], Catch::Matchers::WithinAbs(0., 1e-10));
+}
+
+TEST_CASE("NormalModeAnalyzer benchmark", "[!benchmark][NormalModeAnalyzer]")
+{
+  std::vector<size_t> springFrom;
+  std::vector<size_t> springTo;
+  size_t n = 1000;
+  for (size_t i = 0; i < n; ++i) {
+    springFrom.push_back(i);
+    springTo.push_back((i + 1) % n);
+    size_t cross = (i * 37 + 17) % n;
+    if (cross != i) {
+      springFrom.push_back(i);
+      springTo.push_back(cross);
+    }
+  }
+
+  BENCHMARK("computeAllEigenvalues (eigenvalues only)") {
+    pc::NormalModeAnalyzer nma(springFrom, springTo);
+    nma.computeAllEigenvalues(false);
+    return nma.getEigenvalues().size();
+  };
+
+  BENCHMARK("computeAllEigenvalues (with eigenvectors)") {
+    pc::NormalModeAnalyzer nma(springFrom, springTo);
+    nma.computeAllEigenvalues(true);
+    return nma.getEigenvalues().size();
+  };
 }

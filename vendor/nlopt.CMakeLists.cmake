@@ -25,16 +25,21 @@ if (NOT DEFINED nlopt_LOADED)
             set(nlopt_BUILD_TYPE "Debug")
         endif ()
 
-        ExternalProject_Add(
-                nloptLib
-                GIT_REPOSITORY https://github.com/stevengj/nlopt
-                GIT_TAG 9e44e525370646def8152e73bb5c53a6531f6f7e # 2.10.1
-                PREFIX ${nlopt_PREFIX_PATH}
-                INSTALL_DIR ${nlopt_PREFIX_PATH}/nloptLib-install
-                CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${nlopt_PREFIX_PATH}/nloptLib-install -DINSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DCMAKE_INSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DNLOPT_GUILE=OFF -DNLOPT_OCTAVE=OFF -DNLOPT_MATLAB=OFF -DNLOPT_SWIG=OFF -DNLOPT_PYTHON=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=${nlopt_BUILD_TYPE}
-                BUILD_COMMAND ${CMAKE_COMMAND} --build ${nlopt_PREFIX_PATH}/src/nloptLib-build --config ${nlopt_BUILD_TYPE}
-                BUILD_BYPRODUCTS ${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt${LIBRARY_SUFFIX}
-        )
+        if (EXISTS "${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt${LIBRARY_SUFFIX}")
+            add_custom_target(nloptLib)
+        else ()
+            ExternalProject_Add(
+                    nloptLib
+                    GIT_REPOSITORY https://github.com/stevengj/nlopt
+                    GIT_TAG 9e44e525370646def8152e73bb5c53a6531f6f7e # 2.10.1
+                    UPDATE_COMMAND ""
+                    PREFIX ${nlopt_PREFIX_PATH}
+                    INSTALL_DIR ${nlopt_PREFIX_PATH}/nloptLib-install
+                    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${nlopt_PREFIX_PATH}/nloptLib-install -DINSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DCMAKE_INSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DNLOPT_GUILE=OFF -DNLOPT_OCTAVE=OFF -DNLOPT_MATLAB=OFF -DNLOPT_SWIG=OFF -DNLOPT_PYTHON=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=${nlopt_BUILD_TYPE}
+                    BUILD_COMMAND ${CMAKE_COMMAND} --build ${nlopt_PREFIX_PATH}/src/nloptLib-build --config ${nlopt_BUILD_TYPE}
+                    BUILD_BYPRODUCTS ${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt${LIBRARY_SUFFIX}
+            )
+        endif ()
         # FetchContent_MakeAvailable(nloptLib)
         add_library(nlopt STATIC IMPORTED)
         add_dependencies(nlopt nloptLib)

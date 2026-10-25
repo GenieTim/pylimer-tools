@@ -79,6 +79,17 @@ init_pylimer_bound_calc(py::module_& m)
          :return: True if computation was successful
          )pbdoc",
          py::arg("compute_eigenvectors") = false)
+#ifdef USE_CUDA
+    .def("find_all_eigenvalues_gpu",
+         &NormalModeAnalyzer::computeAllEigenvaluesGPU,
+         R"pbdoc(
+         Find all eigenvalues using a dense GPU solver (cuSOLVER on CUDA).
+         
+         :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
+         :return: True if computation was successful
+         )pbdoc",
+         py::arg("compute_eigenvectors") = false)
+#endif
     .def("get_eigenvalues",
          &NormalModeAnalyzer::getEigenvalues,
          R"pbdoc(

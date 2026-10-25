@@ -153,6 +153,7 @@ include(CTest)
 include(Catch)
 catch_discover_tests(pylimer_tests
         TEST_SPEC "~[long]"
+        EXTRA_ARGS --skip-benchmarks
 )
 
 # code coverage setup in the end

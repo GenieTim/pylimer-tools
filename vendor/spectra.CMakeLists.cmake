@@ -2,6 +2,10 @@
 include(FetchContent)
 message(STATUS "Using FetchContent to load Spectra")
 
+if (NOT DEFINED FETCHCONTENT_SOURCE_DIR_SPECTRA AND EXISTS "${CMAKE_CURRENT_LIST_DIR}/../tests/build/_deps/spectra-src")
+    set(FETCHCONTENT_SOURCE_DIR_SPECTRA "${CMAKE_CURRENT_LIST_DIR}/../tests/build/_deps/spectra-src")
+endif ()
+
 FetchContent_Declare(
         Spectra
         GIT_REPOSITORY https://github.com/yixuan/spectra.git
