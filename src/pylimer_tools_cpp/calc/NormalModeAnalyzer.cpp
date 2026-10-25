@@ -130,12 +130,12 @@ NormalModeAnalyzer::computeAllEigenvalues(const bool includeEigenvectors)
 
   if (includeEigenvectors) {
     // For all eigenvalues and eigenvectors of a dense symmetric matrix,
-    // LAPACKE_dsyevd (divide-and-conquer) is significantly faster than DSYEVR/DSYEV
-    // and parallelizes Level-3 BLAS operations efficiently.
-    // In DSYEVD with JOBZ='V', the input matrix A is overwritten with the orthonormal eigenvectors.
-    int info = LAPACKE_dsyevd(Eigen::MatrixXd::IsRowMajor
-                                ? LAPACK_ROW_MAJOR
-                                : LAPACK_COL_MAJOR,
+    // LAPACKE_dsyevd (divide-and-conquer) is significantly faster than
+    // DSYEVR/DSYEV and parallelizes Level-3 BLAS operations efficiently. In
+    // DSYEVD with JOBZ='V', the input matrix A is overwritten with the
+    // orthonormal eigenvectors.
+    int info = LAPACKE_dsyevd(Eigen::MatrixXd::IsRowMajor ? LAPACK_ROW_MAJOR
+                                                          : LAPACK_COL_MAJOR,
                               'V',
                               'U',
                               size,
@@ -144,8 +144,8 @@ NormalModeAnalyzer::computeAllEigenvalues(const bool includeEigenvectors)
                               eigenvaluesMemory.data());
 
     RUNTIME_EXP_IFN(info == 0,
-                    "Error in LAPACKE_dsyevd. Exit code " + std::to_string(info) +
-                      ".");
+                    "Error in LAPACKE_dsyevd. Exit code " +
+                      std::to_string(info) + ".");
     this->setEigenvalues(eigenvaluesMemory);
     this->setEigenvectors(assembledConnectivityMatrixDense);
   } else {
@@ -160,11 +160,11 @@ NormalModeAnalyzer::computeAllEigenvalues(const bool includeEigenvectors)
 
     int info = LAPACKE_dsyevr(Eigen::MatrixXd::IsRowMajor
                                 ? LAPACK_ROW_MAJOR
-                                : LAPACK_COL_MAJOR,            // matrix_order
-                              'N',                             // JOBZ
-                              'A',                             // RANGE
-                              'U',                             // UPLO
-                              size,                            // N
+                                : LAPACK_COL_MAJOR, // matrix_order
+                              'N',                  // JOBZ
+                              'A',                  // RANGE
+                              'U',                  // UPLO
+                              size,                 // N
                               assembledConnectivityMatrixDense.data(), // A
                               size,                                    // LDA
                               0,                                       // VL
@@ -173,15 +173,15 @@ NormalModeAnalyzer::computeAllEigenvalues(const bool includeEigenvectors)
                               iu,                                      // IU
                               abstol,                                  // ABSTOL
                               &M, // M, total number of eigenvalues found
-                              eigenvaluesMemory.data(),  // W
-                              dummyZ.data(),             // Z
-                              ldz,                       // LDZ
-                              support.data()             // ISUPPZ
+                              eigenvaluesMemory.data(), // W
+                              dummyZ.data(),            // Z
+                              ldz,                      // LDZ
+                              support.data()            // ISUPPZ
     );
 
     RUNTIME_EXP_IFN(info == 0,
-                    "Error in LAPACK_dsyevr. Exit code " + std::to_string(info) +
-                      ".");
+                    "Error in LAPACK_dsyevr. Exit code " +
+                      std::to_string(info) + ".");
     this->setEigenvalues(eigenvaluesMemory);
   }
 #endif

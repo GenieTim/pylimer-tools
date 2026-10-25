@@ -115,13 +115,15 @@ TEST_CASE("NormalModeAnalyzer benchmark", "[!benchmark][NormalModeAnalyzer]")
     }
   }
 
-  BENCHMARK("computeAllEigenvalues (eigenvalues only)") {
+  BENCHMARK("computeAllEigenvalues (eigenvalues only)")
+  {
     pc::NormalModeAnalyzer nma(springFrom, springTo);
     nma.computeAllEigenvalues(false);
     return nma.getEigenvalues().size();
   };
 
-  BENCHMARK("computeAllEigenvalues (with eigenvectors)") {
+  BENCHMARK("computeAllEigenvalues (with eigenvectors)")
+  {
     pc::NormalModeAnalyzer nma(springFrom, springTo);
     nma.computeAllEigenvalues(true);
     return nma.getEigenvalues().size();
