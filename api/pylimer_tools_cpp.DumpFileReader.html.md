@@ -1,6 +1,6 @@
 # DumpFileReader
 
-### *class* pylimer_tools_cpp.DumpFileReader(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), path_of_file_to_read: [str](https://docs.python.org/3/library/stdtypes.html#str))
+### *class* pylimer_tools_cpp.DumpFileReader(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), path_of_file_to_read: [str](https://docs.python.org/3/builtins/stdtypes.html#str))
 
 Bases: `pybind11_object`
 
@@ -13,25 +13,25 @@ Initialize the dump file reader.
 
 ### Methods Summary
 
-| [`get_length`](#pylimer_tools_cpp.DumpFileReader.get_length)(self)                                              | Get the number of sections (time-steps) in the file.                                                     |
-|-----------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| [`get_length`](#pylimer_tools_cpp.DumpFileReader.get_length)(self)                               | Get the number of sections (time-steps) in the file.                                                     |
+|-------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
 | [`get_numeric_values_for_at`](#pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at)(self, rowIndex, ...) | Get numeric values for the section at index, the main header headerKey and the column columnIndex.       |
-| [`get_string_values_for_at`](#pylimer_tools_cpp.DumpFileReader.get_string_values_for_at)(self, rowIndex, ...)   | Get string values for the section at index, the main header headerKey and the column columnIndex.        |
-| [`has_key`](#pylimer_tools_cpp.DumpFileReader.has_key)(self, headerKey)                                         | Check whether the first section has the header specified.                                                |
-| [`key_has_column`](#pylimer_tools_cpp.DumpFileReader.key_has_column)(self, headerKey, columnName)               | Check whether the header of the first section has the specified column.                                  |
-| [`key_has_directional_column`](#pylimer_tools_cpp.DumpFileReader.key_has_directional_column)(self, header_key)  | Check whether the header of the first section has all the three columns {dir_prefix}{x|y|z}{dir_suffix}. |
-| [`read`](#pylimer_tools_cpp.DumpFileReader.read)(self)                                                          | Read the whole file.                                                                                     |
+| [`get_string_values_for_at`](#pylimer_tools_cpp.DumpFileReader.get_string_values_for_at)(self, rowIndex, ...)  | Get string values for the section at index, the main header headerKey and the column columnIndex.        |
+| [`has_key`](#pylimer_tools_cpp.DumpFileReader.has_key)(self, headerKey)                       | Check whether the first section has the header specified.                                                |
+| [`key_has_column`](#pylimer_tools_cpp.DumpFileReader.key_has_column)(self, headerKey, columnName)    | Check whether the header of the first section has the specified column.                                  |
+| [`key_has_directional_column`](#pylimer_tools_cpp.DumpFileReader.key_has_directional_column)(self, header_key)   | Check whether the header of the first section has all the three columns {dir_prefix}{x|y|z}{dir_suffix}. |
+| [`read`](#pylimer_tools_cpp.DumpFileReader.read)(self)                                     | Read the whole file.                                                                                     |
 
 ### Methods Documentation
 
-#### get_length(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader)) → [int](https://docs.python.org/3/library/functions.html#int)
+#### get_length(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the number of sections (time-steps) in the file.
 
 * **Returns:**
   Number of timesteps/sections in the dump file
 
-#### get_numeric_values_for_at(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), rowIndex: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), headerKey: [str](https://docs.python.org/3/library/stdtypes.html#str), columnIndex: [str](https://docs.python.org/3/library/stdtypes.html#str)) → [list](https://docs.python.org/3/library/stdtypes.html#list)[[float](https://docs.python.org/3/library/functions.html#float)]
+#### get_numeric_values_for_at(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), rowIndex: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), headerKey: [str](https://docs.python.org/3/builtins/stdtypes.html#str), columnIndex: [str](https://docs.python.org/3/builtins/stdtypes.html#str)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
 
 Get numeric values for the section at index, the main header headerKey and the column columnIndex.
 
@@ -42,7 +42,7 @@ Get numeric values for the section at index, the main header headerKey and the c
 * **Returns:**
   Vector of numeric values for the specified location
 
-#### get_string_values_for_at(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), rowIndex: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), headerKey: [str](https://docs.python.org/3/library/stdtypes.html#str), columnIndex: [str](https://docs.python.org/3/library/stdtypes.html#str)) → [list](https://docs.python.org/3/library/stdtypes.html#list)[[str](https://docs.python.org/3/library/stdtypes.html#str)]
+#### get_string_values_for_at(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), rowIndex: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), headerKey: [str](https://docs.python.org/3/builtins/stdtypes.html#str), columnIndex: [str](https://docs.python.org/3/builtins/stdtypes.html#str)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 Get string values for the section at index, the main header headerKey and the column columnIndex.
 
@@ -53,7 +53,7 @@ Get string values for the section at index, the main header headerKey and the co
 * **Returns:**
   Vector of string values for the specified location
 
-#### has_key(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), headerKey: [str](https://docs.python.org/3/library/stdtypes.html#str)) → [bool](https://docs.python.org/3/library/functions.html#bool)
+#### has_key(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), headerKey: [str](https://docs.python.org/3/builtins/stdtypes.html#str)) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
 
 Check whether the first section has the header specified.
 
@@ -62,7 +62,7 @@ Check whether the first section has the header specified.
 * **Returns:**
   True if the header exists in the first section
 
-#### key_has_column(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), headerKey: [str](https://docs.python.org/3/library/stdtypes.html#str), columnName: [str](https://docs.python.org/3/library/stdtypes.html#str)) → [bool](https://docs.python.org/3/library/functions.html#bool)
+#### key_has_column(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), headerKey: [str](https://docs.python.org/3/builtins/stdtypes.html#str), columnName: [str](https://docs.python.org/3/builtins/stdtypes.html#str)) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
 
 Check whether the header of the first section has the specified column.
 
@@ -72,7 +72,7 @@ Check whether the header of the first section has the specified column.
 * **Returns:**
   True if the column exists in the specified header
 
-#### key_has_directional_column(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), header_key: [str](https://docs.python.org/3/library/stdtypes.html#str), dir_prefix: [str](https://docs.python.org/3/library/stdtypes.html#str) = '', dir_suffix: [str](https://docs.python.org/3/library/stdtypes.html#str) = '') → [bool](https://docs.python.org/3/library/functions.html#bool)
+#### key_has_directional_column(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), header_key: [str](https://docs.python.org/3/builtins/stdtypes.html#str), dir_prefix: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '', dir_suffix: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '') → [bool](https://docs.python.org/3/builtins/functions.html#bool)
 
 Check whether the header of the first section has all the three columns {dir_prefix}{x|y|z}{dir_suffix}.
 
@@ -83,6 +83,6 @@ Check whether the header of the first section has all the three columns {dir_pre
 * **Returns:**
   True if all three directional columns (x, y, z) exist
 
-#### read(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader)) → [None](https://docs.python.org/3/library/constants.html#None)
+#### read(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Read the whole file.

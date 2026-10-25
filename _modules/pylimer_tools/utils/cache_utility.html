@@ -4,13 +4,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>pylimer_tools.utils.cache_utility - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -379,17 +379,17 @@
 <div class="viewcode-block" id="do_cache">
 <a class="viewcode-back" href="../../../pylimer_tools.utils.html#pylimer_tools.utils.cache_utility.do_cache">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">do_cache</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Store the object in the cache.</span>
 
 <span class="sd">    :param obj: The object to cache.</span>
-<span class="sd">    :param file: A part of what&#39;s used for the cache&#39;s name. Ideally the file that is read,</span>
+<span class="sd">    :param file: A part of what's used for the cache's name. Ideally the file that is read,</span>
 <span class="sd">        such that the filemtime of `file` can be used to check whether cache must be generated anew.</span>
-<span class="sd">    :param suffix: The file name&#39;s suffix.</span>
+<span class="sd">    :param suffix: The file name's suffix.</span>
 <span class="sd">    :param tmp_dir: The directory to store the cache in.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">cache_file_name</span> <span class="o">=</span> <span class="n">get_cache_file_name</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file_name</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cache_file</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file_name</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">cache_file</span><span class="p">:</span>
         <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">cache_file</span><span class="p">)</span></div>
 
 
@@ -403,20 +403,20 @@
     <span class="n">tmp_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">anyway</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Load an object from cache, iff the cache is new enough.</span>
 
-<span class="sd">    :param file: A part of what&#39;s used for the cache&#39;s name. Ideally the file that is read,</span>
+<span class="sd">    :param file: A part of what's used for the cache's name. Ideally the file that is read,</span>
 <span class="sd">        such that the filemtime of `file` can be used to check whether cache must be generated anew.</span>
-<span class="sd">    :param suffix: The file name&#39;s suffix.</span>
+<span class="sd">    :param suffix: The file name's suffix.</span>
 <span class="sd">    :param disable_warnings: Whether to disable warnings about missing possibilities to check for filemtime.</span>
 <span class="sd">    :param tmp_dir: The directory to load the cache from.</span>
-<span class="sd">    :param anyway: Whether to ignore the cache&#39;s modification time, and return the cached data anyway,</span>
+<span class="sd">    :param anyway: Whether to ignore the cache's modification time, and return the cached data anyway,</span>
 <span class="sd">        as if it were current.</span>
 <span class="sd">    :return: Either the content of the cache, or None if the cache has to be loaded again / is non existent.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="s2">""</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">file</span> <span class="o">=</span> <span class="p">[</span><span class="n">file</span><span class="p">]</span>
     <span class="n">cache_file_name</span> <span class="o">=</span> <span class="n">get_cache_file_name</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">)</span>
@@ -429,29 +429,29 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">file</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">disable_warnings</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;Cache called for non-existent file. Make sure the key is time-restricted&quot;</span>
+                    <span class="s2">"Cache called for non-existent file. Make sure the key is time-restricted"</span>
                 <span class="p">)</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file_name</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cache_file</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file_name</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">cache_file</span><span class="p">:</span>
                 <span class="n">to_return</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cache_file</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">to_return</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">anyway</span> <span class="ow">or</span> <span class="n">is_current_cache</span><span class="p">(</span><span class="n">cache_file_name</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file_name</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cache_file</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file_name</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">cache_file</span><span class="p">:</span>
                         <span class="n">to_return</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cache_file</span><span class="p">)</span>
                     <span class="k">return</span> <span class="n">to_return</span>
                 <span class="k">except</span> <span class="n">pickle</span><span class="o">.</span><span class="n">UnpicklingError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                        <span class="s2">&quot;Unpickling of cache file </span><span class="si">{}</span><span class="s2"> failed: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="s2">"Unpickling of cache file </span><span class="si">{}</span><span class="s2"> failed: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                             <span class="n">file</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
                     <span class="p">)</span>
                 <span class="k">except</span> <span class="ne">ModuleNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                        <span class="s2">&quot;Unpickling of cache file </span><span class="si">{}</span><span class="s2"> failed: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="s2">"Unpickling of cache file </span><span class="si">{}</span><span class="s2"> failed: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                             <span class="n">file</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
                     <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># print(&quot;Dump cache file is elder than dump. Reloading...&quot;)</span>
+                <span class="c1"># print("Dump cache file is elder than dump. Reloading...")</span>
                 <span class="k">pass</span>
 
     <span class="k">return</span> <span class="kc">None</span></div>
@@ -466,21 +466,21 @@
     <span class="n">tmp_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">old</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the name and path of a cache file. Internal method.</span>
 
-<span class="sd">    :param file: A part of what&#39;s used for the cache&#39;s name. Ideally the file that is read,</span>
+<span class="sd">    :param file: A part of what's used for the cache's name. Ideally the file that is read,</span>
 <span class="sd">        such that the filemtime of `file` can be used to check whether cache must be generated anew.</span>
-<span class="sd">    :param suffix: The file name&#39;s suffix.</span>
+<span class="sd">    :param suffix: The file name's suffix.</span>
 <span class="sd">    :param tmp_dir: The temporary directory.</span>
 <span class="sd">    :param old: Whether to use the old file naming scheme.</span>
 <span class="sd">    :return: The path to the cache file.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">old</span> <span class="k">else</span> <span class="n">file</span><span class="p">)</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">old</span> <span class="k">else</span> <span class="n">file</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">cache_file_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">.pickle&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">cache_file_name</span> <span class="o">=</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">.pickle"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">tmp_dir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">tmp_dir</span><span class="p">,</span>
         <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">(),</span>
         <span class="n">suffix</span><span class="p">,</span>
@@ -492,13 +492,13 @@
 <div class="viewcode-block" id="is_current_cache">
 <a class="viewcode-back" href="../../../pylimer_tools.utils.html#pylimer_tools.utils.cache_utility.is_current_cache">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">is_current_cache</span><span class="p">(</span><span class="n">cache_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dependencies</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Determine whether the provided file is newer than all its dependencies.</span>
 
 <span class="sd">    :param cache_file: The cache file that is required to be newer.</span>
 <span class="sd">    :param dependencies: The list of files (or a single file path) that need to be older.</span>
 <span class="sd">    :return: True if the file is newer than all its dependencies, False otherwise.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_file</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dependencies</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>

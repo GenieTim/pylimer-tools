@@ -2,7 +2,7 @@
 
 # Computation times
 
-**09:06.771** total execution time for 1 file **from auto_examples/trajectory_analysis**:
+**09:03.617** total execution time for 1 file **from auto_examples/trajectory_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -17,6 +17,6 @@ $(document).ready( function () {
 } );
 </script>
 
-| Example                                                                                                                                                   | Time      |   Mem (MB) |
-|-----------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Trajectory Analysis](plot_trajectory_analysis.md#sphx-glr-auto-examples-trajectory-analysis-plot-trajectory-analysis-py) (`plot_trajectory_analysis.py`) | 09:06.771 |          0 |
+| Example                                                                                                                                                                   | Time      |   Mem (MB) |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
+| [Trajectory Analysis](plot_trajectory_analysis.html.md#sphx-glr-auto-examples-trajectory-analysis-plot-trajectory-analysis-py) (`plot_trajectory_analysis.py`) | 09:03.617 |          0 |

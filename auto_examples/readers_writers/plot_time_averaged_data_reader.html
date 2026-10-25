@@ -20,15 +20,17 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="pylimer-tools" />
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
-<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Convert for Bond Swapping" href="plot_convert_for_bond_swapping.html"><link rel="prev" title="Dump File Reader" href="plot_dump_file_reader.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+<link rel="alternate" type="text/markdown" href="plot_time_averaged_data_reader.html.md">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Convert for Bond Swapping" href="plot_convert_for_bond_swapping.html"><link rel="prev" title="Dump File Reader" href="plot_dump_file_reader.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>Time-Averaged Data Reader - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -417,44 +419,43 @@ Timestep 300: 3 data points
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.io.read_lammps_output_file</span><span class="w"> </span><span class="kn">import</span> <a href="../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_averages_file" title="pylimer_tools.io.read_lammps_output_file.read_averages_file" class="sphx-glr-backref-module-pylimer_tools-io-read_lammps_output_file sphx-glr-backref-type-py-function"><span class="n">read_averages_file</span></a>
-
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">averages_file</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span>
-    <a href="https://docs.python.org/3/library/os.html#os.getcwd" title="os.getcwd" class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span></a><span class="p">(),</span>
-    <span class="s2">&quot;../..&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;tests/pylimer_tools/fixtures/example_avg_file.out.avg.txt&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># Read simple averages file</span>
-<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">averages</span></a> <span class="o">=</span> <a href="../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_averages_file" title="pylimer_tools.io.read_lammps_output_file.read_averages_file" class="sphx-glr-backref-module-pylimer_tools-io-read_lammps_output_file sphx-glr-backref-type-py-function"><span class="n">read_averages_file</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">averages_file</span></a><span class="p">)</span>
-
-<span class="c1"># Plot &quot;TimeStep&quot; vs &quot;something&quot;</span>
-<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">averages</span></a><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;TimeStep&quot;</span><span class="p">,</span>
-    <span class="n">y</span><span class="o">=</span><span class="s2">&quot;something&quot;</span><span class="p">,</span>
-    <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Time Step&quot;</span><span class="p">,</span>
-    <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Something&quot;</span><span class="p">,</span>
-    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Averaged Data Plot&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">vec_averages_file</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span>
-    <a href="https://docs.python.org/3/library/os.html#os.getcwd" title="os.getcwd" class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span></a><span class="p">(),</span>
-    <span class="s2">&quot;../..&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;tests/pylimer_tools/fixtures/example_vec_avg_file.out.vec-avg.txt&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># Read sectioned averages</span>
-<span class="c1"># (e.g., from vector quantities from e.g. ``fix ave/time ... vector``)</span>
-<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sectioned_data</span></a> <span class="o">=</span> <a href="../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_averages_file" title="pylimer_tools.io.read_lammps_output_file.read_averages_file" class="sphx-glr-backref-module-pylimer_tools-io-read_lammps_output_file sphx-glr-backref-type-py-function"><span class="n">read_averages_file</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">vec_averages_file</span></a><span class="p">)</span>
-
-<span class="c1"># Group by timestep for sectioned data</span>
-<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timestep</span></a><span class="p">,</span> <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">group</span></a> <span class="ow">in</span> <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.groupby.html#pandas.DataFrame.groupby" title="pandas.DataFrame.groupby" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-method"><span class="n">sectioned_data</span><span class="o">.</span><span class="n">groupby</span></a><span class="p">(</span><span class="s2">&quot;TimeStep&quot;</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Timestep </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timestep</span></a><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">group</span></a><span class="p">)</span><span class="si">}</span><span class="s2"> data points&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.068 seconds)</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="w">
+</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools</span><span class="nn">.</span><span class="nn">io</span><span class="nn">.</span><span class="nn">read_lammps_output_file</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pylimer_tools-io-read_lammps_output_file sphx-glr-backref-type-py-function reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_averages_file" title="pylimer_tools.io.read_lammps_output_file.read_averages_file"><span class="n">read_averages_file</span></a><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">averages_file</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/os.html#os.getcwd" title="os.getcwd"><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span></a><span class="p">(</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>    <span class="s2">&quot;</span><span class="s2">../..</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="s2">&quot;</span><span class="s2">tests/pylimer_tools/fixtures/example_avg_file.out.avg.txt</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Read simple averages file</span><span class="w">
+</span><a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">averages</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools-io-read_lammps_output_file sphx-glr-backref-type-py-function reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_averages_file" title="pylimer_tools.io.read_lammps_output_file.read_averages_file"><span class="n">read_averages_file</span></a><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">averages_file</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Plot &quot;TimeStep&quot; vs &quot;something&quot;</span><span class="w">
+</span><a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">averages</span></a><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="w">
+</span>    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">TimeStep</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="n">y</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">something</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">Time Step</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">Something</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">Averaged Data Plot</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">vec_averages_file</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/os.html#os.getcwd" title="os.getcwd"><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span></a><span class="p">(</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>    <span class="s2">&quot;</span><span class="s2">../..</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="s2">&quot;</span><span class="s2">tests/pylimer_tools/fixtures/example_vec_avg_file.out.vec-avg.txt</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Read sectioned averages</span><span class="w">
+</span><span class="c1"># (e.g., from vector quantities from e.g. ``fix ave/time ... vector``)</span><span class="w">
+</span><a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">sectioned_data</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools-io-read_lammps_output_file sphx-glr-backref-type-py-function reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_averages_file" title="pylimer_tools.io.read_lammps_output_file.read_averages_file"><span class="n">read_averages_file</span></a><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">vec_averages_file</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Group by timestep for sectioned data</span><span class="w">
+</span><span class="k">for</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">timestep</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">group</span></a> <span class="ow">in</span> <a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-method reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.groupby.html#pandas.DataFrame.groupby" title="pandas.DataFrame.groupby"><span class="n">sectioned_data</span><span class="o">.</span><span class="n">groupby</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">TimeStep</span><span class="s2">&quot;</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="s2">Timestep </span><span class="si">{</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">timestep</span></a><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">group</span></a><span class="p">)</span><span class="si">}</span><span class="s2"> data points</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.079 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-readers-writers-plot-time-averaged-data-reader-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/cb3d76a475c6f5dcd93f25df87baef20/plot_time_averaged_data_reader.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_time_averaged_data_reader.ipynb</span></code></a></p>

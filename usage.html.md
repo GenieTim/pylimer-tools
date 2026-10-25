@@ -4,7 +4,7 @@ This guide will help you get started with pylimer-tools, covering basic usage pa
 
 ## Basic Usage
 
-After [installing](installation.md) pylimer-tools, you can import the modules in Python:
+After [installing](installation.html.md) pylimer-tools, you can import the modules in Python:
 
 ```python
 import pylimer_tools
@@ -22,7 +22,7 @@ Understanding the key data structures is essential for working with pylimer-tool
 
 ### Universe
 
-The [`Universe`](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) class represents a collection of atoms and their interactions at a specific time point.
+The [`Universe`](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) class represents a collection of atoms and their interactions at a specific time point.
 
 ```python
 from pylimer_tools_cpp import Universe
@@ -37,7 +37,7 @@ print(f"Simulation box volume: {universe.get_volume()}")
 
 ### UniverseSequence
 
-The [`UniverseSequence`](api/pylimer_tools_cpp.UniverseSequence.md#pylimer_tools_cpp.UniverseSequence) class manages multiple universes (e.g., trajectory data) efficiently:
+The [`UniverseSequence`](api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence) class manages multiple universes (e.g., trajectory data) efficiently:
 
 ```python
 from pylimer_tools_cpp import UniverseSequence
@@ -149,11 +149,11 @@ writer.write_to_file("modified_system.data")
 
 ## Next Steps
 
-- Dive into the [Assumptions](assumptions.md) and [Nomenclature](nomenclature.md) for understanding the underlying concepts and terminology used in pylimer-tools
-- Explore the [File I/O: Readers & Writers](auto_examples/readers_writers/index.md) guide for detailed file I/O operations
-- Check out [Network Generation](auto_examples/network_generator/index.md) for creating custom polymer networks
-- See [Examples](auto_examples/index.md) for running simulations and computations with pylimer-tools
-- Review the [src](modules.md) for complete API reference
+- Dive into the [Assumptions](assumptions.html.md) and [Nomenclature](nomenclature.html.md) for understanding the underlying concepts and terminology used in pylimer-tools
+- Explore the [File I/O: Readers & Writers](auto_examples/readers_writers/index.html.md) guide for detailed file I/O operations
+- Check out [Network Generation](auto_examples/network_generator/index.html.md) for creating custom polymer networks
+- See [Examples](auto_examples/index.html.md) for running simulations and computations with pylimer-tools
+- Review the [src](modules.html.md) for complete API reference
 - Look at the [test suite](https://github.com/GenieTim/pylimer-tools/tree/main/tests) for more examples
 
-For help and support, visit the [GitHub repository](https://github.com/GenieTim/pylimer-tools) or check the [Assumptions](assumptions.md) and [Nomenclature](nomenclature.md) pages for important implementation details.
+For help and support, visit the [GitHub repository](https://github.com/GenieTim/pylimer-tools) or check the [Assumptions](assumptions.html.md) and [Nomenclature](nomenclature.html.md) pages for important implementation details.

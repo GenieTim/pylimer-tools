@@ -8,36 +8,36 @@ An enumeration of the LAMMPS atom styles.
 
 ### Attributes Summary
 
-| [`ANGLE`](#pylimer_tools_cpp.AtomStyle.ANGLE)               |    |
-|-------------------------------------------------------------|----|
-| [`ATOMIC`](#pylimer_tools_cpp.AtomStyle.ATOMIC)             |    |
-| [`BODY`](#pylimer_tools_cpp.AtomStyle.BODY)                 |    |
-| [`BOND`](#pylimer_tools_cpp.AtomStyle.BOND)                 |    |
-| [`BPM_SPHERE`](#pylimer_tools_cpp.AtomStyle.BPM_SPHERE)     |    |
-| [`CHARGE`](#pylimer_tools_cpp.AtomStyle.CHARGE)             |    |
-| [`DIELECTRIC`](#pylimer_tools_cpp.AtomStyle.DIELECTRIC)     |    |
-| [`DIPOLE`](#pylimer_tools_cpp.AtomStyle.DIPOLE)             |    |
-| [`DPD`](#pylimer_tools_cpp.AtomStyle.DPD)                   |    |
-| [`EDPD`](#pylimer_tools_cpp.AtomStyle.EDPD)                 |    |
-| [`ELECTRON`](#pylimer_tools_cpp.AtomStyle.ELECTRON)         |    |
-| [`ELLIPSOID`](#pylimer_tools_cpp.AtomStyle.ELLIPSOID)       |    |
-| [`FULL`](#pylimer_tools_cpp.AtomStyle.FULL)                 |    |
-| [`HYBRID`](#pylimer_tools_cpp.AtomStyle.HYBRID)             |    |
-| [`LINE`](#pylimer_tools_cpp.AtomStyle.LINE)                 |    |
-| [`MDPD`](#pylimer_tools_cpp.AtomStyle.MDPD)                 |    |
-| [`MOLECULAR`](#pylimer_tools_cpp.AtomStyle.MOLECULAR)       |    |
-| [`NONE`](#pylimer_tools_cpp.AtomStyle.NONE)                 |    |
-| [`PERI`](#pylimer_tools_cpp.AtomStyle.PERI)                 |    |
-| [`RHEO`](#pylimer_tools_cpp.AtomStyle.RHEO)                 |    |
+| [`ANGLE`](#pylimer_tools_cpp.AtomStyle.ANGLE)        |    |
+|---------------------------------------------------------------|----|
+| [`ATOMIC`](#pylimer_tools_cpp.AtomStyle.ATOMIC)       |    |
+| [`BODY`](#pylimer_tools_cpp.AtomStyle.BODY)         |    |
+| [`BOND`](#pylimer_tools_cpp.AtomStyle.BOND)         |    |
+| [`BPM_SPHERE`](#pylimer_tools_cpp.AtomStyle.BPM_SPHERE)   |    |
+| [`CHARGE`](#pylimer_tools_cpp.AtomStyle.CHARGE)       |    |
+| [`DIELECTRIC`](#pylimer_tools_cpp.AtomStyle.DIELECTRIC)   |    |
+| [`DIPOLE`](#pylimer_tools_cpp.AtomStyle.DIPOLE)       |    |
+| [`DPD`](#pylimer_tools_cpp.AtomStyle.DPD)          |    |
+| [`EDPD`](#pylimer_tools_cpp.AtomStyle.EDPD)         |    |
+| [`ELECTRON`](#pylimer_tools_cpp.AtomStyle.ELECTRON)     |    |
+| [`ELLIPSOID`](#pylimer_tools_cpp.AtomStyle.ELLIPSOID)    |    |
+| [`FULL`](#pylimer_tools_cpp.AtomStyle.FULL)         |    |
+| [`HYBRID`](#pylimer_tools_cpp.AtomStyle.HYBRID)       |    |
+| [`LINE`](#pylimer_tools_cpp.AtomStyle.LINE)         |    |
+| [`MDPD`](#pylimer_tools_cpp.AtomStyle.MDPD)         |    |
+| [`MOLECULAR`](#pylimer_tools_cpp.AtomStyle.MOLECULAR)    |    |
+| [`NONE`](#pylimer_tools_cpp.AtomStyle.NONE)         |    |
+| [`PERI`](#pylimer_tools_cpp.AtomStyle.PERI)         |    |
+| [`RHEO`](#pylimer_tools_cpp.AtomStyle.RHEO)         |    |
 | [`RHEO_THERMAL`](#pylimer_tools_cpp.AtomStyle.RHEO_THERMAL) |    |
-| [`SMD`](#pylimer_tools_cpp.AtomStyle.SMD)                   |    |
-| [`SPH`](#pylimer_tools_cpp.AtomStyle.SPH)                   |    |
-| [`SPHERE`](#pylimer_tools_cpp.AtomStyle.SPHERE)             |    |
-| [`SPIN`](#pylimer_tools_cpp.AtomStyle.SPIN)                 |    |
-| [`TDPD`](#pylimer_tools_cpp.AtomStyle.TDPD)                 |    |
-| [`TEMPLATE`](#pylimer_tools_cpp.AtomStyle.TEMPLATE)         |    |
-| [`TRI`](#pylimer_tools_cpp.AtomStyle.TRI)                   |    |
-| [`WAVEPACKET`](#pylimer_tools_cpp.AtomStyle.WAVEPACKET)     |    |
+| [`SMD`](#pylimer_tools_cpp.AtomStyle.SMD)          |    |
+| [`SPH`](#pylimer_tools_cpp.AtomStyle.SPH)          |    |
+| [`SPHERE`](#pylimer_tools_cpp.AtomStyle.SPHERE)       |    |
+| [`SPIN`](#pylimer_tools_cpp.AtomStyle.SPIN)         |    |
+| [`TDPD`](#pylimer_tools_cpp.AtomStyle.TDPD)         |    |
+| [`TEMPLATE`](#pylimer_tools_cpp.AtomStyle.TEMPLATE)     |    |
+| [`TRI`](#pylimer_tools_cpp.AtomStyle.TRI)          |    |
+| [`WAVEPACKET`](#pylimer_tools_cpp.AtomStyle.WAVEPACKET)   |    |
 
 ### Attributes Documentation
 

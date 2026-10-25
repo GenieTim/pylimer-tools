@@ -4,13 +4,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>pylimer_tools.calc.mehp_utilities - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -366,13 +366,13 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for pylimer_tools.calc.mehp_utilities</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">This module is deprecated.</span>
 <span class="sd">Use :func:`pylimer_tools_cpp.MEHPForceBalance` or :func:`pylimer_tools_cpp.MEHPForceRelaxation` instead.</span>
 
 <span class="sd">In principle, it offers comparable functionality, but without the force minimization - the networks you pass</span>
 <span class="sd">to these methods should be minimized first.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="c1"># source: https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</span>
 
@@ -398,7 +398,7 @@
     <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
     <span class="n">total_mass</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Predict the shear modulus using ANT Analysis.</span>
 
 <span class="sd">    Source:</span>
@@ -414,7 +414,7 @@
 <span class="sd">    :type networks: Sequence[Universe]</span>
 <span class="sd">    :param temperature: The temperature in your unit system</span>
 <span class="sd">    :type temperature: float</span>
-<span class="sd">    :param k_boltzmann: Boltzmann&#39;s constant in your unit system</span>
+<span class="sd">    :param k_boltzmann: Boltzmann's constant in your unit system</span>
 <span class="sd">    :type k_boltzmann: float</span>
 <span class="sd">    :param crosslinker_type: The type of atoms to ignore (junctions, crosslinkers)</span>
 <span class="sd">    :type crosslinker_type: int</span>
@@ -423,7 +423,7 @@
 
 <span class="sd">    :return: The estimated shear modulus in pressure units</span>
 <span class="sd">    :rtype: float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">gamma</span> <span class="o">=</span> <span class="n">compute_topological_factor</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">,</span> <span class="n">total_mass</span><span class="p">)</span>
     <span class="n">nu</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
@@ -446,7 +446,7 @@
     <span class="n">rel_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the cycle rank (:math:`\\chi`).</span>
 <span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
 
@@ -477,11 +477,11 @@
 
 <span class="sd">    :return: The cycle rank (:math:`\\xi = \\nu_{eff} - \\mu_{eff}`) in units of 1/Volume</span>
 <span class="sd">    :rtype: float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">nu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">crosslinker_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">networks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Argument missing: When not specifying nu, network and crosslinker_type need to be specified&quot;</span>
+                <span class="s2">"Argument missing: When not specifying nu, network and crosslinker_type need to be specified"</span>
             <span class="p">)</span>
         <span class="n">nu</span> <span class="o">=</span> <span class="n">compute_effective_nr_density_of_network</span><span class="p">(</span>
             <span class="n">networks</span><span class="p">,</span> <span class="n">abs_tol</span><span class="p">,</span> <span class="n">rel_tol</span><span class="p">,</span> <span class="n">crosslinker_type</span>
@@ -489,7 +489,7 @@
     <span class="k">if</span> <span class="n">mu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">crosslinker_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">networks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Argument missing: When not specifying mu, network and crosslinker_type need to be specified&quot;</span>
+                <span class="s2">"Argument missing: When not specifying mu, network and crosslinker_type need to be specified"</span>
             <span class="p">)</span>
         <span class="n">mu</span> <span class="o">=</span> <span class="n">compute_effective_nr_density_of_junctions</span><span class="p">(</span>
             <span class="n">networks</span><span class="p">,</span> <span class="n">abs_tol</span><span class="p">,</span> <span class="n">rel_tol</span><span class="p">,</span> <span class="n">crosslinker_type</span>
@@ -507,7 +507,7 @@
     <span class="n">rel_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the effective number density :math:`\\nu_{eff}` of a network.</span>
 <span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
 
@@ -537,7 +537,7 @@
 
 <span class="sd">    :return: The effective number density of network strands in units of 1/Volume</span>
 <span class="sd">    :rtype: float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">0</span>
 
@@ -567,7 +567,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_mean_universe_volume</span><span class="p">(</span>
     <span class="n">networks</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Universe</span><span class="p">],</span> <span class="n">accept_different_sizes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the mean volume of a list of universes.</span>
 
 <span class="sd">    :param networks: A list of universes</span>
@@ -580,9 +580,9 @@
 
 <span class="sd">    :raises ValueError: If the input list is empty</span>
 <span class="sd">    :raises NotImplementedError: If universes have different sizes and accept_different_sizes is False</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must have at least one network&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Must have at least one network"</span><span class="p">)</span>
     <span class="c1"># compute the mean volume of the universes</span>
     <span class="n">mean_volume</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">divisor</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
@@ -590,8 +590,8 @@
     <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">accept_different_sizes</span> <span class="ow">and</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">!=</span> <span class="n">network_size</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;Currently, only sequences of networks with the same size are supported&quot;</span>
-                <span class="o">+</span> <span class="s2">&quot; (got one with </span><span class="si">{}</span><span class="s2"> instead of </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s2">"Currently, only sequences of networks with the same size are supported"</span>
+                <span class="o">+</span> <span class="s2">" (got one with </span><span class="si">{}</span><span class="s2"> instead of </span><span class="si">{}</span><span class="s2">)"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">(),</span> <span class="n">network_size</span>
                 <span class="p">)</span>
             <span class="p">)</span>
@@ -609,7 +609,7 @@
     <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
     <span class="n">min_num_effective_strands</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the number density of the elastically effective crosslinks,</span>
 <span class="sd">    defined as the ones that connect at least `min_num_effective_strands` elastically effective strands.</span>
 <span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
@@ -631,7 +631,7 @@
 
 <span class="sd">    :return: The effective number density of junctions in units of 1/Volume</span>
 <span class="sd">    :rtype: float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">0.0</span>
     <span class="k">if</span> <span class="n">crosslinker_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -691,7 +691,7 @@
     <span class="n">total_mass</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">b</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the topological factor of a polymer network.</span>
 
 <span class="sd">    Assumptions:</span>
@@ -713,7 +713,7 @@
 
 <span class="sd">    :return: The topological factor :math:`\\Gamma`</span>
 <span class="sd">    :rtype: float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">r_taus</span> <span class="o">=</span> <span class="n">compute_mean_end_to_end_distances</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">)</span>
 
     <span class="c1"># find the topological factor</span>

@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/readers_writers/plot_pylimer_tools_output_reader.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="Read output from pylimer-tools’ own simulators. Relevant documentation: read_avg_file(), Total running time of the script:(0 minutes 0.050 seconds) Download Jupyter notebook: plot_pylimer_tools_out..." />
+<meta property="og:description" content="Read output from pylimer-tools’ own simulators. Relevant documentation: read_avg_file(), import os import matplotlib. pyplot as plt from pylimer_tools. io. read_pylimer_tools_output_file import rea..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
-<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_readers_writers_plot_pylimer_tools_output_reader_9732f515.png" />
-<meta property="og:image:alt" content="Read output from pylimer-tools’ own simulators. Relevant documentation: read_avg_file(), Total running time of the script:(0 minutes 0.050 seconds) Download Jupyter notebook: plot_pylimer_tools_out..." />
-<meta name="description" content="Read output from pylimer-tools’ own simulators. Relevant documentation: read_avg_file(), Total running time of the script:(0 minutes 0.050 seconds) Download Jupyter notebook: plot_pylimer_tools_out..." />
+<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_readers_writers_plot_pylimer_tools_output_reader_57ba4a9a.png" />
+<meta property="og:image:alt" content="Read output from pylimer-tools’ own simulators. Relevant documentation: read_avg_file(), import os import matplotlib. pyplot as plt from pylimer_tools. io. read_pylimer_tools_output_file import rea..." />
+<meta name="description" content="Read output from pylimer-tools’ own simulators. Relevant documentation: read_avg_file(), import os import matplotlib. pyplot as plt from pylimer_tools. io. read_pylimer_tools_output_file import rea..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -20,15 +20,17 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="pylimer-tools" />
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
-<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Correlated Averages Reader" href="plot_correlated_averages_reader.html"><link rel="prev" title="File I/O: Readers &amp; Writers" href="index.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+<link rel="alternate" type="text/markdown" href="plot_pylimer_tools_output_reader.html.md">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Correlated Averages Reader" href="plot_correlated_averages_reader.html"><link rel="prev" title="File I/O: Readers &amp; Writers" href="index.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>pylimer-tools Output Reader - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -408,32 +410,31 @@ to download the full example code.</p>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools.io.read_pylimer_tools_output_file</span><span class="w"> </span><span class="kn">import</span> <a href="../../pylimer_tools.io.html#pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file" title="pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file" class="sphx-glr-backref-module-pylimer_tools-io-read_pylimer_tools_output_file sphx-glr-backref-type-py-function"><span class="n">read_avg_file</span></a>
-
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">example_file</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span>
-    <a href="https://docs.python.org/3/library/os.html#os.getcwd" title="os.getcwd" class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span></a><span class="p">(),</span>
-    <span class="s2">&quot;..&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dpd_simulations/dpd_simulation_avg_output.txt&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># Read pylimer-tools averages file</span>
-<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pylimer_data</span></a> <span class="o">=</span> <a href="../../pylimer_tools.io.html#pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file" title="pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file" class="sphx-glr-backref-module-pylimer_tools-io-read_pylimer_tools_output_file sphx-glr-backref-type-py-function"><span class="n">read_avg_file</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">example_file</span></a><span class="p">)</span>
-
-<span class="c1"># Data is automatically grouped by OutputStep</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulation steps: </span><span class="si">{</span><a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pylimer_data</span></a><span class="p">[</span><span class="s1">&#39;Step&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># Access specific measurements</span>
-<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="matplotlib.pyplot.plot" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pylimer_data</span></a><span class="p">[</span><span class="s2">&quot;Step&quot;</span><span class="p">],</span> <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pylimer_data</span></a><span class="p">[</span><span class="s2">&quot;Temperature&quot;</span><span class="p">])</span>
-<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.xlabel.html#matplotlib.pyplot.xlabel" title="matplotlib.pyplot.xlabel" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span></a><span class="p">(</span><span class="s2">&quot;Output Step&quot;</span><span class="p">)</span>
-<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.ylabel.html#matplotlib.pyplot.ylabel" title="matplotlib.pyplot.ylabel" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span></a><span class="p">(</span><span class="s2">&quot;Temperature&quot;</span><span class="p">)</span>
-<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
-</pre></div>
-</div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.050 seconds)</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="w">
+</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span><span class="w">
+</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools</span><span class="nn">.</span><span class="nn">io</span><span class="nn">.</span><span class="nn">read_pylimer_tools_output_file</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pylimer_tools-io-read_pylimer_tools_output_file sphx-glr-backref-type-py-function reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file" title="pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file"><span class="n">read_avg_file</span></a><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">example_file</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/os.html#os.getcwd" title="os.getcwd"><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span></a><span class="p">(</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>    <span class="s2">&quot;</span><span class="s2">..</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="s2">&quot;</span><span class="s2">dpd_simulations/dpd_simulation_avg_output.txt</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Read pylimer-tools averages file</span><span class="w">
+</span><a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">pylimer_data</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools-io-read_pylimer_tools_output_file sphx-glr-backref-type-py-function reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file" title="pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file"><span class="n">read_avg_file</span></a><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">example_file</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Data is automatically grouped by OutputStep</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="s2">Simulation steps: </span><span class="si">{</span><a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">pylimer_data</span></a><span class="p">[</span><span class="s1">'</span><span class="s1">Step</span><span class="s1">'</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">(</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Access specific measurements</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="matplotlib.pyplot.plot"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">pylimer_data</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">Step</span><span class="s2">&quot;</span><span class="p">]</span><span class="p">,</span> <a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">pylimer_data</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">Temperature</span><span class="s2">&quot;</span><span class="p">]</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.xlabel.html#matplotlib.pyplot.xlabel" title="matplotlib.pyplot.xlabel"><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Output Step</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.ylabel.html#matplotlib.pyplot.ylabel" title="matplotlib.pyplot.ylabel"><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Temperature</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.054 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c36754c12af5040c29c9a9f6876c9564/plot_pylimer_tools_output_reader.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_pylimer_tools_output_reader.ipynb</span></code></a></p>

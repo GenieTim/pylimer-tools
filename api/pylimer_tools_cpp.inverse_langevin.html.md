@@ -1,6 +1,6 @@
 # inverse_langevin
 
-### pylimer_tools_cpp.inverse_langevin(x: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)) → [float](https://docs.python.org/3/library/functions.html#float)
+### pylimer_tools_cpp.inverse_langevin(x: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 A somewhat accurate (for $x \in (-1, 1)$) implementation of the inverse Langevin function.
 

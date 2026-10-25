@@ -20,15 +20,17 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="pylimer-tools" />
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Installation Guide" href="installation.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+<link rel="alternate" type="text/markdown" href="index.html.md">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Installation Guide" href="installation.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -420,15 +422,15 @@ This library provides powerful tools for reading, processing, and analyzing poly
 <span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">UniverseSequence</span>
 
 <span class="c1"># Load a LAMMPS data file</span>
-<span class="n">filePath</span> <span class="o">=</span> <span class="s2">&quot;your_lammps_data_file.structure.out&quot;</span>
+<span class="n">filePath</span> <span class="o">=</span> <span class="s2">"your_lammps_data_file.structure.out"</span>
 <span class="n">universeSequence</span> <span class="o">=</span> <span class="n">UniverseSequence</span><span class="p">()</span>
 <span class="n">universeSequence</span><span class="o">.</span><span class="n">initialize_from_data_sequence</span><span class="p">([</span><span class="n">filePath</span><span class="p">])</span>
 <span class="n">universe</span> <span class="o">=</span> <span class="n">universeSequence</span><span class="o">.</span><span class="n">at_index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="c1"># Analyze the system</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;System size: </span><span class="si">{</span><span class="n">universe</span><span class="o">.</span><span class="n">get_size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Volume: </span><span class="si">{</span><span class="n">universe</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span><span class="si">}</span><span class="s2"> u³&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean bond length: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">universe</span><span class="o">.</span><span class="n">compute_bond_lengths</span><span class="p">())</span><span class="si">}</span><span class="s2"> u&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"System size: </span><span class="si">{</span><span class="n">universe</span><span class="o">.</span><span class="n">get_size</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Volume: </span><span class="si">{</span><span class="n">universe</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span><span class="si">}</span><span class="s2"> u³"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Mean bond length: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">universe</span><span class="o">.</span><span class="n">compute_bond_lengths</span><span class="p">())</span><span class="si">}</span><span class="s2"> u"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -464,7 +466,7 @@ This library provides powerful tools for reading, processing, and analyzing poly
 <li><p><strong>Generating networks?</strong> See <a class="reference internal" href="auto_examples/network_generator/index.html"><span class="doc">Network Generation</span></a></p></li>
 <li><p><strong>Need examples?</strong> Browse <a class="reference internal" href="auto_examples/index.html"><span class="doc">Examples</span></a> for practical code samples</p></li>
 <li><p><strong>Understanding limitations?</strong> Review <a class="reference internal" href="assumptions.html"><span class="doc">Assumptions</span></a> and <a class="reference internal" href="nomenclature.html"><span class="doc">Nomenclature</span></a></p></li>
-<li><p><strong>Like papers?</strong> See <span id="id1">Bernhard <em>et al.</em> [<a class="reference internal" href="acknowledgements.html#id25" title="Tim Bernhard, Fabian Schwarz, and Andrei A. Gusev. Pylimer-tools: A Python Package for Generating and Analyzing Bead-Spring Polymer Networks. Journal of Open Research Software, December 2025. doi:10.5334/jors.609.">BSG25</a>]</span> and <a class="reference internal" href="acknowledgements.html"><span class="doc">Acknowledgements</span></a> for related publications</p></li>
+<li><p><strong>Like papers?</strong> See <span class="bibtex-citation" id="id1">Bernhard <em>et al.</em> [<a class="reference internal" href="acknowledgements.html#id25" title="Tim Bernhard, Fabian Schwarz, and Andrei A. Gusev. Pylimer-tools: A Python Package for Generating and Analyzing Bead-Spring Polymer Networks. Journal of Open Research Software, December 2025. doi:10.5334/jors.609.">BSG25</a>]</span> and <a class="reference internal" href="acknowledgements.html"><span class="doc">Acknowledgements</span></a> for related publications</p></li>
 </ul>
 </section>
 <section id="useful-links">

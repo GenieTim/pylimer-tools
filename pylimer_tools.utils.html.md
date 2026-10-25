@@ -4,7 +4,7 @@
 
 ## pylimer_tools.utils.cache_utility module
 
-### pylimer_tools.utils.cache_utility.do_cache(obj, file: [str](https://docs.python.org/3/library/stdtypes.html#str), suffix: [str](https://docs.python.org/3/library/stdtypes.html#str), tmp_dir: [str](https://docs.python.org/3/library/stdtypes.html#str) | [None](https://docs.python.org/3/library/constants.html#None) = None)
+### pylimer_tools.utils.cache_utility.do_cache(obj, file: [str](https://docs.python.org/3/builtins/stdtypes.html#str), suffix: [str](https://docs.python.org/3/builtins/stdtypes.html#str), tmp_dir: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None) = None)
 
 Store the object in the cache.
 
@@ -15,7 +15,7 @@ Store the object in the cache.
   * **suffix** – The file name’s suffix.
   * **tmp_dir** – The directory to store the cache in.
 
-### pylimer_tools.utils.cache_utility.get_cache_file_name(file: [str](https://docs.python.org/3/library/stdtypes.html#str) | [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/library/stdtypes.html#str)] | [None](https://docs.python.org/3/library/constants.html#None), suffix: [str](https://docs.python.org/3/library/stdtypes.html#str), tmp_dir: [str](https://docs.python.org/3/library/stdtypes.html#str) | [None](https://docs.python.org/3/library/constants.html#None) = None, old: [bool](https://docs.python.org/3/library/functions.html#bool) = False)
+### pylimer_tools.utils.cache_utility.get_cache_file_name(file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [None](https://docs.python.org/3/builtins/constants.html#None), suffix: [str](https://docs.python.org/3/builtins/stdtypes.html#str), tmp_dir: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, old: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False)
 
 Get the name and path of a cache file. Internal method.
 
@@ -28,7 +28,7 @@ Get the name and path of a cache file. Internal method.
 * **Returns:**
   The path to the cache file.
 
-### pylimer_tools.utils.cache_utility.is_current_cache(cache_file: [str](https://docs.python.org/3/library/stdtypes.html#str), dependencies: [str](https://docs.python.org/3/library/stdtypes.html#str) | [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/library/stdtypes.html#str)])
+### pylimer_tools.utils.cache_utility.is_current_cache(cache_file: [str](https://docs.python.org/3/builtins/stdtypes.html#str), dependencies: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)])
 
 Determine whether the provided file is newer than all its dependencies.
 
@@ -38,7 +38,7 @@ Determine whether the provided file is newer than all its dependencies.
 * **Returns:**
   True if the file is newer than all its dependencies, False otherwise.
 
-### pylimer_tools.utils.cache_utility.load_cache(file: [str](https://docs.python.org/3/library/stdtypes.html#str) | [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/library/stdtypes.html#str)] | [None](https://docs.python.org/3/library/constants.html#None), suffix: [str](https://docs.python.org/3/library/stdtypes.html#str), disable_warnings: [bool](https://docs.python.org/3/library/functions.html#bool) = False, tmp_dir: [str](https://docs.python.org/3/library/stdtypes.html#str) | [None](https://docs.python.org/3/library/constants.html#None) = None, anyway: [bool](https://docs.python.org/3/library/functions.html#bool) = False)
+### pylimer_tools.utils.cache_utility.load_cache(file: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] | [None](https://docs.python.org/3/builtins/constants.html#None), suffix: [str](https://docs.python.org/3/builtins/stdtypes.html#str), disable_warnings: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, tmp_dir: [str](https://docs.python.org/3/builtins/stdtypes.html#str) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, anyway: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False)
 
 Load an object from cache, iff the cache is new enough.
 
@@ -74,10 +74,10 @@ This preserves the historical behavior of `errors='ignore'` from
 Extract the last few entries of a list
 
 * **Parameters:**
-  * **data** ([*list*](https://docs.python.org/3/library/stdtypes.html#list) *or* *pd.DataFrame* *or* *pd.Series*) – The list, DataFrame, or Series to extract the last few entries from
-  * **percentage** ([*float*](https://docs.python.org/3/library/functions.html#float)) – The percentage of entries to extract (default: 0.2)
-  * **min_n** ([*int*](https://docs.python.org/3/library/functions.html#int)) – The minimum number of entries to extract (default: 25)
-  * **max_percentage** ([*float*](https://docs.python.org/3/library/functions.html#float)) – The maximum percentage of entries to extract (default: 0.5)
+  * **data** ([*list*](https://docs.python.org/3/builtins/stdtypes.html#list) *or* *pd.DataFrame* *or* *pd.Series*) – The list, DataFrame, or Series to extract the last few entries from
+  * **percentage** ([*float*](https://docs.python.org/3/builtins/functions.html#float)) – The percentage of entries to extract (default: 0.2)
+  * **min_n** ([*int*](https://docs.python.org/3/builtins/functions.html#int)) – The minimum number of entries to extract (default: 25)
+  * **max_percentage** ([*float*](https://docs.python.org/3/builtins/functions.html#float)) – The maximum percentage of entries to extract (default: 0.5)
 * **Returns:**
   A subset of the input data containing the last entries according to the specified criteria
 * **Return type:**
@@ -87,15 +87,15 @@ The function returns a subset with at maximum max_percentage,
 at least min_n entries (assuming the initial data is as large),
 but ideally percentage many percentage of the last entries.
 
-### pylimer_tools.utils.data_utility.unify_data_stepsizes(data: [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame), key: [str](https://docs.python.org/3/library/stdtypes.html#str), step_size: [int](https://docs.python.org/3/library/functions.html#int) = None, max_expected_step_size: [int](https://docs.python.org/3/library/functions.html#int) = 100) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
+### pylimer_tools.utils.data_utility.unify_data_stepsizes(data: [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame), key: [str](https://docs.python.org/3/builtins/stdtypes.html#str), step_size: [int](https://docs.python.org/3/builtins/functions.html#int) = None, max_expected_step_size: [int](https://docs.python.org/3/builtins/functions.html#int) = 100) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
 
 Get a DataFrame where all data points have the same step between the values in column given by key
 
 * **Parameters:**
   * **data** (*pd.DataFrame*) – The DataFrame to unify the step-size for
-  * **key** ([*str*](https://docs.python.org/3/library/stdtypes.html#str)) – The column name indicating the column containing the step-nr
-  * **step_size** ([*int*](https://docs.python.org/3/library/functions.html#int) *,* *optional*) – The step size to use for filtering (if None, computed automatically)
-  * **max_expected_step_size** ([*int*](https://docs.python.org/3/library/functions.html#int) *,* *default=100*) – Used to get a warning if the computed step-size is larger
+  * **key** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – The column name indicating the column containing the step-nr
+  * **step_size** ([*int*](https://docs.python.org/3/builtins/functions.html#int) *,* *optional*) – The step size to use for filtering (if None, computed automatically)
+  * **max_expected_step_size** ([*int*](https://docs.python.org/3/builtins/functions.html#int) *,* *default=100*) – Used to get a warning if the computed step-size is larger
 * **Returns:**
   A DataFrame with a consistent step-size
 * **Return type:**
@@ -114,13 +114,13 @@ Heavily inspired by the following sources:
 - [https://medium.com/bigdatarepublic/advanced-pandas-optimize-speed-and-memory-a654b53be6c2](https://medium.com/bigdatarepublic/advanced-pandas-optimize-speed-and-memory-a654b53be6c2)
 - [https://stackoverflow.com/questions/57531388/how-can-i-reduce-the-memory-of-a-pandas-dataframe](https://stackoverflow.com/questions/57531388/how-can-i-reduce-the-memory-of-a-pandas-dataframe)
 
-### pylimer_tools.utils.optimize_dataframe.optimize(df: [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame), datetime_features: [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/library/stdtypes.html#str)] = [])
+### pylimer_tools.utils.optimize_dataframe.optimize(df: [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame), datetime_features: [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)] = [])
 
 Optimize all types of all columns in a dataframe.
 
 * **Parameters:**
   * **df** (*pd.DataFrame*) – dataframe to reduce
-  * **datetime_features** (*List* *[*[*str*](https://docs.python.org/3/library/stdtypes.html#str) *]*) – list of column names that contain datetime data
+  * **datetime_features** (*List* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *]*) – list of column names that contain datetime data
 * **Returns:**
   dataset with the column dtypes adjusted
 * **Return type:**
@@ -148,13 +148,13 @@ Optimize the integer point type entries.
 * **Return type:**
   pd.DataFrame
 
-### pylimer_tools.utils.optimize_dataframe.optimize_objects(df: [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame), datetime_features: [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/library/stdtypes.html#str)]) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
+### pylimer_tools.utils.optimize_dataframe.optimize_objects(df: [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame), datetime_features: [List](https://docs.python.org/3/library/typing.html#typing.List)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]) → [DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame)
 
 Optimize object type entries.
 
 * **Parameters:**
   * **df** (*pd.DataFrame*) – dataframe to reduce
-  * **datetime_features** (*List* *[*[*str*](https://docs.python.org/3/library/stdtypes.html#str) *]*) – list of column names that contain datetime data
+  * **datetime_features** (*List* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *]*) – list of column names that contain datetime data
 * **Returns:**
   dataset with the column dtypes adjusted
 * **Return type:**
@@ -166,10 +166,10 @@ Iterate through all the columns of a dataframe and modify the data type to reduc
 
 * **Parameters:**
   * **df** (*pd.DataFrame*) – dataframe to reduce
-  * **obj_to_category** ([*bool*](https://docs.python.org/3/library/functions.html#bool)) – convert non-datetime related objects to category dtype
-  * **subset** (*List* *[*[*str*](https://docs.python.org/3/library/stdtypes.html#str) *] or* *None*) – subset of columns to analyse
-  * **inplace** ([*bool*](https://docs.python.org/3/library/functions.html#bool)) – whether to modify the dataframe in place
-  * **print_stats** ([*bool*](https://docs.python.org/3/library/functions.html#bool)) – whether to print memory usage statistics
+  * **obj_to_category** ([*bool*](https://docs.python.org/3/builtins/functions.html#bool)) – convert non-datetime related objects to category dtype
+  * **subset** (*List* *[*[*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *] or* *None*) – subset of columns to analyse
+  * **inplace** ([*bool*](https://docs.python.org/3/builtins/functions.html#bool)) – whether to modify the dataframe in place
+  * **print_stats** ([*bool*](https://docs.python.org/3/builtins/functions.html#bool)) – whether to print memory usage statistics
 * **Returns:**
   dataset with the column dtypes adjusted
 * **Return type:**

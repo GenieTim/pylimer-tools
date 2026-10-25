@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/network_generator/plot_simple_crosslinked_network.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="Here’s a minimal example of creating a crosslinked polymer network:, Total running time of the script:(0 minutes 0.514 seconds) Download Jupyter notebook: plot_simple_crosslinked_network.ipynb Down..." />
+<meta property="og:description" content="Here’s a minimal example of creating a crosslinked polymer network:, import os from pylimer_tools_cpp import DataFileWriter, MCUniverseGenerator# Create generator for a 50x50x50 simulation box gene..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
-<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_network_generator_plot_simple_crosslinked_network_258a2afc.png" />
-<meta property="og:image:alt" content="Here’s a minimal example of creating a crosslinked polymer network:, Total running time of the script:(0 minutes 0.514 seconds) Download Jupyter notebook: plot_simple_crosslinked_network.ipynb Down..." />
-<meta name="description" content="Here’s a minimal example of creating a crosslinked polymer network:, Total running time of the script:(0 minutes 0.514 seconds) Download Jupyter notebook: plot_simple_crosslinked_network.ipynb Down..." />
+<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_network_generator_plot_simple_crosslinked_network_0632d6cc.png" />
+<meta property="og:image:alt" content="Here’s a minimal example of creating a crosslinked polymer network:, import os from pylimer_tools_cpp import DataFileWriter, MCUniverseGenerator# Create generator for a 50x50x50 simulation box gene..." />
+<meta name="description" content="Here’s a minimal example of creating a crosslinked polymer network:, import os from pylimer_tools_cpp import DataFileWriter, MCUniverseGenerator# Create generator for a 50x50x50 simulation box gene..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -20,15 +20,17 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/_static/favicon/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="pylimer-tools" />
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
-<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Adding Topology Information" href="plot_add_angles.html"><link rel="prev" title="Save Generated Network" href="plot_save_network.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+<link rel="alternate" type="text/markdown" href="plot_simple_crosslinked_network.html.md">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Adding Topology Information" href="plot_add_angles.html"><link rel="prev" title="Save Generated Network" href="plot_save_network.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>Simple Crosslinked Network - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -407,50 +409,49 @@ to download the full example code.</p>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">DataFileWriter</span></a><span class="p">,</span> <a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">MCUniverseGenerator</span></a>
-
-<span class="c1"># Create generator for a 50x50x50 simulation box</span>
-<a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">generator</span></a> <span class="o">=</span> <a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">MCUniverseGenerator</span></a><span class="p">(</span><span class="mf">50.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">)</span>
-
-<span class="c1"># Set random seed for reproducibility</span>
-<a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.set_seed" title="pylimer_tools_cpp.MCUniverseGenerator.set_seed" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">generator</span><span class="o">.</span><span class="n">set_seed</span></a><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
-
-<span class="c1"># Set mean bead-to-bead distance</span>
-<a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">generator</span><span class="o">.</span><span class="n">set_bead_distance</span></a><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
-
-<span class="c1"># Add crosslinking sites</span>
-<a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers" title="pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">generator</span><span class="o">.</span><span class="n">add_crosslinkers</span></a><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># 100 crosslinkers of functionality 4</span>
-
-<span class="c1"># Add polymer chains</span>
-<a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_strands" title="pylimer_tools_cpp.MCUniverseGenerator.add_strands" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">generator</span><span class="o">.</span><span class="n">add_strands</span></a><span class="p">(</span>
-    <span class="n">nr_of_strands</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>  <span class="c1"># 200 polymer chains</span>
-    <span class="n">strand_lengths</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">200</span><span class="p">)],</span>  <span class="c1"># 20 beads per chain</span>
-<span class="p">)</span>
-
-<span class="c1"># Crosslink polymer strands</span>
-<a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">generator</span><span class="o">.</span><span class="n">link_strands_to_conversion</span></a><span class="p">(</span>
-    <span class="n">crosslinker_conversion</span><span class="o">=</span><span class="mf">0.925</span><span class="p">,</span>  <span class="c1"># 92.5% of crosslinker sites used</span>
-<span class="p">)</span>
-
-<span class="c1"># Get the generated network</span>
-<a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">universe</span></a> <span class="o">=</span> <a href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.get_universe" title="pylimer_tools_cpp.MCUniverseGenerator.get_universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">generator</span><span class="o">.</span><span class="n">get_universe</span></a><span class="p">()</span>
-
-<span class="c1"># Set masses, e.g. for LAMMPS</span>
-<a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.set_masses" title="pylimer_tools_cpp.Universe.set_masses" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">universe</span><span class="o">.</span><span class="n">set_masses</span></a><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">})</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated network with </span><span class="si">{</span><a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_nr_of_atoms" title="pylimer_tools_cpp.Universe.get_nr_of_atoms" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">universe</span><span class="o">.</span><span class="n">get_nr_of_atoms</span></a><span class="p">()</span><span class="si">}</span><span class="s2"> atoms&quot;</span><span class="p">)</span>
-
-<span class="c1"># Save the universe to a file</span>
-<a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">writer</span></a> <span class="o">=</span> <a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class"><span class="n">DataFileWriter</span></a><span class="p">(</span><a href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">universe</span></a><span class="p">)</span>
-
-<span class="k">if</span> <span class="ow">not</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.exists" title="os.path.exists" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span></a><span class="p">(</span><span class="s2">&quot;generated_structures&quot;</span><span class="p">):</span>
-    <a href="https://docs.python.org/3/library/os.html#os.makedirs" title="os.makedirs" class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">makedirs</span></a><span class="p">(</span><span class="s2">&quot;generated_structures&quot;</span><span class="p">)</span>
-
-<a href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.write_to_file" title="pylimer_tools_cpp.DataFileWriter.write_to_file" class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method"><span class="n">writer</span><span class="o">.</span><span class="n">write_to_file</span></a><span class="p">(</span><span class="s2">&quot;generated_structures/simple_crosslinked_network.data&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.514 seconds)</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class reference internal" href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="n">DataFileWriter</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="n">MCUniverseGenerator</span></a><span class="w">
+</span><span class="w">
+</span><span class="c1"># Create generator for a 50x50x50 simulation box</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="n">generator</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="n">MCUniverseGenerator</span></a><span class="p">(</span><span class="mf">50.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Set random seed for reproducibility</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.set_seed" title="pylimer_tools_cpp.MCUniverseGenerator.set_seed"><span class="n">generator</span><span class="o">.</span><span class="n">set_seed</span></a><span class="p">(</span><span class="mi">12345</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Set mean bead-to-bead distance</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance"><span class="n">generator</span><span class="o">.</span><span class="n">set_bead_distance</span></a><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Add crosslinking sites</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers" title="pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers"><span class="n">generator</span><span class="o">.</span><span class="n">add_crosslinkers</span></a><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># 100 crosslinkers of functionality 4</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Add polymer chains</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_strands" title="pylimer_tools_cpp.MCUniverseGenerator.add_strands"><span class="n">generator</span><span class="o">.</span><span class="n">add_strands</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">nr_of_strands</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>  <span class="c1"># 200 polymer chains</span><span class="w">
+</span>    <span class="n">strand_lengths</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="p">]</span><span class="p">,</span>  <span class="c1"># 20 beads per chain</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Crosslink polymer strands</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion"><span class="n">generator</span><span class="o">.</span><span class="n">link_strands_to_conversion</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">crosslinker_conversion</span><span class="o">=</span><span class="mf">0.925</span><span class="p">,</span>  <span class="c1"># 92.5% of crosslinker sites used</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Get the generated network</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="n">universe</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.get_universe" title="pylimer_tools_cpp.MCUniverseGenerator.get_universe"><span class="n">generator</span><span class="o">.</span><span class="n">get_universe</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Set masses, e.g. for LAMMPS</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.set_masses" title="pylimer_tools_cpp.Universe.set_masses"><span class="n">universe</span><span class="o">.</span><span class="n">set_masses</span></a><span class="p">(</span><span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">}</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="s2">Generated network with </span><span class="si">{</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_nr_of_atoms" title="pylimer_tools_cpp.Universe.get_nr_of_atoms"><span class="n">universe</span><span class="o">.</span><span class="n">get_nr_of_atoms</span></a><span class="p">(</span><span class="p">)</span><span class="si">}</span><span class="s2"> atoms</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Save the universe to a file</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="n">writer</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class reference internal" href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="n">DataFileWriter</span></a><span class="p">(</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="n">universe</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="k">if</span> <span class="ow">not</span> <a class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/os.path.html#os.path.exists" title="os.path.exists"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">generated_structures</span><span class="s2">&quot;</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/os.html#os.makedirs" title="os.makedirs"><span class="n">os</span><span class="o">.</span><span class="n">makedirs</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">generated_structures</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.write_to_file" title="pylimer_tools_cpp.DataFileWriter.write_to_file"><span class="n">writer</span><span class="o">.</span><span class="n">write_to_file</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">generated_structures/simple_crosslinked_network.data</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.513 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-network-generator-plot-simple-crosslinked-network-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/81342f99548b60c95d06fcd36cbc0ee3/plot_simple_crosslinked_network.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_simple_crosslinked_network.ipynb</span></code></a></p>

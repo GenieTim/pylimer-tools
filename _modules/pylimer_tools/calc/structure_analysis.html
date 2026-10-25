@@ -4,13 +4,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>pylimer_tools.calc.structure_analysis - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -366,9 +366,9 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for pylimer_tools.calc.structure_analysis</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">This module provides functions to compute various quantities related to polymer networks from their structure.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -394,7 +394,7 @@
     <span class="n">ignore_types</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">effective</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the stoichiometric imbalance</span>
 <span class="sd">    ( nr. of bonds formable of crosslinker / (nr. of bonds formable of precursor chains) )</span>
 
@@ -415,7 +415,7 @@
 <span class="sd">        or the maximum functionality of the crosslinkers.</span>
 <span class="sd">    :return: The stoichiometric imbalance. If the network is empty, or no crosslinkers are present 0. is returned.</span>
 <span class="sd">    :rtype: float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">0.0</span>
 
@@ -427,8 +427,8 @@
     <span class="p">):</span>
         <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;Crosslink&#39;s atom type not found in functionality_per_type, &quot;</span>
-            <span class="o">+</span> <span class="s2">&quot;will ignore passed argument `functionality_per_type`.&quot;</span>
+            <span class="s2">"Crosslink's atom type not found in functionality_per_type, "</span>
+            <span class="o">+</span> <span class="s2">"will ignore passed argument `functionality_per_type`."</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -475,7 +475,7 @@
     <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
     <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the extent of polymerization reaction</span>
 <span class="sd">    (nr. of formed bonds in reaction / max. nr. of bonds formable)</span>
 
@@ -492,7 +492,7 @@
 <span class="sd">        If None: will use max functionality per type.</span>
 <span class="sd">    :return: The extent of reaction</span>
 <span class="sd">    :rtype: float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">1</span>
 
@@ -504,10 +504,10 @@
     <span class="p">):</span>
         <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;Crosslinker type </span><span class="si">{}</span><span class="s2"> not found in passed functionality_per_type, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="s2">"Crosslinker type </span><span class="si">{}</span><span class="s2"> not found in passed functionality_per_type, "</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">crosslinker_type</span>
             <span class="p">)</span>
-            <span class="o">+</span> <span class="s2">&quot;will ignore passed argument `functionality_per_type`.&quot;</span>
+            <span class="o">+</span> <span class="s2">"will ignore passed argument `functionality_per_type`."</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -544,7 +544,7 @@
     <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
     <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the mole fraction of reactive sites in B2</span>
 <span class="sd">    among all reactive sites in a mixture of B1 and B2.</span>
 <span class="sd">    Uses the network to detect what might be monofunctional chains,</span>
@@ -555,16 +555,16 @@
 <span class="sd">    :param functionality_per_type: A dictionary with key: type, and value: functionality of this atom type</span>
 <span class="sd">    :return: The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</span>
 <span class="sd">    :rtype: float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">determine_functionality_per_type</span><span class="p">()</span>
 
     <span class="n">monofunctional_types</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">functionality_per_type</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">monofunctional_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Assume the whole monofunctional chain has the same atom type</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">chains_with_crosslinks</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_chains_with_crosslinker</span><span class="p">(</span>
             <span class="n">crosslinker_type</span><span class="o">=</span><span class="n">crosslinker_type</span>
         <span class="p">)</span>
@@ -618,7 +618,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_mean_end_to_end_distances</span><span class="p">(</span>
     <span class="n">networks</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Universe</span><span class="p">],</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the mean end to end distance between each pair of (indirectly) connected crosslinker</span>
 
 <span class="sd">    :param networks: The different configurations of the polymer network to do the computation for</span>
@@ -626,9 +626,9 @@
 <span class="sd">    :param crosslinker_type: The atom type to compute the in-between vectors for</span>
 <span class="sd">    :type crosslinker_type: int</span>
 
-<span class="sd">    :return: a dictionary with key: &quot;{atom1.name}+{atom2.name}&quot; and value: The norm of the mean difference vector</span>
+<span class="sd">    :return: a dictionary with key: "{atom1.name}+{atom2.name}" and value: The norm of the mean difference vector</span>
 <span class="sd">    :rtype: dict</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">r_tau_vectors</span> <span class="o">=</span> <span class="n">compute_mean_end_to_end_vectors</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r_tau_vectors</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{}</span>
@@ -647,7 +647,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_mean_end_to_end_vectors</span><span class="p">(</span>
     <span class="n">networks</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Universe</span><span class="p">],</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the mean end to end vectors between each pair of (indirectly) connected crosslinker</span>
 
 <span class="sd">    :param networks: The different configurations of the polymer network to do the computation for</span>
@@ -655,9 +655,9 @@
 <span class="sd">    :param crosslinker_type: The atom type to compute the in-between vectors for</span>
 <span class="sd">    :type crosslinker_type: int</span>
 
-<span class="sd">    :return: a dictionary with key: &quot;{atom1.name}+{atom2.name}&quot; and value: Their mean distance difference vector</span>
+<span class="sd">    :return: a dictionary with key: "{atom1.name}+{atom2.name}" and value: Their mean distance difference vector</span>
 <span class="sd">    :rtype: dict</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{}</span>
     <span class="n">end_to_end_vectors</span> <span class="o">=</span> <span class="p">{}</span>
@@ -677,7 +677,7 @@
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">end_to_end_vectors</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">iteration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;Found molecule </span><span class="si">{}</span><span class="s2"> in network </span><span class="si">{}</span><span class="s2">, but not in previous&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="s2">"Found molecule </span><span class="si">{}</span><span class="s2"> in network </span><span class="si">{}</span><span class="s2">, but not in previous"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                             <span class="n">key</span><span class="p">,</span> <span class="n">iteration</span>
                         <span class="p">)</span>
                     <span class="p">)</span>
@@ -692,7 +692,7 @@
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_counts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
         <span class="n">c</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">key_counts</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">key_counts</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The networks contain different molecules.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"The networks contain different molecules."</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">end_to_end_vectors</span></div>
 
 
@@ -701,7 +701,7 @@
 <a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_end_to_end_vectors">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_end_to_end_vectors</span><span class="p">(</span>
         <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the end to end vectors between each pair of (indirectly) connected crosslinker</span>
 
 <span class="sd">    :param network: The polymer network to do the computation for</span>
@@ -709,9 +709,9 @@
 <span class="sd">    :param crosslinker_type: The atom type to compute the in-between vectors for</span>
 <span class="sd">    :type crosslinker_type: int</span>
 
-<span class="sd">    :return: a dictionary with key: &quot;{atom1.name}+{atom2.name}&quot; and value: Their difference vector</span>
+<span class="sd">    :return: a dictionary with key: "{atom1.name}+{atom2.name}" and value: Their difference vector</span>
 <span class="sd">    :rtype: dict</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># while we could do the decomposition again with explicit removal of irrelevant strand atoms,</span>
     <span class="c1"># this should not be any more expensive</span>
     <span class="n">end_to_end_vectors</span> <span class="o">=</span> <span class="p">{}</span>
@@ -747,7 +747,7 @@
     <span class="n">f</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">functionality_per_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the extent of reaction of the crosslinkers</span>
 <span class="sd">    (actual functionality divided by target functionality)</span>
 
@@ -757,7 +757,7 @@
 <span class="sd">    :param functionality_per_type: A dictionary with key: type, and value: (target) functionality of this atom type</span>
 <span class="sd">    :return: The (mean) crosslinker conversion</span>
 <span class="sd">    :rtype: float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">functionality_per_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">functionality_per_type</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">determine_functionality_per_type</span><span class="p">()</span>
@@ -767,7 +767,7 @@
 
     <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">f</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Crosslinker functionality = </span><span class="si">{}</span><span class="s2"> is not reasonable.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+            <span class="s2">"Crosslinker functionality = </span><span class="si">{}</span><span class="s2"> is not reasonable."</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">compute_effective_crosslinker_functionality</span><span class="p">(</span>
         <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span></div>
@@ -779,14 +779,14 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_effective_crosslinker_functionality</span><span class="p">(</span>
     <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the mean crosslinker functionality</span>
 
 <span class="sd">    :param network: The polymer network to do the computation for</span>
 <span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
 <span class="sd">    :return: The (mean) effective crosslinker functionality</span>
 <span class="sd">    :rtype: float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">junction_degrees</span> <span class="o">=</span> <span class="n">compute_effective_crosslinker_functionalities</span><span class="p">(</span>
         <span class="n">network</span><span class="p">,</span> <span class="n">crosslinker_type</span>
     <span class="p">)</span>
@@ -800,14 +800,14 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_effective_crosslinker_functionalities</span><span class="p">(</span>
     <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the functionality of every crosslinker in the network</span>
 
 <span class="sd">    :param network: The polymer network to do the computation for</span>
 <span class="sd">    :param crosslinker_type: The type of the junctions/crosslinkers to select them in the network</span>
 <span class="sd">    :return: The functionality of every crosslinker</span>
 <span class="sd">    :rtype: list[int]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
     <span class="n">junctions</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_atoms_by_type</span><span class="p">(</span><span class="n">crosslinker_type</span><span class="p">)</span>
@@ -821,7 +821,7 @@
 <div class="viewcode-block" id="compute_weight_fractions">
 <a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_weight_fractions">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_weight_fractions</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the weight fractions of each atom type in the network.</span>
 <span class="sd">    Kept for compatibility reasons; just call</span>
 <span class="sd">    :func:`pylimer_tools_cpp.Universe.compute_weight_fractions()` instead.</span>
@@ -829,7 +829,7 @@
 <span class="sd">    :param network: The polymer network to do the computation for</span>
 <span class="sd">    :return: Using the type i as a key, this dict contains the weight fractions (:math:`\\frac{W_i}{W_{tot}}`)</span>
 <span class="sd">    :rtype: dict</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">network</span><span class="o">.</span><span class="n">compute_weight_fractions</span><span class="p">()</span></div>
 
 
@@ -838,7 +838,7 @@
 <a class="viewcode-back" href="../../../pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">measure_weight_fraction_of_backbone</span><span class="p">(</span>
         <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the weight fraction of network backbone in infinite network</span>
 
 <span class="sd">    :param network: The network to compute the weight fraction for</span>
@@ -849,7 +849,7 @@
 <span class="sd">    See also:</span>
 <span class="sd">      - :func:`pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains()`</span>
 <span class="sd">      - :func:`pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material()`</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">0.0</span>
 
@@ -869,7 +869,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">measure_weight_fraction_of_dangling_chains</span><span class="p">(</span>
     <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">crosslinker_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the weight fraction of dangling strands in infinite network</span>
 
 <span class="sd">    .. note::</span>
@@ -880,7 +880,7 @@
 <span class="sd">    :param crosslinker_type: The atom type to use to split the molecules</span>
 <span class="sd">    :return: A tuple containing (weightDangling/weightTotal, numDangling/numTotal)</span>
 <span class="sd">    :rtype: Tuple[float, float]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
 
@@ -905,7 +905,7 @@
             <span class="n">weight_dangling</span> <span class="o">+=</span> <span class="n">get_weight_of_graph</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">weight_total</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c1"># warnings.warn(&quot;Total weight of network is = 0.&quot;)</span>
+        <span class="c1"># warnings.warn("Total weight of network is = 0.")</span>
         <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">num_dangling</span> <span class="o">/</span> <span class="n">num_total</span>
 
     <span class="k">return</span> <span class="n">weight_dangling</span> <span class="o">/</span> <span class="n">weight_total</span><span class="p">,</span> <span class="n">num_dangling</span> <span class="o">/</span> <span class="n">num_total</span></div>
@@ -917,7 +917,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">measure_weight_fraction_of_soluble_material</span><span class="p">(</span>
     <span class="n">network</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">rel_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">abs_tol</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the weight fraction of soluble material by counting.</span>
 <span class="sd">    Effectively, this method counts the weight of clusters</span>
 <span class="sd">    that have a weight less than a certain fraction of the total weight.</span>
@@ -927,7 +927,7 @@
 <span class="sd">    :param abs_tol: The weight from which on a component is not soluble anymore</span>
 <span class="sd">    :return: The weight fraction of soluble material as counted. 0 for an empty network</span>
 <span class="sd">    :rtype: float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">0.0</span>
 
@@ -959,7 +959,7 @@
     <span class="n">rel_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">,</span>
     <span class="n">abs_tol</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute a lower bound on the weight fraction of soluble material by counting.</span>
 <span class="sd">    This is ones as such: only clusters, which do not contain loops and are smaller than the rel_tol of the biggest,</span>
 <span class="sd">    are counted as soluble</span>
@@ -970,7 +970,7 @@
 <span class="sd">    :param abs_tol: The weight from which on a component is not soluble anymore</span>
 <span class="sd">    :return: The weight fraction of soluble material as counted. 0 for an empty network</span>
 <span class="sd">    :rtype: float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">get_nr_of_atoms</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">0.0</span>
 

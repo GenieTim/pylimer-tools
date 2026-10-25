@@ -4,13 +4,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>pylimer_tools.utils.optimize_dataframe - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -366,14 +366,14 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for pylimer_tools.utils.optimize_dataframe</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">Utility functions to reduce the memory usage of a pandas DataFrame.</span>
 <span class="sd">Particularly useful when dealing with large datasets, e.g. output from long LAMMPS simulation runs.</span>
 
 <span class="sd">Heavily inspired by the following sources:</span>
 <span class="sd">- https://medium.com/bigdatarepublic/advanced-pandas-optimize-speed-and-memory-a654b53be6c2</span>
 <span class="sd">- https://stackoverflow.com/questions/57531388/how-can-i-reduce-the-memory-of-a-pandas-dataframe</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
@@ -387,7 +387,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">reduce_mem_usage</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span> <span class="n">obj_to_category</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_stats</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Iterate through all the columns of a dataframe and modify the data type to reduce memory usage.</span>
 
 <span class="sd">    :param df: dataframe to reduce</span>
@@ -403,11 +403,11 @@
 
 <span class="sd">    :return: dataset with the column dtypes adjusted</span>
 <span class="sd">    :rtype: pd.DataFrame</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">start_mem</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">2</span>
     <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">print_stats</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Memory usage of dataframe is </span><span class="si">{:.2f}</span><span class="s2"> MB&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_mem</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Memory usage of dataframe is </span><span class="si">{:.2f}</span><span class="s2"> MB"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_mem</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -419,16 +419,16 @@
 
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">col_type</span> <span class="o">!=</span> <span class="nb">object</span>
-            <span class="ow">and</span> <span class="n">col_type</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;category&quot;</span>
-            <span class="ow">and</span> <span class="s2">&quot;datetime&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">col_type</span><span class="o">.</span><span class="n">name</span>
+            <span class="ow">and</span> <span class="n">col_type</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">"category"</span>
+            <span class="ow">and</span> <span class="s2">"datetime"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">col_type</span><span class="o">.</span><span class="n">name</span>
         <span class="p">):</span>
             <span class="n">c_min</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
             <span class="n">c_max</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
 
             <span class="c1"># test if column can be converted to an integer</span>
             <span class="n">treat_as_int</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">col_type</span><span class="p">)[</span>
-                <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;int&quot;</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">col_type</span><span class="p">)[</span>
-                <span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;uint&quot;</span>
+                <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"int"</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">col_type</span><span class="p">)[</span>
+                <span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"uint"</span>
 
             <span class="k">if</span> <span class="n">treat_as_int</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">c_min</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span>
@@ -473,13 +473,13 @@
                     <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="s2">&quot;datetime&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">col_type</span><span class="o">.</span><span class="n">name</span> <span class="ow">and</span> <span class="n">obj_to_category</span><span class="p">:</span>
-            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">"datetime"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">col_type</span><span class="o">.</span><span class="n">name</span> <span class="ow">and</span> <span class="n">obj_to_category</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"category"</span><span class="p">)</span>
     <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
     <span class="n">end_mem</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">2</span>
     <span class="k">if</span> <span class="n">print_stats</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Memory usage after optimization is: </span><span class="si">{:.3f}</span><span class="s2"> MB&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_mem</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Decreased by </span><span class="si">{:.1f}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Memory usage after optimization is: </span><span class="si">{:.3f}</span><span class="s2"> MB"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_mem</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Decreased by </span><span class="si">{:.1f}</span><span class="s2">%"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">start_mem</span> <span class="o">-</span> <span class="n">end_mem</span><span class="p">)</span> <span class="o">/</span> <span class="n">start_mem</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">df</span></div>
@@ -489,7 +489,7 @@
 <div class="viewcode-block" id="optimize_floats">
 <a class="viewcode-back" href="../../../pylimer_tools.utils.html#pylimer_tools.utils.optimize_dataframe.optimize_floats">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">optimize_floats</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Optimize the floating point type entries.</span>
 
 <span class="sd">    :param df: dataframe to reduce</span>
@@ -497,9 +497,9 @@
 
 <span class="sd">    :return: dataset with the column dtypes adjusted</span>
 <span class="sd">    :rtype: pd.DataFrame</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">floats</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;float64&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-    <span class="n">df</span><span class="p">[</span><span class="n">floats</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">floats</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">,</span> <span class="n">downcast</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">floats</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s2">"float64"</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="n">floats</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">floats</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">,</span> <span class="n">downcast</span><span class="o">=</span><span class="s2">"float"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
 
@@ -507,7 +507,7 @@
 <div class="viewcode-block" id="optimize_ints">
 <a class="viewcode-back" href="../../../pylimer_tools.utils.html#pylimer_tools.utils.optimize_dataframe.optimize_ints">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">optimize_ints</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Optimize the integer point type entries.</span>
 
 <span class="sd">    :param df: dataframe to reduce</span>
@@ -515,9 +515,9 @@
 
 <span class="sd">    :return: dataset with the column dtypes adjusted</span>
 <span class="sd">    :rtype: pd.DataFrame</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ints</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;int64&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-    <span class="n">df</span><span class="p">[</span><span class="n">ints</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">ints</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">,</span> <span class="n">downcast</span><span class="o">=</span><span class="s2">&quot;integer&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">ints</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s2">"int64"</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="n">ints</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">ints</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">,</span> <span class="n">downcast</span><span class="o">=</span><span class="s2">"integer"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
 
@@ -526,7 +526,7 @@
 <a class="viewcode-back" href="../../../pylimer_tools.utils.html#pylimer_tools.utils.optimize_dataframe.optimize_objects">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">optimize_objects</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
                      <span class="n">datetime_features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Optimize object type entries.</span>
 
 <span class="sd">    :param df: dataframe to reduce</span>
@@ -536,13 +536,13 @@
 
 <span class="sd">    :return: dataset with the column dtypes adjusted</span>
 <span class="sd">    :rtype: pd.DataFrame</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">]):</span>
+<span class="sd">    """</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s2">"object"</span><span class="p">]):</span>
         <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">datetime_features</span><span class="p">:</span>
             <span class="n">num_unique_values</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
             <span class="n">num_total_values</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
             <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">num_unique_values</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_total_values</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
-                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"category"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">df</span></div>
@@ -552,7 +552,7 @@
 <div class="viewcode-block" id="optimize">
 <a class="viewcode-back" href="../../../pylimer_tools.utils.html#pylimer_tools.utils.optimize_dataframe.optimize">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">datetime_features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Optimize all types of all columns in a dataframe.</span>
 
 <span class="sd">    :param df: dataframe to reduce</span>
@@ -562,7 +562,7 @@
 
 <span class="sd">    :return: dataset with the column dtypes adjusted</span>
 <span class="sd">    :rtype: pd.DataFrame</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">optimize_floats</span><span class="p">(</span><span class="n">optimize_ints</span><span class="p">(</span>
         <span class="n">optimize_objects</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">datetime_features</span><span class="p">)))</span></div>
 

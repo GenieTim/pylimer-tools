@@ -1,6 +1,6 @@
 # do_linear_walk_chain_from_to
 
-### pylimer_tools_cpp.do_linear_walk_chain_from_to(box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box), from_coordinates: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[3, 1]'], to_coordinates: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[3, 1]'], chain_len: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), include_ends: [bool](https://docs.python.org/3/library/functions.html#bool) = False) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+### pylimer_tools_cpp.do_linear_walk_chain_from_to(box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box), from_coordinates: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[3, 1]'], to_coordinates: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[3, 1]'], chain_len: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), include_ends: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Get coordinates linearly interpolated from one point to another (both exclusive).
 

@@ -8,27 +8,27 @@ Solver for sparse linear equation systems
 
 ### Attributes Summary
 
-| [`BICGSTAB`](#pylimer_tools_cpp.SLESolver.BICGSTAB)                                                                           |    |
-|-------------------------------------------------------------------------------------------------------------------------------|----|
-| [`BICGSTAB_DIAGONALIZED`](#pylimer_tools_cpp.SLESolver.BICGSTAB_DIAGONALIZED)                                                 |    |
-| [`BICGSTAB_IDENTITY`](#pylimer_tools_cpp.SLESolver.BICGSTAB_IDENTITY)                                                         |    |
-| [`BICGSTAB_INCOMPLETE_LU`](#pylimer_tools_cpp.SLESolver.BICGSTAB_INCOMPLETE_LU)                                               |    |
-| [`CONJUGATE_GRADIENT`](#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT)                                                       |    |
-| [`CONJUGATE_GRADIENT_DIAGONALIZED`](#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED)                             |    |
-| [`CONJUGATE_GRADIENT_IDENTITY`](#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_IDENTITY)                                     |    |
-| [`CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY`](#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY)               |    |
-| [`DEFAULT`](#pylimer_tools_cpp.SLESolver.DEFAULT)                                                                             |    |
-| [`GRADIENT_DESCENT`](#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT)                                                           |    |
-| [`GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG`](#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG)               |    |
-| [`GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM`](#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM)       |    |
-| [`GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT`](#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT)             |    |
-| [`LEAST_SQUARES_CONJUGATE_GRADIENT`](#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT)                           |    |
+| [`BICGSTAB`](#pylimer_tools_cpp.SLESolver.BICGSTAB)                                      |    |
+|------------------------------------------------------------------------------------------------|----|
+| [`BICGSTAB_DIAGONALIZED`](#pylimer_tools_cpp.SLESolver.BICGSTAB_DIAGONALIZED)                         |    |
+| [`BICGSTAB_IDENTITY`](#pylimer_tools_cpp.SLESolver.BICGSTAB_IDENTITY)                             |    |
+| [`BICGSTAB_INCOMPLETE_LU`](#pylimer_tools_cpp.SLESolver.BICGSTAB_INCOMPLETE_LU)                        |    |
+| [`CONJUGATE_GRADIENT`](#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT)                            |    |
+| [`CONJUGATE_GRADIENT_DIAGONALIZED`](#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED)               |    |
+| [`CONJUGATE_GRADIENT_IDENTITY`](#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_IDENTITY)                   |    |
+| [`CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY`](#pylimer_tools_cpp.SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY)        |    |
+| [`DEFAULT`](#pylimer_tools_cpp.SLESolver.DEFAULT)                                       |    |
+| [`GRADIENT_DESCENT`](#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT)                              |    |
+| [`GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG`](#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG)        |    |
+| [`GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM`](#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM)    |    |
+| [`GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT`](#pylimer_tools_cpp.SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT)       |    |
+| [`LEAST_SQUARES_CONJUGATE_GRADIENT`](#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT)              |    |
 | [`LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED`](#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED) |    |
-| [`LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY`](#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY)         |    |
-| [`SIMPLICIAL_LDLT`](#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LDLT)                                                             |    |
-| [`SIMPLICIAL_LLT`](#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT)                                                               |    |
-| [`SPARSE_LU`](#pylimer_tools_cpp.SLESolver.SPARSE_LU)                                                                         |    |
-| [`SPARSE_QR`](#pylimer_tools_cpp.SLESolver.SPARSE_QR)                                                                         |    |
+| [`LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY`](#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY)     |    |
+| [`SIMPLICIAL_LDLT`](#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LDLT)                               |    |
+| [`SIMPLICIAL_LLT`](#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT)                                |    |
+| [`SPARSE_LU`](#pylimer_tools_cpp.SLESolver.SPARSE_LU)                                     |    |
+| [`SPARSE_QR`](#pylimer_tools_cpp.SLESolver.SPARSE_QR)                                     |    |
 
 ### Attributes Documentation
 

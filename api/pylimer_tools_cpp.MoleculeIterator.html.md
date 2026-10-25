@@ -4,4 +4,4 @@
 
 Bases: `pybind11_object`
 
-An iterator to iterate through the atoms in [`Molecule`](pylimer_tools_cpp.Molecule.md#pylimer_tools_cpp.Molecule).
+An iterator to iterate through the atoms in [`Molecule`](pylimer_tools_cpp.Molecule.html.md#pylimer_tools_cpp.Molecule).

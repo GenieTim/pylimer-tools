@@ -8,10 +8,10 @@ Enum for controlling the strand linking process in linkStrandsCallback.
 
 ### Attributes Summary
 
-| [`STOP`](#pylimer_tools_cpp.BackTrackStatus.STOP)                     |    |
-|-----------------------------------------------------------------------|----|
+| [`STOP`](#pylimer_tools_cpp.BackTrackStatus.STOP)           |    |
+|-----------------------------------------------------------------|----|
 | [`TRACK_BACKWARD`](#pylimer_tools_cpp.BackTrackStatus.TRACK_BACKWARD) |    |
-| [`TRACK_FORWARD`](#pylimer_tools_cpp.BackTrackStatus.TRACK_FORWARD)   |    |
+| [`TRACK_FORWARD`](#pylimer_tools_cpp.BackTrackStatus.TRACK_FORWARD)  |    |
 
 ### Attributes Documentation
 

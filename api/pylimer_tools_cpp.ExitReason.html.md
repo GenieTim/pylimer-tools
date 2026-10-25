@@ -9,30 +9,30 @@ the simulation or optimization procedure.
 
 ### Attributes Summary
 
-| [`FAILURE`](#pylimer_tools_cpp.ExitReason.FAILURE)                     |                                                      |
-|------------------------------------------------------------------------|------------------------------------------------------|
-| [`F_TOLERANCE`](#pylimer_tools_cpp.ExitReason.F_TOLERANCE)             |                                                      |
-| [`INTERRUPT`](#pylimer_tools_cpp.ExitReason.INTERRUPT)                 |                                                      |
-| [`MAX_STEPS`](#pylimer_tools_cpp.ExitReason.MAX_STEPS)                 |                                                      |
+| [`FAILURE`](#pylimer_tools_cpp.ExitReason.FAILURE)           |                                                      |
+|--------------------------------------------------------------------|------------------------------------------------------|
+| [`F_TOLERANCE`](#pylimer_tools_cpp.ExitReason.F_TOLERANCE)       |                                                      |
+| [`INTERRUPT`](#pylimer_tools_cpp.ExitReason.INTERRUPT)         |                                                      |
+| [`MAX_STEPS`](#pylimer_tools_cpp.ExitReason.MAX_STEPS)         |                                                      |
 | [`NO_STEPS_POSSIBLE`](#pylimer_tools_cpp.ExitReason.NO_STEPS_POSSIBLE) |                                                      |
-| [`OTHER`](#pylimer_tools_cpp.ExitReason.OTHER)                         |                                                      |
-| [`UNSET`](#pylimer_tools_cpp.ExitReason.UNSET)                         |                                                      |
-| [`X_TOLERANCE`](#pylimer_tools_cpp.ExitReason.X_TOLERANCE)             |                                                      |
-| [`denominator`](#pylimer_tools_cpp.ExitReason.denominator)             | the denominator of a rational number in lowest terms |
-| [`imag`](#pylimer_tools_cpp.ExitReason.imag)                           | the imaginary part of a complex number               |
-| [`numerator`](#pylimer_tools_cpp.ExitReason.numerator)                 | the numerator of a rational number in lowest terms   |
-| [`real`](#pylimer_tools_cpp.ExitReason.real)                           | the real part of a complex number                    |
+| [`OTHER`](#pylimer_tools_cpp.ExitReason.OTHER)             |                                                      |
+| [`UNSET`](#pylimer_tools_cpp.ExitReason.UNSET)             |                                                      |
+| [`X_TOLERANCE`](#pylimer_tools_cpp.ExitReason.X_TOLERANCE)       |                                                      |
+| [`denominator`](#pylimer_tools_cpp.ExitReason.denominator)       | the denominator of a rational number in lowest terms |
+| [`imag`](#pylimer_tools_cpp.ExitReason.imag)              | the imaginary part of a complex number               |
+| [`numerator`](#pylimer_tools_cpp.ExitReason.numerator)         | the numerator of a rational number in lowest terms   |
+| [`real`](#pylimer_tools_cpp.ExitReason.real)              | the real part of a complex number                    |
 
 ### Methods Summary
 
-| [`as_integer_ratio`](#pylimer_tools_cpp.ExitReason.as_integer_ratio)()               | Return a pair of integers, whose ratio is equal to the original int.       |
-|--------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
-| [`bit_count`](#pylimer_tools_cpp.ExitReason.bit_count)()                             | Number of ones in the binary representation of the absolute value of self. |
+| [`as_integer_ratio`](#pylimer_tools_cpp.ExitReason.as_integer_ratio)()                     | Return a pair of integers, whose ratio is equal to the original int.       |
+|-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| [`bit_count`](#pylimer_tools_cpp.ExitReason.bit_count)()                            | Number of ones in the binary representation of the absolute value of self. |
 | [`bit_length`](#pylimer_tools_cpp.ExitReason.bit_length)()                           | Number of bits necessary to represent self in binary.                      |
-| [`conjugate`](#pylimer_tools_cpp.ExitReason.conjugate)                               | Returns self, the complex conjugate of any int.                            |
+| [`conjugate`](#pylimer_tools_cpp.ExitReason.conjugate)                              | Returns self, the complex conjugate of any int.                            |
 | [`from_bytes`](#pylimer_tools_cpp.ExitReason.from_bytes)(bytes[, byteorder, signed]) | Return the integer represented by the given array of bytes.                |
 | [`is_integer`](#pylimer_tools_cpp.ExitReason.is_integer)()                           | Returns True.                                                              |
-| [`to_bytes`](#pylimer_tools_cpp.ExitReason.to_bytes)([length, byteorder, signed])    | Return an array of bytes representing an integer.                          |
+| [`to_bytes`](#pylimer_tools_cpp.ExitReason.to_bytes)([length, byteorder, signed])  | Return an array of bytes representing an integer.                          |
 
 ### Attributes Documentation
 

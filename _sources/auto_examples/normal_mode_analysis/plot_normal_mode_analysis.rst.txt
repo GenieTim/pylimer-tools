@@ -98,13 +98,21 @@ Plot the results
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /home/runner/work/pylimer-tools/pylimer-tools/examples/normal_mode_analysis/plot_normal_mode_analysis.py:54: Pandas4Warning: The inplace keyword in DataFrame.set_index is deprecated and will be removed in a future version (PDEP-8).
+    See https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace for more details.
+      df.set_index("Frequency", inplace=True)
+
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 15.359 seconds)
+   **Total running time of the script:** (0 minutes 15.671 seconds)
 
 
 .. _sphx_glr_download_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py:

@@ -17,13 +17,13 @@ Create a new OutputConfiguration instance.
 
 ### Attributes Summary
 
-| [`append`](#pylimer_tools_cpp.OutputConfiguration.append)               | Whether to append to the file or truncate it                    |
-|-------------------------------------------------------------------------|-----------------------------------------------------------------|
+| [`append`](#pylimer_tools_cpp.OutputConfiguration.append)        | Whether to append to the file or truncate it                    |
+|----------------------------------------------------------------|-----------------------------------------------------------------|
 | [`double_values`](#pylimer_tools_cpp.OutputConfiguration.double_values) | List of double-valued quantities to output.                     |
-| [`filename`](#pylimer_tools_cpp.OutputConfiguration.filename)           | The path and name of the file to write to.                      |
-| [`int_values`](#pylimer_tools_cpp.OutputConfiguration.int_values)       | List of integer-valued quantities to output.                    |
-| [`output_every`](#pylimer_tools_cpp.OutputConfiguration.output_every)   | How often to write the values to the output.                    |
-| [`use_every`](#pylimer_tools_cpp.OutputConfiguration.use_every)         | For autocorrelation and averaging, how often to include values. |
+| [`filename`](#pylimer_tools_cpp.OutputConfiguration.filename)      | The path and name of the file to write to.                      |
+| [`int_values`](#pylimer_tools_cpp.OutputConfiguration.int_values)    | List of integer-valued quantities to output.                    |
+| [`output_every`](#pylimer_tools_cpp.OutputConfiguration.output_every)  | How often to write the values to the output.                    |
+| [`use_every`](#pylimer_tools_cpp.OutputConfiguration.use_every)     | For autocorrelation and averaging, how often to include values. |
 
 ### Attributes Documentation
 
@@ -35,7 +35,7 @@ Whether to append to the file or truncate it
 
 List of double-valued quantities to output.
 
-Use [`ComputedDoubleValues`](pylimer_tools_cpp.ComputedDoubleValues.md#pylimer_tools_cpp.ComputedDoubleValues) enum to specify which floating-point quantities
+Use [`ComputedDoubleValues`](pylimer_tools_cpp.ComputedDoubleValues.html.md#pylimer_tools_cpp.ComputedDoubleValues) enum to specify which floating-point quantities
 should be computed and written to output.
 
 #### filename
@@ -47,7 +47,7 @@ An empty string (“”) means standard output (console).
 
 List of integer-valued quantities to output.
 
-Use [`ComputedIntValues`](pylimer_tools_cpp.ComputedIntValues.md#pylimer_tools_cpp.ComputedIntValues) enum to specify which integer quantities
+Use [`ComputedIntValues`](pylimer_tools_cpp.ComputedIntValues.html.md#pylimer_tools_cpp.ComputedIntValues) enum to specify which integer quantities
 should be computed and written to output.
 
 #### output_every

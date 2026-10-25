@@ -8,15 +8,15 @@ How slip-links may act when they reach each-other or even a crosslink.
 
 ### Attributes Summary
 
-| [`ALL`](#pylimer_tools_cpp.LinkSwappingMode.ALL)                           |    |
-|----------------------------------------------------------------------------|----|
-| [`ALL_CYCLE`](#pylimer_tools_cpp.LinkSwappingMode.ALL_CYCLE)               |    |
-| [`ALL_MC`](#pylimer_tools_cpp.LinkSwappingMode.ALL_MC)                     |    |
-| [`ALL_MC_CYCLE`](#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_CYCLE)         |    |
-| [`ALL_MC_TRY`](#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_TRY)             |    |
+| [`ALL`](#pylimer_tools_cpp.LinkSwappingMode.ALL)              |    |
+|-------------------------------------------------------------------|----|
+| [`ALL_CYCLE`](#pylimer_tools_cpp.LinkSwappingMode.ALL_CYCLE)        |    |
+| [`ALL_MC`](#pylimer_tools_cpp.LinkSwappingMode.ALL_MC)           |    |
+| [`ALL_MC_CYCLE`](#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_CYCLE)     |    |
+| [`ALL_MC_TRY`](#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_TRY)       |    |
 | [`ALL_MC_TRY_CYCLE`](#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_TRY_CYCLE) |    |
-| [`NO_SWAPPING`](#pylimer_tools_cpp.LinkSwappingMode.NO_SWAPPING)           |    |
-| [`SLIPLINKS_ONLY`](#pylimer_tools_cpp.LinkSwappingMode.SLIPLINKS_ONLY)     |    |
+| [`NO_SWAPPING`](#pylimer_tools_cpp.LinkSwappingMode.NO_SWAPPING)      |    |
+| [`SLIPLINKS_ONLY`](#pylimer_tools_cpp.LinkSwappingMode.SLIPLINKS_ONLY)   |    |
 
 ### Attributes Documentation
 

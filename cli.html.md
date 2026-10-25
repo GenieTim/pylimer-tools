@@ -33,7 +33,7 @@ pylimer-analyse-networks [OPTIONS] [FILES]...
 Name of the polymer to use for parameter retrieval.
 
 * **Options:**
-  peo | pi50 | pi20 | pe | pe413 | apmma | apea | cispi | pib413 | apoa | pet | ips | sbr | pi7 | pi34 | ipp | aps | pi75 | apams | app413 | pom | apva | app348 | app | pc | pbd20 | pbd98 | pib | pdms | apma | p6n | spp | app463 | ptfe | aphma | cispbd
+  pi7 | pib413 | pi75 | pe | aphma | app463 | apams | apma | app | app348 | sbr | pi50 | pc | apva | peo | pi34 | ipp | aps | spp | apoa | ips | p6n | cispbd | pdms | pet | pib | pbd20 | pe413 | apmma | pi20 | pbd98 | apea | pom | cispi | ptfe | app413
 
 ### Arguments
 

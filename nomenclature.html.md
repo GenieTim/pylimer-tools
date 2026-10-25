@@ -6,15 +6,15 @@ Understanding these terms is crucial for effective use of the library.
 ## Core Entities
 
 **Atom**
-: An [`Atom`](api/pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom) represents a fundamental unit in the simulation, used interchangeably with “bead” following LAMMPS conventions.
+: An [`Atom`](api/pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom) represents a fundamental unit in the simulation, used interchangeably with “bead” following LAMMPS conventions.
   Each atom has properties such as position, type, and mass.
   Following LAMMPS convention, each atom must have a unique ID, a type and a position.
 
 **Molecule**
-: A [`Molecule`](api/pylimer_tools_cpp.Molecule.md#pylimer_tools_cpp.Molecule) is a collection of atoms that are necessarily connected through bonds. This could represent a polymer chain, a strand, or even a single atom depending on the system.
+: A [`Molecule`](api/pylimer_tools_cpp.Molecule.html.md#pylimer_tools_cpp.Molecule) is a collection of atoms that are necessarily connected through bonds. This could represent a polymer chain, a strand, or even a single atom depending on the system.
 
 **Universe**
-: A [`Universe`](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) represents a complete collection of atoms in a simulation system. Atoms within a universe are not necessarily all connected to each other.
+: A [`Universe`](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) represents a complete collection of atoms in a simulation system. Atoms within a universe are not necessarily all connected to each other.
 
 **UniverseSequence**
 : A collection of universes, typically representing different time steps or configurations of the same system.
@@ -57,9 +57,9 @@ Understanding these terms is crucial for effective use of the library.
 **Mass vs. Weight**: We generally try to follow official scientific nomenclature.
 However, there are historical inconsistencies where we follow tradition and use “weight” instead of “mass” in certain function names:
 
-- [`compute_number_average_molecular_weight()`](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe.compute_number_average_molecular_weight)
-- [`compute_weight_average_molecular_weight()`](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe.compute_weight_average_molecular_weight)
-- [`compute_weight_fractions()`](api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe.compute_weight_fractions)
+- [`compute_number_average_molecular_weight()`](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe.compute_number_average_molecular_weight)
+- [`compute_weight_average_molecular_weight()`](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe.compute_weight_average_molecular_weight)
+- [`compute_weight_fractions()`](api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe.compute_weight_fractions)
 
 These functions actually calculate molecular masses, not weights. See [Mass vs. Weight](https://en.wikipedia.org/wiki/Mass_versus_weight) for the scientific distinction.
 

@@ -4,13 +4,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>pylimer_tools.io.read_pylimer_tools_output_file - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -366,9 +366,9 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for pylimer_tools.io.read_pylimer_tools_output_file</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module provides a few functions to read output from pylimer_tools_cpp&#39;s simulators.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
+<span class="sd">This module provides a few functions to read output from pylimer_tools_cpp's simulators.</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
@@ -379,7 +379,7 @@
 <div class="viewcode-block" id="read_avg_file">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">read_avg_file</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read an averages-output file from one of the simulators shipped with pylimer_tools.</span>
 
 <span class="sd">    This function parses the output file format used by pylimer_tools_cpp simulators,</span>
@@ -391,37 +391,37 @@
 <span class="sd">    :return: DataFrame containing the parsed averages data, grouped by OutputStep</span>
 <span class="sd">    :rtype: pd.DataFrame</span>
 
-<span class="sd">    :note: The function automatically filters out lines containing &quot;-nan&quot; values,</span>
+<span class="sd">    :note: The function automatically filters out lines containing "-nan" values,</span>
 <span class="sd">           null characters, or fewer than 3 columns.</span>
 <span class="sd">    :note: The returned DataFrame is grouped by OutputStep, keeping only the last</span>
 <span class="sd">           entry for each step.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cache</span> <span class="o">=</span> <span class="n">load_cache</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;my-avg&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">cache</span> <span class="o">=</span> <span class="n">load_cache</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">"my-avg"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">cache</span>
     <span class="n">data_frames</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">first_line_split</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">first_line_split</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;-nan&quot;</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">or</span> <span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">"-nan"</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">or</span> <span class="s2">"</span><span class="se">\x00</span><span class="s2">"</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">stripped_line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">stripped_line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">stripped_line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">first_line_split</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="n">data_frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
                         <span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">first_line_split</span><span class="p">))</span>
                 <span class="n">first_line_split</span> <span class="o">=</span> <span class="n">stripped_line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">elif</span> <span class="n">stripped_line</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">stripped_line</span> <span class="o">!=</span> <span class="s2">""</span><span class="p">:</span>
                 <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stripped_line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">data_frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">first_line_split</span><span class="p">))</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">data_frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">apply_to_numeric_ignore_compat</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;OutputStep&quot;</span><span class="p">,</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;OutputStep&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
-    <span class="n">do_cache</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;my-avg&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"OutputStep"</span><span class="p">,</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s2">"OutputStep"</span><span class="p">]</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+    <span class="n">do_cache</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="s2">"my-avg"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">result</span></div>
 
 </pre></div>

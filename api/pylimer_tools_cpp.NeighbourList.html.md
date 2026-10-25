@@ -1,6 +1,6 @@
 # NeighbourList
 
-### *class* pylimer_tools_cpp.NeighbourList(self: [pylimer_tools_cpp.NeighbourList](#pylimer_tools_cpp.NeighbourList), atoms: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)], box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box), cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat))
+### *class* pylimer_tools_cpp.NeighbourList(self: [pylimer_tools_cpp.NeighbourList](#pylimer_tools_cpp.NeighbourList), atoms: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)], box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box), cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat))
 
 Bases: `pybind11_object`
 
@@ -19,12 +19,12 @@ Instantiate a new neighbour list.
 ### Methods Summary
 
 | [`get_atoms_close_to`](#pylimer_tools_cpp.NeighbourList.get_atoms_close_to)(self, atom[, ...])   | List all atoms that are close to a given one.   |
-|--------------------------------------------------------------------------------------------------|-------------------------------------------------|
-| [`remove_atom`](#pylimer_tools_cpp.NeighbourList.remove_atom)(self, atom[, debug_hint])          | Remove an atom from this neighbour list.        |
+|------------------------------------------------------------------------------------------|-------------------------------------------------|
+| [`remove_atom`](#pylimer_tools_cpp.NeighbourList.remove_atom)(self, atom[, debug_hint])   | Remove an atom from this neighbour list.        |
 
 ### Methods Documentation
 
-#### get_atoms_close_to(self: [pylimer_tools_cpp.NeighbourList](#pylimer_tools_cpp.NeighbourList), atom: [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom), upper_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0, lower_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.0, unwrapped: [bool](https://docs.python.org/3/library/functions.html#bool) = False, expect_self: [bool](https://docs.python.org/3/library/functions.html#bool) = False) → [list](https://docs.python.org/3/library/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)]
+#### get_atoms_close_to(self: [pylimer_tools_cpp.NeighbourList](#pylimer_tools_cpp.NeighbourList), atom: [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom), upper_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0, lower_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.0, unwrapped: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, expect_self: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)]
 
 List all atoms that are close to a given one.
 
@@ -45,7 +45,7 @@ filling the neighbour list buckets.
 * **Returns:**
   List of neighbouring atoms
 
-#### remove_atom(self: [pylimer_tools_cpp.NeighbourList](#pylimer_tools_cpp.NeighbourList), atom: [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom), debug_hint: [str](https://docs.python.org/3/library/stdtypes.html#str) = '') → [None](https://docs.python.org/3/library/constants.html#None)
+#### remove_atom(self: [pylimer_tools_cpp.NeighbourList](#pylimer_tools_cpp.NeighbourList), atom: [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom), debug_hint: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '') → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Remove an atom from this neighbour list.
 It will not show up when querying for neighbours,

@@ -4,13 +4,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>pylimer_tools.utils.data_utility - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -374,21 +374,21 @@
 <div class="viewcode-block" id="apply_to_numeric_ignore_compat">
 <a class="viewcode-back" href="../../../pylimer_tools.utils.html#pylimer_tools.utils.data_utility.apply_to_numeric_ignore_compat">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_to_numeric_ignore_compat</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Convert DataFrame columns to numeric when possible.</span>
 
-<span class="sd">    This preserves the historical behavior of ``errors=&#39;ignore&#39;`` from</span>
+<span class="sd">    This preserves the historical behavior of ``errors='ignore'`` from</span>
 <span class="sd">    ``pandas.to_numeric`` while remaining compatible with newer pandas versions.</span>
 
 <span class="sd">    :param df: DataFrame whose columns should be converted where possible</span>
 <span class="sd">    :type df: pd.DataFrame</span>
 <span class="sd">    :return: DataFrame with numeric-like columns converted</span>
 <span class="sd">    :rtype: pd.DataFrame</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_convert</span><span class="p">(</span><span class="n">series</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">series</span>
 
@@ -399,7 +399,7 @@
 <div class="viewcode-block" id="get_tail">
 <a class="viewcode-back" href="../../../pylimer_tools.utils.html#pylimer_tools.utils.data_utility.get_tail">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_tail</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">percentage</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">min_n</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">max_percentage</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Extract the last few entries of a list</span>
 
 <span class="sd">    :param data: The list, DataFrame, or Series to extract the last few entries from</span>
@@ -416,7 +416,7 @@
 <span class="sd">    The function returns a subset with at maximum max_percentage,</span>
 <span class="sd">    at least min_n entries (assuming the initial data is as large),</span>
 <span class="sd">    but ideally `percentage` many percentage of the last entries.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">assert</span> <span class="n">percentage</span> <span class="o">&lt;=</span> <span class="mi">1</span>
     <span class="k">assert</span> <span class="n">max_percentage</span> <span class="o">&lt;=</span> <span class="mi">1</span>
     <span class="n">tail_n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
@@ -440,7 +440,7 @@
     <span class="n">step_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">max_expected_step_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get a DataFrame where all data points have the same step between the values in column given by `key`</span>
 
 <span class="sd">    :param data: The DataFrame to unify the step-size for</span>
@@ -457,18 +457,18 @@
 <span class="sd">    NOTE: this function is rather unstable, as it has a few assumptions:</span>
 <span class="sd">    - steps are modulo stepsize. Breaks e.g. with steps start with 1 and go up by step_size.</span>
 <span class="sd">    - ideal step-size is max step difference. Breaks e.g. if there is one big gap</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># lenBefore = len(data)</span>
     <span class="k">if</span> <span class="n">step_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">step_size</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">step_size</span> <span class="o">&gt;</span> <span class="n">max_expected_step_size</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;Step size </span><span class="si">{}</span><span class="s2"> unexpectedly large, with max expected </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="s2">"Step size </span><span class="si">{}</span><span class="s2"> unexpectedly large, with max expected </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">step_size</span><span class="p">,</span> <span class="n">max_expected_step_size</span>
             <span class="p">)</span>
         <span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[(</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">%</span> <span class="n">step_size</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
-    <span class="c1"># print(&quot;Reduced from {} to {} data-points using step size of {}&quot;.format(lenBefore, len(data), step_size))</span>
+    <span class="c1"># print("Reduced from {} to {} data-points using step size of {}".format(lenBefore, len(data), step_size))</span>
     <span class="k">return</span> <span class="n">data</span></div>
 
 </pre></div>

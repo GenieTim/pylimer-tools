@@ -4,13 +4,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>pylimer_tools.io.unit_styles - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -381,7 +381,7 @@
 <div class="viewcode-block" id="UnitStyle">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyle">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UnitStyle</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    UnitStyle: a collection of units of a particular LAMMPS unit style,</span>
 <span class="sd">    but in SI units</span>
 <span class="sd">    (i.e.: use this to convert your LAMMPS output data to SI units).</span>
@@ -392,48 +392,48 @@
 
 <span class="sd">        unit_style_factory = UnitStyleFactory()</span>
 <span class="sd">        unit_style = unit_style_factory.get_unit_style(</span>
-<span class="sd">            &quot;lj&quot;, polymer=&quot;pdms&quot;, warning=False, accept_mol=True)</span>
+<span class="sd">            "lj", polymer="pdms", warning=False, accept_mol=True)</span>
 
 <span class="sd">        # multiply with the following factor to convert LJ stress to SI units,</span>
 <span class="sd">        # namely MPa in this example:</span>
-<span class="sd">        lj_stress_to_si_conversion_factor = (1.*unit_style.pressure).to(&quot;MPa&quot;).magnitude</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        lj_stress_to_si_conversion_factor = (1.*unit_style.pressure).to("MPa").magnitude</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit_configuration</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">ureg</span><span class="p">:</span> <span class="n">UnitRegistry</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize a UnitStyle object.</span>
 
 <span class="sd">        :param unit_configuration: Dictionary containing unit definitions</span>
 <span class="sd">        :type unit_configuration: dict</span>
 <span class="sd">        :param ureg: Pint unit registry to use for unit conversions</span>
 <span class="sd">        :type ureg: UnitRegistry</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unit_configuration</span> <span class="o">=</span> <span class="n">unit_configuration</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">underlying_unit_registry</span> <span class="o">=</span> <span class="n">ureg</span>
         <span class="c1"># add some auxiliary constants</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">unit_configuration</span><span class="p">[</span><span class="s2">&quot;kb&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.381e-23</span> <span class="o">*</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;joule/kelvin&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;volume&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_configuration</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">unit_configuration</span><span class="p">[</span><span class="s2">&quot;volume&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_configuration</span><span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit_configuration</span><span class="p">[</span><span class="s2">"kb"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.381e-23</span> <span class="o">*</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"joule/kelvin"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"volume"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_configuration</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unit_configuration</span><span class="p">[</span><span class="s2">"volume"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_configuration</span><span class="p">[</span><span class="s2">"distance"</span><span class="p">]</span> <span class="o">**</span> <span class="mi">3</span>
 
 <div class="viewcode-block" id="UnitStyle.get_underlying_unit_registry">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyle.get_underlying_unit_registry">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_underlying_unit_registry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the underlying Pint unit registry.</span>
 
 <span class="sd">        :return: The unit registry used by this UnitStyle</span>
 <span class="sd">        :rtype: UnitRegistry</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_unit_registry</span></div>
 
 
 <div class="viewcode-block" id="UnitStyle.get_base_unit_of">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyle.get_base_unit_of">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_base_unit_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">property</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns the conversion factor from the unit style to SI units.</span>
 
-<span class="sd">        :param property: The property name to get the unit for (e.g., &quot;mass&quot;, &quot;distance&quot;)</span>
+<span class="sd">        :param property: The property name to get the unit for (e.g., "mass", "distance")</span>
 <span class="sd">        :type property: str</span>
 <span class="sd">        :return: The unit object for the requested property</span>
 <span class="sd">        :rtype: pint.Quantity</span>
@@ -442,12 +442,12 @@
 
 <span class="sd">        .. code:: python</span>
 
-<span class="sd">          units = get_unit_style(&quot;lj&quot;)</span>
-<span class="sd">          mass_in_si = mass_in_lj * units.get_base_unit_of(&quot;mass&quot;)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">          units = get_unit_style("lj")</span>
+<span class="sd">          mass_in_si = mass_in_lj * units.get_base_unit_of("mass")</span>
+<span class="sd">        """</span>
         <span class="n">translator</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;dynamic viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;viscosity&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;electric field&quot;</span><span class="p">:</span> <span class="s2">&quot;electric_field&quot;</span><span class="p">,</span>
+            <span class="s2">"dynamic viscosity"</span><span class="p">:</span> <span class="s2">"viscosity"</span><span class="p">,</span>
+            <span class="s2">"electric field"</span><span class="p">:</span> <span class="s2">"electric_field"</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="nb">property</span> <span class="o">=</span> <span class="nb">property</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">property</span> <span class="ow">in</span> <span class="n">translator</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -458,7 +458,7 @@
 <div class="viewcode-block" id="UnitStyle.__getattr__">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyle.__getattr__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">property</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Shorthand access for :func:`~pylimer_tools.io.unitStyles.UnitStyle.get_base_unit_of`.</span>
 
 <span class="sd">        :param property: The property name to get the unit for</span>
@@ -470,9 +470,9 @@
 
 <span class="sd">        .. code:: python</span>
 
-<span class="sd">          units = get_unit_style(&quot;lj&quot;)</span>
+<span class="sd">          units = get_unit_style("lj")</span>
 <span class="sd">          mass_with_units = mass_in_lj * units.mass</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">property</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_configuration</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_configuration</span><span class="p">[</span><span class="nb">property</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span></div>
 </div>
@@ -482,51 +482,51 @@
 <div class="viewcode-block" id="UnitStyleFactory">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UnitStyleFactory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    This is a factory to get multiple instances of different</span>
 <span class="sd">    :obj:`~pylimer_tools.io.UnitStyle`</span>
 <span class="sd">    using the same UnitRegistry, such that they are compatible.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize the UnitStyleFactory with a new UnitRegistry.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ureg</span> <span class="o">=</span> <span class="n">UnitRegistry</span><span class="p">()</span>
 
 <div class="viewcode-block" id="UnitStyleFactory.get_unit_registry">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_registry">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_unit_registry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the underlying unit registry.</span>
 
 <span class="sd">        :return: The unit registry used by this factory</span>
 <span class="sd">        :rtype: UnitRegistry</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ureg</span></div>
 
 
 <div class="viewcode-block" id="UnitStyleFactory.get_everares_et_al_data">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_everares_et_al_data">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_everares_et_al_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Load the Everaers et al. (2020) unit properties data.</span>
 
 <span class="sd">        :return: PolymerDataFrame containing polymer properties from Everaers et al.</span>
 <span class="sd">        :rtype: PolymerDataFrame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">load_everaers_et_al_data</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="UnitStyleFactory.get_available_polymers">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_available_polymers">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_available_polymers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        List all available polymers for which we have lj unit conversions.</span>
 
 <span class="sd">        :return: List of polymer names</span>
 <span class="sd">        :rtype: list</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">get_available_polymers</span><span class="p">()</span></div>
 
 
@@ -534,10 +534,10 @@
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_unit_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                        <span class="n">dimension</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UnitStyle</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get a UnitStyle instance corresponding to the unit system requested.</span>
 
-<span class="sd">        :param unit_type: The unit type, e.g. &quot;lj&quot;, &quot;nano&quot;, &quot;real&quot;, &quot;si&quot;, etc.</span>
+<span class="sd">        :param unit_type: The unit type, e.g. "lj", "nano", "real", "si", etc.</span>
 <span class="sd">        :type unit_type: str</span>
 <span class="sd">        :param dimension: The dimension of the box</span>
 <span class="sd">        :type dimension: int</span>
@@ -556,25 +556,25 @@
 <span class="sd">        .. warning::</span>
 <span class="sd">            Please check the source code of this function to see</span>
 <span class="sd">            whether the units you need are correctly implemented</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">ureg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ureg</span>
         <span class="n">elementary_charge</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.602176634e-19</span><span class="p">)</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">coulomb</span>
         <span class="n">avogadro_constant</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mf">6.02214076e23</span>  <span class="c1"># any/mol</span>
 
-        <span class="n">accept_mol</span> <span class="o">=</span> <span class="s2">&quot;accept_mol&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;accept_mol&quot;</span><span class="p">]</span>
+        <span class="n">accept_mol</span> <span class="o">=</span> <span class="s2">"accept_mol"</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"accept_mol"</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">unit_type</span> <span class="o">==</span> <span class="s2">&quot;lj&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;warning&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;warning&quot;</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span>
-                <span class="s2">&quot;polymer&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;polymer&quot;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">unit_type</span> <span class="o">==</span> <span class="s2">"lj"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="s2">"warning"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"warning"</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="s2">"polymer"</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">"polymer"</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
             <span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428&quot;</span>
+                    <span class="s2">"LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428"</span>
                 <span class="p">)</span>
-            <span class="k">if</span> <span class="s2">&quot;polymer&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">"polymer"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;LJ unit styles are derived. Please specify the polymer to use (`polymer=...`)&quot;</span>
+                    <span class="s2">"LJ unit styles are derived. Please specify the polymer to use (`polymer=...`)"</span>
                 <span class="p">)</span>
-            <span class="n">polymer_data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;polymer&quot;</span><span class="p">]</span>
+            <span class="n">polymer_data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"polymer"</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">polymer_data</span> <span class="o">=</span> <span class="n">get_polymer_by_name</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">)</span>
@@ -584,8 +584,8 @@
                     <span class="n">all_polymer_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_everares_et_al_data</span><span class="p">()</span>
                     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">all_polymer_data</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
                         <span class="k">if</span> <span class="p">(</span>
-                            <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">isalnum</span><span class="p">,</span> <span class="n">polymer_data</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-                            <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">isalnum</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">name</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                            <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">isalnum</span><span class="p">,</span> <span class="n">polymer_data</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                            <span class="o">==</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">isalnum</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">name</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
                         <span class="p">):</span>
                             <span class="n">polymer_data</span> <span class="o">=</span> <span class="n">row</span>
                             <span class="k">break</span>
@@ -595,7 +595,7 @@
                 <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">,</span> <span class="n">PolymerData</span><span class="p">)</span>
             <span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;No useable data for this polymer found to use for lj units. Check whether your usage is correct.&quot;</span>
+                    <span class="s2">"No useable data for this polymer found to use for lj units. Check whether your usage is correct."</span>
                 <span class="p">)</span>
             <span class="c1"># follow derivation for more accurate results</span>
             <span class="c1"># sigma_conversion = polymer_data.sigma</span>
@@ -603,163 +603,163 @@
                 <span class="mf">0.1</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">polymer_data</span><span class="o">.</span><span class="n">l_K</span><span class="p">)</span> <span class="o">/</span>
                 <span class="p">(</span><span class="mf">0.965</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">polymer_data</span><span class="o">.</span><span class="n">Cb</span><span class="p">))</span>
             <span class="p">)</span>
-            <span class="n">ureg</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s2">&quot;sigma = </span><span class="si">{}</span><span class="s2"> * nanometer&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sigma_conversion</span><span class="p">))</span>
-            <span class="n">ureg</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s2">&quot;eps = </span><span class="si">{}</span><span class="s2">e-21 joule&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">polymer_data</span><span class="o">.</span><span class="n">kB_Tref</span><span class="p">))</span>
-            <span class="c1"># time is most difficult in LJ — let&#39;s keep tau</span>
-            <span class="n">ureg</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s2">&quot;tau = 1 * tau&quot;</span><span class="p">)</span>
+            <span class="n">ureg</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s2">"sigma = </span><span class="si">{}</span><span class="s2"> * nanometer"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sigma_conversion</span><span class="p">))</span>
+            <span class="n">ureg</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s2">"eps = </span><span class="si">{}</span><span class="s2">e-21 joule"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">polymer_data</span><span class="o">.</span><span class="n">kB_Tref</span><span class="p">))</span>
+            <span class="c1"># time is most difficult in LJ — let's keep tau</span>
+            <span class="n">ureg</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s2">"tau = 1 * tau"</span><span class="p">)</span>
             <span class="c1"># NOTE: The formula in the LAMMPS documentation contains \epsilon_0.</span>
             <span class="c1"># BUT: it does not add up in terms of units, so... the implementation here</span>
             <span class="c1"># *might* be wrong</span>
             <span class="c1"># epsZero = (8.8541878128e-12*ureg.farad/ureg.meter)</span>
             <span class="k">return</span> <span class="n">UnitStyle</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;mass&quot;</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="n">polymer_data</span><span class="o">.</span><span class="n">Mb</span> <span class="o">*</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;g/mol&quot;</span><span class="p">)</span>
+                    <span class="s2">"mass"</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">polymer_data</span><span class="o">.</span><span class="n">Mb</span> <span class="o">*</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"g/mol"</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">accept_mol</span>
-                        <span class="k">else</span> <span class="n">polymer_data</span><span class="o">.</span><span class="n">Mb</span> <span class="o">*</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">avogadro_constant</span>
+                        <span class="k">else</span> <span class="n">polymer_data</span><span class="o">.</span><span class="n">Mb</span> <span class="o">*</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"g"</span><span class="p">)</span> <span class="o">/</span> <span class="n">avogadro_constant</span>
                     <span class="p">),</span>
-                    <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span>
-                    <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span>
-                    <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span>
-                    <span class="s2">&quot;velocity&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span>
-                    <span class="s2">&quot;force&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">eps</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span><span class="p">),</span>
-                    <span class="s2">&quot;torque&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span>
-                    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">polymer_data</span><span class="o">.</span><span class="n">T_ref</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>
-                    <span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="n">polymer_data</span><span class="o">.</span><span class="n">kB_Tref_over_sigma_to_3</span> <span class="o">*</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;MPa&quot;</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">,</span> <span class="s2">&quot;kB_Tref_over_sigma_to_3&quot;</span><span class="p">)</span>
+                    <span class="s2">"distance"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span>
+                    <span class="s2">"time"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span>
+                    <span class="s2">"energy"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span>
+                    <span class="s2">"velocity"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span>
+                    <span class="s2">"force"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">eps</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span><span class="p">),</span>
+                    <span class="s2">"torque"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span>
+                    <span class="s2">"temperature"</span><span class="p">:</span> <span class="n">polymer_data</span><span class="o">.</span><span class="n">T_ref</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>
+                    <span class="s2">"pressure"</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">polymer_data</span><span class="o">.</span><span class="n">kB_Tref_over_sigma_to_3</span> <span class="o">*</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"MPa"</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">polymer_data</span><span class="p">,</span> <span class="s2">"kB_Tref_over_sigma_to_3"</span><span class="p">)</span>
                         <span class="k">else</span> <span class="n">ureg</span><span class="o">.</span><span class="n">eps</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span> <span class="o">**</span> <span class="p">(</span><span class="mi">3</span><span class="p">))</span>
                     <span class="p">),</span>
-                    <span class="s2">&quot;viscosity&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">tau</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span> <span class="o">**</span> <span class="p">(</span><span class="mi">3</span><span class="p">)),</span>
+                    <span class="s2">"viscosity"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">tau</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span> <span class="o">**</span> <span class="p">(</span><span class="mi">3</span><span class="p">)),</span>
                     <span class="c1"># TODO: The use of elementary charge might not be correct, see</span>
                     <span class="c1"># above</span>
-                    <span class="s2">&quot;charge&quot;</span><span class="p">:</span> <span class="n">elementary_charge</span><span class="p">,</span>
-                    <span class="s2">&quot;dipole&quot;</span><span class="p">:</span> <span class="n">elementary_charge</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span>
-                    <span class="s2">&quot;electric_field&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">eps</span> <span class="o">/</span> <span class="p">(</span><span class="n">elementary_charge</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span><span class="p">),</span>
-                    <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">polymer_data</span><span class="o">.</span><span class="n">rho_bulk</span> <span class="o">*</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;g/(cm^3)&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
-                        <span class="s2">&quot;g/(sigma^3)&quot;</span>
+                    <span class="s2">"charge"</span><span class="p">:</span> <span class="n">elementary_charge</span><span class="p">,</span>
+                    <span class="s2">"dipole"</span><span class="p">:</span> <span class="n">elementary_charge</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span>
+                    <span class="s2">"electric_field"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">eps</span> <span class="o">/</span> <span class="p">(</span><span class="n">elementary_charge</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span><span class="p">),</span>
+                    <span class="s2">"density"</span><span class="p">:</span> <span class="p">(</span><span class="n">polymer_data</span><span class="o">.</span><span class="n">rho_bulk</span> <span class="o">*</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"g/(cm^3)"</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
+                        <span class="s2">"g/(sigma^3)"</span>
                     <span class="p">),</span>
-                    <span class="c1"># polymer_data.M_k * ureg(&#39;g/mol&#39;) / (ureg.sigma**(dimension)) if accept_mol</span>
-                    <span class="c1"># else (polymer_data.M_k / avogadro_constant) * ureg(&#39;g&#39;) /</span>
+                    <span class="c1"># polymer_data.M_k * ureg('g/mol') / (ureg.sigma**(dimension)) if accept_mol</span>
+                    <span class="c1"># else (polymer_data.M_k / avogadro_constant) * ureg('g') /</span>
                     <span class="c1"># (ureg.sigma**(dimension)),</span>
-                    <span class="s2">&quot;dt&quot;</span><span class="p">:</span> <span class="mf">0.005</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span>
-                    <span class="s2">&quot;skin&quot;</span><span class="p">:</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span>
+                    <span class="s2">"dt"</span><span class="p">:</span> <span class="mf">0.005</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span>
+                    <span class="s2">"skin"</span><span class="p">:</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span>
                 <span class="p">},</span>
                 <span class="n">ureg</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">unit_type</span> <span class="o">==</span> <span class="s2">&quot;real&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">unit_type</span> <span class="o">==</span> <span class="s2">"real"</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">UnitStyle</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;mass&quot;</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;g/mol&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">accept_mol</span> <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">)</span> <span class="o">/</span>
+                    <span class="s2">"mass"</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">ureg</span><span class="p">(</span><span class="s2">"g/mol"</span><span class="p">)</span> <span class="k">if</span> <span class="n">accept_mol</span> <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"g"</span><span class="p">)</span> <span class="o">/</span>
                         <span class="n">avogadro_constant</span>
                     <span class="p">),</span>
-                    <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
-                    <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">femtosecond</span><span class="p">,</span>
-                    <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;kcal/mol&quot;</span><span class="p">)</span>
+                    <span class="s2">"distance"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
+                    <span class="s2">"time"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">femtosecond</span><span class="p">,</span>
+                    <span class="s2">"energy"</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">ureg</span><span class="p">(</span><span class="s2">"kcal/mol"</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">accept_mol</span>
-                        <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;kcal&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">avogadro_constant</span>
+                        <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"kcal"</span><span class="p">)</span> <span class="o">/</span> <span class="n">avogadro_constant</span>
                     <span class="p">),</span>
-                    <span class="s2">&quot;velocity&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">femtosecond</span><span class="p">,</span>
-                    <span class="s2">&quot;force&quot;</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;kcal/(mol*angstrom)&quot;</span><span class="p">)</span>
+                    <span class="s2">"velocity"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">femtosecond</span><span class="p">,</span>
+                    <span class="s2">"force"</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">ureg</span><span class="p">(</span><span class="s2">"kcal/(mol*angstrom)"</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">accept_mol</span>
-                        <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;kcal&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">avogadro_constant</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span>
+                        <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"kcal"</span><span class="p">)</span> <span class="o">/</span> <span class="n">avogadro_constant</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span>
                     <span class="p">),</span>
-                    <span class="s2">&quot;torque&quot;</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;kcal/mol&quot;</span><span class="p">)</span>
+                    <span class="s2">"torque"</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">ureg</span><span class="p">(</span><span class="s2">"kcal/mol"</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">accept_mol</span>
-                        <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;kcal&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">avogadro_constant</span>
+                        <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"kcal"</span><span class="p">)</span> <span class="o">/</span> <span class="n">avogadro_constant</span>
                     <span class="p">),</span>
-                    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>
-                    <span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">atmosphere</span><span class="p">,</span>
-                    <span class="s2">&quot;viscosity&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">poise</span><span class="p">,</span>
-                    <span class="s2">&quot;charge&quot;</span><span class="p">:</span> <span class="n">elementary_charge</span><span class="p">,</span>
-                    <span class="s2">&quot;dipole&quot;</span><span class="p">:</span> <span class="n">elementary_charge</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
-                    <span class="s2">&quot;electric_field&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">volt</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
-                    <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">gram</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">centimeter</span> <span class="o">**</span> <span class="p">(</span><span class="n">dimension</span><span class="p">)),</span>
-                    <span class="s2">&quot;dt&quot;</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">femtosecond</span><span class="p">,</span>
-                    <span class="s2">&quot;skin&quot;</span><span class="p">:</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
+                    <span class="s2">"temperature"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>
+                    <span class="s2">"pressure"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">atmosphere</span><span class="p">,</span>
+                    <span class="s2">"viscosity"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">poise</span><span class="p">,</span>
+                    <span class="s2">"charge"</span><span class="p">:</span> <span class="n">elementary_charge</span><span class="p">,</span>
+                    <span class="s2">"dipole"</span><span class="p">:</span> <span class="n">elementary_charge</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
+                    <span class="s2">"electric_field"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">volt</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
+                    <span class="s2">"density"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">gram</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">centimeter</span> <span class="o">**</span> <span class="p">(</span><span class="n">dimension</span><span class="p">)),</span>
+                    <span class="s2">"dt"</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">femtosecond</span><span class="p">,</span>
+                    <span class="s2">"skin"</span><span class="p">:</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
                 <span class="p">},</span>
                 <span class="n">ureg</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">unit_type</span> <span class="o">==</span> <span class="s2">&quot;metal&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">unit_type</span> <span class="o">==</span> <span class="s2">"metal"</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">UnitStyle</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;mass&quot;</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;g/mol&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">accept_mol</span> <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">)</span> <span class="o">/</span>
+                    <span class="s2">"mass"</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">ureg</span><span class="p">(</span><span class="s2">"g/mol"</span><span class="p">)</span> <span class="k">if</span> <span class="n">accept_mol</span> <span class="k">else</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"g"</span><span class="p">)</span> <span class="o">/</span>
                         <span class="n">avogadro_constant</span>
                     <span class="p">),</span>
-                    <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
-                    <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">picosecond</span><span class="p">,</span>
-                    <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;eV&quot;</span><span class="p">),</span>
-                    <span class="s2">&quot;velocity&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">picosecond</span><span class="p">,</span>
-                    <span class="s2">&quot;force&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;eV/angstrom&quot;</span><span class="p">),</span>
-                    <span class="s2">&quot;torque&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">&quot;eV&quot;</span><span class="p">),</span>
-                    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>
-                    <span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">bar</span><span class="p">,</span>
-                    <span class="s2">&quot;viscosity&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">poise</span><span class="p">,</span>
-                    <span class="s2">&quot;charge&quot;</span><span class="p">:</span> <span class="n">elementary_charge</span><span class="p">,</span>
-                    <span class="s2">&quot;dipole&quot;</span><span class="p">:</span> <span class="n">elementary_charge</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
-                    <span class="s2">&quot;electric_field&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">volt</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
-                    <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">gram</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">centimeter</span> <span class="o">**</span> <span class="p">(</span><span class="n">dimension</span><span class="p">)),</span>
-                    <span class="s2">&quot;dt&quot;</span><span class="p">:</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">picosecond</span><span class="p">,</span>
-                    <span class="s2">&quot;skin&quot;</span><span class="p">:</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
+                    <span class="s2">"distance"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
+                    <span class="s2">"time"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">picosecond</span><span class="p">,</span>
+                    <span class="s2">"energy"</span><span class="p">:</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"eV"</span><span class="p">),</span>
+                    <span class="s2">"velocity"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">picosecond</span><span class="p">,</span>
+                    <span class="s2">"force"</span><span class="p">:</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"eV/angstrom"</span><span class="p">),</span>
+                    <span class="s2">"torque"</span><span class="p">:</span> <span class="n">ureg</span><span class="p">(</span><span class="s2">"eV"</span><span class="p">),</span>
+                    <span class="s2">"temperature"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>
+                    <span class="s2">"pressure"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">bar</span><span class="p">,</span>
+                    <span class="s2">"viscosity"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">poise</span><span class="p">,</span>
+                    <span class="s2">"charge"</span><span class="p">:</span> <span class="n">elementary_charge</span><span class="p">,</span>
+                    <span class="s2">"dipole"</span><span class="p">:</span> <span class="n">elementary_charge</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
+                    <span class="s2">"electric_field"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">volt</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
+                    <span class="s2">"density"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">gram</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">centimeter</span> <span class="o">**</span> <span class="p">(</span><span class="n">dimension</span><span class="p">)),</span>
+                    <span class="s2">"dt"</span><span class="p">:</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">picosecond</span><span class="p">,</span>
+                    <span class="s2">"skin"</span><span class="p">:</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
                 <span class="p">},</span>
                 <span class="n">ureg</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">unit_type</span> <span class="o">==</span> <span class="s2">&quot;si&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">unit_type</span> <span class="o">==</span> <span class="s2">"si"</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">UnitStyle</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;mass&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kilogram</span><span class="p">,</span>
-                    <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span><span class="p">,</span>
-                    <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
-                    <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">joule</span><span class="p">,</span>
-                    <span class="s2">&quot;velocity&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
-                    <span class="s2">&quot;force&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">newton</span><span class="p">,</span>
-                    <span class="s2">&quot;torque&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">newton</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span><span class="p">,</span>
-                    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>
-                    <span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">pascal</span><span class="p">,</span>
-                    <span class="s2">&quot;viscosity&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">pascal</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
-                    <span class="s2">&quot;charge&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">coulomb</span><span class="p">,</span>
-                    <span class="s2">&quot;dipole&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">coulomb</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span><span class="p">,</span>
-                    <span class="s2">&quot;electric_field&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">volt</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span><span class="p">,</span>
-                    <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kilogram</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">meter</span> <span class="o">**</span> <span class="p">(</span><span class="n">dimension</span><span class="p">)),</span>
-                    <span class="s2">&quot;dt&quot;</span><span class="p">:</span> <span class="mf">1e-8</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
-                    <span class="s2">&quot;skin&quot;</span><span class="p">:</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span><span class="p">,</span>
+                    <span class="s2">"mass"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kilogram</span><span class="p">,</span>
+                    <span class="s2">"distance"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span><span class="p">,</span>
+                    <span class="s2">"time"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
+                    <span class="s2">"energy"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">joule</span><span class="p">,</span>
+                    <span class="s2">"velocity"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
+                    <span class="s2">"force"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">newton</span><span class="p">,</span>
+                    <span class="s2">"torque"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">newton</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span><span class="p">,</span>
+                    <span class="s2">"temperature"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>
+                    <span class="s2">"pressure"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">pascal</span><span class="p">,</span>
+                    <span class="s2">"viscosity"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">pascal</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
+                    <span class="s2">"charge"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">coulomb</span><span class="p">,</span>
+                    <span class="s2">"dipole"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">coulomb</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span><span class="p">,</span>
+                    <span class="s2">"electric_field"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">volt</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span><span class="p">,</span>
+                    <span class="s2">"density"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kilogram</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">meter</span> <span class="o">**</span> <span class="p">(</span><span class="n">dimension</span><span class="p">)),</span>
+                    <span class="s2">"dt"</span><span class="p">:</span> <span class="mf">1e-8</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
+                    <span class="s2">"skin"</span><span class="p">:</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span><span class="p">,</span>
                 <span class="p">},</span>
                 <span class="n">ureg</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">unit_type</span> <span class="o">==</span> <span class="s2">&quot;nano&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">unit_type</span> <span class="o">==</span> <span class="s2">"nano"</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">UnitStyle</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;mass&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span><span class="p">,</span>
-                    <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span><span class="p">,</span>
-                    <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanosecond</span><span class="p">,</span>
-                    <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span>
+                    <span class="s2">"mass"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span><span class="p">,</span>
+                    <span class="s2">"distance"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span><span class="p">,</span>
+                    <span class="s2">"time"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanosecond</span><span class="p">,</span>
+                    <span class="s2">"energy"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span>
                     <span class="o">*</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                     <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanosecond</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
-                    <span class="s2">&quot;velocity&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanosecond</span><span class="p">,</span>
-                    <span class="s2">&quot;force&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanosecond</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
-                    <span class="s2">&quot;torque&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span>
+                    <span class="s2">"velocity"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanosecond</span><span class="p">,</span>
+                    <span class="s2">"force"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanosecond</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
+                    <span class="s2">"torque"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span>
                     <span class="o">*</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                     <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanosecond</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
-                    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>
-                    <span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span> <span class="o">*</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanosecond</span><span class="o">**</span><span class="mi">2</span><span class="p">)),</span>
-                    <span class="s2">&quot;viscosity&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span> <span class="o">*</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanosecond</span><span class="p">)),</span>
-                    <span class="s2">&quot;charge&quot;</span><span class="p">:</span> <span class="n">elementary_charge</span><span class="p">,</span>
-                    <span class="s2">&quot;dipole&quot;</span><span class="p">:</span> <span class="n">elementary_charge</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span><span class="p">,</span>
-                    <span class="s2">&quot;electric_field&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">volt</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span><span class="p">,</span>
-                    <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span> <span class="o">**</span> <span class="p">(</span><span class="n">dimension</span><span class="p">)),</span>
-                    <span class="s2">&quot;dt&quot;</span><span class="p">:</span> <span class="mf">1e-8</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
-                    <span class="s2">&quot;skin&quot;</span><span class="p">:</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span><span class="p">,</span>
+                    <span class="s2">"temperature"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>
+                    <span class="s2">"pressure"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span> <span class="o">*</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanosecond</span><span class="o">**</span><span class="mi">2</span><span class="p">)),</span>
+                    <span class="s2">"viscosity"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span> <span class="o">*</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanosecond</span><span class="p">)),</span>
+                    <span class="s2">"charge"</span><span class="p">:</span> <span class="n">elementary_charge</span><span class="p">,</span>
+                    <span class="s2">"dipole"</span><span class="p">:</span> <span class="n">elementary_charge</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span><span class="p">,</span>
+                    <span class="s2">"electric_field"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">volt</span> <span class="o">/</span> <span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span><span class="p">,</span>
+                    <span class="s2">"density"</span><span class="p">:</span> <span class="n">ureg</span><span class="o">.</span><span class="n">attogram</span> <span class="o">/</span> <span class="p">(</span><span class="n">ureg</span><span class="o">.</span><span class="n">nanometer</span> <span class="o">**</span> <span class="p">(</span><span class="n">dimension</span><span class="p">)),</span>
+                    <span class="s2">"dt"</span><span class="p">:</span> <span class="mf">1e-8</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
+                    <span class="s2">"skin"</span><span class="p">:</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">ureg</span><span class="o">.</span><span class="n">meter</span><span class="p">,</span>
                 <span class="p">},</span>
                 <span class="n">ureg</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;Unit type &#39;</span><span class="si">{}</span><span class="s2">&#39; is not implemented&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">unit_type</span><span class="p">)</span>
+                <span class="s2">"Unit type '</span><span class="si">{}</span><span class="s2">' is not implemented"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">unit_type</span><span class="p">)</span>
             <span class="p">)</span></div>
 </div>
 

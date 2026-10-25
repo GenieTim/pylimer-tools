@@ -41,32 +41,32 @@ Overloaded function.
 
 ### Methods Summary
 
-| [`compute_vector_to`](#pylimer_tools_cpp.Atom.compute_vector_to)(self, to_atom, pbc_box)          | Compute the vector to another atom.                                                            |
-|---------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| [`distance_to`](#pylimer_tools_cpp.Atom.distance_to)(self, to_atom, pbc_box)                      | Compute the distance to another atom.                                                          |
-| [`distance_to_unwrapped`](#pylimer_tools_cpp.Atom.distance_to_unwrapped)(self, arg0, arg1)        | Compute the distance to another atom respecting the periodic image flags.                      |
-| [`get_coordinates`](#pylimer_tools_cpp.Atom.get_coordinates)(self)                                | Get the coordinates of this atom as a vector.                                                  |
-| [`get_extra_data`](#pylimer_tools_cpp.Atom.get_extra_data)(self)                                  | Get all extra data properties stored with this atom (e.g., charge, dipole, etc.).              |
-| [`get_id`](#pylimer_tools_cpp.Atom.get_id)(self)                                                  | Get the ID of the atom.                                                                        |
-| [`get_nx`](#pylimer_tools_cpp.Atom.get_nx)(self)                                                  | Get the box image that the atom is in in x direction (also known as ix or nx).                 |
-| [`get_ny`](#pylimer_tools_cpp.Atom.get_ny)(self)                                                  | Get the box image that the atom is in in y direction (also known as iy or ny).                 |
-| [`get_nz`](#pylimer_tools_cpp.Atom.get_nz)(self)                                                  | Get the box image that the atom is in in z direction (also known as iz or nz).                 |
-| [`get_property`](#pylimer_tools_cpp.Atom.get_property)(self, property)                            | Get a specific property value from the extra data.                                             |
-| [`get_type`](#pylimer_tools_cpp.Atom.get_type)(self)                                              | Get the type of the atom.                                                                      |
-| [`get_unwrapped_coordinates`](#pylimer_tools_cpp.Atom.get_unwrapped_coordinates)(self, arg0)      | Get the unwrapped coordinates of this atom.                                                    |
-| [`get_unwrapped_x`](#pylimer_tools_cpp.Atom.get_unwrapped_x)(self, box)                           | Get the unwrapped x coordinate of the atom.                                                    |
-| [`get_unwrapped_y`](#pylimer_tools_cpp.Atom.get_unwrapped_y)(self, box)                           | Get the unwrapped y coordinate of the atom.                                                    |
-| [`get_unwrapped_z`](#pylimer_tools_cpp.Atom.get_unwrapped_z)(self, box)                           | Get the unwrapped z coordinate of the atom.                                                    |
-| [`get_x`](#pylimer_tools_cpp.Atom.get_x)(self)                                                    | Get the x coordinate of the atom.                                                              |
-| [`get_y`](#pylimer_tools_cpp.Atom.get_y)(self)                                                    | Get the y coordinate of the atom.                                                              |
-| [`get_z`](#pylimer_tools_cpp.Atom.get_z)(self)                                                    | Get the z coordinate of the atom.                                                              |
-| [`mean_position_with`](#pylimer_tools_cpp.Atom.mean_position_with)(self, other_atom, pbc_box)     | Compute the mean position between this atom and another atom, considering periodic boundaries. |
-| [`mean_position_with_unwrapped`](#pylimer_tools_cpp.Atom.mean_position_with_unwrapped)(self, ...) | Compute the mean position between this atom and another atom using unwrapped coordinates.      |
-| [`vector_to_unwrapped`](#pylimer_tools_cpp.Atom.vector_to_unwrapped)(self, arg0, arg1)            | Compute the vector to another atom respecting the periodic image flags.                        |
+| [`compute_vector_to`](#pylimer_tools_cpp.Atom.compute_vector_to)(self, to_atom, pbc_box)     | Compute the vector to another atom.                                                            |
+|------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| [`distance_to`](#pylimer_tools_cpp.Atom.distance_to)(self, to_atom, pbc_box)           | Compute the distance to another atom.                                                          |
+| [`distance_to_unwrapped`](#pylimer_tools_cpp.Atom.distance_to_unwrapped)(self, arg0, arg1)       | Compute the distance to another atom respecting the periodic image flags.                      |
+| [`get_coordinates`](#pylimer_tools_cpp.Atom.get_coordinates)(self)                         | Get the coordinates of this atom as a vector.                                                  |
+| [`get_extra_data`](#pylimer_tools_cpp.Atom.get_extra_data)(self)                          | Get all extra data properties stored with this atom (e.g., charge, dipole, etc.).              |
+| [`get_id`](#pylimer_tools_cpp.Atom.get_id)(self)                                  | Get the ID of the atom.                                                                        |
+| [`get_nx`](#pylimer_tools_cpp.Atom.get_nx)(self)                                  | Get the box image that the atom is in in x direction (also known as ix or nx).                 |
+| [`get_ny`](#pylimer_tools_cpp.Atom.get_ny)(self)                                  | Get the box image that the atom is in in y direction (also known as iy or ny).                 |
+| [`get_nz`](#pylimer_tools_cpp.Atom.get_nz)(self)                                  | Get the box image that the atom is in in z direction (also known as iz or nz).                 |
+| [`get_property`](#pylimer_tools_cpp.Atom.get_property)(self, property)                  | Get a specific property value from the extra data.                                             |
+| [`get_type`](#pylimer_tools_cpp.Atom.get_type)(self)                                | Get the type of the atom.                                                                      |
+| [`get_unwrapped_coordinates`](#pylimer_tools_cpp.Atom.get_unwrapped_coordinates)(self, arg0)         | Get the unwrapped coordinates of this atom.                                                    |
+| [`get_unwrapped_x`](#pylimer_tools_cpp.Atom.get_unwrapped_x)(self, box)                    | Get the unwrapped x coordinate of the atom.                                                    |
+| [`get_unwrapped_y`](#pylimer_tools_cpp.Atom.get_unwrapped_y)(self, box)                    | Get the unwrapped y coordinate of the atom.                                                    |
+| [`get_unwrapped_z`](#pylimer_tools_cpp.Atom.get_unwrapped_z)(self, box)                    | Get the unwrapped z coordinate of the atom.                                                    |
+| [`get_x`](#pylimer_tools_cpp.Atom.get_x)(self)                                   | Get the x coordinate of the atom.                                                              |
+| [`get_y`](#pylimer_tools_cpp.Atom.get_y)(self)                                   | Get the y coordinate of the atom.                                                              |
+| [`get_z`](#pylimer_tools_cpp.Atom.get_z)(self)                                   | Get the z coordinate of the atom.                                                              |
+| [`mean_position_with`](#pylimer_tools_cpp.Atom.mean_position_with)(self, other_atom, pbc_box) | Compute the mean position between this atom and another atom, considering periodic boundaries. |
+| [`mean_position_with_unwrapped`](#pylimer_tools_cpp.Atom.mean_position_with_unwrapped)(self, ...)       | Compute the mean position between this atom and another atom using unwrapped coordinates.      |
+| [`vector_to_unwrapped`](#pylimer_tools_cpp.Atom.vector_to_unwrapped)(self, arg0, arg1)         | Compute the vector to another atom respecting the periodic image flags.                        |
 
 ### Methods Documentation
 
-#### compute_vector_to(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), to_atom: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), pbc_box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### compute_vector_to(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), to_atom: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), pbc_box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Compute the vector to another atom.
 
@@ -76,7 +76,7 @@ Compute the vector to another atom.
 * **Returns:**
   Vector pointing from this atom to the target atom
 
-#### distance_to(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), to_atom: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), pbc_box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box)) → [float](https://docs.python.org/3/library/functions.html#float)
+#### distance_to(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), to_atom: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), pbc_box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the distance to another atom.
 
@@ -86,7 +86,7 @@ Compute the distance to another atom.
 * **Returns:**
   Euclidean distance between the atoms
 
-#### distance_to_unwrapped(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), arg0: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), arg1: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box)) → [float](https://docs.python.org/3/library/functions.html#float)
+#### distance_to_unwrapped(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), arg0: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), arg1: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the distance to another atom respecting the periodic image flags.
 
@@ -102,42 +102,42 @@ Get the coordinates of this atom as a vector.
 * **Returns:**
   A vector containing the x, y, z coordinates
 
-#### get_extra_data(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [dict](https://docs.python.org/3/library/stdtypes.html#dict)[[str](https://docs.python.org/3/library/stdtypes.html#str), [float](https://docs.python.org/3/library/functions.html#float)]
+#### get_extra_data(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [float](https://docs.python.org/3/builtins/functions.html#float)]
 
 Get all extra data properties stored with this atom (e.g., charge, dipole, etc.).
 
 * **Returns:**
   Dictionary containing all extra properties
 
-#### get_id(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [int](https://docs.python.org/3/library/functions.html#int)
+#### get_id(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the ID of the atom.
 
 * **Returns:**
   The atom’s unique identifier
 
-#### get_nx(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [int](https://docs.python.org/3/library/functions.html#int)
+#### get_nx(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the box image that the atom is in in x direction (also known as ix or nx).
 
 * **Returns:**
   The periodic image flag in x direction
 
-#### get_ny(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [int](https://docs.python.org/3/library/functions.html#int)
+#### get_ny(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the box image that the atom is in in y direction (also known as iy or ny).
 
 * **Returns:**
   The periodic image flag in y direction
 
-#### get_nz(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [int](https://docs.python.org/3/library/functions.html#int)
+#### get_nz(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the box image that the atom is in in z direction (also known as iz or nz).
 
 * **Returns:**
   The periodic image flag in z direction
 
-#### get_property(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), property: [str](https://docs.python.org/3/library/stdtypes.html#str)) → [float](https://docs.python.org/3/library/functions.html#float)
+#### get_property(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), property: [str](https://docs.python.org/3/builtins/stdtypes.html#str)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Get a specific property value from the extra data.
 
@@ -148,14 +148,14 @@ Get a specific property value from the extra data.
 * **Raises:**
   std::out_of_range if the property doesn’t exist
 
-#### get_type(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [int](https://docs.python.org/3/library/functions.html#int)
+#### get_type(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the type of the atom.
 
 * **Returns:**
   The atom’s type classification
 
-#### get_unwrapped_coordinates(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), arg0: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### get_unwrapped_coordinates(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), arg0: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Get the unwrapped coordinates of this atom.
 
@@ -164,7 +164,7 @@ Get the unwrapped coordinates of this atom.
 * **Returns:**
   A vector containing the unwrapped x, y, z coordinates
 
-#### get_unwrapped_x(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box)) → [float](https://docs.python.org/3/library/functions.html#float)
+#### get_unwrapped_x(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Get the unwrapped x coordinate of the atom.
 
@@ -173,7 +173,7 @@ Get the unwrapped x coordinate of the atom.
 * **Returns:**
   The unwrapped x coordinate
 
-#### get_unwrapped_y(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box)) → [float](https://docs.python.org/3/library/functions.html#float)
+#### get_unwrapped_y(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Get the unwrapped y coordinate of the atom.
 
@@ -182,7 +182,7 @@ Get the unwrapped y coordinate of the atom.
 * **Returns:**
   The unwrapped y coordinate
 
-#### get_unwrapped_z(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box)) → [float](https://docs.python.org/3/library/functions.html#float)
+#### get_unwrapped_z(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Get the unwrapped z coordinate of the atom.
 
@@ -191,28 +191,28 @@ Get the unwrapped z coordinate of the atom.
 * **Returns:**
   The unwrapped z coordinate
 
-#### get_x(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [float](https://docs.python.org/3/library/functions.html#float)
+#### get_x(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Get the x coordinate of the atom.
 
 * **Returns:**
   The x coordinate
 
-#### get_y(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [float](https://docs.python.org/3/library/functions.html#float)
+#### get_y(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Get the y coordinate of the atom.
 
 * **Returns:**
   The y coordinate
 
-#### get_z(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [float](https://docs.python.org/3/library/functions.html#float)
+#### get_z(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Get the z coordinate of the atom.
 
 * **Returns:**
   The z coordinate
 
-#### mean_position_with(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), other_atom: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), pbc_box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### mean_position_with(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), other_atom: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), pbc_box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Compute the mean position between this atom and another atom, considering periodic boundaries.
 
@@ -222,7 +222,7 @@ Compute the mean position between this atom and another atom, considering period
 * **Returns:**
   Vector representing the mean position
 
-#### mean_position_with_unwrapped(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), other_atom: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), pbc_box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### mean_position_with_unwrapped(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), other_atom: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), pbc_box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Compute the mean position between this atom and another atom using unwrapped coordinates.
 
@@ -232,7 +232,7 @@ Compute the mean position between this atom and another atom using unwrapped coo
 * **Returns:**
   Vector representing the mean position (unwrapped)
 
-#### vector_to_unwrapped(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), arg0: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), arg1: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### vector_to_unwrapped(self: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), arg0: [pylimer_tools_cpp.Atom](#pylimer_tools_cpp.Atom), arg1: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.html.md#pylimer_tools_cpp.Box)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Compute the vector to another atom respecting the periodic image flags.
 

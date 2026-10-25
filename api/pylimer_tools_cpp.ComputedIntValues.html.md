@@ -8,30 +8,30 @@ Integer output quantities
 
 ### Attributes Summary
 
-| [`NUM_ATOMS`](#pylimer_tools_cpp.ComputedIntValues.NUM_ATOMS)                 |                                                      |
-|-------------------------------------------------------------------------------|------------------------------------------------------|
-| [`NUM_BONDS`](#pylimer_tools_cpp.ComputedIntValues.NUM_BONDS)                 |                                                      |
+| [`NUM_ATOMS`](#pylimer_tools_cpp.ComputedIntValues.NUM_ATOMS)         |                                                      |
+|--------------------------------------------------------------------|------------------------------------------------------|
+| [`NUM_BONDS`](#pylimer_tools_cpp.ComputedIntValues.NUM_BONDS)         |                                                      |
 | [`NUM_BONDS_TO_FORM`](#pylimer_tools_cpp.ComputedIntValues.NUM_BONDS_TO_FORM) |                                                      |
-| [`NUM_EXTRA_ATOMS`](#pylimer_tools_cpp.ComputedIntValues.NUM_EXTRA_ATOMS)     |                                                      |
-| [`NUM_EXTRA_BONDS`](#pylimer_tools_cpp.ComputedIntValues.NUM_EXTRA_BONDS)     |                                                      |
-| [`NUM_RELOC`](#pylimer_tools_cpp.ComputedIntValues.NUM_RELOC)                 |                                                      |
-| [`NUM_SHIFT`](#pylimer_tools_cpp.ComputedIntValues.NUM_SHIFT)                 |                                                      |
-| [`STEP`](#pylimer_tools_cpp.ComputedIntValues.STEP)                           |                                                      |
-| [`denominator`](#pylimer_tools_cpp.ComputedIntValues.denominator)             | the denominator of a rational number in lowest terms |
-| [`imag`](#pylimer_tools_cpp.ComputedIntValues.imag)                           | the imaginary part of a complex number               |
-| [`numerator`](#pylimer_tools_cpp.ComputedIntValues.numerator)                 | the numerator of a rational number in lowest terms   |
-| [`real`](#pylimer_tools_cpp.ComputedIntValues.real)                           | the real part of a complex number                    |
+| [`NUM_EXTRA_ATOMS`](#pylimer_tools_cpp.ComputedIntValues.NUM_EXTRA_ATOMS)   |                                                      |
+| [`NUM_EXTRA_BONDS`](#pylimer_tools_cpp.ComputedIntValues.NUM_EXTRA_BONDS)   |                                                      |
+| [`NUM_RELOC`](#pylimer_tools_cpp.ComputedIntValues.NUM_RELOC)         |                                                      |
+| [`NUM_SHIFT`](#pylimer_tools_cpp.ComputedIntValues.NUM_SHIFT)         |                                                      |
+| [`STEP`](#pylimer_tools_cpp.ComputedIntValues.STEP)              |                                                      |
+| [`denominator`](#pylimer_tools_cpp.ComputedIntValues.denominator)       | the denominator of a rational number in lowest terms |
+| [`imag`](#pylimer_tools_cpp.ComputedIntValues.imag)              | the imaginary part of a complex number               |
+| [`numerator`](#pylimer_tools_cpp.ComputedIntValues.numerator)         | the numerator of a rational number in lowest terms   |
+| [`real`](#pylimer_tools_cpp.ComputedIntValues.real)              | the real part of a complex number                    |
 
 ### Methods Summary
 
-| [`as_integer_ratio`](#pylimer_tools_cpp.ComputedIntValues.as_integer_ratio)()               | Return a pair of integers, whose ratio is equal to the original int.       |
-|---------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
-| [`bit_count`](#pylimer_tools_cpp.ComputedIntValues.bit_count)()                             | Number of ones in the binary representation of the absolute value of self. |
+| [`as_integer_ratio`](#pylimer_tools_cpp.ComputedIntValues.as_integer_ratio)()                     | Return a pair of integers, whose ratio is equal to the original int.       |
+|-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| [`bit_count`](#pylimer_tools_cpp.ComputedIntValues.bit_count)()                            | Number of ones in the binary representation of the absolute value of self. |
 | [`bit_length`](#pylimer_tools_cpp.ComputedIntValues.bit_length)()                           | Number of bits necessary to represent self in binary.                      |
-| [`conjugate`](#pylimer_tools_cpp.ComputedIntValues.conjugate)                               | Returns self, the complex conjugate of any int.                            |
+| [`conjugate`](#pylimer_tools_cpp.ComputedIntValues.conjugate)                              | Returns self, the complex conjugate of any int.                            |
 | [`from_bytes`](#pylimer_tools_cpp.ComputedIntValues.from_bytes)(bytes[, byteorder, signed]) | Return the integer represented by the given array of bytes.                |
 | [`is_integer`](#pylimer_tools_cpp.ComputedIntValues.is_integer)()                           | Returns True.                                                              |
-| [`to_bytes`](#pylimer_tools_cpp.ComputedIntValues.to_bytes)([length, byteorder, signed])    | Return an array of bytes representing an integer.                          |
+| [`to_bytes`](#pylimer_tools_cpp.ComputedIntValues.to_bytes)([length, byteorder, signed])  | Return an array of bytes representing an integer.                          |
 
 ### Attributes Documentation
 

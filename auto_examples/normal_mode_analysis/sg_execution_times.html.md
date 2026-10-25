@@ -2,7 +2,7 @@
 
 # Computation times
 
-**00:15.359** total execution time for 1 file **from auto_examples/normal_mode_analysis**:
+**00:15.671** total execution time for 1 file **from auto_examples/normal_mode_analysis**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -17,6 +17,6 @@ $(document).ready( function () {
 } );
 </script>
 
-| Example                                                                                                                                                              | Time      |   Mem (MB) |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Normal Mode Analysis (NMA)](plot_normal_mode_analysis.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`) | 00:15.359 |          0 |
+| Example                                                                                                                                                                             | Time      |   Mem (MB) |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
+| [Normal Mode Analysis (NMA)](plot_normal_mode_analysis.html.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`plot_normal_mode_analysis.py`) | 00:15.671 |          0 |

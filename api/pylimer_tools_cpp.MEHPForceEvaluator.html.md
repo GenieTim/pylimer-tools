@@ -14,16 +14,16 @@ To create a custom force evaluator in Python, subclass this class and implement:
 
 ### Attributes Summary
 
-| [`is_2d`](#pylimer_tools_cpp.MEHPForceEvaluator.is_2d)     |    |
-|------------------------------------------------------------|----|
+| [`is_2d`](#pylimer_tools_cpp.MEHPForceEvaluator.is_2d)   |    |
+|----------------------------------------------------------|----|
 | [`network`](#pylimer_tools_cpp.MEHPForceEvaluator.network) |    |
 
 ### Methods Summary
 
 | [`evaluate_force_set_gradient`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_force_set_gradient)(self, n, ...[, ...])   | Evaluate the force and optionally compute its gradient.   |
-|---------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| [`evaluate_stress_contribution`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_stress_contribution)(self, ...)           | Evaluate the stress-contribution for a single spring.     |
-| [`prepare_for_evaluations`](#pylimer_tools_cpp.MEHPForceEvaluator.prepare_for_evaluations)(self)                          | Prepare the evaluator for a series of evaluations.        |
+|-----------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| [`evaluate_stress_contribution`](#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_stress_contribution)(self, ...)            | Evaluate the stress-contribution for a single spring.     |
+| [`prepare_for_evaluations`](#pylimer_tools_cpp.MEHPForceEvaluator.prepare_for_evaluations)(self)                      | Prepare the evaluator for a series of evaluations.        |
 
 ### Attributes Documentation
 
@@ -33,7 +33,7 @@ To create a custom force evaluator in Python, subclass this class and implement:
 
 ### Methods Documentation
 
-#### evaluate_force_set_gradient(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator), n: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), spring_distances: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], compute_gradient: [bool](https://docs.python.org/3/library/functions.html#bool) = False) → [tuple](https://docs.python.org/3/library/stdtypes.html#tuple)
+#### evaluate_force_set_gradient(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator), n: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), spring_distances: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], compute_gradient: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)
 
 Evaluate the force and optionally compute its gradient.
 
@@ -65,7 +65,7 @@ def evaluate_force_set_gradient(self, n, spring_distances, compute_gradient):
     return (force, gradient)
 ```
 
-#### evaluate_stress_contribution(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator), spring_distances: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), i: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), j: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), spring_index: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [float](https://docs.python.org/3/library/functions.html#float)
+#### evaluate_stress_contribution(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator), spring_distances: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), i: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), j: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), spring_index: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Evaluate the stress-contribution for a single spring.
 
@@ -77,7 +77,7 @@ Evaluate the stress-contribution for a single spring.
 * **Returns:**
   The stress contribution value
 
-#### prepare_for_evaluations(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator)) → [None](https://docs.python.org/3/library/constants.html#None)
+#### prepare_for_evaluations(self: [pylimer_tools_cpp.MEHPForceEvaluator](#pylimer_tools_cpp.MEHPForceEvaluator)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Prepare the evaluator for a series of evaluations.
 This method is called before a batch of force evaluations,

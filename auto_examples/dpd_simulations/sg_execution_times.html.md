@@ -2,7 +2,7 @@
 
 # Computation times
 
-**00:05.003** total execution time for 1 file **from auto_examples/dpd_simulations**:
+**00:04.978** total execution time for 1 file **from auto_examples/dpd_simulations**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -17,6 +17,6 @@ $(document).ready( function () {
 } );
 </script>
 
-| Example                                                                                                                                                            | Time      |   Mem (MB) |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Dissipative Particle Dynamics (DPD) Simulations](plot_dpd_simulation.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`plot_dpd_simulation.py`) | 00:05.003 |          0 |
+| Example                                                                                                                                                                                 | Time      |   Mem (MB) |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
+| [Dissipative Particle Dynamics (DPD) Simulations](plot_dpd_simulation.html.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`plot_dpd_simulation.py`) | 00:04.978 |          0 |

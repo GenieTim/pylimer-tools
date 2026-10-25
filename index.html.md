@@ -48,12 +48,12 @@ print(f"Mean bond length: {np.mean(universe.compute_bond_lengths())} u")
 
 ## 💡 **Quick Navigation**
 
-- **New to pylimer-tools?** Start with [Installation Guide](installation.md) and [Getting Started Guide](usage.md)
-- **Working with files?** Check out [File I/O: Readers & Writers](auto_examples/readers_writers/index.md)
-- **Generating networks?** See [Network Generation](auto_examples/network_generator/index.md)
-- **Need examples?** Browse [Examples](auto_examples/index.md) for practical code samples
-- **Understanding limitations?** Review [Assumptions](assumptions.md) and [Nomenclature](nomenclature.md)
-- **Like papers?** See Bernhard *et al.* [[BSG25](acknowledgements.md#id25)] and [Acknowledgements](acknowledgements.md) for related publications
+- **New to pylimer-tools?** Start with [Installation Guide](installation.html.md) and [Getting Started Guide](usage.html.md)
+- **Working with files?** Check out [File I/O: Readers & Writers](auto_examples/readers_writers/index.html.md)
+- **Generating networks?** See [Network Generation](auto_examples/network_generator/index.html.md)
+- **Need examples?** Browse [Examples](auto_examples/index.html.md) for practical code samples
+- **Understanding limitations?** Review [Assumptions](assumptions.html.md) and [Nomenclature](nomenclature.html.md)
+- **Like papers?** See Bernhard *et al.* [[BSG25](acknowledgements.html.md#id25)] and [Acknowledgements](acknowledgements.html.md) for related publications
 
 ## 🔗 **Useful Links**
 
@@ -65,7 +65,7 @@ print(f"Mean bond length: {np.mean(universe.compute_bond_lengths())} u")
 
 ## 📖 **Indices and Tables**
 
-* [Index](genindex.md)
-* [Module Index](py-modindex.md)
-* [Search Page](search.md)
-* [References](acknowledgements.md#references)
+* [Index](genindex.html.md)
+* [Module Index](py-modindex.html.md)
+* [Search Page](search.html.md)
+* [References](acknowledgements.html.md#references)

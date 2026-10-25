@@ -4,13 +4,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>pylimer_tools.io.read_lammps_output_file - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -366,8 +366,8 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for pylimer_tools.io.read_lammps_output_file</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module provides a few functions to read LAMMPS&#39; output files, including:</span>
+<span></span><span class="sd">"""</span>
+<span class="sd">This module provides a few functions to read LAMMPS' output files, including:</span>
 
 <span class="sd">- log files (thermo output)</span>
 <span class="sd">- dump files (focusing on the coordinates of atoms)</span>
@@ -375,7 +375,7 @@
 <span class="sd">- averaged data (from :code:`fix ave/time...` or :code:`fix ave/hist...`)</span>
 <span class="sd">- correlation data (from :code:`fix ave/correlate/...`)</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
@@ -394,8 +394,8 @@
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_log_file">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">read_log_file</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">,</span> <span class="n">lines_to_read_to_detect_header</span><span class="o">=</span><span class="mi">500000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Read a LAMMPS&#39; log (thermo output) file.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Read a LAMMPS' log (thermo output) file.</span>
 
 <span class="sd">    :param filepath: Path to the LAMMPS log file</span>
 <span class="sd">    :type filepath: str</span>
@@ -403,7 +403,7 @@
 <span class="sd">    :type lines_to_read_to_detect_header: int</span>
 <span class="sd">    :return: DataFrame containing the parsed thermo data</span>
 <span class="sd">    :rtype: pd.DataFrame</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">extract_thermo_params</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">,</span>
         <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -418,8 +418,8 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">read_dump_file</span><span class="p">(</span>
     <span class="n">data_file</span><span class="p">,</span> <span class="n">dump_file</span><span class="p">,</span> <span class="n">atom_style</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">AtomStyle</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UniverseSequence</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Read a file with LAMMPS&#39; dump of snapshots of structures into a Universe.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Read a file with LAMMPS' dump of snapshots of structures into a Universe.</span>
 
 <span class="sd">    :param data_file: Path to the LAMMPS data file containing structure information</span>
 <span class="sd">    :type data_file: str</span>
@@ -429,7 +429,7 @@
 <span class="sd">    :type atom_style: Union[List[AtomStyle], None]</span>
 <span class="sd">    :return: Sequence of Universe objects representing the trajectory</span>
 <span class="sd">    :rtype: UniverseSequence</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">u_s</span> <span class="o">=</span> <span class="n">UniverseSequence</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">atom_style</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">u_s</span><span class="o">.</span><span class="n">set_data_file_atom_style</span><span class="p">(</span><span class="n">atom_style</span><span class="p">)</span>
@@ -443,8 +443,8 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">read_data_file</span><span class="p">(</span>
     <span class="n">structure_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">atom_style</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">AtomStyle</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Universe</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Read a file with LAMMPS&#39; data type of structure into a Universe.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Read a file with LAMMPS' data type of structure into a Universe.</span>
 
 <span class="sd">    :param structure_file: Path to the structure file</span>
 <span class="sd">    :type structure_file: str</span>
@@ -453,10 +453,10 @@
 <span class="sd">    :return: Universe object representing the molecular structure</span>
 <span class="sd">    :rtype: Universe</span>
 <span class="sd">    :raises FileNotFoundError: If the structure file does not exist</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">structure_file</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Structure-file &#39;</span><span class="si">{</span><span class="n">structure_file</span><span class="si">}</span><span class="s2">&#39; not found.&quot;</span><span class="p">)</span>
+            <span class="sa">f</span><span class="s2">"Structure-file '</span><span class="si">{</span><span class="n">structure_file</span><span class="si">}</span><span class="s2">' not found."</span><span class="p">)</span>
     <span class="n">u_s</span> <span class="o">=</span> <span class="n">UniverseSequence</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">atom_style</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">u_s</span><span class="o">.</span><span class="n">set_data_file_atom_style</span><span class="p">(</span><span class="n">atom_style</span><span class="p">)</span>
@@ -470,11 +470,11 @@
 <div class="viewcode-block" id="read_averages_file">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_averages_file">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">read_averages_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                       <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+                       <span class="n">sep</span><span class="o">=</span><span class="s2">" "</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read a file written by a `fix ave/time` command.</span>
 
-<span class="sd">    Uses pandas&#39; read_csv after detecting the columns.</span>
+<span class="sd">    Uses pandas' read_csv after detecting the columns.</span>
 
 <span class="sd">    Important assumption: The first 2 or 3 lines in the file are:</span>
 <span class="sd">        - comment,</span>
@@ -490,25 +490,25 @@
 <span class="sd">    :return: DataFrame containing the parsed average data</span>
 <span class="sd">    :rtype: pd.DataFrame</span>
 <span class="sd">    :raises FileNotFoundError: If the averages file does not exist</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Averages-file &#39;</span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&#39; not found.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Averages-file '</span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">' not found."</span><span class="p">)</span>
     <span class="n">header_line</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">line0</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line1</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line2</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">line2</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">line2</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#"</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">read_sectioned_averages_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">)</span>
 
-        <span class="n">header_line</span> <span class="o">=</span> <span class="n">line1</span> <span class="k">if</span> <span class="n">line1</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">line0</span>
-    <span class="n">header_line</span> <span class="o">=</span> <span class="n">header_line</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">header_line</span> <span class="o">=</span> <span class="n">line1</span> <span class="k">if</span> <span class="n">line1</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span> <span class="k">else</span> <span class="n">line0</span>
+    <span class="n">header_line</span> <span class="o">=</span> <span class="n">header_line</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
             <span class="n">filepath</span><span class="p">,</span>
-            <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;#&quot;</span><span class="p">,</span>
+            <span class="n">comment</span><span class="o">=</span><span class="s2">"#"</span><span class="p">,</span>
             <span class="n">names</span><span class="o">=</span><span class="n">header_line</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span>
             <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">pd</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">EmptyDataError</span><span class="p">:</span>
@@ -522,10 +522,10 @@
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_file">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">read_sectioned_averages_file</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read a file written by a `fix ave/time` command with multiple sections.</span>
 
-<span class="sd">    Use the section delimiter columns together with pandas&#39; groupby()</span>
+<span class="sd">    Use the section delimiter columns together with pandas' groupby()</span>
 <span class="sd">    to restore the original sections.</span>
 
 <span class="sd">    :param filepath: Path to the sectioned averages file</span>
@@ -536,39 +536,39 @@
 <span class="sd">    :rtype: pd.DataFrame</span>
 <span class="sd">    :raises FileNotFoundError: If the file does not exist</span>
 <span class="sd">    :raises ValueError: If the file format is not recognized as a proper sectioned averages file</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Averages-file &#39;</span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&#39; not found.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Averages-file '</span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">' not found."</span><span class="p">)</span>
 
-    <span class="n">cache_suffix</span> <span class="o">=</span> <span class="s2">&quot;sectionedavg-cache.pickle&quot;</span>
+    <span class="n">cache_suffix</span> <span class="o">=</span> <span class="s2">"sectionedavg-cache.pickle"</span>
     <span class="n">cache_content</span> <span class="o">=</span> <span class="n">load_cache</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">cache_suffix</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">cache_content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">use_cache</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">cache_content</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>  <span class="c1"># discard line 0</span>
         <span class="n">line1</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line2</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">line2</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">line2</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#"</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;The file &#39;</span><span class="si">{}</span><span class="s2">&#39; was not detected to be a proper sectioned averages file.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s2">"The file '</span><span class="si">{}</span><span class="s2">' was not detected to be a proper sectioned averages file."</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">filepath</span>
                 <span class="p">)</span>
             <span class="p">)</span>
             <span class="c1"># return readSectionedAveragesFile(filepath)</span>
 
-        <span class="n">header_line1</span> <span class="o">=</span> <span class="n">line1</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="n">header_line2</span> <span class="o">=</span> <span class="n">line2</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">header_line1</span> <span class="o">=</span> <span class="n">line1</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">header_line2</span> <span class="o">=</span> <span class="n">line2</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
         <span class="n">header_line1_split</span> <span class="o">=</span> <span class="n">header_line1</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="n">header_line2_split</span> <span class="o">=</span> <span class="n">header_line2</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">header_line1_split</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">header_line2_split</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Cannot read this file, as we cannot distinguish between section header and main data&quot;</span>
+                <span class="s2">"Cannot read this file, as we cannot distinguish between section header and main data"</span>
             <span class="p">)</span>
 
         <span class="n">current_data</span> <span class="o">=</span> <span class="p">[]</span>
@@ -592,7 +592,7 @@
     <span class="n">dfs_to_concat</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">if</span> <span class="n">header_line1_split</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Did not find a useable header line.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Did not find a useable header line."</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="n">split_key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
@@ -614,7 +614,7 @@
 <div class="viewcode-block" id="read_histogram_file">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_histogram_file">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">read_histogram_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read a file written by `fix ave/hist` or similar.</span>
 
 <span class="sd">    This is a wrapper around read_sectioned_averages_file for histogram data.</span>
@@ -627,7 +627,7 @@
 <span class="sd">    :rtype: pd.DataFrame</span>
 
 <span class="sd">    :see: :func:`~pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_file`</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">read_sectioned_averages_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">)</span></div>
 
 
@@ -635,9 +635,9 @@
 <div class="viewcode-block" id="read_correlation_file">
 <a class="viewcode-back" href="../../../pylimer_tools.io.html#pylimer_tools.io.read_lammps_output_file.read_correlation_file">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">read_correlation_file</span><span class="p">(</span>
-    <span class="n">filepath</span><span class="p">,</span> <span class="n">group_key</span><span class="o">=</span><span class="s2">&quot;Timestep&quot;</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">filepath</span><span class="p">,</span> <span class="n">group_key</span><span class="o">=</span><span class="s2">"Timestep"</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Read a file written by a `fix ave/correlate{/long}` command.</span>
 
 <span class="sd">    :param filepath: Path to the correlation file</span>
@@ -647,15 +647,15 @@
 <span class="sd">    :param use_cache: Whether to use the cache to speed up reading &amp; writing</span>
 <span class="sd">    :type use_cache: bool</span>
 <span class="sd">    :return: DataFrame containing the correlation data. Use the group_key with</span>
-<span class="sd">             the DataFrame&#39;s groupby() to restore the original sections.</span>
+<span class="sd">             the DataFrame's groupby() to restore the original sections.</span>
 <span class="sd">    :rtype: pd.DataFrame</span>
 <span class="sd">    :raises FileNotFoundError: If the correlation file does not exist</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Correlation-file &#39;</span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&#39; not found.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Correlation-file '</span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">' not found."</span><span class="p">)</span>
 
-    <span class="n">cache_suffix</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">-correlation-cache.pickle&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="n">group_key</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;g&quot;</span>
+    <span class="n">cache_suffix</span> <span class="o">=</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">-correlation-cache.pickle"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">group_key</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="s2">"g"</span>
     <span class="p">)</span>
     <span class="n">cache_content</span> <span class="o">=</span> <span class="n">load_cache</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">cache_suffix</span><span class="p">)</span>
 
@@ -664,15 +664,15 @@
 
     <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">header_line</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">current_data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">current_key</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">header_line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">header_line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">header_line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#"</span><span class="p">):</span>
             <span class="c1"># in LAMMPS files, there is a title line that does not exist in our DPD output,</span>
             <span class="c1"># -&gt; this line is needed for LAMMPS</span>
             <span class="n">header_line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="n">cols</span> <span class="o">=</span> <span class="n">header_line</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">header_line</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="n">normal_line_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
         <span class="n">lines_interpreted</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -683,7 +683,7 @@
             <span class="k">return</span> <span class="n">group_key</span> <span class="ow">in</span> <span class="n">line</span>
 
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_group_key</span><span class="p">(</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_group_key</span><span class="p">(</span>
                 <span class="n">line</span>
             <span class="p">):</span>
                 <span class="k">if</span> <span class="n">lines_interpreted</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -691,7 +691,7 @@
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="n">header_line</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">split</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">split</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">split</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">is_group_key</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">current_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">data</span><span class="p">[</span><span class="n">current_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_data</span>
@@ -703,7 +703,7 @@
                 <span class="n">current_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">split</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Did not expect </span><span class="si">{}</span><span class="s2"> splited values on line with content </span><span class="si">{}</span><span class="s2"> in correlation file </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s2">"Did not expect </span><span class="si">{}</span><span class="s2"> splited values on line with content </span><span class="si">{}</span><span class="s2"> in correlation file </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                         <span class="nb">len</span><span class="p">(</span><span class="n">split</span><span class="p">),</span> <span class="n">line</span><span class="p">,</span> <span class="n">filepath</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
@@ -715,11 +715,11 @@
     <span class="n">correlated_data_assembled</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="k">assert</span> <span class="n">group_key</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-        <span class="n">compiled_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:? ([\d]+)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">group_key</span><span class="p">))</span>
+        <span class="n">compiled_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"</span><span class="si">{}</span><span class="s2">:? ([\d]+)"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">group_key</span><span class="p">))</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">compiled_regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">results</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Did not find </span><span class="si">{}</span><span class="s2"> with number in </span><span class="si">{}</span><span class="s2"> when reading </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s2">"Did not find </span><span class="si">{}</span><span class="s2"> with number in </span><span class="si">{}</span><span class="s2"> when reading </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">group_key</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">filepath</span>
                 <span class="p">)</span>
             <span class="p">)</span>

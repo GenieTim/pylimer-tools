@@ -30,6 +30,6 @@ This will enable the correct handling of periodic boundaries and hopefully preve
 Note, however, that it assumes that the initial configuration of the structure has bonds that are all shorter than half the box length, since those are used to determine the initial offsets imposed by the PBC.
 
 Relevant methods:
-- [`pylimer_tools_cpp.DPDSimulator.assume_box_large_enough()`](api/pylimer_tools_cpp.DPDSimulator.md#pylimer_tools_cpp.DPDSimulator.assume_box_large_enough)
-- [`pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough()`](api/pylimer_tools_cpp.MEHPForceRelaxation.md#pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough)
-- [`pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough()`](api/pylimer_tools_cpp.MEHPForceBalance.md#pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough)
+- [`pylimer_tools_cpp.DPDSimulator.assume_box_large_enough()`](api/pylimer_tools_cpp.DPDSimulator.html.md#pylimer_tools_cpp.DPDSimulator.assume_box_large_enough)
+- [`pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough()`](api/pylimer_tools_cpp.MEHPForceRelaxation.html.md#pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough)
+- [`pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough()`](api/pylimer_tools_cpp.MEHPForceBalance.html.md#pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough)
