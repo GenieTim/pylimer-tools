@@ -16,14 +16,21 @@ and :func:`~pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_fil
 """
 
 import os
+from pathlib import Path
 
 from pylimer_tools.io.read_lammps_output_file import read_averages_file
 
-averages_file = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/example_avg_file.out.avg.txt",
+_fixtures_dir = (
+    Path(__file__).resolve().parent.parent.parent /
+    "tests/pylimer_tools/fixtures"
+    if "__file__" in globals()
+    else (
+        Path.cwd().parent / "tests/pylimer_tools/fixtures"
+        if Path.cwd().name == "docs"
+        else Path("tests/pylimer_tools/fixtures").resolve()
+    )
 )
+averages_file = str(_fixtures_dir / "example_avg_file.out.avg.txt")
 
 # Read simple averages file
 averages = read_averages_file(averages_file)
@@ -37,11 +44,7 @@ averages.plot(
     title="Averaged Data Plot",
 )
 
-vec_averages_file = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/example_vec_avg_file.out.vec-avg.txt",
-)
+vec_averages_file = str(_fixtures_dir / "example_vec_avg_file.out.vec-avg.txt")
 
 # Read sectioned averages
 # (e.g., from vector quantities from e.g. ``fix ave/time ... vector``)

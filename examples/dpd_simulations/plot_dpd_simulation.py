@@ -12,6 +12,7 @@ e.g., in the terminal before running your script: :code:`export OMP_NUM_THREADS=
 """
 
 import os
+from pathlib import Path
 
 import pandas as pd
 
@@ -25,11 +26,17 @@ from pylimer_tools_cpp import (
 )
 
 # Load a LAMMPS data file (replace with your file)
-filePath = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/structure/melt_83_a_100.structure.out",
+_fixtures_dir = (
+    Path(__file__).resolve().parent.parent.parent /
+    "tests/pylimer_tools/fixtures"
+    if "__file__" in globals()
+    else (
+        Path.cwd().parent / "tests/pylimer_tools/fixtures"
+        if Path.cwd().name == "docs"
+        else Path("tests/pylimer_tools/fixtures").resolve()
+    )
 )
+filePath = str(_fixtures_dir / "structure/melt_83_a_100.structure.out")
 universe = read_data_file(
     filePath, atom_style=[AtomStyle.HYBRID, AtomStyle.BOND, AtomStyle.EDPD]
 )

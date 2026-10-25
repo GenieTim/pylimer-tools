@@ -55,6 +55,23 @@ bibtex_bibfiles = ["references.bib"]
 # Enable nitpicky mode to warn about missing references
 nitpicky = True
 
+nitpick_ignore = [
+    ("py:class", "pybind11_builtins.pybind11_object"),
+    ("py:class", "pd.DataFrame"),
+    ("py:class", "pd.Series"),
+    ("py:class", "igraph_t"),
+    ("py:class", "UnitRegistry"),
+    ("py:obj", "pd.DataFrame"),
+    ("py:obj", "pd.Series"),
+    ("py:obj", "UnitRegistry"),
+]
+
+nitpick_ignore_regex = [
+    (r"py:.*", r"numpy\.typing\..*"),
+    (r"py:.*", r"pybind11_builtins\..*"),
+    (r".*", r"igraph_t"),
+]
+
 # Configuration for specific extensions
 # napoleon settings
 napoleon_google_docstring = True
@@ -102,6 +119,7 @@ intersphinx_mapping = get_intersphinx_mapping(
         "numpy",
         "pandas",
         "python",
+        "scipy",
     },
 )
 
@@ -123,7 +141,7 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-source_suffix = [".rst", ".md"]
+source_suffix = {".rst": "restructuredtext", ".md": "restructuredtext"}
 
 # The master toctree document.
 master_doc = "index"

@@ -7,6 +7,7 @@ including mean square displacement (MSD) and radius of gyration calculation.
 """
 
 import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,11 +15,17 @@ import numpy as np
 from pylimer_tools_cpp import UniverseSequence
 
 # Load a LAMMPS dump trajectory file (replace with your file)
-file_path = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/",
+_fixtures_dir = (
+    Path(__file__).resolve().parent.parent.parent /
+    "tests/pylimer_tools/fixtures"
+    if "__file__" in globals()
+    else (
+        Path.cwd().parent / "tests/pylimer_tools/fixtures"
+        if Path.cwd().name == "docs"
+        else Path("tests/pylimer_tools/fixtures").resolve()
+    )
 )
+file_path = str(_fixtures_dir)
 sequence = UniverseSequence()
 sequence.initialize_from_dump_file(
     initial_data_file=os.path.join(file_path, "big_dump_file_data.out"),

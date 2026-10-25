@@ -9,6 +9,7 @@ Reference: :cite:t:`gusev_molecular_2024`
 """
 
 import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -17,11 +18,17 @@ from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import NormalModeAnalyzer
 
 # Load a LAMMPS data file (replace with your file)
-filePath = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/structure/network_100_a_46.structure.out",
+_fixtures_dir = (
+    Path(__file__).resolve().parent.parent.parent /
+    "tests/pylimer_tools/fixtures"
+    if "__file__" in globals()
+    else (
+        Path.cwd().parent / "tests/pylimer_tools/fixtures"
+        if Path.cwd().name == "docs"
+        else Path("tests/pylimer_tools/fixtures").resolve()
+    )
 )
+filePath = str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 universe = read_data_file(filePath)
 edges = universe.get_edges()
 

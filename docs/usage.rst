@@ -36,7 +36,7 @@ The :class:`~pylimer_tools_cpp.Universe` class represents a collection of atoms 
    universe = Universe()
    
    # Basic properties
-   print(f"Number of atoms: {universe.get_size()}")
+   print(f"Number of atoms: {universe.get_nr_of_atoms()}")
    print(f"Simulation box volume: {universe.get_volume()}")
 
 UniverseSequence
@@ -73,10 +73,10 @@ Common Workflows
    universe = sequence.at_index(0)
    
    # Basic system information
-   print(f"System contains {universe.get_size()} atoms")
-   print(f"Simulation box: {universe.get_box().get_x_length():.2f} x " +
-         f"{universe.get_box().get_y_length():.2f} x " +
-         f"{universe.get_box().get_z_length():.2f}")
+   print(f"System contains {universe.get_nr_of_atoms()} atoms")
+   print(f"Simulation box: {universe.get_box().get_lx():.2f} x " +
+         f"{universe.get_box().get_ly():.2f} x " +
+         f"{universe.get_box().get_lz():.2f}")
    
    # Analyze molecules
    molecules = universe.get_molecules(atom_type_to_omit=2)  # Omit type 2 atoms
@@ -98,7 +98,7 @@ Common Workflows
    end_to_end_distances = []
    
    for molecule in universe.get_molecules():
-       if molecule.get_size() > 2:  # Skip single atoms/dimers
+       if molecule.get_nr_of_atoms() > 2:  # Skip single atoms/dimers
            rg = molecule.compute_radius_of_gyration()
            ree = molecule.compute_end_to_end_distance()
            
@@ -130,7 +130,7 @@ Common Workflows
        # Process each frame
        pass
 
-5. Writing Modified Systems
+4. Writing Modified Systems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python

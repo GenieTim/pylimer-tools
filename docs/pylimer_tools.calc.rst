@@ -20,6 +20,14 @@ pylimer\_tools.calc.miller_macosko_theory module
    :undoc-members:
    :show-inheritance:
 
+pylimer\_tools.calc.stoichiometric_relationships module
+-------------------------------------------------------
+
+.. automodule:: pylimer_tools.calc.stoichiometric_relationships
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pylimer\_tools.calc.structure_analysis module
 ---------------------------------------------
 

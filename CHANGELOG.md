@@ -2,11 +2,33 @@
 
 ## main
 
+## v0.4.0
+
+### Simulation & Physics
+- Fix inverse Langevin approximation (`langevin_inv`) symmetry for negative displacements, ensuring restorative forces have the correct sign.
+- Fix stress evaluation in `NonGaussianSpringForceEvaluator` to properly account for non-linear Langevin chain tension.
+- Prevent division by zero and NaN in `evaluateForceSetGradient` and `csch` when spring distance is zero.
+- Ensure safe move semantics and delete copy operations for `MEHPForceRelaxation` to prevent solver handle double-free.
+- Guard `std::clamp` limits in `MEHPForceBalance` when `limit > 0.5`.
+- Fix periodic boundary validation in `Box::validateOffset` for negative displacement offsets.
+- Prevent mutating input vectors in `median(Eigen::DenseBase)` and improve its performance with `std::nth_element`.
+- Support empty networks and direct crosslinker bonds in `compute_topological_factor`.
+- Optimize DataFrame memory reduction utility to only downcast numeric column types.
+
+### Build System & Performance
 - Performance: switch to divide-and-conquer `LAPACKE_dsyevd` in `NormalModeAnalyzer` when computing both eigenvalues and eigenvectors, significantly speeding up dense decomposition.
 - Feature: add GPU-accelerated dense eigenvalue calculation via cuSOLVER (`computeAllEigenvaluesGPU`) with fallback to CPU if compiled without CUDA.
-- Build system: add `USE_CUDA` CMake option and improve LAPACKE discovery on macOS (Homebrew OpenBLAS/LAPACK search paths).
-- Build system: reuse pre-built vendor packages (`nlopt`, `cereal`, `spectra`) when available to accelerate rebuilds.
-- Tests: add Catch2 benchmarks for `NormalModeAnalyzer` and configure CTest to skip benchmarks during standard test discovery.
+- Improve vendor dependency builds (`nlopt`, `cereal`, `igraph`, `spectra`) with forwarded architecture, sysroot, and compiler flags (`vendorForwardArgs.cmake`).
+- Remove `-ffast-math` from high-performance compiler flags to avoid NaN and precision inconsistencies.
+- Detect Ninja build generator via `ninja.BIN_DIR` and fix parallel build core allocation in `setup.py`.
+- Link standard filesystem library conditionally via `STD_FS_LIB` rather than hardcoding `stdc++fs`.
+- Clean up build-time requirements in `pyproject.toml`.
+
+### Documentation & Examples
+- Document missing modules: `analyse_networks`, `basic_lammps_structure_stats`, `displace_randomly`, `generate_network`, `bead_spring_parameter_provider`, `polymer_data`, and `stoichiometric_relationships`.
+- Fix Sphinx configuration and nitpicky reference warnings; update intersphinx to include `scipy`.
+- Standardize fixture path discovery across all example scripts (`examples/**/plot_*.py`) for standalone runs and Sphinx Gallery generation.
+- Add comprehensive unit tests and regression tests for MEHP simulation, box offsets, and Eigen utilities.
 
 ## v0.3.16-v0.3.19
 

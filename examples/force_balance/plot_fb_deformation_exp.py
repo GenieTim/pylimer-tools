@@ -8,6 +8,7 @@ It also shows, that deformation is an equivalent method to the :math:`\\Gamma` f
 """
 
 import copy
+from pathlib import Path
 import math
 import os
 
@@ -28,12 +29,18 @@ params = get_parameters_for_polymer(
 assert isinstance(params, Parameters)
 
 # Load your network (replace with your file)
-universe = read_data_file(
-    os.path.join(
-        os.getcwd(),
-        "../..",
-        "tests/pylimer_tools/fixtures/structure/network_100_a_46.structure.out",
+_fixtures_dir = (
+    Path(__file__).resolve().parent.parent.parent /
+    "tests/pylimer_tools/fixtures"
+    if "__file__" in globals()
+    else (
+        Path.cwd().parent / "tests/pylimer_tools/fixtures"
+        if Path.cwd().name == "docs"
+        else Path("tests/pylimer_tools/fixtures").resolve()
     )
+)
+universe = read_data_file(
+    str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 )
 assert isinstance(universe, Universe)
 

@@ -9,6 +9,7 @@ Here's how you could re-set the molecule indices for bond swapping with constant
 """
 
 import os
+from pathlib import Path
 
 from pylimer_tools_cpp import DataFileWriter, UniverseSequence
 
@@ -16,11 +17,17 @@ if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
 
 # Load original system
-input_file = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/structure/melt_83_a_100.structure.out",
+_fixtures_dir = (
+    Path(__file__).resolve().parent.parent.parent /
+    "tests/pylimer_tools/fixtures"
+    if "__file__" in globals()
+    else (
+        Path.cwd().parent / "tests/pylimer_tools/fixtures"
+        if Path.cwd().name == "docs"
+        else Path("tests/pylimer_tools/fixtures").resolve()
+    )
 )
+input_file = str(_fixtures_dir / "structure/melt_83_a_100.structure.out")
 sequence = UniverseSequence()
 sequence.initialize_from_data_sequence([input_file])
 universe = sequence.at_index(0)

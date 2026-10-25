@@ -10,16 +10,24 @@ Relevant documentation: :func:`~pylimer_tools.io.read_pylimer_tools_output_file.
 """
 
 import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
 from pylimer_tools.io.read_pylimer_tools_output_file import read_avg_file
 
-example_file = os.path.join(
-    os.getcwd(),
-    "..",
-    "dpd_simulations/dpd_simulation_avg_output.txt",
+_examples_dir = (
+    Path(__file__).resolve().parent.parent
+    if "__file__" in globals()
+    else (
+        Path.cwd().parent / "examples"
+        if Path.cwd().name == "docs"
+        else Path("examples").resolve()
+    )
 )
+example_file = str(
+    _examples_dir /
+    "dpd_simulations/dpd_simulation_avg_output.txt")
 
 # Read pylimer-tools averages file
 pylimer_data = read_avg_file(example_file)
