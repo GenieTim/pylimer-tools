@@ -229,6 +229,14 @@ TEST_CASE("Box's offset corresponds to PBC", "[entity][Box][header_tests]")
   CHECK(box.isValidOffset(box.getOffset(diff)));
   CHECK_FALSE(box.isValidOffset(Eigen::Vector3d::Constant(3.2)));
 
+  // Negative offset validation
+  Eigen::Vector3d negValid;
+  negValid << -1.0 * box.getLx(), 0.0, 0.0;
+  CHECK(box.isValidOffset(negValid));
+  Eigen::Vector3d negInvalid;
+  negInvalid << -1.5 * box.getLx(), 0.0, 0.0;
+  CHECK_FALSE(box.isValidOffset(negInvalid));
+
   pe::Box box2 = pe::Box(97.383096, 97.383096, 97.383096);
   Eigen::Vector3d offset;
   offset << 97.3831, 2 * 97.3831, -3 * 97.3831;

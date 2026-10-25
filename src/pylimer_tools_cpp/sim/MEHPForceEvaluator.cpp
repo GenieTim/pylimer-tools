@@ -131,7 +131,7 @@ double
 langevin_inv(const double x)
 {
   if (x < 0.0) {
-    return langevin_inv(-x);
+    return -langevin_inv(-x);
   }
   if (x > 0.99999) {
     return 1e5 * (1 + x * x);
@@ -152,7 +152,7 @@ langevin_inv(const double x)
 // double langevin_inv(const double x)
 // {
 //   if (x < 0.0) {
-//     return langevin_inv(-x);
+//     return -langevin_inv(-x);
 //   }
 //   if (x > 0.99999) {
 //     return 1e5 * (1 + x * x);
@@ -166,6 +166,9 @@ langevin_inv(const double x)
 double
 csch(const double x)
 {
+  if (x == 0.0) {
+    return std::numeric_limits<double>::infinity();
+  }
   return 1. / sinh(x);
 };
 
@@ -195,6 +198,9 @@ NonGaussianSpringForceEvaluator::evaluateForceSetGradient(
         sqrt(springDistances[3 * i] * springDistances[3 * i] +
              springDistances[3 * i + 1] * springDistances[3 * i + 1] +
              springDistances[3 * i + 2] * springDistances[3 * i + 2]);
+      if (r == 0.0) {
+        continue;
+      }
       const double linv =
         langevin_inv(r * this->oneOverl / (this->net.springsContourLength[i]));
       if (std::isnan(linv) || std::isinf(linv)) {
@@ -207,10 +213,7 @@ NonGaussianSpringForceEvaluator::evaluateForceSetGradient(
       for (size_t dir = 0; dir < nrOfDim; ++dir) {
         const double springDistance = springDistances[3 * i + dir];
         // dr/dui
-        double gradTerm = (springDistance / r) * fr;
-        if (r == 0.0) {
-          gradTerm = 0.0;
-        }
+        const double gradTerm = (springDistance / r) * fr;
         if (std::isnan(gradTerm)) {
           std::cerr << "Got " << gradTerm << " grad term, with " << linv
                     << " for spring " << i << " and distance " << r
@@ -228,13 +231,18 @@ NonGaussianSpringForceEvaluator::evaluateForceSetGradient(
       std::sqrt(springDistances[3 * i] * springDistances[3 * i] +
                 springDistances[3 * i + 1] * springDistances[3 * i + 1] +
                 springDistances[3 * i + 2] * springDistances[3 * i + 2]);
+    if (r == 0.0) {
+      continue;
+    }
     const double rOverNl =
       r * this->oneOverl / (this->net.springsContourLength[i]);
     const double beta = langevin_inv(rOverNl);
-    const double cschTerm =
-      csch(beta) *
-      beta; // can be inf or 0. In case of zero, std::log() returns -inf.
-    if (beta > 0.0 && !std::isinf(cschTerm) && cschTerm > 0.0) {
+    if (beta == 0.0) {
+      continue;
+    }
+    const double cschTerm = csch(beta) * beta;
+    if (beta > 0.0 && !std::isnan(cschTerm) && !std::isinf(cschTerm) &&
+        cschTerm > 0.0) {
       force += this->net.springsContourLength[i] *
                (rOverNl * beta + std::log(cschTerm));
     } else if (beta > 0.0 && (std::isinf(cschTerm) || cschTerm == 0.0)) {

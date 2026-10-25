@@ -422,9 +422,22 @@ A strand is a chain of connected links between two crosslinks.
       py::arg("n"),
       py::arg("spring_distances"),
       py::arg("compute_gradient") = false)
-    .def("evaluate_stress_contribution",
-         &mehp::MEHPForceEvaluator::evaluateStressContribution,
-         R"pbdoc(
+    .def(
+      "evaluate_stress_contribution",
+      [](const mehp::MEHPForceEvaluator& self,
+         const std::vector<double>& springDistances,
+         size_t i,
+         size_t j,
+         size_t springIndex) {
+        if (springDistances.size() < 3) {
+          throw std::invalid_argument("spring_distances must have 3 elements");
+        }
+        double s[3] = { springDistances[0],
+                        springDistances[1],
+                        springDistances[2] };
+        return self.evaluateStressContribution(s, i, j, springIndex);
+      },
+      R"pbdoc(
           Evaluate the stress-contribution for a single spring.
 
           :param spring_distances: The three coordinate differences for one spring (list of 3 floats)
@@ -433,10 +446,10 @@ A strand is a chain of connected links between two crosslinks.
           :param spring_index: The index of the spring being evaluated
           :return: The stress contribution value
     )pbdoc",
-         py::arg("spring_distances"),
-         py::arg("i"),
-         py::arg("j"),
-         py::arg("spring_index"))
+      py::arg("spring_distances"),
+      py::arg("i"),
+      py::arg("j"),
+      py::arg("spring_index"))
     .def("prepare_for_evaluations",
          &mehp::MEHPForceEvaluator::prepareForEvaluations,
          R"pbdoc(
@@ -529,7 +542,7 @@ A strand is a chain of connected links between two crosslinks.
          py::arg("kappa") = 1.0,
          py::arg("remove_2functional_crosslinkers") = false,
          py::arg("remove_dangling_chains") = false,
-         py::keep_alive<1, 4>()) // Keep force_evaluator alive with the
+         py::keep_alive<1, 5>()) // Keep force_evaluator alive with the
                                  // MEHPForceRelaxation object
     .def(
       "run_force_relaxation",

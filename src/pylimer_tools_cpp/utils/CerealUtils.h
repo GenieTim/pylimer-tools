@@ -463,7 +463,7 @@ namespace pylimer_tools::utils {
 
 template<typename T>
 std::string
-serializeToString(T obj)
+serializeToString(const T& obj)
 {
   std::stringstream os;
   {
@@ -484,7 +484,7 @@ deserializeFromString(T& obj, std::string& in)
 
 template<typename T>
 void
-serializeToFile(T obj, const std::string file)
+serializeToFile(const T& obj, const std::string file)
 {
   std::ofstream os(file);
   if (file.ends_with("json")) {

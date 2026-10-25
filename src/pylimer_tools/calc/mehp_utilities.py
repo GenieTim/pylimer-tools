@@ -1,6 +1,6 @@
 """
 This module is deprecated.
-Use :func:`pylimer_tools_cpp.MEHPForceBalance` or :func:`pylimer_tools_cpp.MEHPForceRelaxation` instead.
+Use :class:`pylimer_tools_cpp.MEHPForceBalance` or :class:`pylimer_tools_cpp.MEHPForceRelaxation` instead.
 
 In principle, it offers comparable functionality, but without the force minimization - the networks you pass
 to these methods should be minimized first.
@@ -329,6 +329,9 @@ def compute_topological_factor(
     :return: The topological factor :math:`\\Gamma`
     :rtype: float
     """
+    if len(networks) == 0:
+        return 0.0
+
     r_taus = compute_mean_end_to_end_distances(networks, crosslinker_type)
 
     # find the topological factor
@@ -344,6 +347,11 @@ def compute_topological_factor(
         ):
             # dangling, free chains and loops are irrelevant for our purposes
             continue
+        n_atoms = molecule.get_nr_of_atoms()
+        if n_atoms <= 2:
+            # Cannot compute Kuhn factor for direct crosslink-crosslink bonds
+            # (N <= 2)
+            continue
         if b is None:
             b = float(np.mean(molecule.compute_bond_lengths()))
         crosslinkers = [crosslinkers[0], crosslinkers[1]]
@@ -352,8 +360,7 @@ def compute_topological_factor(
         crosslinkers.sort(key=lambda a: a.get_id())
         key = molecule.get_key()
         gamma_sum += (
-            r_taus[key] * r_taus[key] /
-            ((molecule.get_nr_of_atoms() - 2) * b * b)
+            r_taus[key] * r_taus[key] / ((n_atoms - 2) * b * b)
         )  # -2: remove crosslinkers again (assumption 3)
 
     return gamma_sum / total_mass

@@ -111,11 +111,22 @@ TEST_CASE("Eigen Median computation", "[Eigen]")
 
     Eigen::VectorXd testVec2(10);
     testVec2 << 3, 4, 1, 1, 1, 3.5, 4, 1, 1, 1;
+    Eigen::VectorXd testVec2Original = testVec2;
     CHECK(Eigen::median(testVec2) == 1.);
+    CHECK(testVec2 == testVec2Original);
 
     Eigen::VectorXd testVec3(1);
     testVec3 << 1;
     CHECK(Eigen::median(testVec3) == 1);
+  }
+
+  SECTION("Does not mutate input vector")
+  {
+    Eigen::VectorXd unsorted(5);
+    unsorted << 5.0, 1.0, 4.0, 2.0, 3.0;
+    Eigen::VectorXd original = unsorted;
+    CHECK(Eigen::median(unsorted) == 3.0);
+    CHECK(unsorted == original);
   }
 
   SECTION("Constant vector")

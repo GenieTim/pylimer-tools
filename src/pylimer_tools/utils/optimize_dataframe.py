@@ -48,7 +48,8 @@ def reduce_mem_usage(
         col_type = df[col].dtype
 
         if (
-            col_type != object
+            pd.api.types.is_numeric_dtype(col_type)
+            and col_type != object
             and col_type.name != "category"
             and "datetime" not in col_type.name
         ):

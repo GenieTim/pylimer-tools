@@ -60,20 +60,24 @@ operator==(const std::vector<T>& stdVec,
 
 template<typename Derived>
 typename Derived::Scalar
-median(Eigen::DenseBase<Derived>& d)
-{
-  auto r{ d.reshaped() };
-  std::sort(r.begin(), r.end());
-  return r.size() % 2 == 0 ? r.segment((r.size() - 2) / 2, 2).mean()
-                           : r(r.size() / 2);
-}
-
-template<typename Derived>
-typename Derived::Scalar
 median(const Eigen::DenseBase<Derived>& d)
 {
-  typename Derived::PlainObject m{ d.replicate(1, 1) };
-  return median(m);
+  if (d.size() == 0) {
+    throw std::invalid_argument(
+      "Cannot compute median of empty Eigen expression.");
+  }
+  typename Derived::PlainObject copy = d.eval();
+  auto r = copy.reshaped();
+  const Eigen::Index n = r.size();
+  const Eigen::Index mid = n / 2;
+  std::nth_element(r.begin(), r.begin() + mid, r.end());
+  if (n % 2 != 0) {
+    return r(mid);
+  } else {
+    typename decltype(r)::iterator max_it =
+      std::max_element(r.begin(), r.begin() + mid);
+    return (*max_it + r(mid)) * 0.5;
+  }
 }
 
 static inline bool

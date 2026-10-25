@@ -172,6 +172,41 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
             compute_topological_factor([self.saturatedTestUniverse], 2),
         )
 
+    def test_topological_factor_small_molecules_no_zero_division(self):
+        """Test that small molecules with N <= 2 do not cause ZeroDivisionError."""
+        universe = Universe(20, 20, 20)
+        # Directly bonded crosslinkers: N = 2
+        universe.add_atoms(
+            [
+                1, 2], [
+                2, 2], [
+                0.0, 1.0], [
+                0.0, 0.0], [
+                    0.0, 0.0], [
+                        0, 0], [
+                            0, 0], [
+                                0, 0]
+        )
+        universe.add_bonds([1], [2])
+        # Normal polymer strand: crosslinker 3 - monomer 4 - crosslinker 5 (N =
+        # 3)
+        universe.add_atoms(
+            [3, 4, 5],
+            [2, 1, 2],
+            [0.0, 1.0, 2.0],
+            [5.0, 5.0, 5.0],
+            [0.0, 0.0, 0.0],
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0],
+        )
+        universe.add_bonds([3, 4], [4, 5])
+
+        # R^2 = 4, (N - 2) = 1, b = 1 => contribution = 4.0
+        gamma = compute_topological_factor(
+            [universe], crosslinker_type=2, b=1.0)
+        self.assertAlmostEqual(4.0, gamma)
+
     def test_shear_modulus_prediction(self):
         self.assertEqual(
             0.0, predict_shear_modulus(

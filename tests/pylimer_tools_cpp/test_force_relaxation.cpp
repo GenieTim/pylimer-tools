@@ -943,3 +943,112 @@ TEST_CASE("Fully active chains are fully active",
     }
   }
 }
+
+TEST_CASE("MEHP Bugfixes and Regression Tests",
+          "[analysis][MEHPForceRelaxation][bugfixes]")
+{
+  SECTION("1. Test langevin_inv symmetry and restorative force")
+  {
+    std::vector<double> testValues = { 0.0, 0.01, 0.1, 0.5, 0.8, 0.99, 1.5 };
+    for (double val : testValues) {
+      double pos = pcm::langevin_inv(val);
+      double neg = pcm::langevin_inv(-val);
+      CHECK(neg == Catch::Approx(-pos));
+      if (val > 0.0) {
+        CHECK(pos > 0.0);
+        CHECK(neg < 0.0);
+      }
+    }
+  }
+
+  SECTION(
+    "2. Test evaluateForceSetGradient and csch at r=0: returns 0 and no NaN")
+  {
+    pcm::Network net;
+    net.nrOfSprings = 1;
+    net.nrOfNodes = 2;
+    net.springIndexA = Eigen::VectorXi(1);
+    net.springIndexA << 0;
+    net.springIndexB = Eigen::VectorXi(1);
+    net.springIndexB << 1;
+    net.springsContourLength = Eigen::VectorXd::Constant(1, 5.0);
+    net.meanSpringContourLength = 5.0;
+
+    pcm::NonGaussianSpringForceEvaluator evaluator(1.0, 5.0, 1.0);
+    evaluator.setIs2D(false);
+    evaluator.setNetwork(net);
+    evaluator.prepareForEvaluations();
+
+    Eigen::VectorXd springDistances = Eigen::VectorXd::Zero(3);
+    double grad[6] = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
+
+    double energy =
+      evaluator.evaluateForceSetGradient(6, springDistances, grad);
+    CHECK(energy == 0.0);
+    for (int i = 0; i < 6; ++i) {
+      CHECK_FALSE(std::isnan(grad[i]));
+      CHECK(grad[i] == 0.0);
+    }
+
+    double s[3] = { 0.0, 0.0, 0.0 };
+    double stress = evaluator.evaluateStressContribution(s, 0, 0, 0);
+    CHECK_FALSE(std::isnan(stress));
+    CHECK(stress == 0.0);
+  }
+
+  SECTION("3. Test NonGaussian evaluateStressContribution incorporates "
+          "non-linear tension")
+  {
+    pcm::Network net;
+    net.nrOfSprings = 1;
+    net.nrOfNodes = 2;
+    net.springIndexA = Eigen::VectorXi(1);
+    net.springIndexA << 0;
+    net.springIndexB = Eigen::VectorXi(1);
+    net.springIndexB << 1;
+    net.springsContourLength = Eigen::VectorXd::Constant(1, 10.0);
+
+    pcm::NonGaussianSpringForceEvaluator nonGaussianEval(1.0, 10.0, 1.0);
+    nonGaussianEval.setNetwork(net);
+
+    pcm::SimpleSpringMEHPForceEvaluator gaussianEval(1.0);
+    gaussianEval.setNetwork(net);
+
+    // Highly stretched spring: r = 9.0 (close to contour length N*l = 10.0)
+    double s[3] = { 9.0, 0.0, 0.0 };
+    double nonGaussianStress =
+      nonGaussianEval.evaluateStressContribution(s, 0, 0, 0);
+    double gaussianStress = gaussianEval.evaluateStressContribution(s, 0, 0, 0);
+
+    // Non-linear Langevin tension diverges near contour length, so
+    // nonGaussianStress >> gaussianStress
+    CHECK_FALSE(std::isnan(nonGaussianStress));
+    CHECK(nonGaussianStress > gaussianStress * 2.0);
+  }
+
+  SECTION("4. Test std::clamp edge cases where limit > 0.5 without failure")
+  {
+    double limit = 0.8;
+    double idealValue = 0.5;
+    const double lo = std::min(limit, 1.0 - limit);
+    const double hi = std::max(limit, 1.0 - limit);
+    double clamped = std::clamp(idealValue, lo, hi);
+    CHECK(clamped >= lo);
+    CHECK(clamped <= hi);
+    CHECK(lo == Catch::Approx(0.2));
+    CHECK(hi == Catch::Approx(0.8));
+  }
+
+  SECTION("5. Test MEHPForceRelaxation non-copyability and safe move semantics")
+  {
+    STATIC_CHECK_FALSE(std::is_copy_constructible_v<pcm::MEHPForceRelaxation>);
+    STATIC_CHECK_FALSE(std::is_copy_assignable_v<pcm::MEHPForceRelaxation>);
+    STATIC_CHECK(std::is_move_constructible_v<pcm::MEHPForceRelaxation>);
+    STATIC_CHECK(std::is_move_assignable_v<pcm::MEHPForceRelaxation>);
+
+    pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+    pcm::MEHPForceRelaxation r1(universe, 2);
+    pcm::MEHPForceRelaxation r2 = std::move(r1);
+    CHECK(r2.getNrOfIterations() == 0);
+  }
+}

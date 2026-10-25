@@ -116,9 +116,17 @@ public:
                                     const size_t j,
                                     const size_t spring_index) const override
   {
-    return this->kappa * springDistances[i] * springDistances[j] /
-           this->net
-             .springsContourLength[static_cast<Eigen::Index>(spring_index)];
+    const double r = std::sqrt(springDistances[0] * springDistances[0] +
+                               springDistances[1] * springDistances[1] +
+                               springDistances[2] * springDistances[2]);
+    if (r == 0.0) {
+      return 0.0;
+    }
+    const double linv = langevin_inv(
+      r * this->oneOverl /
+      this->net.springsContourLength[static_cast<Eigen::Index>(spring_index)]);
+    const double fr = (this->oneOverl) * linv;
+    return (springDistances[i] * springDistances[j] / r) * fr;
   }
 
   void prepareForEvaluations() override

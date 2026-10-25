@@ -261,7 +261,7 @@ public:
       return false;
     }
     for (int i = 0; i < offset.size(); ++i) {
-      if (offset[i] > precision) {
+      if (std::abs(offset[i]) > precision) {
         double multiple = offset[i] / this->L[i % 3];
         bool rowIsValid = std::abs(multiple - round(multiple)) < precision;
         if (!rowIsValid) {

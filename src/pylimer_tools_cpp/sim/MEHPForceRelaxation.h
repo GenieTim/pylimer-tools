@@ -54,6 +54,71 @@ private:
   double dt = 1;
 
 public:
+  MEHPForceRelaxation(const MEHPForceRelaxation&) = delete;
+  MEHPForceRelaxation& operator=(const MEHPForceRelaxation&) = delete;
+
+  MEHPForceRelaxation(MEHPForceRelaxation&& other) noexcept
+    : pylimer_tools::sim::OutputSupportingSimulation(std::move(other))
+    , universe(std::move(other.universe))
+    , simulationHasRun(other.simulationHasRun)
+    , simulationSuggestsRerun(other.simulationSuggestsRerun)
+    , outputEndNodes(other.outputEndNodes)
+    , exitReason(other.exitReason)
+    , nrOfStepsDone(other.nrOfStepsDone)
+    , forceRelaxationNetwork(std::move(other.forceRelaxationNetwork))
+    , currentSpringDistances(std::move(other.currentSpringDistances))
+    , currentVelocities(std::move(other.currentVelocities))
+    , currentVelocitiesPlus(std::move(other.currentVelocitiesPlus))
+    , currentForces(std::move(other.currentForces))
+    , springForceEvaluator(std::move(other.springForceEvaluator))
+    , is2D(other.is2D)
+    , defaultNrOfChains(other.defaultNrOfChains)
+    , defaultR0Squared(other.defaultR0Squared)
+    , suggestRerunEps(other.suggestRerunEps)
+    , crossLinkerType(other.crossLinkerType)
+    , dt(other.dt)
+  {
+    if (other.forceEvaluator == &other.springForceEvaluator) {
+      this->forceEvaluator = &this->springForceEvaluator;
+    } else {
+      this->forceEvaluator = other.forceEvaluator;
+    }
+    other.forceEvaluator = nullptr;
+  }
+
+  MEHPForceRelaxation& operator=(MEHPForceRelaxation&& other) noexcept
+  {
+    if (this != &other) {
+      pylimer_tools::sim::OutputSupportingSimulation::operator=(
+        std::move(other));
+      universe = std::move(other.universe);
+      simulationHasRun = other.simulationHasRun;
+      simulationSuggestsRerun = other.simulationSuggestsRerun;
+      outputEndNodes = other.outputEndNodes;
+      exitReason = other.exitReason;
+      nrOfStepsDone = other.nrOfStepsDone;
+      forceRelaxationNetwork = std::move(other.forceRelaxationNetwork);
+      currentSpringDistances = std::move(other.currentSpringDistances);
+      currentVelocities = std::move(other.currentVelocities);
+      currentVelocitiesPlus = std::move(other.currentVelocitiesPlus);
+      currentForces = std::move(other.currentForces);
+      springForceEvaluator = std::move(other.springForceEvaluator);
+      is2D = other.is2D;
+      defaultNrOfChains = other.defaultNrOfChains;
+      defaultR0Squared = other.defaultR0Squared;
+      suggestRerunEps = other.suggestRerunEps;
+      crossLinkerType = other.crossLinkerType;
+      dt = other.dt;
+      if (other.forceEvaluator == &other.springForceEvaluator) {
+        this->forceEvaluator = &this->springForceEvaluator;
+      } else {
+        this->forceEvaluator = other.forceEvaluator;
+      }
+      other.forceEvaluator = nullptr;
+    }
+    return *this;
+  }
+
   MEHPForceRelaxation(const pylimer_tools::entities::Universe& u,
                       const int crossLinkerType = 2,
                       const bool is2D = false,
