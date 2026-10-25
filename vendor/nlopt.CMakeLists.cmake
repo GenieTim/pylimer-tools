@@ -5,6 +5,8 @@ if (NOT DEFINED vendor_suffix)
     set(vendor_suffix "")
 endif ()
 
+include(${CMAKE_CURRENT_LIST_DIR}/vendorForwardArgs.cmake)
+
 # download, compile & install nlopt
 # TODO: enable possibility of including externally installed nlopt library
 if (NOT DEFINED nlopt_LOADED)
@@ -35,7 +37,7 @@ if (NOT DEFINED nlopt_LOADED)
                     UPDATE_COMMAND ""
                     PREFIX ${nlopt_PREFIX_PATH}
                     INSTALL_DIR ${nlopt_PREFIX_PATH}/nloptLib-install
-                    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${nlopt_PREFIX_PATH}/nloptLib-install -DINSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DCMAKE_INSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DNLOPT_GUILE=OFF -DNLOPT_OCTAVE=OFF -DNLOPT_MATLAB=OFF -DNLOPT_SWIG=OFF -DNLOPT_PYTHON=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=${nlopt_BUILD_TYPE}
+                    CMAKE_ARGS ${VENDOR_FORWARD_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=${nlopt_PREFIX_PATH}/nloptLib-install -DINSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DCMAKE_INSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DNLOPT_GUILE=OFF -DNLOPT_OCTAVE=OFF -DNLOPT_MATLAB=OFF -DNLOPT_SWIG=OFF -DNLOPT_PYTHON=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=${nlopt_BUILD_TYPE}
                     BUILD_COMMAND ${CMAKE_COMMAND} --build ${nlopt_PREFIX_PATH}/src/nloptLib-build --config ${nlopt_BUILD_TYPE}
                     BUILD_BYPRODUCTS ${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt${LIBRARY_SUFFIX}
             )

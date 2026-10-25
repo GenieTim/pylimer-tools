@@ -216,6 +216,8 @@ class CMakeBuild(build_ext):
         cmake_args.extend(
             [
                 f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
+                f"-DPython_EXECUTABLE={sys.executable}",
+                f"-DPython3_EXECUTABLE={sys.executable}",
                 f"-DPYTHON_EXECUTABLE={sys.executable}",
                 "-DCODE_COVERAGE=OFF",
                 "-DLEAK_ANALYSIS=OFF",
@@ -253,11 +255,18 @@ class CMakeBuild(build_ext):
                 or cmake_generator == "Ninja"
                 or cmake_generator == ""
             ):
-                # import ninja
-                # ninja_executable_path = Path(ninja.BIN_DIR) / "ninja"
-                import shutil
+                ninja_executable_path = None
+                try:
+                    import ninja
+                    candidate = os.path.join(ninja.BIN_DIR, "ninja")
+                    if os.path.exists(candidate):
+                        ninja_executable_path = candidate
+                except ImportError:
+                    pass
 
-                ninja_executable_path = shutil.which("ninja")
+                if not ninja_executable_path:
+                    import shutil
+                    ninja_executable_path = shutil.which("ninja")
 
                 if ninja_executable_path:
                     try:
@@ -282,9 +291,8 @@ class CMakeBuild(build_ext):
                         )
                     except (
                         ImportError,
-                        subprocess.CalledProcessError,
-                        PermissionError,
-                        subprocess.TimeoutExpired,
+                        subprocess.SubprocessError,
+                        OSError,
                     ):
                         warnings.warn(
                             "Ninja check did not pass, using default generator."
@@ -328,7 +336,7 @@ class CMakeBuild(build_ext):
             if hasattr(self, "parallel") and self.parallel:
                 parallel_level = self.parallel
             else:
-                parallel_level = min(1, multiprocessing.cpu_count()-1)
+                parallel_level = max(1, multiprocessing.cpu_count()-1)
             if parallel_level > 1:
                 # Set the CMake variable for parallel builds
                 cmake_args.append(f"-DCMAKE_BUILD_PARALLEL_LEVEL={parallel_level}")

@@ -14,6 +14,8 @@ if (NOT DEFINED cereal_LOADED)
     # FetchContent_MakeAvailable(cereal)
     set(cereal_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/cereal${vendor_suffix}")
 
+    include(${CMAKE_CURRENT_LIST_DIR}/vendorForwardArgs.cmake)
+
     include(ExternalProject)
     if (EXISTS "${cereal_PREFIX_PATH}/cerealLib-install/include/cereal")
         add_custom_target(cerealLib)
@@ -23,10 +25,22 @@ if (NOT DEFINED cereal_LOADED)
                 GIT_SUBMODULES_RECURSE ON
                 GIT_SHALLOW ON
                 UPDATE_COMMAND ""
-                CMAKE_ARGS -DJUST_INSTALL_CEREAL=ON -DSKIP_PORTABILITY_TEST=ON -DBUILD_TESTS=OFF
                 PREFIX ${cereal_PREFIX_PATH}
-                CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${cereal_PREFIX_PATH}/cerealLib-install -DINSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/cereal/cerealLib-install/lib -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/cereal/cerealLib-install/lib -Dcereal_GUILE=OFF -Dcereal_OCTAVE=OFF -Dcereal_MATLAB=OFF -Dcereal_SWIG=OFF -Dcereal_PYTHON=OFF -DBUILD_SHARED_LIBS=OFF
-                INSTALL_DIR ${CMAKE_CURRENT_LIST_DIR}/cereal${vendor_suffix}/cerealLib-install
+                INSTALL_DIR ${cereal_PREFIX_PATH}/cerealLib-install
+                CMAKE_ARGS
+                    ${VENDOR_FORWARD_CMAKE_ARGS}
+                    -DCMAKE_INSTALL_PREFIX=${cereal_PREFIX_PATH}/cerealLib-install
+                    -DINSTALL_LIBDIR=${cereal_PREFIX_PATH}/cerealLib-install/lib
+                    -DCMAKE_INSTALL_LIBDIR=${cereal_PREFIX_PATH}/cerealLib-install/lib
+                    -DJUST_INSTALL_CEREAL=ON
+                    -DSKIP_PORTABILITY_TEST=ON
+                    -DBUILD_TESTS=OFF
+                    -Dcereal_GUILE=OFF
+                    -Dcereal_OCTAVE=OFF
+                    -Dcereal_MATLAB=OFF
+                    -Dcereal_SWIG=OFF
+                    -Dcereal_PYTHON=OFF
+                    -DBUILD_SHARED_LIBS=OFF
         )
     endif ()
 

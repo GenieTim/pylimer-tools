@@ -51,16 +51,7 @@ if (NOT DEFINED igraph_LOADED)
                 )
             endif ()
 
-            # Add Windows-specific configuration
-            if (WIN32)
-                list(APPEND igraph_EXTRA_CMAKE_ARGS
-                        #                 "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-                        #                 "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-                        "-DCMAKE_POSITION_INDEPENDENT_CODE=OFF"
-                )
-            else ()
-                list(APPEND igraph_EXTRA_CMAKE_ARGS "-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
-            endif ()
+            include(${CMAKE_CURRENT_LIST_DIR}/vendorForwardArgs.cmake)
 
             set(igraph_BUILD_TYPE "Release")
             if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -83,7 +74,7 @@ if (NOT DEFINED igraph_LOADED)
                     PREFIX ${igraph_PREFIX_PATH}
                     INSTALL_DIR ${igraph_PREFIX_PATH}/igraphLib-install
                     PATCH_COMMAND git apply --check ${CMAKE_CURRENT_LIST_DIR}/patches/igraph.patch && git apply ${CMAKE_CURRENT_LIST_DIR}/patches/igraph.patch || true
-                    CMAKE_ARGS ${igraph_EXTRA_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=${igraph_BUILD_TYPE} -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=OFF
+                    CMAKE_ARGS ${VENDOR_FORWARD_CMAKE_ARGS} ${igraph_EXTRA_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=${igraph_BUILD_TYPE} -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=OFF
                     BUILD_COMMAND ${CMAKE_COMMAND} --build ${igraph_PREFIX_PATH}/src/igraphLib-build --config ${igraph_BUILD_TYPE}
                     BUILD_BYPRODUCTS ${EXPECTED_IGRAPH_LIB}
             )

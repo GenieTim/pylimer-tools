@@ -55,8 +55,6 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMakeLists.txt)
 target_link_libraries(pylimer_tools 
     PUBLIC 
         Eigen3::Eigen
-    PRIVATE
-        ${STD_FS_LIB}
 )
 
 # Add explicit dependencies to ensure proper build order
@@ -135,6 +133,10 @@ elseif (STD_FS_NEEDS_CXXFS)
 else ()
     set(STD_FS_LIB "")
     message(STATUS "std::filesystem available without additional linking")
+endif ()
+
+if (STD_FS_LIB)
+    target_link_libraries(pylimer_tools PRIVATE ${STD_FS_LIB})
 endif ()
 
 # ==============================================================================

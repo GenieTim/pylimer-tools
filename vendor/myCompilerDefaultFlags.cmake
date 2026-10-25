@@ -30,21 +30,26 @@ endif ()
 # ==============================================================================
 
 # Release optimizations
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
-set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG")
+if (MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /DNDEBUG")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /O2 /DNDEBUG")
+else ()
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -DNDEBUG")
+endif ()
 
 # Debug flags with comprehensive warnings
 if (MSVC)
-    set(CMAKE_CXX_FLAGS_DEBUG "/Zi /Od /Wall /D_DEBUG")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi /Od /Wall /D_DEBUG")
 else ()
-    set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -Wextra -Wpedantic -D_DEBUG")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -Wall -Wextra -Wpedantic -D_DEBUG")
 endif ()
 
 # RelWithDebInfo - optimized but with debug info (good for profiling)
 if (MSVC)
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/O2 /Zi /DNDEBUG")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /O2 /Zi /DNDEBUG")
 else ()
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O3 -g -DNDEBUG")
 endif ()
 
 # ==============================================================================
@@ -57,10 +62,10 @@ endif ()
 
 if (HIGH_PERFORMANCE)
     if (MSVC)
-        add_compile_options(/O2 /fp:fast)
+        add_compile_options(/O2)
     else ()
         # Enable aggressive optimizations, but be careful with -march=native in CI/packaging
-        add_compile_options(-O3 -ffast-math)
+        add_compile_options(-O3)
 
         # Only use -march=native if not cross-compiling and not in CI
         if (NOT CMAKE_CROSSCOMPILING AND NOT DEFINED ENV{CI})
@@ -89,9 +94,6 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR
     # Enable WebAssembly SIMD instructions for vector operations
     add_compile_options(-msimd128)
     add_compile_options(-mrelaxed-simd)
-
-    # Aggressive optimizations for numerical computations
-    add_compile_options(-ffast-math)  # Fast floating-point math
 
     # Conditionally disable RTTI to reduce binary size, but only if Cereal is disabled
     # since Cereal's polymorphic serialization requires RTTI (uses typeid())
@@ -169,8 +171,6 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     # Enable more aggressive optimization for Release builds
     if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         add_compile_options(-flto)  # Link-time optimization
-        set(CMAKE_AR gcc-ar)
-        set(CMAKE_RANLIB gcc-ranlib)
     endif ()
 
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")

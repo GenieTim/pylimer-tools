@@ -165,4 +165,6 @@ docs/api
 docs/sg_execution_times.rst
 wheelhouse
 
-./_version.txt
+_version.txt
+.DS_Store
+*.DS_Store

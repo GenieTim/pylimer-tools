@@ -207,9 +207,9 @@ if (COMMAND OUTPUT_FLAGS)
     OUTPUT_FLAGS(pylimer_tools_cpp)
 endif ()
 
-# Platform-specific linking
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Intel")
-    target_link_libraries(pylimer_tools_cpp PRIVATE stdc++fs)
+# Platform-specific linking (only link std::filesystem library if detected as needed)
+if (STD_FS_LIB)
+    target_link_libraries(pylimer_tools_cpp PRIVATE ${STD_FS_LIB})
 endif ()
 
 # Installation

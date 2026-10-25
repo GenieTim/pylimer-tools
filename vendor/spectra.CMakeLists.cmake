@@ -21,17 +21,12 @@ if(NOT spectra_POPULATED)
 
     FetchContent_Populate(Spectra)
     
-    # Temporarily override the install command to prevent Spectra from installing
-    # This avoids the export conflict with FetchContent Eigen
-    function(install)
-        # Silently ignore all install commands from Spectra
-    endfunction()
+    # Silence Spectra tests/examples and exclude from all
+    set(SPECTRA_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(SPECTRA_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
     
-    # Now add the subdirectory with our overridden install function
-    add_subdirectory(${spectra_SOURCE_DIR} ${spectra_BINARY_DIR})
-    
-    # Restore the original install function
-    unset(install)
+    # Add subdirectory excluding targets from 'all'
+    add_subdirectory(${spectra_SOURCE_DIR} ${spectra_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
 SET(Spectra_INCLUDE_DIRS "${spectra_SOURCE_DIR}/include")
