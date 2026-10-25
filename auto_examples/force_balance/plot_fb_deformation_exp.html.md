@@ -16,7 +16,7 @@ This example shows how to use the MEHPForceBalance2 class in a deformation exper
 
 It also shows, that deformation is an equivalent method to the $\Gamma$ factor to obtain the modulus.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 9-139 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 9-142 -->
 ```Python
 import copy
 from pathlib import Path
@@ -39,9 +39,12 @@ params = get_parameters_for_polymer(
     "PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
 
+
 # Load your network (replace with your file)
 def _find_fixtures_dir() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             candidate = p / "tests" / "pylimer_tools" / "fixtures"
             if candidate.is_dir():
@@ -149,17 +152,17 @@ plt.show()
 ```
 
 ```none
-Final residual (should be close to 0): 1.8842663149170603e-13
-Shear Modulus from Equilibrium [MPa]:  0.1357646277353902
+Final residual (should be close to 0): 2.975459594902525e-13
+Shear Modulus from Equilibrium [MPa]:  0.10485544546398662
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 140-143 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 143-146 -->
 
 Rather than using the nominal stress, you can also use the
 stress tensor directly to compute the shear modulus.
 Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
 
-**Total running time of the script:** (0 minutes 1.127 seconds)
+**Total running time of the script:** (0 minutes 0.590 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-fb-deformation-exp-py"></a>
 

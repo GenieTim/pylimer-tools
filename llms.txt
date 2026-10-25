@@ -285,6 +285,7 @@
 - [NoMaxDistanceProvider](api/pylimer_tools_cpp.NoMaxDistanceProvider.html.md): Bases: &#96;MaxDistanceProvider&#96;
 - [NonGaussianSpringForceEvaluator](api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html.md): Bases: &#96;MEHPForceEvaluator&#96;
 - [NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.html.md): Bases: &#96;pybind11_object&#96;
+- [NormalModeSolver](api/pylimer_tools_cpp.NormalModeSolver.html.md): Bases: &#96;Enum&#96;
 - [OutputConfiguration](api/pylimer_tools_cpp.OutputConfiguration.html.md): Bases: &#96;pybind11_object&#96;
 - [SLESolver](api/pylimer_tools_cpp.SLESolver.html.md): Bases: &#96;Enum&#96;
 - [SimpleSpringMEHPForceEvaluator](api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html.md): Bases: &#96;MEHPForceEvaluator&#96;
@@ -298,12 +299,12 @@
 - [STOP](api/pylimer_tools_cpp.STOP.html.md): Stop the linking process
 - [TRACK_BACKWARD](api/pylimer_tools_cpp.TRACK_BACKWARD.html.md): Track backward in the linking process
 - [TRACK_FORWARD](api/pylimer_tools_cpp.TRACK_FORWARD.html.md): Continue linking forward
-- [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.911&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
-- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;05:34.706&#42;&#42; total execution time for 5 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:03.146&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
+- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;05:31.917&#42;&#42; total execution time for 5 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 - [Computation times](auto_examples/network_generator/sg_execution_times.html.md): &#42;&#42;02:20.935&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
-- [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:15.751&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
-- [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:20.233&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
+- [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:07.937&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
+- [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:11.499&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
 - [Computation times](auto_examples/sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
-- [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.391&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
-- [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;09:02.554&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
-- [Computation times](sg_execution_times.html.md): &#42;&#42;17:39.482&#42;&#42; total execution time for 34 files &#42;&#42;from all galleries&#42;&#42;:
+- [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.231&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
+- [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;04:47.601&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;13:03.267&#42;&#42; total execution time for 34 files &#42;&#42;from all galleries&#42;&#42;:

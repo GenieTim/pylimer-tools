@@ -1,0 +1,23 @@
+NormalModeSolver
+================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: NormalModeSolver
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~NormalModeSolver.AUTO
+      ~NormalModeSolver.DENSE_EIGEN
+      ~NormalModeSolver.DENSE_LAPACK
+      ~NormalModeSolver.SPARSE_SLICING
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: AUTO
+   .. autoattribute:: DENSE_EIGEN
+   .. autoattribute:: DENSE_LAPACK
+   .. autoattribute:: SPARSE_SLICING

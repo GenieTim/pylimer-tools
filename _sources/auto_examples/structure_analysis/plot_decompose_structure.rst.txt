@@ -30,7 +30,7 @@ The following approaches are shown:
 - Decomposing the network to chains while keeping crosslinkers
 - Finding clusters after manual junction removal
 
-.. GENERATED FROM PYTHON SOURCE LINES 15-64
+.. GENERATED FROM PYTHON SOURCE LINES 15-67
 
 
 
@@ -69,9 +69,12 @@ The following approaches are shown:
     # Replace with your crosslinker type
     crosslinker_type = 2
 
+
     # Load your network (replace path accordingly)
     def _find_fixtures_dir() -> Path:
-        for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for cur in (
+            [Path(__file__).resolve().parent] if "__file__" in globals() else []
+        ) + [Path.cwd()]:
             for p in [cur] + list(cur.parents):
                 candidate = p / "tests" / "pylimer_tools" / "fixtures"
                 if candidate.is_dir():
@@ -110,7 +113,7 @@ The following approaches are shown:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.070 seconds)
+   **Total running time of the script:** (0 minutes 0.044 seconds)
 
 
 .. _sphx_glr_download_auto_examples_structure_analysis_plot_decompose_structure.py:

@@ -16,15 +16,18 @@ The `DataFileParser` handles LAMMPS data files containing complete system defini
 The [`UniverseSequence`](../../api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence) provides a convenient way to have these data files read
 into the [`Universe`](../../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) objects.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 10-54 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 10-57 -->
 ```Python
 import os
 from pathlib import Path
 
 from pylimer_tools_cpp import UniverseSequence
 
+
 def _find_fixtures_dir() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             candidate = p / "tests" / "pylimer_tools" / "fixtures"
             if candidate.is_dir():
@@ -67,7 +70,7 @@ Loaded universe with 56000 atoms
 Loaded universe with 56000 atoms
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 55-60 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 58-63 -->
 
 Please note that the `hybrid` and `tdpd` atom styles are not fully supported.
 
@@ -75,7 +78,7 @@ If your data files don’t hint the atom style in the line that starts with “A
 you should specify it manually, see [`read()`](../../api/pylimer_tools_cpp.DataFileReader.html.md#pylimer_tools_cpp.DataFileReader.read)
 and [`set_data_file_atom_style()`](../../api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style).
 
-**Total running time of the script:** (0 minutes 0.219 seconds)
+**Total running time of the script:** (0 minutes 0.130 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-reader-py"></a>
 

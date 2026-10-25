@@ -200,6 +200,8 @@
         * [`NonGaussianSpringForceEvaluator`](api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.md#pylimer_tools_cpp.NonGaussianSpringForceEvaluator)
       * [NormalModeAnalyzer](api/pylimer_tools_cpp.NormalModeAnalyzer.md)
         * [`NormalModeAnalyzer`](api/pylimer_tools_cpp.NormalModeAnalyzer.md#pylimer_tools_cpp.NormalModeAnalyzer)
+      * [NormalModeSolver](api/pylimer_tools_cpp.NormalModeSolver.md)
+        * [`NormalModeSolver`](api/pylimer_tools_cpp.NormalModeSolver.md#pylimer_tools_cpp.NormalModeSolver)
       * [OutputConfiguration](api/pylimer_tools_cpp.OutputConfiguration.md)
         * [`OutputConfiguration`](api/pylimer_tools_cpp.OutputConfiguration.md#pylimer_tools_cpp.OutputConfiguration)
       * [SLESolver](api/pylimer_tools_cpp.SLESolver.md)

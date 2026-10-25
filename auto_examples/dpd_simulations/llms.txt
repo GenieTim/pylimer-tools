@@ -195,7 +195,7 @@
 
 - [Dissipative Particle Dynamics (DPD) Simulations](index.html.md): pylimer-tools provides a powerful framework for simulating coarse-grained polymer systems using Diss...
 - [NOTE](plot_dpd_simulation.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;00:04.911&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;00:03.146&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
 
 ## Optional
 

@@ -14,7 +14,7 @@ to download the full example code.
 
 All readers support automatic caching for improved performance.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-31 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-34 -->
 ```Python
 import os
 from pathlib import Path
@@ -24,9 +24,12 @@ import matplotlib.pyplot as plt
 
 from pylimer_tools.io.extract_thermo_data import extract_thermo_params
 
+
 # Read complete log file
 def _find_fixtures_dir() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             candidate = p / "tests" / "pylimer_tools" / "fixtures"
             if candidate.is_dir():
@@ -40,12 +43,12 @@ log_file = str(_fixtures_dir / "log.lammps")
 time_start = time.time()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 32-34 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 35-37 -->
 
 [`extract_thermo_params()`](../../pylimer_tools.io.md#pylimer_tools.io.extract_thermo_data.extract_thermo_params) is a more elaborate version of
 [`read_log_file()`](../../pylimer_tools.io.md#pylimer_tools.io.read_lammps_output_file.read_log_file)
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 34-49 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 37-52 -->
 ```Python
 thermo_data = extract_thermo_params(log_file, use_cache=False)
 time_end = time.time()
@@ -64,7 +67,7 @@ plt.ylabel("Time [s]")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.046 seconds)
+**Total running time of the script:** (0 minutes 0.028 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-performance-caching-py"></a>
 

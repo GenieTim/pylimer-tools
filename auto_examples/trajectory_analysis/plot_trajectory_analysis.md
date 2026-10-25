@@ -15,7 +15,7 @@ to download the full example code.
 This example demonstrates how to analyze a polymer trajectory using pylimer-tools,
 including mean square displacement (MSD) and radius of gyration calculation.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-41 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-44 -->
 ```Python
 import os
 from pathlib import Path
@@ -25,9 +25,12 @@ import numpy as np
 
 from pylimer_tools_cpp import UniverseSequence
 
+
 # Load a LAMMPS dump trajectory file (replace with your file)
 def _find_fixtures_dir() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             candidate = p / "tests" / "pylimer_tools" / "fixtures"
             if candidate.is_dir():
@@ -50,14 +53,14 @@ msd = sequence.compute_msd_for_atoms(
 )
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 42-46 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 45-49 -->
 
 You can also compute other properties like radius of gyration, end-to-end distance, etc.
 by using the “lazy” iterator over the sequence
 This allows you to process large trajectories without loading everything
 into memory at once.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 46-110 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 49-113 -->
 ```Python
 # Compute radius of gyration over time
 rgs = []
@@ -123,7 +126,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 111-137 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 114-140 -->
 
 Please beware that the MSD is computed in an $N^2$ manner, which can be slow for large systems,
 many origins and long trajectories.
@@ -151,7 +154,7 @@ msd_result = tidynamics.msd(
  )
 ```
 
-**Total running time of the script:** (9 minutes 2.554 seconds)
+**Total running time of the script:** (4 minutes 47.601 seconds)
 
 <a id="sphx-glr-download-auto-examples-trajectory-analysis-plot-trajectory-analysis-py"></a>
 

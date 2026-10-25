@@ -26,7 +26,7 @@ to get the stoichiometric imbalance :math:`r`,
 the crosslinker conversion :math:`p` or
 the functionality of the crosslinker :math:`f`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-74
+.. GENERATED FROM PYTHON SOURCE LINES 11-77
 
 
 
@@ -70,9 +70,12 @@ the functionality of the crosslinker :math:`f`.
     # Replace with your crosslinker type
     crosslinker_type = 2
 
+
     # Load your network (replace path accordingly)
     def _find_fixtures_dir() -> Path:
-        for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for cur in (
+            [Path(__file__).resolve().parent] if "__file__" in globals() else []
+        ) + [Path.cwd()]:
             for p in [cur] + list(cur.parents):
                 candidate = p / "tests" / "pylimer_tools" / "fixtures"
                 if candidate.is_dir():
@@ -120,7 +123,7 @@ the functionality of the crosslinker :math:`f`.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.075 seconds)
+   **Total running time of the script:** (0 minutes 0.045 seconds)
 
 
 .. _sphx_glr_download_auto_examples_structure_analysis_plot_structure_analysis.py:

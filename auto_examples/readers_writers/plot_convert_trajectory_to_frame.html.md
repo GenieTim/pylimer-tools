@@ -14,7 +14,7 @@ to download the full example code.
 
 Take a later entry from a LAMMPS trajectory and save it as a data file.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-17 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-18 -->
 ```Python
 import os
 from pathlib import Path
@@ -25,15 +25,17 @@ if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 18-20 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 19-21 -->
 
 For large trajectories, frames are loaded on-demand
 Load a LAMMPS dump trajectory file (replace with your file)
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 20-43 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 21-46 -->
 ```Python
 def _find_fixtures_dir() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             candidate = p / "tests" / "pylimer_tools" / "fixtures"
             if candidate.is_dir():
@@ -57,7 +59,7 @@ writer.config_include_angles(True)
 writer.write_to_file("generated_structures/final_configuration.data")
 ```
 
-**Total running time of the script:** (0 minutes 0.123 seconds)
+**Total running time of the script:** (0 minutes 0.079 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"></a>
 

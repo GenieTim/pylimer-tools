@@ -315,6 +315,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeSolver.html">NormalModeSolver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.OutputConfiguration.html">OutputConfiguration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SLESolver.html">SLESolver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">SimpleSpringMEHPForceEvaluator</a></li>
@@ -660,6 +661,8 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle">AtomStyle (class in pylimer_tools_cpp)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeSolver.html#pylimer_tools_cpp.NormalModeSolver.AUTO">AUTO (pylimer_tools_cpp.NormalModeSolver attribute)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.AveFileReader.html#pylimer_tools_cpp.AveFileReader.autocorrelate_column">autocorrelate_column() (pylimer_tools_cpp.AveFileReader method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.AveFileReader.html#pylimer_tools_cpp.AveFileReader.autocorrelate_column_difference">autocorrelate_column_difference() (pylimer_tools_cpp.AveFileReader method)</a>
@@ -740,9 +743,13 @@
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_bond_vectors">compute_bond_vectors() (pylimer_tools_cpp.Universe method)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm">compute_chebyshev_moments_kpm() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
+</li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion">compute_crosslinker_conversion() (in module pylimer_tools.calc.structure_analysis)</a>
 </li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.mehp_utilities.compute_cycle_rank">compute_cycle_rank() (in module pylimer_tools.calc.mehp_utilities)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.compute_density_of_states_kpm">compute_density_of_states_kpm() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.compute_distance_autocorrelation_from_to">compute_distance_autocorrelation_from_to() (pylimer_tools_cpp.UniverseSequence method)</a>
 </li>
@@ -858,10 +865,10 @@
 </li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material">compute_weight_fraction_of_soluble_material() (in module pylimer_tools.calc.miller_macosko_theory)</a>
 </li>
-        <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions">compute_weight_fraction_of_soluble_material_from_weight_fractions() (in module pylimer_tools.calc.miller_macosko_theory)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions">compute_weight_fraction_of_soluble_material_from_weight_fractions() (in module pylimer_tools.calc.miller_macosko_theory)</a>
+</li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.stoichiometric_relationships.compute_weight_fractions">compute_weight_fractions() (in module pylimer_tools.calc.stoichiometric_relationships)</a>
 
         <ul>
@@ -1036,6 +1043,10 @@
           <li><a href="api/pylimer_tools_cpp.ExitReason.html#pylimer_tools_cpp.ExitReason.denominator">(pylimer_tools_cpp.ExitReason attribute)</a>
 </li>
         </ul></li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeSolver.html#pylimer_tools_cpp.NormalModeSolver.DENSE_EIGEN">DENSE_EIGEN (pylimer_tools_cpp.NormalModeSolver attribute)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeSolver.html#pylimer_tools_cpp.NormalModeSolver.DENSE_LAPACK">DENSE_LAPACK (pylimer_tools_cpp.NormalModeSolver attribute)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.detect_angles">detect_angles() (pylimer_tools_cpp.Universe method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.detect_dihedral_angles">detect_dihedral_angles() (pylimer_tools_cpp.Universe method)</a>
@@ -1044,10 +1055,10 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.determine_effective_functionality_per_type">determine_effective_functionality_per_type() (pylimer_tools_cpp.Universe method)</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.determine_functionality_per_type">determine_functionality_per_type() (pylimer_tools_cpp.Universe method)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.determine_functionality_per_type">determine_functionality_per_type() (pylimer_tools_cpp.Universe method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.DIELECTRIC">DIELECTRIC (pylimer_tools_cpp.AtomStyle attribute)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.DIPOLE">DIPOLE (pylimer_tools_cpp.AtomStyle attribute)</a>
@@ -1100,6 +1111,8 @@
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus">evaluate_loss_modulus() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm">evaluate_loss_modulus_kpm() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance">evaluate_spring_distance() (pylimer_tools_cpp.MEHPForceBalance method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from">evaluate_spring_distance_from() (pylimer_tools_cpp.MEHPForceBalance method)</a>
@@ -1116,7 +1129,11 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus">evaluate_storage_modulus() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm">evaluate_storage_modulus_kpm() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation">evaluate_stress_autocorrelation() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
+</li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm">evaluate_stress_autocorrelation_kpm() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.MEHPForceEvaluator.evaluate_stress_contribution">evaluate_stress_contribution() (pylimer_tools_cpp.MEHPForceEvaluator method)</a>
 
@@ -2240,6 +2257,8 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer">NormalModeAnalyzer (class in pylimer_tools_cpp)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeSolver.html#pylimer_tools_cpp.NormalModeSolver">NormalModeSolver (class in pylimer_tools_cpp)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork.nr_of_crosslink_swaps_endured">nr_of_crosslink_swaps_endured (pylimer_tools_cpp.SimplifiedBalanceNetwork attribute)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html#pylimer_tools_cpp.SimplifiedBalance2Network.nr_of_crosslinks">nr_of_crosslinks (pylimer_tools_cpp.SimplifiedBalance2Network attribute)</a>
@@ -2798,6 +2817,8 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.SLESolver.html#pylimer_tools_cpp.SLESolver.SPARSE_QR">SPARSE_QR (pylimer_tools_cpp.SLESolver attribute)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.NormalModeSolver.html#pylimer_tools_cpp.NormalModeSolver.SPARSE_SLICING">SPARSE_SLICING (pylimer_tools_cpp.NormalModeSolver attribute)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.SPH">SPH (pylimer_tools_cpp.AtomStyle attribute)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.SPHERE">SPHERE (pylimer_tools_cpp.AtomStyle attribute)</a>
@@ -2812,14 +2833,14 @@
           <li><a href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork.spring_box_offset">(pylimer_tools_cpp.SimplifiedBalanceNetwork attribute)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html#pylimer_tools_cpp.SimplifiedBalance2Network.spring_contour_length">spring_contour_length (pylimer_tools_cpp.SimplifiedBalance2Network attribute)</a>
 
         <ul>
           <li><a href="api/pylimer_tools_cpp.SimplifiedNetwork.html#pylimer_tools_cpp.SimplifiedNetwork.spring_contour_length">(pylimer_tools_cpp.SimplifiedNetwork attribute)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html#pylimer_tools_cpp.SimplifiedBalance2Network.spring_coordinate_index_a">spring_coordinate_index_a (pylimer_tools_cpp.SimplifiedBalance2Network attribute)</a>
 
         <ul>

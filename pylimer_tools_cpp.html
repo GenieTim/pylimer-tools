@@ -336,6 +336,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeSolver.html">NormalModeSolver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.OutputConfiguration.html">OutputConfiguration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SLESolver.html">SLESolver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">SimpleSpringMEHPForceEvaluator</a></li>
@@ -537,34 +538,37 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NormalModeAnalyzer</span></code></a>(self, spring_from, spring_to)</p></td>
 <td><p>Compute the normal modes and predict the loss/storage moduli.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.OutputConfiguration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OutputConfiguration</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeSolver.html#pylimer_tools_cpp.NormalModeSolver" title="pylimer_tools_cpp.NormalModeSolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NormalModeSolver</span></code></a>(*values)</p></td>
+<td><p>Solver algorithms for normal mode analysis</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.OutputConfiguration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OutputConfiguration</span></code></a>(self)</p></td>
 <td><p>A configuration object to configure the output values and frequency for simulation classes in this package.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SLESolver.html#pylimer_tools_cpp.SLESolver" title="pylimer_tools_cpp.SLESolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SLESolver</span></code></a>(*values)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SLESolver.html#pylimer_tools_cpp.SLESolver" title="pylimer_tools_cpp.SLESolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SLESolver</span></code></a>(*values)</p></td>
 <td><p>Solver for sparse linear equation systems</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator" title="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleSpringMEHPForceEvaluator</span></code></a>(self[, kappa])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator" title="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleSpringMEHPForceEvaluator</span></code></a>(self[, kappa])</p></td>
 <td><p>This is equal to a spring evaluator for Gaussian chains.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html#pylimer_tools_cpp.SimplifiedBalance2Network" title="pylimer_tools_cpp.SimplifiedBalance2Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedBalance2Network</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html#pylimer_tools_cpp.SimplifiedBalance2Network" title="pylimer_tools_cpp.SimplifiedBalance2Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedBalance2Network</span></code></a></p></td>
 <td><p>A more efficient structure of the network for use in <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceBalance2</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork" title="pylimer_tools_cpp.SimplifiedBalanceNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork" title="pylimer_tools_cpp.SimplifiedBalanceNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork</span></code></a></p></td>
 <td><p>A more efficient structure of the network for use in MEHP force balance, namely <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceBalance</span></code></a>, though also passable to namely <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceBalance2</span></code></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedNetwork.html#pylimer_tools_cpp.SimplifiedNetwork" title="pylimer_tools_cpp.SimplifiedNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedNetwork</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedNetwork.html#pylimer_tools_cpp.SimplifiedNetwork" title="pylimer_tools_cpp.SimplifiedNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedNetwork</span></code></a></p></td>
 <td><p>A more efficient structure of the network for use in MEHP, namely <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceRelaxation</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.StructureSimplificationMode.html#pylimer_tools_cpp.StructureSimplificationMode" title="pylimer_tools_cpp.StructureSimplificationMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StructureSimplificationMode</span></code></a>(*values)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.StructureSimplificationMode.html#pylimer_tools_cpp.StructureSimplificationMode" title="pylimer_tools_cpp.StructureSimplificationMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StructureSimplificationMode</span></code></a>(*values)</p></td>
 <td><p>How the structure shall be simplified during the optimization in order to remove non-trapped entanglement links.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Universe</span></code></a>(self, Lx, Ly, Lz)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Universe</span></code></a>(self, Lx, Ly, Lz)</p></td>
 <td><p>Represents a full Polymer Network structure, a collection of molecules.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniverseSequence</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniverseSequence</span></code></a>(self)</p></td>
 <td><p>This class represents a sequence of Universes, with the Universe's data only being read on request.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html#pylimer_tools_cpp.ZScoreMaxDistanceProvider" title="pylimer_tools_cpp.ZScoreMaxDistanceProvider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZScoreMaxDistanceProvider</span></code></a>(self, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html#pylimer_tools_cpp.ZScoreMaxDistanceProvider" title="pylimer_tools_cpp.ZScoreMaxDistanceProvider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZScoreMaxDistanceProvider</span></code></a>(self, ...)</p></td>
 <td><p>For MC generation, converts the <span class="math notranslate nohighlight">\(N\)</span> to a maximum distance within which to sample.</p></td>
 </tr>
 </tbody>

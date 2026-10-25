@@ -230,6 +230,7 @@
 - [NoMaxDistanceProvider](pylimer_tools_cpp.NoMaxDistanceProvider.html.md): Bases: &#96;MaxDistanceProvider&#96;
 - [NonGaussianSpringForceEvaluator](pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html.md): Bases: &#96;MEHPForceEvaluator&#96;
 - [NormalModeAnalyzer](pylimer_tools_cpp.NormalModeAnalyzer.html.md): Bases: &#96;pybind11_object&#96;
+- [NormalModeSolver](pylimer_tools_cpp.NormalModeSolver.html.md): Bases: &#96;Enum&#96;
 - [OutputConfiguration](pylimer_tools_cpp.OutputConfiguration.html.md): Bases: &#96;pybind11_object&#96;
 - [SLESolver](pylimer_tools_cpp.SLESolver.html.md): Bases: &#96;Enum&#96;
 - [SimpleSpringMEHPForceEvaluator](pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html.md): Bases: &#96;MEHPForceEvaluator&#96;

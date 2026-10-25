@@ -25,7 +25,7 @@ This example demonstrates how to analyze the end-to-end distribution of polymer 
 using pylimer-tools. It reads a structure file, computes the end-to-end distances,
 and plots the distribution of these distances.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-67
+.. GENERATED FROM PYTHON SOURCE LINES 10-70
 
 
 
@@ -52,9 +52,12 @@ and plots the distribution of these distances.
     # Replace with your crosslinker type
     crosslinker_type = 2
 
+
     # Load your network (replace path accordingly)
     def _find_fixtures_dir() -> Path:
-        for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for cur in (
+            [Path(__file__).resolve().parent] if "__file__" in globals() else []
+        ) + [Path.cwd()]:
             for p in [cur] + list(cur.parents):
                 candidate = p / "tests" / "pylimer_tools" / "fixtures"
                 if candidate.is_dir():
@@ -101,7 +104,7 @@ and plots the distribution of these distances.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.131 seconds)
+   **Total running time of the script:** (0 minutes 0.071 seconds)
 
 
 .. _sphx_glr_download_auto_examples_structure_analysis_plot_end_to_end_distribution.py:

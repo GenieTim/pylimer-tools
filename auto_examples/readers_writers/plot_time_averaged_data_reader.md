@@ -23,7 +23,7 @@ and [`read_sectioned_averages_file()`](../../pylimer_tools.io.md#pylimer_tools.i
 - Vector quantities (multiple values per output timestep)
 - Multi-section files with varying column structures
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 17-56 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 17-59 -->
 ```none
 Timestep 100: 3 data points
 Timestep 200: 3 data points
@@ -37,8 +37,11 @@ from pathlib import Path
 
 from pylimer_tools.io.read_lammps_output_file import read_averages_file
 
+
 def _find_fixtures_dir() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             candidate = p / "tests" / "pylimer_tools" / "fixtures"
             if candidate.is_dir():
@@ -72,7 +75,7 @@ for timestep, group in sectioned_data.groupby("TimeStep"):
     print(f"Timestep {timestep}: {len(group)} data points")
 ```
 
-**Total running time of the script:** (0 minutes 0.081 seconds)
+**Total running time of the script:** (0 minutes 0.044 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-time-averaged-data-reader-py"></a>
 

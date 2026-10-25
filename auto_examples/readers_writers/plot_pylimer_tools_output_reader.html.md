@@ -16,7 +16,7 @@ Read output from pylimer-tools’ own simulators.
 
 Relevant documentation: [`read_avg_file()`](../../pylimer_tools.io.html.md#pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file)
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 11-43 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 11-46 -->
 ```none
 Simulation steps: 100
 ```
@@ -30,8 +30,11 @@ import matplotlib.pyplot as plt
 
 from pylimer_tools.io.read_pylimer_tools_output_file import read_avg_file
 
+
 def _find_repo_root() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             if (p / "examples").is_dir() and (p / "src").is_dir():
                 return p
@@ -56,7 +59,7 @@ plt.ylabel("Temperature")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.061 seconds)
+**Total running time of the script:** (0 minutes 0.034 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py"></a>
 

@@ -25,7 +25,7 @@ LAMMPS bond swapping can significantly speed up equilibration for polymer networ
 However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly.
 Here's how you could re-set the molecule indices for bond swapping with constant chain lengths.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-48
+.. GENERATED FROM PYTHON SOURCE LINES 10-51
 
 .. code-block:: Python
 
@@ -38,9 +38,12 @@ Here's how you could re-set the molecule indices for bond swapping with constant
     if not os.path.exists("generated_structures"):
         os.makedirs("generated_structures")
 
+
     # Load original system
     def _find_fixtures_dir() -> Path:
-        for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for cur in (
+            [Path(__file__).resolve().parent] if "__file__" in globals() else []
+        ) + [Path.cwd()]:
             for p in [cur] + list(cur.parents):
                 candidate = p / "tests" / "pylimer_tools" / "fixtures"
                 if candidate.is_dir():
@@ -80,7 +83,7 @@ Here's how you could re-set the molecule indices for bond swapping with constant
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-51
+.. GENERATED FROM PYTHON SOURCE LINES 52-54
 
 To convert it back to the molecule index relating to their current connectivity,
 simply repeat the process with ``config_molecule_idx_for_swap(False)``
@@ -88,7 +91,7 @@ simply repeat the process with ``config_molecule_idx_for_swap(False)``
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.050 seconds)
+   **Total running time of the script:** (0 minutes 0.030 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_convert_for_bond_swapping.py:

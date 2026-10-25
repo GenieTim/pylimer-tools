@@ -17,7 +17,7 @@ to get the stoichiometric imbalance $r$,
 the crosslinker conversion $p$ or
 the functionality of the crosslinker $f$.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 11-74 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 11-77 -->
 ```none
 Stoichiometric imbalance (r): 1.16
 Crosslinker conversion (p): 0.7241379310344828
@@ -42,9 +42,12 @@ from pylimer_tools_cpp import Universe
 # Replace with your crosslinker type
 crosslinker_type = 2
 
+
 # Load your network (replace path accordingly)
 def _find_fixtures_dir() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             candidate = p / "tests" / "pylimer_tools" / "fixtures"
             if candidate.is_dir():
@@ -90,7 +93,7 @@ plt.ylabel("Count")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.075 seconds)
+**Total running time of the script:** (0 minutes 0.045 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-structure-analysis-py"></a>
 

@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**05:34.706** total execution time for 5 files **from auto_examples/force_balance**:
+**05:31.917** total execution time for 5 files **from auto_examples/force_balance**:
 
 .. container::
 
@@ -36,14 +36,14 @@ Computation times
      - 05:28.732
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py` (``plot_force_relaxation.py``)
-     - 00:04.093
+     - 00:02.214
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py` (``plot_fb_deformation_exp.py``)
-     - 00:01.127
+     - 00:00.590
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``plot_force_balance_2.py``)
-     - 00:00.430
+     - 00:00.213
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py` (``plot_force_balance.py``)
-     - 00:00.325
+     - 00:00.169
      - 0.0

@@ -16,7 +16,7 @@ This example demonstrates how to use
 the “original” MEHP implementation (see Gusev [[Gus19](../../acknowledgements.md#id8)])
 without slip-links or entanglements.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 10-153 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 10-155 -->
 ```none
 Phantom Shear Modulus [MPa]:  0.006117500031984316
 Phantom Shear Modulus [MPa] (Langevin):  0.006117508589323436
@@ -96,7 +96,9 @@ class CustomForceEvaluator(MEHPForceEvaluator):
 
 # Load your network (replace with your file)
 def _find_fixtures_dir() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             candidate = p / "tests" / "pylimer_tools" / "fixtures"
             if candidate.is_dir():
@@ -169,7 +171,7 @@ print(
 )
 ```
 
-**Total running time of the script:** (0 minutes 4.093 seconds)
+**Total running time of the script:** (0 minutes 2.214 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-relaxation-py"></a>
 

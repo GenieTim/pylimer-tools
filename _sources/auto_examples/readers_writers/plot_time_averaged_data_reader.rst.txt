@@ -32,7 +32,7 @@ and :func:`~pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_fil
 - Vector quantities (multiple values per output timestep)
 - Multi-section files with varying column structures
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-56
+.. GENERATED FROM PYTHON SOURCE LINES 17-59
 
 
 
@@ -65,8 +65,11 @@ and :func:`~pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_fil
 
     from pylimer_tools.io.read_lammps_output_file import read_averages_file
 
+
     def _find_fixtures_dir() -> Path:
-        for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for cur in (
+            [Path(__file__).resolve().parent] if "__file__" in globals() else []
+        ) + [Path.cwd()]:
             for p in [cur] + list(cur.parents):
                 candidate = p / "tests" / "pylimer_tools" / "fixtures"
                 if candidate.is_dir():
@@ -102,7 +105,7 @@ and :func:`~pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_fil
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.081 seconds)
+   **Total running time of the script:** (0 minutes 0.044 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_time_averaged_data_reader.py:

@@ -16,10 +16,10 @@ MEHPForceBalance2 is a faster implementation of the MEHP force balance method,
 which uses static links to model entanglements instead of slip-links.
 See Bernhard and Gusev [[BG25](../../acknowledgements.md#id12)]
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 9-73 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 9-76 -->
 ```none
-Final residual (should be close to 0): 2.6774750148018954e-13
-Shear Modulus [MPa]:  0.09592779002848224
+Final residual (should be close to 0): 1.7153887116022568e-13
+Shear Modulus [MPa]:  0.11323753391944498
 ```
 
 <br/>
@@ -42,9 +42,12 @@ params = get_parameters_for_polymer(
     "PDMS", parameter_type=ParameterType.GAUSSIAN)
 assert isinstance(params, Parameters)
 
+
 # Load your network (replace with your file)
 def _find_fixtures_dir() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             candidate = p / "tests" / "pylimer_tools" / "fixtures"
             if candidate.is_dir():
@@ -89,7 +92,7 @@ shear_modulus = (
 print("Shear Modulus [MPa]: ", shear_modulus)
 ```
 
-**Total running time of the script:** (0 minutes 0.430 seconds)
+**Total running time of the script:** (0 minutes 0.213 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-2-py"></a>
 

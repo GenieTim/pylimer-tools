@@ -10,9 +10,14 @@ NormalModeAnalyzer
 
    .. autosummary::
 
+      ~NormalModeAnalyzer.compute_chebyshev_moments_kpm
+      ~NormalModeAnalyzer.compute_density_of_states_kpm
       ~NormalModeAnalyzer.evaluate_loss_modulus
+      ~NormalModeAnalyzer.evaluate_loss_modulus_kpm
       ~NormalModeAnalyzer.evaluate_storage_modulus
+      ~NormalModeAnalyzer.evaluate_storage_modulus_kpm
       ~NormalModeAnalyzer.evaluate_stress_autocorrelation
+      ~NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm
       ~NormalModeAnalyzer.find_all_eigenvalues
       ~NormalModeAnalyzer.find_sparse_eigenvalues
       ~NormalModeAnalyzer.get_eigenvalues
@@ -25,9 +30,14 @@ NormalModeAnalyzer
 
    .. rubric:: Methods Documentation
 
+   .. automethod:: compute_chebyshev_moments_kpm
+   .. automethod:: compute_density_of_states_kpm
    .. automethod:: evaluate_loss_modulus
+   .. automethod:: evaluate_loss_modulus_kpm
    .. automethod:: evaluate_storage_modulus
+   .. automethod:: evaluate_storage_modulus_kpm
    .. automethod:: evaluate_stress_autocorrelation
+   .. automethod:: evaluate_stress_autocorrelation_kpm
    .. automethod:: find_all_eigenvalues
    .. automethod:: find_sparse_eigenvalues
    .. automethod:: get_eigenvalues

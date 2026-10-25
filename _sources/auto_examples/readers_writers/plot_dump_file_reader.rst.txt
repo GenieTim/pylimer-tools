@@ -26,7 +26,7 @@ Is has a practical interface to read frames from a trajectory file
 and access them as :class:`~pylimer_tools_cpp.Universe` objects
 in the :class:`~pylimer_tools_cpp.UniverseSequence` class.
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-45
+.. GENERATED FROM PYTHON SOURCE LINES 11-49
 
 
 
@@ -55,8 +55,12 @@ in the :class:`~pylimer_tools_cpp.UniverseSequence` class.
 
     # Load trajectory data
     sequence = UniverseSequence()
+
+
     def _find_fixtures_dir() -> Path:
-        for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for cur in (
+            [Path(__file__).resolve().parent] if "__file__" in globals() else []
+        ) + [Path.cwd()]:
             for p in [cur] + list(cur.parents):
                 candidate = p / "tests" / "pylimer_tools" / "fixtures"
                 if candidate.is_dir():
@@ -85,7 +89,7 @@ in the :class:`~pylimer_tools_cpp.UniverseSequence` class.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.002 seconds)
+   **Total running time of the script:** (0 minutes 0.001 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_dump_file_reader.py:

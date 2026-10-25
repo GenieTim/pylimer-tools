@@ -25,7 +25,7 @@ Read output from pylimer-tools' own simulators.
 
 Relevant documentation: :func:`~pylimer_tools.io.read_pylimer_tools_output_file.read_avg_file`
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-43
+.. GENERATED FROM PYTHON SOURCE LINES 11-46
 
 
 
@@ -58,8 +58,11 @@ Relevant documentation: :func:`~pylimer_tools.io.read_pylimer_tools_output_file.
 
     from pylimer_tools.io.read_pylimer_tools_output_file import read_avg_file
 
+
     def _find_repo_root() -> Path:
-        for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for cur in (
+            [Path(__file__).resolve().parent] if "__file__" in globals() else []
+        ) + [Path.cwd()]:
             for p in [cur] + list(cur.parents):
                 if (p / "examples").is_dir() and (p / "src").is_dir():
                     return p
@@ -86,7 +89,7 @@ Relevant documentation: :func:`~pylimer_tools.io.read_pylimer_tools_output_file.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.061 seconds)
+   **Total running time of the script:** (0 minutes 0.034 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_pylimer_tools_output_reader.py:

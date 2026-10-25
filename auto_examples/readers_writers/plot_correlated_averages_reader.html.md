@@ -14,15 +14,18 @@ to download the full example code.
 
 Read correlation functions from `fix ave/correlate` and `fix ave/correlate/long` commands.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-37 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-40 -->
 ```Python
 import os
 from pathlib import Path
 
 from pylimer_tools.io.read_lammps_output_file import read_correlation_file
 
+
 def _find_fixtures_dir() -> Path:
-    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+    for cur in (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]:
         for p in [cur] + list(cur.parents):
             candidate = p / "tests" / "pylimer_tools" / "fixtures"
             if candidate.is_dir():
@@ -46,7 +49,7 @@ _ = last_correlation.plot(
         "c_pA1*c_pA1", "c_pA2*c_pA2", "c_pA3*c_pA3"])
 ```
 
-**Total running time of the script:** (0 minutes 0.069 seconds)
+**Total running time of the script:** (0 minutes 0.039 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-correlated-averages-reader-py"></a>
 

@@ -23,7 +23,7 @@ Loop Finding and Analysis
 
 This example demonstrates how to find and analyze loops in polymer networks using pylimer-tools.
 
-.. GENERATED FROM PYTHON SOURCE LINES 7-56
+.. GENERATED FROM PYTHON SOURCE LINES 7-59
 
 
 
@@ -62,9 +62,12 @@ This example demonstrates how to find and analyze loops in polymer networks usin
     # Replace with your crosslinker type
     crosslinker_type = 2
 
+
     # Load your network (replace 'network.gml' with your file)
     def _find_fixtures_dir() -> Path:
-        for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for cur in (
+            [Path(__file__).resolve().parent] if "__file__" in globals() else []
+        ) + [Path.cwd()]:
             for p in [cur] + list(cur.parents):
                 candidate = p / "tests" / "pylimer_tools" / "fixtures"
                 if candidate.is_dir():
@@ -103,7 +106,7 @@ This example demonstrates how to find and analyze loops in polymer networks usin
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.115 seconds)
+   **Total running time of the script:** (0 minutes 0.071 seconds)
 
 
 .. _sphx_glr_download_auto_examples_structure_analysis_plot_loop_analysis.py:

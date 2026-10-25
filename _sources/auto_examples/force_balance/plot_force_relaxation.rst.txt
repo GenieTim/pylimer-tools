@@ -25,7 +25,7 @@ This example demonstrates how to use
 the "original" MEHP implementation (see :cite:t:`gusev_numerical_2019`)
 without slip-links or entanglements.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-153
+.. GENERATED FROM PYTHON SOURCE LINES 10-155
 
 
 
@@ -119,7 +119,9 @@ without slip-links or entanglements.
 
     # Load your network (replace with your file)
     def _find_fixtures_dir() -> Path:
-        for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for cur in (
+            [Path(__file__).resolve().parent] if "__file__" in globals() else []
+        ) + [Path.cwd()]:
             for p in [cur] + list(cur.parents):
                 candidate = p / "tests" / "pylimer_tools" / "fixtures"
                 if candidate.is_dir():
@@ -194,7 +196,7 @@ without slip-links or entanglements.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.093 seconds)
+   **Total running time of the script:** (0 minutes 2.214 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_force_relaxation.py:

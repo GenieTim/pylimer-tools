@@ -23,7 +23,7 @@ Correlated Averages Reader
 
 Read correlation functions from ``fix ave/correlate`` and ``fix ave/correlate/long`` commands.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-37
+.. GENERATED FROM PYTHON SOURCE LINES 8-40
 
 
 
@@ -44,8 +44,11 @@ Read correlation functions from ``fix ave/correlate`` and ``fix ave/correlate/lo
 
     from pylimer_tools.io.read_lammps_output_file import read_correlation_file
 
+
     def _find_fixtures_dir() -> Path:
-        for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for cur in (
+            [Path(__file__).resolve().parent] if "__file__" in globals() else []
+        ) + [Path.cwd()]:
             for p in [cur] + list(cur.parents):
                 candidate = p / "tests" / "pylimer_tools" / "fixtures"
                 if candidate.is_dir():
@@ -71,7 +74,7 @@ Read correlation functions from ``fix ave/correlate`` and ``fix ave/correlate/lo
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.069 seconds)
+   **Total running time of the script:** (0 minutes 0.039 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_correlated_averages_reader.py:
