@@ -14,7 +14,7 @@ to download the full example code.
 
 This example demonstrates how to find and analyze loops in polymer networks using pylimer-tools.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 7-49 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 7-56 -->
 ```none
 Number of loops found (max length 2*(46+1)): 2
 Loop length counts: {322: 1, 92: 1, 46: 2, 138: 1}
@@ -24,6 +24,7 @@ Shortest loop involving atom 1: []
 <br/>
 ```Python
 import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
@@ -34,12 +35,18 @@ from pylimer_tools_cpp import Universe
 crosslinker_type = 2
 
 # Load your network (replace 'network.gml' with your file)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
 universe = read_data_file(
-    os.path.join(
-        os.getcwd(),
-        "../..",
-        "tests/pylimer_tools/fixtures/structure/network_100_a_46.structure.out",
-    )
+    str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 )
 assert isinstance(universe, Universe)
 
@@ -66,7 +73,7 @@ shortest_loop = universe.find_minimal_order_loop_from(
 print(f"Shortest loop involving atom 1: {shortest_loop}")
 ```
 
-**Total running time of the script:** (0 minutes 0.114 seconds)
+**Total running time of the script:** (0 minutes 0.115 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-loop-analysis-py"></a>
 

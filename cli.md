@@ -7,6 +7,115 @@ This allows you to perform tasks directly from the terminal without writing Pyth
 
 Generate crosslinked polymer networks using Monte Carlo procedures.
 
+### pylimer-generate-network
+
+Generate a crosslinked polymer network using Monte Carlo procedure.
+
+This command generates a crosslinked polymer network with specified parameters.
+You must specify either –target-p (crosslinker conversion) or –target-wsol
+(soluble fraction), but not both.
+
+Example:
+: pylimer-generate-network –polymer-name PDMS –parameter-type GAUSSIAN –target-p 0.8 –n-chains-crosslinks 100 –target-file network.dat
+
+### Usage
+
+```shell
+pylimer-generate-network [OPTIONS]
+```
+
+### Options
+
+### --polymer-name <polymer_name>
+
+Name of the polymer to generate the network for
+
+* **Options:**
+  apma | pbd98 | ptfe | pi75 | pbd20 | cispbd | cispi | app463 | sbr | p6n | ips | apoa | app413 | peo | apea | pi34 | pi50 | spp | ipp | pe413 | pom | pet | app | pi7 | apmma | apva | pc | pe | apams | app348 | aps | pdms | aphma | pib | pi20 | pib413
+
+### --parameter-type <parameter_type>
+
+Type of parameters to use for the polymer model
+
+* **Options:**
+  GAUSSIAN | KG_LJ | KUHN
+
+### --target-p <target_p>
+
+Target crosslinker conversion (p). Mutually exclusive with –target-wsol.
+
+### --target-wsol <target_wsol>
+
+Target soluble fraction (w_sol). Mutually exclusive with –target-p.
+
+### --n-chains-crosslinkers <n_chains_crosslinkers>
+
+Number of crosslinkers
+
+### --target-f <target_f>
+
+Crosslinker functionality
+
+### --n-solvent-chains <n_solvent_chains>
+
+Number of solvent chains
+
+### --n-beads-per-solvent-chain <n_beads_per_solvent_chain>
+
+Beads per solvent chain
+
+### --n-chains-1 <n_chains_1>
+
+Number of chains
+
+### --n-beads-per-chain-1 <n_beads_per_chain_1>
+
+Beads per chain
+
+### --n-chains-2 <n_chains_2>
+
+Number of other chains
+
+### --n-beads-per-chain-2 <n_beads_per_chain_2>
+
+Beads per other chain
+
+### --n-mono-chains <n_mono_chains>
+
+Number of monofunctional chains
+
+### --n-mono-beads-per-chain <n_mono_beads_per_chain>
+
+Beads per monofunctional chain
+
+### --n-beads-per-xlink <n_beads_per_xlink>
+
+Beads per crosslinker (xlink)
+
+### --remove-wsol
+
+Remove soluble fraction after generation
+
+### --functionalize-discrete, --no-functionalize-discrete
+
+Functionalize crosslinks discrete. Applicable to crosslinkers longer than one bead. If enabled, the crosslinker functionality is distributed in discrete chunks. If disabled, the crosslinker functionality is distributed randomly across the crosslinker beads.
+
+### --disable-primary-loops
+
+Disable primary loops in the network
+
+### --disable-secondary-loops
+
+Disable secondary loops in the network
+
+### --z-score-std-mult <z_score_std_mult>
+
+Z-score standard deviation multiplier for max distance
+
+### --target-file <target_file>
+
+**Required** Output file for the generated network
+
 ## Network Analysis
 
 Analyze existing polymer networks to compute structural properties.
@@ -33,7 +142,7 @@ pylimer-analyse-networks [OPTIONS] [FILES]...
 Name of the polymer to use for parameter retrieval.
 
 * **Options:**
-  pi7 | pib413 | pi75 | pe | aphma | app463 | apams | apma | app | app348 | sbr | pi50 | pc | apva | peo | pi34 | ipp | aps | spp | apoa | ips | p6n | cispbd | pdms | pet | pib | pbd20 | pe413 | apmma | pi20 | pbd98 | apea | pom | cispi | ptfe | app413
+  apma | pbd98 | ptfe | pi75 | pbd20 | cispbd | cispi | app463 | sbr | p6n | ips | apoa | app413 | peo | apea | pi34 | pi50 | spp | ipp | pe413 | pom | pet | app | pi7 | apmma | apva | pc | pe | apams | app348 | aps | pdms | aphma | pib | pi20 | pib413
 
 ### Arguments
 

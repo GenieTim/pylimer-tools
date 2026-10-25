@@ -6,6 +6,7 @@ This example demonstrates how to find and analyze loops in polymer networks usin
 """
 
 import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
@@ -16,12 +17,18 @@ from pylimer_tools_cpp import Universe
 crosslinker_type = 2
 
 # Load your network (replace 'network.gml' with your file)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
 universe = read_data_file(
-    os.path.join(
-        os.getcwd(),
-        "../..",
-        "tests/pylimer_tools/fixtures/structure/network_100_a_46.structure.out",
-    )
+    str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 )
 assert isinstance(universe, Universe)
 

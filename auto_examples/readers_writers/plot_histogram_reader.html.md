@@ -14,19 +14,26 @@ to download the full example code.
 
 Process histogram data from `fix ave/hist` commands.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-33 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-40 -->
 ```Python
 import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
 from pylimer_tools.io.read_lammps_output_file import read_histogram_file
 
-file_path = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/example_vec_avg_file.out.vec-avg.txt",
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
+file_path = str(_fixtures_dir / "example_vec_avg_file.out.vec-avg.txt")
 
 # Read histogram data
 histogram_data = read_histogram_file(file_path)
@@ -42,7 +49,7 @@ plt.title(f"Density Distribution at Step {final_timestep}")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.070 seconds)
+**Total running time of the script:** (0 minutes 0.072 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-histogram-reader-py"></a>
 

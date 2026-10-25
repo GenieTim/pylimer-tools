@@ -7,6 +7,7 @@ All readers support automatic caching for improved performance.
 """
 
 import os
+from pathlib import Path
 import time
 
 import matplotlib.pyplot as plt
@@ -14,11 +15,17 @@ import matplotlib.pyplot as plt
 from pylimer_tools.io.extract_thermo_data import extract_thermo_params
 
 # Read complete log file
-log_file = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/log.lammps",
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
+log_file = str(_fixtures_dir / "log.lammps")
 
 time_start = time.time()
 # %%

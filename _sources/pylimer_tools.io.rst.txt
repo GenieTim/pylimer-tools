@@ -4,10 +4,26 @@ pylimer\_tools.io package
 Submodules
 ----------
 
+pylimer\_tools.io.bead_spring_parameter_provider module
+-------------------------------------------------------
+
+.. automodule:: pylimer_tools.io.bead_spring_parameter_provider
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pylimer\_tools.io.extract_thermo_data module
 --------------------------------------------
 
 .. automodule:: pylimer_tools.io.extract_thermo_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pylimer\_tools.io.polymer_data module
+-------------------------------------
+
+.. automodule:: pylimer_tools.io.polymer_data
    :members:
    :undoc-members:
    :show-inheritance:

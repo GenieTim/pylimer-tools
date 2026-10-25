@@ -17,7 +17,7 @@ to get the stoichiometric imbalance $r$,
 the crosslinker conversion $p$ or
 the functionality of the crosslinker $f$.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 11-67 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 11-74 -->
 ```none
 Stoichiometric imbalance (r): 1.16
 Crosslinker conversion (p): 0.7241379310344828
@@ -27,6 +27,7 @@ Functionality of the crosslinker (f): 4
 <br/>
 ```Python
 import os
+from pathlib import Path
 from collections import Counter
 
 import matplotlib.pyplot as plt
@@ -42,12 +43,18 @@ from pylimer_tools_cpp import Universe
 crosslinker_type = 2
 
 # Load your network (replace path accordingly)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
 universe = read_data_file(
-    os.path.join(
-        os.getcwd(),
-        "../..",
-        "tests/pylimer_tools/fixtures/structure/network_100_a_46.structure.out",
-    )
+    str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 )
 assert isinstance(universe, Universe)
 
@@ -83,7 +90,7 @@ plt.ylabel("Count")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.074 seconds)
+**Total running time of the script:** (0 minutes 0.075 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-structure-analysis-py"></a>
 

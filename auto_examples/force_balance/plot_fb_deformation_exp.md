@@ -16,9 +16,10 @@ This example shows how to use the MEHPForceBalance2 class in a deformation exper
 
 It also shows, that deformation is an equivalent method to the $\Gamma$ factor to obtain the modulus.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 9-132 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 9-139 -->
 ```Python
 import copy
+from pathlib import Path
 import math
 import os
 
@@ -39,12 +40,18 @@ params = get_parameters_for_polymer(
 assert isinstance(params, Parameters)
 
 # Load your network (replace with your file)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
 universe = read_data_file(
-    os.path.join(
-        os.getcwd(),
-        "../..",
-        "tests/pylimer_tools/fixtures/structure/network_100_a_46.structure.out",
-    )
+    str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 )
 assert isinstance(universe, Universe)
 
@@ -142,17 +149,17 @@ plt.show()
 ```
 
 ```none
-Final residual (should be close to 0): 1.6322302907368992e-13
-Shear Modulus from Equilibrium [MPa]:  0.08959463307999524
+Final residual (should be close to 0): 1.8842663149170603e-13
+Shear Modulus from Equilibrium [MPa]:  0.1357646277353902
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 133-136 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 140-143 -->
 
 Rather than using the nominal stress, you can also use the
 stress tensor directly to compute the shear modulus.
 Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
 
-**Total running time of the script:** (0 minutes 1.082 seconds)
+**Total running time of the script:** (0 minutes 1.127 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-fb-deformation-exp-py"></a>
 

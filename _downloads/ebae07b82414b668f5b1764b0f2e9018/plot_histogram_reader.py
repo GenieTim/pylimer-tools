@@ -7,16 +7,23 @@ Process histogram data from ``fix ave/hist`` commands.
 """
 
 import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
 from pylimer_tools.io.read_lammps_output_file import read_histogram_file
 
-file_path = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/example_vec_avg_file.out.vec-avg.txt",
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
+file_path = str(_fixtures_dir / "example_vec_avg_file.out.vec-avg.txt")
 
 # Read histogram data
 histogram_data = read_histogram_file(file_path)

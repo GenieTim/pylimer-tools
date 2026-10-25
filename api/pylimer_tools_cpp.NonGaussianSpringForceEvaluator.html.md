@@ -75,7 +75,7 @@ def evaluate_force_set_gradient(self, n, spring_distances, compute_gradient):
     return (force, gradient)
 ```
 
-#### evaluate_stress_contribution(self: [pylimer_tools_cpp.MEHPForceEvaluator](pylimer_tools_cpp.MEHPForceEvaluator.html.md#pylimer_tools_cpp.MEHPForceEvaluator), spring_distances: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), i: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), j: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), spring_index: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### evaluate_stress_contribution(self: [pylimer_tools_cpp.MEHPForceEvaluator](pylimer_tools_cpp.MEHPForceEvaluator.html.md#pylimer_tools_cpp.MEHPForceEvaluator), spring_distances: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)], i: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), j: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), spring_index: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Evaluate the stress-contribution for a single spring.
 

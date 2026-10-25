@@ -21,7 +21,7 @@ The following approaches are shown:
 - Decomposing the network to chains while keeping crosslinkers
 - Finding clusters after manual junction removal
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 15-57 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 15-64 -->
 ```none
 Number of chains (without crosslinkers): 100
 Number of chains (with crosslinkers): 100
@@ -31,6 +31,7 @@ Number of clusters: 3
 <br/>
 ```Python
 import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
@@ -41,12 +42,18 @@ from pylimer_tools_cpp import Universe
 crosslinker_type = 2
 
 # Load your network (replace path accordingly)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
 universe = read_data_file(
-    os.path.join(
-        os.getcwd(),
-        "../..",
-        "tests/pylimer_tools/fixtures/structure/network_100_a_46.structure.out",
-    )
+    str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 )
 assert isinstance(universe, Universe)
 
@@ -73,7 +80,7 @@ plt.ylabel("Count")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.068 seconds)
+**Total running time of the script:** (0 minutes 0.070 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-decompose-structure-py"></a>
 

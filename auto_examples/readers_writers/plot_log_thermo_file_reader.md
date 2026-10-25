@@ -24,7 +24,7 @@ The log file reader automatically:
 Relevant documentation: [`read_log_file()`](../../pylimer_tools.io.md#pylimer_tools.io.read_lammps_output_file.read_log_file)
 and [`extract_thermo_params()`](../../pylimer_tools.io.md#pylimer_tools.io.extract_thermo_data.extract_thermo_params)
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 18-48 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 18-55 -->
 ```none
 Temperature range: 0.00 - 0.36
 Final pressure: -0.170444
@@ -33,17 +33,24 @@ Final pressure: -0.170444
 <br/>
 ```Python
 import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
 from pylimer_tools.io.read_lammps_output_file import read_log_file
 
 # Read complete log file
-log_file = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/log.lammps",
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
+log_file = str(_fixtures_dir / "log.lammps")
 thermo_data = read_log_file(log_file)
 
 # Access thermodynamic properties
@@ -63,7 +70,7 @@ plt.ylabel("Temperature [LJ-units]")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.069 seconds)
+**Total running time of the script:** (0 minutes 0.068 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-log-thermo-file-reader-py"></a>
 

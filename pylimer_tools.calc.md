@@ -5,7 +5,7 @@
 ## pylimer_tools.calc.mehp_utilities module
 
 This module is deprecated.
-Use [`pylimer_tools_cpp.MEHPForceBalance()`](api/pylimer_tools_cpp.MEHPForceBalance.md#pylimer_tools_cpp.MEHPForceBalance) or [`pylimer_tools_cpp.MEHPForceRelaxation()`](api/pylimer_tools_cpp.MEHPForceRelaxation.md#pylimer_tools_cpp.MEHPForceRelaxation) instead.
+Use [`pylimer_tools_cpp.MEHPForceBalance`](api/pylimer_tools_cpp.MEHPForceBalance.md#pylimer_tools_cpp.MEHPForceBalance) or [`pylimer_tools_cpp.MEHPForceRelaxation`](api/pylimer_tools_cpp.MEHPForceRelaxation.md#pylimer_tools_cpp.MEHPForceRelaxation) instead.
 
 In principle, it offers comparable functionality, but without the force minimization - the networks you pass
 to these methods should be minimized first.
@@ -517,6 +517,52 @@ Source:
   **kwargs** – See [`compute_modulus_decomposition()`](#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition)
 * **Returns:**
   G: The predicted shear modulus
+
+## pylimer_tools.calc.stoichiometric_relationships module
+
+Module for calculating stoichiometric relationships in polymer networks.
+
+In particular, it helps to work with the parameter b2, which is the mole fraction
+of reactive sites in B2 among all reactive sites in a mixture of B1 and B2.
+
+### pylimer_tools.calc.stoichiometric_relationships.compute_number_fractions(b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1.0) → [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]
+
+Compute the number fractions of bifunctional and monofunctional strands.
+
+* **Parameters:**
+  **b2** – The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2
+* **Returns:**
+  A tuple containing the number fractions (x_bifunctional, x_monofunctional)
+* **Return type:**
+  [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]
+
+### pylimer_tools.calc.stoichiometric_relationships.compute_strand_number_density(mw_bifunctional: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), density: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), mw_monofunctional: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1.0) → [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)
+
+Compute the strand number density of the polymer network.
+
+* **Parameters:**
+  * **mw_bifunctional** – The molecular weight of the bifunctional strands
+  * **density** – The density of the polymer network
+  * **mw_monofunctional** – The molecular weight of the monofunctional strands. None if not present
+  * **b2** – The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2
+* **Returns:**
+  The strand number density
+* **Return type:**
+  [pint.Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity)
+
+### pylimer_tools.calc.stoichiometric_relationships.compute_weight_fractions(mw_bifunctional: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity), mw_monofunctional: [Quantity](https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity) | [None](https://docs.python.org/3/builtins/constants.html#None) = None, b2: [float](https://docs.python.org/3/builtins/functions.html#float) = 1.0) → [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]
+
+Compute the weight fractions of bifunctional and monofunctional strands.
+Makes some assumptions, e.g. the same density for both types of strands.
+
+* **Parameters:**
+  * **mw_bifunctional** – The molecular weight of the bifunctional strands
+  * **mw_monofunctional** – The molecular weight of the monofunctional strands. None if not present
+  * **b2** – The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2
+* **Returns:**
+  A tuple containing the weight fractions (w_bifunctional, w_monofunctional)
+* **Return type:**
+  [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]
 
 ## pylimer_tools.calc.structure_analysis module
 

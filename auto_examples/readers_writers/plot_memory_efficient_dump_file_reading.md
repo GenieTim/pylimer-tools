@@ -14,27 +14,34 @@ to download the full example code.
 
 The [`UniverseSequence`](../../api/pylimer_tools_cpp.UniverseSequence.md#pylimer_tools_cpp.UniverseSequence) class provides automatic memory management.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-15 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-16 -->
 ```Python
 import os
+from pathlib import Path
 
 import psutil
 
 from pylimer_tools_cpp import UniverseSequence
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 16-18 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 17-19 -->
 
 For large trajectories, frames are loaded on-demand
 Load a LAMMPS dump trajectory file (replace with your file)
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 18-52 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 19-59 -->
 ```Python
-file_path = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/",
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
+file_path = str(_fixtures_dir)
 sequence = UniverseSequence()
 sequence.initialize_from_dump_file(
     initial_data_file=os.path.join(file_path, "big_dump_file_data.out"),
@@ -7502,13 +7509,13 @@ Processing frame 74310 with 32 atoms
 Processing frame 74320 with 32 atoms
 
 --- Memory Usage Report ---
-Memory before processing: 682.04 MB
-Memory after processing:  682.04 MB
+Memory before processing: 664.22 MB
+Memory after processing:  664.22 MB
 Memory used by script:    0.00 MB
 Dump file size:           83.32 MB
 ```
 
-**Total running time of the script:** (0 minutes 18.962 seconds)
+**Total running time of the script:** (0 minutes 19.237 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py"></a>
 

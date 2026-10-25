@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/readers_writers/plot_convert_trajectory_to_frame.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="Take a later entry from a LAMMPS trajectory and save it as a data file. import os from pylimer_tools_cpp import DataFileWriter, UniverseSequence if not os. path. exists(&quot; generated_structures&..." />
+<meta property="og:description" content="Take a later entry from a LAMMPS trajectory and save it as a data file. import os from pathlib import Path from pylimer_tools_cpp import DataFileWriter, UniverseSequence if not os. path. exists(&qu..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
-<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_readers_writers_plot_convert_trajectory_to_frame_f330f4ea.png" />
-<meta property="og:image:alt" content="Take a later entry from a LAMMPS trajectory and save it as a data file. import os from pylimer_tools_cpp import DataFileWriter, UniverseSequence if not os. path. exists(&quot; generated_structures&..." />
-<meta name="description" content="Take a later entry from a LAMMPS trajectory and save it as a data file. import os from pylimer_tools_cpp import DataFileWriter, UniverseSequence if not os. path. exists(&quot; generated_structures&..." />
+<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_readers_writers_plot_convert_trajectory_to_frame_6329910c.png" />
+<meta property="og:image:alt" content="Take a later entry from a LAMMPS trajectory and save it as a data file. import os from pathlib import Path from pylimer_tools_cpp import DataFileWriter, UniverseSequence if not os. path. exists(&qu..." />
+<meta name="description" content="Take a later entry from a LAMMPS trajectory and save it as a data file. import os from pathlib import Path from pylimer_tools_cpp import DataFileWriter, UniverseSequence if not os. path. exists(&qu..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -22,7 +22,7 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 
 <link rel="alternate" type="text/markdown" href="plot_convert_trajectory_to_frame.html.md">
-<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Dump File Reader" href="plot_dump_file_reader.html"><link rel="prev" title="Log &amp; Thermo File Reader" href="plot_log_thermo_file_reader.html">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Log &amp; Thermo File Reader" href="plot_log_thermo_file_reader.html"><link rel="prev" title="Performance and Caching" href="plot_performance_caching.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>Extract Trajectory Frame to Data File - pylimer-tools</title>
@@ -257,13 +257,13 @@
 </ul>
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">File I/O: Readers &amp; Writers</a><input aria-label="Toggle navigation of File I/O: Readers &amp; Writers" checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
@@ -404,6 +404,7 @@ to download the full example code.</p>
 <span id="sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"></span><h1>Extract Trajectory Frame to Data File<a class="headerlink" href="#extract-trajectory-frame-to-data-file" title="Link to this heading">¶</a></h1>
 <p>Take a later entry from a LAMMPS trajectory and save it as a data file.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a><span class="w">
 </span><span class="w">
 </span><span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class reference internal" href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="n">DataFileWriter</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class reference internal" href="../../api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><span class="n">UniverseSequence</span></a><span class="w">
 </span><span class="w">
@@ -412,11 +413,17 @@ to download the full example code.</p>
 </span></pre></div></div>
 <p>For large trajectories, frames are loaded on-demand
 Load a LAMMPS dump trajectory file (replace with your file)</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">file_path</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><span class="w">
-</span>    <a class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/os.html#os.getcwd" title="os.getcwd"><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span></a><span class="p">(</span><span class="p">)</span><span class="p">,</span><span class="w">
-</span>    <span class="s2">&quot;</span><span class="s2">../..</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
-</span>    <span class="s2">&quot;</span><span class="s2">tests/pylimer_tools/fixtures/</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
-</span><span class="p">)</span><span class="w">
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="k">def</span><span class="w"> </span><span class="nf">_find_fixtures_dir</span><span class="p">(</span><span class="p">)</span> <span class="o">-</span><span class="o">&gt;</span> <a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a><span class="p">:</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">cur</span> <span class="ow">in</span> <span class="p">(</span><span class="p">[</span><a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;</span><span class="s2">__file__</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">(</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="p">]</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-method reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path.cwd" title="pathlib.Path.cwd"><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span></a><span class="p">(</span><span class="p">)</span><span class="p">]</span><span class="p">:</span><span class="w">
+</span>        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">cur</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">cur</span><span class="o">.</span><span class="n">parents</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>            <span class="n">candidate</span> <span class="o">=</span> <span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;</span><span class="s2">tests</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="s2">&quot;</span><span class="s2">pylimer_tools</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="s2">&quot;</span><span class="s2">fixtures</span><span class="s2">&quot;</span><span class="w">
+</span>            <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="n">is_dir</span><span class="p">(</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>                <span class="k">return</span> <span class="n">candidate</span><span class="w">
+</span>    <span class="k">return</span> <a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">tests/pylimer_tools/fixtures</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="pathlib.PosixPath"><span class="n">_fixtures_dir</span></a> <span class="o">=</span> <span class="n">_find_fixtures_dir</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">file_path</span></a> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="pathlib.PosixPath"><span class="n">_fixtures_dir</span></a><span class="p">)</span><span class="w">
 </span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><span class="n">sequence</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class reference internal" href="../../api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><span class="n">UniverseSequence</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.initialize_from_dump_file" title="pylimer_tools_cpp.UniverseSequence.initialize_from_dump_file"><span class="n">sequence</span><span class="o">.</span><span class="n">initialize_from_dump_file</span></a><span class="p">(</span><span class="w">
 </span>    <span class="n">initial_data_file</span><span class="o">=</span><a class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">file_path</span></a><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">big_dump_file_data.out</span><span class="s2">&quot;</span><span class="p">)</span><span class="p">,</span><span class="w">
@@ -450,23 +457,23 @@ Load a LAMMPS dump trajectory file (replace with your file)</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="plot_dump_file_reader.html">
+          <a class="next-page" href="plot_log_thermo_file_reader.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Dump File Reader</div>
+                <div class="title">Log &amp; Thermo File Reader</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="plot_log_thermo_file_reader.html">
+          <a class="prev-page" href="plot_performance_caching.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Log &amp; Thermo File Reader</div>
+                <div class="title">Performance and Caching</div>
                 
               </div>
             </a>

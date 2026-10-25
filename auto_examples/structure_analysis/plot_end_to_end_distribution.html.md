@@ -16,9 +16,10 @@ This example demonstrates how to analyze the end-to-end distribution of polymer 
 using pylimer-tools. It reads a structure file, computes the end-to-end distances,
 and plots the distribution of these distances.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 10-60 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 10-67 -->
 ```Python
 import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
@@ -29,12 +30,18 @@ from pylimer_tools_cpp import Universe
 crosslinker_type = 2
 
 # Load your network (replace path accordingly)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
 universe = read_data_file(
-    os.path.join(
-        os.getcwd(),
-        "../..",
-        "tests/pylimer_tools/fixtures/structure/network_100_a_46.structure.out",
-    )
+    str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 )
 assert isinstance(universe, Universe)
 
@@ -69,7 +76,7 @@ plt.ylabel("Frequency")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.126 seconds)
+**Total running time of the script:** (0 minutes 0.131 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-end-to-end-distribution-py"></a>
 

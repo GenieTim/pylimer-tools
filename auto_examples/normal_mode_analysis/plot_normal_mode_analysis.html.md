@@ -17,9 +17,10 @@ to predict the loss and storage modulus of polymer networks.
 
 Reference: Gusev and Bernhard [[GB24](../../acknowledgements.html.md#id7)]
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 10-42 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 10-49 -->
 ```Python
 import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -28,11 +29,17 @@ from pylimer_tools.io.read_lammps_output_file import read_data_file
 from pylimer_tools_cpp import NormalModeAnalyzer
 
 # Load a LAMMPS data file (replace with your file)
-filePath = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/structure/network_100_a_46.structure.out",
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
+filePath = str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 universe = read_data_file(filePath)
 edges = universe.get_edges()
 
@@ -51,13 +58,13 @@ storage_modulus = nma.evaluate_storage_modulus(omega=frequencies)
 loss_modulus = nma.evaluate_loss_modulus(omega=frequencies)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 43-47 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 50-54 -->
 <!-- todo:
 Apply conversion factors where necessary -->
 
 Plot the results
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 47-56 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 54-63 -->
 ```Python
 df = pd.DataFrame(
     {
@@ -71,12 +78,12 @@ _ = df.plot(title="Storage and Loss Modulus vs Frequency", loglog=True)
 ```
 
 ```none
-/home/runner/work/pylimer-tools/pylimer-tools/examples/normal_mode_analysis/plot_normal_mode_analysis.py:54: Pandas4Warning: The inplace keyword in DataFrame.set_index is deprecated and will be removed in a future version (PDEP-8).
+/home/runner/work/pylimer-tools/pylimer-tools/examples/normal_mode_analysis/plot_normal_mode_analysis.py:61: Pandas4Warning: The inplace keyword in DataFrame.set_index is deprecated and will be removed in a future version (PDEP-8).
 See https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace for more details.
   df.set_index("Frequency", inplace=True)
 ```
 
-**Total running time of the script:** (0 minutes 15.671 seconds)
+**Total running time of the script:** (0 minutes 15.751 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py"></a>
 

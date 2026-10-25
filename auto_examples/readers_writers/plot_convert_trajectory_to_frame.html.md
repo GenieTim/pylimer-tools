@@ -14,9 +14,10 @@ to download the full example code.
 
 Take a later entry from a LAMMPS trajectory and save it as a data file.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-16 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-17 -->
 ```Python
 import os
+from pathlib import Path
 
 from pylimer_tools_cpp import DataFileWriter, UniverseSequence
 
@@ -24,18 +25,24 @@ if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 17-19 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 18-20 -->
 
 For large trajectories, frames are loaded on-demand
 Load a LAMMPS dump trajectory file (replace with your file)
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 19-36 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 20-43 -->
 ```Python
-file_path = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/",
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
+file_path = str(_fixtures_dir)
 sequence = UniverseSequence()
 sequence.initialize_from_dump_file(
     initial_data_file=os.path.join(file_path, "big_dump_file_data.out"),

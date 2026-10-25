@@ -199,7 +199,7 @@
 - [NOTE](plot_polydispersity_study.html.md): Go to the end
 - [NOTE](plot_fb_deformation_exp.html.md): Go to the end
 - [NOTE](plot_force_relaxation.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;05:45.119&#42;&#42; total execution time for 5 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;05:34.706&#42;&#42; total execution time for 5 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 
 ## Optional
 

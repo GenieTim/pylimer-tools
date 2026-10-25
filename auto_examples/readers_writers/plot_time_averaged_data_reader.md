@@ -23,7 +23,7 @@ and [`read_sectioned_averages_file()`](../../pylimer_tools.io.md#pylimer_tools.i
 - Vector quantities (multiple values per output timestep)
 - Multi-section files with varying column structures
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 17-53 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 17-56 -->
 ```none
 Timestep 100: 3 data points
 Timestep 200: 3 data points
@@ -33,14 +33,21 @@ Timestep 300: 3 data points
 <br/>
 ```Python
 import os
+from pathlib import Path
 
 from pylimer_tools.io.read_lammps_output_file import read_averages_file
 
-averages_file = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/example_avg_file.out.avg.txt",
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
+averages_file = str(_fixtures_dir / "example_avg_file.out.avg.txt")
 
 # Read simple averages file
 averages = read_averages_file(averages_file)
@@ -54,11 +61,7 @@ averages.plot(
     title="Averaged Data Plot",
 )
 
-vec_averages_file = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/example_vec_avg_file.out.vec-avg.txt",
-)
+vec_averages_file = str(_fixtures_dir / "example_vec_avg_file.out.vec-avg.txt")
 
 # Read sectioned averages
 # (e.g., from vector quantities from e.g. ``fix ave/time ... vector``)
@@ -69,7 +72,7 @@ for timestep, group in sectioned_data.groupby("TimeStep"):
     print(f"Timestep {timestep}: {len(group)} data points")
 ```
 
-**Total running time of the script:** (0 minutes 0.079 seconds)
+**Total running time of the script:** (0 minutes 0.081 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-time-averaged-data-reader-py"></a>
 

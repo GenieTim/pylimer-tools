@@ -194,20 +194,20 @@
 ## Pages in this subsection
 
 - [File I/O: Readers &amp; Writers](index.html.md): pylimer-tools provides comprehensive support for reading and writing various LAMMPS file formats, en...
+- [NOTE](plot_unit_conversion.html.md): Go to the end
 - [NOTE](plot_pylimer_tools_output_reader.html.md): Go to the end
 - [NOTE](plot_correlated_averages_reader.html.md): Go to the end
 - [NOTE](plot_histogram_reader.html.md): Go to the end
 - [NOTE](plot_performance_caching.html.md): Go to the end
-- [NOTE](plot_unit_conversion.html.md): Go to the end
-- [NOTE](plot_log_thermo_file_reader.html.md): Go to the end
 - [NOTE](plot_convert_trajectory_to_frame.html.md): Go to the end
+- [NOTE](plot_log_thermo_file_reader.html.md): Go to the end
 - [NOTE](plot_dump_file_reader.html.md): Go to the end
 - [NOTE](plot_time_averaged_data_reader.html.md): Go to the end
 - [NOTE](plot_convert_for_bond_swapping.html.md): Go to the end
 - [NOTE](plot_data_file_reader.html.md): Go to the end
 - [NOTE](plot_memory_efficient_dump_file_reading.html.md): Go to the end
 - [NOTE](plot_data_file_writer.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;00:19.935&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;00:20.233&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
 
 ## Optional
 

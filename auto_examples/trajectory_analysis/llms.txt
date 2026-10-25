@@ -195,7 +195,7 @@
 
 - [Trajectory Analysis](index.html.md): pylimer-tools provides advanced tools for analyzing molecular dynamics trajectories, particularly fo...
 - [NOTE](plot_trajectory_analysis.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;09:03.617&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;09:02.554&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
 
 ## Optional
 

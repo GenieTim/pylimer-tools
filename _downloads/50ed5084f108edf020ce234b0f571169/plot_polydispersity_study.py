@@ -48,7 +48,7 @@ for d in polydispersity:
     n_atoms_total = (
         sum(strand_lengths) + 0.5 * n_strands
     )  # also count crosslinker sites
-    volume = params.get_bead_density() * n_atoms_total
+    volume = n_atoms_total / params.get_bead_density()
 
     generator = MCUniverseGenerator(
         volume ** (1 / 3),

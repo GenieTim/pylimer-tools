@@ -9,14 +9,21 @@ into the :class:`~pylimer_tools_cpp.Universe` objects.
 """
 
 import os
+from pathlib import Path
 
 from pylimer_tools_cpp import UniverseSequence
 
-base_structure_path = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/structure",
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
+base_structure_path = str(_fixtures_dir / "structure")
 
 # Load a single data file
 data_file = os.path.join(

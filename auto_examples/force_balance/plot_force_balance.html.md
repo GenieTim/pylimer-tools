@@ -15,15 +15,16 @@ to download the full example code.
 This example demonstrates how to use the MEHP implementation with slip-springs
 to homogenize a polymer network and predict its equilibrium shear modulus.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 9-68 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 9-75 -->
 ```none
-Final residual (should be close to 0): 4.2407822835244035e-07
-Shear Modulus [MPa]:  0.050684374931808225
+Final residual (should be close to 0): 3.981549847463648e-08
+Shear Modulus [MPa]:  0.06610965926915253
 ```
 
 <br/>
 ```Python
 import os
+from pathlib import Path
 
 import numpy as np
 
@@ -41,12 +42,18 @@ params = get_parameters_for_polymer(
 assert isinstance(params, Parameters)
 
 # Load your network (replace with your file)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
 universe = read_data_file(
-    os.path.join(
-        os.getcwd(),
-        "../..",
-        "tests/pylimer_tools/fixtures/structure/network_100_a_46.structure.out",
-    )
+    str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 )
 assert isinstance(universe, Universe)
 
@@ -83,7 +90,7 @@ print(
 )
 ```
 
-**Total running time of the script:** (0 minutes 0.321 seconds)
+**Total running time of the script:** (0 minutes 0.325 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-py"></a>
 

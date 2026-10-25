@@ -51,7 +51,7 @@ Basic usage example:
    universe = universeSequence.at_index(0)
    
    # Analyze the system
-   print(f"System size: {universe.get_size()}")
+   print(f"System size: {universe.get_nr_of_atoms()}")
    print(f"Volume: {universe.get_volume()} u³")
    print(f"Mean bond length: {np.mean(universe.compute_bond_lengths())} u")
 

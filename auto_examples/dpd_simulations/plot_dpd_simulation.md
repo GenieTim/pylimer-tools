@@ -20,9 +20,10 @@ Assuming your `pylimer_tools` version was compiled with OpenMP,
 to run this in parallel, you can use the typical OpenMP environment variables,
 e.g., in the terminal before running your script: `export OMP_NUM_THREADS=4` to use 4 threads.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 13-42 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 13-49 -->
 ```Python
 import os
+from pathlib import Path
 
 import pandas as pd
 
@@ -36,11 +37,17 @@ from pylimer_tools_cpp import (
 )
 
 # Load a LAMMPS data file (replace with your file)
-filePath = os.path.join(
-    os.getcwd(),
-    "../..",
-    "tests/pylimer_tools/fixtures/structure/melt_83_a_100.structure.out",
-)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
+filePath = str(_fixtures_dir / "structure/melt_83_a_100.structure.out")
 universe = read_data_file(
     filePath, atom_style=[AtomStyle.HYBRID, AtomStyle.BOND, AtomStyle.EDPD]
 )
@@ -52,13 +59,13 @@ dpd_simulator = DPDSimulator(
 )
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 43-46 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 50-53 -->
 
 Note that the random seed does not guarantee the same results across different runs,
 as the DPD algorithm is inherently stochastic and will produce different results
 if you use more than one processor.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 46-89 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 53-96 -->
 ```Python
 # Randomly sample slip-springs
 dpd_simulator.create_slip_springs(num=100)
@@ -107,11 +114,11 @@ print("DPD simulation completed.")
 DPD simulation completed.
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 90-91 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 97-98 -->
 
 read the output file and actually plot something
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 91-105 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 98-112 -->
 ```Python
 df = pd.read_csv("dpd_simulation_output.txt", sep="\\s+")
 _ = df.plot(
@@ -129,7 +136,7 @@ _ = df.plot(
 )
 ```
 
-**Total running time of the script:** (0 minutes 4.978 seconds)
+**Total running time of the script:** (0 minutes 4.911 seconds)
 
 <a id="sphx-glr-download-auto-examples-dpd-simulations-plot-dpd-simulation-py"></a>
 

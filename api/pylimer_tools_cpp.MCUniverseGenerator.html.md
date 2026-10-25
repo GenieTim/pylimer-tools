@@ -9,8 +9,8 @@ This generator creates phantom bead-spring polymer networks with crosslinkers an
 
 #### NOTE
 A note on the characteristic ratio $C_{\infty}$ and the bead distance $b$:
-If you use parameters from `pylimer_tools.io.bead_spring_parameter_provider` with
-type `pylimer_tools.io.bead_spring_parameter_provider.ParameterType.GAUSSIAN`,
+If you use parameters from [`pylimer_tools.io.bead_spring_parameter_provider`](../pylimer_tools.io.html.md#module-pylimer_tools.io.bead_spring_parameter_provider) with
+type [`pylimer_tools.io.bead_spring_parameter_provider.ParameterType.GAUSSIAN`](../pylimer_tools.io.html.md#id0),
 there is no need to set $C_{\infty}$ in the MCUniverseGenerator methods,
 as the bead distance $b$ you set via [`set_bead_distance()`](#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance)
 from `pylimer_tools.io.bead_spring_parameter_provider.Parameters.get("<b>")()`

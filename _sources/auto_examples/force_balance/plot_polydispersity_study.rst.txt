@@ -70,7 +70,7 @@ and no repeated sampling of the polydispersity distribution nor entanglements.
         n_atoms_total = (
             sum(strand_lengths) + 0.5 * n_strands
         )  # also count crosslinker sites
-        volume = params.get_bead_density() * n_atoms_total
+        volume = n_atoms_total / params.get_bead_density()
 
         generator = MCUniverseGenerator(
             volume ** (1 / 3),
@@ -153,7 +153,7 @@ There are many things you would want to do differently in a real study, for exam
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (5 minutes 39.237 seconds)
+   **Total running time of the script:** (5 minutes 28.732 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_polydispersity_study.py:

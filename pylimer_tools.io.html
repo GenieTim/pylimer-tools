@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/pylimer_tools.io.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="Submodules: pylimer_tools.io.extract_thermo_data module: pylimer_tools.io.read_pylimer_tools_output_file module: This module provides a few functions to read output from pylimer_tools_cpp’s simulat..." />
+<meta property="og:description" content="Submodules: pylimer_tools.io.bead_spring_parameter_provider module: pylimer_tools.io.extract_thermo_data module: pylimer_tools.io.polymer_data module: Lightweight data loader for polymer properties..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
-<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_pylimer_tools.io_294e4fe8.png" />
-<meta property="og:image:alt" content="Submodules: pylimer_tools.io.extract_thermo_data module: pylimer_tools.io.read_pylimer_tools_output_file module: This module provides a few functions to read output from pylimer_tools_cpp’s simulat..." />
-<meta name="description" content="Submodules: pylimer_tools.io.extract_thermo_data module: pylimer_tools.io.read_pylimer_tools_output_file module: This module provides a few functions to read output from pylimer_tools_cpp’s simulat..." />
+<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_pylimer_tools.io_ad81144a.png" />
+<meta property="og:image:alt" content="Submodules: pylimer_tools.io.bead_spring_parameter_provider module: pylimer_tools.io.extract_thermo_data module: pylimer_tools.io.polymer_data module: Lightweight data loader for polymer properties..." />
+<meta name="description" content="Submodules: pylimer_tools.io.bead_spring_parameter_provider module: pylimer_tools.io.extract_thermo_data module: pylimer_tools.io.polymer_data module: Lightweight data loader for polymer properties..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -257,13 +257,13 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="auto_examples/readers_writers/index.html">File I/O: Readers &amp; Writers</a><input aria-label="Toggle navigation of File I/O: Readers &amp; Writers" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
@@ -400,6 +400,200 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 </section>
+<section id="module-pylimer_tools.io.bead_spring_parameter_provider">
+<span id="pylimer-tools-io-bead-spring-parameter-provider-module"></span><h2>pylimer_tools.io.bead_spring_parameter_provider module<a class="headerlink" href="#module-pylimer_tools.io.bead_spring_parameter_provider" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.ParameterType">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.bead_spring_parameter_provider.</span></span><span class="sig-name descname"><span class="pre">ParameterType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#ParameterType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.ParameterType" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Enum for parameter types used in the Parameters class.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.ParameterType.GAUSSIAN">
+<span class="sig-name descname"><span class="pre">GAUSSIAN</span></span><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.ParameterType.GAUSSIAN" title="Link to this definition">¶</a></dt>
+<dd><p>Gaussian chain model parameters for ideal bead-spring polymer chains</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.ParameterType.KG_LJ">
+<span class="sig-name descname"><span class="pre">KG_LJ</span></span><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.ParameterType.KG_LJ" title="Link to this definition">¶</a></dt>
+<dd><p>Kremer-Grest model parameters with Lennard-Jones units</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.ParameterType.KUHN">
+<span class="sig-name descname"><span class="pre">KUHN</span></span><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.ParameterType.KUHN" title="Link to this definition">¶</a></dt>
+<dd><p>Kuhn segment model parameters</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">GAUSSIAN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Gaussian'</span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">KG_LJ</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Kremer-Grest,</span> <span class="pre">Lennard-Jones'</span></span><a class="headerlink" href="#id1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">KUHN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Kuhn'</span></span><a class="headerlink" href="#id2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.Parameters">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.bead_spring_parameter_provider.</span></span><span class="sig-name descname"><span class="pre">Parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ureg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">UnitRegistry</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#Parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Initialize a Parameters object with polymer-related data.</p>
+<p>This constructor initializes a Parameters object with a dictionary of polymer-related
+quantities, a unit registry for unit conversions, and an optional name.</p>
+<section id="parameters">
+<h3>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>data<span class="classifier">dict</span></dt><dd><p>A dictionary containing polymer-related quantities. Each value in the dictionary
+must be a Pint Quantity object. The dictionary must include the keys “Mw”, “&lt;b&gt;”,
+“rho”, “&lt;b^2&gt;”, as these are required parameters.
+Depending on the parametrization, additional parameters such as “R02”, “kb”, and “C_inf”
+may also be included. If “R02” is not provided, it will be set to the value of “&lt;b^2&gt;”.
+If “kb” is not provided, it will be set to the Boltzmann constant value.
+If “C_inf” is not provided, it will be set to 1.0.</p>
+</dd>
+<dt>ureg<span class="classifier">UnitRegistry</span></dt><dd><p>A Pint UnitRegistry object used for unit conversions within the class.</p>
+</dd>
+<dt>name<span class="classifier">str, optional</span></dt><dd><p>An optional name for this set of parameters. Defaults to an empty string.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises:<a class="headerlink" href="#raises" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>AssertionError</dt><dd><p>If any value in the data dictionary is not a Quantity object, or if any of the
+required parameters (“Mw”, “&lt;b&gt;”, “&lt;b^2&gt;”, “rho”) are missing from the data dictionary.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.Parameters.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">Quantity</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#Parameters.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the Quantity associated with the given parameter.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_base_distance_units">
+<span class="sig-name descname"><span class="pre">get_base_distance_units</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">Quantity</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#Parameters.get_base_distance_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_base_distance_units" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_bead_density">
+<span class="sig-name descname"><span class="pre">get_bead_density</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#Parameters.get_bead_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_bead_density" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the number of segments/beads per unit volume of this particular parameter set.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_entanglement_density">
+<span class="sig-name descname"><span class="pre">get_entanglement_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_e</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">Quantity</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#Parameters.get_entanglement_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_entanglement_density" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the number of entanglements per unit volume of this particular parameter set.</p>
+<p>Parameters:
+- g_e: the entanglement modulus</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_fb_stress_conversion">
+<span class="sig-name descname"><span class="pre">get_fb_stress_conversion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#Parameters.get_fb_stress_conversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_fb_stress_conversion" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_gamma_conversion_factor">
+<span class="sig-name descname"><span class="pre">get_gamma_conversion_factor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">Quantity</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#Parameters.get_gamma_conversion_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_gamma_conversion_factor" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the conversion factor for shear modulus from the gamma factors
+used in the force balance method to MPa.</p>
+<p>Apply as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">shear_modulus</span> <span class="o">=</span> <span class="n">gamma_conversion_factor</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="n">gamma_factors</span><span class="p">)</span> <span class="o">/</span> <span class="n">universe</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>where <cite>gamma_factors</cite> are the gamma factors calculated from the force balance method,
+using the appropriate <cite>b02</cite>, which can be obtained from the parameters as such:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_kappa">
+<span class="sig-name descname"><span class="pre">get_kappa</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">Quantity</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#Parameters.get_kappa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_kappa" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_name">
+<span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#Parameters.get_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_sampling_cutoff">
+<span class="sig-name descname"><span class="pre">get_sampling_cutoff</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#Parameters.get_sampling_cutoff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_sampling_cutoff" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_unit_registry">
+<span class="sig-name descname"><span class="pre">get_unit_registry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">UnitRegistry</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#Parameters.get_unit_registry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_unit_registry" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.assemble_gaussian_parameters_from_kuhn">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.bead_spring_parameter_provider.</span></span><span class="sig-name descname"><span class="pre">assemble_gaussian_parameters_from_kuhn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ureg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">UnitRegistry</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kuhn_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">Quantity</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kuhn_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">Quantity</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">Quantity</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">entanglement_modulus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">Quantity</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">characteristic_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">Quantity</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">Quantity</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters" title="pylimer_tools.io.bead_spring_parameter_provider.Parameters"><span class="pre">Parameters</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#assemble_gaussian_parameters_from_kuhn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.assemble_gaussian_parameters_from_kuhn" title="Link to this definition">¶</a></dt>
+<dd><p>Assembles a Parameters object from Kuhn length, mass, density, entanglement modulus, and an optional temperature.</p>
+<p>Parameters:
+- ureg (UnitRegistry): A Pint UnitRegistry instance for unit conversion.
+- kuhn_length (Quantity): The Kuhn length of the polymer chain.
+- kuhn_mass (Quantity): The Kuhn mass of the polymer chain.
+- density (Quantity): The density of the polymer solution.
+- entanglement_modulus (Quantity): The entanglement modulus of the polymer.
+- characteristic_ratio (Quantity): The characteristic ratio of the polymer.
+- temperature (Quantity, optional): The temperature of the polymer solution. Defaults to 298 Kelvin.
+- name (str, optional): An optional name for this set of parameters. Defaults to an empty string.</p>
+<p>Returns:
+- Parameters: A Parameters object containing the calculated parameters.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.get_gaussian_parameters_for_polymer">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.bead_spring_parameter_provider.</span></span><span class="sig-name descname"><span class="pre">get_gaussian_parameters_for_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polymer_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ureg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">UnitRegistry</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters" title="pylimer_tools.io.bead_spring_parameter_provider.Parameters"><span class="pre">Parameters</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#get_gaussian_parameters_for_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.get_gaussian_parameters_for_polymer" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a Parameters object containing
+the parameters for a Gaussian chain model,
+(the ideal bead-spring polymer chain model)
+for the specified polymer.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.get_kg_lj_parameters_for_polymer">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.bead_spring_parameter_provider.</span></span><span class="sig-name descname"><span class="pre">get_kg_lj_parameters_for_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polymer_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters" title="pylimer_tools.io.bead_spring_parameter_provider.Parameters"><span class="pre">Parameters</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#get_kg_lj_parameters_for_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.get_kg_lj_parameters_for_polymer" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a Parameters object containing
+the parameters for a Kremer-Grest model with Lennard-Jones units
+for the specified polymer.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.get_kuhn_parameters_for_polymer">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.bead_spring_parameter_provider.</span></span><span class="sig-name descname"><span class="pre">get_kuhn_parameters_for_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polymer_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ureg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.UnitRegistry" title="(in pint v0.1.dev50+gaf817a609)"><span class="pre">UnitRegistry</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters" title="pylimer_tools.io.bead_spring_parameter_provider.Parameters"><span class="pre">Parameters</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#get_kuhn_parameters_for_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.get_kuhn_parameters_for_polymer" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a Parameters object containing
+the parameters for a Kuhn segment model
+for the specified polymer.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.get_parameters_for_polymer">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.bead_spring_parameter_provider.</span></span><span class="sig-name descname"><span class="pre">get_parameters_for_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polymer_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.ParameterType" title="pylimer_tools.io.bead_spring_parameter_provider.ParameterType"><span class="pre">ParameterType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters" title="pylimer_tools.io.bead_spring_parameter_provider.Parameters"><span class="pre">Parameters</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#get_parameters_for_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.get_parameters_for_polymer" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a Parameters object for the specified polymer and parameter type.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.io.bead_spring_parameter_provider.get_supported_polymer_names">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.bead_spring_parameter_provider.</span></span><span class="sig-name descname"><span class="pre">get_supported_polymer_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pylimer_tools/io/bead_spring_parameter_provider.html#get_supported_polymer_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.bead_spring_parameter_provider.get_supported_polymer_names" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a list of supported polymer names based on the Everaers et al. data.</p>
+</dd></dl>
+
+</section>
 <section id="module-pylimer_tools.io.extract_thermo_data">
 <span id="pylimer-tools-io-extract-thermo-data-module"></span><h2>pylimer_tools.io.extract_thermo_data module<a class="headerlink" href="#module-pylimer_tools.io.extract_thermo_data" title="Link to this heading">¶</a></h2>
 <dl class="py function">
@@ -532,6 +726,180 @@ multi-section files where the structure may change between sections.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pylimer_tools.io.polymer_data">
+<span id="pylimer-tools-io-polymer-data-module"></span><h2>pylimer_tools.io.polymer_data module<a class="headerlink" href="#module-pylimer_tools.io.polymer_data" title="Link to this heading">¶</a></h2>
+<p>Lightweight data loader for polymer properties.</p>
+<p>This module provides functionality to load polymer properties data
+without requiring pandas or openpyxl as runtime dependencies.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerData">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.polymer_data.</span></span><span class="sig-name descname"><span class="pre">PolymerData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.15)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerData" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A lightweight container for polymer property data that mimics
+the basic functionality needed from pandas DataFrame/Series.</p>
+<p>Initialize with polymer property dictionary.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerData.__getattr__">
+<span class="sig-name descname"><span class="pre">__getattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerData.__getattr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerData.__getattr__" title="Link to this definition">¶</a></dt>
+<dd><p>Allow attribute-style access to properties.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerData.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerData.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerData.__getitem__" title="Link to this definition">¶</a></dt>
+<dd><p>Allow dictionary-style access to properties.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerData.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerData.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerData.get" title="Link to this definition">¶</a></dt>
+<dd><p>Get property value with optional default.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerData.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.15)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerData.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerData.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Convert to dictionary.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerDataFrame">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.polymer_data.</span></span><span class="sig-name descname"><span class="pre">PolymerDataFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polymers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.15)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.15)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.15)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerDataFrame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerDataFrame" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A lightweight container that mimics the basic DataFrame functionality
+needed for polymer properties data.</p>
+<p>Initialize with list of polymer dictionaries and column names.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerDataFrame.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.15)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.15)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerData" title="pylimer_tools.io.polymer_data.PolymerData"><span class="pre">PolymerData</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame" title="pylimer_tools.io.polymer_data.PolymerDataFrame"><span class="pre">PolymerDataFrame</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerDataFrame.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.__getitem__" title="Link to this definition">¶</a></dt>
+<dd><p>Access columns by name or list of names.
+Access rows by integer index.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerDataFrame.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerDataFrame.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.__len__" title="Link to this definition">¶</a></dt>
+<dd><p>Get number of polymers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerDataFrame.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerDataFrame.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.__repr__" title="Link to this definition">¶</a></dt>
+<dd><p>String representation similar to pandas DataFrame.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerDataFrame.columns">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">columns</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.15)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.columns" title="Link to this definition">¶</a></dt>
+<dd><p>Get column names.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerDataFrame.head">
+<span class="sig-name descname"><span class="pre">head</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame" title="pylimer_tools.io.polymer_data.PolymerDataFrame"><span class="pre">PolymerDataFrame</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerDataFrame.head"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.head" title="Link to this definition">¶</a></dt>
+<dd><p>Get first n rows.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerDataFrame.index">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">index</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.15)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.index" title="Link to this definition">¶</a></dt>
+<dd><p>Get index (row numbers).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerDataFrame.iterrows">
+<span class="sig-name descname"><span class="pre">iterrows</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerDataFrame.iterrows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.iterrows" title="Link to this definition">¶</a></dt>
+<dd><p>Iterate over DataFrame rows as (index, Series) pairs.</p>
+<p>This mimics pandas.DataFrame.iterrows() behavior.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerDataFrame.itertuples">
+<span class="sig-name descname"><span class="pre">itertuples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Pandas'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerDataFrame.itertuples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.itertuples" title="Link to this definition">¶</a></dt>
+<dd><p>Iterate over DataFrame rows as named tuples.</p>
+<p>This mimics pandas.DataFrame.itertuples() behavior.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerDataFrame.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame" title="pylimer_tools.io.polymer_data.PolymerDataFrame"><span class="pre">PolymerDataFrame</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerDataFrame.query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.query" title="Link to this definition">¶</a></dt>
+<dd><p>Simple query functionality. Only supports basic column comparisons.
+Example: df.query(“name == ‘PS’”)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerDataFrame.shape">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">shape</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a></span><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.shape" title="Link to this definition">¶</a></dt>
+<dd><p>Get shape as (rows, columns).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerDataFrame.tail">
+<span class="sig-name descname"><span class="pre">tail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame" title="pylimer_tools.io.polymer_data.PolymerDataFrame"><span class="pre">PolymerDataFrame</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerDataFrame.tail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.tail" title="Link to this definition">¶</a></dt>
+<dd><p>Get last n rows.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.PolymerDataFrame.unique">
+<span class="sig-name descname"><span class="pre">unique</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.15)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#PolymerDataFrame.unique"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.unique" title="Link to this definition">¶</a></dt>
+<dd><p>Get unique values from a column.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.get_available_polymers">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.polymer_data.</span></span><span class="sig-name descname"><span class="pre">get_available_polymers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.15)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#get_available_polymers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.get_available_polymers" title="Link to this definition">¶</a></dt>
+<dd><p>List all available polymers for which we have LJ unit conversions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of polymer names</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.get_polymer_by_name">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.polymer_data.</span></span><span class="sig-name descname"><span class="pre">get_polymer_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polymer_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerData" title="pylimer_tools.io.polymer_data.PolymerData"><span class="pre">PolymerData</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#get_polymer_by_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.get_polymer_by_name" title="Link to this definition">¶</a></dt>
+<dd><p>Get polymer data by name with fuzzy matching.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>polymer_name</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>) – Name of the polymer to find</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Polymer data object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerData" title="pylimer_tools.io.polymer_data.PolymerData">PolymerData</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If polymer not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.io.polymer_data.load_everaers_et_al_data">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.polymer_data.</span></span><span class="sig-name descname"><span class="pre">load_everaers_et_al_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame" title="pylimer_tools.io.polymer_data.PolymerDataFrame"><span class="pre">PolymerDataFrame</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/io/polymer_data.html#load_everaers_et_al_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.io.polymer_data.load_everaers_et_al_data" title="Link to this definition">¶</a></dt>
+<dd><p>Load the Everaers et al. (2020) unit properties data from JSON.</p>
+<p>This replaces the pandas.read_excel() functionality with a lightweight
+JSON-based approach that doesn’t require external dependencies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PolymerDataFrame containing polymer properties</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame" title="pylimer_tools.io.polymer_data.PolymerDataFrame">PolymerDataFrame</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -873,7 +1241,7 @@ using the same UnitRegistry, such that they are compatible.</p>
 <dd class="field-odd"><p>PolymerDataFrame containing polymer properties from Everaers et al.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>PolymerDataFrame</p>
+<dd class="field-even"><p><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame" title="pylimer_tools.io.polymer_data.PolymerDataFrame">PolymerDataFrame</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -996,12 +1364,71 @@ LAMMPS and pylimer_tools in- and output files.</p>
             <ul>
 <li><a class="reference internal" href="#">pylimer_tools.io package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-pylimer_tools.io.bead_spring_parameter_provider">pylimer_tools.io.bead_spring_parameter_provider module</a><ul>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.ParameterType"><code class="docutils literal notranslate"><span class="pre">ParameterType</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.ParameterType.GAUSSIAN"><code class="docutils literal notranslate"><span class="pre">ParameterType.GAUSSIAN</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.ParameterType.KG_LJ"><code class="docutils literal notranslate"><span class="pre">ParameterType.KG_LJ</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.ParameterType.KUHN"><code class="docutils literal notranslate"><span class="pre">ParameterType.KUHN</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">ParameterType.GAUSSIAN</span></code></a></li>
+<li><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">ParameterType.KG_LJ</span></code></a></li>
+<li><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">ParameterType.KUHN</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters"><code class="docutils literal notranslate"><span class="pre">Parameters</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get"><code class="docutils literal notranslate"><span class="pre">Parameters.get()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_base_distance_units"><code class="docutils literal notranslate"><span class="pre">Parameters.get_base_distance_units()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_bead_density"><code class="docutils literal notranslate"><span class="pre">Parameters.get_bead_density()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_entanglement_density"><code class="docutils literal notranslate"><span class="pre">Parameters.get_entanglement_density()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_fb_stress_conversion"><code class="docutils literal notranslate"><span class="pre">Parameters.get_fb_stress_conversion()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_gamma_conversion_factor"><code class="docutils literal notranslate"><span class="pre">Parameters.get_gamma_conversion_factor()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_kappa"><code class="docutils literal notranslate"><span class="pre">Parameters.get_kappa()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_name"><code class="docutils literal notranslate"><span class="pre">Parameters.get_name()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_sampling_cutoff"><code class="docutils literal notranslate"><span class="pre">Parameters.get_sampling_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_unit_registry"><code class="docutils literal notranslate"><span class="pre">Parameters.get_unit_registry()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.assemble_gaussian_parameters_from_kuhn"><code class="docutils literal notranslate"><span class="pre">assemble_gaussian_parameters_from_kuhn()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.get_gaussian_parameters_for_polymer"><code class="docutils literal notranslate"><span class="pre">get_gaussian_parameters_for_polymer()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.get_kg_lj_parameters_for_polymer"><code class="docutils literal notranslate"><span class="pre">get_kg_lj_parameters_for_polymer()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.get_kuhn_parameters_for_polymer"><code class="docutils literal notranslate"><span class="pre">get_kuhn_parameters_for_polymer()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.get_parameters_for_polymer"><code class="docutils literal notranslate"><span class="pre">get_parameters_for_polymer()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.bead_spring_parameter_provider.get_supported_polymer_names"><code class="docutils literal notranslate"><span class="pre">get_supported_polymer_names()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-pylimer_tools.io.extract_thermo_data">pylimer_tools.io.extract_thermo_data module</a><ul>
 <li><a class="reference internal" href="#pylimer_tools.io.extract_thermo_data.detect_headers"><code class="docutils literal notranslate"><span class="pre">detect_headers()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.io.extract_thermo_data.extract_thermo_params"><code class="docutils literal notranslate"><span class="pre">extract_thermo_params()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.io.extract_thermo_data.get_thermo_cache_name_suffix"><code class="docutils literal notranslate"><span class="pre">get_thermo_cache_name_suffix()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.io.extract_thermo_data.read_multi_section_separated_value_file"><code class="docutils literal notranslate"><span class="pre">read_multi_section_separated_value_file()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.io.extract_thermo_data.read_one_group"><code class="docutils literal notranslate"><span class="pre">read_one_group()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pylimer_tools.io.polymer_data">pylimer_tools.io.polymer_data module</a><ul>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerData"><code class="docutils literal notranslate"><span class="pre">PolymerData</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerData.__getattr__"><code class="docutils literal notranslate"><span class="pre">PolymerData.__getattr__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerData.__getitem__"><code class="docutils literal notranslate"><span class="pre">PolymerData.__getitem__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerData.get"><code class="docutils literal notranslate"><span class="pre">PolymerData.get()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerData.to_dict"><code class="docutils literal notranslate"><span class="pre">PolymerData.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.__getitem__"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame.__getitem__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.__len__"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame.__len__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.__repr__"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame.__repr__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.columns"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame.columns</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.head"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame.head()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.index"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame.index</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.iterrows"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame.iterrows()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.itertuples"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame.itertuples()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.query"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame.query()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.shape"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame.shape</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.tail"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame.tail()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.PolymerDataFrame.unique"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame.unique()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.get_available_polymers"><code class="docutils literal notranslate"><span class="pre">get_available_polymers()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.get_polymer_by_name"><code class="docutils literal notranslate"><span class="pre">get_polymer_by_name()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.io.polymer_data.load_everaers_et_al_data"><code class="docutils literal notranslate"><span class="pre">load_everaers_et_al_data()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-pylimer_tools.io.read_pylimer_tools_output_file">pylimer_tools.io.read_pylimer_tools_output_file module</a><ul>

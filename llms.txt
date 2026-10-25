@@ -221,13 +221,13 @@
 - [Normal Mode Analysis](auto_examples/normal_mode_analysis/index.html.md): pylimer-tools provides a normal mode analysis (NMA) implementation to predict the loss and storage m...
 - [NOTE](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md): Go to the end
 - [File I/O: Readers &amp; Writers](auto_examples/readers_writers/index.html.md): pylimer-tools provides comprehensive support for reading and writing various LAMMPS file formats, en...
+- [NOTE](auto_examples/readers_writers/plot_unit_conversion.html.md): Go to the end
 - [NOTE](auto_examples/readers_writers/plot_pylimer_tools_output_reader.html.md): Go to the end
 - [NOTE](auto_examples/readers_writers/plot_correlated_averages_reader.html.md): Go to the end
 - [NOTE](auto_examples/readers_writers/plot_histogram_reader.html.md): Go to the end
 - [NOTE](auto_examples/readers_writers/plot_performance_caching.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_unit_conversion.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_log_thermo_file_reader.html.md): Go to the end
 - [NOTE](auto_examples/readers_writers/plot_convert_trajectory_to_frame.html.md): Go to the end
+- [NOTE](auto_examples/readers_writers/plot_log_thermo_file_reader.html.md): Go to the end
 - [NOTE](auto_examples/readers_writers/plot_dump_file_reader.html.md): Go to the end
 - [NOTE](auto_examples/readers_writers/plot_time_averaged_data_reader.html.md): Go to the end
 - [NOTE](auto_examples/readers_writers/plot_convert_for_bond_swapping.html.md): Go to the end
@@ -245,7 +245,7 @@
 - [src](modules.html.md): &#42; pylimer_tools package
 - [pylimer_tools package](pylimer_tools.html.md): &#42; pylimer_tools.calc package
 - [pylimer_tools.calc package](pylimer_tools.calc.html.md): This module is deprecated.
-- [pylimer_tools.io package](pylimer_tools.io.html.md): Read max_nr_of_lines_to_read lines from the given file and return all possible header lines.
+- [pylimer_tools.io package](pylimer_tools.io.html.md): Bases: &#96;Enum&#96;
 - [pylimer_tools.utils package](pylimer_tools.utils.html.md): Store the object in the cache.
 - [pylimer_tools_cpp package](pylimer_tools_cpp.html.md): A collection of utility python functions for handling LAMMPS output and polymers in Python.
 - [do_linear_walk_chain_from_to](api/pylimer_tools_cpp.do_linear_walk_chain_from_to.html.md): Get coordinates linearly interpolated from one point to another (both exclusive).
@@ -298,12 +298,12 @@
 - [STOP](api/pylimer_tools_cpp.STOP.html.md): Stop the linking process
 - [TRACK_BACKWARD](api/pylimer_tools_cpp.TRACK_BACKWARD.html.md): Track backward in the linking process
 - [TRACK_FORWARD](api/pylimer_tools_cpp.TRACK_FORWARD.html.md): Continue linking forward
-- [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.978&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
-- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;05:45.119&#42;&#42; total execution time for 5 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.911&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
+- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;05:34.706&#42;&#42; total execution time for 5 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 - [Computation times](auto_examples/network_generator/sg_execution_times.html.md): &#42;&#42;02:20.935&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
-- [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:15.671&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
-- [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:19.935&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
+- [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:15.751&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
+- [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:20.233&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
 - [Computation times](auto_examples/sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
-- [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.383&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
-- [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;09:03.617&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
-- [Computation times](sg_execution_times.html.md): &#42;&#42;17:50.639&#42;&#42; total execution time for 34 files &#42;&#42;from all galleries&#42;&#42;:
+- [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.391&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
+- [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;09:02.554&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;17:39.482&#42;&#42; total execution time for 34 files &#42;&#42;from all galleries&#42;&#42;:

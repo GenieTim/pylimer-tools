@@ -94,7 +94,7 @@ Get eigenvectors.
 * **Returns:**
   Matrix of eigenvectors
 
-#### get_matrix(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer)) → scipy.sparse.csc_matrix[numpy.float64]
+#### get_matrix(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer)) → [scipy.sparse.csc_matrix](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix)[numpy.float64]
 
 Get the assembled connectivity matrix.
 

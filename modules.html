@@ -257,13 +257,13 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="auto_examples/readers_writers/index.html">File I/O: Readers &amp; Writers</a><input aria-label="Toggle navigation of File I/O: Readers &amp; Writers" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
@@ -436,6 +436,12 @@
 <li class="toctree-l5"><a class="reference internal" href="pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.predict_shear_modulus"><code class="docutils literal notranslate"><span class="pre">predict_shear_modulus()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools.calc.html#module-pylimer_tools.calc.stoichiometric_relationships">pylimer_tools.calc.stoichiometric_relationships module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.calc.html#pylimer_tools.calc.stoichiometric_relationships.compute_number_fractions"><code class="docutils literal notranslate"><span class="pre">compute_number_fractions()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.calc.html#pylimer_tools.calc.stoichiometric_relationships.compute_strand_number_density"><code class="docutils literal notranslate"><span class="pre">compute_strand_number_density()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.calc.html#pylimer_tools.calc.stoichiometric_relationships.compute_weight_fractions"><code class="docutils literal notranslate"><span class="pre">compute_weight_fractions()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools.calc.html#module-pylimer_tools.calc.structure_analysis">pylimer_tools.calc.structure_analysis module</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion"><code class="docutils literal notranslate"><span class="pre">compute_crosslinker_conversion()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_effective_crosslinker_functionalities"><code class="docutils literal notranslate"><span class="pre">compute_effective_crosslinker_functionalities()</span></code></a></li>
@@ -458,12 +464,31 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools.io.html">pylimer_tools.io package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools.io.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools.io.html#module-pylimer_tools.io.bead_spring_parameter_provider">pylimer_tools.io.bead_spring_parameter_provider module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.ParameterType"><code class="docutils literal notranslate"><span class="pre">ParameterType</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters"><code class="docutils literal notranslate"><span class="pre">Parameters</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.assemble_gaussian_parameters_from_kuhn"><code class="docutils literal notranslate"><span class="pre">assemble_gaussian_parameters_from_kuhn()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_gaussian_parameters_for_polymer"><code class="docutils literal notranslate"><span class="pre">get_gaussian_parameters_for_polymer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_kg_lj_parameters_for_polymer"><code class="docutils literal notranslate"><span class="pre">get_kg_lj_parameters_for_polymer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_kuhn_parameters_for_polymer"><code class="docutils literal notranslate"><span class="pre">get_kuhn_parameters_for_polymer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_parameters_for_polymer"><code class="docutils literal notranslate"><span class="pre">get_parameters_for_polymer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_supported_polymer_names"><code class="docutils literal notranslate"><span class="pre">get_supported_polymer_names()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools.io.html#module-pylimer_tools.io.extract_thermo_data">pylimer_tools.io.extract_thermo_data module</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.extract_thermo_data.detect_headers"><code class="docutils literal notranslate"><span class="pre">detect_headers()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.extract_thermo_data.extract_thermo_params"><code class="docutils literal notranslate"><span class="pre">extract_thermo_params()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.extract_thermo_data.get_thermo_cache_name_suffix"><code class="docutils literal notranslate"><span class="pre">get_thermo_cache_name_suffix()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.extract_thermo_data.read_multi_section_separated_value_file"><code class="docutils literal notranslate"><span class="pre">read_multi_section_separated_value_file()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.extract_thermo_data.read_one_group"><code class="docutils literal notranslate"><span class="pre">read_one_group()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools.io.html#module-pylimer_tools.io.polymer_data">pylimer_tools.io.polymer_data module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerData"><code class="docutils literal notranslate"><span class="pre">PolymerData</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame"><code class="docutils literal notranslate"><span class="pre">PolymerDataFrame</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.get_available_polymers"><code class="docutils literal notranslate"><span class="pre">get_available_polymers()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.get_polymer_by_name"><code class="docutils literal notranslate"><span class="pre">get_polymer_by_name()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.load_everaers_et_al_data"><code class="docutils literal notranslate"><span class="pre">load_everaers_et_al_data()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools.io.html#module-pylimer_tools.io.read_pylimer_tools_output_file">pylimer_tools.io.read_pylimer_tools_output_file module</a><ul>
@@ -516,6 +541,22 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="pylimer_tools.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pylimer_tools.html#module-pylimer_tools.analyse_networks">pylimer_tools.analyse_networks module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools.html#analyse-networks">Analyse Networks</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pylimer_tools.html#module-pylimer_tools.basic_lammps_structure_stats">pylimer_tools.basic_lammps_structure_stats module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pylimer_tools.html#module-pylimer_tools.displace_randomly">pylimer_tools.displace_randomly module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pylimer_tools.html#module-pylimer_tools.generate_network">pylimer_tools.generate_network module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools.html#generate-mc-network">Generate MC Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools.html#pylimer_tools.generate_network.generate_structure"><code class="docutils literal notranslate"><span class="pre">generate_structure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools.html#pylimer_tools.generate_network.is_active_network"><code class="docutils literal notranslate"><span class="pre">is_active_network()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools.html#pylimer_tools.generate_network.prepare_structure_generation"><code class="docutils literal notranslate"><span class="pre">prepare_structure_generation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools.html#pylimer_tools.generate_network.print_with_time"><code class="docutils literal notranslate"><span class="pre">print_with_time()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pylimer_tools.html#module-pylimer_tools">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pylimer_tools_cpp.html">pylimer_tools_cpp package</a><ul>

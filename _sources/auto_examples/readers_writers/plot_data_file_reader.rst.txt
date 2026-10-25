@@ -25,20 +25,27 @@ The :class:`~pylimer_tools_cpp.DataFileParser` handles LAMMPS data files contain
 The :class:`~pylimer_tools_cpp.UniverseSequence` provides a convenient way to have these data files read
 into the :class:`~pylimer_tools_cpp.Universe` objects.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-47
+.. GENERATED FROM PYTHON SOURCE LINES 10-54
 
 .. code-block:: Python
 
 
     import os
+    from pathlib import Path
 
     from pylimer_tools_cpp import UniverseSequence
 
-    base_structure_path = os.path.join(
-        os.getcwd(),
-        "../..",
-        "tests/pylimer_tools/fixtures/structure",
-    )
+    def _find_fixtures_dir() -> Path:
+        for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+            for p in [cur] + list(cur.parents):
+                candidate = p / "tests" / "pylimer_tools" / "fixtures"
+                if candidate.is_dir():
+                    return candidate
+        return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+    _fixtures_dir = _find_fixtures_dir()
+    base_structure_path = str(_fixtures_dir / "structure")
 
     # Load a single data file
     data_file = os.path.join(
@@ -80,7 +87,7 @@ into the :class:`~pylimer_tools_cpp.Universe` objects.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-53
+.. GENERATED FROM PYTHON SOURCE LINES 55-60
 
 Please note that the ``hybrid`` and ``tdpd`` atom styles are not fully supported.
 
@@ -91,7 +98,7 @@ and :func:`~pylimer_tools_cpp.UniverseSequence.set_data_file_atom_style()`.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.213 seconds)
+   **Total running time of the script:** (0 minutes 0.219 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_data_file_reader.py:

@@ -12,7 +12,12 @@ The library supports four main file I/O operations:
 4. **Writing LAMMPS data files** - Modified or generated systems
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="Read output from pylimer-tools&#x27; own simulators.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_pylimer_tools_output_reader_thumb.png)
+<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="Convert LAMMPS units to SI or other unit systems:">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_unit_conversion_thumb.png)
+
+[Unit Conversion](plot_unit_conversion.md)
+
+  <div class="sphx-glr-thumbnail-title">Unit Conversion</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Read output from pylimer-tools&#x27; own simulators.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_pylimer_tools_output_reader_thumb.png)
 
 [pylimer-tools Output Reader](plot_pylimer_tools_output_reader.md)
 
@@ -32,21 +37,16 @@ The library supports four main file I/O operations:
 [Performance and Caching](plot_performance_caching.md)
 
   <div class="sphx-glr-thumbnail-title">Performance and Caching</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Convert LAMMPS units to SI or other unit systems:">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_unit_conversion_thumb.png)
-
-[Unit Conversion](plot_unit_conversion.md)
-
-  <div class="sphx-glr-thumbnail-title">Unit Conversion</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_log_thermo_file_reader_thumb.png)
-
-[Log & Thermo File Reader](plot_log_thermo_file_reader.md)
-
-  <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Take a later entry from a LAMMPS trajectory and save it as a data file.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_trajectory_to_frame_thumb.png)
 
 [Extract Trajectory Frame to Data File](plot_convert_trajectory_to_frame.md)
 
   <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame to Data File</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_log_thermo_file_reader_thumb.png)
+
+[Log & Thermo File Reader](plot_log_thermo_file_reader.md)
+
+  <div class="sphx-glr-thumbnail-title">Log & Thermo File Reader</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="The DumpFileReader processes LAMMPS trajectory files. Is has a practical interface to read frames from a trajectory file and access them as Universe objects in the UniverseSequence class.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_dump_file_reader_thumb.png)
 
 [Dump File Reader](plot_dump_file_reader.md)

@@ -16,15 +16,16 @@ MEHPForceBalance2 is a faster implementation of the MEHP force balance method,
 which uses static links to model entanglements instead of slip-links.
 See Bernhard and Gusev [[BG25](../../acknowledgements.md#id12)]
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 9-66 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 9-73 -->
 ```none
-Final residual (should be close to 0): 1.7629626014563216e-13
-Shear Modulus [MPa]:  0.09651001123304613
+Final residual (should be close to 0): 2.6774750148018954e-13
+Shear Modulus [MPa]:  0.09592779002848224
 ```
 
 <br/>
 ```Python
 import os
+from pathlib import Path
 
 import numpy as np
 
@@ -42,12 +43,18 @@ params = get_parameters_for_polymer(
 assert isinstance(params, Parameters)
 
 # Load your network (replace with your file)
+def _find_fixtures_dir() -> Path:
+    for cur in ([Path(__file__).resolve().parent] if "__file__" in globals() else []) + [Path.cwd()]:
+        for p in [cur] + list(cur.parents):
+            candidate = p / "tests" / "pylimer_tools" / "fixtures"
+            if candidate.is_dir():
+                return candidate
+    return Path("tests/pylimer_tools/fixtures").resolve()
+
+
+_fixtures_dir = _find_fixtures_dir()
 universe = read_data_file(
-    os.path.join(
-        os.getcwd(),
-        "../..",
-        "tests/pylimer_tools/fixtures/structure/network_100_a_46.structure.out",
-    )
+    str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 )
 assert isinstance(universe, Universe)
 
@@ -82,7 +89,7 @@ shear_modulus = (
 print("Shear Modulus [MPa]: ", shear_modulus)
 ```
 
-**Total running time of the script:** (0 minutes 0.421 seconds)
+**Total running time of the script:** (0 minutes 0.430 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-2-py"></a>
 

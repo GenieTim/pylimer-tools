@@ -236,13 +236,13 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="auto_examples/readers_writers/index.html">File I/O: Readers &amp; Writers</a><input aria-label="Toggle navigation of File I/O: Readers &amp; Writers" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/readers_writers/plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
@@ -367,7 +367,7 @@
           
 <section class="genindex-section">
   <h1 id="index">Index</h1>
-  <div class="genindex-jumpbox"><a href="#Symbols"><strong>Symbols</strong></a> | <a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a> | <a href="#X"><strong>X</strong></a> | <a href="#Z"><strong>Z</strong></a></div>
+  <div class="genindex-jumpbox"><a href="#Symbols"><strong>Symbols</strong></a> | <a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#Q"><strong>Q</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a> | <a href="#X"><strong>X</strong></a> | <a href="#Z"><strong>Z</strong></a></div>
 </section>
 <section id="Symbols" class="genindex-section">
   <h2>Symbols</h2>
@@ -380,13 +380,162 @@
           <li><a href="cli.html#cmdoption-pylimer-analyse-networks-crosslinker-type">pylimer-analyse-networks command line option</a>
 </li>
         </ul></li>
+        <li>
+    --disable-primary-loops
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-disable-primary-loops">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --disable-secondary-loops
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-disable-secondary-loops">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --functionalize-discrete
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-functionalize-discrete">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --n-beads-per-chain-1
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-beads-per-chain-1">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --n-beads-per-chain-2
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-beads-per-chain-2">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --n-beads-per-solvent-chain
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-beads-per-solvent-chain">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --n-beads-per-xlink
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-beads-per-xlink">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --n-chains-1
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-chains-1">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --n-chains-2
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-chains-2">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --n-chains-crosslinkers
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-chains-crosslinkers">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --n-mono-beads-per-chain
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-mono-beads-per-chain">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    --n-mono-chains
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-mono-chains">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --n-solvent-chains
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-solvent-chains">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --no-functionalize-discrete
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-functionalize-discrete">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --parameter-type
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-parameter-type">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
         <li>
     --polymer-name
 
         <ul>
           <li><a href="cli.html#cmdoption-pylimer-analyse-networks-polymer-name">pylimer-analyse-networks command line option</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-polymer-name">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --remove-wsol
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-remove-wsol">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --target-f
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-target-f">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --target-file
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-target-file">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --target-p
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-target-p">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --target-wsol
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-target-wsol">pylimer-generate-network command line option</a>
+</li>
+        </ul></li>
+        <li>
+    --z-score-std-mult
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-z-score-std-mult">pylimer-generate-network command line option</a>
 </li>
         </ul></li>
     </ul></td>
@@ -397,7 +546,23 @@
   <h2>_</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyle.__getattr__">__getattr__() (pylimer_tools.io.unit_styles.UnitStyle method)</a>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerData.__getattr__">__getattr__() (pylimer_tools.io.polymer_data.PolymerData method)</a>
+
+        <ul>
+          <li><a href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyle.__getattr__">(pylimer_tools.io.unit_styles.UnitStyle method)</a>
+</li>
+        </ul></li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerData.__getitem__">__getitem__() (pylimer_tools.io.polymer_data.PolymerData method)</a>
+
+        <ul>
+          <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.__getitem__">(pylimer_tools.io.polymer_data.PolymerDataFrame method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.__len__">__len__() (pylimer_tools.io.polymer_data.PolymerDataFrame method)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.__repr__">__repr__() (pylimer_tools.io.polymer_data.PolymerDataFrame method)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -449,10 +614,10 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.LinkSwappingMode.html#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_CYCLE">ALL_MC_CYCLE (pylimer_tools_cpp.LinkSwappingMode attribute)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.LinkSwappingMode.html#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_TRY">ALL_MC_TRY (pylimer_tools_cpp.LinkSwappingMode attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.LinkSwappingMode.html#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_TRY_CYCLE">ALL_MC_TRY_CYCLE (pylimer_tools_cpp.LinkSwappingMode attribute)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.ANGLE">ANGLE (pylimer_tools_cpp.AtomStyle attribute)</a>
@@ -473,6 +638,8 @@
           <li><a href="api/pylimer_tools_cpp.ExitReason.html#pylimer_tools_cpp.ExitReason.as_integer_ratio">(pylimer_tools_cpp.ExitReason method)</a>
 </li>
         </ul></li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.assemble_gaussian_parameters_from_kuhn">assemble_gaussian_parameters_from_kuhn() (in module pylimer_tools.io.bead_spring_parameter_provider)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.SimplifiedNetwork.html#pylimer_tools_cpp.SimplifiedNetwork.assume_box_large_enough">assume_box_large_enough (pylimer_tools_cpp.SimplifiedNetwork attribute)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.assume_box_large_enough">assume_box_large_enough() (pylimer_tools_cpp.DPDSimulator method)</a>
@@ -561,6 +728,8 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.CHARGE">CHARGE (pylimer_tools_cpp.AtomStyle attribute)</a>
 </li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.columns">columns (pylimer_tools.io.polymer_data.PolymerDataFrame property)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_angles">compute_angles() (pylimer_tools_cpp.Universe method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.compute_bond_lengths">compute_bond_lengths() (pylimer_tools_cpp.Molecule method)</a>
@@ -637,6 +806,8 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_number_average_molecular_weight">compute_number_average_molecular_weight() (pylimer_tools_cpp.Universe method)</a>
 </li>
+        <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.stoichiometric_relationships.compute_number_fractions">compute_number_fractions() (in module pylimer_tools.calc.stoichiometric_relationships)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_polydispersity_index">compute_polydispersity_index() (pylimer_tools_cpp.Universe method)</a>
 </li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_dangling">compute_probability_that_bifunctional_monomer_is_dangling() (in module pylimer_tools.calc.miller_macosko_theory)</a>
@@ -654,6 +825,8 @@
         <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.compute_radius_of_gyration_with_derived_image_flags">compute_radius_of_gyration_with_derived_image_flags() (pylimer_tools_cpp.Molecule method)</a>
 </li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance">compute_stoichiometric_imbalance() (in module pylimer_tools.calc.structure_analysis)</a>
+</li>
+        <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.stoichiometric_relationships.compute_strand_number_density">compute_strand_number_density() (in module pylimer_tools.calc.stoichiometric_relationships)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_temperature">compute_temperature() (pylimer_tools_cpp.Universe method)</a>
 </li>
@@ -687,14 +860,16 @@
 </li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions">compute_weight_fraction_of_soluble_material_from_weight_fractions() (in module pylimer_tools.calc.miller_macosko_theory)</a>
 </li>
-        <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_weight_fractions">compute_weight_fractions() (in module pylimer_tools.calc.structure_analysis)</a>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.stoichiometric_relationships.compute_weight_fractions">compute_weight_fractions() (in module pylimer_tools.calc.stoichiometric_relationships)</a>
 
         <ul>
+          <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.structure_analysis.compute_weight_fractions">(in module pylimer_tools.calc.structure_analysis)</a>
+</li>
           <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_weight_fractions">(pylimer_tools_cpp.Universe method)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues">ComputedDoubleValues (class in pylimer_tools_cpp)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.ComputedIntValues.html#pylimer_tools_cpp.ComputedIntValues">ComputedIntValues (class in pylimer_tools_cpp)</a>
@@ -1019,6 +1194,16 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues.GAMMA">GAMMA (pylimer_tools_cpp.ComputedDoubleValues attribute)</a>
 </li>
+        <li><a href="pylimer_tools.io.html#id0">GAUSSIAN (pylimer_tools.io.bead_spring_parameter_provider.ParameterType attribute)</a>, <a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.ParameterType.GAUSSIAN">[1]</a>
+</li>
+        <li><a href="pylimer_tools.html#pylimer_tools.generate_network.generate_structure">generate_structure() (in module pylimer_tools.generate_network)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get">get() (pylimer_tools.io.bead_spring_parameter_provider.Parameters method)</a>
+
+        <ul>
+          <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerData.get">(pylimer_tools.io.polymer_data.PolymerData method)</a>
+</li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.get_active_chains">get_active_chains() (pylimer_tools_cpp.MEHPForceRelaxation method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.get_all">get_all() (pylimer_tools_cpp.UniverseSequence method)</a>
@@ -1095,8 +1280,12 @@
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.get_atoms_lined_up">get_atoms_lined_up() (pylimer_tools_cpp.Molecule method)</a>
 </li>
-        <li><a href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_available_polymers">get_available_polymers() (pylimer_tools.io.unit_styles.UnitStyleFactory method)</a>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.get_available_polymers">get_available_polymers() (in module pylimer_tools.io.polymer_data)</a>
+
+        <ul>
+          <li><a href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_available_polymers">(pylimer_tools.io.unit_styles.UnitStyleFactory method)</a>
 </li>
+        </ul></li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.get_average_contour_length">get_average_contour_length() (pylimer_tools_cpp.MEHPForceRelaxation method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2.get_average_spring_length">get_average_spring_length() (pylimer_tools_cpp.MEHPForceBalance2 method)</a>
@@ -1107,7 +1296,11 @@
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.get_average_strand_length">get_average_strand_length() (pylimer_tools_cpp.MEHPForceBalance method)</a>
 </li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_base_distance_units">get_base_distance_units() (pylimer_tools.io.bead_spring_parameter_provider.Parameters method)</a>
+</li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyle.get_base_unit_of">get_base_unit_of() (pylimer_tools.io.unit_styles.UnitStyle method)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_bead_density">get_bead_density() (pylimer_tools.io.bead_spring_parameter_provider.Parameters method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.DataFileReader.html#pylimer_tools_cpp.DataFileReader.get_bond_from">get_bond_from() (pylimer_tools_cpp.DataFileReader method)</a>
 </li>
@@ -1239,6 +1432,8 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors">get_eigenvectors() (pylimer_tools_cpp.NormalModeAnalyzer method)</a>
 </li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_entanglement_density">get_entanglement_density() (pylimer_tools.io.bead_spring_parameter_provider.Parameters method)</a>
+</li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_everares_et_al_data">get_everares_et_al_data() (pylimer_tools.io.unit_styles.UnitStyleFactory method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.get_exit_reason">get_exit_reason() (pylimer_tools_cpp.MEHPForceBalance method)</a>
@@ -1250,6 +1445,8 @@
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.Atom.get_extra_data">get_extra_data() (pylimer_tools_cpp.Atom method)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_fb_stress_conversion">get_fb_stress_conversion() (pylimer_tools.io.bead_spring_parameter_provider.Parameters method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.get_force">get_force() (pylimer_tools_cpp.MEHPForceRelaxation method)</a>
 </li>
@@ -1270,6 +1467,8 @@
 </li>
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation">get_force_relaxation() (pylimer_tools_cpp.MCUniverseGenerator method)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_gamma_conversion_factor">get_gamma_conversion_factor() (pylimer_tools.io.bead_spring_parameter_provider.Parameters method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor">get_gamma_factor() (pylimer_tools_cpp.MEHPForceBalance method)</a>
 
@@ -1293,6 +1492,8 @@
           <li><a href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2.get_gamma_factors_in_dir">(pylimer_tools_cpp.MEHPForceBalance2 method)</a>
 </li>
         </ul></li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_gaussian_parameters_for_polymer">get_gaussian_parameters_for_polymer() (in module pylimer_tools.io.bead_spring_parameter_provider)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box.get_high_x">get_high_x() (pylimer_tools_cpp.Box method)</a>
 
         <ul>
@@ -1327,7 +1528,13 @@
           <li><a href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2.get_initial_coordinates">(pylimer_tools_cpp.MEHPForceBalance2 method)</a>
 </li>
         </ul></li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_kappa">get_kappa() (pylimer_tools.io.bead_spring_parameter_provider.Parameters method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.Molecule.get_key">get_key() (pylimer_tools_cpp.Molecule method)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_kg_lj_parameters_for_polymer">get_kg_lj_parameters_for_polymer() (in module pylimer_tools.io.bead_spring_parameter_provider)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_kuhn_parameters_for_polymer">get_kuhn_parameters_for_polymer() (in module pylimer_tools.io.bead_spring_parameter_provider)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box.get_l">get_l() (pylimer_tools_cpp.Box method)</a>
 </li>
@@ -1361,6 +1568,8 @@
           <li><a href="api/pylimer_tools_cpp.DataFileReader.html#pylimer_tools_cpp.DataFileReader.get_lx">(pylimer_tools_cpp.DataFileReader method)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box.get_ly">get_ly() (pylimer_tools_cpp.Box method)</a>
 
         <ul>
@@ -1373,8 +1582,6 @@
           <li><a href="api/pylimer_tools_cpp.DataFileReader.html#pylimer_tools_cpp.DataFileReader.get_lz">(pylimer_tools_cpp.DataFileReader method)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.DataFileReader.html#pylimer_tools_cpp.DataFileReader.get_masses">get_masses() (pylimer_tools_cpp.DataFileReader method)</a>
 
         <ul>
@@ -1402,6 +1609,8 @@
         <li><a href="api/pylimer_tools_cpp.DataFileReader.html#pylimer_tools_cpp.DataFileReader.get_molecule_ids">get_molecule_ids() (pylimer_tools_cpp.DataFileReader method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_molecules">get_molecules() (pylimer_tools_cpp.Universe method)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_name">get_name() (pylimer_tools.io.bead_spring_parameter_provider.Parameters method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.get_neighbour_link_indices">get_neighbour_link_indices() (pylimer_tools_cpp.MEHPForceBalance static method)</a>
 
@@ -1563,6 +1772,10 @@
           <li><a href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2.get_overall_strand_lengths">(pylimer_tools_cpp.MEHPForceBalance2 method)</a>
 </li>
         </ul></li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_parameters_for_polymer">get_parameters_for_polymer() (in module pylimer_tools.io.bead_spring_parameter_provider)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.get_polymer_by_name">get_polymer_by_name() (in module pylimer_tools.io.polymer_data)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.get_pressure">get_pressure() (pylimer_tools_cpp.MEHPForceBalance method)</a>
 
         <ul>
@@ -1576,6 +1789,8 @@
         <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.get_residual_norm">get_residual_norm() (pylimer_tools_cpp.MEHPForceRelaxation method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation.get_residuals">get_residuals() (pylimer_tools_cpp.MEHPForceRelaxation method)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_sampling_cutoff">get_sampling_cutoff() (pylimer_tools.io.bead_spring_parameter_provider.Parameters method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.get_shift_one_at_a_time">get_shift_one_at_a_time() (pylimer_tools_cpp.DPDSimulator method)</a>
 </li>
@@ -1631,6 +1846,8 @@
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.DumpFileReader.html#pylimer_tools_cpp.DumpFileReader.get_string_values_for_at">get_string_values_for_at() (pylimer_tools_cpp.DumpFileReader method)</a>
 </li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.get_supported_polymer_names">get_supported_polymer_names() (in module pylimer_tools.io.bead_spring_parameter_provider)</a>
+</li>
         <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.data_utility.get_tail">get_tail() (in module pylimer_tools.utils.data_utility)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.get_temperature">get_temperature() (pylimer_tools_cpp.DPDSimulator method)</a>
@@ -1647,8 +1864,12 @@
 </li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyle.get_underlying_unit_registry">get_underlying_unit_registry() (pylimer_tools.io.unit_styles.UnitStyle method)</a>
 </li>
-        <li><a href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_registry">get_unit_registry() (pylimer_tools.io.unit_styles.UnitStyleFactory method)</a>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_unit_registry">get_unit_registry() (pylimer_tools.io.bead_spring_parameter_provider.Parameters method)</a>
+
+        <ul>
+          <li><a href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_registry">(pylimer_tools.io.unit_styles.UnitStyleFactory method)</a>
 </li>
+        </ul></li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style">get_unit_style() (pylimer_tools.io.unit_styles.UnitStyleFactory method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.DPDSimulator.html#pylimer_tools_cpp.DPDSimulator.get_universe">get_universe() (pylimer_tools_cpp.DPDSimulator method)</a>
@@ -1721,6 +1942,8 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.hash_dihedral_angle_type">hash_dihedral_angle_type() (pylimer_tools_cpp.Universe method)</a>
 </li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.head">head() (pylimer_tools.io.polymer_data.PolymerDataFrame method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.HYBRID">HYBRID (pylimer_tools_cpp.AtomStyle attribute)</a>
 </li>
     </ul></td>
@@ -1743,6 +1966,8 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.StructureSimplificationMode.html#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_THEN_X2F">INACTIVE_THEN_X2F (pylimer_tools_cpp.StructureSimplificationMode attribute)</a>
 </li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.index">index (pylimer_tools.io.polymer_data.PolymerDataFrame property)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.initialize_from_data_sequence">initialize_from_data_sequence() (pylimer_tools_cpp.UniverseSequence method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence.initialize_from_dump_file">initialize_from_dump_file() (pylimer_tools_cpp.UniverseSequence method)</a>
@@ -1757,10 +1982,10 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance.inspect_strand_partition_update">inspect_strand_partition_update() (pylimer_tools_cpp.MEHPForceBalance method)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration.int_values">int_values (pylimer_tools_cpp.OutputConfiguration attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.interpolate_edges">interpolate_edges() (pylimer_tools_cpp.Universe method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.ExitReason.html#pylimer_tools_cpp.ExitReason.INTERRUPT">INTERRUPT (pylimer_tools_cpp.ExitReason attribute)</a>
@@ -1775,6 +2000,8 @@
           <li><a href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.is_2d">(pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator attribute)</a>
 </li>
         </ul></li>
+        <li><a href="pylimer_tools.html#pylimer_tools.generate_network.is_active_network">is_active_network() (in module pylimer_tools.generate_network)</a>
+</li>
         <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.cache_utility.is_current_cache">is_current_cache() (in module pylimer_tools.utils.cache_utility)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues.is_integer">is_integer() (pylimer_tools_cpp.ComputedDoubleValues method)</a>
@@ -1787,6 +2014,10 @@
         </ul></li>
         <li><a href="api/pylimer_tools_cpp.Box.html#pylimer_tools_cpp.Box.is_valid_offset">is_valid_offset() (pylimer_tools_cpp.Box method)</a>
 </li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.iterrows">iterrows() (pylimer_tools.io.polymer_data.PolymerDataFrame method)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.itertuples">itertuples() (pylimer_tools.io.polymer_data.PolymerDataFrame method)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -1797,9 +2028,13 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.DumpFileReader.html#pylimer_tools_cpp.DumpFileReader.key_has_column">key_has_column() (pylimer_tools_cpp.DumpFileReader method)</a>
 </li>
+        <li><a href="api/pylimer_tools_cpp.DumpFileReader.html#pylimer_tools_cpp.DumpFileReader.key_has_directional_column">key_has_directional_column() (pylimer_tools_cpp.DumpFileReader method)</a>
+</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/pylimer_tools_cpp.DumpFileReader.html#pylimer_tools_cpp.DumpFileReader.key_has_directional_column">key_has_directional_column() (pylimer_tools_cpp.DumpFileReader method)</a>
+        <li><a href="pylimer_tools.io.html#id1">KG_LJ (pylimer_tools.io.bead_spring_parameter_provider.ParameterType attribute)</a>, <a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.ParameterType.KG_LJ">[1]</a>
+</li>
+        <li><a href="pylimer_tools.io.html#id2">KUHN (pylimer_tools.io.bead_spring_parameter_provider.ParameterType attribute)</a>, <a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.ParameterType.KUHN">[1]</a>
 </li>
     </ul></td>
   </tr></table>
@@ -1827,10 +2062,10 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strand">link_strand() (pylimer_tools_cpp.MCUniverseGenerator method)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to">link_strand_to() (pylimer_tools_cpp.MCUniverseGenerator method)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to_strand">link_strand_to_strand() (pylimer_tools_cpp.MCUniverseGenerator method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strands_callback">link_strands_callback() (pylimer_tools_cpp.MCUniverseGenerator method)</a>
@@ -1850,6 +2085,8 @@
         <li><a href="api/pylimer_tools_cpp.LinkSwappingMode.html#pylimer_tools_cpp.LinkSwappingMode">LinkSwappingMode (class in pylimer_tools_cpp)</a>
 </li>
         <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.cache_utility.load_cache">load_cache() (in module pylimer_tools.utils.cache_utility)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.load_everaers_et_al_data">load_everaers_et_al_data() (in module pylimer_tools.io.polymer_data)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -1902,17 +2139,33 @@
     module
 
         <ul>
+          <li><a href="pylimer_tools.html#module-pylimer_tools">pylimer_tools</a>
+</li>
+          <li><a href="pylimer_tools.html#module-pylimer_tools.analyse_networks">pylimer_tools.analyse_networks</a>
+</li>
+          <li><a href="pylimer_tools.html#module-pylimer_tools.basic_lammps_structure_stats">pylimer_tools.basic_lammps_structure_stats</a>
+</li>
           <li><a href="pylimer_tools.calc.html#module-pylimer_tools.calc">pylimer_tools.calc</a>
 </li>
           <li><a href="pylimer_tools.calc.html#module-pylimer_tools.calc.mehp_utilities">pylimer_tools.calc.mehp_utilities</a>
 </li>
           <li><a href="pylimer_tools.calc.html#module-pylimer_tools.calc.miller_macosko_theory">pylimer_tools.calc.miller_macosko_theory</a>
 </li>
+          <li><a href="pylimer_tools.calc.html#module-pylimer_tools.calc.stoichiometric_relationships">pylimer_tools.calc.stoichiometric_relationships</a>
+</li>
           <li><a href="pylimer_tools.calc.html#module-pylimer_tools.calc.structure_analysis">pylimer_tools.calc.structure_analysis</a>
+</li>
+          <li><a href="pylimer_tools.html#module-pylimer_tools.displace_randomly">pylimer_tools.displace_randomly</a>
+</li>
+          <li><a href="pylimer_tools.html#module-pylimer_tools.generate_network">pylimer_tools.generate_network</a>
 </li>
           <li><a href="pylimer_tools.io.html#module-pylimer_tools.io">pylimer_tools.io</a>
 </li>
+          <li><a href="pylimer_tools.io.html#module-pylimer_tools.io.bead_spring_parameter_provider">pylimer_tools.io.bead_spring_parameter_provider</a>
+</li>
           <li><a href="pylimer_tools.io.html#module-pylimer_tools.io.extract_thermo_data">pylimer_tools.io.extract_thermo_data</a>
+</li>
+          <li><a href="pylimer_tools.io.html#module-pylimer_tools.io.polymer_data">pylimer_tools.io.polymer_data</a>
 </li>
           <li><a href="pylimer_tools.io.html#module-pylimer_tools.io.read_lammps_output_file">pylimer_tools.io.read_lammps_output_file</a>
 </li>
@@ -2089,7 +2342,15 @@
 </li>
         <li><a href="api/pylimer_tools_cpp.AtomPairEntanglements.html#pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms">pairs_of_atoms (pylimer_tools_cpp.AtomPairEntanglements attribute)</a>
 </li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.Parameters">Parameters (class in pylimer_tools.io.bead_spring_parameter_provider)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.bead_spring_parameter_provider.ParameterType">ParameterType (class in pylimer_tools.io.bead_spring_parameter_provider)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.PERI">PERI (pylimer_tools_cpp.AtomStyle attribute)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerData">PolymerData (class in pylimer_tools.io.polymer_data)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame">PolymerDataFrame (class in pylimer_tools.io.polymer_data)</a>
 </li>
         <li><a href="pylimer_tools.calc.html#pylimer_tools.calc.miller_macosko_theory.predict_gelation_point">predict_gelation_point() (in module pylimer_tools.calc.miller_macosko_theory)</a>
 </li>
@@ -2115,9 +2376,13 @@
           <li><a href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.prepare_for_evaluations">(pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator method)</a>
 </li>
         </ul></li>
+        <li><a href="pylimer_tools.html#pylimer_tools.generate_network.prepare_structure_generation">prepare_structure_generation() (in module pylimer_tools.generate_network)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues.PRESSURE">PRESSURE (pylimer_tools_cpp.ComputedDoubleValues attribute)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType.PRIMARY_LOOP">PRIMARY_LOOP (pylimer_tools_cpp.MoleculeType attribute)</a>
+</li>
+        <li><a href="pylimer_tools.html#pylimer_tools.generate_network.print_with_time">print_with_time() (in module pylimer_tools.generate_network)</a>
 </li>
         <li>
     pylimer-analyse-networks command line option
@@ -2147,14 +2412,84 @@
 </li>
         </ul></li>
         <li>
+    pylimer-generate-network command line option
+
+        <ul>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-disable-primary-loops">--disable-primary-loops</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-disable-secondary-loops">--disable-secondary-loops</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-functionalize-discrete">--functionalize-discrete</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-beads-per-chain-1">--n-beads-per-chain-1</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-beads-per-chain-2">--n-beads-per-chain-2</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-beads-per-solvent-chain">--n-beads-per-solvent-chain</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-beads-per-xlink">--n-beads-per-xlink</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-chains-1">--n-chains-1</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-chains-2">--n-chains-2</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-chains-crosslinkers">--n-chains-crosslinkers</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-mono-beads-per-chain">--n-mono-beads-per-chain</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-mono-chains">--n-mono-chains</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-n-solvent-chains">--n-solvent-chains</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-functionalize-discrete">--no-functionalize-discrete</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-parameter-type">--parameter-type</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-polymer-name">--polymer-name</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-remove-wsol">--remove-wsol</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-target-f">--target-f</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-target-file">--target-file</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-target-p">--target-p</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-target-wsol">--target-wsol</a>
+</li>
+          <li><a href="cli.html#cmdoption-pylimer-generate-network-z-score-std-mult">--z-score-std-mult</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    pylimer_tools
+
+        <ul>
+          <li><a href="pylimer_tools.html#module-pylimer_tools">module</a>
+</li>
+        </ul></li>
+        <li>
+    pylimer_tools.analyse_networks
+
+        <ul>
+          <li><a href="pylimer_tools.html#module-pylimer_tools.analyse_networks">module</a>
+</li>
+        </ul></li>
+        <li>
+    pylimer_tools.basic_lammps_structure_stats
+
+        <ul>
+          <li><a href="pylimer_tools.html#module-pylimer_tools.basic_lammps_structure_stats">module</a>
+</li>
+        </ul></li>
+        <li>
     pylimer_tools.calc
 
         <ul>
           <li><a href="pylimer_tools.calc.html#module-pylimer_tools.calc">module</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     pylimer_tools.calc.mehp_utilities
 
@@ -2170,10 +2505,31 @@
 </li>
         </ul></li>
         <li>
+    pylimer_tools.calc.stoichiometric_relationships
+
+        <ul>
+          <li><a href="pylimer_tools.calc.html#module-pylimer_tools.calc.stoichiometric_relationships">module</a>
+</li>
+        </ul></li>
+        <li>
     pylimer_tools.calc.structure_analysis
 
         <ul>
           <li><a href="pylimer_tools.calc.html#module-pylimer_tools.calc.structure_analysis">module</a>
+</li>
+        </ul></li>
+        <li>
+    pylimer_tools.displace_randomly
+
+        <ul>
+          <li><a href="pylimer_tools.html#module-pylimer_tools.displace_randomly">module</a>
+</li>
+        </ul></li>
+        <li>
+    pylimer_tools.generate_network
+
+        <ul>
+          <li><a href="pylimer_tools.html#module-pylimer_tools.generate_network">module</a>
 </li>
         </ul></li>
         <li>
@@ -2184,10 +2540,24 @@
 </li>
         </ul></li>
         <li>
+    pylimer_tools.io.bead_spring_parameter_provider
+
+        <ul>
+          <li><a href="pylimer_tools.io.html#module-pylimer_tools.io.bead_spring_parameter_provider">module</a>
+</li>
+        </ul></li>
+        <li>
     pylimer_tools.io.extract_thermo_data
 
         <ul>
           <li><a href="pylimer_tools.io.html#module-pylimer_tools.io.extract_thermo_data">module</a>
+</li>
+        </ul></li>
+        <li>
+    pylimer_tools.io.polymer_data
+
+        <ul>
+          <li><a href="pylimer_tools.io.html#module-pylimer_tools.io.polymer_data">module</a>
 </li>
         </ul></li>
         <li>
@@ -2246,6 +2616,16 @@
           <li><a href="pylimer_tools_cpp.html#module-pylimer_tools_cpp">module</a>
 </li>
         </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="Q" class="genindex-section">
+  <h2>Q</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.query">query() (pylimer_tools.io.polymer_data.PolymerDataFrame method)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -2391,6 +2771,8 @@
         <li><a href="api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter.set_universe_to_write">set_universe_to_write() (pylimer_tools_cpp.DataFileWriter method)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.set_vertex_property">set_vertex_property() (pylimer_tools_cpp.Universe method)</a>
+</li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.shape">shape (pylimer_tools.io.polymer_data.PolymerDataFrame property)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator">SimpleSpringMEHPForceEvaluator (class in pylimer_tools_cpp)</a>
 </li>
@@ -2540,6 +2922,8 @@
   <h2>T</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.tail">tail() (pylimer_tools.io.polymer_data.PolymerDataFrame method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.AtomStyle.html#pylimer_tools_cpp.AtomStyle.TDPD">TDPD (pylimer_tools_cpp.AtomStyle attribute)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.ComputedDoubleValues.html#pylimer_tools_cpp.ComputedDoubleValues.TEMPERATURE">TEMPERATURE (pylimer_tools_cpp.ComputedDoubleValues attribute)</a>
@@ -2560,6 +2944,8 @@
         </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerData.to_dict">to_dict() (pylimer_tools.io.polymer_data.PolymerData method)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.TRACK_BACKWARD.html#pylimer_tools_cpp.TRACK_BACKWARD">TRACK_BACKWARD (in module pylimer_tools_cpp)</a>
 
         <ul>
@@ -2586,14 +2972,16 @@
 </li>
         <li><a href="pylimer_tools.utils.html#pylimer_tools.utils.data_utility.unify_data_stepsizes">unify_data_stepsizes() (in module pylimer_tools.utils.data_utility)</a>
 </li>
+        <li><a href="pylimer_tools.io.html#pylimer_tools.io.polymer_data.PolymerDataFrame.unique">unique() (pylimer_tools.io.polymer_data.PolymerDataFrame method)</a>
+</li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyle">UnitStyle (class in pylimer_tools.io.unit_styles)</a>
 </li>
         <li><a href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory">UnitStyleFactory (class in pylimer_tools.io.unit_styles)</a>
 </li>
-        <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe">Universe (class in pylimer_tools_cpp)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe">Universe (class in pylimer_tools_cpp)</a>
+</li>
         <li><a href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence">UniverseSequence (class in pylimer_tools_cpp)</a>
 </li>
         <li><a href="api/pylimer_tools_cpp.ExitReason.html#pylimer_tools_cpp.ExitReason.UNSET">UNSET (pylimer_tools_cpp.ExitReason attribute)</a>
