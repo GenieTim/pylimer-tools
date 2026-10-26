@@ -195,7 +195,7 @@
 
 - [Normal Mode Analysis](index.html.md): pylimer-tools provides a normal mode analysis (NMA) implementation to predict the loss and storage m...
 - [NOTE](plot_normal_mode_analysis.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;00:07.937&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;00:14.577&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
 
 ## Optional
 

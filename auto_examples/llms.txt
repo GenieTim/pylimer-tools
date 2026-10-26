@@ -235,14 +235,14 @@
 - [NOTE](structure_analysis/plot_structure_analysis.html.md): Go to the end
 - [Trajectory Analysis](trajectory_analysis/index.html.md): pylimer-tools provides advanced tools for analyzing molecular dynamics trajectories, particularly fo...
 - [NOTE](trajectory_analysis/plot_trajectory_analysis.html.md): Go to the end
-- [Computation times](dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:03.146&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
-- [Computation times](force_balance/sg_execution_times.html.md): &#42;&#42;05:31.917&#42;&#42; total execution time for 5 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.997&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
+- [Computation times](force_balance/sg_execution_times.html.md): &#42;&#42;05:34.576&#42;&#42; total execution time for 5 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 - [Computation times](network_generator/sg_execution_times.html.md): &#42;&#42;02:20.935&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
-- [Computation times](normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:07.937&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
-- [Computation times](readers_writers/sg_execution_times.html.md): &#42;&#42;00:11.499&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
+- [Computation times](normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:14.577&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
+- [Computation times](readers_writers/sg_execution_times.html.md): &#42;&#42;00:20.298&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
 - [Computation times](sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
-- [Computation times](structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.231&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
-- [Computation times](trajectory_analysis/sg_execution_times.html.md): &#42;&#42;04:47.601&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
+- [Computation times](structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.395&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
+- [Computation times](trajectory_analysis/sg_execution_times.html.md): &#42;&#42;09:10.193&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
 
 ## Optional
 

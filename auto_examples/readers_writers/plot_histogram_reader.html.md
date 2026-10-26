@@ -52,7 +52,7 @@ plt.title(f"Density Distribution at Step {final_timestep}")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.041 seconds)
+**Total running time of the script:** (0 minutes 0.073 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-histogram-reader-py"></a>
 

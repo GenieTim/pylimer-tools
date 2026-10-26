@@ -68,7 +68,7 @@ Optimized system capable of bond swapping written to: /home/runner/work/pylimer-
 To convert it back to the molecule index relating to their current connectivity,
 simply repeat the process with `config_molecule_idx_for_swap(False)`
 
-**Total running time of the script:** (0 minutes 0.030 seconds)
+**Total running time of the script:** (0 minutes 0.049 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-for-bond-swapping-py"></a>
 

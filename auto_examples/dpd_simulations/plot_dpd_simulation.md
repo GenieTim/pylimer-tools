@@ -139,7 +139,7 @@ _ = df.plot(
 )
 ```
 
-**Total running time of the script:** (0 minutes 3.146 seconds)
+**Total running time of the script:** (0 minutes 4.997 seconds)
 
 <a id="sphx-glr-download-auto-examples-dpd-simulations-plot-dpd-simulation-py"></a>
 

@@ -59,7 +59,7 @@ plt.ylabel("Temperature")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.034 seconds)
+**Total running time of the script:** (0 minutes 0.059 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-pylimer-tools-output-reader-py"></a>
 
