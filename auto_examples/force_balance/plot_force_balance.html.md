@@ -17,8 +17,8 @@ to homogenize a polymer network and predict its equilibrium shear modulus.
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 9-78 -->
 ```none
-Final residual (should be close to 0): 9.925511847947765e-07
-Shear Modulus [MPa]:  0.057571650757099115
+Final residual (should be close to 0): 6.962563606519517e-09
+Shear Modulus [MPa]:  0.056431786974241456
 ```
 
 <br/>
@@ -93,7 +93,7 @@ print(
 )
 ```
 
-**Total running time of the script:** (0 minutes 0.321 seconds)
+**Total running time of the script:** (0 minutes 0.322 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-py"></a>
 
