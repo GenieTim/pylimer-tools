@@ -162,8 +162,8 @@ class CMakeBuild(build_ext):
         convert_script = project_root / "bin" / "convert-excel-to-json.py"
         
         # Check if conversion is needed (Excel newer than JSON or JSON doesn't exist)
-        if (not json_path.exists() or 
-            (excel_path.exists() and excel_path.stat().st_mtime > json_path.stat().st_mtime)):
+        # In CI, use the tracked JSON file directly to avoid spurious mtime discrepancies from checkout
+        if not json_path.exists() or (not os.environ.get("CI") and excel_path.exists() and excel_path.stat().st_mtime > json_path.stat().st_mtime):
             
             print("Converting Excel data to JSON...")
             try:

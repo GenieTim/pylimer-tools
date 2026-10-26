@@ -8,10 +8,8 @@ if (NOT DEFINED eigen_LOADED)
         include(FetchContent)
         FetchContent_Declare(
                 Eigen
-                GIT_REPOSITORY https://gitlab.com/libeigen/eigen
-                GIT_TAG 5.0.1
-                GIT_SHALLOW TRUE
-                GIT_PROGRESS TRUE
+                URL https://gitlab.com/libeigen/eigen/-/archive/5.0.1/eigen-5.0.1.tar.gz
+                URL_HASH SHA256=e9c326dc8c05cd1e044c71f30f1b2e34a6161a3b6ecf445d56b53ff1669e3dec
         )
         set(EIGEN_BUILD_DOC OFF)
         set(EIGEN_BUILD_PKGCONFIG OFF)
