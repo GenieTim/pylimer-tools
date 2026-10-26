@@ -1,6 +1,12 @@
 # Changelog
 
-## main
+## v0.4.1
+
+### Build System & PyPI WebAssembly Toolchain
+- Upgrade WebAssembly / Pyodide build toolchain to Pyodide 314 (`pyemscripten_2026_0_wasm32`), Python 3.14, and Emscripten 5.0.3 per PEP 783.
+- Publish `pyemscripten` WebAssembly wheels directly to PyPI alongside native wheels and sdist, enabling direct in-browser installation (`micropip.install("pylimer-tools")`).
+- Pass WebAssembly exception handling (`-fwasm-exceptions`) and forward toolchain configurations to vendor dependencies.
+- Remove obsolete downstream `pyodide-recipes` sync automation now that PyPI directly hosts WebAssembly wheels.
 
 ### Normal Mode Analysis & Rheology
 - Add `NormalModeSolver` enum (`AUTO`, `DENSE_LAPACK`, `DENSE_EIGEN`, `SPARSE_SLICING`) and solver string selection to `NormalModeAnalyzer.find_all_eigenvalues`.

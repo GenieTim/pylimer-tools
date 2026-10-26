@@ -85,11 +85,17 @@ endif ()
 if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR
         CMAKE_C_COMPILER MATCHES "emcc" OR
         CMAKE_CXX_COMPILER MATCHES "em\\+\\+" OR
+        DEFINED ENV{PYODIDE} OR
         DEFINED ENV{PYODIDE_BUILD} OR
+        DEFINED ENV{PYODIDE_PACKAGE_BUILD} OR
         PYODIDE_BUILD OR
         BUILDING_WITH_PYODIDE)
     # Emscripten/WebAssembly/Pyodide-specific optimizations
     message(STATUS "Configuring Emscripten/WebAssembly optimizations")
+
+    # Pyodide ABI: WebAssembly exception handling
+    add_compile_options(-fwasm-exceptions)
+    add_link_options(-fwasm-exceptions)
 
     # Enable WebAssembly SIMD instructions for vector operations
     add_compile_options(-msimd128)

@@ -232,7 +232,9 @@ class CMakeBuild(build_ext):
 
         # Detect Pyodide / Emscripten build environment
         is_emscripten = (
-            os.environ.get("PYODIDE_BUILD")
+            os.environ.get("PYODIDE")
+            or os.environ.get("PYODIDE_BUILD")
+            or os.environ.get("PYODIDE_PACKAGE_BUILD")
             or sys.platform.startswith("emscripten")
             or "emscripten" in str(sys.platform)
         )

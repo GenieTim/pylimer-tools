@@ -100,7 +100,9 @@ include(${CMAKE_CURRENT_LIST_DIR}/vendor/CMakeLists.txt)
 if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR 
     CMAKE_C_COMPILER MATCHES "pyodide" OR 
     CMAKE_CXX_COMPILER MATCHES "pyodide" OR
+    DEFINED ENV{PYODIDE} OR
     DEFINED ENV{PYODIDE_BUILD} OR
+    DEFINED ENV{PYODIDE_PACKAGE_BUILD} OR
     PYODIDE_BUILD)
     set(BUILDING_WITH_PYODIDE ON)
     message(STATUS "Detected Pyodide build environment")
@@ -131,9 +133,11 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR
     
     if (PYODIDE_PYTHON_INCLUDE_DIR)
         set(Python_INCLUDE_DIRS ${PYODIDE_PYTHON_INCLUDE_DIR} CACHE PATH "Python include directory from pyodide config" FORCE)
+        set(Python3_INCLUDE_DIRS ${PYODIDE_PYTHON_INCLUDE_DIR} CACHE PATH "Python 3 include directory from pyodide config" FORCE)
         message(STATUS "Set Python_INCLUDE_DIRS to: ${Python_INCLUDE_DIRS}")
         
         set(PYTHON_INCLUDE_DIRS ${PYODIDE_PYTHON_INCLUDE_DIR} CACHE PATH "Python include directory for pybind11" FORCE)
+        set(pybind11_INCLUDE_DIRS ${PYODIDE_PYTHON_INCLUDE_DIR} CACHE PATH "Python include directory for pybind11" FORCE)
         
     else()
         message(WARNING "Could not get python_include_dir from pyodide config, falling back to default behavior")
