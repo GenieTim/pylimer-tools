@@ -59,7 +59,7 @@ writer.config_include_angles(True)
 writer.write_to_file("generated_structures/final_configuration.data")
 ```
 
-**Total running time of the script:** (0 minutes 0.074 seconds)
+**Total running time of the script:** (0 minutes 0.076 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"></a>
 
