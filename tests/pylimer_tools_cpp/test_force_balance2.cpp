@@ -3171,4 +3171,264 @@ TEST_CASE("MEHPForceBalance2 Metal vs CPU Network Relaxation Benchmark",
     return fb.getNrOfActiveSprings();
   };
 }
+
+TEST_CASE("MEHPForceBalance2 Metal Buffer Pooling and Reallocation",
+          "[MEHPForceBalance2][Metal]")
+{
+  std::cout << "Running test \"MEHPForceBalance2 Metal Buffer Pooling and "
+               "Reallocation\""
+            << std::endl;
+
+  // Run solve with N=3000
+  const int N1 = 3000;
+  std::vector<Eigen::Triplet<double>> triplets1;
+  triplets1.reserve(N1 * 3);
+  for (int i = 0; i < N1; ++i) {
+    triplets1.push_back({ i, i, 4.0 });
+    triplets1.push_back({ i, (i + 1) % N1, -1.0 });
+    triplets1.push_back({ (i + 1) % N1, i, -1.0 });
+  }
+  Eigen::SparseMatrix<double> A1(N1, N1);
+  A1.setFromTriplets(triplets1.begin(), triplets1.end());
+  A1.makeCompressed();
+  Eigen::VectorXd b1 = Eigen::VectorXd::Ones(N1);
+
+  int iters = 0;
+  Eigen::VectorXd x1_cg = pcm::solveSLEMetalCG(A1, b1, 1e-4, 100, iters);
+  CHECK(iters > 0);
+  CHECK((A1 * x1_cg - b1).norm() / b1.norm() < 1e-3);
+
+  // Run solve with smaller N=1500 (proves buffer pooling works when N decreases
+  // without reallocation)
+  const int N2 = 1500;
+  std::vector<Eigen::Triplet<double>> triplets2;
+  triplets2.reserve(N2 * 3);
+  for (int i = 0; i < N2; ++i) {
+    triplets2.push_back({ i, i, 4.0 });
+    triplets2.push_back({ i, (i + 1) % N2, -1.0 });
+    triplets2.push_back({ (i + 1) % N2, i, -1.0 });
+  }
+  Eigen::SparseMatrix<double> A2(N2, N2);
+  A2.setFromTriplets(triplets2.begin(), triplets2.end());
+  A2.makeCompressed();
+  Eigen::VectorXd b2 = Eigen::VectorXd::Ones(N2);
+
+  Eigen::VectorXd x2_cg = pcm::solveSLEMetalCG(A2, b2, 1e-4, 100, iters);
+  CHECK(iters > 0);
+  CHECK((A2 * x2_cg - b2).norm() / b2.norm() < 1e-3);
+
+  // Run solve with larger N=6000 (proves automatic reallocation when N
+  // increases)
+  const int N3 = 6000;
+  std::vector<Eigen::Triplet<double>> triplets3;
+  triplets3.reserve(N3 * 3);
+  for (int i = 0; i < N3; ++i) {
+    triplets3.push_back({ i, i, 4.0 });
+    triplets3.push_back({ i, (i + 1) % N3, -1.0 });
+    triplets3.push_back({ (i + 1) % N3, i, -1.0 });
+  }
+  Eigen::SparseMatrix<double> A3(N3, N3);
+  A3.setFromTriplets(triplets3.begin(), triplets3.end());
+  A3.makeCompressed();
+  Eigen::VectorXd b3 = Eigen::VectorXd::Ones(N3);
+
+  Eigen::VectorXd x3_cg = pcm::solveSLEMetalCG(A3, b3, 1e-4, 100, iters);
+  CHECK(iters > 0);
+  CHECK((A3 * x3_cg - b3).norm() / b3.norm() < 1e-3);
+
+  // Also test Barzilai-Borwein with same pooling
+  Eigen::VectorXd x3_bb =
+    pcm::solveSLEMetalBarzilaiBorwein(A3, b3, 0.1, 1e-4, 200, iters, true);
+  CHECK(iters > 0);
+  CHECK((A3 * x3_bb - b3).norm() / b3.norm() < 1e-3);
+}
+
+TEST_CASE("MEHPForceBalance2 Metal Center-of-Mass Zero-Mode Projection",
+          "[MEHPForceBalance2][Metal]")
+{
+  std::cout << "Running test \"MEHPForceBalance2 Metal Center-of-Mass "
+               "Zero-Mode Projection\""
+            << std::endl;
+
+  // Create a 3D periodic network Laplacian with exact zero eigenvalues
+  // (translational nullspace)
+  const int S = 8;
+  const int numNodes = S * S * S;
+  const int N = numNodes * 3;
+  std::vector<Eigen::Triplet<double>> triplets;
+  triplets.reserve(N * 7);
+
+  auto idx = [S](int x, int y, int z) {
+    return (x % S) * S * S + (y % S) * S + (z % S);
+  };
+
+  for (int x = 0; x < S; ++x) {
+    for (int y = 0; y < S; ++y) {
+      for (int z = 0; z < S; ++z) {
+        int u = idx(x, y, z);
+        int neighbors[6] = { idx(x + 1, y, z), idx(x - 1 + S, y, z),
+                             idx(x, y + 1, z), idx(x, y - 1 + S, z),
+                             idx(x, y, z + 1), idx(x, y, z - 1 + S) };
+        for (int d = 0; d < 3; ++d) {
+          triplets.push_back({ 3 * u + d, 3 * u + d, 6.0 });
+          for (int v : neighbors) {
+            triplets.push_back({ 3 * u + d, 3 * v + d, -1.0 });
+          }
+        }
+      }
+    }
+  }
+
+  Eigen::SparseMatrix<double> A(N, N);
+  A.setFromTriplets(triplets.begin(), triplets.end());
+  A.makeCompressed();
+
+  // Verify that uniform translation is in the nullspace: A * 1 == 0
+  Eigen::VectorXd ones = Eigen::VectorXd::Zero(N);
+  for (int i = 0; i < numNodes; ++i)
+    ones[3 * i] = 1.0;
+  CHECK((A * ones).norm() < 1e-12);
+
+  // Construct exact solution with 0 COM, and compute RHS b = A * x_exact
+  Eigen::VectorXd x_exact = Eigen::VectorXd::Zero(N);
+  for (int x = 0; x < S; ++x) {
+    for (int y = 0; y < S; ++y) {
+      for (int z = 0; z < S; ++z) {
+        int u = idx(x, y, z);
+        x_exact[3 * u + 0] = std::sin(2.0 * M_PI * x / S);
+        x_exact[3 * u + 1] = std::sin(2.0 * M_PI * y / S);
+        x_exact[3 * u + 2] = std::sin(2.0 * M_PI * z / S);
+      }
+    }
+  }
+  Eigen::VectorXd b = A * x_exact;
+
+  // Initial guess with intentional large translational shift
+  Eigen::VectorXd initialX = Eigen::VectorXd::Zero(N);
+  for (int i = 0; i < numNodes; ++i) {
+    initialX[3 * i + 0] = 15.0;
+    initialX[3 * i + 1] = -25.0;
+    initialX[3 * i + 2] = 40.0;
+  }
+
+  int itersWithout = 0;
+  Eigen::VectorXd x_no_proj = pcm::solveSLEMetalCG(
+    A, b, 1e-4, 150, itersWithout, initialX, /*projectZeroModes=*/false);
+
+  int itersWith = 0;
+  Eigen::VectorXd x_with_proj = pcm::solveSLEMetalCG(
+    A, b, 1e-4, 150, itersWith, initialX, /*projectZeroModes=*/true);
+
+  // Without projection, the initial offset remains in the nullspace
+  double meanX_no = 0, meanY_no = 0, meanZ_no = 0;
+  for (int i = 0; i < numNodes; ++i) {
+    meanX_no += x_no_proj[3 * i + 0];
+    meanY_no += x_no_proj[3 * i + 1];
+    meanZ_no += x_no_proj[3 * i + 2];
+  }
+  meanX_no /= numNodes;
+  meanY_no /= numNodes;
+  meanZ_no /= numNodes;
+
+  // With projection, COM drift is eliminated (< 1e-4)
+  double meanX_with = 0, meanY_with = 0, meanZ_with = 0;
+  for (int i = 0; i < numNodes; ++i) {
+    meanX_with += x_with_proj[3 * i + 0];
+    meanY_with += x_with_proj[3 * i + 1];
+    meanZ_with += x_with_proj[3 * i + 2];
+  }
+  meanX_with /= numNodes;
+  meanY_with /= numNodes;
+  meanZ_with /= numNodes;
+
+  std::cout << "COM without projection: (" << meanX_no << ", " << meanY_no
+            << ", " << meanZ_no << ")" << std::endl;
+  std::cout << "COM with projection: (" << meanX_with << ", " << meanY_with
+            << ", " << meanZ_with << ")" << std::endl;
+
+  CHECK(std::abs(meanX_no) > 1.0);
+  CHECK(std::abs(meanY_no) > 1.0);
+  CHECK(std::abs(meanZ_no) > 1.0);
+
+  CHECK(std::abs(meanX_with) < 1e-4);
+  CHECK(std::abs(meanY_with) < 1e-4);
+  CHECK(std::abs(meanZ_with) < 1e-4);
+
+  // Both solve the equation Ax = b
+  CHECK((A * x_with_proj - b).norm() / b.norm() < 1e-3);
+
+  // Test Barzilai-Borwein with projection as well
+  int itersBB = 0;
+  Eigen::VectorXd x_bb_proj = pcm::solveSLEMetalBarzilaiBorwein(
+    A, b, 0.05, 1e-4, 250, itersBB, true, initialX, /*projectZeroModes=*/true);
+  double meanX_bb = 0, meanY_bb = 0, meanZ_bb = 0;
+  for (int i = 0; i < numNodes; ++i) {
+    meanX_bb += x_bb_proj[3 * i + 0];
+    meanY_bb += x_bb_proj[3 * i + 1];
+    meanZ_bb += x_bb_proj[3 * i + 2];
+  }
+  meanX_bb /= numNodes;
+  meanY_bb /= numNodes;
+  meanZ_bb /= numNodes;
+
+  CHECK(std::abs(meanX_bb) < 1e-4);
+  CHECK(std::abs(meanY_bb) < 1e-4);
+  CHECK(std::abs(meanZ_bb) < 1e-4);
+  CHECK((A * x_bb_proj - b).norm() / b.norm() < 1e-3);
+}
+
+TEST_CASE("MEHPForceBalance2 Metal SIMDgroup-Cooperative SpMV Degree Variation",
+          "[MEHPForceBalance2][Metal]")
+{
+  std::cout << "Running test \"MEHPForceBalance2 Metal SIMDgroup-Cooperative "
+               "SpMV Degree Variation\""
+            << std::endl;
+
+  // Build symmetric matrix with wide degree distribution: degree 1 chain ends,
+  // degree 4 junctions, degree 6 crosslinks
+  const int N = 9000;
+  std::vector<Eigen::Triplet<double>> triplets;
+  triplets.reserve(N * 8);
+
+  Eigen::VectorXd diag = Eigen::VectorXd::Zero(N);
+  for (int i = 0; i < N; ++i) {
+    int deg = (i % 11 == 0) ? 1 : ((i % 5 == 0) ? 6 : ((i % 2 == 0) ? 4 : 2));
+    for (int d = 1; d <= deg; ++d) {
+      int j = (i + d * 3) % N;
+      double w = 0.5 / deg;
+      // Add symmetric entries
+      triplets.push_back({ i, j, w });
+      triplets.push_back({ j, i, w });
+      diag[i] -= (w + 0.05);
+      diag[j] -= (w + 0.05);
+    }
+  }
+  for (int i = 0; i < N; ++i) {
+    triplets.push_back({ i, i, diag[i] });
+  }
+
+  Eigen::SparseMatrix<double> A(N, N);
+  A.setFromTriplets(triplets.begin(), triplets.end());
+  A.makeCompressed();
+
+  Eigen::VectorXd x_exact = Eigen::VectorXd::Random(N);
+  Eigen::VectorXd b = A * x_exact;
+
+  int iters_cg = 0, iters_bb = 0;
+  Eigen::VectorXd x_cg = pcm::solveSLEMetalCG(A, b, 1e-4, 200, iters_cg);
+  Eigen::VectorXd x_bb =
+    pcm::solveSLEMetalBarzilaiBorwein(A, b, 0.05, 1e-4, 300, iters_bb, true);
+
+  double rel_err_cg = (x_cg - x_exact).norm() / x_exact.norm();
+  double rel_err_bb = (x_bb - x_exact).norm() / x_exact.norm();
+
+  std::cout << "Degree variation CG rel err: " << rel_err_cg
+            << ", iters: " << iters_cg << std::endl;
+  std::cout << "Degree variation BB rel err: " << rel_err_bb
+            << ", iters: " << iters_bb << std::endl;
+
+  CHECK(rel_err_cg < 1e-3);
+  CHECK(rel_err_bb < 1e-3);
+}
+
 #endif

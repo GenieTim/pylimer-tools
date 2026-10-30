@@ -1073,7 +1073,8 @@ MEHPForceBalance2::runForceRelaxation(
                                            std::sqrt(residualReduction),
                                            maxIterations,
                                            solverIterations,
-                                           initialSolution);
+                                           initialSolution,
+                                           /*projectZeroModes=*/true);
         iterationsDone += solverIterations;
         this->exitReason = (solverIterations >= maxIterations)
                              ? ExitReason::MAX_STEPS
@@ -1095,7 +1096,8 @@ MEHPForceBalance2::runForceRelaxation(
                                        maxIterations,
                                        solverIterations,
                                        true,
-                                       initialSolution);
+                                       initialSolution,
+                                       /*projectZeroModes=*/true);
         iterationsDone += solverIterations;
         this->exitReason = (solverIterations >= maxIterations)
                              ? ExitReason::MAX_STEPS

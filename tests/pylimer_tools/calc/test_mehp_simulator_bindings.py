@@ -8,6 +8,8 @@ import numpy as np
 from pylimer_tools_cpp import (
     Box,
     MEHPForceRelaxation,
+    MEHPForceBalance2,
+    SLESolver,
     NonGaussianSpringForceEvaluator,
     SimpleSpringMEHPForceEvaluator,
     inverse_langevin,
@@ -88,3 +90,34 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             [0.0, 0.0, 0.0], 0, 0, 0)
         self.assertEqual(stress, 0.0)
         self.assertFalse(math.isnan(stress))
+
+    def test_metal_cg_force_balance_relaxation(self):
+        """Test that MEHPForceBalance2 with METAL_CG completes force relaxation."""
+        try:
+            fb = MEHPForceBalance2(self.testUniverseSmall, 2, False)
+            fb.run_force_relaxation(sle_solver=SLESolver.METAL_CG)
+            self.assertGreater(fb.get_nr_of_iterations(), 0)
+        except RuntimeError as e:
+            if (
+                "Metal acceleration is not enabled" in str(e)
+                or "Metal GPU backend is not available" in str(e)
+            ):
+                self.skipTest(f"Metal not available: {e}")
+            else:
+                raise
+
+    def test_metal_bb_force_balance_relaxation(self):
+        """Test that MEHPForceBalance2 with METAL_BARZILAI_BORWEIN completes force relaxation."""
+        try:
+            fb = MEHPForceBalance2(self.testUniverseSmall, 2, False)
+            fb.run_force_relaxation(sle_solver=SLESolver.METAL_BARZILAI_BORWEIN)
+            self.assertGreater(fb.get_nr_of_iterations(), 0)
+        except RuntimeError as e:
+            if (
+                "Metal acceleration is not enabled" in str(e)
+                or "Metal GPU backend is not available" in str(e)
+            ):
+                self.skipTest(f"Metal not available: {e}")
+            else:
+                raise
+

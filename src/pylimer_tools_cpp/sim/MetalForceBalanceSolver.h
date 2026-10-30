@@ -25,6 +25,8 @@ isMetalAvailable();
  * @param shortAlpha Whether to use BB1 (short) step size formula instead of BB2
  * (long)
  * @param initialX Optional initial guess vector
+ * @param projectZeroModes Whether to periodically project out center-of-mass
+ * translational zero modes
  * @return Solution vector x
  */
 Eigen::VectorXd
@@ -36,7 +38,8 @@ solveSLEMetalBarzilaiBorwein(
   int maxIterations,
   int& iterationsDone,
   bool shortAlpha = false,
-  const Eigen::VectorXd& initialX = Eigen::VectorXd());
+  const Eigen::VectorXd& initialX = Eigen::VectorXd(),
+  bool projectZeroModes = false);
 
 /**
  * @brief Solves the sparse linear equation system Ax = b on Apple Silicon GPU
@@ -49,6 +52,8 @@ solveSLEMetalBarzilaiBorwein(
  * @param maxIterations Maximum number of iterations
  * @param iterationsDone Output count of iterations performed
  * @param initialX Optional initial guess vector
+ * @param projectZeroModes Whether to periodically project out center-of-mass
+ * translational zero modes
  * @return Solution vector x
  */
 Eigen::VectorXd
@@ -57,6 +62,7 @@ solveSLEMetalCG(const Eigen::SparseMatrix<double>& A,
                 double tolerance,
                 int maxIterations,
                 int& iterationsDone,
-                const Eigen::VectorXd& initialX = Eigen::VectorXd());
+                const Eigen::VectorXd& initialX = Eigen::VectorXd(),
+                bool projectZeroModes = false);
 
 } // namespace pylimer_tools::sim::mehp

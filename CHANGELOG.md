@@ -14,8 +14,14 @@
       - `METAL_CG`: Conjugate Gradient SLE solver using Metal compute shaders.
       - `METAL_BARZILAI_BORWEIN`: Barzilai-Borwein two-point step size gradient descent solver using Metal compute shaders.
     - Add `SLESolver.METAL_CG` and `SLESolver.METAL_BARZILAI_BORWEIN` to `MEHPForceBalance2` and Python bindings.
+    - **Performance & Stability Enhancements**:
+      - SIMDgroup-cooperative SpMV kernel (`csr_spmv_coop8`) with 8 threads per row, coalesced memory access, and `simd_shuffle_down` reductions.
+      - Persistent `MTLBuffer` pooling in `MetalFBSBackend` to eliminate per-solve buffer allocation overhead.
+      - GPU-resident batched iteration loops (20-25 steps per batch) evaluating step sizes and convergence on-device without CPU round-trips.
+      - Translational zero-mode (center-of-mass) projection to eliminate rigid body drift in unanchored periodic networks.
+      - Periodic gradient recomputation in Barzilai-Borwein batches to prevent single-precision drift.
 - Fix `ADD_ITERATIONS` assertion in `MEHPForceBalance2` when residual vector is zero.
-- Add comprehensive Catch2 accuracy benchmarks and tests for Metal KPM, Jacobi, Conjugate Gradient, and Barzilai-Borwein solvers with cross-platform build guards.
+- Add comprehensive Catch2 accuracy benchmarks and tests for Metal KPM, Jacobi, Conjugate Gradient, Barzilai-Borwein solvers, buffer pooling, and zero-mode projection with cross-platform build guards.
 
 ## v0.4.1
 
