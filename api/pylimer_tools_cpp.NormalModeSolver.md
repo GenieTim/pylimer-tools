@@ -12,6 +12,7 @@ Solver algorithms for normal mode analysis
 |-----------------------------------------------------------------|----|
 | [`DENSE_EIGEN`](#pylimer_tools_cpp.NormalModeSolver.DENSE_EIGEN)    |    |
 | [`DENSE_LAPACK`](#pylimer_tools_cpp.NormalModeSolver.DENSE_LAPACK)   |    |
+| [`METAL`](#pylimer_tools_cpp.NormalModeSolver.METAL)          |    |
 | [`SPARSE_SLICING`](#pylimer_tools_cpp.NormalModeSolver.SPARSE_SLICING) |    |
 
 ### Attributes Documentation
@@ -21,5 +22,7 @@ Solver algorithms for normal mode analysis
 #### DENSE_EIGEN *= 2*
 
 #### DENSE_LAPACK *= 1*
+
+#### METAL *= 4*
 
 #### SPARSE_SLICING *= 3*

@@ -25,6 +25,8 @@ Solver for sparse linear equation systems
 | [`LEAST_SQUARES_CONJUGATE_GRADIENT`](#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT)              |    |
 | [`LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED`](#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED) |    |
 | [`LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY`](#pylimer_tools_cpp.SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY)     |    |
+| [`METAL_BARZILAI_BORWEIN`](#pylimer_tools_cpp.SLESolver.METAL_BARZILAI_BORWEIN)                        |    |
+| [`METAL_CG`](#pylimer_tools_cpp.SLESolver.METAL_CG)                                      |    |
 | [`SIMPLICIAL_LDLT`](#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LDLT)                               |    |
 | [`SIMPLICIAL_LLT`](#pylimer_tools_cpp.SLESolver.SIMPLICIAL_LLT)                                |    |
 | [`SPARSE_LU`](#pylimer_tools_cpp.SLESolver.SPARSE_LU)                                     |    |
@@ -63,6 +65,10 @@ Solver for sparse linear equation systems
 #### LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED *= 10*
 
 #### LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY *= 11*
+
+#### METAL_BARZILAI_BORWEIN *= 21*
+
+#### METAL_CG *= 20*
 
 #### SIMPLICIAL_LDLT *= 2*
 

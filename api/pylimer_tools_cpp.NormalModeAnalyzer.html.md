@@ -18,30 +18,42 @@ Constructs the connectivity matrix from the given edges.
 
 ### Methods Summary
 
-| [`compute_chebyshev_moments_kpm`](#pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm)(self[, ...])       | Compute Chebyshev moments using the Kernel Polynomial Method (KPM).                   |
-|---------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| [`compute_density_of_states_kpm`](#pylimer_tools_cpp.NormalModeAnalyzer.compute_density_of_states_kpm)(self, lambda_grid) | Compute continuous density of states (DOS) using KPM.                                 |
-| [`evaluate_loss_modulus`](#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus)(self, omega)               | Evaluate the loss modulus $G''(\omega)$.                                              |
-| [`evaluate_loss_modulus_kpm`](#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm)(self, omega[, ...])    | Evaluate loss modulus G'' directly using KPM without computing eigenvalues.           |
-| [`evaluate_storage_modulus`](#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus)(self, omega)            | Evaluate the storage modulus $G'(\omega)$.                                            |
-| [`evaluate_storage_modulus_kpm`](#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm)(self, omega[, ...]) | Evaluate storage modulus G' directly using KPM without computing eigenvalues.         |
-| [`evaluate_stress_autocorrelation`](#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation)(self, t)         | Evaluate stress autocorrelation $C(t)$.                                               |
-| [`evaluate_stress_autocorrelation_kpm`](#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm)(self, t)     | Evaluate stress autocorrelation directly using KPM without computing eigenvalues.     |
-| [`find_all_eigenvalues`](#pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues)(self[, solver, ...])        | Find all eigenvalues using the specified solver.                                      |
-| [`find_sparse_eigenvalues`](#pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues)(self, nr_of_eigenvalues) | Find the k smallest eigenvalues using a sparse solver.                                |
-| [`get_eigenvalues`](#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvalues)(self)                            | Get the eigenvalues.                                                                  |
-| [`get_eigenvectors`](#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors)(self)                           | Get eigenvectors.                                                                     |
-| [`get_matrix`](#pylimer_tools_cpp.NormalModeAnalyzer.get_matrix)(self)                                 | Get the assembled connectivity matrix.                                                |
-| [`get_matrix_size`](#pylimer_tools_cpp.NormalModeAnalyzer.get_matrix_size)(self)                            | Get the size of the matrix (the maximum number of eigenvalues that could be queried). |
-| [`get_nr_of_soluble_clusters`](#pylimer_tools_cpp.NormalModeAnalyzer.get_nr_of_soluble_clusters)(self)                 | Get the number of soluble clusters (eigenvalues = 0).                                 |
-| [`set_eigenvalues`](#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues)(self, eigenvalues)               | Set the eigenvalues, e.g. if you use an external solver.                              |
-| [`set_eigenvectors`](#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors)(self, eigenvectors)             | Set eigenvectors, e.g. if you use an external solver.                                 |
+| [`compute_chebyshev_moments_kpm`](#pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm)(self[, ...])       | Compute Chebyshev moments using the Kernel Polynomial Method (KPM).                                                      |
+|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| [`compute_chebyshev_moments_kpm_metal`](#pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm_metal)(self[, ...]) | Compute Chebyshev moments using the Kernel Polynomial Method (KPM) accelerated with Apple Silicon Metal compute kernels. |
+| [`compute_density_of_states_kpm`](#pylimer_tools_cpp.NormalModeAnalyzer.compute_density_of_states_kpm)(self, lambda_grid) | Compute continuous density of states (DOS) using KPM.                                                                    |
+| [`evaluate_loss_modulus`](#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus)(self, omega)               | Evaluate the loss modulus $G''(\omega)$.                                                                                 |
+| [`evaluate_loss_modulus_kpm`](#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm)(self, omega[, ...])    | Evaluate loss modulus G'' directly using KPM without computing eigenvalues.                                              |
+| [`evaluate_storage_modulus`](#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus)(self, omega)            | Evaluate the storage modulus $G'(\omega)$.                                                                               |
+| [`evaluate_storage_modulus_kpm`](#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm)(self, omega[, ...]) | Evaluate storage modulus G' directly using KPM without computing eigenvalues.                                            |
+| [`evaluate_stress_autocorrelation`](#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation)(self, t)         | Evaluate stress autocorrelation $C(t)$.                                                                                  |
+| [`evaluate_stress_autocorrelation_kpm`](#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm)(self, t)     | Evaluate stress autocorrelation directly using KPM without computing eigenvalues.                                        |
+| [`find_all_eigenvalues`](#pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues)(self[, solver, ...])        | Find all eigenvalues using the specified solver.                                                                         |
+| [`find_sparse_eigenvalues`](#pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues)(self, nr_of_eigenvalues) | Find the k smallest eigenvalues using a sparse solver.                                                                   |
+| [`get_eigenvalues`](#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvalues)(self)                            | Get the eigenvalues.                                                                                                     |
+| [`get_eigenvectors`](#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors)(self)                           | Get eigenvectors.                                                                                                        |
+| [`get_matrix`](#pylimer_tools_cpp.NormalModeAnalyzer.get_matrix)(self)                                 | Get the assembled connectivity matrix.                                                                                   |
+| [`get_matrix_size`](#pylimer_tools_cpp.NormalModeAnalyzer.get_matrix_size)(self)                            | Get the size of the matrix (the maximum number of eigenvalues that could be queried).                                    |
+| [`get_nr_of_soluble_clusters`](#pylimer_tools_cpp.NormalModeAnalyzer.get_nr_of_soluble_clusters)(self)                 | Get the number of soluble clusters (eigenvalues = 0).                                                                    |
+| [`set_eigenvalues`](#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues)(self, eigenvalues)               | Set the eigenvalues, e.g. if you use an external solver.                                                                 |
+| [`set_eigenvectors`](#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors)(self, eigenvectors)             | Set eigenvectors, e.g. if you use an external solver.                                                                    |
 
 ### Methods Documentation
 
 #### compute_chebyshev_moments_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 20) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Compute Chebyshev moments using the Kernel Polynomial Method (KPM).
+
+* **Parameters:**
+  * **num_moments** – Number of moments to compute (default: 1024)
+  * **num_random_vectors** – Number of random Rademacher vectors for trace estimation (default: 20)
+* **Returns:**
+  Vector of damped Chebyshev moments
+
+#### compute_chebyshev_moments_kpm_metal(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 20) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+
+Compute Chebyshev moments using the Kernel Polynomial Method (KPM)
+accelerated with Apple Silicon Metal compute kernels.
 
 * **Parameters:**
   * **num_moments** – Number of moments to compute (default: 1024)
@@ -128,7 +140,7 @@ Evaluate stress autocorrelation directly using KPM without computing eigenvalues
 Find all eigenvalues using the specified solver.
 
 * **Parameters:**
-  * **solver** – Solver method to use (NormalModeSolver enum or string: ‘auto’, ‘dense_lapack’, ‘dense_eigen’, ‘sparse_slicing’; default: NormalModeSolver.AUTO)
+  * **solver** – Solver method to use (NormalModeSolver enum or string: ‘auto’, ‘dense_lapack’, ‘dense_eigen’, ‘sparse_slicing’, ‘metal’; default: NormalModeSolver.AUTO)
   * **compute_eigenvectors** – Whether to also compute eigenvectors (default: False)
   * **decompose_components** – Whether to decompose the graph into connected components (default: True)
 

@@ -18,8 +18,8 @@ without slip-links or entanglements.
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 10-155 -->
 ```none
-Phantom Shear Modulus [MPa]:  0.006117500031984316
-Phantom Shear Modulus [MPa] (Langevin):  0.006117508589323436
+Phantom Shear Modulus [MPa]:  0.00611750001673971
+Phantom Shear Modulus [MPa] (Langevin):  0.006117508743626068
 Phantom Shear Modulus [MPa] (Custom Evaluator):  0.006117500021057896
 ```
 
@@ -171,7 +171,7 @@ print(
 )
 ```
 
-**Total running time of the script:** (0 minutes 4.139 seconds)
+**Total running time of the script:** (0 minutes 2.153 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-relaxation-py"></a>
 

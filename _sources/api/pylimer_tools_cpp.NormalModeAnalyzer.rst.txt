@@ -11,6 +11,7 @@ NormalModeAnalyzer
    .. autosummary::
 
       ~NormalModeAnalyzer.compute_chebyshev_moments_kpm
+      ~NormalModeAnalyzer.compute_chebyshev_moments_kpm_metal
       ~NormalModeAnalyzer.compute_density_of_states_kpm
       ~NormalModeAnalyzer.evaluate_loss_modulus
       ~NormalModeAnalyzer.evaluate_loss_modulus_kpm
@@ -31,6 +32,7 @@ NormalModeAnalyzer
    .. rubric:: Methods Documentation
 
    .. automethod:: compute_chebyshev_moments_kpm
+   .. automethod:: compute_chebyshev_moments_kpm_metal
    .. automethod:: compute_density_of_states_kpm
    .. automethod:: evaluate_loss_modulus
    .. automethod:: evaluate_loss_modulus_kpm
