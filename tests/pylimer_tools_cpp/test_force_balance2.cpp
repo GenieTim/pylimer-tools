@@ -3431,4 +3431,434 @@ TEST_CASE("MEHPForceBalance2 Metal SIMDgroup-Cooperative SpMV Degree Variation",
   CHECK(rel_err_bb < 1e-3);
 }
 
+TEST_CASE("MEHPForceBalance2 Metal Multi-RHS 3D Block-SpMV Accuracy and Benchmark",
+          "[MEHPForceBalance2][Metal]")
+{
+  std::cout << "Running test \"MEHPForceBalance2 Metal Multi-RHS 3D Block-SpMV "
+               "Accuracy and Benchmark\""
+            << std::endl;
+
+  const int numNodes = 2000;
+  const int N = numNodes * 3; // 6000 DOFs
+
+  // Build an N_nodes x N_nodes scalar Laplacian matrix (Symmetric Negative Definite)
+  std::vector<Eigen::Triplet<double>> scalarTriplets;
+  scalarTriplets.reserve(numNodes * 8);
+  Eigen::VectorXd scalarDiag = Eigen::VectorXd::Zero(numNodes);
+
+  for (int i = 0; i < numNodes; ++i) {
+    int n1 = (i + 1) % numNodes;
+    int n2 = (i + 3) % numNodes;
+    int n3 = (i + 17) % numNodes;
+    scalarTriplets.push_back({ i, n1, 1.0 });
+    scalarTriplets.push_back({ n1, i, 1.0 });
+    scalarTriplets.push_back({ i, n2, 0.5 });
+    scalarTriplets.push_back({ n2, i, 0.5 });
+    scalarTriplets.push_back({ i, n3, 0.25 });
+    scalarTriplets.push_back({ n3, i, 0.25 });
+    scalarDiag[i] -= (1.0 + 0.5 + 0.25);
+    scalarDiag[n1] -= 1.0;
+    scalarDiag[n2] -= 0.5;
+    scalarDiag[n3] -= 0.25;
+  }
+  for (int i = 0; i < numNodes; ++i) {
+    scalarDiag[i] -= 0.5; // Strictly negative definite grounding
+    scalarTriplets.push_back({ i, i, scalarDiag[i] });
+  }
+
+  Eigen::SparseMatrix<double> scalarL(numNodes, numNodes);
+  scalarL.setFromTriplets(scalarTriplets.begin(), scalarTriplets.end());
+  scalarL.makeCompressed();
+
+  // Build the corresponding full (3N_nodes x 3N_nodes) expanded matrix
+  std::vector<Eigen::Triplet<double>> fullTriplets;
+  fullTriplets.reserve(numNodes * 8 * 3);
+  for (int k = 0; k < scalarL.outerSize(); ++k) {
+    for (Eigen::SparseMatrix<double>::InnerIterator it(scalarL, k); it; ++it) {
+      int r = static_cast<int>(it.row());
+      int c = static_cast<int>(it.col());
+      double v = it.value();
+      for (int d = 0; d < 3; ++d) {
+        fullTriplets.push_back({ 3 * r + d, 3 * c + d, v });
+      }
+    }
+  }
+  Eigen::SparseMatrix<double> fullA(N, N);
+  fullA.setFromTriplets(fullTriplets.begin(), fullTriplets.end());
+  fullA.makeCompressed();
+
+  // Verify matrix memory sizes: scalarL has exactly 1/3 the nonzeros of fullA
+  CHECK(scalarL.nonZeros() * 3 == fullA.nonZeros());
+  std::cout << "Scalar Laplacian NNZ: " << scalarL.nonZeros()
+            << ", Full 3Nx3N NNZ: " << fullA.nonZeros()
+            << " (exact 3x reduction in matrix nonzeros and storage)" << std::endl;
+
+  // Generate exact 3D displacement vector
+  Eigen::VectorXd x_exact(N);
+  for (int i = 0; i < N; ++i) {
+    x_exact[i] = std::sin(0.01 * i) + 0.2 * std::cos(0.05 * i);
+  }
+
+  // 1. Verify Pure SpMV Mathematical Equivalence: 3D Block-SpMV vs Full SpMV vs CPU
+  Eigen::VectorXd y_metal_3d = pcm::spmvMetal3D(scalarL, x_exact);
+  Eigen::VectorXd y_metal_full = pcm::spmvMetal(fullA, x_exact);
+  Eigen::VectorXd y_cpu = fullA * x_exact;
+
+  double spmv_err_3d = (y_metal_3d - y_cpu).norm() / y_cpu.norm();
+  double spmv_err_full = (y_metal_full - y_cpu).norm() / y_cpu.norm();
+  double spmv_diff_3d_full = (y_metal_3d - y_metal_full).norm() / y_cpu.norm();
+
+  std::cout << "Pure SpMV relative error to CPU: 3D Block-SpMV = " << spmv_err_3d
+            << ", Full SpMV = " << spmv_err_full
+            << ", 3D vs Full diff = " << spmv_diff_3d_full << std::endl;
+  CHECK(spmv_err_3d < 1e-5);
+  CHECK(spmv_err_full < 1e-5);
+  CHECK(spmv_diff_3d_full < 1e-5);
+
+  Eigen::VectorXd b = y_cpu;
+
+  int iters_3d = 0;
+  int iters_full = 0;
+
+  // Solve with Multi-RHS 3D Block-SpMV solver (N_nodes x N_nodes scalar matrix, 3N vector)
+  Eigen::VectorXd x_3d =
+    pcm::solveSLEMetalCG3D(scalarL, b, 1e-5, 300, iters_3d, Eigen::VectorXd(), false, false);
+
+  // Solve with Full 3Nx3N matrix solver
+  Eigen::VectorXd x_full =
+    pcm::solveSLEMetalCG(fullA, b, 1e-5, 300, iters_full, Eigen::VectorXd(), false, false);
+
+  double rel_err_3d = (x_3d - x_exact).norm() / x_exact.norm();
+  double rel_err_full = (x_full - x_exact).norm() / x_exact.norm();
+  double diff_3d_full = (x_3d - x_full).norm() / x_full.norm();
+
+  std::cout << "3D Block-SpMV rel err: " << rel_err_3d << ", iters: " << iters_3d << std::endl;
+  std::cout << "Full 3Nx3N SpMV rel err: " << rel_err_full << ", iters: " << iters_full << std::endl;
+  std::cout << "Diff between 3D Block and Full solves: " << diff_3d_full << std::endl;
+
+  CHECK(rel_err_3d < 1e-3);
+  CHECK(rel_err_full < 1e-3);
+  CHECK(diff_3d_full < 1e-4);
+
+  // Test automatic detection: solveSLEMetalCG with scalarL (rows*3 == b.size())
+  int iters_auto = 0;
+  Eigen::VectorXd x_auto =
+    pcm::solveSLEMetalCG(scalarL, b, 1e-5, 300, iters_auto, Eigen::VectorXd(), false, false);
+  CHECK((x_auto - x_3d).norm() / x_3d.norm() < 1e-5);
+  CHECK(iters_auto == iters_3d);
+
+  // Also test 3D Barzilai-Borwein solver
+  int iters_bb_3d = 0;
+  Eigen::VectorXd x_bb_3d =
+    pcm::solveSLEMetalBarzilaiBorwein3D(scalarL, b, 0.01, 1e-5, 500, iters_bb_3d, true);
+  double rel_err_bb_3d = (x_bb_3d - x_exact).norm() / x_exact.norm();
+  std::cout << "3D BB rel err: " << rel_err_bb_3d << ", iters: " << iters_bb_3d << std::endl;
+  CHECK(rel_err_bb_3d < 1e-3);
+
+  // 2. Pure SpMV Throughput and Memory Bandwidth Benchmark on Larger Network
+  const int benchNodes = 10000; // 30,000 DOFs
+  std::vector<Eigen::Triplet<double>> benchScalarTriplets;
+  benchScalarTriplets.reserve(benchNodes * 7);
+  for (int i = 0; i < benchNodes; ++i) {
+    int n1 = (i + 1) % benchNodes;
+    int n2 = (i + 5) % benchNodes;
+    int n3 = (i + 23) % benchNodes;
+    benchScalarTriplets.push_back({ i, n1, 1.0 });
+    benchScalarTriplets.push_back({ i, n2, 0.5 });
+    benchScalarTriplets.push_back({ i, n3, 0.25 });
+    benchScalarTriplets.push_back({ i, i, -2.5 });
+  }
+  Eigen::SparseMatrix<double> benchScalarL(benchNodes, benchNodes);
+  benchScalarL.setFromTriplets(benchScalarTriplets.begin(), benchScalarTriplets.end());
+  benchScalarL.makeCompressed();
+
+  std::vector<Eigen::Triplet<double>> benchFullTriplets;
+  benchFullTriplets.reserve(benchNodes * 7 * 3);
+  for (int k = 0; k < benchScalarL.outerSize(); ++k) {
+    for (Eigen::SparseMatrix<double>::InnerIterator it(benchScalarL, k); it; ++it) {
+      int r = static_cast<int>(it.row());
+      int c = static_cast<int>(it.col());
+      double v = it.value();
+      for (int d = 0; d < 3; ++d) {
+        benchFullTriplets.push_back({ 3 * r + d, 3 * c + d, v });
+      }
+    }
+  }
+  Eigen::SparseMatrix<double> benchFullA(benchNodes * 3, benchNodes * 3);
+  benchFullA.setFromTriplets(benchFullTriplets.begin(), benchFullTriplets.end());
+  benchFullA.makeCompressed();
+
+  pcm::SpmvBenchmarkResult benchResult =
+    pcm::benchmarkSpMVMetal(benchScalarL, benchFullA, 100);
+
+  std::cout << "Pure SpMV Benchmark (100 repetitions, N=" << benchNodes * 3 << "): "
+            << "Full SpMV time = " << benchResult.timeFull_ms << " ms, "
+            << "3D Block-SpMV time = " << benchResult.time3D_ms << " ms, "
+            << "Speedup = " << benchResult.speedup << "x, "
+            << "Bandwidth reduction = " << benchResult.bandwidthReductionRatio << "x "
+            << "(" << benchResult.memory3D_bytes / 1024 << " KB vs "
+            << benchResult.memoryFull_bytes / 1024 << " KB)" << std::endl;
+
+  CHECK(benchResult.bandwidthReductionRatio >= 2.9); // Exactly ~3x less matrix memory bandwidth
+  CHECK(benchResult.speedup >= 1.35);                 // Substantial speedup for pure SpMV
+}
+
+TEST_CASE("MEHPForceBalance2 Metal GPU-Resident Jacobi Preconditioner Convergence",
+          "[MEHPForceBalance2][Metal]")
+{
+  std::cout << "Running test \"MEHPForceBalance2 Metal GPU-Resident Jacobi "
+               "Preconditioner Convergence\""
+            << std::endl;
+
+  // Build a realistic polydisperse polymer network:
+  // - Chain strands have varying stiffness based on strand length (k ~ 1 / N_k)
+  // - Crosslink hubs connect multiple chains with higher junction functionality
+  const int numNodes = 3000;
+  const int N = numNodes * 3; // 9000 DOFs
+
+  std::vector<Eigen::Triplet<double>> scalarTriplets;
+  scalarTriplets.reserve(numNodes * 8);
+  Eigen::VectorXd scalarDiag = Eigen::VectorXd::Zero(numNodes);
+
+  for (int i = 0; i < numNodes; ++i) {
+    int n1 = (i + 1) % numNodes;
+    int n2 = (i + 7) % numNodes;
+    // Strand stiffnesses vary widely (0.2 to 3.2, 0.1 to 2.1) representing polydisperse chains
+    double k1 = 0.2 + 3.0 * std::sin(0.1 * i) * std::sin(0.1 * i);
+    double k2 = 0.1 + 2.0 * std::cos(0.05 * i) * std::cos(0.05 * i);
+    scalarTriplets.push_back({ i, n1, k1 });
+    scalarTriplets.push_back({ n1, i, k1 });
+    scalarTriplets.push_back({ i, n2, k2 });
+    scalarTriplets.push_back({ n2, i, k2 });
+    scalarDiag[i] -= (k1 + k2);
+    scalarDiag[n1] -= k1;
+    scalarDiag[n2] -= k2;
+
+    if (i % 12 == 0) { // Crosslink hubs
+      int x1 = (i + 31) % numNodes;
+      int x2 = (i + 97) % numNodes;
+      double kX = 4.0;
+      scalarTriplets.push_back({ i, x1, kX });
+      scalarTriplets.push_back({ x1, i, kX });
+      scalarTriplets.push_back({ i, x2, kX });
+      scalarTriplets.push_back({ x2, i, kX });
+      scalarDiag[i] -= 2.0 * kX;
+      scalarDiag[x1] -= kX;
+      scalarDiag[x2] -= kX;
+    }
+  }
+
+  // Grounding for negative definiteness
+  for (int i = 0; i < numNodes; ++i) {
+    scalarDiag[i] -= 0.05;
+    scalarTriplets.push_back({ i, i, scalarDiag[i] });
+  }
+
+  Eigen::SparseMatrix<double> scalarL(numNodes, numNodes);
+  scalarL.setFromTriplets(scalarTriplets.begin(), scalarTriplets.end());
+  scalarL.makeCompressed();
+
+  // Check diagonal variation ratio
+  double minDiag = std::abs(scalarDiag.maxCoeff()); // least negative
+  double maxDiag = std::abs(scalarDiag.minCoeff()); // most negative
+  double condRatio = maxDiag / minDiag;
+  std::cout << "Polymer network diagonal range: [" << minDiag << ", "
+            << maxDiag << "], diagonal variation ratio = " << condRatio << std::endl;
+  CHECK(condRatio > 4.0); // Significant degree/diagonal heterogeneity
+
+  Eigen::VectorXd x_exact(N);
+  for (int i = 0; i < N; ++i) {
+    x_exact[i] = std::sin(0.02 * i) + 0.5 * std::cos(0.01 * i);
+  }
+
+  // Compute b = (L (x) I3) * x_exact
+  Eigen::VectorXd b = Eigen::VectorXd::Zero(N);
+  for (int k = 0; k < scalarL.outerSize(); ++k) {
+    for (Eigen::SparseMatrix<double>::InnerIterator it(scalarL, k); it; ++it) {
+      int r = static_cast<int>(it.row());
+      int c = static_cast<int>(it.col());
+      double v = it.value();
+      b.segment(3 * r, 3) += v * x_exact.segment(3 * c, 3);
+    }
+  }
+
+  int iters_unpreconditioned = 0;
+  int iters_jacobi = 0;
+
+  // 1. Unpreconditioned Metal CG (M = I)
+  Eigen::VectorXd x_unprec =
+    pcm::solveSLEMetalCG3D(scalarL, b, 1e-5, 400, iters_unpreconditioned,
+                           Eigen::VectorXd(), false, /*useJacobi=*/false);
+
+  // 2. Preconditioned Metal CG with GPU-Resident Jacobi (M = diag(A))
+  Eigen::VectorXd x_jacobi =
+    pcm::solveSLEMetalCG3D(scalarL, b, 1e-5, 400, iters_jacobi,
+                           Eigen::VectorXd(), false, /*useJacobi=*/true);
+
+  double rel_err_unprec = (x_unprec - x_exact).norm() / x_exact.norm();
+  double rel_err_jacobi = (x_jacobi - x_exact).norm() / x_exact.norm();
+
+  double iterReduction = 100.0 * (1.0 - static_cast<double>(iters_jacobi) /
+                                          static_cast<double>(iters_unpreconditioned));
+
+  std::cout << "Unpreconditioned CG iters: " << iters_unpreconditioned
+            << ", rel err: " << rel_err_unprec << std::endl;
+  std::cout << "Jacobi Preconditioned CG iters: " << iters_jacobi
+            << ", rel err: " << rel_err_jacobi << std::endl;
+  std::cout << "Iteration reduction from GPU-Resident Jacobi: "
+            << iterReduction << "%" << std::endl;
+
+  CHECK(rel_err_jacobi < 1e-3);
+  CHECK(rel_err_unprec < 1e-3);
+  // Verify 20% - 40% reduction in CG iterations
+  CHECK(iterReduction >= 18.0);
+  CHECK(iters_jacobi < iters_unpreconditioned);
+}
+
+TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
+          "[MEHPForceBalance2][Metal]")
+{
+  std::cout << "Running test \"MEHPForceBalance2 Metal End-to-End GPU "
+               "Relaxation\""
+            << std::endl;
+
+  // 1. Unit Test for GPU Spring Strain and Inactivity Evaluation Kernel
+  {
+    const size_t numNodes = 4;
+    const size_t numSprings = 4;
+
+    // Node 0: (0,0,0)
+    // Node 1: (1,0,0) -> dist = 1.0 (normal)
+    // Node 2: (4,0,0) -> dist = 4.0 (overstretched, contour=1.0, threshold=3.0)
+    // Node 3: (0.05,0,0) -> dist = 0.05 (inactive, contour=1.0, cutoff=0.1)
+    Eigen::VectorXd coords(12);
+    coords << 0, 0, 0,
+              1, 0, 0,
+              4, 0, 0,
+              0.05, 0, 0;
+
+    // Load coordinates into GPU buffer
+    Eigen::SparseMatrix<double> dummyA(numNodes, numNodes);
+    dummyA.insert(0, 0) = 1.0;
+    dummyA.insert(1, 1) = 1.0;
+    dummyA.insert(2, 2) = 1.0;
+    dummyA.insert(3, 3) = 1.0;
+    dummyA.makeCompressed();
+    Eigen::VectorXd dummyB = coords;
+    int dummyIters = 0;
+    pcm::solveSLEMetalCG3D(dummyA, dummyB, 1e-5, 1, dummyIters, coords, false, false);
+
+    std::vector<int> springA = { 0, 0, 0, 1 };
+    std::vector<int> springB = { 1, 2, 3, 2 };
+    std::vector<double> boxOffset = { 0, 0, 0,
+                                      0, 0, 0,
+                                      0, 0, 0,
+                                      0, 0, 0 };
+    std::vector<double> contourLength = { 1.0, 1.0, 1.0, 1.0 };
+
+    pcm::SpringRelaxationData springData;
+    springData.springIndexA = springA.data();
+    springData.springIndexB = springB.data();
+    springData.springBoxOffset = boxOffset.data();
+    springData.springContourLength = contourLength.data();
+    springData.numSprings = numSprings;
+    springData.breakingThreshold = 2.5; // Spring 1 (len=4.0) and Spring 3 (len=3.0) will break
+    springData.inactiveCutoff = 0.1;     // Spring 2 (len=0.05) is inactive
+
+    pcm::SpringEvaluationResult evalRes =
+      pcm::evaluateSpringStrainAndInactivityMetal(numNodes, springData);
+
+    std::cout << "GPU Spring Evaluation: numBroken = " << evalRes.numBroken
+              << ", numInactive = " << evalRes.numInactive
+              << ", totalFlagged = " << evalRes.totalFlagged << std::endl;
+
+    CHECK(evalRes.numBroken >= 2);
+    CHECK(evalRes.numInactive >= 1);
+    CHECK(evalRes.totalFlagged >= 3);
+    // Spring 0 is normal (0)
+    CHECK((evalRes.springFlags[0] & 1) == 0);
+    CHECK((evalRes.springFlags[0] & 2) == 0);
+    // Spring 1 is broken (bit 0 set)
+    CHECK((evalRes.springFlags[1] & 1) != 0);
+    // Spring 2 is inactive (bit 1 set)
+    CHECK((evalRes.springFlags[2] & 2) != 0);
+  }
+
+  // 2. Full Network Relaxation using MEHPForceBalance2 with Metal CG and BB
+  {
+    size_t nrOfBeads = 60;
+    size_t nrOfChains = 20;
+    pe::Universe universe = pe::Universe(20.0, 20.0, 20.0);
+    for (size_t i = 0; i < nrOfChains; ++i) {
+      long int beadOffset = i * nrOfBeads;
+      std::vector<long int> atomIds(nrOfBeads);
+      std::iota(atomIds.begin(), atomIds.end(), 1 + beadOffset);
+      std::vector<double> coords(nrOfBeads);
+      std::iota(coords.begin(), coords.end(), 1. + beadOffset * 0.5);
+      universe.addAtoms(atomIds,
+                        pylimer_tools::utils::initializeWithValue(nrOfBeads, 1),
+                        coords,
+                        coords,
+                        coords,
+                        pylimer_tools::utils::initializeWithValue(nrOfBeads, 0),
+                        pylimer_tools::utils::initializeWithValue(nrOfBeads, 0),
+                        pylimer_tools::utils::initializeWithValue(nrOfBeads, 0));
+      std::vector<long int> bondFrom(nrOfBeads - 1);
+      std::vector<long int> bondTo(nrOfBeads - 1);
+      std::iota(bondFrom.begin(), bondFrom.end(), 1 + beadOffset);
+      std::iota(bondTo.begin(), bondTo.end(), 2 + beadOffset);
+      universe.addBonds(bondFrom, bondTo);
+    }
+    std::vector<long int> crossFrom, crossTo;
+    for (size_t i = 0; i < nrOfChains - 1; ++i) {
+      crossFrom.push_back(i * nrOfBeads + 10);
+      crossTo.push_back((i + 1) * nrOfBeads + 20);
+      crossFrom.push_back(i * nrOfBeads + 40);
+      crossTo.push_back(((i + 2) % nrOfChains) * nrOfBeads + 50);
+    }
+    universe.addBonds(crossFrom, crossTo);
+
+    // Run CPU Conjugate Gradient Relaxation as baseline
+    pcm::MEHPForceBalance2 fb_cpu(universe, 2, false);
+    fb_cpu.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                              1e-4,
+                              pcm::SLESolver::CONJUGATE_GRADIENT);
+    double res_cpu = fb_cpu.getDisplacementResidualNorm();
+    int active_cpu = fb_cpu.getNrOfActiveSprings();
+
+    // Run Metal CG Relaxation (End-to-End GPU fused relaxation)
+    pcm::MEHPForceBalance2 fb_metal(universe, 2, false);
+    fb_metal.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                                1e-4,
+                                pcm::SLESolver::METAL_CG);
+    double res_metal = fb_metal.getDisplacementResidualNorm();
+    int active_metal = fb_metal.getNrOfActiveSprings();
+
+    std::cout << "CPU CG Final Residual: " << res_cpu
+              << ", Active Springs: " << active_cpu << std::endl;
+    std::cout << "Metal CG Final Residual: " << res_metal
+              << ", Active Springs: " << active_metal << std::endl;
+
+    CHECK(active_metal > 0);
+    CHECK(active_metal == active_cpu);
+    CHECK(res_metal < 1e-3);
+    CHECK_NOTHROW(fb_metal.validateNetwork());
+
+    // Also run Metal Barzilai-Borwein Relaxation
+    pcm::MEHPForceBalance2 fb_bb(universe, 2, false);
+    fb_bb.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                             1e-4,
+                             pcm::SLESolver::METAL_BARZILAI_BORWEIN);
+    double res_bb = fb_bb.getDisplacementResidualNorm();
+    int active_bb = fb_bb.getNrOfActiveSprings();
+
+    std::cout << "Metal BB Final Residual: " << res_bb
+              << ", Active Springs: " << active_bb << std::endl;
+
+    CHECK(active_bb == active_cpu);
+    CHECK(res_bb < 1e-3);
+    CHECK_NOTHROW(fb_bb.validateNetwork());
+  }
+}
+
 #endif

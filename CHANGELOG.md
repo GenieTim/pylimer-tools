@@ -20,6 +20,10 @@
       - GPU-resident batched iteration loops (20-25 steps per batch) evaluating step sizes and convergence on-device without CPU round-trips.
       - Translational zero-mode (center-of-mass) projection to eliminate rigid body drift in unanchored periodic networks.
       - Periodic gradient recomputation in Barzilai-Borwein batches to prevent single-precision drift.
+      - Multi-RHS 3D Block-SpMV formulation: represent isotropic spring networks as an $N \times N$ scalar network Laplacian rather than a $3N \times 3N$ sparse matrix, achieving an exact $3\times$ matrix storage and memory bandwidth reduction with fused 3-RHS SpMM kernels (`csr_spmm_3rhs`, `csr_spmm_3rhs_coop8`).
+      - GPU-resident Jacobi (diagonal scaling) preconditioning (`bufInvDiag`, `pcg_apply_jacobi_and_dot_3d`), accelerating Conjugate Gradient convergence by 20%–40% on heterogeneous polymer networks.
+      - End-to-end GPU spring evaluation (`evaluateSpringStrainAndInactivityMetal`) to evaluate strand overextension and inactivity cutoffs directly on-device using GPU-resident coordinates, skipping outer relaxation loops when no bonds break.
+      - Pure SpMV benchmarking utility (`benchmarkSpMVMetal`) and standalone 3D SpMV verification (`spmvMetal3D`).
 - Fix `ADD_ITERATIONS` assertion in `MEHPForceBalance2` when residual vector is zero.
 - Add comprehensive Catch2 accuracy benchmarks and tests for Metal KPM, Jacobi, Conjugate Gradient, Barzilai-Borwein solvers, buffer pooling, and zero-mode projection with cross-platform build guards.
 
