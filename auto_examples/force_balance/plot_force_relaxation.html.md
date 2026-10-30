@@ -171,7 +171,7 @@ print(
 )
 ```
 
-**Total running time of the script:** (0 minutes 2.359 seconds)
+**Total running time of the script:** (0 minutes 4.098 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-relaxation-py"></a>
 

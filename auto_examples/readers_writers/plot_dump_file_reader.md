@@ -64,7 +64,7 @@ dump_file_reader = DumpFileReader(
 print(f"Dump file contains {dump_file_reader.get_length()} frames")
 ```
 
-**Total running time of the script:** (0 minutes 0.001 seconds)
+**Total running time of the script:** (0 minutes 0.002 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-dump-file-reader-py"></a>
 

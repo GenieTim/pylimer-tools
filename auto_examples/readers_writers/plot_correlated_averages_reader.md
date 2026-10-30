@@ -49,7 +49,7 @@ _ = last_correlation.plot(
         "c_pA1*c_pA1", "c_pA2*c_pA2", "c_pA3*c_pA3"])
 ```
 
-**Total running time of the script:** (0 minutes 0.042 seconds)
+**Total running time of the script:** (0 minutes 0.066 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-correlated-averages-reader-py"></a>
 
