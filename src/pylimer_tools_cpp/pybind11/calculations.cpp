@@ -37,6 +37,7 @@ init_pylimer_bound_calc(py::module_& m)
     .value("DENSE_LAPACK", calc::NormalModeSolver::DENSE_LAPACK)
     .value("DENSE_EIGEN", calc::NormalModeSolver::DENSE_EIGEN)
     .value("SPARSE_SLICING", calc::NormalModeSolver::SPARSE_SLICING)
+    .value("METAL", calc::NormalModeSolver::METAL)
     .finalize();
 
   py::class_<NormalModeAnalyzer>(m,
@@ -106,6 +107,8 @@ init_pylimer_bound_calc(py::module_& m)
             solver = calc::NormalModeSolver::DENSE_EIGEN;
           } else if (s == "sparse" || s == "sparse_slicing" || s == "slicing") {
             solver = calc::NormalModeSolver::SPARSE_SLICING;
+          } else if (s == "metal" || s == "gpu") {
+            solver = calc::NormalModeSolver::METAL;
           } else {
             throw std::invalid_argument("Unknown NormalModeSolver string: " +
                                         s);
@@ -115,7 +118,7 @@ init_pylimer_bound_calc(py::module_& m)
         } else {
           throw py::type_error(
             "solver must be a NormalModeSolver enum or string ('auto', "
-            "'dense_lapack', 'dense_eigen', 'sparse_slicing')");
+            "'dense_lapack', 'dense_eigen', 'sparse_slicing', 'metal')");
         }
         self.computeAllEigenvalues(
           solver, compute_eigenvectors, decompose_components);
@@ -123,18 +126,18 @@ init_pylimer_bound_calc(py::module_& m)
       R"pbdoc(
          Find all eigenvalues using the specified solver.
 
-         :param solver: Solver method to use (NormalModeSolver enum or string: 'auto', 'dense_lapack', 'dense_eigen', 'sparse_slicing'; default: NormalModeSolver.AUTO)
+         :param solver: Solver method to use (NormalModeSolver enum or string: 'auto', 'dense_lapack', 'dense_eigen', 'sparse_slicing', 'metal'; default: NormalModeSolver.AUTO)
          :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
          :param decompose_components: Whether to decompose the graph into connected components (default: True)
          )pbdoc",
       py::arg("solver") = "auto",
       py::arg("compute_eigenvectors") = false,
       py::arg("decompose_components") = true)
-#ifdef USE_CUDA
+#if defined(USE_CUDA) || defined(USE_METAL)
     .def("find_all_eigenvalues_gpu",
          &NormalModeAnalyzer::computeAllEigenvaluesGPU,
          R"pbdoc(
-         Find all eigenvalues using a dense GPU solver (cuSOLVER on CUDA).
+         Find all eigenvalues using a GPU solver (cuSOLVER on CUDA or Metal on Apple Silicon).
          
          :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
          :return: True if computation was successful
@@ -209,6 +212,18 @@ init_pylimer_bound_calc(py::module_& m)
          &NormalModeAnalyzer::computeChebyshevMomentsKPM,
          R"pbdoc(
          Compute Chebyshev moments using the Kernel Polynomial Method (KPM).
+
+         :param num_moments: Number of moments to compute (default: 1024)
+         :param num_random_vectors: Number of random Rademacher vectors for trace estimation (default: 20)
+         :return: Vector of damped Chebyshev moments
+         )pbdoc",
+         py::arg("num_moments") = 1024,
+         py::arg("num_random_vectors") = 20)
+    .def("compute_chebyshev_moments_kpm_metal",
+         &NormalModeAnalyzer::computeChebyshevMomentsKPMMetal,
+         R"pbdoc(
+         Compute Chebyshev moments using the Kernel Polynomial Method (KPM)
+         accelerated with Apple Silicon Metal compute kernels.
 
          :param num_moments: Number of moments to compute (default: 1024)
          :param num_random_vectors: Number of random Rademacher vectors for trace estimation (default: 20)

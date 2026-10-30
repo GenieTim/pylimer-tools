@@ -143,6 +143,16 @@ _skbuild
 _cmake_test_compile
 
 output*.txt
+*-output*.txt
+*-output.txt
+*_output.txt
+*-log.txt
+*.structure.out
+tests/pylimer_tools/fixtures/*.txt
+tests/pylimer_tools/fixtures/*.bin
+tests/pylimer_tools/fixturesmelt*
+CMakeFiles/
+.idea/
 
 docs/_autosummary
 docs/auto_examples

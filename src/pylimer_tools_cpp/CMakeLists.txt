@@ -152,6 +152,20 @@ if (USE_CUDA)
     message(STATUS "CUDA acceleration enabled")
 endif()
 
+option(USE_METAL "Enable Metal acceleration on Apple Silicon" ON)
+
+if (APPLE AND USE_METAL)
+    find_library(METAL_FRAMEWORK Metal REQUIRED)
+    find_library(FOUNDATION_FRAMEWORK Foundation REQUIRED)
+    target_link_libraries(pylimer_tools PUBLIC ${METAL_FRAMEWORK} ${FOUNDATION_FRAMEWORK})
+    target_compile_definitions(pylimer_tools PUBLIC USE_METAL)
+    target_sources(pylimer_tools PRIVATE
+        calc/MetalNormalModeSolver.mm
+        sim/MetalForceBalanceSolver.mm
+    )
+    message(STATUS "Metal acceleration enabled on Apple Silicon")
+endif()
+
 # Code coverage option
 if (NOT DEFINED CODE_COVERAGE)
     option(CODE_COVERAGE "Collect coverage from test library" OFF)

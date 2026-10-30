@@ -33,6 +33,10 @@
 #include <cusolverDn.h>
 #endif
 
+#ifdef USE_METAL
+#include "MetalNormalModeSolver.h"
+#endif
+
 #define NORMAL_MODE_ZERO_TOLERANCE 1e-12
 
 namespace pylimer_tools::calc {
@@ -420,8 +424,19 @@ NormalModeAnalyzer::computeAllEigenvalues(const NormalModeSolver solver,
   if (!decomposeComponents) {
     Eigen::VectorXd evals;
     Eigen::MatrixXd evecs;
-    if (solver == NormalModeSolver::SPARSE_SLICING ||
-        (solver == NormalModeSolver::AUTO && nRows > 2000)) {
+    if (solver == NormalModeSolver::METAL) {
+#ifdef USE_METAL
+      computeAllEigenvaluesMetal(
+        this->assembledConnectivityMatrix, includeEigenvectors, evals, evecs);
+#else
+      computeAllEigenvaluesDense(this->assembledConnectivityMatrix,
+                                 includeEigenvectors,
+                                 false,
+                                 evals,
+                                 evecs);
+#endif
+    } else if (solver == NormalModeSolver::SPARSE_SLICING ||
+               (solver == NormalModeSolver::AUTO && nRows > 2000)) {
       computeAllEigenvaluesSparseSlicing(
         this->assembledConnectivityMatrix, includeEigenvectors, evals, evecs);
     } else {
@@ -565,8 +580,16 @@ NormalModeAnalyzer::computeAllEigenvalues(const NormalModeSolver solver,
 
     Eigen::VectorXd subEvals;
     Eigen::MatrixXd subEvecs;
-    if (solver == NormalModeSolver::SPARSE_SLICING ||
-        (solver == NormalModeSolver::AUTO && M > 2000)) {
+    if (solver == NormalModeSolver::METAL) {
+#ifdef USE_METAL
+      computeAllEigenvaluesMetal(
+        subMat, includeEigenvectors, subEvals, subEvecs);
+#else
+      computeAllEigenvaluesDense(
+        subMat, includeEigenvectors, false, subEvals, subEvecs);
+#endif
+    } else if (solver == NormalModeSolver::SPARSE_SLICING ||
+               (solver == NormalModeSolver::AUTO && M > 2000)) {
       computeAllEigenvaluesSparseSlicing(
         subMat, includeEigenvectors, subEvals, subEvecs);
     } else {
@@ -590,11 +613,24 @@ NormalModeAnalyzer::computeAllEigenvalues(const NormalModeSolver solver,
   if (includeEigenvectors) {
     Eigen::VectorXd dummyEvals;
     Eigen::MatrixXd fullEvecs;
+#ifdef USE_METAL
+    if (solver == NormalModeSolver::METAL) {
+      computeAllEigenvaluesMetal(
+        this->assembledConnectivityMatrix, true, dummyEvals, fullEvecs);
+    } else {
+      computeAllEigenvaluesDense(this->assembledConnectivityMatrix,
+                                 true,
+                                 (solver == NormalModeSolver::DENSE_EIGEN),
+                                 dummyEvals,
+                                 fullEvecs);
+    }
+#else
     computeAllEigenvaluesDense(this->assembledConnectivityMatrix,
                                true,
                                (solver == NormalModeSolver::DENSE_EIGEN),
                                dummyEvals,
                                fullEvecs);
+#endif
     this->setEigenvectors(fullEvecs);
   }
 }
@@ -707,6 +743,15 @@ NormalModeAnalyzer::computeAllEigenvaluesGPU(const bool includeEigenvectors)
   this->setEigenvalues(eigenvaluesMemory);
   if (includeEigenvectors) {
     this->setEigenvectors(eigenvectorsMemory);
+  }
+#elif defined(USE_METAL)
+  Eigen::VectorXd outEvals;
+  Eigen::MatrixXd outEvecs;
+  computeAllEigenvaluesMetal(
+    this->assembledConnectivityMatrix, includeEigenvectors, outEvals, outEvecs);
+  this->setEigenvalues(outEvals);
+  if (includeEigenvectors) {
+    this->setEigenvectors(outEvecs);
   }
 #else
   std::cerr << "GPU computation requested but neither USE_CUDA nor USE_METAL "
@@ -947,6 +992,22 @@ NormalModeAnalyzer::computeChebyshevMomentsKPM(size_t numMoments,
   }
 
   return avgMoments;
+}
+
+Eigen::VectorXd
+NormalModeAnalyzer::computeChebyshevMomentsKPMMetal(
+  size_t numMoments,
+  size_t numRandomVectors) const
+{
+#ifdef USE_METAL
+  auto [c, w] = getSpectralScalingParameters(0.01);
+  return pylimer_tools::calc::computeChebyshevMomentsKPMMetal(
+    this->assembledConnectivityMatrix, numMoments, numRandomVectors, c, w);
+#else
+  std::cerr << "Metal acceleration not enabled. Falling back to CPU KPM."
+            << std::endl;
+  return computeChebyshevMomentsKPM(numMoments, numRandomVectors);
+#endif
 }
 
 void

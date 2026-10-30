@@ -321,3 +321,124 @@ TEST_CASE("NormalModeAnalyzer benchmark", "[!benchmark][NormalModeAnalyzer]")
     return nma.getEigenvalues().size();
   };
 }
+
+TEST_CASE("NormalModeAnalyzer Metal GPU solver computes accurate eigenvalues "
+          "and eigenvectors",
+          "[analysis][NormalModeAnalyzer][Metal]")
+{
+  // Test 1: Simple 3-bead ring
+  {
+    pc::NormalModeAnalyzer nmaCPU({ 0, 1, 2 }, { 1, 2, 0 });
+    nmaCPU.computeAllEigenvalues(pc::NormalModeSolver::DENSE_LAPACK, true);
+
+    pc::NormalModeAnalyzer nmaGPU({ 0, 1, 2 }, { 1, 2, 0 });
+    nmaGPU.computeAllEigenvaluesGPU(true);
+
+    REQUIRE(nmaGPU.getEigenvalues().size() == 3);
+    for (Eigen::Index i = 0; i < 3; ++i) {
+      CHECK_THAT(nmaGPU.getEigenvalues()[i],
+                 Catch::Matchers::WithinAbs(nmaCPU.getEigenvalues()[i], 1e-4));
+    }
+
+    // Check eigenvector orthonormality: V^T * V = I
+    Eigen::MatrixXd V = nmaGPU.getEigenvectors();
+    Eigen::MatrixXd Id = V.transpose() * V;
+    for (int r = 0; r < 3; ++r) {
+      for (int c = 0; c < 3; ++c) {
+        CHECK_THAT(Id(r, c),
+                   Catch::Matchers::WithinAbs(r == c ? 1.0 : 0.0, 1e-3));
+      }
+    }
+  }
+
+  // Test 2: 20-bead ring with crosslinks
+  {
+    std::vector<size_t> springFrom;
+    std::vector<size_t> springTo;
+    size_t n = 20;
+    for (size_t i = 0; i < n; ++i) {
+      springFrom.push_back(i);
+      springTo.push_back((i + 1) % n);
+      if (i % 5 == 0) {
+        springFrom.push_back(i);
+        springTo.push_back((i + 10) % n);
+      }
+    }
+
+    pc::NormalModeAnalyzer nmaCPU(springFrom, springTo);
+    nmaCPU.computeAllEigenvalues(pc::NormalModeSolver::DENSE_LAPACK, false);
+
+    pc::NormalModeAnalyzer nmaGPU(springFrom, springTo);
+    nmaGPU.computeAllEigenvalues(pc::NormalModeSolver::METAL, false);
+
+    REQUIRE(nmaGPU.getEigenvalues().size() == static_cast<Eigen::Index>(n));
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(n); ++i) {
+      CHECK_THAT(nmaGPU.getEigenvalues()[i],
+                 Catch::Matchers::WithinAbs(nmaCPU.getEigenvalues()[i], 1e-3));
+    }
+  }
+}
+
+TEST_CASE("NormalModeAnalyzer Metal KPM computes accurate Chebyshev moments",
+          "[analysis][NormalModeAnalyzer][Metal][KPM]")
+{
+  std::vector<size_t> springFrom;
+  std::vector<size_t> springTo;
+  size_t n = 100;
+  for (size_t i = 0; i < n; ++i) {
+    springFrom.push_back(i);
+    springTo.push_back((i + 1) % n);
+    size_t cross = (i * 7 + 3) % n;
+    if (cross != i) {
+      springFrom.push_back(i);
+      springTo.push_back(cross);
+    }
+  }
+
+  pc::NormalModeAnalyzer nma(springFrom, springTo);
+  size_t numMoments = 128;
+  size_t numRandomVectors = 10;
+
+  Eigen::VectorXd cpuMoments =
+    nma.computeChebyshevMomentsKPM(numMoments, numRandomVectors);
+  Eigen::VectorXd gpuMoments =
+    nma.computeChebyshevMomentsKPMMetal(numMoments, numRandomVectors);
+
+  REQUIRE(gpuMoments.size() == static_cast<Eigen::Index>(numMoments));
+  for (size_t m = 0; m < numMoments; ++m) {
+    CHECK_THAT(gpuMoments[static_cast<Eigen::Index>(m)],
+               Catch::Matchers::WithinAbs(
+                 cpuMoments[static_cast<Eigen::Index>(m)], 1e-3));
+  }
+}
+
+TEST_CASE("NormalModeAnalyzer Metal vs CPU KPM benchmark",
+          "[!benchmark][NormalModeAnalyzer][Metal]")
+{
+  std::vector<size_t> springFrom;
+  std::vector<size_t> springTo;
+  size_t n = 2000;
+  for (size_t i = 0; i < n; ++i) {
+    springFrom.push_back(i);
+    springTo.push_back((i + 1) % n);
+    size_t cross = (i * 37 + 17) % n;
+    if (cross != i) {
+      springFrom.push_back(i);
+      springTo.push_back(cross);
+    }
+  }
+
+  pc::NormalModeAnalyzer nma(springFrom, springTo);
+
+  BENCHMARK(
+    "CPU computeChebyshevMomentsKPM (2000 nodes, 256 moments, 10 vectors)")
+  {
+    return nma.computeChebyshevMomentsKPM(256, 10).size();
+  };
+
+  BENCHMARK("Metal GPU computeChebyshevMomentsKPMMetal (2000 nodes, 256 "
+            "moments, 10 vectors)")
+  {
+    return nma.computeChebyshevMomentsKPMMetal(256, 10).size();
+  };
+}

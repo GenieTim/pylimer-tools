@@ -1,4 +1,7 @@
 #include "MEHPForceBalance2.h"
+#ifdef USE_METAL
+#include "MetalForceBalanceSolver.h"
+#endif
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
@@ -871,7 +874,10 @@ MEHPForceBalance2::runForceRelaxation(
     }                                                                          \
   }
 
-#define ADD_ITERATIONS(solver) iterationsDone += solver.iterations();
+#define ADD_ITERATIONS(solver)                                                 \
+  if (!constants.isZero(1e-9)) {                                               \
+    iterationsDone += solver.iterations();                                     \
+  }
 
 #define SOLVE_ITERATIVE(solver)                                                \
   solver.setTolerance(residualReduction);                                      \
@@ -1058,6 +1064,47 @@ MEHPForceBalance2::runForceRelaxation(
         Eigen::SparseQR<Eigen::SparseMatrix<double>, Eigen::COLAMDOrdering<int>>
           solver;
         SOLVE_DIRECT(solver);
+      }
+      case SLESolver::METAL_CG: {
+#ifdef USE_METAL
+        int solverIterations = 0;
+        finalCoordinates = solveSLEMetalCG(sysMatrix,
+                                           constants,
+                                           std::sqrt(residualReduction),
+                                           maxIterations,
+                                           solverIterations,
+                                           initialSolution);
+        iterationsDone += solverIterations;
+        this->exitReason = (solverIterations >= maxIterations)
+                             ? ExitReason::MAX_STEPS
+                             : ExitReason::X_TOLERANCE;
+        break;
+#else
+        throw std::runtime_error(
+          "Metal acceleration is not enabled in this build.");
+#endif
+      }
+      case SLESolver::METAL_BARZILAI_BORWEIN: {
+#ifdef USE_METAL
+        int solverIterations = 0;
+        finalCoordinates =
+          solveSLEMetalBarzilaiBorwein(sysMatrix,
+                                       constants,
+                                       gradientDescentLearningRate,
+                                       std::sqrt(residualReduction),
+                                       maxIterations,
+                                       solverIterations,
+                                       true,
+                                       initialSolution);
+        iterationsDone += solverIterations;
+        this->exitReason = (solverIterations >= maxIterations)
+                             ? ExitReason::MAX_STEPS
+                             : ExitReason::X_TOLERANCE;
+        break;
+#else
+        throw std::runtime_error(
+          "Metal acceleration is not enabled in this build.");
+#endif
       }
       default:
         throw std::runtime_error("This solver is not implemented.");

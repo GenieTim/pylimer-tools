@@ -5,6 +5,10 @@ cmake_policy(SET CMP0077 NEW)
 
 project(pylimer_tests VERSION "0.1.15" LANGUAGES CXX C)
 
+if (APPLE)
+    enable_language(OBJCXX)
+endif ()
+
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)

@@ -16,7 +16,8 @@ namespace pylimer_tools::calc {
   X(AUTO, "Auto")                                                              \
   X(DENSE_LAPACK, "Dense LAPACK")                                              \
   X(DENSE_EIGEN, "Dense Eigen")                                                \
-  X(SPARSE_SLICING, "Sparse Slicing")
+  X(SPARSE_SLICING, "Sparse Slicing")                                          \
+  X(METAL, "Metal GPU")
 
 /**
  * @brief Available eigenvalue solver algorithms for normal mode analysis.
@@ -99,6 +100,18 @@ public:
    * @return Vector of damped Chebyshev moments
    */
   Eigen::VectorXd computeChebyshevMomentsKPM(
+    size_t numMoments = 1024,
+    size_t numRandomVectors = 20) const;
+
+  /**
+   * @brief Compute Chebyshev moments using the Kernel Polynomial Method (KPM)
+   *        accelerated with Apple Silicon Metal compute kernels.
+   *
+   * @param numMoments Number of Chebyshev moments (default: 1024)
+   * @param numRandomVectors Number of random vectors (default: 20)
+   * @return Vector of damped Chebyshev moments
+   */
+  Eigen::VectorXd computeChebyshevMomentsKPMMetal(
     size_t numMoments = 1024,
     size_t numRandomVectors = 20) const;
 

@@ -1,5 +1,22 @@
 # Changelog
 
+## main
+
+### Apple Silicon Metal GPU Acceleration
+- Add Apple Silicon GPU acceleration via Apple Metal framework (`USE_METAL` option enabled by default on macOS):
+  - **Normal Mode Analysis**:
+    - Implement `computeAllEigenvaluesMetal` using parallel Jacobi rotations on Metal compute shaders.
+    - Implement `computeChebyshevMomentsKPMMetal` for Kernel Polynomial Method (KPM) with custom Metal shaders for CSR sparse matrix-vector multiplication (SpMV), Chebyshev polynomial recurrence, and parallel reduction dot products (delivering over 25x speedup for large networks).
+    - Add `NormalModeSolver.METAL` enum value and string option (`"metal"`, `"gpu"`) to `NormalModeAnalyzer.find_all_eigenvalues`.
+    - Expose `compute_chebyshev_moments_kpm_metal` in Python bindings and type stubs.
+  - **MEHP Network Force Relaxation**:
+    - Add GPU-accelerated sparse linear equation solvers in `MetalForceBalanceSolver`:
+      - `METAL_CG`: Conjugate Gradient SLE solver using Metal compute shaders.
+      - `METAL_BARZILAI_BORWEIN`: Barzilai-Borwein two-point step size gradient descent solver using Metal compute shaders.
+    - Add `SLESolver.METAL_CG` and `SLESolver.METAL_BARZILAI_BORWEIN` to `MEHPForceBalance2` and Python bindings.
+- Fix `ADD_ITERATIONS` assertion in `MEHPForceBalance2` when residual vector is zero.
+- Add comprehensive Catch2 accuracy benchmarks and tests for Metal KPM, Jacobi, Conjugate Gradient, and Barzilai-Borwein solvers with cross-platform build guards.
+
 ## v0.4.1
 
 ### Build System & PyPI WebAssembly Toolchain

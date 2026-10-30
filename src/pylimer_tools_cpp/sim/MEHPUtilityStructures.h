@@ -111,7 +111,9 @@ static std::string ExitReasonNames[] = {
     "GradientDescent (Barzilai-Borwein method, long time-step)")               \
   X(GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM,                                \
     "GradientDescent (Barzilai-Borwein & heavy ball method, selective "        \
-    "time-step)")
+    "time-step)")                                                              \
+  X(METAL_CG, "Metal Conjugate Gradient (GPU)")                                \
+  X(METAL_BARZILAI_BORWEIN, "Metal Barzilai-Borwein (GPU)")
 
 enum SLESolver
 {

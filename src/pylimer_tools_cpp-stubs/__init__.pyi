@@ -3384,6 +3384,14 @@ class NormalModeAnalyzer:
         :param num_random_vectors: Number of random Rademacher vectors for trace estimation (default: 20)
         :return: Vector of damped Chebyshev moments
         """
+    def compute_chebyshev_moments_kpm_metal(self, num_moments: int = 1024, num_random_vectors: int = 20) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+        Compute Chebyshev moments using the Kernel Polynomial Method (KPM) on Apple Silicon GPU via Metal.
+
+        :param num_moments: Number of moments to compute (default: 1024)
+        :param num_random_vectors: Number of random Rademacher vectors for trace estimation (default: 20)
+        :return: Vector of damped Chebyshev moments
+        """
     def compute_density_of_states_kpm(self, lambda_grid: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], num_moments: int = 1024, num_random_vectors: int = 20) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
         Compute continuous density of states (DOS) using KPM.
@@ -3431,6 +3439,7 @@ class NormalModeSolver(enum.Enum):
     DENSE_LAPACK = ...
     DENSE_EIGEN = ...
     SPARSE_SLICING = ...
+    METAL = ...
 
 class OutputConfiguration:
     """
@@ -3531,6 +3540,8 @@ class SLESolver(enum.Enum):
     SIMPLICIAL_LLT: typing.ClassVar[SLESolver]  # value = <SLESolver.SIMPLICIAL_LLT: 1>
     SPARSE_LU: typing.ClassVar[SLESolver]  # value = <SLESolver.SPARSE_LU: 3>
     SPARSE_QR: typing.ClassVar[SLESolver]  # value = <SLESolver.SPARSE_QR: 4>
+    METAL_CG: typing.ClassVar[SLESolver]  # value = <SLESolver.METAL_CG: 20>
+    METAL_BARZILAI_BORWEIN: typing.ClassVar[SLESolver]  # value = <SLESolver.METAL_BARZILAI_BORWEIN: 21>
 class SimpleSpringMEHPForceEvaluator(MEHPForceEvaluator):
     """
     

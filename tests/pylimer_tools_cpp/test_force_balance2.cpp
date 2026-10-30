@@ -20,6 +20,10 @@
 
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance.h"
 #include "../../src/pylimer_tools_cpp/utils/MCUniverseGenerator.h"
+#ifdef USE_METAL
+#include "../../src/pylimer_tools_cpp/sim/MetalForceBalanceSolver.h"
+#endif
+#include "../../src/pylimer_tools_cpp/utils/ExtraEigenSolvers.h"
 
 #include <unistd.h>
 
@@ -2689,6 +2693,10 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple melt systems",
          pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT,
          pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG,
          pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM,
+#ifdef USE_METAL
+         pcm::SLESolver::METAL_BARZILAI_BORWEIN,
+         pcm::SLESolver::METAL_CG,
+#endif
        }) {
     INFO("Testing solver: " << solver << " ("
                             << pcm::SLESolverNames[static_cast<int>(solver)]
@@ -2766,6 +2774,10 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple network systems",
          pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT,
          pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG,
          pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM,
+#ifdef USE_METAL
+         pcm::SLESolver::METAL_BARZILAI_BORWEIN,
+         pcm::SLESolver::METAL_CG,
+#endif
        }) {
     INFO("Testing solver: " << solver);
     pcm::MEHPForceBalance2 forceBalancer =
@@ -2964,3 +2976,199 @@ TEST_CASE("All MEHP compute correct dangling and soluble fractions",
     }
   }
 }
+
+#ifdef USE_METAL
+TEST_CASE("MEHPForceBalance2 Metal SLE Solvers Accuracy and Benchmark",
+          "[MEHPForceBalance2][Metal]")
+{
+  std::cout << "Running test \"MEHPForceBalance2 Metal SLE Solvers Accuracy "
+               "and Benchmark\""
+            << std::endl;
+
+  const int N = 6000; // 6,000 DOFs (e.g. 2,000 3D vertices)
+  std::vector<Eigen::Triplet<double>> triplets;
+  triplets.reserve(N * 7);
+
+  std::mt19937 rng(42);
+  std::uniform_real_distribution<double> dist(-1.0, 1.0);
+
+  // Build a symmetric negative definite matrix (similar to MEHP force balance
+  // system)
+  Eigen::VectorXd diag = Eigen::VectorXd::Zero(N);
+  for (int i = 0; i < N; ++i) {
+    // Connect to neighbors
+    int n1 = (i + 1) % N;
+    int n2 = (i + 3) % N;
+    int n3 = (i + 17) % N;
+    triplets.push_back({ i, n1, 1.0 });
+    triplets.push_back({ n1, i, 1.0 });
+    triplets.push_back({ i, n2, 0.5 });
+    triplets.push_back({ n2, i, 0.5 });
+    triplets.push_back({ i, n3, 0.25 });
+    triplets.push_back({ n3, i, 0.25 });
+    diag[i] -= (1.0 + 0.5 + 0.25 + 0.05); // slightly negative definite
+  }
+  for (int i = 0; i < N; ++i) {
+    triplets.push_back({ i, i, diag[i] });
+  }
+
+  Eigen::SparseMatrix<double> A(N, N);
+  A.setFromTriplets(triplets.begin(), triplets.end());
+  A.makeCompressed();
+
+  Eigen::VectorXd x_exact(N);
+  for (int i = 0; i < N; ++i)
+    x_exact[i] = std::sin(0.01 * i);
+  Eigen::VectorXd b = A * x_exact;
+
+  int iters_cpu_cg = 0, iters_metal_cg = 0;
+  int iters_cpu_bb = 0, iters_metal_bb = 0;
+
+  // CPU CG
+  Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
+                           Eigen::Lower | Eigen::Upper,
+                           Eigen::IdentityPreconditioner>
+    cpu_cg;
+  cpu_cg.setTolerance(1e-5);
+  cpu_cg.setMaxIterations(200);
+  cpu_cg.compute(A);
+  Eigen::VectorXd x_cpu_cg = cpu_cg.solve(b);
+  iters_cpu_cg = static_cast<int>(cpu_cg.iterations());
+
+  // Metal CG
+  Eigen::VectorXd x_metal_cg =
+    pcm::solveSLEMetalCG(A, b, 1e-5, 200, iters_metal_cg);
+
+  // CPU BB
+  Eigen::VectorXd x_cpu_bb = Eigen::gradientDescentBarzilaiBorwein(
+    A, b, 0.01, 1e-5, 500, iters_cpu_bb, true);
+
+  // Metal BB
+  Eigen::VectorXd x_metal_bb = pcm::solveSLEMetalBarzilaiBorwein(
+    A, b, 0.01, 1e-5, 500, iters_metal_bb, true);
+
+  double rel_err_metal_cg = (x_metal_cg - x_exact).norm() / x_exact.norm();
+  double rel_err_metal_bb = (x_metal_bb - x_exact).norm() / x_exact.norm();
+  double diff_cg = (x_metal_cg - x_cpu_cg).norm() / x_cpu_cg.norm();
+  double diff_bb = (x_metal_bb - x_cpu_bb).norm() / x_cpu_bb.norm();
+
+  std::cout << "Metal CG relative error to exact: " << rel_err_metal_cg
+            << ", diff to CPU CG: " << diff_cg << std::endl;
+  std::cout << "Metal BB relative error to exact: " << rel_err_metal_bb
+            << ", diff to CPU BB: " << diff_bb << std::endl;
+  std::cout << "Iterations: CPU CG=" << iters_cpu_cg
+            << ", Metal CG=" << iters_metal_cg << ", CPU BB=" << iters_cpu_bb
+            << ", Metal BB=" << iters_metal_bb << std::endl;
+
+  CHECK(rel_err_metal_cg < 1e-3);
+  CHECK(rel_err_metal_bb < 1e-3);
+  CHECK(diff_cg < 1e-3);
+  CHECK(diff_bb < 1e-3);
+
+  BENCHMARK("CPU Conjugate Gradient (N=6000)")
+  {
+    Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
+                             Eigen::Lower | Eigen::Upper,
+                             Eigen::IdentityPreconditioner>
+      solver;
+    solver.setTolerance(1e-5);
+    solver.setMaxIterations(200);
+    solver.compute(A);
+    return solver.solve(b);
+  };
+
+  BENCHMARK("Metal GPU Conjugate Gradient (N=6000)")
+  {
+    int iters = 0;
+    return pcm::solveSLEMetalCG(A, b, 1e-5, 200, iters);
+  };
+
+  BENCHMARK("CPU Barzilai-Borwein (N=6000)")
+  {
+    int iters = 0;
+    return Eigen::gradientDescentBarzilaiBorwein(
+      A, b, 0.01, 1e-5, 500, iters, true);
+  };
+
+  BENCHMARK("Metal GPU Barzilai-Borwein (N=6000)")
+  {
+    int iters = 0;
+    return pcm::solveSLEMetalBarzilaiBorwein(
+      A, b, 0.01, 1e-5, 500, iters, true);
+  };
+}
+
+TEST_CASE("MEHPForceBalance2 Metal vs CPU Network Relaxation Benchmark",
+          "[!benchmark][MEHPForceBalance2][Metal]")
+{
+  size_t nrOfBeads = 80;
+  size_t nrOfChains = 25;
+  pe::Universe universe = pe::Universe(20.0, 20.0, 20.0);
+  for (size_t i = 0; i < nrOfChains; ++i) {
+    long int beadOffset = i * nrOfBeads;
+    std::vector<long int> atomIds(nrOfBeads);
+    std::iota(atomIds.begin(), atomIds.end(), 1 + beadOffset);
+    std::vector<double> coords(nrOfBeads);
+    std::iota(coords.begin(), coords.end(), 1. + beadOffset * 0.5);
+    universe.addAtoms(atomIds,
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 1),
+                      coords,
+                      coords,
+                      coords,
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 0),
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 0),
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 0));
+    std::vector<long int> bondFrom(nrOfBeads - 1);
+    std::vector<long int> bondTo(nrOfBeads - 1);
+    std::iota(bondFrom.begin(), bondFrom.end(), 1 + beadOffset);
+    std::iota(bondTo.begin(), bondTo.end(), 2 + beadOffset);
+    universe.addBonds(bondFrom, bondTo);
+  }
+  // Add crosslinks across boundaries
+  std::vector<long int> crossFrom, crossTo;
+  for (size_t i = 0; i < nrOfChains - 1; ++i) {
+    crossFrom.push_back(i * nrOfBeads + 10);
+    crossTo.push_back((i + 1) * nrOfBeads + 20);
+    crossFrom.push_back(i * nrOfBeads + 40);
+    crossTo.push_back(((i + 2) % nrOfChains) * nrOfBeads + 50);
+  }
+  universe.addBonds(crossFrom, crossTo);
+
+  BENCHMARK("CPU Conjugate Gradient Network Relaxation")
+  {
+    pcm::MEHPForceBalance2 fb(universe, 2, false);
+    fb.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                          1e-4,
+                          pcm::SLESolver::CONJUGATE_GRADIENT);
+    return fb.getNrOfActiveSprings();
+  };
+
+  BENCHMARK("Metal GPU Conjugate Gradient Network Relaxation")
+  {
+    pcm::MEHPForceBalance2 fb(universe, 2, false);
+    fb.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                          1e-4,
+                          pcm::SLESolver::METAL_CG);
+    return fb.getNrOfActiveSprings();
+  };
+
+  BENCHMARK("CPU Barzilai-Borwein Network Relaxation")
+  {
+    pcm::MEHPForceBalance2 fb(universe, 2, false);
+    fb.runForceRelaxation(
+      pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+      1e-4,
+      pcm::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT);
+    return fb.getNrOfActiveSprings();
+  };
+
+  BENCHMARK("Metal GPU Barzilai-Borwein Network Relaxation")
+  {
+    pcm::MEHPForceBalance2 fb(universe, 2, false);
+    fb.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                          1e-4,
+                          pcm::SLESolver::METAL_BARZILAI_BORWEIN);
+    return fb.getNrOfActiveSprings();
+  };
+}
+#endif
