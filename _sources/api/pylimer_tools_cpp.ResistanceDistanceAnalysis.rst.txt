@@ -1,0 +1,55 @@
+ResistanceDistanceAnalysis
+==========================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: ResistanceDistanceAnalysis
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ResistanceDistanceAnalysis.compute_all_pairs_commute_time
+      ~ResistanceDistanceAnalysis.compute_all_pairs_effective_resistance
+      ~ResistanceDistanceAnalysis.compute_commute_time
+      ~ResistanceDistanceAnalysis.compute_effective_resistance
+      ~ResistanceDistanceAnalysis.compute_effective_resistance_batched
+      ~ResistanceDistanceAnalysis.compute_kirchhoff_index
+      ~ResistanceDistanceAnalysis.compute_kirchhoff_index_spectral
+      ~ResistanceDistanceAnalysis.compute_resistance_centrality
+      ~ResistanceDistanceAnalysis.compute_total_resistance_per_node
+      ~ResistanceDistanceAnalysis.create_complete
+      ~ResistanceDistanceAnalysis.create_linear_chain
+      ~ResistanceDistanceAnalysis.create_ring
+      ~ResistanceDistanceAnalysis.create_star
+      ~ResistanceDistanceAnalysis.get_connected_components
+      ~ResistanceDistanceAnalysis.get_laplacian
+      ~ResistanceDistanceAnalysis.get_nr_of_connected_components
+      ~ResistanceDistanceAnalysis.get_nr_of_edges
+      ~ResistanceDistanceAnalysis.get_nr_of_nodes
+      ~ResistanceDistanceAnalysis.get_total_edge_weight
+      ~ResistanceDistanceAnalysis.is_connected
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: compute_all_pairs_commute_time
+   .. automethod:: compute_all_pairs_effective_resistance
+   .. automethod:: compute_commute_time
+   .. automethod:: compute_effective_resistance
+   .. automethod:: compute_effective_resistance_batched
+   .. automethod:: compute_kirchhoff_index
+   .. automethod:: compute_kirchhoff_index_spectral
+   .. automethod:: compute_resistance_centrality
+   .. automethod:: compute_total_resistance_per_node
+   .. automethod:: create_complete
+   .. automethod:: create_linear_chain
+   .. automethod:: create_ring
+   .. automethod:: create_star
+   .. automethod:: get_connected_components
+   .. automethod:: get_laplacian
+   .. automethod:: get_nr_of_connected_components
+   .. automethod:: get_nr_of_edges
+   .. automethod:: get_nr_of_nodes
+   .. automethod:: get_total_edge_weight
+   .. automethod:: is_connected

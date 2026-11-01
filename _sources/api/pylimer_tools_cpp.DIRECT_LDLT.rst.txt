@@ -1,0 +1,6 @@
+DIRECT_LDLT
+===========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autodata:: DIRECT_LDLT

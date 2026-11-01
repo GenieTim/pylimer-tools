@@ -1,0 +1,25 @@
+RouseSolverType
+===============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: RouseSolverType
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~RouseSolverType.CONJUGATE_GRADIENT
+      ~RouseSolverType.DIRECT_LDLT
+      ~RouseSolverType.DIRECT_LLT
+      ~RouseSolverType.name
+      ~RouseSolverType.value
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: CONJUGATE_GRADIENT
+   .. autoattribute:: DIRECT_LDLT
+   .. autoattribute:: DIRECT_LLT
+   .. autoattribute:: name
+   .. autoattribute:: value

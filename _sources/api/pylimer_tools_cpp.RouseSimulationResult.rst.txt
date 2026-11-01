@@ -1,0 +1,25 @@
+RouseSimulationResult
+=====================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: RouseSimulationResult
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~RouseSimulationResult.end_to_end_correlation
+      ~RouseSimulationResult.msd
+      ~RouseSimulationResult.msd_center_of_mass
+      ~RouseSimulationResult.times
+      ~RouseSimulationResult.trajectory
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: end_to_end_correlation
+   .. autoattribute:: msd
+   .. autoattribute:: msd_center_of_mass
+   .. autoattribute:: times
+   .. autoattribute:: trajectory

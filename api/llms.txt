@@ -232,6 +232,10 @@
 - [NormalModeAnalyzer](pylimer_tools_cpp.NormalModeAnalyzer.html.md): Bases: &#96;pybind11_object&#96;
 - [NormalModeSolver](pylimer_tools_cpp.NormalModeSolver.html.md): Bases: &#96;Enum&#96;
 - [OutputConfiguration](pylimer_tools_cpp.OutputConfiguration.html.md): Bases: &#96;pybind11_object&#96;
+- [ResistanceDistanceAnalysis](pylimer_tools_cpp.ResistanceDistanceAnalysis.html.md): Bases: &#96;pybind11_object&#96;
+- [RouseBrownianSimulator](pylimer_tools_cpp.RouseBrownianSimulator.html.md): Bases: &#96;pybind11_object&#96;
+- [RouseSimulationResult](pylimer_tools_cpp.RouseSimulationResult.html.md): Bases: &#96;pybind11_object&#96;
+- [RouseSolverType](pylimer_tools_cpp.RouseSolverType.html.md): Bases: &#96;pybind11_object&#96;
 - [SLESolver](pylimer_tools_cpp.SLESolver.html.md): Bases: &#96;Enum&#96;
 - [SimpleSpringMEHPForceEvaluator](pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html.md): Bases: &#96;MEHPForceEvaluator&#96;
 - [SimplifiedBalance2Network](pylimer_tools_cpp.SimplifiedBalance2Network.html.md): Bases: &#96;pybind11_object&#96;
@@ -241,6 +245,9 @@
 - [Universe](pylimer_tools_cpp.Universe.html.md): Bases: &#96;pybind11_object&#96;
 - [UniverseSequence](pylimer_tools_cpp.UniverseSequence.html.md): Bases: &#96;pybind11_object&#96;
 - [ZScoreMaxDistanceProvider](pylimer_tools_cpp.ZScoreMaxDistanceProvider.html.md): Bases: &#96;MaxDistanceProvider&#96;
+- [CONJUGATE_GRADIENT](pylimer_tools_cpp.CONJUGATE_GRADIENT.html.md): DIRECT_LDLT
+- [DIRECT_LDLT](pylimer_tools_cpp.DIRECT_LDLT.html.md): DIRECT_LDLT
+- [DIRECT_LLT](pylimer_tools_cpp.DIRECT_LLT.html.md): DIRECT_LDLT
 - [STOP](pylimer_tools_cpp.STOP.html.md): Stop the linking process
 - [TRACK_BACKWARD](pylimer_tools_cpp.TRACK_BACKWARD.html.md): Track backward in the linking process
 - [TRACK_FORWARD](pylimer_tools_cpp.TRACK_FORWARD.html.md): Continue linking forward

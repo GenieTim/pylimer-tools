@@ -1,0 +1,6 @@
+CONJUGATE_GRADIENT
+==================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autodata:: CONJUGATE_GRADIENT
