@@ -54,8 +54,8 @@ public:
   /**
    * @brief Compute all eigenvalues using the specified solver.
    *
-   * @param solver Eigenvalue solver method (AUTO, DENSE_LAPACK, DENSE_EIGEN, or
-   * SPARSE_SLICING)
+   * @param solver Eigenvalue solver method (AUTO, DENSE_LAPACK, DENSE_EIGEN,
+   * SPARSE_SLICING, or METAL)
    * @param includeEigenvectors Whether to also compute and store eigenvectors
    * @param decomposeComponents Whether to decompose the graph into connected
    * components

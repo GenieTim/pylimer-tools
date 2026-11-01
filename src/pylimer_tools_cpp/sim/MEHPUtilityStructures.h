@@ -83,6 +83,7 @@ inline const std::string ExitReasonNames[] = {
 
 #define SLE_SOLVERS                                                            \
   X(DEFAULT, "default")                                                        \
+  X(AUTO, "auto")                                                              \
   /* direct methods */                                                         \
   X(SIMPLICIAL_LLT, "SimplicialLLT")                                           \
   X(SIMPLICIAL_LDLT, "SimplicialLDLT")                                         \

@@ -2,6 +2,16 @@
 
 ## main
 
+### Automatic Solver Selection Optimizations
+- **NormalModeAnalyzer**:
+  - Fix `NormalModeSolver::AUTO` to only select `SPARSE_SLICING` when `!includeEigenvectors && n > 5000` (previously selected sparse slicing for $n > 2000$ even when eigenvectors were requested, triggering redundant eigenvalue bisection followed by dense fallback diagonalization).
+  - Raise dense-to-sparse eigenvalue threshold to $n = 5000$ where dense LAPACK (`LAPACKE_dsyevr` MRRR) is up to ~29x faster than sparse slicing and fits in < 200 MB RAM, while preserving sparse slicing for large scales ($N > 55,000$, where dense matrix allocation requires $> 24$ GB RAM).
+  - Automatically accelerate `computeEffectiveSpectrumKPM` and `computeDensityOfStatesKPM` via `computeChebyshevMomentsKPMMetal` when Metal GPU acceleration is available (> 25x speedup for large systems), falling back seamlessly to CPU when unavailable.
+- **MEHPForceBalance2**:
+  - Add `SLESolver::AUTO` enum (`"auto"`) and optimize `SLESolver::DEFAULT` / `SLESolver::AUTO` to automatically resolve to `SLESolver::METAL_CG` (GPU 3-RHS multi-column SpMM Conjugate Gradient with Jacobi preconditioning and zero-mode projection) when Apple Silicon Metal is available, and `SLESolver::CONJUGATE_GRADIENT` (CPU scalar $N \times N$ 3-RHS system) otherwise. This replaces the un-preconditioned $3N \times 3N$ Barzilai-Borwein gradient descent default which required thousands of iterations on realistic systems ($N > 55,000$).
+  - Allow `sle_solver` in Python `run_force_relaxation` to accept both `SLESolver` enum instances and string descriptors (`"auto"`, `"metal_cg"`, `"cg"`, etc.).
+  - Fix `exitReason` handling in `METAL_CG` and `METAL_BARZILAI_BORWEIN` when constant vector is zero to correctly record `ExitReason::X_TOLERANCE`.
+
 ### Apple Silicon Metal GPU Acceleration
 - Add Apple Silicon GPU acceleration via Apple Metal framework (`USE_METAL` option enabled by default on macOS):
   - **Normal Mode Analysis**:

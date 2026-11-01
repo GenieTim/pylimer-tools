@@ -717,13 +717,32 @@ MEHPForceBalance2::runForceRelaxation(
   }
 
   /* array allocation */
+  SLESolver effectiveSolverChoice = solverChoice;
+  if (solverChoice == SLESolver::DEFAULT || solverChoice == SLESolver::AUTO) {
+#ifdef USE_METAL
+    if (isMetalAvailable()) {
+      effectiveSolverChoice = SLESolver::METAL_CG;
+    } else {
+      effectiveSolverChoice = SLESolver::CONJUGATE_GRADIENT;
+    }
+#else
+    effectiveSolverChoice = SLESolver::CONJUGATE_GRADIENT;
+#endif
+  }
+
   Eigen::VectorXd oneOverSpringPartitions =
     this->assembleOneOverSpringPartition(this->initialConfig);
   const double initialResidual = this->getDisplacementResidualNormFor(
     this->initialConfig, this->currentDisplacements, oneOverSpringPartitions);
   std::cout << "Starting force balance procedure with a "
             << SLESolverNames[solverChoice] << " (" << solverChoice << ")"
-            << " solver. Initial residual is " << initialResidual << std::endl;
+            << " solver"
+            << ((solverChoice == SLESolver::DEFAULT ||
+                 solverChoice == SLESolver::AUTO)
+                  ? (" (resolved to " +
+                     SLESolverNames[effectiveSolverChoice] + ")")
+                  : "")
+            << ". Initial residual is " << initialResidual << std::endl;
   std::cout << "Simplification mode is " << simplificationMode << " ("
             << StructureSimplificationModeNames[simplificationMode] << ")"
             << std::endl;
@@ -740,27 +759,27 @@ MEHPForceBalance2::runForceRelaxation(
   // reserve triplet list
   std::vector<Eigen::Triplet<double>> triplets;
   const bool isScalarSolver =
-    (solverChoice == SLESolver::SIMPLICIAL_LLT ||
-     solverChoice == SLESolver::SIMPLICIAL_LDLT ||
-     solverChoice == SLESolver::SPARSE_LU ||
-     solverChoice == SLESolver::SPARSE_QR ||
-     solverChoice == SLESolver::CONJUGATE_GRADIENT ||
-     solverChoice == SLESolver::CONJUGATE_GRADIENT_IDENTITY ||
-     solverChoice == SLESolver::CONJUGATE_GRADIENT_DIAGONALIZED ||
-     solverChoice == SLESolver::CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY ||
-     solverChoice == SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT ||
-     solverChoice == SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED ||
-     solverChoice == SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY ||
-     solverChoice == SLESolver::BICGSTAB ||
-     solverChoice == SLESolver::BICGSTAB_DIAGONALIZED ||
-     solverChoice == SLESolver::BICGSTAB_IDENTITY ||
-     solverChoice == SLESolver::BICGSTAB_INCOMPLETE_LU ||
-     solverChoice == SLESolver::METAL_CG ||
-     solverChoice == SLESolver::METAL_BARZILAI_BORWEIN);
+    (effectiveSolverChoice == SLESolver::SIMPLICIAL_LLT ||
+     effectiveSolverChoice == SLESolver::SIMPLICIAL_LDLT ||
+     effectiveSolverChoice == SLESolver::SPARSE_LU ||
+     effectiveSolverChoice == SLESolver::SPARSE_QR ||
+     effectiveSolverChoice == SLESolver::CONJUGATE_GRADIENT ||
+     effectiveSolverChoice == SLESolver::CONJUGATE_GRADIENT_IDENTITY ||
+     effectiveSolverChoice == SLESolver::CONJUGATE_GRADIENT_DIAGONALIZED ||
+     effectiveSolverChoice == SLESolver::CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY ||
+     effectiveSolverChoice == SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT ||
+     effectiveSolverChoice == SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED ||
+     effectiveSolverChoice == SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY ||
+     effectiveSolverChoice == SLESolver::BICGSTAB ||
+     effectiveSolverChoice == SLESolver::BICGSTAB_DIAGONALIZED ||
+     effectiveSolverChoice == SLESolver::BICGSTAB_IDENTITY ||
+     effectiveSolverChoice == SLESolver::BICGSTAB_INCOMPLETE_LU ||
+     effectiveSolverChoice == SLESolver::METAL_CG ||
+     effectiveSolverChoice == SLESolver::METAL_BARZILAI_BORWEIN);
 #ifdef USE_METAL
   const bool isMetalSolver =
-    (solverChoice == SLESolver::METAL_CG ||
-     solverChoice == SLESolver::METAL_BARZILAI_BORWEIN);
+    (effectiveSolverChoice == SLESolver::METAL_CG ||
+     effectiveSolverChoice == SLESolver::METAL_BARZILAI_BORWEIN);
 #endif
   // diagonal + the lower of the two components of each spring
   triplets.reserve(isScalarSolver ? (this->initialConfig.nrOfLinks +
@@ -946,8 +965,8 @@ MEHPForceBalance2::runForceRelaxation(
 #define SOLVER_FAILED(action)                                                  \
   this->exitReason = ExitReason::FAILURE;                                      \
   RUNTIME_EXP(std::to_string(action) + " with solver " +                       \
-              std::to_string(solverChoice) + " (" +                            \
-              std::to_string(SLESolverNames[solverChoice]) +                   \
+              std::to_string(effectiveSolverChoice) + " (" +                   \
+              std::to_string(SLESolverNames[effectiveSolverChoice]) +          \
               "). Solver info: " + std::to_string(solver.info()));
 
 #define COMPUTE_SOLVE(solver)                                                  \
@@ -1096,7 +1115,7 @@ MEHPForceBalance2::runForceRelaxation(
       iterationsDone += solverIterations;
     };
 
-    switch (solverChoice) {
+    switch (effectiveSolverChoice) {
       // iterative solvers
       case SLESolver::CONJUGATE_GRADIENT:
       case SLESolver::CONJUGATE_GRADIENT_DIAGONALIZED: {
@@ -1174,6 +1193,7 @@ MEHPForceBalance2::runForceRelaxation(
         break;
       }
       case SLESolver::DEFAULT:
+      case SLESolver::AUTO:
       case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT:
       case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG: {
         int solverIterations = 0;
@@ -1186,7 +1206,8 @@ MEHPForceBalance2::runForceRelaxation(
           std::sqrt(residualReduction),
           maxIterations,
           solverIterations,
-          solverChoice == SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT,
+          effectiveSolverChoice ==
+            SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT,
           initialSolution,
           // initial solution
           std::sqrt(initialResidual),
@@ -1238,6 +1259,7 @@ MEHPForceBalance2::runForceRelaxation(
 #ifdef USE_METAL
         if (constants.isZero(1e-9)) {
           finalCoordinates = Eigen::VectorXd::Zero(constants.size());
+          this->exitReason = ExitReason::X_TOLERANCE;
           break;
         }
 
@@ -1287,6 +1309,11 @@ MEHPForceBalance2::runForceRelaxation(
       }
       case SLESolver::METAL_BARZILAI_BORWEIN: {
 #ifdef USE_METAL
+        if (constants.isZero(1e-9)) {
+          finalCoordinates = Eigen::VectorXd::Zero(constants.size());
+          this->exitReason = ExitReason::X_TOLERANCE;
+          break;
+        }
         int solverIterations = 0;
         finalCoordinates =
           solveSLEMetalBarzilaiBorwein(sysMatrix,
@@ -1526,6 +1553,8 @@ MEHPForceBalance2::runForceRelaxation(
   if (wasInterrupted) {
     this->exitReason = ExitReason::INTERRUPT;
     cleanupInterrupt();
+  } else if (this->exitReason == ExitReason::UNSET) {
+    this->exitReason = ExitReason::X_TOLERANCE;
   }
 }
 

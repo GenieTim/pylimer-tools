@@ -121,3 +121,17 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             else:
                 raise
 
+    def test_auto_sle_solver_relaxation(self):
+        """Test that MEHPForceBalance2 with SLESolver.AUTO and string 'auto' completes."""
+        fb1 = MEHPForceBalance2(self.testUniverseSmall, 2, False)
+        fb1.run_force_relaxation(sle_solver=SLESolver.AUTO)
+        self.assertGreater(fb1.get_nr_of_iterations(), 0)
+
+        fb2 = MEHPForceBalance2(self.testUniverseSmall, 2, False)
+        fb2.run_force_relaxation(sle_solver="auto")
+        self.assertGreater(fb2.get_nr_of_iterations(), 0)
+
+        fb3 = MEHPForceBalance2(self.testUniverseSmall, 2, False)
+        fb3.run_force_relaxation(sle_solver="default")
+        self.assertGreater(fb3.get_nr_of_iterations(), 0)
+

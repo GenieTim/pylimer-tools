@@ -56,6 +56,13 @@ class TestNormalModeAnalyzer(unittest.TestCase):
         # Orthonormality check
         np.testing.assert_allclose(evecs.T @ evecs, np.eye(3), atol=1e-8)
 
+    def test_auto_solver_eigenvectors(self):
+        nma = NormalModeAnalyzer(self.ring_from, self.ring_to)
+        nma.find_all_eigenvalues(solver="auto", compute_eigenvectors=True)
+        evecs = nma.get_eigenvectors()
+        self.assertEqual(evecs.shape, (3, 3))
+        np.testing.assert_allclose(evecs.T @ evecs, np.eye(3), atol=1e-8)
+
     def test_invalid_solver_argument(self):
         nma = NormalModeAnalyzer(self.ring_from, self.ring_to)
         with self.assertRaises(ValueError):

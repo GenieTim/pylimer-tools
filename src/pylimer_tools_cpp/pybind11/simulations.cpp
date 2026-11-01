@@ -1713,9 +1713,47 @@ A strand is a chain of connected links between two crosslinks.
       [](mehp::MEHPForceBalance2& sim,
          const mehp::StructureSimplificationMode simplificationMode,
          const double inactiveRemovalCutoff,
-         const mehp::SLESolver solverChoice,
+         const py::object& sle_solver_obj,
          const double tolerance,
          const int maxIterations) {
+        mehp::SLESolver solverChoice = mehp::SLESolver::DEFAULT;
+        if (py::isinstance<mehp::SLESolver>(sle_solver_obj)) {
+          solverChoice = sle_solver_obj.cast<mehp::SLESolver>();
+        } else if (py::isinstance<py::str>(sle_solver_obj)) {
+          std::string s = sle_solver_obj.cast<std::string>();
+          std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+          if (s == "auto" || s == "default") {
+            solverChoice = mehp::SLESolver::AUTO;
+          } else if (s == "cg" || s == "conjugate_gradient") {
+            solverChoice = mehp::SLESolver::CONJUGATE_GRADIENT;
+          } else if (s == "metal_cg" || s == "gpu_cg" || s == "metal") {
+            solverChoice = mehp::SLESolver::METAL_CG;
+          } else if (s == "metal_bb" || s == "metal_barzilai_borwein") {
+            solverChoice = mehp::SLESolver::METAL_BARZILAI_BORWEIN;
+          } else if (s == "ldlt" || s == "simplicial_ldlt") {
+            solverChoice = mehp::SLESolver::SIMPLICIAL_LDLT;
+          } else if (s == "llt" || s == "simplicial_llt") {
+            solverChoice = mehp::SLESolver::SIMPLICIAL_LLT;
+          } else if (s == "lu" || s == "sparse_lu") {
+            solverChoice = mehp::SLESolver::SPARSE_LU;
+          } else if (s == "qr" || s == "sparse_qr") {
+            solverChoice = mehp::SLESolver::SPARSE_QR;
+          } else if (s == "bicgstab") {
+            solverChoice = mehp::SLESolver::BICGSTAB;
+          } else if (s == "bb" || s == "barzilai_borwein" || s == "bb_long") {
+            solverChoice =
+              mehp::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG;
+          } else if (s == "bb_short") {
+            solverChoice =
+              mehp::SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT;
+          } else {
+            throw std::invalid_argument("Unknown SLESolver string: " + s);
+          }
+        } else {
+          throw py::type_error(
+            "sle_solver must be a SLESolver enum or string ('auto', 'metal_cg', "
+            "'cg', etc.)");
+        }
         return sim.runForceRelaxation(
           simplificationMode,
           inactiveRemovalCutoff,
@@ -1730,7 +1768,7 @@ A strand is a chain of connected links between two crosslinks.
 
            :param simplification_mode: How to simplify the structure during the minimization.
            :param inactive_removal_cutoff: The tolerance in distance units of the partial spring length to count as active, relevant if simplification mode is specified to be something other than NO_SIMPLIFICATION.
-           :param sle_solver: The solver to use for the system of linear equations (SLE).
+           :param sle_solver: The solver to use for the system of linear equations (SLE) (SLESolver enum or string, default: SLESolver.DEFAULT / 'auto').
            :param tolerance: The stopping condition/tolerance for the SLE solver if it's an iterative one.
            :param max_iterations: The maximum number of iterations to perform if the SLE solver is an iterative one.
            )pbdoc",

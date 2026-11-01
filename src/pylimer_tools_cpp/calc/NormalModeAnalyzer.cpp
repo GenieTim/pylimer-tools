@@ -431,7 +431,8 @@ NormalModeAnalyzer::solveMatrix(const Eigen::SparseMatrix<double>& mat,
       mat, includeEigenvectors, false, outEvals, outEvecs);
 #endif
   } else if (solver == NormalModeSolver::SPARSE_SLICING ||
-             (solver == NormalModeSolver::AUTO && n > 2000)) {
+             (solver == NormalModeSolver::AUTO && !includeEigenvectors &&
+              n > 5000)) {
     computeAllEigenvaluesSparseSlicing(
       mat, includeEigenvectors, outEvals, outEvecs);
   } else {
@@ -1041,20 +1042,19 @@ NormalModeAnalyzer::computeChebyshevMomentsKPMMetal(size_t numMoments,
                                                     size_t batchSize) const
 {
 #ifdef USE_METAL
-  auto [c, w] = getSpectralScalingParameters(0.01);
-  return pylimer_tools::calc::computeChebyshevMomentsKPMMetal(
-    this->assembledConnectivityMatrix,
-    numMoments,
-    numRandomVectors,
-    c,
-    w,
-    batchSize);
-#else
-  (void)batchSize;
-  std::cerr << "Metal acceleration not enabled. Falling back to CPU KPM."
-            << std::endl;
-  return computeChebyshevMomentsKPM(numMoments, numRandomVectors);
+  if (isMetalAvailable()) {
+    auto [c, w] = getSpectralScalingParameters(0.01);
+    return pylimer_tools::calc::computeChebyshevMomentsKPMMetal(
+      this->assembledConnectivityMatrix,
+      numMoments,
+      numRandomVectors,
+      c,
+      w,
+      batchSize);
+  }
 #endif
+  (void)batchSize;
+  return computeChebyshevMomentsKPM(numMoments, numRandomVectors);
 }
 
 void
@@ -1070,7 +1070,8 @@ NormalModeAnalyzer::computeEffectiveSpectrumKPM(
     return;
 
   auto [c, w] = getSpectralScalingParameters(0.01);
-  Eigen::VectorXd mu = computeChebyshevMomentsKPM(numMoments, numRandomVectors);
+  Eigen::VectorXd mu =
+    computeChebyshevMomentsKPMMetal(numMoments, numRandomVectors);
 
   size_t Q = numQuadraturePoints;
   lambdaNodes.reserve(Q);
@@ -1106,7 +1107,8 @@ NormalModeAnalyzer::computeDensityOfStatesKPM(const Eigen::ArrayXd& lambdaGrid,
     return Eigen::ArrayXd::Zero(lambdaGrid.size());
 
   auto [c, w] = getSpectralScalingParameters(0.01);
-  Eigen::VectorXd mu = computeChebyshevMomentsKPM(numMoments, numRandomVectors);
+  Eigen::VectorXd mu =
+    computeChebyshevMomentsKPMMetal(numMoments, numRandomVectors);
 
   Eigen::ArrayXd dos = Eigen::ArrayXd::Zero(lambdaGrid.size());
   for (Eigen::Index i = 0; i < lambdaGrid.size(); ++i) {

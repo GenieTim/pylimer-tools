@@ -2429,7 +2429,7 @@ class MEHPForceBalance2:
         """
                    Helper method to debug and/or understand what happens to certain links when being displaced.
         """
-    def run_force_relaxation(self, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: typing.SupportsFloat = 1e-06, sle_solver: SLESolver = ..., tolerance: typing.SupportsFloat = 1e-15, max_iterations: typing.SupportsInt = 10000) -> None:
+    def run_force_relaxation(self, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: typing.SupportsFloat = 1e-06, sle_solver: SLESolver | str = ..., tolerance: typing.SupportsFloat = 1e-15, max_iterations: typing.SupportsInt = 10000) -> None:
         """
                    Run the simulation.
         
@@ -3682,6 +3682,7 @@ class SLESolver(enum.Enum):
     CONJUGATE_GRADIENT_DIAGONALIZED: typing.ClassVar[SLESolver]  # value = <SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED: 6>
     CONJUGATE_GRADIENT_IDENTITY: typing.ClassVar[SLESolver]  # value = <SLESolver.CONJUGATE_GRADIENT_IDENTITY: 7>
     CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY: typing.ClassVar[SLESolver]  # value = <SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY: 8>
+    AUTO: typing.ClassVar[SLESolver]
     DEFAULT: typing.ClassVar[SLESolver]  # value = <SLESolver.DEFAULT: 0>
     GRADIENT_DESCENT: typing.ClassVar[SLESolver]  # value = <SLESolver.GRADIENT_DESCENT: 16>
     GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG: typing.ClassVar[SLESolver]  # value = <SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG: 18>
