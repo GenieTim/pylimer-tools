@@ -450,14 +450,14 @@ Get the current spring lengths (norm of vector) divided by the spring partition 
 
 Helper method to debug and/or understand what happens to certain links when being displaced.
 
-#### run_force_relaxation(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), simplification_mode: [pylimer_tools_cpp.StructureSimplificationMode](pylimer_tools_cpp.StructureSimplificationMode.md#pylimer_tools_cpp.StructureSimplificationMode) = StructureSimplificationMode.NO_SIMPLIFICATION, inactive_removal_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-06, sle_solver: [pylimer_tools_cpp.SLESolver](pylimer_tools_cpp.SLESolver.md#pylimer_tools_cpp.SLESolver) = SLESolver.DEFAULT, tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-12, max_iterations: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 10000) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### run_force_relaxation(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), simplification_mode: [pylimer_tools_cpp.StructureSimplificationMode](pylimer_tools_cpp.StructureSimplificationMode.md#pylimer_tools_cpp.StructureSimplificationMode) = StructureSimplificationMode.NO_SIMPLIFICATION, inactive_removal_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-06, sle_solver: [object](https://docs.python.org/3/builtins/functions.html#object) = SLESolver.DEFAULT, tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-12, max_iterations: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 10000) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Run the simulation.
 
 * **Parameters:**
   * **simplification_mode** – How to simplify the structure during the minimization.
   * **inactive_removal_cutoff** – The tolerance in distance units of the partial spring length to count as active, relevant if simplification mode is specified to be something other than NO_SIMPLIFICATION.
-  * **sle_solver** – The solver to use for the system of linear equations (SLE).
+  * **sle_solver** – The solver to use for the system of linear equations (SLE) (SLESolver enum or string, default: SLESolver.DEFAULT / ‘auto’).
   * **tolerance** – The stopping condition/tolerance for the SLE solver if it’s an iterative one.
   * **max_iterations** – The maximum number of iterations to perform if the SLE solver is an iterative one.
 

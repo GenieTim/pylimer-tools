@@ -8,8 +8,9 @@ Solver for sparse linear equation systems
 
 ### Attributes Summary
 
-| [`BICGSTAB`](#pylimer_tools_cpp.SLESolver.BICGSTAB)                                      |    |
+| [`AUTO`](#pylimer_tools_cpp.SLESolver.AUTO)                                          |    |
 |------------------------------------------------------------------------------------------------|----|
+| [`BICGSTAB`](#pylimer_tools_cpp.SLESolver.BICGSTAB)                                      |    |
 | [`BICGSTAB_DIAGONALIZED`](#pylimer_tools_cpp.SLESolver.BICGSTAB_DIAGONALIZED)                         |    |
 | [`BICGSTAB_IDENTITY`](#pylimer_tools_cpp.SLESolver.BICGSTAB_IDENTITY)                             |    |
 | [`BICGSTAB_INCOMPLETE_LU`](#pylimer_tools_cpp.SLESolver.BICGSTAB_INCOMPLETE_LU)                        |    |
@@ -34,46 +35,48 @@ Solver for sparse linear equation systems
 
 ### Attributes Documentation
 
-#### BICGSTAB *= 12*
+#### AUTO *= 1*
 
-#### BICGSTAB_DIAGONALIZED *= 13*
+#### BICGSTAB *= 13*
 
-#### BICGSTAB_IDENTITY *= 14*
+#### BICGSTAB_DIAGONALIZED *= 14*
 
-#### BICGSTAB_INCOMPLETE_LU *= 15*
+#### BICGSTAB_IDENTITY *= 15*
 
-#### CONJUGATE_GRADIENT *= 5*
+#### BICGSTAB_INCOMPLETE_LU *= 16*
 
-#### CONJUGATE_GRADIENT_DIAGONALIZED *= 6*
+#### CONJUGATE_GRADIENT *= 6*
 
-#### CONJUGATE_GRADIENT_IDENTITY *= 7*
+#### CONJUGATE_GRADIENT_DIAGONALIZED *= 7*
 
-#### CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY *= 8*
+#### CONJUGATE_GRADIENT_IDENTITY *= 8*
+
+#### CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY *= 9*
 
 #### DEFAULT *= 0*
 
-#### GRADIENT_DESCENT *= 16*
+#### GRADIENT_DESCENT *= 17*
 
-#### GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG *= 18*
+#### GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG *= 19*
 
-#### GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM *= 19*
+#### GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM *= 20*
 
-#### GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT *= 17*
+#### GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT *= 18*
 
-#### LEAST_SQUARES_CONJUGATE_GRADIENT *= 9*
+#### LEAST_SQUARES_CONJUGATE_GRADIENT *= 10*
 
-#### LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED *= 10*
+#### LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED *= 11*
 
-#### LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY *= 11*
+#### LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY *= 12*
 
-#### METAL_BARZILAI_BORWEIN *= 21*
+#### METAL_BARZILAI_BORWEIN *= 22*
 
-#### METAL_CG *= 20*
+#### METAL_CG *= 21*
 
-#### SIMPLICIAL_LDLT *= 2*
+#### SIMPLICIAL_LDLT *= 3*
 
-#### SIMPLICIAL_LLT *= 1*
+#### SIMPLICIAL_LLT *= 2*
 
-#### SPARSE_LU *= 3*
+#### SPARSE_LU *= 4*
 
-#### SPARSE_QR *= 4*
+#### SPARSE_QR *= 5*

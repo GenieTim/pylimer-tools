@@ -10,6 +10,7 @@ SLESolver
 
    .. autosummary::
 
+      ~SLESolver.AUTO
       ~SLESolver.BICGSTAB
       ~SLESolver.BICGSTAB_DIAGONALIZED
       ~SLESolver.BICGSTAB_IDENTITY
@@ -35,6 +36,7 @@ SLESolver
 
    .. rubric:: Attributes Documentation
 
+   .. autoattribute:: AUTO
    .. autoattribute:: BICGSTAB
    .. autoattribute:: BICGSTAB_DIAGONALIZED
    .. autoattribute:: BICGSTAB_IDENTITY
