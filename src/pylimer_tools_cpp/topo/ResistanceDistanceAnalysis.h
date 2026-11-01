@@ -90,14 +90,25 @@ public:
     const std::vector<std::pair<size_t, size_t>>& pairs) const;
 
   /**
+   * @brief Solve L_pinned * X = I in multi-column chunks (Level-3 BLAS dtrsm)
+   * of specified chunk size B (e.g. 64 or 128), returning N x N solution matrix X.
+   *
+   * @param chunkSize Number of columns to solve per chunk (defaults to 128)
+   * @return Dense N x N solution matrix X
+   */
+  Eigen::MatrixXd solveIdentityChunked(size_t chunkSize = 128) const;
+
+  /**
    * @brief Compute all-pairs effective resistance matrix R of size N x N.
    *
    * Solves L X = I with pinned reference nodes, giving all pairwise resistances
    * R_ij = X_ii + X_jj - 2 * X_ij.
    *
+   * @param chunkSize Number of columns per solve chunk (Level-3 BLAS chunking)
    * @return Symmetric N x N matrix of effective resistances
    */
-  Eigen::MatrixXd computeAllPairsEffectiveResistance() const;
+  Eigen::MatrixXd computeAllPairsEffectiveResistance(
+    size_t chunkSize = 128) const;
 
   /**
    * @brief Compute total Kirchhoff index K(G) = sum_{i < j} R_ij.
@@ -118,8 +129,11 @@ public:
    * N).
    *
    * Satisfies L L^+ L = L and L^+ 1 = 0.
+   *
+   * @param chunkSize Number of columns per solve chunk (Level-3 BLAS chunking)
    */
-  Eigen::MatrixXd computeMoorePenrosePseudoInverse() const;
+  Eigen::MatrixXd computeMoorePenrosePseudoInverse(
+    size_t chunkSize = 128) const;
 
   /**
    * @brief Compute random-walk commute time between node i and node j:

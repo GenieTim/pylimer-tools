@@ -49,6 +49,7 @@ private:
   double defaultBondLength = 0.0;
   double springBreakingLength = -1.;
   bool assumeNetworkIsComplete = false;
+  double inPlaceRebuildThreshold = 0.15; // Threshold fraction of cumulative broken springs to rebuild CSR (default 15%)
 
 public:
   /**
@@ -557,6 +558,23 @@ public:
   void configAssumeNetworkIsComplete(const bool assumeNetworkIsComplete = false)
   {
     this->assumeNetworkIsComplete = assumeNetworkIsComplete;
+  }
+
+  /**
+   * @brief Configure the threshold fraction of cumulative broken springs
+   * required to trigger a full CSR sparse matrix rebuild and symbolic re-factorization
+   * (eliminating structural nonzeros) under NO_SIMPLIFICATION mode. Default is 0.15 (15%).
+   *
+   * @param threshold Fraction of springs broken (e.g. 0.15 for 15%)
+   */
+  void configInPlaceRebuildThreshold(const double threshold = 0.15)
+  {
+    this->inPlaceRebuildThreshold = threshold;
+  }
+
+  double getInPlaceRebuildThreshold() const
+  {
+    return this->inPlaceRebuildThreshold;
   }
 
   /**

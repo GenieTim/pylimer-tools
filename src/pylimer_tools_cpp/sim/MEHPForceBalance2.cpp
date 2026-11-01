@@ -776,6 +776,8 @@ MEHPForceBalance2::runForceRelaxation(
   Eigen::SparseMatrix<double> sysMatrix;
   bool matrixNeedsRebuild = true;
   std::vector<BrokenSpringRecord> brokenSprings;
+  size_t totalSpringsAtLastRebuild = this->initialConfig.nrOfSprings;
+  size_t cumulativeBrokenSinceRebuild = 0;
 
   // actual loop
   bool wasInterrupted = false;
@@ -888,6 +890,8 @@ MEHPForceBalance2::runForceRelaxation(
       sysMatrix.setFromTriplets(triplets.begin(), triplets.end());
       sysMatrix.makeCompressed();
       matrixNeedsRebuild = false;
+      totalSpringsAtLastRebuild = this->initialConfig.nrOfSprings;
+      cumulativeBrokenSinceRebuild = 0;
     }
 
     if (sysMatrix.nonZeros() == 0) {
@@ -921,6 +925,10 @@ MEHPForceBalance2::runForceRelaxation(
 #endif
 
     Eigen::VectorXd finalCoordinates;
+#ifdef USE_METAL
+    bool hasMetalSpringEval = false;
+    uint32_t metalTotalFlagged = 0;
+#endif
 
 #define SOLVER_FAILED(action)                                                  \
   this->exitReason = ExitReason::FAILURE;                                      \
@@ -1194,18 +1202,46 @@ MEHPForceBalance2::runForceRelaxation(
       }
       case SLESolver::METAL_CG: {
 #ifdef USE_METAL
-        int solverIterations = 0;
-        finalCoordinates = solveSLEMetalCG(sysMatrix,
-                                           constants,
-                                           std::sqrt(residualReduction),
-                                           maxIterations,
-                                           solverIterations,
-                                           initialSolution,
-                                           /*projectZeroModes=*/true);
-        iterationsDone += solverIterations;
-        this->exitReason = (solverIterations >= maxIterations)
+        if (constants.isZero(1e-9)) {
+          finalCoordinates = Eigen::VectorXd::Zero(constants.size());
+          break;
+        }
+
+        SpringRelaxationData springData;
+        springData.springIndexA = this->initialConfig.springIndexA.data();
+        springData.springIndexB = this->initialConfig.springIndexB.data();
+        springData.springBoxOffset = this->initialConfig.springBoxOffset.data();
+        springData.springContourLength =
+          this->initialConfig.springContourLength.data();
+        springData.numSprings = this->initialConfig.nrOfSprings;
+        springData.breakingThreshold = this->springBreakingLength;
+        springData.inactiveCutoff =
+          (simplificationMode == StructureSimplificationMode::INACTIVE_ONLY ||
+           simplificationMode == StructureSimplificationMode::INACTIVE_THEN_X2F)
+            ? inactiveRemovalCutoff
+            : 0.0;
+
+        // Fused zero-copy relaxation pipeline: solve and strain evaluation run entirely on GPU
+        GpuRelaxationStepResult stepResult =
+          runGpuRelaxationStep(sysMatrix,
+                               constants,
+                               std::sqrt(residualReduction),
+                               maxIterations,
+                               springData,
+                               initialSolution,
+                               /*projectZeroModes=*/true,
+                               /*useJacobi=*/true,
+                               /*pinnedNode=*/-1,
+                               /*enableCpuFallback=*/true);
+
+        iterationsDone += static_cast<size_t>(stepResult.solverIterations);
+        this->exitReason = (stepResult.solverIterations >= maxIterations)
                              ? ExitReason::MAX_STEPS
                              : ExitReason::X_TOLERANCE;
+        hasMetalSpringEval = true;
+        metalTotalFlagged = stepResult.totalFlagged;
+
+        finalCoordinates = getGpuResidentCoordinates(3 * this->initialConfig.nrOfLinks);
         break;
 #else
         throw std::runtime_error(
@@ -1255,32 +1291,37 @@ MEHPForceBalance2::runForceRelaxation(
 
 #ifdef USE_METAL
     if (isMetalSolver) {
-      SpringRelaxationData springData;
-      springData.springIndexA = this->initialConfig.springIndexA.data();
-      springData.springIndexB = this->initialConfig.springIndexB.data();
-      springData.springBoxOffset = this->initialConfig.springBoxOffset.data();
-      springData.springContourLength =
-        this->initialConfig.springContourLength.data();
-      springData.numSprings = this->initialConfig.nrOfSprings;
-      springData.breakingThreshold = this->springBreakingLength;
-      springData.inactiveCutoff =
-        (simplificationMode == StructureSimplificationMode::INACTIVE_ONLY ||
-         simplificationMode == StructureSimplificationMode::INACTIVE_THEN_X2F)
-          ? inactiveRemovalCutoff
-          : 0.0;
+      if (!hasMetalSpringEval && !constants.isZero(1e-9)) {
+        SpringRelaxationData springData;
+        springData.springIndexA = this->initialConfig.springIndexA.data();
+        springData.springIndexB = this->initialConfig.springIndexB.data();
+        springData.springBoxOffset = this->initialConfig.springBoxOffset.data();
+        springData.springContourLength =
+          this->initialConfig.springContourLength.data();
+        springData.numSprings = this->initialConfig.nrOfSprings;
+        springData.breakingThreshold = this->springBreakingLength;
+        springData.inactiveCutoff =
+          (simplificationMode == StructureSimplificationMode::INACTIVE_ONLY ||
+           simplificationMode == StructureSimplificationMode::INACTIVE_THEN_X2F)
+            ? inactiveRemovalCutoff
+            : 0.0;
 
-      SpringEvaluationResult evalResult =
-        evaluateSpringStrainAndInactivityMetal(this->initialConfig.nrOfLinks,
-                                               springData);
+        SpringEvaluationResult evalResult =
+          evaluateSpringStrainAndInactivityMetal(this->initialConfig.nrOfLinks,
+                                                 springData);
+        hasMetalSpringEval = true;
+        metalTotalFlagged = evalResult.totalFlagged;
+      }
 
-      if (evalResult.totalFlagged == 0 &&
+      if (hasMetalSpringEval && metalTotalFlagged == 0 &&
           simplificationMode != StructureSimplificationMode::X2F_ONLY &&
           simplificationMode !=
             StructureSimplificationMode::INACTIVE_THEN_X2F) {
         // GPU evaluation confirmed no springs are broken or inactive!
-        // Outer loop finishes immediately without host-device synchronization
-        this->handleOutput(static_cast<long>(iterationsDone));
-        break;
+        if (currentResidual <= residualReduction) {
+          this->handleOutput(static_cast<long>(iterationsDone));
+          break;
+        }
       }
     }
 #endif
@@ -1351,36 +1392,48 @@ MEHPForceBalance2::runForceRelaxation(
     } while (nRemovedThisLoop > 0);
 
     // If only springs broke (and no links were deleted/simplified), update
-    // sysMatrix and constants in-place!
+    // sysMatrix and constants in-place, UNLESS cumulative broken springs exceed threshold
+    // (>15-20%), in which case we trigger a clean matrix rebuild and symbolic re-factorization
+    // to eliminate dead structural zeros.
     if (simplificationMode == StructureSimplificationMode::NO_SIMPLIFICATION &&
         !brokenSprings.empty()) {
-      if (isScalarSolver) {
-        for (const auto& bs : brokenSprings) {
-          sysMatrix.coeffRef(bs.idxA, bs.idxB) -= bs.multiplier;
-          sysMatrix.coeffRef(bs.idxB, bs.idxA) -= bs.multiplier;
-          sysMatrix.coeffRef(bs.idxA, bs.idxA) += bs.multiplier;
-          sysMatrix.coeffRef(bs.idxB, bs.idxB) += bs.multiplier;
+      cumulativeBrokenSinceRebuild += brokenSprings.size();
+      bool shouldRebuildDueToThreshold =
+        (this->inPlaceRebuildThreshold >= 0.0 && totalSpringsAtLastRebuild > 0 &&
+         (static_cast<double>(cumulativeBrokenSinceRebuild) /
+          static_cast<double>(totalSpringsAtLastRebuild)) >= this->inPlaceRebuildThreshold);
 
-          constants.segment<3>(3 * bs.idxA) += bs.offset * bs.multiplier;
-          constants.segment<3>(3 * bs.idxB) -= bs.offset * bs.multiplier;
-        }
+      if (shouldRebuildDueToThreshold) {
+        matrixNeedsRebuild = true;
       } else {
-        for (const auto& bs : brokenSprings) {
-          for (size_t dir = 0; dir < 3; ++dir) {
-            sysMatrix.coeffRef(3 * bs.idxA + dir, 3 * bs.idxB + dir) -=
-              bs.multiplier;
-            sysMatrix.coeffRef(3 * bs.idxB + dir, 3 * bs.idxA + dir) -=
-              bs.multiplier;
-            sysMatrix.coeffRef(3 * bs.idxA + dir, 3 * bs.idxA + dir) +=
-              bs.multiplier;
-            sysMatrix.coeffRef(3 * bs.idxB + dir, 3 * bs.idxB + dir) +=
-              bs.multiplier;
+        if (isScalarSolver) {
+          for (const auto& bs : brokenSprings) {
+            sysMatrix.coeffRef(bs.idxA, bs.idxB) -= bs.multiplier;
+            sysMatrix.coeffRef(bs.idxB, bs.idxA) -= bs.multiplier;
+            sysMatrix.coeffRef(bs.idxA, bs.idxA) += bs.multiplier;
+            sysMatrix.coeffRef(bs.idxB, bs.idxB) += bs.multiplier;
+
+            constants.segment<3>(3 * bs.idxA) += bs.offset * bs.multiplier;
+            constants.segment<3>(3 * bs.idxB) -= bs.offset * bs.multiplier;
           }
-          constants.segment<3>(3 * bs.idxA) += bs.offset * bs.multiplier;
-          constants.segment<3>(3 * bs.idxB) -= bs.offset * bs.multiplier;
+        } else {
+          for (const auto& bs : brokenSprings) {
+            for (size_t dir = 0; dir < 3; ++dir) {
+              sysMatrix.coeffRef(3 * bs.idxA + dir, 3 * bs.idxB + dir) -=
+                bs.multiplier;
+              sysMatrix.coeffRef(3 * bs.idxB + dir, 3 * bs.idxA + dir) -=
+                bs.multiplier;
+              sysMatrix.coeffRef(3 * bs.idxA + dir, 3 * bs.idxA + dir) +=
+                bs.multiplier;
+              sysMatrix.coeffRef(3 * bs.idxB + dir, 3 * bs.idxB + dir) +=
+                bs.multiplier;
+            }
+            constants.segment<3>(3 * bs.idxA) += bs.offset * bs.multiplier;
+            constants.segment<3>(3 * bs.idxB) -= bs.offset * bs.multiplier;
+          }
         }
+        matrixNeedsRebuild = false;
       }
-      matrixNeedsRebuild = false;
     } else if (nRemovedInIteration > 0) {
       matrixNeedsRebuild = true;
     }

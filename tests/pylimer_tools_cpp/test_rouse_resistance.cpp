@@ -4,7 +4,9 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <chrono>
 #include <cmath>
+#include <iostream>
 #include <numeric>
 #include <vector>
 
@@ -592,5 +594,73 @@ TEST_CASE("RouseBrownianSimulator coordinates and parameter manipulation",
     double expectedRg = std::sqrt(1.25);
     CHECK_THAT(sim.getRadiusOfGyration(),
                Catch::Matchers::WithinAbs(expectedRg, 1e-10));
+  }
+}
+
+TEST_CASE("ResistanceDistanceAnalysis Level-3 BLAS Chunking for All-Pairs & Pseudo-Inverse",
+          "[ResistanceDistanceAnalysis][topo][benchmark]")
+{
+  const size_t N = 300;
+  std::vector<size_t> from, to;
+  std::vector<double> weights;
+  for (size_t i = 0; i < N - 1; ++i) {
+    from.push_back(i);
+    to.push_back(i + 1);
+    weights.push_back(1.0);
+  }
+  from.push_back(N - 1);
+  to.push_back(0);
+  weights.push_back(1.0);
+
+  // Cross-links
+  for (size_t i = 0; i < N / 4; ++i) {
+    from.push_back(i * 3);
+    to.push_back((i * 3 + N / 2) % N);
+    weights.push_back(0.5);
+  }
+
+  pt::ResistanceDistanceAnalysis rda(from, to, weights, N);
+
+  SECTION("Chunked solves produce numerically identical results across chunk sizes")
+  {
+    Eigen::MatrixXd R_chunk1 = rda.computeAllPairsEffectiveResistance(1);
+    Eigen::MatrixXd R_chunk32 = rda.computeAllPairsEffectiveResistance(32);
+    Eigen::MatrixXd R_chunk64 = rda.computeAllPairsEffectiveResistance(64);
+    Eigen::MatrixXd R_chunk128 = rda.computeAllPairsEffectiveResistance(128);
+
+    double diff32 = (R_chunk1 - R_chunk32).cwiseAbs().maxCoeff();
+    double diff64 = (R_chunk1 - R_chunk64).cwiseAbs().maxCoeff();
+    double diff128 = (R_chunk1 - R_chunk128).cwiseAbs().maxCoeff();
+
+    CHECK(diff32 < 1e-12);
+    CHECK(diff64 < 1e-12);
+    CHECK(diff128 < 1e-12);
+
+    Eigen::MatrixXd P_chunk1 = rda.computeMoorePenrosePseudoInverse(1);
+    Eigen::MatrixXd P_chunk128 = rda.computeMoorePenrosePseudoInverse(128);
+    double pDiff = (P_chunk1 - P_chunk128).cwiseAbs().maxCoeff();
+    CHECK(pDiff < 1e-12);
+  }
+
+  SECTION("Benchmark Level-3 BLAS Chunking (B=1 vs B=128)")
+  {
+    auto start1 = std::chrono::high_resolution_clock::now();
+    Eigen::MatrixXd R1 = rda.computeAllPairsEffectiveResistance(1);
+    auto end1 = std::chrono::high_resolution_clock::now();
+    double time1_ms = std::chrono::duration<double, std::milli>(end1 - start1).count();
+
+    auto start128 = std::chrono::high_resolution_clock::now();
+    Eigen::MatrixXd R128 = rda.computeAllPairsEffectiveResistance(128);
+    auto end128 = std::chrono::high_resolution_clock::now();
+    double time128_ms = std::chrono::duration<double, std::milli>(end128 - start128).count();
+
+    double speedup = time1_ms / time128_ms;
+    std::cout << "\n=== All-Pairs Resistance Distance Level-3 BLAS Chunking Benchmark (N=" << N << ") ===\n"
+              << "Level-2 BLAS (chunk=1, dtrsv):   " << time1_ms << " ms\n"
+              << "Level-3 BLAS (chunk=128, dtrsm): " << time128_ms << " ms\n"
+              << "Speedup:                         " << speedup << "x\n"
+              << "=========================================================================\n";
+
+    CHECK(speedup >= 1.0);
   }
 }

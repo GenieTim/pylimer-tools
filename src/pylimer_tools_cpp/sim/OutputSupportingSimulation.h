@@ -230,6 +230,12 @@ public:
     this->outputBuffer.reserve(600);
   }
 
+  bool hasOutputs() const
+  {
+    return !outputConfigs.empty() || !outputAverageConfigs.empty() ||
+           !outputAutoCorrelationConfigs.empty();
+  }
+
 #ifdef CEREALIZABLE
   virtual void writeRestartFile(std::string& filename) = 0;
 #endif

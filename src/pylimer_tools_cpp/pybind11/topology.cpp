@@ -135,7 +135,15 @@ init_pylimer_bound_topo(py::module_& m)
          py::arg("pairs"))
     .def("compute_all_pairs_effective_resistance",
          &pylimer_tools::topo::ResistanceDistanceAnalysis::
-           computeAllPairsEffectiveResistance)
+           computeAllPairsEffectiveResistance,
+         py::arg("chunk_size") = 128)
+    .def("compute_moore_penrose_pseudo_inverse",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::
+           computeMoorePenrosePseudoInverse,
+         py::arg("chunk_size") = 128)
+    .def("solve_identity_chunked",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::solveIdentityChunked,
+         py::arg("chunk_size") = 128)
     .def(
       "compute_kirchhoff_index",
       &pylimer_tools::topo::ResistanceDistanceAnalysis::computeKirchhoffIndex)

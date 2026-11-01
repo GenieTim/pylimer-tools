@@ -1785,6 +1785,15 @@ A strand is a chain of connected links between two crosslinks.
            :param distance_over_contour_length: The threshold for breaking springs.
           )pbdoc",
          py::arg("distance_over_contour_length") = -1)
+    .def("config_in_place_rebuild_threshold",
+         &mehp::MEHPForceBalance2::configInPlaceRebuildThreshold,
+         R"pbdoc(
+           Configure threshold fraction of cumulative broken springs to rebuild CSR sparse pattern.
+           Default: 0.15 (15%).
+          )pbdoc",
+         py::arg("threshold") = 0.15)
+    .def("get_in_place_rebuild_threshold",
+         &mehp::MEHPForceBalance2::getInPlaceRebuildThreshold)
     .def("config_assume_network_is_complete",
          &mehp::MEHPForceBalance2::configAssumeNetworkIsComplete,
          R"pbdoc(

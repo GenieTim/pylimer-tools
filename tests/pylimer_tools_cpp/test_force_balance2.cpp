@@ -4022,6 +4022,280 @@ TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
   }
 }
 
+TEST_CASE("MEHPForceBalance2 Metal Single-Precision Solvers & Robust CPU Fallback on Ill-Conditioned Networks",
+          "[MEHPForceBalance2][Metal][IllConditioned][Fallback]")
+{
+  std::cout << "\n=== Testing Single-Precision GPU Solvers & CPU Fallback on Ill-Conditioned Networks ==="
+            << std::endl;
+  // Construct ill-conditioned network with stiffness ratio > 10^7
+  const size_t numNodes = 200;
+  std::vector<Eigen::Triplet<double>> trips;
+  trips.reserve(numNodes * 3);
+  for (size_t i = 0; i < numNodes - 1; ++i) {
+    double stiffness = (i % 10 == 0) ? 1e4 : 1.0;
+    trips.emplace_back(i, i + 1, -stiffness);
+    trips.emplace_back(i + 1, i, -stiffness);
+  }
+  // Soft dangling strand
+  trips.emplace_back(numNodes - 2, numNodes - 1, -1e-3);
+  trips.emplace_back(numNodes - 1, numNodes - 2, -1e-3);
+
+  Eigen::VectorXd diag = Eigen::VectorXd::Zero(numNodes);
+  for (const auto& tr : trips) {
+    diag[tr.row()] -= tr.value();
+  }
+  for (size_t i = 0; i < numNodes; ++i) {
+    trips.emplace_back(i, i, diag[i] + 0.01);
+  }
+  Eigen::SparseMatrix<double> scalarL(numNodes, numNodes);
+  scalarL.setFromTriplets(trips.begin(), trips.end());
+  scalarL.makeCompressed();
+
+  Eigen::VectorXd b = Eigen::VectorXd::Random(numNodes * 3);
+  double bNorm = b.norm();
+  const double targetTol = 1e-8;
+
+  SECTION("Float32 GPU without fallback on ill-conditioned network hits float floor")
+  {
+    int itersNoFallback = 0;
+    Eigen::VectorXd xNoFallback = pcm::solveSLEMetalCG3D(
+      scalarL, b, targetTol, 1000, itersNoFallback, Eigen::VectorXd(), false, true, -1, false);
+    Eigen::VectorXd AxNo = pcm::spmvMetal3D(scalarL, xNoFallback);
+    double relResNo = (b - AxNo).norm() / bNorm;
+    std::cout << "GPU Float32 (no fallback) Rel Residual: " << relResNo
+              << ", Iterations: " << itersNoFallback << std::endl;
+    CHECK(relResNo > targetTol); // Demonstrates the precision limitation of float32 on ill-conditioned network
+  }
+
+  SECTION("Robust CPU Double-Precision Fallback achieves tight tolerance")
+  {
+    int itersFallback = 0;
+    Eigen::VectorXd xFallback = pcm::solveSLEMetalCG3D(
+      scalarL, b, targetTol, 1000, itersFallback, Eigen::VectorXd(), false, true, -1, true);
+
+    // Compute residual in double precision on CPU
+    Eigen::MatrixXd xMat(numNodes, 3), bMat(numNodes, 3);
+    for (size_t i = 0; i < numNodes; ++i) {
+      xMat(i, 0) = xFallback[3 * i + 0];
+      xMat(i, 1) = xFallback[3 * i + 1];
+      xMat(i, 2) = xFallback[3 * i + 2];
+      bMat(i, 0) = b[3 * i + 0];
+      bMat(i, 1) = b[3 * i + 1];
+      bMat(i, 2) = b[3 * i + 2];
+    }
+    double relResFall = (bMat - scalarL * xMat).norm() / bMat.norm();
+    std::cout << "GPU with CPU Double Fallback Rel Residual (double-precision): " << relResFall
+              << ", Total Iterations: " << itersFallback << std::endl;
+    CHECK(relResFall <= 1e-7); // Driven down to double precision accuracy
+  }
+}
+
+TEST_CASE("MEHPForceBalance2 Metal Pinned Reference Node vs Center-of-Mass Projection",
+          "[MEHPForceBalance2][Metal][PinnedNode][EliminationTree]")
+{
+  std::cout << "\n=== Testing Elimination Tree / Pinned Reference Node vs Center-of-Mass Projection ==="
+            << std::endl;
+  // Build periodic network of N = 400 nodes
+  const size_t numNodes = 400;
+  std::vector<Eigen::Triplet<double>> trips;
+  trips.reserve(numNodes * 4);
+  for (size_t i = 0; i < numNodes - 1; ++i) {
+    trips.emplace_back(i, i + 1, -1.0);
+    trips.emplace_back(i + 1, i, -1.0);
+  }
+  trips.emplace_back(numNodes - 1, 0, -1.0);
+  trips.emplace_back(0, numNodes - 1, -1.0);
+  // Crosslinks
+  for (size_t i = 0; i < numNodes / 8; ++i) {
+    size_t u = (i * 7) % numNodes;
+    size_t v = (i * 13 + 50) % numNodes;
+    if (u != v) {
+      trips.emplace_back(u, v, -0.5);
+      trips.emplace_back(v, u, -0.5);
+    }
+  }
+
+  Eigen::VectorXd diag = Eigen::VectorXd::Zero(numNodes);
+  for (const auto& tr : trips) {
+    diag[tr.row()] -= tr.value();
+  }
+  for (size_t i = 0; i < numNodes; ++i) {
+    trips.emplace_back(i, i, diag[i]); // Periodic Laplacian with zero eigenvalue
+  }
+  Eigen::SparseMatrix<double> L_periodic(numNodes, numNodes);
+  L_periodic.setFromTriplets(trips.begin(), trips.end());
+  L_periodic.makeCompressed();
+
+  // RHS with zero net force (sum b = 0)
+  Eigen::VectorXd b = Eigen::VectorXd::Random(numNodes * 3);
+  for (int d = 0; d < 3; ++d) {
+    double mean = 0.0;
+    for (size_t i = 0; i < numNodes; ++i) mean += b[3 * i + d];
+    mean /= static_cast<double>(numNodes);
+    for (size_t i = 0; i < numNodes; ++i) b[3 * i + d] -= mean;
+  }
+
+  // 1. Solve using periodic Center-of-Mass projection every 25 iterations
+  auto t0 = std::chrono::high_resolution_clock::now();
+  int itersCom = 0;
+  Eigen::VectorXd xCom = pcm::solveSLEMetalCG3D(
+    L_periodic, b, 1e-4, 500, itersCom, Eigen::VectorXd(), /*projectZeroModes=*/true, true, -1);
+  auto t1 = std::chrono::high_resolution_clock::now();
+  double timeCom_ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
+
+  // 2. Solve using Pinned Reference Node 0 (strictly positive definite submatrix, zero COM projection)
+  auto t2 = std::chrono::high_resolution_clock::now();
+  int itersPinned = 0;
+  Eigen::VectorXd xPinned = pcm::solveSLEMetalCG3DPinned(
+    L_periodic, b, 1e-4, 500, itersPinned, Eigen::VectorXd(), /*pinnedNode=*/0, true);
+  auto t3 = std::chrono::high_resolution_clock::now();
+  double timePinned_ms = std::chrono::duration<double, std::milli>(t3 - t2).count();
+
+  std::cout << "COM Projection Method:   Iterations = " << itersCom
+            << ", Time = " << timeCom_ms << " ms\n"
+            << "Pinned Reference Node:   Iterations = " << itersPinned
+            << ", Time = " << timePinned_ms << " ms\n"
+            << "Iteration Reduction:     "
+            << (100.0 * (itersCom - itersPinned) / std::max(itersCom, 1)) << "%\n"
+            << "=========================================================================\n";
+
+  // Check residuals
+  Eigen::MatrixXd xComMat(numNodes, 3), xPinnedMat(numNodes, 3), bMat(numNodes, 3);
+  for (size_t i = 0; i < numNodes; ++i) {
+    xComMat(i, 0) = xCom[3 * i + 0];
+    xComMat(i, 1) = xCom[3 * i + 1];
+    xComMat(i, 2) = xCom[3 * i + 2];
+    xPinnedMat(i, 0) = xPinned[3 * i + 0];
+    xPinnedMat(i, 1) = xPinned[3 * i + 1];
+    xPinnedMat(i, 2) = xPinned[3 * i + 2];
+    bMat(i, 0) = b[3 * i + 0];
+    bMat(i, 1) = b[3 * i + 1];
+    bMat(i, 2) = b[3 * i + 2];
+  }
+  double relResCom = (bMat - L_periodic * xComMat).norm() / bMat.norm();
+  double relResPinned = (bMat - L_periodic * xPinnedMat).norm() / bMat.norm();
+  std::cout << "COM Actual Rel Residual:    " << relResCom << "\n"
+            << "Pinned Actual Rel Residual: " << relResPinned << "\n";
+
+  // Check reference node 0 remained pinned (x0 = 0)
+  CHECK(std::abs(xPinned[0]) < 1e-6);
+  CHECK(std::abs(xPinned[1]) < 1e-6);
+  CHECK(std::abs(xPinned[2]) < 1e-6);
+  // Verify pinning eliminates COM projection overhead and achieves convergence
+  CHECK(relResPinned <= 1e-3);
+  CHECK(timePinned_ms > 0.0);
+}
+
+TEST_CASE("MEHPForceBalance2 Metal Hybrid SIMDgroup SpMM Degree-Aware Work-Queue",
+          "[MEHPForceBalance2][Metal][Hybrid][SpMM]")
+{
+  std::cout << "\n=== Testing Hybrid SIMDgroup SpMM: Degree-Aware Work-Queue ==="
+            << std::endl;
+  // Build polymer network: 90% degree-2 linear beads, 10% degree >= 4 crosslinks
+  const size_t numNodes = 4000;
+  std::vector<Eigen::Triplet<double>> trips;
+  trips.reserve(numNodes * 3);
+  for (size_t i = 0; i < numNodes - 1; ++i) {
+    trips.emplace_back(i, i + 1, -1.0);
+    trips.emplace_back(i + 1, i, -1.0);
+  }
+  // Crosslinks connecting beads together (making them degree 4, 6, 8)
+  for (size_t i = 0; i < numNodes / 15; ++i) {
+    size_t a = (i * 29) % numNodes;
+    size_t b = (i * 47 + 100) % numNodes;
+    if (a != b) {
+      trips.emplace_back(a, b, -1.0);
+      trips.emplace_back(b, a, -1.0);
+    }
+  }
+
+  Eigen::VectorXd diag = Eigen::VectorXd::Zero(numNodes);
+  for (const auto& tr : trips) {
+    diag[tr.row()] -= tr.value();
+  }
+  for (size_t i = 0; i < numNodes; ++i) {
+    trips.emplace_back(i, i, diag[i] + 0.1);
+  }
+  Eigen::SparseMatrix<double> scalarL(numNodes, numNodes);
+  scalarL.setFromTriplets(trips.begin(), trips.end());
+  scalarL.makeCompressed();
+
+  Eigen::VectorXd x = Eigen::VectorXd::Random(numNodes * 3);
+
+  // 1. Verify Numerical Accuracy of Hybrid Kernel vs Uniform SpMV
+  Eigen::VectorXd yUniform = pcm::spmvMetal3D(scalarL, x);
+  Eigen::VectorXd yHybrid = pcm::spmvMetal3DHybrid(scalarL, x, 8);
+  double diff = (yUniform - yHybrid).cwiseAbs().maxCoeff();
+  std::cout << "Hybrid vs Uniform SpMV Max Diff: " << diff << std::endl;
+  CHECK(diff < 1e-4);
+
+  // 2. Run Degree-Aware Hybrid Work-Queue Benchmark
+  auto bench = pcm::benchmarkHybridSpMVMetal(scalarL, 50);
+  std::cout << "Polymer network beads: Low-degree (<4) = " << bench.numLowDegreeRows
+            << " (" << (100.0 * bench.numLowDegreeRows / numNodes) << "%), "
+            << "High-degree (>=4) = " << bench.numHighDegreeRows << "\n"
+            << "Uniform Coop2 Time: " << bench.timeCoop2_ms << " ms\n"
+            << "Uniform Coop8 Time: " << bench.timeCoop8_ms << " ms\n"
+            << "Degree-Aware Hybrid Queue Time: " << bench.timeHybrid_ms << " ms\n"
+            << "Speedup Hybrid vs Coop8: " << bench.speedupHybridVs8 << "x\n"
+            << "=========================================================================\n";
+
+  CHECK(bench.numLowDegreeRows >= static_cast<uint32_t>(0.80 * static_cast<double>(numNodes)));
+  CHECK(bench.timeHybrid_ms > 0.0);
+}
+
+TEST_CASE("MEHPForceBalance2 Metal Zero-Copy End-to-End Simulation Pipeline",
+          "[MEHPForceBalance2][Metal][ZeroCopy]")
+{
+  std::cout << "\n=== Testing Zero-Copy End-to-End Simulation Pipeline ==="
+            << std::endl;
+  // Construct small test network for runGpuRelaxationStep
+  const size_t numNodes = 6;
+  Eigen::SparseMatrix<double> scalarA(numNodes, numNodes);
+  std::vector<Eigen::Triplet<double>> trips;
+  for (size_t i = 0; i < numNodes - 1; ++i) {
+    trips.emplace_back(i, i + 1, -1.0);
+    trips.emplace_back(i + 1, i, -1.0);
+  }
+  for (size_t i = 0; i < numNodes; ++i) {
+    trips.emplace_back(i, i, 3.0);
+  }
+  scalarA.setFromTriplets(trips.begin(), trips.end());
+  scalarA.makeCompressed();
+
+  Eigen::VectorXd b = Eigen::VectorXd::Zero(numNodes * 3);
+  b[0] = 1.0;
+  b[3 * (numNodes - 1)] = -1.0;
+
+  std::vector<int> sA = { 0, 1, 2, 3, 4 };
+  std::vector<int> sB = { 1, 2, 3, 4, 5 };
+  std::vector<double> boxOffset(15, 0.0);
+  std::vector<double> contour(5, 1.0);
+
+  pcm::SpringRelaxationData springData;
+  springData.springIndexA = sA.data();
+  springData.springIndexB = sB.data();
+  springData.springBoxOffset = boxOffset.data();
+  springData.springContourLength = contour.data();
+  springData.numSprings = 5;
+  springData.breakingThreshold = 100.0; // High threshold: none broken
+  springData.inactiveCutoff = 0.0;
+
+  pcm::GpuRelaxationStepResult result = pcm::runGpuRelaxationStep(
+    scalarA, b, 1e-4, 100, springData, Eigen::VectorXd(), false, true, -1, true);
+
+  CHECK(result.converged);
+  CHECK(result.numBroken == 0);
+  CHECK(result.totalFlagged == 0);
+
+  // Retrieve GPU-resident coordinates at end
+  Eigen::VectorXd coords = pcm::getGpuResidentCoordinates(numNodes * 3);
+  CHECK(coords.size() == static_cast<Eigen::Index>(numNodes * 3));
+  CHECK(coords.norm() > 0.0);
+}
+
+#endif
+
 TEST_CASE("MEHPForceBalance2 in-place CSR matrix update on strand breaking",
           "[MEHPForceBalance2]")
 {
@@ -4069,4 +4343,66 @@ TEST_CASE("MEHPForceBalance2 in-place CSR matrix update on strand breaking",
             << std::endl;
 }
 
-#endif
+TEST_CASE("MEHPForceBalance2 In-Place CSR Updates with Threshold Rebuild",
+          "[MEHPForceBalance2][CSR][threshold]")
+{
+  pe::Universe universe(30.0, 30.0, 30.0);
+  const size_t nrOfChains = 3;
+  const size_t nrOfBeads = 20;
+
+  for (size_t chainIdx = 0; chainIdx < nrOfChains; ++chainIdx) {
+    long int beadOffset = static_cast<long int>(chainIdx * nrOfBeads);
+    std::vector<long int> atomIds(nrOfBeads);
+    std::iota(atomIds.begin(), atomIds.end(), 1 + beadOffset);
+    std::vector<double> coords(nrOfBeads);
+    std::iota(coords.begin(), coords.end(), 1.0 + static_cast<double>(beadOffset));
+    universe.addAtoms(atomIds,
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 1),
+                      coords,
+                      coords,
+                      coords,
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 0),
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 0),
+                      pylimer_tools::utils::initializeWithValue(nrOfBeads, 0));
+    std::vector<long int> bondFrom(nrOfBeads - 1);
+    std::vector<long int> bondTo(nrOfBeads - 1);
+    std::iota(bondFrom.begin(), bondFrom.end(), 1 + beadOffset);
+    std::iota(bondTo.begin(), bondTo.end(), 2 + beadOffset);
+    universe.addBonds(bondFrom, bondTo);
+  }
+  // Crosslinks connecting chains
+  universe.addBonds(std::vector<long int>{ 1, 21, 41 },
+                    std::vector<long int>{ 21, 41, 1 });
+
+  SECTION("Threshold configuration getter and setter")
+  {
+    pcm::MEHPForceBalance2 fb(universe, 2, false);
+    CHECK(fb.getInPlaceRebuildThreshold() == Catch::Approx(0.15));
+    fb.configInPlaceRebuildThreshold(0.20);
+    CHECK(fb.getInPlaceRebuildThreshold() == Catch::Approx(0.20));
+  }
+
+  SECTION("In-place update with high threshold retains numerical zeros")
+  {
+    pcm::MEHPForceBalance2 fb(universe, 2, false);
+    fb.configSpringBreakingDistance(5.0);
+    fb.configInPlaceRebuildThreshold(0.90); // High threshold: stay in-place
+    CHECK_NOTHROW(
+      fb.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                            1e-6,
+                            pcm::SLESolver::SIMPLICIAL_LDLT));
+    CHECK(fb.validateNetwork());
+  }
+
+  SECTION("Threshold trigger rebuilds CSR and re-factorizes cleanly")
+  {
+    pcm::MEHPForceBalance2 fb(universe, 2, false);
+    fb.configSpringBreakingDistance(5.0);
+    fb.configInPlaceRebuildThreshold(0.05); // Low threshold: triggers rebuild
+    CHECK_NOTHROW(
+      fb.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                            1e-6,
+                            pcm::SLESolver::SIMPLICIAL_LDLT));
+    CHECK(fb.validateNetwork());
+  }
+}

@@ -90,13 +90,15 @@ solveSLEMetalCG(const Eigen::SparseMatrix<double>& A,
                 int& iterationsDone,
                 const Eigen::VectorXd& initialX = Eigen::VectorXd(),
                 bool projectZeroModes = false,
-                bool useJacobi = true);
+                bool useJacobi = true,
+                bool enableCpuFallback = true);
 
 /**
  * @brief Multi-RHS 3D Block Conjugate Gradient solver using an N x N scalar
  * Laplacian and 3 RHS components (x, y, z) per node with GPU-resident Jacobi
  * preconditioning. Fused 3-RHS SpMM achieves 3x matrix memory bandwidth
- * reduction.
+ * reduction. Supports pinned reference node (eliminating rigid translation and
+ * COM projection passes) and robust CPU double-precision fallback on ill-conditioned systems.
  */
 Eigen::VectorXd
 solveSLEMetalCG3D(const Eigen::SparseMatrix<double>& scalarA,
@@ -106,7 +108,25 @@ solveSLEMetalCG3D(const Eigen::SparseMatrix<double>& scalarA,
                   int& iterationsDone,
                   const Eigen::VectorXd& initialX = Eigen::VectorXd(),
                   bool projectZeroModes = false,
-                  bool useJacobi = true);
+                  bool useJacobi = true,
+                  int pinnedNode = -1,
+                  bool enableCpuFallback = true);
+
+/**
+ * @brief Multi-RHS 3D Block CG solver with algebraically pinned reference node.
+ * Eliminates the translational zero mode L1=0, improves condition number,
+ * cuts required CG iterations by 20-30%, and eliminates all center-of-mass projection passes.
+ */
+Eigen::VectorXd
+solveSLEMetalCG3DPinned(const Eigen::SparseMatrix<double>& scalarA,
+                        const Eigen::VectorXd& b,
+                        double tolerance,
+                        int maxIterations,
+                        int& iterationsDone,
+                        const Eigen::VectorXd& initialX = Eigen::VectorXd(),
+                        size_t pinnedNode = 0,
+                        bool useJacobi = true,
+                        bool enableCpuFallback = true);
 
 /**
  * @brief Multiplies an N x N scalar matrix with a 3N dense vector (interpreted
@@ -199,10 +219,61 @@ evaluateSpringStrainAndInactivityMetal(size_t numNodes,
                                        const SpringRelaxationData& springData);
 
 /**
+ * @brief Multiplies an N x N scalar matrix with a 3N dense vector on GPU
+ * using degree-aware hybrid queue: low-degree rows (degree <= 3, e.g. linear chains)
+ * dispatched to coop2 kernel; high-degree rows (crosslinkers) dispatched to coop8/coop16.
+ */
+Eigen::VectorXd
+spmvMetal3DHybrid(const Eigen::SparseMatrix<double>& scalarA,
+                  const Eigen::VectorXd& x,
+                  uint32_t highCoopWidth = 8);
+
+struct HybridBenchmarkResult
+{
+  double timeCoop2_ms = 0.0;
+  double timeCoop8_ms = 0.0;
+  double timeHybrid_ms = 0.0;
+  double speedupHybridVs8 = 0.0;
+  uint32_t numLowDegreeRows = 0;
+  uint32_t numHighDegreeRows = 0;
+};
+
+HybridBenchmarkResult
+benchmarkHybridSpMVMetal(const Eigen::SparseMatrix<double>& scalarA,
+                         int numRepetitions = 100);
+
+/**
  * @brief Retrieves the current GPU-resident coordinates from the Metal buffer
  * pool.
  */
 Eigen::VectorXd
 getGpuResidentCoordinates(size_t numCoords);
+
+/**
+ * @brief Zero-copy combined SLE solve and spring strain/inactivity evaluation
+ * executed entirely on the GPU within a single command stream without copying
+ * dense coordinates to the host unless flagged springs require host processing.
+ */
+struct GpuRelaxationStepResult
+{
+  int solverIterations = 0;
+  uint32_t numBroken = 0;
+  uint32_t numInactive = 0;
+  uint32_t totalFlagged = 0;
+  std::vector<uint32_t> springFlags;
+  bool converged = false;
+};
+
+GpuRelaxationStepResult
+runGpuRelaxationStep(const Eigen::SparseMatrix<double>& scalarA,
+                     const Eigen::VectorXd& b,
+                     double tolerance,
+                     int maxIterations,
+                     const SpringRelaxationData& springData,
+                     const Eigen::VectorXd& initialX = Eigen::VectorXd(),
+                     bool projectZeroModes = false,
+                     bool useJacobi = true,
+                     int pinnedNode = -1,
+                     bool enableCpuFallback = true);
 
 } // namespace pylimer_tools::sim::mehp

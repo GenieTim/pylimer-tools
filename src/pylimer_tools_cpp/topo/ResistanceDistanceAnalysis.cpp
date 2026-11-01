@@ -312,12 +312,41 @@ ResistanceDistanceAnalysis::computeEffectiveResistanceBatched(
 }
 
 Eigen::MatrixXd
-ResistanceDistanceAnalysis::computeAllPairsEffectiveResistance() const
+ResistanceDistanceAnalysis::solveIdentityChunked(size_t chunkSize) const
 {
   ensureFactorized();
+  if (numNodes_ == 0) {
+    return Eigen::MatrixXd(0, 0);
+  }
 
-  Eigen::MatrixXd I = Eigen::MatrixXd::Identity(numNodes_, numNodes_);
-  Eigen::MatrixXd X = solver_.solve(I);
+  Eigen::Index N = static_cast<Eigen::Index>(numNodes_);
+  Eigen::MatrixXd X(N, N);
+  if (chunkSize == 0) {
+    chunkSize = 128;
+  }
+
+  // Level-3 BLAS chunked forward/back-substitutions:
+  // Solving in chunks of B columns converts triangular solves from memory-bound
+  // dtrsv (Level-2 BLAS) into compute-bound dtrsm (Level-3 BLAS), exploiting AMX/Accelerate
+  for (size_t colStart = 0; colStart < numNodes_; colStart += chunkSize) {
+    size_t curChunk = std::min(chunkSize, numNodes_ - colStart);
+    Eigen::MatrixXd I_chunk = Eigen::MatrixXd::Zero(
+      N, static_cast<Eigen::Index>(curChunk));
+    for (size_t c = 0; c < curChunk; ++c) {
+      I_chunk(static_cast<Eigen::Index>(colStart + c), static_cast<Eigen::Index>(c)) = 1.0;
+    }
+    X.middleCols(static_cast<Eigen::Index>(colStart),
+                 static_cast<Eigen::Index>(curChunk)) = solver_.solve(I_chunk);
+  }
+
+  return X;
+}
+
+Eigen::MatrixXd
+ResistanceDistanceAnalysis::computeAllPairsEffectiveResistance(
+  size_t chunkSize) const
+{
+  Eigen::MatrixXd X = solveIdentityChunked(chunkSize);
 
   // Zero out rows and columns corresponding to pinned reference nodes
   for (size_t r : referenceNodePerComponent_) {
@@ -325,7 +354,8 @@ ResistanceDistanceAnalysis::computeAllPairsEffectiveResistance() const
     X.col(static_cast<Eigen::Index>(r)).setZero();
   }
 
-  Eigen::MatrixXd R(numNodes_, numNodes_);
+  Eigen::Index N = static_cast<Eigen::Index>(numNodes_);
+  Eigen::MatrixXd R(N, N);
   for (size_t i = 0; i < numNodes_; ++i) {
     for (size_t j = 0; j < numNodes_; ++j) {
       if (i == j) {
@@ -394,12 +424,10 @@ ResistanceDistanceAnalysis::computeKirchhoffIndexSpectral() const
 }
 
 Eigen::MatrixXd
-ResistanceDistanceAnalysis::computeMoorePenrosePseudoInverse() const
+ResistanceDistanceAnalysis::computeMoorePenrosePseudoInverse(
+  size_t chunkSize) const
 {
-  ensureFactorized();
-
-  Eigen::MatrixXd I = Eigen::MatrixXd::Identity(numNodes_, numNodes_);
-  Eigen::MatrixXd X = solver_.solve(I);
+  Eigen::MatrixXd X = solveIdentityChunked(chunkSize);
 
   for (size_t r : referenceNodePerComponent_) {
     X.row(static_cast<Eigen::Index>(r)).setZero();
