@@ -17,6 +17,7 @@ MEHPForceBalance2
    .. autosummary::
 
       ~MEHPForceBalance2.config_assume_network_is_complete
+      ~MEHPForceBalance2.config_in_place_rebuild_threshold
       ~MEHPForceBalance2.config_mean_bond_length
       ~MEHPForceBalance2.config_spring_breaking_distance
       ~MEHPForceBalance2.config_spring_constant
@@ -42,6 +43,7 @@ MEHPForceBalance2
       ~MEHPForceBalance2.get_gamma_factors
       ~MEHPForceBalance2.get_gamma_factors_in_dir
       ~MEHPForceBalance2.get_ids_of_active_nodes
+      ~MEHPForceBalance2.get_in_place_rebuild_threshold
       ~MEHPForceBalance2.get_initial_coordinates
       ~MEHPForceBalance2.get_neighbour_link_indices
       ~MEHPForceBalance2.get_nr_of_active_nodes
@@ -76,6 +78,7 @@ MEHPForceBalance2
    .. rubric:: Methods Documentation
 
    .. automethod:: config_assume_network_is_complete
+   .. automethod:: config_in_place_rebuild_threshold
    .. automethod:: config_mean_bond_length
    .. automethod:: config_spring_breaking_distance
    .. automethod:: config_spring_constant
@@ -101,6 +104,7 @@ MEHPForceBalance2
    .. automethod:: get_gamma_factors
    .. automethod:: get_gamma_factors_in_dir
    .. automethod:: get_ids_of_active_nodes
+   .. automethod:: get_in_place_rebuild_threshold
    .. automethod:: get_initial_coordinates
    .. automethod:: get_neighbour_link_indices
    .. automethod:: get_nr_of_active_nodes

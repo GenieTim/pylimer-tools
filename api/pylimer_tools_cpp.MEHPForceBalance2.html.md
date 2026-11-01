@@ -73,6 +73,7 @@ Overloaded function.
 
 | [`config_assume_network_is_complete`](#pylimer_tools_cpp.MEHPForceBalance2.config_assume_network_is_complete)(self[, ...])    | Configure whether the network is assumed to be complete.                                                                                           |
 |----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`config_in_place_rebuild_threshold`](#pylimer_tools_cpp.MEHPForceBalance2.config_in_place_rebuild_threshold)(self[, ...])    | Configure threshold fraction of cumulative broken springs to rebuild CSR sparse pattern.                                                           |
 | [`config_mean_bond_length`](#pylimer_tools_cpp.MEHPForceBalance2.config_mean_bond_length)(self[, b])                | Configure the $b$ used e.g. for the topological Gamma-factor.                                                                                      |
 | [`config_spring_breaking_distance`](#pylimer_tools_cpp.MEHPForceBalance2.config_spring_breaking_distance)(self[, ...])      | Configure the "force" (distance over contour length) at which the bonds break.                                                                     |
 | [`config_spring_constant`](#pylimer_tools_cpp.MEHPForceBalance2.config_spring_constant)(self[, kappa])             | Configure the spring constant used in the simulation.                                                                                              |
@@ -98,6 +99,7 @@ Overloaded function.
 | [`get_gamma_factors`](#pylimer_tools_cpp.MEHPForceBalance2.get_gamma_factors)(self, b02)                      | Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)                            |
 | [`get_gamma_factors_in_dir`](#pylimer_tools_cpp.MEHPForceBalance2.get_gamma_factors_in_dir)(self, b02, direction)    | Evaluates the gamma factor for each strand in the specified direction (i.e., the squared distance divided by the contour length multiplied by b02) |
 | [`get_ids_of_active_nodes`](#pylimer_tools_cpp.MEHPForceBalance2.get_ids_of_active_nodes)(self[, tolerance])        | Get the atom ids of the nodes that are considered active.                                                                                          |
+| [`get_in_place_rebuild_threshold`](#pylimer_tools_cpp.MEHPForceBalance2.get_in_place_rebuild_threshold)(self)              |                                                                                                                                                    |
 | [`get_initial_coordinates`](#pylimer_tools_cpp.MEHPForceBalance2.get_initial_coordinates)(self)                     | Get the initial coordinates of the crosslinkers and entanglement links.                                                                            |
 | [`get_neighbour_link_indices`](#pylimer_tools_cpp.MEHPForceBalance2.get_neighbour_link_indices)(network, link_idx)     | Get the indices of neighboring links for a given link.                                                                                             |
 | [`get_nr_of_active_nodes`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_nodes)(self[, tolerance])         | Get the number of active nodes (incl.                                                                                                              |
@@ -144,6 +146,11 @@ This is useful to reduce memory between MC generator and force balance,
 since the universe representation with all the in-between beads does not need to be stored.
 However, currently, the removal procedures are not loss-free.
 Therefore, use this with care.
+
+#### config_in_place_rebuild_threshold(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), threshold: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.15) → [None](https://docs.python.org/3/builtins/constants.html#None)
+
+Configure threshold fraction of cumulative broken springs to rebuild CSR sparse pattern.
+Default: 0.15 (15%).
 
 #### config_mean_bond_length(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), b: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
@@ -312,6 +319,8 @@ Only crosslink ids are returned (not e.g. entanglement links).
 
 * **Parameters:**
   **tolerance** – springs under this length are considered inactive. A node is active if it has > 1 active springs.
+
+#### get_in_place_rebuild_threshold(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 #### get_initial_coordinates(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 

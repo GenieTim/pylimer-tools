@@ -17,6 +17,7 @@ ResistanceDistanceAnalysis
       ~ResistanceDistanceAnalysis.compute_effective_resistance_batched
       ~ResistanceDistanceAnalysis.compute_kirchhoff_index
       ~ResistanceDistanceAnalysis.compute_kirchhoff_index_spectral
+      ~ResistanceDistanceAnalysis.compute_moore_penrose_pseudo_inverse
       ~ResistanceDistanceAnalysis.compute_resistance_centrality
       ~ResistanceDistanceAnalysis.compute_total_resistance_per_node
       ~ResistanceDistanceAnalysis.create_complete
@@ -30,6 +31,7 @@ ResistanceDistanceAnalysis
       ~ResistanceDistanceAnalysis.get_nr_of_nodes
       ~ResistanceDistanceAnalysis.get_total_edge_weight
       ~ResistanceDistanceAnalysis.is_connected
+      ~ResistanceDistanceAnalysis.solve_identity_chunked
 
    .. rubric:: Methods Documentation
 
@@ -40,6 +42,7 @@ ResistanceDistanceAnalysis
    .. automethod:: compute_effective_resistance_batched
    .. automethod:: compute_kirchhoff_index
    .. automethod:: compute_kirchhoff_index_spectral
+   .. automethod:: compute_moore_penrose_pseudo_inverse
    .. automethod:: compute_resistance_centrality
    .. automethod:: compute_total_resistance_per_node
    .. automethod:: create_complete
@@ -53,3 +56,4 @@ ResistanceDistanceAnalysis
    .. automethod:: get_nr_of_nodes
    .. automethod:: get_total_edge_weight
    .. automethod:: is_connected
+   .. automethod:: solve_identity_chunked

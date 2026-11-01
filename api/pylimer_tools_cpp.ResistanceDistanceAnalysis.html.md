@@ -19,6 +19,7 @@ Overloaded function.
 | [`compute_effective_resistance_batched`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_effective_resistance_batched)(self, pairs) |    |
 | [`compute_kirchhoff_index`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_kirchhoff_index)(self)                     |    |
 | [`compute_kirchhoff_index_spectral`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_kirchhoff_index_spectral)(self)            |    |
+| [`compute_moore_penrose_pseudo_inverse`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_moore_penrose_pseudo_inverse)(self[, ...]) |    |
 | [`compute_resistance_centrality`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_resistance_centrality)(self)               |    |
 | [`compute_total_resistance_per_node`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.compute_total_resistance_per_node)(self)           |    |
 | [`create_complete`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.create_complete)(num_nodes)                        |    |
@@ -32,12 +33,13 @@ Overloaded function.
 | [`get_nr_of_nodes`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_nr_of_nodes)(self)                             |    |
 | [`get_total_edge_weight`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.get_total_edge_weight)(self)                       |    |
 | [`is_connected`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.is_connected)(self)                                |    |
+| [`solve_identity_chunked`](#pylimer_tools_cpp.ResistanceDistanceAnalysis.solve_identity_chunked)(self[, chunk_size])        |    |
 
 ### Methods Documentation
 
 #### compute_all_pairs_commute_time(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
 
-#### compute_all_pairs_effective_resistance(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
+#### compute_all_pairs_effective_resistance(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 128) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
 
 #### compute_commute_time(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), i: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), j: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
@@ -48,6 +50,8 @@ Overloaded function.
 #### compute_kirchhoff_index(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 #### compute_kirchhoff_index_spectral(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+
+#### compute_moore_penrose_pseudo_inverse(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 128) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
 
 #### compute_resistance_centrality(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
@@ -74,3 +78,5 @@ Overloaded function.
 #### get_total_edge_weight(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 #### is_connected(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
+
+#### solve_identity_chunked(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 128) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
