@@ -1084,6 +1084,46 @@ TEST_CASE(
             forceBalancer2Without.getCurrentDisplacements())));
 }
 
+TEST_CASE("MEHPForceBalance2 Bugfix Validations 1A.1 1A.2 1A.4",
+          "[MEHPForceBalance2][bugfixes]")
+{
+  pe::UniverseSequence universeSeq;
+  std::string inputFile = std::string(PYLIMER_TEST_FIXTURES_DIR) +
+                          "/structure/network_100_a_46.structure.out";
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+
+  // System with slip-links
+  pcm::MEHPForceBalance2 fb(universe, 50, 4.0, 0.0, 50, 3.0, "12345");
+  REQUIRE(fb.getNetwork().nrOfLinks > fb.getNetwork().nrOfNodes);
+
+  // 1A.1: evaluateStrandVectors vs individual evaluateStrandVector
+  Eigen::VectorXd allStrandVectors =
+    fb.evaluateStrandVectors(fb.getNetwork(), fb.getCurrentDisplacements());
+  REQUIRE(allStrandVectors.size() == 3 * fb.getNrOfStrands());
+  for (size_t s = 0; s < fb.getNrOfStrands(); ++s) {
+    Eigen::Vector3d single =
+      fb.evaluateStrandVector(fb.getNetwork(), fb.getCurrentDisplacements(), s);
+    Eigen::Vector3d fromAll = allStrandVectors.segment(3 * s, 3);
+    CHECK(single.isApprox(fromAll));
+  }
+
+  // 1A.2: findSpringsAndLinksClusteredToActive size
+  auto clustered = fb.findSpringsAndLinksClusteredToActive(
+    fb.getNetwork(), fb.getCurrentDisplacements());
+  CHECK(clustered.second.size() == fb.getNetwork().nrOfLinks);
+
+  // 1A.4: getDisplacementResidualNormFor with kappa != 1.0
+  fb.configSpringConstant(2.5);
+  Eigen::VectorXd oneOverPartitions =
+    fb.assembleOneOverSpringPartition(fb.getNetwork());
+  double norm1 = fb.getDisplacementResidualNormFor(
+    fb.getNetwork(), fb.getCurrentDisplacements());
+  double norm2 = fb.getDisplacementResidualNormFor(
+    fb.getNetwork(), fb.getCurrentDisplacements(), oneOverPartitions);
+  CHECK_THAT(norm1, Catch::Matchers::WithinRel(norm2, 1e-6));
+}
+
 TEST_CASE(
   "MEHP Force Balance2 Entanglement Links are just like Entanglement Springs",
   "[analysis][MEHPForceBalance2][long]")
@@ -4022,10 +4062,12 @@ TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
   }
 }
 
-TEST_CASE("MEHPForceBalance2 Metal Single-Precision Solvers & Robust CPU Fallback on Ill-Conditioned Networks",
+TEST_CASE("MEHPForceBalance2 Metal Single-Precision Solvers & Robust CPU "
+          "Fallback on Ill-Conditioned Networks",
           "[MEHPForceBalance2][Metal][IllConditioned][Fallback]")
 {
-  std::cout << "\n=== Testing Single-Precision GPU Solvers & CPU Fallback on Ill-Conditioned Networks ==="
+  std::cout << "\n=== Testing Single-Precision GPU Solvers & CPU Fallback on "
+               "Ill-Conditioned Networks ==="
             << std::endl;
   // Construct ill-conditioned network with stiffness ratio > 10^7
   const size_t numNodes = 200;
@@ -4055,23 +4097,41 @@ TEST_CASE("MEHPForceBalance2 Metal Single-Precision Solvers & Robust CPU Fallbac
   double bNorm = b.norm();
   const double targetTol = 1e-8;
 
-  SECTION("Float32 GPU without fallback on ill-conditioned network hits float floor")
+  SECTION(
+    "Float32 GPU without fallback on ill-conditioned network hits float floor")
   {
     int itersNoFallback = 0;
-    Eigen::VectorXd xNoFallback = pcm::solveSLEMetalCG3D(
-      scalarL, b, targetTol, 1000, itersNoFallback, Eigen::VectorXd(), false, true, -1, false);
+    Eigen::VectorXd xNoFallback = pcm::solveSLEMetalCG3D(scalarL,
+                                                         b,
+                                                         targetTol,
+                                                         1000,
+                                                         itersNoFallback,
+                                                         Eigen::VectorXd(),
+                                                         false,
+                                                         true,
+                                                         -1,
+                                                         false);
     Eigen::VectorXd AxNo = pcm::spmvMetal3D(scalarL, xNoFallback);
     double relResNo = (b - AxNo).norm() / bNorm;
     std::cout << "GPU Float32 (no fallback) Rel Residual: " << relResNo
               << ", Iterations: " << itersNoFallback << std::endl;
-    CHECK(relResNo > targetTol); // Demonstrates the precision limitation of float32 on ill-conditioned network
+    CHECK(relResNo > targetTol); // Demonstrates the precision limitation of
+                                 // float32 on ill-conditioned network
   }
 
   SECTION("Robust CPU Double-Precision Fallback achieves tight tolerance")
   {
     int itersFallback = 0;
-    Eigen::VectorXd xFallback = pcm::solveSLEMetalCG3D(
-      scalarL, b, targetTol, 1000, itersFallback, Eigen::VectorXd(), false, true, -1, true);
+    Eigen::VectorXd xFallback = pcm::solveSLEMetalCG3D(scalarL,
+                                                       b,
+                                                       targetTol,
+                                                       1000,
+                                                       itersFallback,
+                                                       Eigen::VectorXd(),
+                                                       false,
+                                                       true,
+                                                       -1,
+                                                       true);
 
     // Compute residual in double precision on CPU
     Eigen::MatrixXd xMat(numNodes, 3), bMat(numNodes, 3);
@@ -4084,16 +4144,19 @@ TEST_CASE("MEHPForceBalance2 Metal Single-Precision Solvers & Robust CPU Fallbac
       bMat(i, 2) = b[3 * i + 2];
     }
     double relResFall = (bMat - scalarL * xMat).norm() / bMat.norm();
-    std::cout << "GPU with CPU Double Fallback Rel Residual (double-precision): " << relResFall
-              << ", Total Iterations: " << itersFallback << std::endl;
+    std::cout
+      << "GPU with CPU Double Fallback Rel Residual (double-precision): "
+      << relResFall << ", Total Iterations: " << itersFallback << std::endl;
     CHECK(relResFall <= 1e-7); // Driven down to double precision accuracy
   }
 }
 
-TEST_CASE("MEHPForceBalance2 Metal Pinned Reference Node vs Center-of-Mass Projection",
-          "[MEHPForceBalance2][Metal][PinnedNode][EliminationTree]")
+TEST_CASE(
+  "MEHPForceBalance2 Metal Pinned Reference Node vs Center-of-Mass Projection",
+  "[MEHPForceBalance2][Metal][PinnedNode][EliminationTree]")
 {
-  std::cout << "\n=== Testing Elimination Tree / Pinned Reference Node vs Center-of-Mass Projection ==="
+  std::cout << "\n=== Testing Elimination Tree / Pinned Reference Node vs "
+               "Center-of-Mass Projection ==="
             << std::endl;
   // Build periodic network of N = 400 nodes
   const size_t numNodes = 400;
@@ -4120,7 +4183,8 @@ TEST_CASE("MEHPForceBalance2 Metal Pinned Reference Node vs Center-of-Mass Proje
     diag[tr.row()] -= tr.value();
   }
   for (size_t i = 0; i < numNodes; ++i) {
-    trips.emplace_back(i, i, diag[i]); // Periodic Laplacian with zero eigenvalue
+    trips.emplace_back(
+      i, i, diag[i]); // Periodic Laplacian with zero eigenvalue
   }
   Eigen::SparseMatrix<double> L_periodic(numNodes, numNodes);
   L_periodic.setFromTriplets(trips.begin(), trips.end());
@@ -4130,37 +4194,58 @@ TEST_CASE("MEHPForceBalance2 Metal Pinned Reference Node vs Center-of-Mass Proje
   Eigen::VectorXd b = Eigen::VectorXd::Random(numNodes * 3);
   for (int d = 0; d < 3; ++d) {
     double mean = 0.0;
-    for (size_t i = 0; i < numNodes; ++i) mean += b[3 * i + d];
+    for (size_t i = 0; i < numNodes; ++i)
+      mean += b[3 * i + d];
     mean /= static_cast<double>(numNodes);
-    for (size_t i = 0; i < numNodes; ++i) b[3 * i + d] -= mean;
+    for (size_t i = 0; i < numNodes; ++i)
+      b[3 * i + d] -= mean;
   }
 
   // 1. Solve using periodic Center-of-Mass projection every 25 iterations
   auto t0 = std::chrono::high_resolution_clock::now();
   int itersCom = 0;
-  Eigen::VectorXd xCom = pcm::solveSLEMetalCG3D(
-    L_periodic, b, 1e-4, 500, itersCom, Eigen::VectorXd(), /*projectZeroModes=*/true, true, -1);
+  Eigen::VectorXd xCom = pcm::solveSLEMetalCG3D(L_periodic,
+                                                b,
+                                                1e-4,
+                                                500,
+                                                itersCom,
+                                                Eigen::VectorXd(),
+                                                /*projectZeroModes=*/true,
+                                                true,
+                                                -1);
   auto t1 = std::chrono::high_resolution_clock::now();
-  double timeCom_ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
+  double timeCom_ms =
+    std::chrono::duration<double, std::milli>(t1 - t0).count();
 
-  // 2. Solve using Pinned Reference Node 0 (strictly positive definite submatrix, zero COM projection)
+  // 2. Solve using Pinned Reference Node 0 (strictly positive definite
+  // submatrix, zero COM projection)
   auto t2 = std::chrono::high_resolution_clock::now();
   int itersPinned = 0;
-  Eigen::VectorXd xPinned = pcm::solveSLEMetalCG3DPinned(
-    L_periodic, b, 1e-4, 500, itersPinned, Eigen::VectorXd(), /*pinnedNode=*/0, true);
+  Eigen::VectorXd xPinned = pcm::solveSLEMetalCG3DPinned(L_periodic,
+                                                         b,
+                                                         1e-4,
+                                                         500,
+                                                         itersPinned,
+                                                         Eigen::VectorXd(),
+                                                         /*pinnedNode=*/0,
+                                                         true);
   auto t3 = std::chrono::high_resolution_clock::now();
-  double timePinned_ms = std::chrono::duration<double, std::milli>(t3 - t2).count();
+  double timePinned_ms =
+    std::chrono::duration<double, std::milli>(t3 - t2).count();
 
   std::cout << "COM Projection Method:   Iterations = " << itersCom
             << ", Time = " << timeCom_ms << " ms\n"
             << "Pinned Reference Node:   Iterations = " << itersPinned
             << ", Time = " << timePinned_ms << " ms\n"
             << "Iteration Reduction:     "
-            << (100.0 * (itersCom - itersPinned) / std::max(itersCom, 1)) << "%\n"
-            << "=========================================================================\n";
+            << (100.0 * (itersCom - itersPinned) / std::max(itersCom, 1))
+            << "%\n"
+            << "==============================================================="
+               "==========\n";
 
   // Check residuals
-  Eigen::MatrixXd xComMat(numNodes, 3), xPinnedMat(numNodes, 3), bMat(numNodes, 3);
+  Eigen::MatrixXd xComMat(numNodes, 3), xPinnedMat(numNodes, 3),
+    bMat(numNodes, 3);
   for (size_t i = 0; i < numNodes; ++i) {
     xComMat(i, 0) = xCom[3 * i + 0];
     xComMat(i, 1) = xCom[3 * i + 1];
@@ -4186,12 +4271,15 @@ TEST_CASE("MEHPForceBalance2 Metal Pinned Reference Node vs Center-of-Mass Proje
   CHECK(timePinned_ms > 0.0);
 }
 
-TEST_CASE("MEHPForceBalance2 Metal Hybrid SIMDgroup SpMM Degree-Aware Work-Queue",
-          "[MEHPForceBalance2][Metal][Hybrid][SpMM]")
+TEST_CASE(
+  "MEHPForceBalance2 Metal Hybrid SIMDgroup SpMM Degree-Aware Work-Queue",
+  "[MEHPForceBalance2][Metal][Hybrid][SpMM]")
 {
-  std::cout << "\n=== Testing Hybrid SIMDgroup SpMM: Degree-Aware Work-Queue ==="
-            << std::endl;
-  // Build polymer network: 90% degree-2 linear beads, 10% degree >= 4 crosslinks
+  std::cout
+    << "\n=== Testing Hybrid SIMDgroup SpMM: Degree-Aware Work-Queue ==="
+    << std::endl;
+  // Build polymer network: 90% degree-2 linear beads, 10% degree >= 4
+  // crosslinks
   const size_t numNodes = 4000;
   std::vector<Eigen::Triplet<double>> trips;
   trips.reserve(numNodes * 3);
@@ -4231,16 +4319,20 @@ TEST_CASE("MEHPForceBalance2 Metal Hybrid SIMDgroup SpMM Degree-Aware Work-Queue
 
   // 2. Run Degree-Aware Hybrid Work-Queue Benchmark
   auto bench = pcm::benchmarkHybridSpMVMetal(scalarL, 50);
-  std::cout << "Polymer network beads: Low-degree (<4) = " << bench.numLowDegreeRows
-            << " (" << (100.0 * bench.numLowDegreeRows / numNodes) << "%), "
+  std::cout << "Polymer network beads: Low-degree (<4) = "
+            << bench.numLowDegreeRows << " ("
+            << (100.0 * bench.numLowDegreeRows / numNodes) << "%), "
             << "High-degree (>=4) = " << bench.numHighDegreeRows << "\n"
             << "Uniform Coop2 Time: " << bench.timeCoop2_ms << " ms\n"
             << "Uniform Coop8 Time: " << bench.timeCoop8_ms << " ms\n"
-            << "Degree-Aware Hybrid Queue Time: " << bench.timeHybrid_ms << " ms\n"
+            << "Degree-Aware Hybrid Queue Time: " << bench.timeHybrid_ms
+            << " ms\n"
             << "Speedup Hybrid vs Coop8: " << bench.speedupHybridVs8 << "x\n"
-            << "=========================================================================\n";
+            << "==============================================================="
+               "==========\n";
 
-  CHECK(bench.numLowDegreeRows >= static_cast<uint32_t>(0.80 * static_cast<double>(numNodes)));
+  CHECK(bench.numLowDegreeRows >=
+        static_cast<uint32_t>(0.80 * static_cast<double>(numNodes)));
   CHECK(bench.timeHybrid_ms > 0.0);
 }
 
@@ -4281,8 +4373,17 @@ TEST_CASE("MEHPForceBalance2 Metal Zero-Copy End-to-End Simulation Pipeline",
   springData.breakingThreshold = 100.0; // High threshold: none broken
   springData.inactiveCutoff = 0.0;
 
-  pcm::GpuRelaxationStepResult result = pcm::runGpuRelaxationStep(
-    scalarA, b, 1e-4, 100, springData, Eigen::VectorXd(), false, true, -1, true);
+  pcm::GpuRelaxationStepResult result =
+    pcm::runGpuRelaxationStep(scalarA,
+                              b,
+                              1e-4,
+                              100,
+                              springData,
+                              Eigen::VectorXd(),
+                              false,
+                              true,
+                              -1,
+                              true);
 
   CHECK(result.converged);
   CHECK(result.numBroken == 0);
@@ -4355,7 +4456,8 @@ TEST_CASE("MEHPForceBalance2 In-Place CSR Updates with Threshold Rebuild",
     std::vector<long int> atomIds(nrOfBeads);
     std::iota(atomIds.begin(), atomIds.end(), 1 + beadOffset);
     std::vector<double> coords(nrOfBeads);
-    std::iota(coords.begin(), coords.end(), 1.0 + static_cast<double>(beadOffset));
+    std::iota(
+      coords.begin(), coords.end(), 1.0 + static_cast<double>(beadOffset));
     universe.addAtoms(atomIds,
                       pylimer_tools::utils::initializeWithValue(nrOfBeads, 1),
                       coords,
@@ -4404,5 +4506,79 @@ TEST_CASE("MEHPForceBalance2 In-Place CSR Updates with Threshold Rebuild",
                             1e-6,
                             pcm::SLESolver::SIMPLICIAL_LDLT));
     CHECK(fb.validateNetwork());
+  }
+}
+
+#ifdef CEREALIZABLE
+TEST_CASE("MEHPForceBalance2 Cereal Serialization (1A.10)",
+          "[bugfixes][MEHPForceBalance2][cereal]")
+{
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+  std::string inputFile =
+    suspectedPath + "/structure/network_100_a_46.structure.out";
+  REQUIRE(std::filesystem::exists(inputFile));
+
+  pe::UniverseSequence universeSeq;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+
+  pcm::MEHPForceBalance2 fb(universe, 250, 2.0, 0.0, 100);
+  REQUIRE(fb.getNrOfLinks() > fb.getNrOfNodes()); // has slip-links
+
+  std::string serialized = fb.serializeToString();
+  CHECK(!serialized.empty());
+
+  pcm::MEHPForceBalance2 restored =
+    pcm::MEHPForceBalance2::constructFromString(serialized);
+  CHECK(restored.getNrOfNodes() == fb.getNrOfNodes());
+  CHECK(restored.getNrOfLinks() == fb.getNrOfLinks());
+  CHECK(restored.getNrOfStrands() == fb.getNrOfStrands());
+  CHECK(restored.getNrOfSprings() == fb.getNrOfSprings());
+  CHECK(restored.getCurrentDisplacements().size() ==
+        fb.getCurrentDisplacements().size());
+  CHECK(
+    (restored.getCurrentDisplacements() - fb.getCurrentDisplacements()).norm() <
+    1e-12);
+  CHECK(restored.validateNetwork());
+}
+#endif
+
+TEST_CASE("MEHPForceBalance2 2D Mode and Gamma Normalization (1A.5, 1A.8)",
+          "[bugfixes][MEHPForceBalance2][2D]")
+{
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+  std::string inputFile =
+    suspectedPath + "/structure/network_100_a_46.structure.out";
+  REQUIRE(std::filesystem::exists(inputFile));
+
+  pe::UniverseSequence universeSeq;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+
+  SECTION("2D simulation keeps z-displacements zero (1A.5)")
+  {
+    pcm::MEHPForceBalance2 fb2D(universe, 2, true); // is2D = true
+    fb2D.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                            1e-6,
+                            pcm::SLESolver::DEFAULT);
+    const Eigen::VectorXd u = fb2D.getCurrentDisplacements();
+    for (size_t link = 0; link < fb2D.getNrOfLinks(); ++link) {
+      CHECK(std::abs(u[3 * link + 2]) < 1e-12);
+    }
+  }
+
+  SECTION("Gamma factor normalization with slip-links (1A.8)")
+  {
+    pcm::MEHPForceBalance2 fbWithLinks(universe, 250, 2.0, 0.0, 100);
+    REQUIRE(fbWithLinks.getNrOfSprings() >
+            fbWithLinks.getNrOfStrands()); // partial springs > strands
+    double gammaAuto = fbWithLinks.getGammaFactor(1.0, -1);
+    Eigen::VectorXd gammaVec = fbWithLinks.getGammaFactors(1.0);
+    // When nrOfChains < 1, gammaAuto should equal gammaVec.sum() / nrOfStrands,
+    // NOT gammaVec.mean()
+    double expectedGamma =
+      gammaVec.sum() / static_cast<double>(fbWithLinks.getNrOfStrands());
+    CHECK(gammaAuto == Catch::Approx(expectedGamma));
+    CHECK(gammaAuto > gammaVec.mean()); // Because nrOfSprings > nrOfStrands
   }
 }

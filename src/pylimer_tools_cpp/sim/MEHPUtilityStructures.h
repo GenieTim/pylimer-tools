@@ -29,7 +29,7 @@ enum StructureSimplificationMode
 #undef X
 };
 
-static std::string StructureSimplificationModeNames[] = {
+inline const std::string StructureSimplificationModeNames[] = {
 #define X(e, s) s,
   STRUCTURE_SIMPLIFICATION_MODES
 #undef X
@@ -52,7 +52,7 @@ enum LinkSwappingMode
 #undef X
 };
 
-static std::string LinkSwappingModeNames[] = {
+inline const std::string LinkSwappingModeNames[] = {
 #define X(e, s) s,
   LINK_SWAPPING_MODES
 #undef X
@@ -75,7 +75,7 @@ enum ExitReason
 #undef X
 };
 
-static std::string ExitReasonNames[] = {
+inline const std::string ExitReasonNames[] = {
 #define X(e, s) s,
   EXIT_REASONS
 #undef X
@@ -122,13 +122,13 @@ enum SLESolver
 #undef X
 };
 
-static std::string SLESolverNames[] = {
+inline const std::string SLESolverNames[] = {
 #define X(e, s) s,
   SLE_SOLVERS
 #undef X
 };
 
-static SLESolver allSLESolvers[] = {
+inline const SLESolver allSLESolvers[] = {
 #define X(e, s) SLESolver::e,
   SLE_SOLVERS
 #undef X
@@ -315,6 +315,41 @@ struct ForceBalance2Network
   Eigen::ArrayXi oldAtomIds;
   Eigen::ArrayXi oldAtomTypes;
 };
+
+#ifdef CEREALIZABLE
+
+template<class Archive>
+void
+serialize(Archive& ar, ForceBalance2Network& fbn)
+{
+  // Box properties
+  ar(fbn.L, fbn.boxHalfs);
+
+  // Network properties
+  ar(fbn.nrOfLinks, fbn.nrOfNodes, fbn.nrOfStrands, fbn.nrOfSprings);
+
+  // Coordinates and connectivity
+  ar(fbn.coordinates,
+     fbn.springContourLength,
+     fbn.springIsEntanglement,
+     fbn.strandIndicesOfLink,
+     fbn.linkIndicesOfStrand,
+     fbn.springIndicesOfStrand,
+     fbn.linkIsEntanglement);
+
+  // Partial springs
+  ar(fbn.springCoordinateIndexA,
+     fbn.springCoordinateIndexB,
+     fbn.springIndexA,
+     fbn.springIndexB,
+     fbn.springBoxOffset,
+     fbn.strandIndexOfSpring);
+
+  // Old atom info
+  ar(fbn.oldAtomIds, fbn.oldAtomTypes);
+}
+
+#endif
 }
 
 #endif

@@ -9,6 +9,7 @@
 
 #include "./VectorUtils.h"
 #include <Eigen/Dense>
+#include <Eigen/Sparse>
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/archives/xml.hpp>
@@ -144,6 +145,52 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, Eigen::PlainObjectBase<Derived>& m)
       ar(m(i, j));
     }
   }
+}
+
+template<class Archive, typename Scalar, int Options, typename StorageIndex>
+inline void
+CEREAL_SAVE_FUNCTION_NAME(
+  Archive& ar,
+  const Eigen::SparseMatrix<Scalar, Options, StorageIndex>& mat)
+{
+  Eigen::Index rows = mat.rows();
+  Eigen::Index cols = mat.cols();
+  Eigen::Index nonZeros = mat.nonZeros();
+  ar(rows, cols, nonZeros);
+  for (Eigen::Index k = 0; k < mat.outerSize(); ++k) {
+    for (typename Eigen::SparseMatrix<Scalar, Options, StorageIndex>::
+           InnerIterator it(mat, k);
+         it;
+         ++it) {
+      Eigen::Index r = it.row();
+      Eigen::Index c = it.col();
+      Scalar v = it.value();
+      ar(r, c, v);
+    }
+  }
+}
+
+template<class Archive, typename Scalar, int Options, typename StorageIndex>
+inline void
+CEREAL_LOAD_FUNCTION_NAME(
+  Archive& ar,
+  Eigen::SparseMatrix<Scalar, Options, StorageIndex>& mat)
+{
+  Eigen::Index rows = 0;
+  Eigen::Index cols = 0;
+  Eigen::Index nonZeros = 0;
+  ar(rows, cols, nonZeros);
+  mat.resize(rows, cols);
+  std::vector<Eigen::Triplet<Scalar, StorageIndex>> triplets;
+  triplets.reserve(static_cast<size_t>(nonZeros));
+  for (Eigen::Index i = 0; i < nonZeros; ++i) {
+    Eigen::Index r = 0, c = 0;
+    Scalar v = 0;
+    ar(r, c, v);
+    triplets.emplace_back(
+      static_cast<StorageIndex>(r), static_cast<StorageIndex>(c), v);
+  }
+  mat.setFromTriplets(triplets.begin(), triplets.end());
 }
 
 ////////////////////////////////////////////////////////////////

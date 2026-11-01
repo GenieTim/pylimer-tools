@@ -1206,6 +1206,7 @@ kernel void evaluate_springs_strain_and_inactivity(
     constant float& breakingThreshold [[buffer(7)]],
     constant float& inactiveCutoff [[buffer(8)]],
     constant uint& numSprings [[buffer(9)]],
+    constant uint& is2D [[buffer(10)]],
     uint s [[thread_position_in_grid]])
 {
     if (s >= numSprings) return;
@@ -1220,6 +1221,9 @@ kernel void evaluate_springs_strain_and_inactivity(
     float3 posB = float3(coords[idxB]);
     float3 offset = float3(springBoxOffset[s]);
     float3 distVec = (posB - posA) + offset;
+    if (is2D != 0) {
+        distVec.z = 0.0f;
+    }
     float len = length(distVec);
     float contour = springContourLength[s];
 
@@ -2665,7 +2669,7 @@ solveSLEMetalCG3D(const Eigen::SparseMatrix<double>& scalarA,
     statePtr->iter = 0;
     statePtr->converged = 0;
     statePtr->maxIters = static_cast<uint32_t>(maxIterations);
-    statePtr->tolSq = static_cast<float>(std::max(tolerance * tolerance, 1e-12));
+    statePtr->tolSq = static_cast<float>(tolerance * tolerance);
     statePtr->rho = initial_rho;
     statePtr->initial_rho = initial_rho;
 
@@ -3338,7 +3342,7 @@ solveSLEMetalCG(const Eigen::SparseMatrix<double>& A,
     statePtr->iter = 0;
     statePtr->converged = 0;
     statePtr->maxIters = static_cast<uint32_t>(maxIterations);
-    statePtr->tolSq = static_cast<float>(std::max(tolerance * tolerance, 1e-12));
+    statePtr->tolSq = static_cast<float>(tolerance * tolerance);
     statePtr->rho = initial_rho;
     statePtr->initial_rho = initial_rho;
 
@@ -3569,9 +3573,11 @@ evaluateSpringStrainAndInactivityMetal(size_t numNodes,
     [enc setBuffer:bufContour offset:0 atIndex:4];
     [enc setBuffer:bufFlags offset:0 atIndex:5];
     [enc setBuffer:bufCounters offset:0 atIndex:6];
+    uint32_t is2DUint = springData.is2D ? 1u : 0u;
     [enc setBytes:&breakingThreshold length:sizeof(float) atIndex:7];
     [enc setBytes:&inactiveCutoff length:sizeof(float) atIndex:8];
     [enc setBytes:&S length:sizeof(uint32_t) atIndex:9];
+    [enc setBytes:&is2DUint length:sizeof(uint32_t) atIndex:10];
 
     uint32_t tg_size = 256;
     [enc dispatchThreads:MTLSizeMake(S, 1, 1)

@@ -998,18 +998,7 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
     }
 
     avgMoments /= static_cast<double>(numRandomVectors);
-
-    // Apply Jackson damping kernel
-    for (size_t m = 0; m < numMoments; ++m) {
-      double m_d = static_cast<double>(m);
-      double M_d = static_cast<double>(numMoments);
-      double gm =
-        ((M_d - m_d + 1.0) * std::cos(M_PI * m_d / (M_d + 1.0)) +
-         std::sin(M_PI * m_d / (M_d + 1.0)) / std::tan(M_PI / (M_d + 1.0))) /
-        (M_d + 1.0);
-      avgMoments[static_cast<Eigen::Index>(m)] *= gm;
-    }
-
+    avgMoments.array() *= computeJacksonKernel(numMoments).array();
     return avgMoments;
   }
 }

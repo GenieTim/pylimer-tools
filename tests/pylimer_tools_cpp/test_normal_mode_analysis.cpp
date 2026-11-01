@@ -15,9 +15,76 @@ TEST_CASE("NormalModeAnalyzer does not crash", "[analysis][NormalModeAnalyzer]")
 
   REQUIRE_THROWS(normalModeAnalyzer.getEigenvalues());
   REQUIRE_THROWS(normalModeAnalyzer.getEigenvectors());
+  REQUIRE_THROWS(normalModeAnalyzer.getNrOfSolubleClusters());
+  Eigen::ArrayXd testGrid = Eigen::ArrayXd::LinSpaced(5, 0.1, 1.0);
+  REQUIRE_THROWS(normalModeAnalyzer.evaluateStressAutocorrelation(testGrid));
+  REQUIRE_THROWS(normalModeAnalyzer.evaluateStorageModulus(testGrid));
+  REQUIRE_THROWS(normalModeAnalyzer.evaluateLossModulus(testGrid));
   REQUIRE_NOTHROW(normalModeAnalyzer.computeAllEigenvalues());
   Eigen::VectorXd eigenvalues = normalModeAnalyzer.getEigenvalues();
   CHECK(eigenvalues.size() == 5);
+}
+
+TEST_CASE("NormalModeAnalyzer constructor supports explicit nrOfNodes for "
+          "isolated vertices",
+          "[analysis][NormalModeAnalyzer]")
+{
+  // springFrom and springTo only reference indices 0, 1, 2. Max index is 2.
+  // Explicitly specify nrOfNodes = 6.
+  pc::NormalModeAnalyzer nma({ 0, 1 }, { 1, 2 }, 6);
+  CHECK(nma.getMatrixSize() == 6);
+  nma.computeAllEigenvalues();
+  CHECK(nma.getEigenvalues().size() == 6);
+  // Isolated nodes 3, 4, 5 and the connected component each give a zero
+  // eigenvalue -> at least 4 zero eigenvalues
+  CHECK(nma.getNrOfSolubleClusters() >= 4);
+}
+
+#ifdef CEREALIZABLE
+TEST_CASE(
+  "NormalModeAnalyzer serialization preserves assembledConnectivityMatrix",
+  "[analysis][NormalModeAnalyzer][serialization]")
+{
+  pc::NormalModeAnalyzer nma({ 0, 1, 2 }, { 1, 2, 0 });
+  nma.computeAllEigenvalues();
+  std::string serialized = pylimer_tools::utils::serializeToString(nma);
+  pc::NormalModeAnalyzer restored =
+    pc::NormalModeAnalyzer::fromString(serialized);
+
+  CHECK(restored.getMatrixSize() == 3);
+  CHECK(restored.getAssembledConnectivityMatrix().nonZeros() ==
+        nma.getAssembledConnectivityMatrix().nonZeros());
+  CHECK(restored.getEigenvalues().isApprox(nma.getEigenvalues()));
+}
+#endif
+
+TEST_CASE(
+  "NormalModeAnalyzer component decomposition produces valid eigenvectors",
+  "[analysis][NormalModeAnalyzer]")
+{
+  // Two disconnected components: triangle (0,1,2) and line (3,4)
+  std::vector<size_t> from = { 0, 1, 2, 3 };
+  std::vector<size_t> to = { 1, 2, 0, 4 };
+  pc::NormalModeAnalyzer nma(from, to);
+  nma.computeAllEigenvalues(pc::NormalModeSolver::DENSE_EIGEN, true, true);
+
+  Eigen::VectorXd evals = nma.getEigenvalues();
+  Eigen::MatrixXd evecs = nma.getEigenvectors();
+  REQUIRE(evals.size() == 5);
+  REQUIRE(evecs.rows() == 5);
+  REQUIRE(evecs.cols() == 5);
+
+  // Orthonormality check: V^T * V = I
+  Eigen::MatrixXd identity = evecs.transpose() * evecs;
+  CHECK(identity.isApprox(Eigen::MatrixXd::Identity(5, 5), 1e-10));
+
+  // Eigenvector check: A * v_i = lambda_i * v_i
+  Eigen::MatrixXd A = nma.getAssembledConnectivityMatrix();
+  for (Eigen::Index i = 0; i < 5; ++i) {
+    Eigen::VectorXd Av = A * evecs.col(i);
+    Eigen::VectorXd lv = evals[i] * evecs.col(i);
+    CHECK((Av - lv).norm() < 1e-8);
+  }
 }
 
 TEST_CASE("NormalModeAnalyzer computes correct eigenvalues",

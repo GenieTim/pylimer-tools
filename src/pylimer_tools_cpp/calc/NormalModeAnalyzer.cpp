@@ -40,8 +40,9 @@
 #define NORMAL_MODE_ZERO_TOLERANCE 1e-12
 
 namespace pylimer_tools::calc {
-NormalModeAnalyzer::NormalModeAnalyzer(const std::vector<size_t> springFrom,
-                                       const std::vector<size_t> springTo)
+NormalModeAnalyzer::NormalModeAnalyzer(const std::vector<size_t>& springFrom,
+                                       const std::vector<size_t>& springTo,
+                                       size_t nrOfNodes)
 {
   INVALIDARG_EXP_IFN(springFrom.size() == springTo.size(),
                      "springFrom and springTo must have the same size");
@@ -52,6 +53,13 @@ NormalModeAnalyzer::NormalModeAnalyzer(const std::vector<size_t> springFrom,
     std::max(*std::max_element(springFrom.begin(), springFrom.end()),
              *std::max_element(springTo.begin(), springTo.end()));
   size_t nRows = maxIdx + 1;
+  if (nrOfNodes > 0) {
+    INVALIDARG_EXP_IFN(
+      nrOfNodes > maxIdx,
+      "nrOfNodes must be greater than the maximum node index in springs (" +
+        std::to_string(maxIdx) + "), but got " + std::to_string(nrOfNodes));
+    nRows = nrOfNodes;
+  }
   // assemble connectivity matrix
   std::vector<Eigen::Triplet<double>> triplets;
   triplets.reserve(springFrom.size() * 2);
@@ -256,10 +264,7 @@ NormalModeAnalyzer::computeAllEigenvaluesSparseSlicing(
     return;
   }
 
-  double maxDiag = 0.0;
-  for (Eigen::Index i = 0; i < n; ++i) {
-    maxDiag = std::max(maxDiag, mat.coeff(i, i));
-  }
+  double maxDiag = mat.diagonal().maxCoeff();
   double b_upper = 2.0 * maxDiag + 0.1;
   double a_lower = -1e-7;
 
@@ -366,7 +371,7 @@ NormalModeAnalyzer::computeAllEigenvaluesSparseSlicing(
           Eigen::VectorXd evals = eigs.eigenvalues();
           std::vector<double> in_slice;
           for (Eigen::Index i = 0; i < evals.size(); ++i) {
-            if (evals[i] >= slice.a - 1e-7 && evals[i] < slice.b + 1e-7) {
+            if (evals[i] >= slice.a && evals[i] < slice.b) {
               in_slice.push_back(evals[i]);
             }
           }
@@ -404,6 +409,41 @@ NormalModeAnalyzer::computeAllEigenvaluesSparseSlicing(
 }
 
 void
+NormalModeAnalyzer::solveMatrix(const Eigen::SparseMatrix<double>& mat,
+                                NormalModeSolver solver,
+                                bool includeEigenvectors,
+                                Eigen::VectorXd& outEvals,
+                                Eigen::MatrixXd& outEvecs)
+{
+  Eigen::Index n = mat.rows();
+  if (n == 0) {
+    outEvals = Eigen::VectorXd::Zero(0);
+    if (includeEigenvectors) {
+      outEvecs = Eigen::MatrixXd::Zero(0, 0);
+    }
+    return;
+  }
+  if (solver == NormalModeSolver::METAL) {
+#ifdef USE_METAL
+    computeAllEigenvaluesMetal(mat, includeEigenvectors, outEvals, outEvecs);
+#else
+    computeAllEigenvaluesDense(
+      mat, includeEigenvectors, false, outEvals, outEvecs);
+#endif
+  } else if (solver == NormalModeSolver::SPARSE_SLICING ||
+             (solver == NormalModeSolver::AUTO && n > 2000)) {
+    computeAllEigenvaluesSparseSlicing(
+      mat, includeEigenvectors, outEvals, outEvecs);
+  } else {
+    computeAllEigenvaluesDense(mat,
+                               includeEigenvectors,
+                               (solver == NormalModeSolver::DENSE_EIGEN),
+                               outEvals,
+                               outEvecs);
+  }
+}
+
+void
 NormalModeAnalyzer::computeAllEigenvalues(const NormalModeSolver solver,
                                           const bool includeEigenvectors,
                                           const bool decomposeComponents)
@@ -424,28 +464,11 @@ NormalModeAnalyzer::computeAllEigenvalues(const NormalModeSolver solver,
   if (!decomposeComponents) {
     Eigen::VectorXd evals;
     Eigen::MatrixXd evecs;
-    if (solver == NormalModeSolver::METAL) {
-#ifdef USE_METAL
-      computeAllEigenvaluesMetal(
-        this->assembledConnectivityMatrix, includeEigenvectors, evals, evecs);
-#else
-      computeAllEigenvaluesDense(this->assembledConnectivityMatrix,
-                                 includeEigenvectors,
-                                 false,
-                                 evals,
-                                 evecs);
-#endif
-    } else if (solver == NormalModeSolver::SPARSE_SLICING ||
-               (solver == NormalModeSolver::AUTO && nRows > 2000)) {
-      computeAllEigenvaluesSparseSlicing(
-        this->assembledConnectivityMatrix, includeEigenvectors, evals, evecs);
-    } else {
-      computeAllEigenvaluesDense(this->assembledConnectivityMatrix,
-                                 includeEigenvectors,
-                                 (solver == NormalModeSolver::DENSE_EIGEN),
-                                 evals,
-                                 evecs);
-    }
+    this->solveMatrix(this->assembledConnectivityMatrix,
+                      solver,
+                      includeEigenvectors,
+                      evals,
+                      evecs);
     this->setEigenvalues(evals);
     if (includeEigenvectors) {
       this->setEigenvectors(evecs);
@@ -494,11 +517,21 @@ NormalModeAnalyzer::computeAllEigenvalues(const NormalModeSolver solver,
 
   std::vector<double> allEigenvalues;
   allEigenvalues.reserve(static_cast<size_t>(nRows));
+  std::vector<std::pair<double, Eigen::VectorXd>> evalEvecPairs;
+  if (includeEigenvectors) {
+    evalEvecPairs.reserve(static_cast<size_t>(nRows));
+  }
 
   for (auto& [root, comp] : componentsMap) {
     size_t M = comp.size();
     if (M == 1) {
-      allEigenvalues.push_back(0.0);
+      if (includeEigenvectors) {
+        Eigen::VectorXd fullV = Eigen::VectorXd::Zero(nRows);
+        fullV[static_cast<Eigen::Index>(comp[0])] = 1.0;
+        evalEvecPairs.emplace_back(0.0, std::move(fullV));
+      } else {
+        allEigenvalues.push_back(0.0);
+      }
       continue;
     }
 
@@ -535,42 +568,45 @@ NormalModeAnalyzer::computeAllEigenvalues(const NormalModeSolver solver,
       }
     }
 
-    if (M == 2 && allUnitWeights && numInternalEdges == 1) {
-      allEigenvalues.push_back(0.0);
-      allEigenvalues.push_back(2.0);
-      continue;
-    }
-
-    // Check if linear path (Rouse chain)
-    size_t deg1Count = 0;
-    size_t deg2Count = 0;
-    for (size_t d : localDeg) {
-      if (d == 1)
-        deg1Count++;
-      else if (d == 2)
-        deg2Count++;
-    }
-
-    if (allUnitWeights && numInternalEdges == M - 1 && deg1Count == 2 &&
-        deg2Count == M - 2) {
-      for (size_t p = 0; p < M; ++p) {
-        double val = 4.0 * std::pow(std::sin((static_cast<double>(p) * M_PI) /
-                                             (2.0 * static_cast<double>(M))),
-                                    2);
-        allEigenvalues.push_back(val);
+    // Only take analytic shortcuts when eigenvectors are not requested
+    if (!includeEigenvectors) {
+      if (M == 2 && allUnitWeights && numInternalEdges == 1) {
+        allEigenvalues.push_back(0.0);
+        allEigenvalues.push_back(2.0);
+        continue;
       }
-      continue;
-    }
 
-    // Check if simple cycle (ring)
-    if (allUnitWeights && numInternalEdges == M && deg2Count == M) {
-      for (size_t p = 0; p < M; ++p) {
-        double val = 4.0 * std::pow(std::sin((static_cast<double>(p) * M_PI) /
-                                             static_cast<double>(M)),
-                                    2);
-        allEigenvalues.push_back(val);
+      // Check if linear path (Rouse chain)
+      size_t deg1Count = 0;
+      size_t deg2Count = 0;
+      for (size_t d : localDeg) {
+        if (d == 1)
+          deg1Count++;
+        else if (d == 2)
+          deg2Count++;
       }
-      continue;
+
+      if (allUnitWeights && numInternalEdges == M - 1 && deg1Count == 2 &&
+          deg2Count == M - 2) {
+        for (size_t p = 0; p < M; ++p) {
+          double val = 4.0 * std::pow(std::sin((static_cast<double>(p) * M_PI) /
+                                               (2.0 * static_cast<double>(M))),
+                                      2);
+          allEigenvalues.push_back(val);
+        }
+        continue;
+      }
+
+      // Check if simple cycle (ring)
+      if (allUnitWeights && numInternalEdges == M && deg2Count == M) {
+        for (size_t p = 0; p < M; ++p) {
+          double val = 4.0 * std::pow(std::sin((static_cast<double>(p) * M_PI) /
+                                               static_cast<double>(M)),
+                                      2);
+          allEigenvalues.push_back(val);
+        }
+        continue;
+      }
     }
 
     // General subcomponent
@@ -580,58 +616,41 @@ NormalModeAnalyzer::computeAllEigenvalues(const NormalModeSolver solver,
 
     Eigen::VectorXd subEvals;
     Eigen::MatrixXd subEvecs;
-    if (solver == NormalModeSolver::METAL) {
-#ifdef USE_METAL
-      computeAllEigenvaluesMetal(
-        subMat, includeEigenvectors, subEvals, subEvecs);
-#else
-      computeAllEigenvaluesDense(
-        subMat, includeEigenvectors, false, subEvals, subEvecs);
-#endif
-    } else if (solver == NormalModeSolver::SPARSE_SLICING ||
-               (solver == NormalModeSolver::AUTO && M > 2000)) {
-      computeAllEigenvaluesSparseSlicing(
-        subMat, includeEigenvectors, subEvals, subEvecs);
-    } else {
-      computeAllEigenvaluesDense(subMat,
-                                 includeEigenvectors,
-                                 (solver == NormalModeSolver::DENSE_EIGEN),
-                                 subEvals,
-                                 subEvecs);
-    }
+    this->solveMatrix(subMat, solver, includeEigenvectors, subEvals, subEvecs);
 
-    for (Eigen::Index i = 0; i < subEvals.size(); ++i) {
-      allEigenvalues.push_back(subEvals[i]);
+    if (includeEigenvectors) {
+      for (Eigen::Index j = 0; j < subEvals.size(); ++j) {
+        Eigen::VectorXd fullV = Eigen::VectorXd::Zero(nRows);
+        for (size_t k = 0; k < M; ++k) {
+          fullV[static_cast<Eigen::Index>(comp[k])] =
+            subEvecs(static_cast<Eigen::Index>(k), j);
+        }
+        evalEvecPairs.emplace_back(subEvals[j], std::move(fullV));
+      }
+    } else {
+      for (Eigen::Index i = 0; i < subEvals.size(); ++i) {
+        allEigenvalues.push_back(subEvals[i]);
+      }
     }
   }
 
-  std::sort(allEigenvalues.begin(), allEigenvalues.end());
-  Eigen::VectorXd finalEvals = Eigen::Map<Eigen::VectorXd>(
-    allEigenvalues.data(), static_cast<Eigen::Index>(allEigenvalues.size()));
-  this->setEigenvalues(finalEvals);
-
   if (includeEigenvectors) {
-    Eigen::VectorXd dummyEvals;
-    Eigen::MatrixXd fullEvecs;
-#ifdef USE_METAL
-    if (solver == NormalModeSolver::METAL) {
-      computeAllEigenvaluesMetal(
-        this->assembledConnectivityMatrix, true, dummyEvals, fullEvecs);
-    } else {
-      computeAllEigenvaluesDense(this->assembledConnectivityMatrix,
-                                 true,
-                                 (solver == NormalModeSolver::DENSE_EIGEN),
-                                 dummyEvals,
-                                 fullEvecs);
+    std::sort(evalEvecPairs.begin(),
+              evalEvecPairs.end(),
+              [](const auto& a, const auto& b) { return a.first < b.first; });
+    Eigen::VectorXd finalEvals(nRows);
+    Eigen::MatrixXd finalEvecs(nRows, nRows);
+    for (size_t i = 0; i < evalEvecPairs.size(); ++i) {
+      finalEvals[static_cast<Eigen::Index>(i)] = evalEvecPairs[i].first;
+      finalEvecs.col(static_cast<Eigen::Index>(i)) = evalEvecPairs[i].second;
     }
-#else
-    computeAllEigenvaluesDense(this->assembledConnectivityMatrix,
-                               true,
-                               (solver == NormalModeSolver::DENSE_EIGEN),
-                               dummyEvals,
-                               fullEvecs);
-#endif
-    this->setEigenvectors(fullEvecs);
+    this->setEigenvalues(finalEvals);
+    this->setEigenvectors(finalEvecs);
+  } else {
+    std::sort(allEigenvalues.begin(), allEigenvalues.end());
+    Eigen::VectorXd finalEvals = Eigen::Map<Eigen::VectorXd>(
+      allEigenvalues.data(), static_cast<Eigen::Index>(allEigenvalues.size()));
+    this->setEigenvalues(finalEvals);
   }
 }
 
@@ -652,13 +671,36 @@ NormalModeAnalyzer::computeAllEigenvaluesGPU(const bool includeEigenvectors)
     Eigen::MatrixXd(this->assembledConnectivityMatrix);
 
   cusolverDnHandle_t cusolverH = nullptr;
-  cusolverStatus_t cusolver_status = cusolverDnCreate(&cusolverH);
-  RUNTIME_EXP_IFN(cusolver_status == CUSOLVER_STATUS_SUCCESS,
-                  "cuSOLVER initialization failed");
-
   double* d_A = nullptr;
   double* d_W = nullptr;
   int* d_info = nullptr;
+  double* d_work = nullptr;
+
+  struct CudaCleanup
+  {
+    cusolverDnHandle_t& h;
+    double*& A;
+    double*& W;
+    int*& info;
+    double*& work;
+    ~CudaCleanup()
+    {
+      if (work)
+        cudaFree(work);
+      if (info)
+        cudaFree(info);
+      if (W)
+        cudaFree(W);
+      if (A)
+        cudaFree(A);
+      if (h)
+        cusolverDnDestroy(h);
+    }
+  } cleanup{ cusolverH, d_A, d_W, d_info, d_work };
+
+  cusolverStatus_t cusolver_status = cusolverDnCreate(&cusolverH);
+  RUNTIME_EXP_IFN(cusolver_status == CUSOLVER_STATUS_SUCCESS,
+                  "cuSOLVER initialization failed");
 
   cudaError_t cuda_stat =
     cudaMalloc((void**)&d_A, sizeof(double) * nRows * nRows);
@@ -687,7 +729,6 @@ NormalModeAnalyzer::computeAllEigenvaluesGPU(const bool includeEigenvectors)
   RUNTIME_EXP_IFN(cusolver_status == CUSOLVER_STATUS_SUCCESS,
                   "cuSOLVER buffer size calculation failed");
 
-  double* d_work = nullptr;
   cuda_stat = cudaMalloc((void**)&d_work, sizeof(double) * lwork);
   RUNTIME_EXP_IFN(cuda_stat == cudaSuccess, "cudaMalloc failed for d_work");
 
@@ -733,12 +774,6 @@ NormalModeAnalyzer::computeAllEigenvaluesGPU(const bool includeEigenvectors)
   cuda_stat = cudaMemcpy(&info, d_info, sizeof(int), cudaMemcpyDeviceToHost);
   RUNTIME_EXP_IFN(
     info == 0, "cuSOLVER dsyevd info return non-zero: " + std::to_string(info));
-
-  cudaFree(d_work);
-  cudaFree(d_info);
-  cudaFree(d_W);
-  cudaFree(d_A);
-  cusolverDnDestroy(cusolverH);
 
   this->setEigenvalues(eigenvaluesMemory);
   if (includeEigenvectors) {
@@ -822,6 +857,7 @@ NormalModeAnalyzer::countSolubleClusters() const
 size_t
 NormalModeAnalyzer::getNrOfSolubleClusters() const
 {
+  this->requireEigenvaluesComputation();
   return this->clusterCount;
 }
 
@@ -834,6 +870,7 @@ NormalModeAnalyzer::getAssembledConnectivityMatrix() const
 Eigen::ArrayXd
 NormalModeAnalyzer::evaluateStressAutocorrelation(const Eigen::ArrayXd& t) const
 {
+  this->requireEigenvaluesComputation();
   Eigen::ArrayXd result = Eigen::ArrayXd::Zero(t.size());
   for (Eigen::Index i = 0; i < this->eigenvalues.size(); ++i) {
     if (APPROX_EQUAL(this->eigenvalues[i], 0.0, NORMAL_MODE_ZERO_TOLERANCE)) {
@@ -843,18 +880,16 @@ NormalModeAnalyzer::evaluateStressAutocorrelation(const Eigen::ArrayXd& t) const
       continue; // skip non-finite eigenvalues
     }
     result += (-2. * this->eigenvalues[i] * t).exp();
-    RUNTIME_EXP_IFN(result.allFinite(),
-                    "Stress autocorrelation is not fully finite anymore "
-                    "after adding Eigenvalue " +
-                      std::to_string(i) + ": " +
-                      std::to_string(this->eigenvalues[i]) + ".");
   }
+  RUNTIME_EXP_IFN(result.allFinite(),
+                  "Stress autocorrelation is not fully finite.");
   return result;
 }
 
 Eigen::ArrayXd
 NormalModeAnalyzer::evaluateStorageModulus(const Eigen::ArrayXd& omega) const
 {
+  this->requireEigenvaluesComputation();
   Eigen::ArrayXd result = Eigen::ArrayXd::Zero(omega.size());
   for (Eigen::Index i = 0; i < this->eigenvalues.size(); ++i) {
     if (APPROX_EQUAL(this->eigenvalues[i], 0.0, NORMAL_MODE_ZERO_TOLERANCE)) {
@@ -865,18 +900,16 @@ NormalModeAnalyzer::evaluateStorageModulus(const Eigen::ArrayXd& omega) const
     }
     result += (omega / (2. * this->eigenvalues[i])).square() /
               (1. + (omega / (2. * this->eigenvalues[i])).square());
-    if (!result.allFinite()) {
-      std::ostringstream oss;
-      oss << "Storage modulus is not fully finite anymore after adding "
-             "Eigenvalue "
-          << i << ": " << this->eigenvalues[i] << ". Non-finite at indices: ";
-      for (Eigen::Index idx = 0; idx < result.size(); ++idx) {
-        if (!std::isfinite(result[idx])) {
-          oss << idx << " ";
-        }
+  }
+  if (!result.allFinite()) {
+    std::ostringstream oss;
+    oss << "Storage modulus is not fully finite. Non-finite at indices: ";
+    for (Eigen::Index idx = 0; idx < result.size(); ++idx) {
+      if (!std::isfinite(result[idx])) {
+        oss << idx << " ";
       }
-      RUNTIME_EXP_IFN(false, oss.str());
     }
+    RUNTIME_EXP_IFN(false, oss.str());
   }
   return result;
 }
@@ -884,6 +917,7 @@ NormalModeAnalyzer::evaluateStorageModulus(const Eigen::ArrayXd& omega) const
 Eigen::ArrayXd
 NormalModeAnalyzer::evaluateLossModulus(const Eigen::ArrayXd& omega) const
 {
+  this->requireEigenvaluesComputation();
   Eigen::ArrayXd result = Eigen::ArrayXd::Zero(omega.size());
   for (Eigen::Index i = 0; i < this->eigenvalues.size(); ++i) {
     if (APPROX_EQUAL(this->eigenvalues[i], 0.0, NORMAL_MODE_ZERO_TOLERANCE)) {
@@ -894,17 +928,16 @@ NormalModeAnalyzer::evaluateLossModulus(const Eigen::ArrayXd& omega) const
     }
     result += (omega / (2. * this->eigenvalues[i])) /
               (1. + (omega / (2. * this->eigenvalues[i])).square());
-    if (!result.allFinite()) {
-      std::ostringstream oss;
-      oss << "Loss modulus is not fully finite anymore after adding Eigenvalue "
-          << i << ": " << this->eigenvalues[i] << ". Non-finite at indices: ";
-      for (Eigen::Index idx = 0; idx < result.size(); ++idx) {
-        if (!std::isfinite(result[idx])) {
-          oss << idx << " ";
-        }
+  }
+  if (!result.allFinite()) {
+    std::ostringstream oss;
+    oss << "Loss modulus is not fully finite. Non-finite at indices: ";
+    for (Eigen::Index idx = 0; idx < result.size(); ++idx) {
+      if (!std::isfinite(result[idx])) {
+        oss << idx << " ";
       }
-      RUNTIME_EXP_IFN(false, oss.str());
     }
+    RUNTIME_EXP_IFN(false, oss.str());
   }
   return result;
 }
@@ -916,14 +949,33 @@ NormalModeAnalyzer::getSpectralScalingParameters(double eps) const
   if (n == 0) {
     return { 0.0, 1.0 };
   }
-  double maxDiag = 0.0;
-  for (Eigen::Index i = 0; i < n; ++i) {
-    maxDiag = std::max(maxDiag, this->assembledConnectivityMatrix.coeff(i, i));
-  }
+  double maxDiag = this->assembledConnectivityMatrix.diagonal().maxCoeff();
   double lambdaMax = 2.0 * maxDiag + 0.1;
   double c = lambdaMax / 2.0;
   double w = lambdaMax / (2.0 * (1.0 - eps));
   return { c, w };
+}
+
+Eigen::VectorXd
+computeJacksonKernel(size_t numMoments)
+{
+  Eigen::VectorXd kernel(static_cast<Eigen::Index>(numMoments));
+  double M_d = static_cast<double>(numMoments);
+  double denom = std::tan(M_PI / (M_d + 1.0));
+  for (size_t m = 0; m < numMoments; ++m) {
+    double m_d = static_cast<double>(m);
+    kernel[static_cast<Eigen::Index>(m)] =
+      ((M_d - m_d + 1.0) * std::cos(M_PI * m_d / (M_d + 1.0)) +
+       std::sin(M_PI * m_d / (M_d + 1.0)) / denom) /
+      (M_d + 1.0);
+  }
+  return kernel;
+}
+
+Eigen::VectorXd
+NormalModeAnalyzer::computeJacksonKernel(size_t numMoments)
+{
+  return pylimer_tools::calc::computeJacksonKernel(numMoments);
 }
 
 Eigen::VectorXd
@@ -979,18 +1031,7 @@ NormalModeAnalyzer::computeChebyshevMomentsKPM(size_t numMoments,
   }
 
   avgMoments /= static_cast<double>(numRandomVectors);
-
-  // Jackson damping kernel
-  for (size_t m = 0; m < numMoments; ++m) {
-    double m_d = static_cast<double>(m);
-    double M_d = static_cast<double>(numMoments);
-    double gm =
-      ((M_d - m_d + 1.0) * std::cos(M_PI * m_d / (M_d + 1.0)) +
-       std::sin(M_PI * m_d / (M_d + 1.0)) / std::tan(M_PI / (M_d + 1.0))) /
-      (M_d + 1.0);
-    avgMoments[static_cast<Eigen::Index>(m)] *= gm;
-  }
-
+  avgMoments.array() *= computeJacksonKernel(numMoments).array();
   return avgMoments;
 }
 
@@ -1009,6 +1050,7 @@ NormalModeAnalyzer::computeChebyshevMomentsKPMMetal(size_t numMoments,
     w,
     batchSize);
 #else
+  (void)batchSize;
   std::cerr << "Metal acceleration not enabled. Falling back to CPU KPM."
             << std::endl;
   return computeChebyshevMomentsKPM(numMoments, numRandomVectors);

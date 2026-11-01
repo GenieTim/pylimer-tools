@@ -49,7 +49,9 @@ private:
   double defaultBondLength = 0.0;
   double springBreakingLength = -1.;
   bool assumeNetworkIsComplete = false;
-  double inPlaceRebuildThreshold = 0.15; // Threshold fraction of cumulative broken springs to rebuild CSR (default 15%)
+  double inPlaceRebuildThreshold =
+    0.15; // Threshold fraction of cumulative broken springs to rebuild CSR
+          // (default 15%)
 
 public:
   /**
@@ -264,6 +266,48 @@ public:
         entanglementsAsSprings) {};
 
 #ifdef CEREALIZABLE
+  template<class Archive>
+  void serialize(Archive& ar, std::uint32_t const /*version*/)
+  {
+    ar(cereal::virtual_base_class<OutputSupportingSimulation>(this));
+
+    // properties
+    ar(universe,
+       box,
+       exitReason,
+       simulationHasRun,
+       initialConfig,
+       currentDisplacements);
+
+    // configuration
+    ar(is2D,
+       kappa,
+       crossLinkerType,
+       entanglementType,
+       nrOfStepsDone,
+       defaultBondLength,
+       springBreakingLength,
+       assumeNetworkIsComplete,
+       inPlaceRebuildThreshold);
+  }
+
+  static MEHPForceBalance2 readRestartFile(std::string& file)
+  {
+    MEHPForceBalance2 res = MEHPForceBalance2();
+    pylimer_tools::utils::deserializeFromFile(res, file);
+    return res;
+  }
+
+  void writeRestartFile(std::string& file) override
+  {
+    pylimer_tools::utils::serializeToFile<MEHPForceBalance2>(*this, file);
+  }
+
+  std::string serializeToString() const
+  {
+    return pylimer_tools::utils::serializeToString<MEHPForceBalance2>(*this);
+  }
+
   static MEHPForceBalance2 constructFromString(std::string s)
   {
     MEHPForceBalance2 res = MEHPForceBalance2();
@@ -562,8 +606,9 @@ public:
 
   /**
    * @brief Configure the threshold fraction of cumulative broken springs
-   * required to trigger a full CSR sparse matrix rebuild and symbolic re-factorization
-   * (eliminating structural nonzeros) under NO_SIMPLIFICATION mode. Default is 0.15 (15%).
+   * required to trigger a full CSR sparse matrix rebuild and symbolic
+   * re-factorization (eliminating structural nonzeros) under NO_SIMPLIFICATION
+   * mode. Default is 0.15 (15%).
    *
    * @param threshold Fraction of springs broken (e.g. 0.15 for 15%)
    */
@@ -997,7 +1042,7 @@ public:
    * @return the strand lengths (norm of the strand end-to-end vector)
    */
   Eigen::VectorXd evaluateStrandLengths(const ForceBalance2Network& net,
-                                        Eigen::VectorXd u) const;
+                                        const Eigen::VectorXd& u) const;
 
   /**
    *
@@ -1006,7 +1051,7 @@ public:
    * @return the strand end-to-end vectors
    */
   Eigen::Vector3d evaluateStrandVector(const ForceBalance2Network& net,
-                                       const Eigen::VectorXd u,
+                                       const Eigen::VectorXd& u,
                                        const size_t strandIdx) const;
   /**
    *
@@ -1015,7 +1060,7 @@ public:
    * @return the strand end-to-end vectors
    */
   Eigen::VectorXd evaluateStrandVectors(const ForceBalance2Network& net,
-                                        const Eigen::VectorXd u) const;
+                                        const Eigen::VectorXd& u) const;
 
   /**
    * @brief Sum the partitions up to a given link in a spring
@@ -1027,7 +1072,7 @@ public:
    * @return double
    */
   static double sumToTotalFraction(const ForceBalance2Network& net,
-                                   Eigen::VectorXd springPartition,
+                                   const Eigen::VectorXd& springPartition,
                                    size_t springIdx,
                                    size_t targetLink);
 
@@ -1330,13 +1375,6 @@ public:
     const ForceBalance2Network& net,
     const size_t linkIdx);
 
-#ifdef CEREALIZABLE
-  void writeRestartFile(std::string& file) override
-  {
-    throw std::runtime_error("Restart not supported yet");
-  }
-#endif
-
   double getTimestep() override
   {
     return 1.; // this->dt;
@@ -1445,7 +1483,7 @@ protected:
    * @return std::array<std::array<double, 3>, 3>
    */
   Eigen::Matrix3d evaluateStressTensorForLinks(
-    const std::vector<size_t> linkIndices,
+    const std::vector<size_t>& linkIndices,
     const ForceBalance2Network& net,
     const Eigen::VectorXd& u) const;
 
@@ -1694,7 +1732,7 @@ protected:
         !this->distanceIsWithinTolerance(
           Eigen::Vector3d(partialSpringVectors[3 * i + dir], 0, 0),
           tolerance,
-          net.springContourLength[net.strandIndexOfSpring[i]]);
+          net.springContourLength[i]);
     }
 
     return result;

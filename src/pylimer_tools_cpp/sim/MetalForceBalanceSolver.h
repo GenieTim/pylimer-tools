@@ -98,7 +98,8 @@ solveSLEMetalCG(const Eigen::SparseMatrix<double>& A,
  * Laplacian and 3 RHS components (x, y, z) per node with GPU-resident Jacobi
  * preconditioning. Fused 3-RHS SpMM achieves 3x matrix memory bandwidth
  * reduction. Supports pinned reference node (eliminating rigid translation and
- * COM projection passes) and robust CPU double-precision fallback on ill-conditioned systems.
+ * COM projection passes) and robust CPU double-precision fallback on
+ * ill-conditioned systems.
  */
 Eigen::VectorXd
 solveSLEMetalCG3D(const Eigen::SparseMatrix<double>& scalarA,
@@ -115,7 +116,8 @@ solveSLEMetalCG3D(const Eigen::SparseMatrix<double>& scalarA,
 /**
  * @brief Multi-RHS 3D Block CG solver with algebraically pinned reference node.
  * Eliminates the translational zero mode L1=0, improves condition number,
- * cuts required CG iterations by 20-30%, and eliminates all center-of-mass projection passes.
+ * cuts required CG iterations by 20-30%, and eliminates all center-of-mass
+ * projection passes.
  */
 Eigen::VectorXd
 solveSLEMetalCG3DPinned(const Eigen::SparseMatrix<double>& scalarA,
@@ -196,6 +198,7 @@ struct SpringRelaxationData
   size_t numSprings = 0;
   double breakingThreshold = 0.0;
   double inactiveCutoff = 0.0;
+  bool is2D = false;
 };
 
 /**
@@ -220,8 +223,9 @@ evaluateSpringStrainAndInactivityMetal(size_t numNodes,
 
 /**
  * @brief Multiplies an N x N scalar matrix with a 3N dense vector on GPU
- * using degree-aware hybrid queue: low-degree rows (degree <= 3, e.g. linear chains)
- * dispatched to coop2 kernel; high-degree rows (crosslinkers) dispatched to coop8/coop16.
+ * using degree-aware hybrid queue: low-degree rows (degree <= 3, e.g. linear
+ * chains) dispatched to coop2 kernel; high-degree rows (crosslinkers)
+ * dispatched to coop8/coop16.
  */
 Eigen::VectorXd
 spmvMetal3DHybrid(const Eigen::SparseMatrix<double>& scalarA,

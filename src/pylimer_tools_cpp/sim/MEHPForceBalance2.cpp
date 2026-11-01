@@ -757,9 +757,11 @@ MEHPForceBalance2::runForceRelaxation(
      solverChoice == SLESolver::BICGSTAB_INCOMPLETE_LU ||
      solverChoice == SLESolver::METAL_CG ||
      solverChoice == SLESolver::METAL_BARZILAI_BORWEIN);
+#ifdef USE_METAL
   const bool isMetalSolver =
     (solverChoice == SLESolver::METAL_CG ||
      solverChoice == SLESolver::METAL_BARZILAI_BORWEIN);
+#endif
   // diagonal + the lower of the two components of each spring
   triplets.reserve(isScalarSolver ? (this->initialConfig.nrOfLinks +
                                      this->initialConfig.nrOfSprings * 2)
@@ -821,6 +823,10 @@ MEHPForceBalance2::runForceRelaxation(
           constants.segment(3 * idxB, 3) +=
             this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
             multiplier;
+          if (this->is2D) {
+            constants[3 * idxA + 2] = 0.0;
+            constants[3 * idxB + 2] = 0.0;
+          }
         }
 
         for (size_t linkIdx = 0; linkIdx < this->initialConfig.nrOfLinks;
@@ -829,6 +835,7 @@ MEHPForceBalance2::runForceRelaxation(
         }
       } else {
         // 3N x 3N formulation for CPU solvers
+        const size_t numDirs = this->is2D ? 2 : 3;
         for (size_t springIdx = 0; springIdx < this->initialConfig.nrOfSprings;
              ++springIdx) {
           if (this->initialConfig.springIndexA[springIdx] ==
@@ -842,7 +849,7 @@ MEHPForceBalance2::runForceRelaxation(
                  this->initialConfig.nrOfLinks);
           assert(this->initialConfig.springIndexB[springIdx] <
                  this->initialConfig.nrOfLinks);
-          for (size_t dir = 0; dir < 3; ++dir) {
+          for (size_t dir = 0; dir < numDirs; ++dir) {
             triplets.push_back(Eigen::Triplet<double>(
               this->initialConfig.springIndexA[springIdx] * 3 + dir,
               this->initialConfig.springIndexB[springIdx] * 3 + dir,
@@ -852,29 +859,35 @@ MEHPForceBalance2::runForceRelaxation(
               this->initialConfig.springIndexA[springIdx] * 3 + dir,
               1. * multiplier));
           }
-          diagonal.segment(3 * this->initialConfig.springIndexA[springIdx],
-                           3) -= Eigen::Vector3d::Constant(multiplier);
-          diagonal.segment(3 * this->initialConfig.springIndexB[springIdx],
-                           3) -= Eigen::Vector3d::Constant(multiplier);
+          for (size_t dir = 0; dir < numDirs; ++dir) {
+            diagonal[3 * this->initialConfig.springIndexA[springIdx] + dir] -=
+              multiplier;
+            diagonal[3 * this->initialConfig.springIndexB[springIdx] + dir] -=
+              multiplier;
 
-          // the constants, b in Ax = b
-          constants.segment(3 * this->initialConfig.springIndexA[springIdx],
-                            3) -=
-            this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
-            multiplier;
-          constants.segment(3 * this->initialConfig.springIndexB[springIdx],
-                            3) +=
-            this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
-            multiplier;
+            // the constants, b in Ax = b
+            constants[3 * this->initialConfig.springIndexA[springIdx] + dir] -=
+              this->initialConfig.springBoxOffset[3 * springIdx + dir] *
+              multiplier;
+            constants[3 * this->initialConfig.springIndexB[springIdx] + dir] +=
+              this->initialConfig.springBoxOffset[3 * springIdx + dir] *
+              multiplier;
+          }
         }
 
         for (size_t linkIdx = 0; linkIdx < this->initialConfig.nrOfLinks;
              ++linkIdx) {
-          for (size_t dir = 0; dir < 3; ++dir) {
+          for (size_t dir = 0; dir < numDirs; ++dir) {
             triplets.push_back(
               Eigen::Triplet<double>(linkIdx * 3 + dir,
                                      linkIdx * 3 + dir,
                                      diagonal(linkIdx * 3 + dir)));
+          }
+          if (this->is2D) {
+            triplets.push_back(
+              Eigen::Triplet<double>(linkIdx * 3 + 2, linkIdx * 3 + 2, 1.0));
+            constants[linkIdx * 3 + 2] =
+              this->initialConfig.coordinates[linkIdx * 3 + 2];
           }
         }
       }
@@ -966,9 +979,25 @@ MEHPForceBalance2::runForceRelaxation(
       B(i, 1) = constants[3 * i + 1];                                          \
       B(i, 2) = constants[3 * i + 2];                                          \
     }                                                                          \
-    Eigen::MatrixX3d X = solver.solve(B);                                      \
-    if (solver.info() != Eigen::Success) {                                     \
-      SOLVER_FAILED("System could not be solved");                             \
+    Eigen::MatrixX3d X(nLinks, 3);                                             \
+    if (this->is2D) {                                                          \
+      Eigen::MatrixX2d B2(nLinks, 2);                                          \
+      B2.col(0) = B.col(0);                                                    \
+      B2.col(1) = B.col(1);                                                    \
+      Eigen::MatrixX2d X2 = solver.solve(B2);                                  \
+      if (solver.info() != Eigen::Success) {                                   \
+        SOLVER_FAILED("System could not be solved");                           \
+      }                                                                        \
+      X.col(0) = X2.col(0);                                                    \
+      X.col(1) = X2.col(1);                                                    \
+      for (size_t i = 0; i < nLinks; ++i) {                                    \
+        X(i, 2) = this->initialConfig.coordinates[3 * i + 2];                  \
+      }                                                                        \
+    } else {                                                                   \
+      X = solver.solve(B);                                                     \
+      if (solver.info() != Eigen::Success) {                                   \
+        SOLVER_FAILED("System could not be solved");                           \
+      }                                                                        \
     }                                                                          \
     finalCoordinates.resize(3 * nLinks);                                       \
     for (size_t i = 0; i < nLinks; ++i) {                                      \
@@ -994,13 +1023,18 @@ MEHPForceBalance2::runForceRelaxation(
       B(i, 2) = constants[3 * i + 2];                                          \
     }                                                                          \
     Eigen::MatrixX3d X(nLinks, 3);                                             \
-    for (int col = 0; col < 3; ++col) {                                        \
+    for (int col = 0; col < (this->is2D ? 2 : 3); ++col) {                     \
       X.col(col) = solver.solve(B.col(col));                                   \
       if (solver.info() != Eigen::Success &&                                   \
           solver.info() != Eigen::NoConvergence) {                             \
         SOLVER_FAILED("System could not be solved");                           \
       }                                                                        \
       iterationsDone += solver.iterations();                                   \
+    }                                                                          \
+    if (this->is2D) {                                                          \
+      for (size_t i = 0; i < nLinks; ++i) {                                    \
+        X(i, 2) = this->initialConfig.coordinates[3 * i + 2];                  \
+      }                                                                        \
     }                                                                          \
     finalCoordinates.resize(3 * nLinks);                                       \
     for (size_t i = 0; i < nLinks; ++i) {                                      \
@@ -1016,7 +1050,7 @@ MEHPForceBalance2::runForceRelaxation(
   }
 
 #define SOLVE_ITERATIVE(solver)                                                \
-  solver.setTolerance(residualReduction);                                      \
+  solver.setTolerance(std::sqrt(residualReduction));                           \
   solver.setMaxIterations(maxIterations);                                      \
   COMPUTE_SOLVE_SCALAR_ITERATIVE(solver);                                      \
   this->exitReason = ExitReason::X_TOLERANCE;                                  \
@@ -1220,8 +1254,10 @@ MEHPForceBalance2::runForceRelaxation(
            simplificationMode == StructureSimplificationMode::INACTIVE_THEN_X2F)
             ? inactiveRemovalCutoff
             : 0.0;
+        springData.is2D = this->is2D;
 
-        // Fused zero-copy relaxation pipeline: solve and strain evaluation run entirely on GPU
+        // Fused zero-copy relaxation pipeline: solve and strain evaluation run
+        // entirely on GPU
         GpuRelaxationStepResult stepResult =
           runGpuRelaxationStep(sysMatrix,
                                constants,
@@ -1241,7 +1277,8 @@ MEHPForceBalance2::runForceRelaxation(
         hasMetalSpringEval = true;
         metalTotalFlagged = stepResult.totalFlagged;
 
-        finalCoordinates = getGpuResidentCoordinates(3 * this->initialConfig.nrOfLinks);
+        finalCoordinates =
+          getGpuResidentCoordinates(3 * this->initialConfig.nrOfLinks);
         break;
 #else
         throw std::runtime_error(
@@ -1283,6 +1320,12 @@ MEHPForceBalance2::runForceRelaxation(
 
     this->currentDisplacements =
       finalCoordinates - this->initialConfig.coordinates;
+    if (this->is2D) {
+      for (size_t linkIdx = 0; linkIdx < this->initialConfig.nrOfLinks;
+           ++linkIdx) {
+        this->currentDisplacements[3 * linkIdx + 2] = 0.0;
+      }
+    }
 
     currentResidual = this->getDisplacementResidualNormFor(
       this->initialConfig, this->currentDisplacements);
@@ -1306,6 +1349,8 @@ MEHPForceBalance2::runForceRelaxation(
             ? inactiveRemovalCutoff
             : 0.0;
 
+        springData.is2D = this->is2D;
+
         SpringEvaluationResult evalResult =
           evaluateSpringStrainAndInactivityMetal(this->initialConfig.nrOfLinks,
                                                  springData);
@@ -1314,11 +1359,10 @@ MEHPForceBalance2::runForceRelaxation(
       }
 
       if (hasMetalSpringEval && metalTotalFlagged == 0 &&
-          simplificationMode != StructureSimplificationMode::X2F_ONLY &&
-          simplificationMode !=
-            StructureSimplificationMode::INACTIVE_THEN_X2F) {
+          simplificationMode ==
+            StructureSimplificationMode::NO_SIMPLIFICATION) {
         // GPU evaluation confirmed no springs are broken or inactive!
-        if (currentResidual <= residualReduction) {
+        if (currentResidual <= initialResidual * residualReduction) {
           this->handleOutput(static_cast<long>(iterationsDone));
           break;
         }
@@ -1392,16 +1436,19 @@ MEHPForceBalance2::runForceRelaxation(
     } while (nRemovedThisLoop > 0);
 
     // If only springs broke (and no links were deleted/simplified), update
-    // sysMatrix and constants in-place, UNLESS cumulative broken springs exceed threshold
-    // (>15-20%), in which case we trigger a clean matrix rebuild and symbolic re-factorization
-    // to eliminate dead structural zeros.
+    // sysMatrix and constants in-place, UNLESS cumulative broken springs exceed
+    // threshold
+    // (>15-20%), in which case we trigger a clean matrix rebuild and symbolic
+    // re-factorization to eliminate dead structural zeros.
     if (simplificationMode == StructureSimplificationMode::NO_SIMPLIFICATION &&
         !brokenSprings.empty()) {
       cumulativeBrokenSinceRebuild += brokenSprings.size();
       bool shouldRebuildDueToThreshold =
-        (this->inPlaceRebuildThreshold >= 0.0 && totalSpringsAtLastRebuild > 0 &&
+        (this->inPlaceRebuildThreshold >= 0.0 &&
+         totalSpringsAtLastRebuild > 0 &&
          (static_cast<double>(cumulativeBrokenSinceRebuild) /
-          static_cast<double>(totalSpringsAtLastRebuild)) >= this->inPlaceRebuildThreshold);
+          static_cast<double>(totalSpringsAtLastRebuild)) >=
+           this->inPlaceRebuildThreshold);
 
       if (shouldRebuildDueToThreshold) {
         matrixNeedsRebuild = true;
@@ -1415,10 +1462,15 @@ MEHPForceBalance2::runForceRelaxation(
 
             constants.segment<3>(3 * bs.idxA) += bs.offset * bs.multiplier;
             constants.segment<3>(3 * bs.idxB) -= bs.offset * bs.multiplier;
+            if (this->is2D) {
+              constants[3 * bs.idxA + 2] = 0.0;
+              constants[3 * bs.idxB + 2] = 0.0;
+            }
           }
         } else {
+          const size_t numDirs = this->is2D ? 2 : 3;
           for (const auto& bs : brokenSprings) {
-            for (size_t dir = 0; dir < 3; ++dir) {
+            for (size_t dir = 0; dir < numDirs; ++dir) {
               sysMatrix.coeffRef(3 * bs.idxA + dir, 3 * bs.idxB + dir) -=
                 bs.multiplier;
               sysMatrix.coeffRef(3 * bs.idxB + dir, 3 * bs.idxA + dir) -=
@@ -1427,9 +1479,9 @@ MEHPForceBalance2::runForceRelaxation(
                 bs.multiplier;
               sysMatrix.coeffRef(3 * bs.idxB + dir, 3 * bs.idxB + dir) +=
                 bs.multiplier;
+              constants[3 * bs.idxA + dir] += bs.offset[dir] * bs.multiplier;
+              constants[3 * bs.idxB + dir] -= bs.offset[dir] * bs.multiplier;
             }
-            constants.segment<3>(3 * bs.idxA) += bs.offset * bs.multiplier;
-            constants.segment<3>(3 * bs.idxB) -= bs.offset * bs.multiplier;
           }
         }
         matrixNeedsRebuild = false;
@@ -1588,7 +1640,8 @@ MEHPForceBalance2::getDisplacementResidualNormFor(
 
   assert(relevantPartialDistances.size() == oneOverSpringPartitions.size());
   const Eigen::VectorXd partialDistancesOverSpringPartitions =
-    (relevantPartialDistances.array() * oneOverSpringPartitions.array())
+    (this->kappa * relevantPartialDistances.array() *
+     oneOverSpringPartitions.array())
       .matrix();
 
   Eigen::VectorXd overallForces = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
@@ -2135,10 +2188,6 @@ MEHPForceBalance2::mergeSpringsWithoutRemoval(ForceBalance2Network& net,
     this->evaluateSpringVectorFrom(net, u, keptSpringIdx, otherEndKept);
   assert(pylimer_tools::utils::vector_approx_equal(
     totalDistance, distanceAfter, 1e-9));
-
-#ifndef NDEBUG
-  assert(this->validateNetwork(net, u));
-#endif
 }
 
 /**
@@ -2827,7 +2876,7 @@ MEHPForceBalance2::getAverageStrandLength() const
 
 Eigen::VectorXd
 MEHPForceBalance2::evaluateStrandLengths(const ForceBalance2Network& net,
-                                         Eigen::VectorXd u) const
+                                         const Eigen::VectorXd& u) const
 {
   Eigen::VectorXd springVectors = this->evaluateStrandVectors(net, u);
   Eigen::VectorXd springLengths = Eigen::VectorXd::Zero(net.nrOfStrands);
@@ -2840,7 +2889,7 @@ MEHPForceBalance2::evaluateStrandLengths(const ForceBalance2Network& net,
 
 Eigen::Vector3d
 MEHPForceBalance2::evaluateStrandVector(const ForceBalance2Network& net,
-                                        const Eigen::VectorXd u,
+                                        const Eigen::VectorXd& u,
                                         const size_t strandIdx) const
 {
   INVALIDARG_EXP_IFN(strandIdx < net.nrOfStrands, "Invalid strand index.");
@@ -2853,12 +2902,12 @@ MEHPForceBalance2::evaluateStrandVector(const ForceBalance2Network& net,
 
 Eigen::VectorXd
 MEHPForceBalance2::evaluateStrandVectors(const ForceBalance2Network& net,
-                                         const Eigen::VectorXd u) const
+                                         const Eigen::VectorXd& u) const
 {
   Eigen::VectorXd partialSpringVectors = this->evaluateSpringVectors(net, u);
   Eigen::VectorXd strandVectors = Eigen::VectorXd::Zero(3 * net.nrOfStrands);
   for (size_t i = 0; i < net.nrOfSprings; ++i) {
-    strandVectors.segment(net.strandIndexOfSpring[i], 3) +=
+    strandVectors.segment(3 * net.strandIndexOfSpring[i], 3) +=
       partialSpringVectors.segment(3 * i, 3);
   }
 
@@ -2876,7 +2925,7 @@ MEHPForceBalance2::evaluateStrandVectors(const ForceBalance2Network& net,
  */
 double
 MEHPForceBalance2::sumToTotalFraction(const ForceBalance2Network& net,
-                                      Eigen::VectorXd springPartition,
+                                      const Eigen::VectorXd& springPartition,
                                       const size_t springIdx,
                                       const size_t targetLink)
 {
@@ -2923,7 +2972,7 @@ MEHPForceBalance2::getDenominatorOfPartialSpring(
  */
 Eigen::Matrix3d
 MEHPForceBalance2::evaluateStressTensorForLinks(
-  const std::vector<size_t> linkIndices,
+  const std::vector<size_t>& linkIndices,
   const ForceBalance2Network& net,
   const Eigen::VectorXd& u) const
 {
@@ -3274,30 +3323,44 @@ MEHPForceBalance2::findSpringsAndLinksClusteredToActive(
   Eigen::ArrayXb springIsActive =
     Eigen::ArrayXb::Constant(net.nrOfSprings, false);
 
-  // then, iteratively walk along the springs to mark those as "active"
-  // that are connected to active springs
-  bool hadChanged = true;
-  Eigen::ArrayXb linkIsActive = Eigen::ArrayXb::Constant(net.nrOfNodes, false);
-  while (hadChanged) {
-    hadChanged = false;
-    for (Eigen::Index linkIdx = 0; linkIdx < net.nrOfLinks; ++linkIdx) {
-      if (linkIsActive[linkIdx]) {
-        continue;
+  Eigen::ArrayXb linkIsActive = Eigen::ArrayXb::Constant(net.nrOfLinks, false);
+  std::vector<size_t> linkQueue;
+  linkQueue.reserve(net.nrOfLinks);
+
+  // Mark all springs of initially active strands as active
+  for (size_t strandIdx = 0; strandIdx < net.nrOfStrands; ++strandIdx) {
+    if (strandIsActive[strandIdx]) {
+      for (const size_t springIdx : net.springIndicesOfStrand[strandIdx]) {
+        springIsActive[springIdx] = true;
       }
-      for (const int strandIdx : net.strandIndicesOfLink[linkIdx]) {
-        if (strandIsActive[strandIdx]) {
-          hadChanged = true;
-          linkIsActive[linkIdx] = true;
-          // mark all strands of this cross-link as connected to active
-          for (const int innerStrandIdx : net.strandIndicesOfLink[linkIdx]) {
-            strandIsActive[innerStrandIdx] = true;
-            // and all springs of this strand as active
-            for (const int springIdx :
-                 net.springIndicesOfStrand[innerStrandIdx]) {
-              springIsActive[springIdx] = true;
-            }
-          }
-          break;
+    }
+  }
+
+  for (size_t linkIdx = 0; linkIdx < net.nrOfLinks; ++linkIdx) {
+    for (const size_t strandIdx : net.strandIndicesOfLink[linkIdx]) {
+      if (strandIsActive[strandIdx]) {
+        linkIsActive[linkIdx] = true;
+        linkQueue.push_back(linkIdx);
+        break;
+      }
+    }
+  }
+
+  // BFS propagation to all strands and links clustered to active
+  size_t head = 0;
+  while (head < linkQueue.size()) {
+    size_t linkIdx = linkQueue[head++];
+    for (const size_t strandIdx : net.strandIndicesOfLink[linkIdx]) {
+      if (!strandIsActive[strandIdx]) {
+        strandIsActive[strandIdx] = true;
+        for (const size_t springIdx : net.springIndicesOfStrand[strandIdx]) {
+          springIsActive[springIdx] = true;
+        }
+      }
+      for (const size_t otherLink : net.linkIndicesOfStrand[strandIdx]) {
+        if (!linkIsActive[otherLink]) {
+          linkIsActive[otherLink] = true;
+          linkQueue.push_back(otherLink);
         }
       }
     }
@@ -3689,7 +3752,7 @@ MEHPForceBalance2::getGammaFactor(double b02, const int nrOfChains) const
   const Eigen::VectorXd gammaFactors = this->getGammaFactors(b02);
 
   if (nrOfChains < 1) {
-    return gammaFactors.mean();
+    return gammaFactors.sum() / static_cast<double>(this->getNrOfStrands());
   } else {
     return gammaFactors.sum() / static_cast<double>(nrOfChains);
   }
@@ -3880,7 +3943,7 @@ MEHPForceBalance2::debugAtomVicinity(const size_t atomId) const
       std::cout << prefix << "\t";
 
       for (const long int linkIdx :
-           this->initialConfig.linkIndicesOfStrand[springIdx]) {
+           this->initialConfig.linkIndicesOfStrand[parentSpringIdx]) {
         std::cout << linkIdx << " ";
         if (linkIdx < this->initialConfig.nrOfNodes) {
           std::cout << "(" << this->initialConfig.oldAtomIds[linkIdx] << ") ";

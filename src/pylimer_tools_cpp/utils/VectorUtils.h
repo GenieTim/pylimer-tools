@@ -358,28 +358,23 @@ all_components_finite(const IN& vec)
  * @param vec
  * @param rowToRemove
  */
-#define MAKE_REMOVE_ROW(EIGEN_TYPE)                                            \
-  static inline void removeRow(                                                \
-    EIGEN_TYPE& vec, unsigned int rowToRemove, bool noResize = false)          \
-  {                                                                            \
-    INVALIDARG_EXP_IFN(vec.size() > rowToRemove,                               \
-                       "Cannot remove row " + std::to_string(rowToRemove) +    \
-                         " from vector with size " +                           \
-                         std::to_string(vec.size()) + "!");                    \
-    unsigned int numRows = vec.size() - 1;                                     \
-    vec.segment(rowToRemove, numRows - rowToRemove) =                          \
-      vec.segment(rowToRemove + 1, numRows - rowToRemove);                     \
-    if (!noResize) {                                                           \
-      vec.conservativeResize(numRows);                                         \
-    }                                                                          \
+template<typename Derived>
+static inline void
+removeRow(Eigen::PlainObjectBase<Derived>& vec,
+          unsigned int rowToRemove,
+          bool noResize = false)
+{
+  INVALIDARG_EXP_IFN(vec.size() > rowToRemove,
+                     "Cannot remove row " + std::to_string(rowToRemove) +
+                       " from vector with size " + std::to_string(vec.size()) +
+                       "!");
+  unsigned int numRows = vec.size() - 1;
+  vec.segment(rowToRemove, numRows - rowToRemove) =
+    vec.segment(rowToRemove + 1, numRows - rowToRemove);
+  if (!noResize) {
+    vec.conservativeResize(numRows);
   }
-
-MAKE_REMOVE_ROW(Eigen::VectorXd);
-MAKE_REMOVE_ROW(Eigen::VectorXi);
-MAKE_REMOVE_ROW(Eigen::ArrayXi);
-MAKE_REMOVE_ROW(Eigen::ArrayXd);
-MAKE_REMOVE_ROW(Eigen::ArrayXb);
-#undef MAKE_REMOVE_ROW
+}
 
 /**
  * @brief Remove sequential rows from an Eigen vector
@@ -387,32 +382,25 @@ MAKE_REMOVE_ROW(Eigen::ArrayXb);
  * @param vec
  * @param rowToRemove
  */
-#define MAKE_REMOVE_ROWS(EIGEN_TYPE)                                           \
-  static inline void removeRows(EIGEN_TYPE& vec,                               \
-                                unsigned int rowToStartRemove,                 \
-                                unsigned int nrOfRowsToRemove,                 \
-                                bool noResize = false)                         \
-  {                                                                            \
-    INVALIDINDEX_EXP_IFN(                                                      \
-      vec.size() >= rowToStartRemove + nrOfRowsToRemove,                       \
-      "Cannot remove rows " + std::to_string(nrOfRowsToRemove) + " from " +    \
-        std::to_string(rowToStartRemove) + " from vector with size " +         \
-        std::to_string(vec.size()) + "!");                                     \
-    unsigned int numRows = vec.size() - nrOfRowsToRemove;                      \
-    vec.segment(rowToStartRemove, numRows - rowToStartRemove) = vec.segment(   \
-      rowToStartRemove + nrOfRowsToRemove, numRows - rowToStartRemove);        \
-    if (!noResize) {                                                           \
-      vec.conservativeResize(numRows);                                         \
-    }                                                                          \
+template<typename Derived>
+static inline void
+removeRows(Eigen::PlainObjectBase<Derived>& vec,
+           unsigned int rowToStartRemove,
+           unsigned int nrOfRowsToRemove,
+           bool noResize = false)
+{
+  INVALIDINDEX_EXP_IFN(
+    vec.size() >= rowToStartRemove + nrOfRowsToRemove,
+    "Cannot remove rows " + std::to_string(nrOfRowsToRemove) + " from " +
+      std::to_string(rowToStartRemove) + " from vector with size " +
+      std::to_string(vec.size()) + "!");
+  unsigned int numRows = vec.size() - nrOfRowsToRemove;
+  vec.segment(rowToStartRemove, numRows - rowToStartRemove) = vec.segment(
+    rowToStartRemove + nrOfRowsToRemove, numRows - rowToStartRemove);
+  if (!noResize) {
+    vec.conservativeResize(numRows);
   }
-
-MAKE_REMOVE_ROWS(Eigen::VectorXd);
-MAKE_REMOVE_ROWS(Eigen::VectorXi);
-MAKE_REMOVE_ROWS(Eigen::ArrayXi);
-MAKE_REMOVE_ROWS(Eigen::ArrayXd);
-MAKE_REMOVE_ROWS(Eigen::ArrayXb);
-
-#undef MAKE_REMOVE_ROWS
+}
 
 /**
  * @brief Remove multiple sequential rows from an Eigen vector based on
@@ -423,52 +411,44 @@ MAKE_REMOVE_ROWS(Eigen::ArrayXb);
  * @param isSorted whether the indices are already sorted in descending order
  * @param isUnique whether the indices are unique or not
  */
-#define MAKE_REMOVE_ROWS(EIGEN_TYPE)                                           \
-  static inline void removeRows(EIGEN_TYPE& vec,                               \
-                                std::vector<size_t>& indicesToRemove,          \
-                                bool isSorted = false,                         \
-                                bool isUnique = false)                         \
-  {                                                                            \
-    if (indicesToRemove.empty())                                               \
-      return;                                                                  \
-                                                                               \
-    /* Sort indices in descending order */                                     \
-    if (!isSorted) {                                                           \
-      std::ranges::sort(indicesToRemove, std::greater<size_t>());              \
-    }                                                                          \
-                                                                               \
-    /* Remove duplicates */                                                    \
-    if (!isUnique) {                                                           \
-      indicesToRemove.erase(std::ranges::unique(indicesToRemove).begin(),      \
-                            indicesToRemove.end());                            \
-    }                                                                          \
-    /* Check if the largest index is valid */                                  \
-    if (indicesToRemove[0] >= static_cast<size_t>(vec.size())) {               \
-      throw std::out_of_range("Index out of range");                           \
-    }                                                                          \
-                                                                               \
-    size_t j = 0;                                                              \
-    for (size_t i = 0; i < static_cast<size_t>(vec.size()); ++i) {             \
-      if (j < indicesToRemove.size() &&                                        \
-          i == indicesToRemove[indicesToRemove.size() - j - 1]) {              \
-        ++j;                                                                   \
-      } else {                                                                 \
-        vec[static_cast<Eigen::Index>(i - j)] =                                \
-          vec[static_cast<Eigen::Index>(i)];                                   \
-      }                                                                        \
-    }                                                                          \
-                                                                               \
-    vec.conservativeResize(static_cast<Eigen::Index>(                          \
-      static_cast<size_t>(vec.size()) - indicesToRemove.size()));              \
+template<typename Derived>
+static inline void
+removeRows(Eigen::PlainObjectBase<Derived>& vec,
+           std::vector<size_t>& indicesToRemove,
+           bool isSorted = false,
+           bool isUnique = false)
+{
+  if (indicesToRemove.empty())
+    return;
+
+  /* Sort indices in descending order */
+  if (!isSorted) {
+    std::ranges::sort(indicesToRemove, std::greater<size_t>());
   }
 
-MAKE_REMOVE_ROWS(Eigen::VectorXd);
-MAKE_REMOVE_ROWS(Eigen::VectorXi);
-MAKE_REMOVE_ROWS(Eigen::ArrayXi);
-MAKE_REMOVE_ROWS(Eigen::ArrayXd);
-MAKE_REMOVE_ROWS(Eigen::ArrayXb);
+  /* Remove duplicates */
+  if (!isUnique) {
+    indicesToRemove.erase(std::ranges::unique(indicesToRemove).begin(),
+                          indicesToRemove.end());
+  }
+  /* Check if the largest index is valid */
+  if (indicesToRemove[0] >= static_cast<size_t>(vec.size())) {
+    throw std::out_of_range("Index out of range");
+  }
 
-#undef MAKE_REMOVE_ROWS
+  size_t j = 0;
+  for (size_t i = 0; i < static_cast<size_t>(vec.size()); ++i) {
+    if (j < indicesToRemove.size() &&
+        i == indicesToRemove[indicesToRemove.size() - j - 1]) {
+      ++j;
+    } else {
+      vec[static_cast<Eigen::Index>(i - j)] = vec[static_cast<Eigen::Index>(i)];
+    }
+  }
+
+  vec.conservativeResize(static_cast<Eigen::Index>(
+    static_cast<size_t>(vec.size()) - indicesToRemove.size()));
+}
 
 /**
  * @brief Remove multiple sequential rows from an Eigen vector based on
@@ -782,7 +762,7 @@ first_occuring_index(const std::vector<T>& v, const T value, size_t start = 0)
  */
 template<typename T0, typename T1>
 static inline bool
-set_has_key(const T0 map, const T1 key)
+set_has_key(const T0& map, const T1& key)
 {
 #if __cplusplus >= 202002L
   // C++20 (and later) code

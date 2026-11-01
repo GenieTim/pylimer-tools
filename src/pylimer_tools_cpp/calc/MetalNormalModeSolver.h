@@ -6,6 +6,12 @@
 namespace pylimer_tools::calc {
 
 /**
+ * @brief Computes Jackson damping kernel for KPM
+ */
+Eigen::VectorXd
+computeJacksonKernel(size_t numMoments);
+
+/**
  * @brief Checks if Metal GPU acceleration is available on this system.
  */
 bool

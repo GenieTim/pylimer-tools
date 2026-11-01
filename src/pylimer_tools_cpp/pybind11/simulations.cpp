@@ -1739,7 +1739,7 @@ A strand is a chain of connected links between two crosslinks.
                 "StructureSimplificationMode.NO_SIMPLIFICATION"),
       py::arg("inactive_removal_cutoff") = 1e-6,
       py::arg_v("sle_solver", mehp::SLESolver::DEFAULT, "SLESolver.DEFAULT"),
-      py::arg("tolerance") = 1e-15,
+      py::arg("tolerance") = 1e-12,
       py::arg("max_iterations") = 10000)
     .def("deform_to",
          &mehp::MEHPForceBalance2::deformTo,
@@ -2017,12 +2017,20 @@ A strand is a chain of connected links between two crosslinks.
          R"pbdoc(
             Get the number of nodes (crosslinkers) considered in this simulation.
       )pbdoc")
+    .def("get_nr_of_strands",
+         &mehp::MEHPForceBalance2::getNrOfStrands,
+         R"pbdoc(
+           Get the number of strands considered in this simulation.
+      )pbdoc")
+    .def("get_nr_of_partial_springs",
+         &mehp::MEHPForceBalance2::getNrOfSprings,
+         R"pbdoc(
+           Get the number of partial springs considered in this simulation.
+      )pbdoc")
     .def("get_nr_of_springs",
          &mehp::MEHPForceBalance2::getNrOfStrands,
          R"pbdoc(
-           Get the number of springs considered in this simulation.
-
-           :param tolerance: springs under this length are considered inactive
+           Get the number of springs (strands) considered in this simulation. Alias for get_nr_of_strands.
       )pbdoc")
     .def("get_weighted_spring_lengths",
          &mehp::MEHPForceBalance2::getWeightedSpringLengths,
@@ -2075,6 +2083,22 @@ A strand is a chain of connected links between two crosslinks.
            excl. entanglement links [the slip-links created internally when e.g. constructing the simulator with random slip-links]).
 
            :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
+      )pbdoc",
+         py::arg("tolerance") = 1e-3)
+    .def("get_nr_of_active_strands",
+         &mehp::MEHPForceBalance2::getNrOfActiveStrands,
+         R"pbdoc(
+           Get the number of active strands remaining after running the simulation.
+
+           :param tolerance: strands under this length are considered inactive
+      )pbdoc",
+         py::arg("tolerance") = 1e-3)
+    .def("get_nr_of_active_partial_springs",
+         &mehp::MEHPForceBalance2::getNrOfActiveSprings,
+         R"pbdoc(
+           Get the number of active partial springs remaining after running the simulation.
+
+           :param tolerance: springs under this length are considered inactive
       )pbdoc",
          py::arg("tolerance") = 1e-3)
     .def("get_nr_of_active_springs",

@@ -327,13 +327,15 @@ ResistanceDistanceAnalysis::solveIdentityChunked(size_t chunkSize) const
 
   // Level-3 BLAS chunked forward/back-substitutions:
   // Solving in chunks of B columns converts triangular solves from memory-bound
-  // dtrsv (Level-2 BLAS) into compute-bound dtrsm (Level-3 BLAS), exploiting AMX/Accelerate
+  // dtrsv (Level-2 BLAS) into compute-bound dtrsm (Level-3 BLAS), exploiting
+  // AMX/Accelerate
   for (size_t colStart = 0; colStart < numNodes_; colStart += chunkSize) {
     size_t curChunk = std::min(chunkSize, numNodes_ - colStart);
-    Eigen::MatrixXd I_chunk = Eigen::MatrixXd::Zero(
-      N, static_cast<Eigen::Index>(curChunk));
+    Eigen::MatrixXd I_chunk =
+      Eigen::MatrixXd::Zero(N, static_cast<Eigen::Index>(curChunk));
     for (size_t c = 0; c < curChunk; ++c) {
-      I_chunk(static_cast<Eigen::Index>(colStart + c), static_cast<Eigen::Index>(c)) = 1.0;
+      I_chunk(static_cast<Eigen::Index>(colStart + c),
+              static_cast<Eigen::Index>(c)) = 1.0;
     }
     X.middleCols(static_cast<Eigen::Index>(colStart),
                  static_cast<Eigen::Index>(curChunk)) = solver_.solve(I_chunk);

@@ -48,7 +48,9 @@ init_pylimer_bound_calc(py::module_& m)
 
     Please cite :cite:t:`gusev_molecular_2024` if you use this method in your work.
     )pbdoc")
-    .def(py::init<const std::vector<size_t>, const std::vector<size_t>>(),
+    .def(py::init<const std::vector<size_t>&,
+                  const std::vector<size_t>&,
+                  size_t>(),
          R"pbdoc(
          Initialize the NormalModeAnalyzer with the bonds (edges).
 
@@ -56,9 +58,11 @@ init_pylimer_bound_calc(py::module_& m)
          
          :param spring_from: Vector of starting node indices for springs/bonds
          :param spring_to: Vector of ending node indices for springs/bonds
+         :param nr_of_nodes: Optional total number of nodes (to include isolated vertices with index > max)
          )pbdoc",
          py::arg("spring_from"),
-         py::arg("spring_to"))
+         py::arg("spring_to"),
+         py::arg("nr_of_nodes") = 0)
     .def("get_matrix_size",
          &NormalModeAnalyzer::getMatrixSize,
          R"pbdoc(

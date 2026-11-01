@@ -44,8 +44,9 @@ inline const NormalModeSolver allNormalModeSolvers[] = {
 class NormalModeAnalyzer
 {
 public:
-  NormalModeAnalyzer(const std::vector<size_t> springFrom,
-                     const std::vector<size_t> springTo);
+  NormalModeAnalyzer(const std::vector<size_t>& springFrom,
+                     const std::vector<size_t>& springTo,
+                     size_t nrOfNodes = 0);
 
   void findSparseEigenvalues(const size_t nrOfEigenvalues,
                              const bool includeEigenvectors = false);
@@ -204,6 +205,12 @@ private:
   Eigen::VectorXd eigenvalues;
   Eigen::MatrixXd eigenvectors;
 
+  void solveMatrix(const Eigen::SparseMatrix<double>& mat,
+                   NormalModeSolver solver,
+                   bool includeEigenvectors,
+                   Eigen::VectorXd& outEvals,
+                   Eigen::MatrixXd& outEvecs);
+
   void computeAllEigenvaluesDense(const Eigen::SparseMatrix<double>& mat,
                                   const bool includeEigenvectors,
                                   const bool forceEigenSolver,
@@ -225,6 +232,8 @@ private:
                                    std::vector<double>& lambdaNodes,
                                    std::vector<double>& deltaN) const;
 
+  static Eigen::VectorXd computeJacksonKernel(size_t numMoments);
+
   // MARK: serialization
   NormalModeAnalyzer() = default;
 #ifdef CEREALIZABLE
@@ -236,7 +245,8 @@ private:
        isEigenvectorsComputed,
        clusterCount,
        eigenvalues,
-       eigenvectors);
+       eigenvectors,
+       assembledConnectivityMatrix);
   }
 #endif
 };

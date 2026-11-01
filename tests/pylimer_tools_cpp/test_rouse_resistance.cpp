@@ -597,7 +597,8 @@ TEST_CASE("RouseBrownianSimulator coordinates and parameter manipulation",
   }
 }
 
-TEST_CASE("ResistanceDistanceAnalysis Level-3 BLAS Chunking for All-Pairs & Pseudo-Inverse",
+TEST_CASE("ResistanceDistanceAnalysis Level-3 BLAS Chunking for All-Pairs & "
+          "Pseudo-Inverse",
           "[ResistanceDistanceAnalysis][topo][benchmark]")
 {
   const size_t N = 300;
@@ -621,7 +622,8 @@ TEST_CASE("ResistanceDistanceAnalysis Level-3 BLAS Chunking for All-Pairs & Pseu
 
   pt::ResistanceDistanceAnalysis rda(from, to, weights, N);
 
-  SECTION("Chunked solves produce numerically identical results across chunk sizes")
+  SECTION(
+    "Chunked solves produce numerically identical results across chunk sizes")
   {
     Eigen::MatrixXd R_chunk1 = rda.computeAllPairsEffectiveResistance(1);
     Eigen::MatrixXd R_chunk32 = rda.computeAllPairsEffectiveResistance(32);
@@ -647,19 +649,24 @@ TEST_CASE("ResistanceDistanceAnalysis Level-3 BLAS Chunking for All-Pairs & Pseu
     auto start1 = std::chrono::high_resolution_clock::now();
     Eigen::MatrixXd R1 = rda.computeAllPairsEffectiveResistance(1);
     auto end1 = std::chrono::high_resolution_clock::now();
-    double time1_ms = std::chrono::duration<double, std::milli>(end1 - start1).count();
+    double time1_ms =
+      std::chrono::duration<double, std::milli>(end1 - start1).count();
 
     auto start128 = std::chrono::high_resolution_clock::now();
     Eigen::MatrixXd R128 = rda.computeAllPairsEffectiveResistance(128);
     auto end128 = std::chrono::high_resolution_clock::now();
-    double time128_ms = std::chrono::duration<double, std::milli>(end128 - start128).count();
+    double time128_ms =
+      std::chrono::duration<double, std::milli>(end128 - start128).count();
 
     double speedup = time1_ms / time128_ms;
-    std::cout << "\n=== All-Pairs Resistance Distance Level-3 BLAS Chunking Benchmark (N=" << N << ") ===\n"
+    std::cout << "\n=== All-Pairs Resistance Distance Level-3 BLAS Chunking "
+                 "Benchmark (N="
+              << N << ") ===\n"
               << "Level-2 BLAS (chunk=1, dtrsv):   " << time1_ms << " ms\n"
               << "Level-3 BLAS (chunk=128, dtrsm): " << time128_ms << " ms\n"
               << "Speedup:                         " << speedup << "x\n"
-              << "=========================================================================\n";
+              << "============================================================="
+                 "============\n";
 
     CHECK(speedup >= 1.0);
   }

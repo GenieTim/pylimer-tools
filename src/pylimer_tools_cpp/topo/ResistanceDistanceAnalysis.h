@@ -91,7 +91,8 @@ public:
 
   /**
    * @brief Solve L_pinned * X = I in multi-column chunks (Level-3 BLAS dtrsm)
-   * of specified chunk size B (e.g. 64 or 128), returning N x N solution matrix X.
+   * of specified chunk size B (e.g. 64 or 128), returning N x N solution matrix
+   * X.
    *
    * @param chunkSize Number of columns to solve per chunk (defaults to 128)
    * @return Dense N x N solution matrix X
