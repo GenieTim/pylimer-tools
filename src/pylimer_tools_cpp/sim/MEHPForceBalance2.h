@@ -317,16 +317,28 @@ public:
                           const std::function<bool()>& shouldInterrupt,
                           const std::function<void()>& cleanupInterrupt);
 
+  struct BrokenSpringRecord
+  {
+    size_t idxA = 0;
+    size_t idxB = 0;
+    double multiplier = 0.0;
+    Eigen::Vector3d offset = Eigen::Vector3d::Zero();
+  };
+
   /**
    * @brief Remove springs that exert a stress higher than
    * `this->springBreakingLength`
    *
    * @param net the network to modify
    * @param displacements the current displacements (modified in place)
+   * @param outBrokenSprings optional pointer to collect broken spring records
+   * for in-place matrix updates
    * @return size_t the number of springs broken
    */
-  size_t breakTooLongStrands(ForceBalance2Network& net,
-                             Eigen::VectorXd& displacements) const;
+  size_t breakTooLongStrands(
+    ForceBalance2Network& net,
+    Eigen::VectorXd& displacements,
+    std::vector<BrokenSpringRecord>* outBrokenSprings = nullptr) const;
 
   /**
    * @brief Decide for each spring if it should be removed,

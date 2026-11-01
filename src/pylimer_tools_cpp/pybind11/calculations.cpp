@@ -223,14 +223,16 @@ init_pylimer_bound_calc(py::module_& m)
          &NormalModeAnalyzer::computeChebyshevMomentsKPMMetal,
          R"pbdoc(
          Compute Chebyshev moments using the Kernel Polynomial Method (KPM)
-         accelerated with Apple Silicon Metal compute kernels.
+         accelerated with Apple Silicon Metal compute kernels with multi-RHS block batching.
 
          :param num_moments: Number of moments to compute (default: 1024)
          :param num_random_vectors: Number of random Rademacher vectors for trace estimation (default: 20)
+         :param batch_size: Number of RHS vectors batched into each Block-SpMM (default: 4)
          :return: Vector of damped Chebyshev moments
          )pbdoc",
          py::arg("num_moments") = 1024,
-         py::arg("num_random_vectors") = 20)
+         py::arg("num_random_vectors") = 20,
+         py::arg("batch_size") = 4)
     .def("compute_density_of_states_kpm",
          &NormalModeAnalyzer::computeDensityOfStatesKPM,
          R"pbdoc(

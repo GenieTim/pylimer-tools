@@ -2,6 +2,7 @@
 #define PYBIND_ENTANGLEMENT_DETECT_H
 
 #include "../topo/EntanglementDetector.h"
+#include "../topo/ResistanceDistanceAnalysis.h"
 
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
@@ -58,6 +59,102 @@ init_pylimer_bound_topo(py::module_& m)
         py::arg("crosslinker_type") = 2,
         py::arg("ignore_crosslinks") = true,
         py::arg("filter_dangling_and_soluble") = false);
+
+  py::class_<pylimer_tools::topo::ResistanceDistanceAnalysis, py::smart_holder>(
+    m, "ResistanceDistanceAnalysis")
+    .def(py::init<const std::vector<size_t>&,
+                  const std::vector<size_t>&,
+                  const std::vector<double>&,
+                  size_t>(),
+         py::arg("spring_from"),
+         py::arg("spring_to"),
+         py::arg("weights") = std::vector<double>{},
+         py::arg("num_nodes") = 0)
+    .def(py::init<const Eigen::SparseMatrix<double>&>(), py::arg("L"))
+    .def_static(
+      "create_linear_chain",
+      [](size_t num_nodes) {
+        return std::unique_ptr<pylimer_tools::topo::ResistanceDistanceAnalysis>(
+          new pylimer_tools::topo::ResistanceDistanceAnalysis(
+            pylimer_tools::topo::ResistanceDistanceAnalysis::createLinearChain(
+              num_nodes)));
+      },
+      py::arg("num_nodes"))
+    .def_static(
+      "create_ring",
+      [](size_t num_nodes) {
+        return std::unique_ptr<pylimer_tools::topo::ResistanceDistanceAnalysis>(
+          new pylimer_tools::topo::ResistanceDistanceAnalysis(
+            pylimer_tools::topo::ResistanceDistanceAnalysis::createRing(
+              num_nodes)));
+      },
+      py::arg("num_nodes"))
+    .def_static(
+      "create_complete",
+      [](size_t num_nodes) {
+        return std::unique_ptr<pylimer_tools::topo::ResistanceDistanceAnalysis>(
+          new pylimer_tools::topo::ResistanceDistanceAnalysis(
+            pylimer_tools::topo::ResistanceDistanceAnalysis::createComplete(
+              num_nodes)));
+      },
+      py::arg("num_nodes"))
+    .def_static(
+      "create_star",
+      [](size_t num_arms, size_t arm_length) {
+        return std::unique_ptr<pylimer_tools::topo::ResistanceDistanceAnalysis>(
+          new pylimer_tools::topo::ResistanceDistanceAnalysis(
+            pylimer_tools::topo::ResistanceDistanceAnalysis::createStar(
+              num_arms, arm_length)));
+      },
+      py::arg("num_arms"),
+      py::arg("arm_length") = 1)
+    .def("get_nr_of_nodes",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::getNrOfNodes)
+    .def("get_nr_of_edges",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::getNrOfEdges)
+    .def("get_total_edge_weight",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::getTotalEdgeWeight)
+    .def("is_connected",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::isConnected)
+    .def("get_nr_of_connected_components",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::
+           getNrOfConnectedComponents)
+    .def(
+      "get_connected_components",
+      &pylimer_tools::topo::ResistanceDistanceAnalysis::getConnectedComponents)
+    .def("get_laplacian",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::getLaplacian)
+    .def("compute_effective_resistance",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::
+           computeEffectiveResistance,
+         py::arg("i"),
+         py::arg("j"))
+    .def("compute_effective_resistance_batched",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::
+           computeEffectiveResistanceBatched,
+         py::arg("pairs"))
+    .def("compute_all_pairs_effective_resistance",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::
+           computeAllPairsEffectiveResistance)
+    .def(
+      "compute_kirchhoff_index",
+      &pylimer_tools::topo::ResistanceDistanceAnalysis::computeKirchhoffIndex)
+    .def("compute_kirchhoff_index_spectral",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::
+           computeKirchhoffIndexSpectral)
+    .def("compute_total_resistance_per_node",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::
+           computeTotalResistancePerNode)
+    .def("compute_resistance_centrality",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::
+           computeResistanceCentrality)
+    .def("compute_commute_time",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::computeCommuteTime,
+         py::arg("i"),
+         py::arg("j"))
+    .def("compute_all_pairs_commute_time",
+         &pylimer_tools::topo::ResistanceDistanceAnalysis::
+           computeAllPairsCommuteTime);
 };
 // }
 

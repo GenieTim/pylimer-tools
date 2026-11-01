@@ -401,14 +401,34 @@ TEST_CASE("NormalModeAnalyzer Metal KPM computes accurate Chebyshev moments",
 
   Eigen::VectorXd cpuMoments =
     nma.computeChebyshevMomentsKPM(numMoments, numRandomVectors);
-  Eigen::VectorXd gpuMoments =
-    nma.computeChebyshevMomentsKPMMetal(numMoments, numRandomVectors);
+  Eigen::VectorXd gpuMomentsB4 =
+    nma.computeChebyshevMomentsKPMMetal(numMoments, numRandomVectors, 4);
+  Eigen::VectorXd gpuMomentsB8 =
+    nma.computeChebyshevMomentsKPMMetal(numMoments, numRandomVectors, 8);
+  Eigen::VectorXd gpuMomentsB1 =
+    nma.computeChebyshevMomentsKPMMetal(numMoments, numRandomVectors, 1);
 
-  REQUIRE(gpuMoments.size() == static_cast<Eigen::Index>(numMoments));
+  REQUIRE(gpuMomentsB4.size() == static_cast<Eigen::Index>(numMoments));
+  REQUIRE(gpuMomentsB8.size() == static_cast<Eigen::Index>(numMoments));
+  REQUIRE(gpuMomentsB1.size() == static_cast<Eigen::Index>(numMoments));
+
   for (size_t m = 0; m < numMoments; ++m) {
-    CHECK_THAT(gpuMoments[static_cast<Eigen::Index>(m)],
+    CHECK_THAT(gpuMomentsB4[static_cast<Eigen::Index>(m)],
                Catch::Matchers::WithinAbs(
                  cpuMoments[static_cast<Eigen::Index>(m)], 1e-3));
+    CHECK_THAT(gpuMomentsB8[static_cast<Eigen::Index>(m)],
+               Catch::Matchers::WithinAbs(
+                 cpuMoments[static_cast<Eigen::Index>(m)], 1e-3));
+    CHECK_THAT(gpuMomentsB1[static_cast<Eigen::Index>(m)],
+               Catch::Matchers::WithinAbs(
+                 cpuMoments[static_cast<Eigen::Index>(m)], 1e-3));
+    // Verify agreement between batched and sequential implementations
+    CHECK_THAT(gpuMomentsB4[static_cast<Eigen::Index>(m)],
+               Catch::Matchers::WithinAbs(
+                 gpuMomentsB1[static_cast<Eigen::Index>(m)], 1e-4));
+    CHECK_THAT(gpuMomentsB8[static_cast<Eigen::Index>(m)],
+               Catch::Matchers::WithinAbs(
+                 gpuMomentsB1[static_cast<Eigen::Index>(m)], 1e-4));
   }
 }
 
@@ -431,14 +451,20 @@ TEST_CASE("NormalModeAnalyzer Metal vs CPU KPM benchmark",
   pc::NormalModeAnalyzer nma(springFrom, springTo);
 
   BENCHMARK(
-    "CPU computeChebyshevMomentsKPM (2000 nodes, 256 moments, 10 vectors)")
+    "Metal GPU KPM Sequential (B=1, 2000 nodes, 256 moments, 16 vectors)")
   {
-    return nma.computeChebyshevMomentsKPM(256, 10).size();
+    return nma.computeChebyshevMomentsKPMMetal(256, 16, 1).size();
   };
 
-  BENCHMARK("Metal GPU computeChebyshevMomentsKPMMetal (2000 nodes, 256 "
-            "moments, 10 vectors)")
+  BENCHMARK("Metal GPU KPM Multi-RHS Block-SpMM (B=4, 2000 nodes, 256 moments, "
+            "16 vectors)")
   {
-    return nma.computeChebyshevMomentsKPMMetal(256, 10).size();
+    return nma.computeChebyshevMomentsKPMMetal(256, 16, 4).size();
+  };
+
+  BENCHMARK("Metal GPU KPM Multi-RHS Block-SpMM (B=8, 2000 nodes, 256 moments, "
+            "16 vectors)")
+  {
+    return nma.computeChebyshevMomentsKPMMetal(256, 16, 8).size();
   };
 }

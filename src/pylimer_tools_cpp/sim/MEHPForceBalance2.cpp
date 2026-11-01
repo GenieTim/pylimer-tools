@@ -739,20 +739,43 @@ MEHPForceBalance2::runForceRelaxation(
 
   // reserve triplet list
   std::vector<Eigen::Triplet<double>> triplets;
-  const bool isMetalSolver = (solverChoice == SLESolver::METAL_CG ||
-                              solverChoice == SLESolver::METAL_BARZILAI_BORWEIN);
+  const bool isScalarSolver =
+    (solverChoice == SLESolver::SIMPLICIAL_LLT ||
+     solverChoice == SLESolver::SIMPLICIAL_LDLT ||
+     solverChoice == SLESolver::SPARSE_LU ||
+     solverChoice == SLESolver::SPARSE_QR ||
+     solverChoice == SLESolver::CONJUGATE_GRADIENT ||
+     solverChoice == SLESolver::CONJUGATE_GRADIENT_IDENTITY ||
+     solverChoice == SLESolver::CONJUGATE_GRADIENT_DIAGONALIZED ||
+     solverChoice == SLESolver::CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY ||
+     solverChoice == SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT ||
+     solverChoice == SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED ||
+     solverChoice == SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY ||
+     solverChoice == SLESolver::BICGSTAB ||
+     solverChoice == SLESolver::BICGSTAB_DIAGONALIZED ||
+     solverChoice == SLESolver::BICGSTAB_IDENTITY ||
+     solverChoice == SLESolver::BICGSTAB_INCOMPLETE_LU ||
+     solverChoice == SLESolver::METAL_CG ||
+     solverChoice == SLESolver::METAL_BARZILAI_BORWEIN);
+  const bool isMetalSolver =
+    (solverChoice == SLESolver::METAL_CG ||
+     solverChoice == SLESolver::METAL_BARZILAI_BORWEIN);
   // diagonal + the lower of the two components of each spring
-  triplets.reserve(isMetalSolver ? (this->initialConfig.nrOfLinks +
-                                    this->initialConfig.nrOfSprings * 2)
-                                 : (this->initialConfig.nrOfLinks * 3 +
-                                    this->initialConfig.nrOfSprings * 3 * 2));
+  triplets.reserve(isScalarSolver ? (this->initialConfig.nrOfLinks +
+                                     this->initialConfig.nrOfSprings * 2)
+                                  : (this->initialConfig.nrOfLinks * 3 +
+                                     this->initialConfig.nrOfSprings * 3 * 2));
   // reserve space for constants
   Eigen::VectorXd constants =
     Eigen::VectorXd(this->initialConfig.nrOfLinks * 3);
   // it's a bit more efficient to sum the diagonal ourselves
   Eigen::VectorXd diagonal =
-    Eigen::VectorXd(isMetalSolver ? this->initialConfig.nrOfLinks
-                                  : (this->initialConfig.nrOfLinks * 3));
+    Eigen::VectorXd(isScalarSolver ? this->initialConfig.nrOfLinks
+                                   : (this->initialConfig.nrOfLinks * 3));
+
+  Eigen::SparseMatrix<double> sysMatrix;
+  bool matrixNeedsRebuild = true;
+  std::vector<BrokenSpringRecord> brokenSprings;
 
   // actual loop
   bool wasInterrupted = false;
@@ -760,108 +783,116 @@ MEHPForceBalance2::runForceRelaxation(
   do {
     nRemovedInIteration = 0;
 
-    // reset after previous iteration
-    triplets.clear();
-    constants.resize(this->initialConfig.nrOfLinks * 3);
-    constants.setZero();
-    diagonal.resize(isMetalSolver ? this->initialConfig.nrOfLinks
-                                  : (this->initialConfig.nrOfLinks * 3));
-    diagonal.setZero();
+    if (matrixNeedsRebuild) {
+      // reset after previous iteration
+      triplets.clear();
+      constants.resize(this->initialConfig.nrOfLinks * 3);
+      constants.setZero();
+      diagonal.resize(isScalarSolver ? this->initialConfig.nrOfLinks
+                                     : (this->initialConfig.nrOfLinks * 3));
+      diagonal.setZero();
 
-    if (isMetalSolver) {
-      // Multi-RHS 3D Block formulation: keep scalar N x N network Laplacian
-      for (size_t springIdx = 0; springIdx < this->initialConfig.nrOfSprings;
-           ++springIdx) {
-        size_t idxA = this->initialConfig.springIndexA[springIdx];
-        size_t idxB = this->initialConfig.springIndexB[springIdx];
-        if (idxA == idxB) {
-          continue;
+      if (isScalarSolver) {
+        // Multi-RHS 3D Block formulation: keep scalar N x N network Laplacian
+        for (size_t springIdx = 0; springIdx < this->initialConfig.nrOfSprings;
+             ++springIdx) {
+          size_t idxA = this->initialConfig.springIndexA[springIdx];
+          size_t idxB = this->initialConfig.springIndexB[springIdx];
+          if (idxA == idxB) {
+            continue;
+          }
+          double oneOverContourLengthFraction =
+            1.0 / (this->initialConfig.springContourLength[springIdx]);
+          double multiplier = this->kappa * oneOverContourLengthFraction;
+          assert(idxA < this->initialConfig.nrOfLinks);
+          assert(idxB < this->initialConfig.nrOfLinks);
+
+          triplets.emplace_back(idxA, idxB, multiplier);
+          triplets.emplace_back(idxB, idxA, multiplier);
+          diagonal[idxA] -= multiplier;
+          diagonal[idxB] -= multiplier;
+
+          // Constants b in Ax = b (3 components per link)
+          constants.segment(3 * idxA, 3) -=
+            this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
+            multiplier;
+          constants.segment(3 * idxB, 3) +=
+            this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
+            multiplier;
         }
-        double oneOverContourLengthFraction =
-          1.0 / (this->initialConfig.springContourLength[springIdx]);
-        double multiplier = this->kappa * oneOverContourLengthFraction;
-        assert(idxA < this->initialConfig.nrOfLinks);
-        assert(idxB < this->initialConfig.nrOfLinks);
 
-        triplets.emplace_back(idxA, idxB, multiplier);
-        triplets.emplace_back(idxB, idxA, multiplier);
-        diagonal[idxA] -= multiplier;
-        diagonal[idxB] -= multiplier;
+        for (size_t linkIdx = 0; linkIdx < this->initialConfig.nrOfLinks;
+             ++linkIdx) {
+          triplets.emplace_back(linkIdx, linkIdx, diagonal[linkIdx]);
+        }
+      } else {
+        // 3N x 3N formulation for CPU solvers
+        for (size_t springIdx = 0; springIdx < this->initialConfig.nrOfSprings;
+             ++springIdx) {
+          if (this->initialConfig.springIndexA[springIdx] ==
+              this->initialConfig.springIndexB[springIdx]) {
+            continue;
+          }
+          double oneOverContourLengthFraction =
+            1.0 / (this->initialConfig.springContourLength[springIdx]);
+          double multiplier = this->kappa * oneOverContourLengthFraction;
+          assert(this->initialConfig.springIndexA[springIdx] <
+                 this->initialConfig.nrOfLinks);
+          assert(this->initialConfig.springIndexB[springIdx] <
+                 this->initialConfig.nrOfLinks);
+          for (size_t dir = 0; dir < 3; ++dir) {
+            triplets.push_back(Eigen::Triplet<double>(
+              this->initialConfig.springIndexA[springIdx] * 3 + dir,
+              this->initialConfig.springIndexB[springIdx] * 3 + dir,
+              1. * multiplier));
+            triplets.push_back(Eigen::Triplet<double>(
+              this->initialConfig.springIndexB[springIdx] * 3 + dir,
+              this->initialConfig.springIndexA[springIdx] * 3 + dir,
+              1. * multiplier));
+          }
+          diagonal.segment(3 * this->initialConfig.springIndexA[springIdx],
+                           3) -= Eigen::Vector3d::Constant(multiplier);
+          diagonal.segment(3 * this->initialConfig.springIndexB[springIdx],
+                           3) -= Eigen::Vector3d::Constant(multiplier);
 
-        // Constants b in Ax = b (3 components per link)
-        constants.segment(3 * idxA, 3) -=
-          this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
-          multiplier;
-        constants.segment(3 * idxB, 3) +=
-          this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
-          multiplier;
+          // the constants, b in Ax = b
+          constants.segment(3 * this->initialConfig.springIndexA[springIdx],
+                            3) -=
+            this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
+            multiplier;
+          constants.segment(3 * this->initialConfig.springIndexB[springIdx],
+                            3) +=
+            this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
+            multiplier;
+        }
+
+        for (size_t linkIdx = 0; linkIdx < this->initialConfig.nrOfLinks;
+             ++linkIdx) {
+          for (size_t dir = 0; dir < 3; ++dir) {
+            triplets.push_back(
+              Eigen::Triplet<double>(linkIdx * 3 + dir,
+                                     linkIdx * 3 + dir,
+                                     diagonal(linkIdx * 3 + dir)));
+          }
+        }
       }
 
-      for (size_t linkIdx = 0; linkIdx < this->initialConfig.nrOfLinks;
-           ++linkIdx) {
-        triplets.emplace_back(linkIdx, linkIdx, diagonal[linkIdx]);
-      }
-    } else {
-      // 3N x 3N formulation for CPU solvers
-      for (size_t springIdx = 0; springIdx < this->initialConfig.nrOfSprings;
-           ++springIdx) {
-        if (this->initialConfig.springIndexA[springIdx] ==
-            this->initialConfig.springIndexB[springIdx]) {
-          continue;
-        }
-        double oneOverContourLengthFraction =
-          1.0 / (this->initialConfig.springContourLength[springIdx]);
-        double multiplier =
-          this->kappa *
-          oneOverContourLengthFraction;
-        assert(this->initialConfig.springIndexA[springIdx] <
-               this->initialConfig.nrOfLinks);
-        assert(this->initialConfig.springIndexB[springIdx] <
-               this->initialConfig.nrOfLinks);
-        for (size_t dir = 0; dir < 3; ++dir) {
-          triplets.push_back(Eigen::Triplet<double>(
-            this->initialConfig.springIndexA[springIdx] * 3 + dir,
-            this->initialConfig.springIndexB[springIdx] * 3 + dir,
-            1. * multiplier));
-          triplets.push_back(Eigen::Triplet<double>(
-            this->initialConfig.springIndexB[springIdx] * 3 + dir,
-            this->initialConfig.springIndexA[springIdx] * 3 + dir,
-            1. * multiplier));
-        }
-        diagonal.segment(3 * this->initialConfig.springIndexA[springIdx], 3) -=
-          Eigen::Vector3d::Constant(multiplier);
-        diagonal.segment(3 * this->initialConfig.springIndexB[springIdx], 3) -=
-          Eigen::Vector3d::Constant(multiplier);
-
-        // the constants, b in Ax = b
-        constants.segment(3 * this->initialConfig.springIndexA[springIdx], 3) -=
-          this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
-          multiplier;
-        constants.segment(3 * this->initialConfig.springIndexB[springIdx], 3) +=
-          this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
-          multiplier;
+      if (triplets.empty()) {
+        break;
       }
 
-      for (size_t linkIdx = 0; linkIdx < this->initialConfig.nrOfLinks;
-           ++linkIdx) {
-        for (size_t dir = 0; dir < 3; ++dir) {
-          triplets.push_back(Eigen::Triplet<double>(
-            linkIdx * 3 + dir, linkIdx * 3 + dir, diagonal(linkIdx * 3 + dir)));
-        }
-      }
+      sysMatrix.resize(isScalarSolver ? this->initialConfig.nrOfLinks
+                                      : (this->initialConfig.nrOfLinks * 3),
+                       isScalarSolver ? this->initialConfig.nrOfLinks
+                                      : (this->initialConfig.nrOfLinks * 3));
+      sysMatrix.setFromTriplets(triplets.begin(), triplets.end());
+      sysMatrix.makeCompressed();
+      matrixNeedsRebuild = false;
     }
 
-    if (triplets.empty()) {
+    if (sysMatrix.nonZeros() == 0) {
       break;
     }
-
-    Eigen::SparseMatrix<double> sysMatrix(
-      isMetalSolver ? this->initialConfig.nrOfLinks
-                    : (this->initialConfig.nrOfLinks * 3),
-      isMetalSolver ? this->initialConfig.nrOfLinks
-                    : (this->initialConfig.nrOfLinks * 3));
-    sysMatrix.setFromTriplets(triplets.begin(), triplets.end());
-    sysMatrix.makeCompressed();
 
 #ifndef NDEBUG
     // verify that the matrix fulfills the requirements of the gradient descent
@@ -912,6 +943,65 @@ MEHPForceBalance2::runForceRelaxation(
     }                                                                          \
   }
 
+#define COMPUTE_SOLVE_SCALAR_DIRECT(solver)                                    \
+  if (constants.isZero(1e-9)) {                                                \
+    finalCoordinates = Eigen::VectorXd::Zero(constants.size());                \
+  } else {                                                                     \
+    solver.compute(sysMatrix);                                                 \
+    if (solver.info() != Eigen::Success) {                                     \
+      SOLVER_FAILED("System matrix computation failed");                       \
+    }                                                                          \
+    const size_t nLinks = this->initialConfig.nrOfLinks;                       \
+    Eigen::MatrixX3d B(nLinks, 3);                                             \
+    for (size_t i = 0; i < nLinks; ++i) {                                      \
+      B(i, 0) = constants[3 * i];                                              \
+      B(i, 1) = constants[3 * i + 1];                                          \
+      B(i, 2) = constants[3 * i + 2];                                          \
+    }                                                                          \
+    Eigen::MatrixX3d X = solver.solve(B);                                      \
+    if (solver.info() != Eigen::Success) {                                     \
+      SOLVER_FAILED("System could not be solved");                             \
+    }                                                                          \
+    finalCoordinates.resize(3 * nLinks);                                       \
+    for (size_t i = 0; i < nLinks; ++i) {                                      \
+      finalCoordinates[3 * i] = X(i, 0);                                       \
+      finalCoordinates[3 * i + 1] = X(i, 1);                                   \
+      finalCoordinates[3 * i + 2] = X(i, 2);                                   \
+    }                                                                          \
+  }
+
+#define COMPUTE_SOLVE_SCALAR_ITERATIVE(solver)                                 \
+  if (constants.isZero(1e-9)) {                                                \
+    finalCoordinates = Eigen::VectorXd::Zero(constants.size());                \
+  } else {                                                                     \
+    solver.compute(sysMatrix);                                                 \
+    if (solver.info() != Eigen::Success) {                                     \
+      SOLVER_FAILED("System matrix computation failed");                       \
+    }                                                                          \
+    const size_t nLinks = this->initialConfig.nrOfLinks;                       \
+    Eigen::MatrixX3d B(nLinks, 3);                                             \
+    for (size_t i = 0; i < nLinks; ++i) {                                      \
+      B(i, 0) = constants[3 * i];                                              \
+      B(i, 1) = constants[3 * i + 1];                                          \
+      B(i, 2) = constants[3 * i + 2];                                          \
+    }                                                                          \
+    Eigen::MatrixX3d X(nLinks, 3);                                             \
+    for (int col = 0; col < 3; ++col) {                                        \
+      X.col(col) = solver.solve(B.col(col));                                   \
+      if (solver.info() != Eigen::Success &&                                   \
+          solver.info() != Eigen::NoConvergence) {                             \
+        SOLVER_FAILED("System could not be solved");                           \
+      }                                                                        \
+      iterationsDone += solver.iterations();                                   \
+    }                                                                          \
+    finalCoordinates.resize(3 * nLinks);                                       \
+    for (size_t i = 0; i < nLinks; ++i) {                                      \
+      finalCoordinates[3 * i] = X(i, 0);                                       \
+      finalCoordinates[3 * i + 1] = X(i, 1);                                   \
+      finalCoordinates[3 * i + 2] = X(i, 2);                                   \
+    }                                                                          \
+  }
+
 #define ADD_ITERATIONS(solver)                                                 \
   if (!constants.isZero(1e-9)) {                                               \
     iterationsDone += solver.iterations();                                     \
@@ -920,13 +1010,12 @@ MEHPForceBalance2::runForceRelaxation(
 #define SOLVE_ITERATIVE(solver)                                                \
   solver.setTolerance(residualReduction);                                      \
   solver.setMaxIterations(maxIterations);                                      \
-  COMPUTE_SOLVE(solver);                                                       \
-  ADD_ITERATIONS(solver);                                                      \
+  COMPUTE_SOLVE_SCALAR_ITERATIVE(solver);                                      \
   this->exitReason = ExitReason::X_TOLERANCE;                                  \
   break;
 
 #define SOLVE_DIRECT(solver)                                                   \
-  COMPUTE_SOLVE(solver);                                                       \
+  COMPUTE_SOLVE_SCALAR_DIRECT(solver);                                         \
   this->exitReason = ExitReason::X_TOLERANCE;                                  \
   break;
 
@@ -1196,7 +1285,10 @@ MEHPForceBalance2::runForceRelaxation(
     }
 #endif
 
-    this->breakTooLongStrands(this->initialConfig, this->currentDisplacements);
+    brokenSprings.clear();
+    size_t nBrokenStrands = this->breakTooLongStrands(
+      this->initialConfig, this->currentDisplacements, &brokenSprings);
+    nRemovedInIteration += nBrokenStrands;
     size_t nRemovedThisLoop = 0;
 
     do {
@@ -1257,6 +1349,41 @@ MEHPForceBalance2::runForceRelaxation(
 
       nRemovedInIteration += nRemovedThisLoop;
     } while (nRemovedThisLoop > 0);
+
+    // If only springs broke (and no links were deleted/simplified), update
+    // sysMatrix and constants in-place!
+    if (simplificationMode == StructureSimplificationMode::NO_SIMPLIFICATION &&
+        !brokenSprings.empty()) {
+      if (isScalarSolver) {
+        for (const auto& bs : brokenSprings) {
+          sysMatrix.coeffRef(bs.idxA, bs.idxB) -= bs.multiplier;
+          sysMatrix.coeffRef(bs.idxB, bs.idxA) -= bs.multiplier;
+          sysMatrix.coeffRef(bs.idxA, bs.idxA) += bs.multiplier;
+          sysMatrix.coeffRef(bs.idxB, bs.idxB) += bs.multiplier;
+
+          constants.segment<3>(3 * bs.idxA) += bs.offset * bs.multiplier;
+          constants.segment<3>(3 * bs.idxB) -= bs.offset * bs.multiplier;
+        }
+      } else {
+        for (const auto& bs : brokenSprings) {
+          for (size_t dir = 0; dir < 3; ++dir) {
+            sysMatrix.coeffRef(3 * bs.idxA + dir, 3 * bs.idxB + dir) -=
+              bs.multiplier;
+            sysMatrix.coeffRef(3 * bs.idxB + dir, 3 * bs.idxA + dir) -=
+              bs.multiplier;
+            sysMatrix.coeffRef(3 * bs.idxA + dir, 3 * bs.idxA + dir) +=
+              bs.multiplier;
+            sysMatrix.coeffRef(3 * bs.idxB + dir, 3 * bs.idxB + dir) +=
+              bs.multiplier;
+          }
+          constants.segment<3>(3 * bs.idxA) += bs.offset * bs.multiplier;
+          constants.segment<3>(3 * bs.idxB) -= bs.offset * bs.multiplier;
+        }
+      }
+      matrixNeedsRebuild = false;
+    } else if (nRemovedInIteration > 0) {
+      matrixNeedsRebuild = true;
+    }
 
     // after running once, we can update the initial solution
     initialSolution =
@@ -1518,8 +1645,10 @@ MEHPForceBalance2::assembleOneOverSpringPartition(
  * @return size_t the number of strands broken
  */
 size_t
-MEHPForceBalance2::breakTooLongStrands(ForceBalance2Network& net,
-                                       Eigen::VectorXd& displacements) const
+MEHPForceBalance2::breakTooLongStrands(
+  ForceBalance2Network& net,
+  Eigen::VectorXd& displacements,
+  std::vector<BrokenSpringRecord>* outBrokenSprings) const
 {
   if (this->springBreakingLength <= 0.) {
     return 0;
@@ -1552,6 +1681,25 @@ MEHPForceBalance2::breakTooLongStrands(ForceBalance2Network& net,
   }
 
   std::ranges::sort(springIndicesToDelete, std::greater<>());
+  auto [first, last] = std::ranges::unique(springIndicesToDelete);
+  springIndicesToDelete.erase(first, last);
+
+  if (outBrokenSprings != nullptr) {
+    outBrokenSprings->clear();
+    outBrokenSprings->reserve(springIndicesToDelete.size());
+    for (size_t springIdx : springIndicesToDelete) {
+      size_t idxA = net.springIndexA[springIdx];
+      size_t idxB = net.springIndexB[springIdx];
+      if (idxA == idxB) {
+        continue;
+      }
+      double oneOverContour = 1.0 / net.springContourLength[springIdx];
+      double mult = this->kappa * oneOverContour;
+      outBrokenSprings->push_back(
+        { idxA, idxB, mult, net.springBoxOffset.segment<3>(3 * springIdx) });
+    }
+  }
+
   this->removeSprings(net, displacements, springIndicesToDelete);
 
   return numBroken;

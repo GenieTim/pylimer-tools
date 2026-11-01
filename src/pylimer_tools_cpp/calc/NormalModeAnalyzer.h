@@ -109,11 +109,12 @@ public:
    *
    * @param numMoments Number of Chebyshev moments (default: 1024)
    * @param numRandomVectors Number of random vectors (default: 20)
+   * @param batchSize Batch size for multi-RHS block SpMM (default: 4)
    * @return Vector of damped Chebyshev moments
    */
-  Eigen::VectorXd computeChebyshevMomentsKPMMetal(
-    size_t numMoments = 1024,
-    size_t numRandomVectors = 20) const;
+  Eigen::VectorXd computeChebyshevMomentsKPMMetal(size_t numMoments = 1024,
+                                                  size_t numRandomVectors = 20,
+                                                  size_t batchSize = 4) const;
 
   /**
    * @brief Compute continuous density of states (DOS) using KPM.

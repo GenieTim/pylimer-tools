@@ -26,12 +26,14 @@ add_library(pylimer_tools
     calc/Correlator.cpp
     calc/NormalModeAnalyzer.cpp
     topo/EntanglementDetector.cpp
+    topo/ResistanceDistanceAnalysis.cpp
     sim/OutputSupportingSimulation.cpp
     sim/MEHPForceEvaluator.cpp
     sim/MEHPForceRelaxation.cpp
     sim/MEHPForceBalance.cpp
     sim/MEHPForceBalance2.cpp
     sim/DPDSimulator.cpp
+    sim/RouseBrownianSimulator.cpp
     utils/MCUniverseGenerator.cpp
 )
 

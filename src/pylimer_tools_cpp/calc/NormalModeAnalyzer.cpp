@@ -995,14 +995,19 @@ NormalModeAnalyzer::computeChebyshevMomentsKPM(size_t numMoments,
 }
 
 Eigen::VectorXd
-NormalModeAnalyzer::computeChebyshevMomentsKPMMetal(
-  size_t numMoments,
-  size_t numRandomVectors) const
+NormalModeAnalyzer::computeChebyshevMomentsKPMMetal(size_t numMoments,
+                                                    size_t numRandomVectors,
+                                                    size_t batchSize) const
 {
 #ifdef USE_METAL
   auto [c, w] = getSpectralScalingParameters(0.01);
   return pylimer_tools::calc::computeChebyshevMomentsKPMMetal(
-    this->assembledConnectivityMatrix, numMoments, numRandomVectors, c, w);
+    this->assembledConnectivityMatrix,
+    numMoments,
+    numRandomVectors,
+    c,
+    w,
+    batchSize);
 #else
   std::cerr << "Metal acceleration not enabled. Falling back to CPU KPM."
             << std::endl;

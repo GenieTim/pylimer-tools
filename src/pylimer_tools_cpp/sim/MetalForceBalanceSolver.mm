@@ -215,6 +215,114 @@ kernel void csr_spmm_3rhs_coop8(
     }
 }
 
+// 2. SIMDgroup-Cooperative 3-RHS SpMM with 2 threads per row (optimized for degree-2 polymer chain beads)
+kernel void csr_spmm_3rhs_coop2(
+    device const uint* row_ptrs [[buffer(0)]],
+    device const uint* col_indices [[buffer(1)]],
+    device const float* values [[buffer(2)]],
+    device const packed_float3* x [[buffer(3)]],
+    device packed_float3* y [[buffer(4)]],
+    device const CGState* state [[buffer(5)]],
+    constant uint& numNodes [[buffer(6)]],
+    uint gid [[thread_position_in_grid]],
+    uint simd_lane [[thread_index_in_simdgroup]])
+{
+    if (state != nullptr && state->converged != 0) return;
+    uint row = gid / 2;
+    uint lane = simd_lane % 2;
+    if (row >= numNodes) return;
+    uint start = row_ptrs[row];
+    uint end = row_ptrs[row + 1];
+    float3 sum = float3(0.0f);
+    for (uint k = start + lane; k < end; k += 2) {
+        sum += values[k] * float3(x[col_indices[k]]);
+    }
+    sum += simd_shuffle_down_float3(sum, 1);
+    if (lane == 0) {
+        y[row] = packed_float3(sum);
+    }
+}
+
+kernel void csr_spmm_3rhs_coop2_stateless(
+    device const uint* row_ptrs [[buffer(0)]],
+    device const uint* col_indices [[buffer(1)]],
+    device const float* values [[buffer(2)]],
+    device const packed_float3* x [[buffer(3)]],
+    device packed_float3* y [[buffer(4)]],
+    constant uint& numNodes [[buffer(5)]],
+    uint gid [[thread_position_in_grid]],
+    uint simd_lane [[thread_index_in_simdgroup]])
+{
+    uint row = gid / 2;
+    uint lane = simd_lane % 2;
+    if (row >= numNodes) return;
+    uint start = row_ptrs[row];
+    uint end = row_ptrs[row + 1];
+    float3 sum = float3(0.0f);
+    for (uint k = start + lane; k < end; k += 2) {
+        sum += values[k] * float3(x[col_indices[k]]);
+    }
+    sum += simd_shuffle_down_float3(sum, 1);
+    if (lane == 0) {
+        y[row] = packed_float3(sum);
+    }
+}
+
+// 3. SIMDgroup-Cooperative 3-RHS SpMM with 4 threads per row
+kernel void csr_spmm_3rhs_coop4(
+    device const uint* row_ptrs [[buffer(0)]],
+    device const uint* col_indices [[buffer(1)]],
+    device const float* values [[buffer(2)]],
+    device const packed_float3* x [[buffer(3)]],
+    device packed_float3* y [[buffer(4)]],
+    device const CGState* state [[buffer(5)]],
+    constant uint& numNodes [[buffer(6)]],
+    uint gid [[thread_position_in_grid]],
+    uint simd_lane [[thread_index_in_simdgroup]])
+{
+    if (state != nullptr && state->converged != 0) return;
+    uint row = gid / 4;
+    uint lane = simd_lane % 4;
+    if (row >= numNodes) return;
+    uint start = row_ptrs[row];
+    uint end = row_ptrs[row + 1];
+    float3 sum = float3(0.0f);
+    for (uint k = start + lane; k < end; k += 4) {
+        sum += values[k] * float3(x[col_indices[k]]);
+    }
+    sum += simd_shuffle_down_float3(sum, 2);
+    sum += simd_shuffle_down_float3(sum, 1);
+    if (lane == 0) {
+        y[row] = packed_float3(sum);
+    }
+}
+
+kernel void csr_spmm_3rhs_coop4_stateless(
+    device const uint* row_ptrs [[buffer(0)]],
+    device const uint* col_indices [[buffer(1)]],
+    device const float* values [[buffer(2)]],
+    device const packed_float3* x [[buffer(3)]],
+    device packed_float3* y [[buffer(4)]],
+    constant uint& numNodes [[buffer(5)]],
+    uint gid [[thread_position_in_grid]],
+    uint simd_lane [[thread_index_in_simdgroup]])
+{
+    uint row = gid / 4;
+    uint lane = simd_lane % 4;
+    if (row >= numNodes) return;
+    uint start = row_ptrs[row];
+    uint end = row_ptrs[row + 1];
+    float3 sum = float3(0.0f);
+    for (uint k = start + lane; k < end; k += 4) {
+        sum += values[k] * float3(x[col_indices[k]]);
+    }
+    sum += simd_shuffle_down_float3(sum, 2);
+    sum += simd_shuffle_down_float3(sum, 1);
+    if (lane == 0) {
+        y[row] = packed_float3(sum);
+    }
+}
+
 kernel void csr_spmm_3rhs_stateless(
     device const uint* row_ptrs [[buffer(0)]],
     device const uint* col_indices [[buffer(1)]],
@@ -1018,6 +1126,50 @@ public:
   {
     return pipeSpmm3rhsStateless;
   }
+  id<MTLComputePipelineState> getSpmm3rhsCoop2Pipe() const
+  {
+    return pipeSpmm3rhsCoop2;
+  }
+  id<MTLComputePipelineState> getSpmm3rhsCoop2StatelessPipe() const
+  {
+    return pipeSpmm3rhsCoop2Stateless;
+  }
+  id<MTLComputePipelineState> getSpmm3rhsCoop4Pipe() const
+  {
+    return pipeSpmm3rhsCoop4;
+  }
+  id<MTLComputePipelineState> getSpmm3rhsCoop4StatelessPipe() const
+  {
+    return pipeSpmm3rhsCoop4Stateless;
+  }
+
+  id<MTLComputePipelineState> getAdaptiveSpmm3rhsCoopPipe(double avgEntriesPerRow, uint32_t& coopWidth) const
+  {
+    if (avgEntriesPerRow <= 3.8 && pipeSpmm3rhsCoop2) {
+      coopWidth = 2;
+      return pipeSpmm3rhsCoop2;
+    } else if (avgEntriesPerRow <= 7.0 && pipeSpmm3rhsCoop4) {
+      coopWidth = 4;
+      return pipeSpmm3rhsCoop4;
+    } else {
+      coopWidth = 8;
+      return pipeSpmm3rhsCoop;
+    }
+  }
+
+  id<MTLComputePipelineState> getAdaptiveSpmm3rhsStatelessPipe(double avgEntriesPerRow, uint32_t& coopWidth) const
+  {
+    if (avgEntriesPerRow <= 3.8 && pipeSpmm3rhsCoop2Stateless) {
+      coopWidth = 2;
+      return pipeSpmm3rhsCoop2Stateless;
+    } else if (avgEntriesPerRow <= 7.0 && pipeSpmm3rhsCoop4Stateless) {
+      coopWidth = 4;
+      return pipeSpmm3rhsCoop4Stateless;
+    } else {
+      coopWidth = 8;
+      return pipeSpmm3rhsStateless;
+    }
+  }
   id<MTLComputePipelineState> getDot3DPipe() const { return pipeDot3D; }
 
   // Jacobi Preconditioning Pipelines
@@ -1403,6 +1555,10 @@ private:
   id<MTLComputePipelineState> pipeSpmm3rhs = nil;
   id<MTLComputePipelineState> pipeSpmm3rhsCoop = nil;
   id<MTLComputePipelineState> pipeSpmm3rhsStateless = nil;
+  id<MTLComputePipelineState> pipeSpmm3rhsCoop2 = nil;
+  id<MTLComputePipelineState> pipeSpmm3rhsCoop2Stateless = nil;
+  id<MTLComputePipelineState> pipeSpmm3rhsCoop4 = nil;
+  id<MTLComputePipelineState> pipeSpmm3rhsCoop4Stateless = nil;
   id<MTLComputePipelineState> pipeDot3D = nil;
 
   // Jacobi pipelines
@@ -1540,6 +1696,22 @@ private:
       pipeSpmm3rhsStateless =
         [device newComputePipelineStateWithFunction:
                   [library newFunctionWithName:@"csr_spmm_3rhs_stateless"]
+                                              error:&error];
+      pipeSpmm3rhsCoop2 =
+        [device newComputePipelineStateWithFunction:
+                  [library newFunctionWithName:@"csr_spmm_3rhs_coop2"]
+                                              error:&error];
+      pipeSpmm3rhsCoop2Stateless =
+        [device newComputePipelineStateWithFunction:
+                  [library newFunctionWithName:@"csr_spmm_3rhs_coop2_stateless"]
+                                              error:&error];
+      pipeSpmm3rhsCoop4 =
+        [device newComputePipelineStateWithFunction:
+                  [library newFunctionWithName:@"csr_spmm_3rhs_coop4"]
+                                              error:&error];
+      pipeSpmm3rhsCoop4Stateless =
+        [device newComputePipelineStateWithFunction:
+                  [library newFunctionWithName:@"csr_spmm_3rhs_coop4_stateless"]
                                               error:&error];
       pipeDot3D = [device newComputePipelineStateWithFunction:
                             [library newFunctionWithName:@"dot_product_3d"]
@@ -2026,7 +2198,11 @@ solveSLEMetalCG3D(const Eigen::SparseMatrix<double>& scalarA,
     float* rPtr = static_cast<float*>([bufR contents]);
     float* pPtr = static_cast<float*>([bufP contents]);
 
-    uint32_t totalSpmvThreads = numNodes * 8;
+    double avgEntriesPerRow = static_cast<double>(nnz) / static_cast<double>(numNodes);
+    uint32_t coopWidth = 8;
+    id<MTLComputePipelineState> pSpmmCoop = backend.getAdaptiveSpmm3rhsCoopPipe(avgEntriesPerRow, coopWidth);
+    id<MTLComputePipelineState> pSpmmStateless = backend.getAdaptiveSpmm3rhsStatelessPipe(avgEntriesPerRow, coopWidth);
+    uint32_t totalSpmvThreads = numNodes * coopWidth;
 
     // Extract inverse diagonal on GPU if Jacobi preconditioning is enabled
     if (useJacobi) {
@@ -2055,7 +2231,7 @@ solveSLEMetalCG3D(const Eigen::SparseMatrix<double>& scalarA,
       // r = b - A*x using 3-RHS stateless SpMM
       id<MTLCommandBuffer> cmd = [queue commandBuffer];
       id<MTLComputeCommandEncoder> enc = [cmd computeCommandEncoder];
-      [enc setComputePipelineState:backend.getSpmm3rhsStatelessPipe()];
+      [enc setComputePipelineState:pSpmmStateless];
       [enc setBuffer:bufRowPtr offset:0 atIndex:0];
       [enc setBuffer:bufColIdx offset:0 atIndex:1];
       [enc setBuffer:bufValues offset:0 atIndex:2];
@@ -2131,7 +2307,7 @@ solveSLEMetalCG3D(const Eigen::SparseMatrix<double>& scalarA,
     statePtr->iter = 0;
     statePtr->converged = 0;
     statePtr->maxIters = static_cast<uint32_t>(maxIterations);
-    statePtr->tolSq = static_cast<float>(tolerance * tolerance);
+    statePtr->tolSq = static_cast<float>(std::max(tolerance * tolerance, 1e-12));
     statePtr->rho = initial_rho;
     statePtr->initial_rho = initial_rho;
 
@@ -2147,7 +2323,7 @@ solveSLEMetalCG3D(const Eigen::SparseMatrix<double>& scalarA,
 
       for (uint32_t step = 0; step < itersInBatch; ++step) {
         // Step 1: SIMDgroup-Cooperative 3-RHS SpMM Ap = A * p
-        [enc setComputePipelineState:backend.getSpmm3rhsCoopPipe()];
+        [enc setComputePipelineState:pSpmmCoop];
         [enc setBuffer:bufRowPtr offset:0 atIndex:0];
         [enc setBuffer:bufColIdx offset:0 atIndex:1];
         [enc setBuffer:bufValues offset:0 atIndex:2];
@@ -2264,6 +2440,31 @@ solveSLEMetalCG3D(const Eigen::SparseMatrix<double>& scalarA,
     for (uint32_t i = 0; i < N; ++i) {
       res[i] = static_cast<double>(finalXPtr[i]);
     }
+
+    // Mixed-precision iterative refinement when tolerance is tighter than float32 floor (~1e-5)
+    if (tolerance < 1e-5 && iterationsDone < maxIterations) {
+      double bNorm = b.norm();
+      if (bNorm > 1e-20) {
+        Eigen::VectorXd Ax = spmvMetal3D(scalarA, res);
+        Eigen::VectorXd r = b - Ax;
+        double relRes = r.norm() / bNorm;
+        int refineSteps = 0;
+        while (relRes > tolerance && refineSteps < 3 && iterationsDone < maxIterations) {
+          int refineIters = 0;
+          int remainingIters = maxIterations - iterationsDone;
+          Eigen::VectorXd deltaX = solveSLEMetalCG3D(
+            scalarA, r, std::max(tolerance, 1e-5), remainingIters, refineIters,
+            Eigen::VectorXd(), projectZeroModes, useJacobi);
+          res += deltaX;
+          iterationsDone += refineIters;
+          Ax = spmvMetal3D(scalarA, res);
+          r = b - Ax;
+          relRes = r.norm() / bNorm;
+          refineSteps++;
+        }
+      }
+    }
+
     return res;
   }
 }
@@ -2721,7 +2922,7 @@ solveSLEMetalCG(const Eigen::SparseMatrix<double>& A,
     statePtr->iter = 0;
     statePtr->converged = 0;
     statePtr->maxIters = static_cast<uint32_t>(maxIterations);
-    statePtr->tolSq = static_cast<float>(tolerance * tolerance);
+    statePtr->tolSq = static_cast<float>(std::max(tolerance * tolerance, 1e-12));
     statePtr->rho = initial_rho;
     statePtr->initial_rho = initial_rho;
 
@@ -2974,7 +3175,9 @@ getGpuResidentCoordinates(size_t numCoords)
 }
 
 Eigen::VectorXd
-spmvMetal3D(const Eigen::SparseMatrix<double>& scalarA, const Eigen::VectorXd& x)
+spmvMetal3DCoop(const Eigen::SparseMatrix<double>& scalarA,
+                const Eigen::VectorXd& x,
+                uint32_t coopWidth)
 {
   uint32_t numNodes = static_cast<uint32_t>(scalarA.rows());
   uint32_t N = numNodes * 3;
@@ -3014,10 +3217,24 @@ spmvMetal3D(const Eigen::SparseMatrix<double>& scalarA, const Eigen::VectorXd& x
       xPtr[i] = static_cast<float>(x[i]);
     }
 
-    uint32_t totalSpmvThreads = numNodes * 8;
+    id<MTLComputePipelineState> pipe = nil;
+    uint32_t width = coopWidth;
+    if (width == 0) {
+      double avgEntries = static_cast<double>(nnz) / static_cast<double>(numNodes);
+      pipe = backend.getAdaptiveSpmm3rhsStatelessPipe(avgEntries, width);
+    } else if (width == 2) {
+      pipe = backend.getSpmm3rhsCoop2StatelessPipe();
+    } else if (width == 4) {
+      pipe = backend.getSpmm3rhsCoop4StatelessPipe();
+    } else {
+      width = 8;
+      pipe = backend.getSpmm3rhsStatelessPipe();
+    }
+
+    uint32_t totalSpmvThreads = numNodes * width;
     id<MTLCommandBuffer> cmd = [queue commandBuffer];
     id<MTLComputeCommandEncoder> enc = [cmd computeCommandEncoder];
-    [enc setComputePipelineState:backend.getSpmm3rhsStatelessPipe()];
+    [enc setComputePipelineState:pipe];
     [enc setBuffer:bufRowPtr offset:0 atIndex:0];
     [enc setBuffer:bufColIdx offset:0 atIndex:1];
     [enc setBuffer:bufValues offset:0 atIndex:2];
@@ -3036,6 +3253,100 @@ spmvMetal3D(const Eigen::SparseMatrix<double>& scalarA, const Eigen::VectorXd& x
       y[i] = static_cast<double>(apPtr[i]);
     }
     return y;
+  }
+}
+
+Eigen::VectorXd
+spmvMetal3D(const Eigen::SparseMatrix<double>& scalarA, const Eigen::VectorXd& x)
+{
+  return spmvMetal3DCoop(scalarA, x, 0);
+}
+
+CoopBenchmarkResult
+benchmarkCoopWidthsMetal(const Eigen::SparseMatrix<double>& scalarA,
+                         int numRepetitions)
+{
+  CoopBenchmarkResult res;
+  uint32_t numNodes = static_cast<uint32_t>(scalarA.rows());
+  uint32_t N = numNodes * 3;
+  Eigen::VectorXd x = Eigen::VectorXd::Random(N);
+
+  MetalFBSBackend& backend = MetalFBSBackend::instance();
+  if (!backend.isAvailable()) return res;
+
+  @autoreleasepool {
+    id<MTLCommandQueue> queue = backend.getQueue();
+    uint32_t tg_size = 256;
+    size_t nnz = static_cast<size_t>(scalarA.nonZeros());
+
+    backend.ensureMatrixBuffers(numNodes, nnz);
+    id<MTLBuffer> bufRowPtr = backend.getBufRowPtr();
+    id<MTLBuffer> bufColIdx = backend.getBufColIdx();
+    id<MTLBuffer> bufValues = backend.getBufValues();
+
+    uint32_t* rowPtrsMem = static_cast<uint32_t*>([bufRowPtr contents]);
+    for (uint32_t i = 0; i <= numNodes; ++i)
+      rowPtrsMem[i] = static_cast<uint32_t>(scalarA.outerIndexPtr()[i]);
+    uint32_t* colIdxMem = static_cast<uint32_t*>([bufColIdx contents]);
+    float* valuesMem = static_cast<float*>([bufValues contents]);
+    for (size_t i = 0; i < nnz; ++i) {
+      colIdxMem[i] = static_cast<uint32_t>(scalarA.innerIndexPtr()[i]);
+      valuesMem[i] = static_cast<float>(scalarA.valuePtr()[i]);
+    }
+
+    backend.ensureCgBuffers(N, (numNodes + tg_size - 1) / tg_size);
+    id<MTLBuffer> bufX = backend.getBufX();
+    id<MTLBuffer> bufAp = backend.getBufAp();
+    float* xPtr = static_cast<float*>([bufX contents]);
+    for (uint32_t i = 0; i < N; ++i) xPtr[i] = static_cast<float>(x[i]);
+
+    auto measureWidth = [&](id<MTLComputePipelineState> pipe, uint32_t width) -> double {
+      uint32_t threads = numNodes * width;
+      // Warmup
+      for (int i = 0; i < 5; ++i) {
+        id<MTLCommandBuffer> cmd = [queue commandBuffer];
+        id<MTLComputeCommandEncoder> enc = [cmd computeCommandEncoder];
+        [enc setComputePipelineState:pipe];
+        [enc setBuffer:bufRowPtr offset:0 atIndex:0];
+        [enc setBuffer:bufColIdx offset:0 atIndex:1];
+        [enc setBuffer:bufValues offset:0 atIndex:2];
+        [enc setBuffer:bufX offset:0 atIndex:3];
+        [enc setBuffer:bufAp offset:0 atIndex:4];
+        [enc setBytes:&numNodes length:sizeof(uint32_t) atIndex:5];
+        [enc dispatchThreads:MTLSizeMake(threads, 1, 1)
+          threadsPerThreadgroup:MTLSizeMake(tg_size, 1, 1)];
+        [enc endEncoding];
+        [cmd commit];
+        [cmd waitUntilCompleted];
+      }
+
+      auto t0 = std::chrono::high_resolution_clock::now();
+      for (int i = 0; i < numRepetitions; ++i) {
+        id<MTLCommandBuffer> cmd = [queue commandBuffer];
+        id<MTLComputeCommandEncoder> enc = [cmd computeCommandEncoder];
+        [enc setComputePipelineState:pipe];
+        [enc setBuffer:bufRowPtr offset:0 atIndex:0];
+        [enc setBuffer:bufColIdx offset:0 atIndex:1];
+        [enc setBuffer:bufValues offset:0 atIndex:2];
+        [enc setBuffer:bufX offset:0 atIndex:3];
+        [enc setBuffer:bufAp offset:0 atIndex:4];
+        [enc setBytes:&numNodes length:sizeof(uint32_t) atIndex:5];
+        [enc dispatchThreads:MTLSizeMake(threads, 1, 1)
+          threadsPerThreadgroup:MTLSizeMake(tg_size, 1, 1)];
+        [enc endEncoding];
+        [cmd commit];
+        [cmd waitUntilCompleted];
+      }
+      auto t1 = std::chrono::high_resolution_clock::now();
+      return std::chrono::duration<double, std::milli>(t1 - t0).count();
+    };
+
+    res.timeCoop2_ms = measureWidth(backend.getSpmm3rhsCoop2StatelessPipe(), 2);
+    res.timeCoop4_ms = measureWidth(backend.getSpmm3rhsCoop4StatelessPipe(), 4);
+    res.timeCoop8_ms = measureWidth(backend.getSpmm3rhsStatelessPipe(), 8);
+    res.speedupCoop2Vs8 = res.timeCoop8_ms / std::max(res.timeCoop2_ms, 1e-6);
+    res.speedupCoop4Vs8 = res.timeCoop8_ms / std::max(res.timeCoop4_ms, 1e-6);
+    return res;
   }
 }
 

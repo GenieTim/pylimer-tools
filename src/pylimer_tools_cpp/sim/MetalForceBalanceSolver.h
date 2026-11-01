@@ -17,8 +17,8 @@ isMetalAvailable();
  * using the Barzilai-Borwein gradient descent method implemented with Metal
  * compute kernels.
  *
- * If b.size() == A.rows() * 3, automatically invokes the fused Multi-RHS 3D Block-SpMV
- * solver treating A as an N x N scalar network Laplacian.
+ * If b.size() == A.rows() * 3, automatically invokes the fused Multi-RHS 3D
+ * Block-SpMV solver treating A as an N x N scalar network Laplacian.
  *
  * @param A Coefficient matrix (sparse)
  * @param b Right-hand side vector
@@ -46,9 +46,9 @@ solveSLEMetalBarzilaiBorwein(
   bool projectZeroModes = false);
 
 /**
- * @brief Multi-RHS 3D Block Barzilai-Borwein solver using an N x N scalar Laplacian
- * and 3 RHS components (x, y, z) per node. Fused 3-RHS SpMM achieves 3x matrix memory
- * bandwidth reduction.
+ * @brief Multi-RHS 3D Block Barzilai-Borwein solver using an N x N scalar
+ * Laplacian and 3 RHS components (x, y, z) per node. Fused 3-RHS SpMM achieves
+ * 3x matrix memory bandwidth reduction.
  */
 Eigen::VectorXd
 solveSLEMetalBarzilaiBorwein3D(
@@ -67,8 +67,8 @@ solveSLEMetalBarzilaiBorwein3D(
  * using the Conjugate Gradient (CG) method implemented with Metal compute
  * kernels and optional GPU-resident Jacobi diagonal preconditioning.
  *
- * If b.size() == A.rows() * 3, automatically invokes the fused Multi-RHS 3D Block-SpMV
- * solver treating A as an N x N scalar network Laplacian.
+ * If b.size() == A.rows() * 3, automatically invokes the fused Multi-RHS 3D
+ * Block-SpMV solver treating A as an N x N scalar network Laplacian.
  *
  * @param A Symmetric positive (semi-)definite coefficient matrix
  * @param b Right-hand side vector
@@ -78,7 +78,8 @@ solveSLEMetalBarzilaiBorwein3D(
  * @param initialX Optional initial guess vector
  * @param projectZeroModes Whether to periodically project out center-of-mass
  * translational zero modes
- * @param useJacobi Whether to apply GPU-resident Jacobi (diagonal scaling) preconditioning
+ * @param useJacobi Whether to apply GPU-resident Jacobi (diagonal scaling)
+ * preconditioning
  * @return Solution vector x
  */
 Eigen::VectorXd
@@ -92,9 +93,10 @@ solveSLEMetalCG(const Eigen::SparseMatrix<double>& A,
                 bool useJacobi = true);
 
 /**
- * @brief Multi-RHS 3D Block Conjugate Gradient solver using an N x N scalar Laplacian
- * and 3 RHS components (x, y, z) per node with GPU-resident Jacobi preconditioning.
- * Fused 3-RHS SpMM achieves 3x matrix memory bandwidth reduction.
+ * @brief Multi-RHS 3D Block Conjugate Gradient solver using an N x N scalar
+ * Laplacian and 3 RHS components (x, y, z) per node with GPU-resident Jacobi
+ * preconditioning. Fused 3-RHS SpMM achieves 3x matrix memory bandwidth
+ * reduction.
  */
 Eigen::VectorXd
 solveSLEMetalCG3D(const Eigen::SparseMatrix<double>& scalarA,
@@ -107,11 +109,35 @@ solveSLEMetalCG3D(const Eigen::SparseMatrix<double>& scalarA,
                   bool useJacobi = true);
 
 /**
- * @brief Multiplies an N x N scalar matrix with a 3N dense vector (interpreted as N float3 vectors)
- * on GPU using the fused 3-RHS SpMM kernel.
+ * @brief Multiplies an N x N scalar matrix with a 3N dense vector (interpreted
+ * as N float3 vectors) on GPU using the fused 3-RHS SpMM kernel.
  */
 Eigen::VectorXd
-spmvMetal3D(const Eigen::SparseMatrix<double>& scalarA, const Eigen::VectorXd& x);
+spmvMetal3D(const Eigen::SparseMatrix<double>& scalarA,
+            const Eigen::VectorXd& x);
+
+/**
+ * @brief Multiplies an N x N scalar matrix with a 3N dense vector on GPU
+ * using specified cooperative width (2, 4, or 8 threads per row, or 0 for
+ * adaptive).
+ */
+Eigen::VectorXd
+spmvMetal3DCoop(const Eigen::SparseMatrix<double>& scalarA,
+                const Eigen::VectorXd& x,
+                uint32_t coopWidth = 0);
+
+struct CoopBenchmarkResult
+{
+  double timeCoop2_ms = 0.0;
+  double timeCoop4_ms = 0.0;
+  double timeCoop8_ms = 0.0;
+  double speedupCoop2Vs8 = 0.0;
+  double speedupCoop4Vs8 = 0.0;
+};
+
+CoopBenchmarkResult
+benchmarkCoopWidthsMetal(const Eigen::SparseMatrix<double>& scalarA,
+                         int numRepetitions = 100);
 
 /**
  * @brief Multiplies a sparse matrix with a dense vector on GPU.
@@ -120,8 +146,8 @@ Eigen::VectorXd
 spmvMetal(const Eigen::SparseMatrix<double>& A, const Eigen::VectorXd& x);
 
 /**
- * @brief Benchmark pure SpMV execution time (in milliseconds) for 3D Block-SpMV vs Full SpMV
- * over multiple repetitions directly on GPU.
+ * @brief Benchmark pure SpMV execution time (in milliseconds) for 3D Block-SpMV
+ * vs Full SpMV over multiple repetitions directly on GPU.
  */
 struct SpmvBenchmarkResult
 {
@@ -146,7 +172,7 @@ struct SpringRelaxationData
   const int* springIndexA = nullptr;
   const int* springIndexB = nullptr;
   const double* springBoxOffset = nullptr;     // 3 * numSprings doubles
-  const double* springContourLength = nullptr;  // numSprings doubles
+  const double* springContourLength = nullptr; // numSprings doubles
   size_t numSprings = 0;
   double breakingThreshold = 0.0;
   double inactiveCutoff = 0.0;
@@ -164,16 +190,17 @@ struct SpringEvaluationResult
 };
 
 /**
- * @brief Evaluates spring strains and inactivity on GPU using the current GPU-resident
- * coordinates, avoiding CPU host-device synchronization when no springs are flagged.
+ * @brief Evaluates spring strains and inactivity on GPU using the current
+ * GPU-resident coordinates, avoiding CPU host-device synchronization when no
+ * springs are flagged.
  */
 SpringEvaluationResult
-evaluateSpringStrainAndInactivityMetal(
-  size_t numNodes,
-  const SpringRelaxationData& springData);
+evaluateSpringStrainAndInactivityMetal(size_t numNodes,
+                                       const SpringRelaxationData& springData);
 
 /**
- * @brief Retrieves the current GPU-resident coordinates from the Metal buffer pool.
+ * @brief Retrieves the current GPU-resident coordinates from the Metal buffer
+ * pool.
  */
 Eigen::VectorXd
 getGpuResidentCoordinates(size_t numCoords);

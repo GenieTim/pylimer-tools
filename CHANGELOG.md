@@ -7,6 +7,7 @@
   - **Normal Mode Analysis**:
     - Implement `computeAllEigenvaluesMetal` using parallel Jacobi rotations on Metal compute shaders.
     - Implement `computeChebyshevMomentsKPMMetal` for Kernel Polynomial Method (KPM) with custom Metal shaders for CSR sparse matrix-vector multiplication (SpMV), Chebyshev polynomial recurrence, and parallel reduction dot products (delivering over 25x speedup for large networks).
+    - Add multi-RHS block-batched KPM Metal kernels (`batch_size = 4` with `float4` and `batch_size = 8` with `Float8`) to `computeChebyshevMomentsKPMMetal` to amortize sparse matrix memory reads across multiple Rademacher trace estimation vectors.
     - Add `NormalModeSolver.METAL` enum value and string option (`"metal"`, `"gpu"`) to `NormalModeAnalyzer.find_all_eigenvalues`.
     - Expose `compute_chebyshev_moments_kpm_metal` in Python bindings and type stubs.
   - **MEHP Network Force Relaxation**:
@@ -16,16 +17,27 @@
     - Add `SLESolver.METAL_CG` and `SLESolver.METAL_BARZILAI_BORWEIN` to `MEHPForceBalance2` and Python bindings.
     - **Performance & Stability Enhancements**:
       - SIMDgroup-cooperative SpMV kernel (`csr_spmv_coop8`) with 8 threads per row, coalesced memory access, and `simd_shuffle_down` reductions.
+      - Adaptive SIMDgroup-cooperative 3-RHS SpMM kernels with 2, 4, or 8 threads per row (`csr_spmm_3rhs_coop2`, `csr_spmm_3rhs_coop4`, `csr_spmm_3rhs_coop8`, `spmvMetal3DCoop`, and `benchmarkCoopWidthsMetal`), automatically selecting the optimal width based on average node degree.
       - Persistent `MTLBuffer` pooling in `MetalFBSBackend` to eliminate per-solve buffer allocation overhead.
       - GPU-resident batched iteration loops (20-25 steps per batch) evaluating step sizes and convergence on-device without CPU round-trips.
       - Translational zero-mode (center-of-mass) projection to eliminate rigid body drift in unanchored periodic networks.
-      - Periodic gradient recomputation in Barzilai-Borwein batches to prevent single-precision drift.
-      - Multi-RHS 3D Block-SpMV formulation: represent isotropic spring networks as an $N \times N$ scalar network Laplacian rather than a $3N \times 3N$ sparse matrix, achieving an exact $3\times$ matrix storage and memory bandwidth reduction with fused 3-RHS SpMM kernels (`csr_spmm_3rhs`, `csr_spmm_3rhs_coop8`).
+      - Periodic gradient recomputation in Barzilai-Borwein batches and mixed-precision iterative refinement in `solveSLEMetalCG3D` for tight tolerances (`< 1e-5`) to prevent single-precision drift.
+      - Multi-RHS 3D Block-SpMV formulation: represent isotropic spring networks as an $N \times N$ scalar network Laplacian rather than a $3N \times 3N$ sparse matrix, achieving an exact $3\times$ matrix storage and memory bandwidth reduction with fused 3-RHS SpMM kernels (`csr_spmm_3rhs`, `csr_spmm_3rhs_coop8`), and extend the scalar $N \times N$ + 3-RHS formulation to CPU direct and iterative solvers in `MEHPForceBalance2`.
+      - In-place CSR system matrix and RHS updates when strands break (`breakTooLongStrands` with `BrokenSpringRecord`) under `NO_SIMPLIFICATION`, avoiding full triplet re-assembly across outer breaking iterations.
       - GPU-resident Jacobi (diagonal scaling) preconditioning (`bufInvDiag`, `pcg_apply_jacobi_and_dot_3d`), accelerating Conjugate Gradient convergence by 20%–40% on heterogeneous polymer networks.
       - End-to-end GPU spring evaluation (`evaluateSpringStrainAndInactivityMetal`) to evaluate strand overextension and inactivity cutoffs directly on-device using GPU-resident coordinates, skipping outer relaxation loops when no bonds break.
       - Pure SpMV benchmarking utility (`benchmarkSpMVMetal`) and standalone 3D SpMV verification (`spmvMetal3D`).
 - Fix `ADD_ITERATIONS` assertion in `MEHPForceBalance2` when residual vector is zero.
 - Add comprehensive Catch2 accuracy benchmarks and tests for Metal KPM, Jacobi, Conjugate Gradient, Barzilai-Borwein solvers, buffer pooling, and zero-mode projection with cross-platform build guards.
+
+### Topological Resistance Distance & Rouse Brownian Dynamics
+- Add `ResistanceDistanceAnalysis` (`pylimer_tools_cpp.ResistanceDistanceAnalysis`) for graph-Laplacian topological analysis:
+  - Single-pair, batched multi-RHS (`computeEffectiveResistanceBatched`), and all-pairs effective resistance distance calculations with disconnected component support.
+  - Kirchhoff index (direct and spectral), Moore-Penrose Laplacian pseudo-inverse, node resistance centrality, and random-walk commute times.
+  - Canonical topology factories (`createLinearChain`, `createRing`, `createComplete`, `createStar`).
+- Add `RouseBrownianSimulator` (`pylimer_tools_cpp.RouseBrownianSimulator`, `RouseSimulationResult`, `RouseSolverType`) for implicit backward-Euler Rouse and Brownian dynamics simulations of polymer chains and spring networks:
+  - Single scalar shifted-Laplacian factorization ($A = I + \Delta t (k/\gamma) L$) reused across all 3 spatial RHS columns (`DIRECT_LDLT`, `DIRECT_LLT`, `CONJUGATE_GRADIENT`).
+  - Support for thermal noise, deterministic relaxation, external forces, and trajectory observables (bead MSD, center-of-mass MSD, end-to-end vector autocorrelation, radius of gyration, and potential energy).
 
 ## v0.4.1
 

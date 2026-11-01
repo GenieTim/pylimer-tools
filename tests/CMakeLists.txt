@@ -81,6 +81,7 @@ add_library(test_sources
         pylimer_tools_cpp/test_neighbourlist.cpp
         pylimer_tools_cpp/test_normal_mode_analysis.cpp
         pylimer_tools_cpp/test_readers_writers.cpp
+        pylimer_tools_cpp/test_rouse_resistance.cpp
         pylimer_tools_cpp/test_topo.cpp
         pylimer_tools_cpp/test_universe.cpp
         pylimer_tools_cpp/test_universesequence.cpp

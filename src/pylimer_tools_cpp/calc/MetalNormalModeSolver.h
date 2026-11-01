@@ -37,6 +37,7 @@ computeAllEigenvaluesMetal(const Eigen::SparseMatrix<double>& mat,
  * estimation
  * @param c Spectral shift parameter
  * @param w Spectral scale parameter
+ * @param batchSize Batch size for multi-RHS block SpMM (1, 4, or 8; default 4)
  * @return Damped Chebyshev moments vector
  */
 Eigen::VectorXd
@@ -44,6 +45,7 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
                                 size_t numMoments,
                                 size_t numRandomVectors,
                                 double c,
-                                double w);
+                                double w,
+                                size_t batchSize = 4);
 
 } // namespace pylimer_tools::calc

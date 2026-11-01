@@ -9,6 +9,7 @@
 #include "../sim/MEHPForceBalance2.h"
 #include "../sim/MEHPForceEvaluator.h"
 #include "../sim/MEHPForceRelaxation.h"
+#include "../sim/RouseBrownianSimulator.h"
 
 #include <cassert>
 #include <pybind11/eigen.h>
@@ -2564,6 +2565,150 @@ A strand is a chain of connected links between two crosslinks.
           
           Checks internal data structure consistency and throws exceptions if issues are found.
          )pbdoc");
+
+  py::enum_<RouseSolverType>(m, "RouseSolverType")
+    .value("DIRECT_LDLT", RouseSolverType::DIRECT_LDLT)
+    .value("DIRECT_LLT", RouseSolverType::DIRECT_LLT)
+    .value("CONJUGATE_GRADIENT", RouseSolverType::CONJUGATE_GRADIENT)
+    .export_values();
+
+  py::class_<RouseSimulationResult, py::smart_holder>(m,
+                                                      "RouseSimulationResult")
+    .def_readonly("times", &RouseSimulationResult::times)
+    .def_readonly("msd", &RouseSimulationResult::msd)
+    .def_readonly("msd_center_of_mass", &RouseSimulationResult::msdCenterOfMass)
+    .def_readonly("end_to_end_correlation",
+                  &RouseSimulationResult::endToEndCorrelation)
+    .def_readonly("trajectory", &RouseSimulationResult::trajectory);
+
+  py::class_<RouseBrownianSimulator, py::smart_holder>(m,
+                                                       "RouseBrownianSimulator")
+    .def(py::init<const std::vector<size_t>&,
+                  const std::vector<size_t>&,
+                  double,
+                  double,
+                  double,
+                  double,
+                  size_t>(),
+         py::arg("spring_from"),
+         py::arg("spring_to"),
+         py::arg("gamma") = 1.0,
+         py::arg("k") = 1.0,
+         py::arg("T") = 1.0,
+         py::arg("dt") = 0.01,
+         py::arg("num_nodes") = 0)
+    .def(py::init<const Eigen::SparseMatrix<double>&,
+                  double,
+                  double,
+                  double,
+                  double>(),
+         py::arg("L"),
+         py::arg("gamma") = 1.0,
+         py::arg("k") = 1.0,
+         py::arg("T") = 1.0,
+         py::arg("dt") = 0.01)
+    .def_static(
+      "create_linear_chain",
+      [](size_t num_nodes, double gamma, double k, double T, double dt) {
+        return std::unique_ptr<RouseBrownianSimulator>(
+          new RouseBrownianSimulator(RouseBrownianSimulator::createLinearChain(
+            num_nodes, gamma, k, T, dt)));
+      },
+      py::arg("num_nodes"),
+      py::arg("gamma") = 1.0,
+      py::arg("k") = 1.0,
+      py::arg("T") = 1.0,
+      py::arg("dt") = 0.01)
+    .def_static(
+      "create_ring",
+      [](size_t num_nodes, double gamma, double k, double T, double dt) {
+        return std::unique_ptr<RouseBrownianSimulator>(
+          new RouseBrownianSimulator(
+            RouseBrownianSimulator::createRing(num_nodes, gamma, k, T, dt)));
+      },
+      py::arg("num_nodes"),
+      py::arg("gamma") = 1.0,
+      py::arg("k") = 1.0,
+      py::arg("T") = 1.0,
+      py::arg("dt") = 0.01)
+    .def_static(
+      "create_star",
+      [](size_t num_arms,
+         size_t arm_length,
+         double gamma,
+         double k,
+         double T,
+         double dt) {
+        return std::unique_ptr<RouseBrownianSimulator>(
+          new RouseBrownianSimulator(RouseBrownianSimulator::createStar(
+            num_arms, arm_length, gamma, k, T, dt)));
+      },
+      py::arg("num_arms"),
+      py::arg("arm_length") = 1,
+      py::arg("gamma") = 1.0,
+      py::arg("k") = 1.0,
+      py::arg("T") = 1.0,
+      py::arg("dt") = 0.01)
+    .def("get_nr_of_nodes", &RouseBrownianSimulator::getNrOfNodes)
+    .def("get_gamma", &RouseBrownianSimulator::getGamma)
+    .def("get_k", &RouseBrownianSimulator::getK)
+    .def("get_temperature", &RouseBrownianSimulator::getTemperature)
+    .def("get_dt", &RouseBrownianSimulator::getDt)
+    .def("get_diffusion_coefficient",
+         &RouseBrownianSimulator::getDiffusionCoefficient)
+    .def("set_parameters", &RouseBrownianSimulator::setParameters)
+    .def("set_gamma", &RouseBrownianSimulator::setGamma)
+    .def("set_k", &RouseBrownianSimulator::setK)
+    .def("set_temperature", &RouseBrownianSimulator::setTemperature)
+    .def("set_dt", &RouseBrownianSimulator::setDt)
+    .def("set_solver_type", &RouseBrownianSimulator::setSolverType)
+    .def("set_seed", &RouseBrownianSimulator::setSeed)
+    .def("set_positions", &RouseBrownianSimulator::setPositions)
+    .def("get_positions", &RouseBrownianSimulator::getPositions)
+    .def("initialize_linear_positions",
+         &RouseBrownianSimulator::initializeLinearPositions,
+         py::arg("bond_length") = 1.0,
+         py::arg("axis") = 0)
+    .def("initialize_random_walk",
+         &RouseBrownianSimulator::initializeRandomWalk,
+         py::arg("bond_length") = 1.0,
+         py::arg("seed") = 42)
+    .def("get_laplacian", &RouseBrownianSimulator::getLaplacian)
+    .def("get_shifted_matrix", &RouseBrownianSimulator::getShiftedMatrix)
+    .def("step", &RouseBrownianSimulator::step, py::arg("num_steps") = 1)
+    .def("step_with_external_forces",
+         &RouseBrownianSimulator::stepWithExternalForces,
+         py::arg("forces"),
+         py::arg("num_steps") = 1)
+    .def("step_deterministic",
+         &RouseBrownianSimulator::stepDeterministic,
+         py::arg("num_steps") = 1)
+    .def("get_center_of_mass", &RouseBrownianSimulator::getCenterOfMass)
+    .def("get_end_to_end_vector",
+         &RouseBrownianSimulator::getEndToEndVector,
+         py::arg("node_a") = 0,
+         py::arg("node_b") = static_cast<size_t>(-1))
+    .def("get_end_to_end_distance",
+         &RouseBrownianSimulator::getEndToEndDistance,
+         py::arg("node_a") = 0,
+         py::arg("node_b") = static_cast<size_t>(-1))
+    .def("get_radius_of_gyration", &RouseBrownianSimulator::getRadiusOfGyration)
+    .def("get_potential_energy", &RouseBrownianSimulator::getPotentialEnergy)
+    .def("run",
+         &RouseBrownianSimulator::run,
+         py::arg("total_steps"),
+         py::arg("sample_interval") = 1,
+         py::arg("save_trajectory") = false,
+         py::arg("end_to_end_node_a") = 0,
+         py::arg("end_to_end_node_b") = static_cast<size_t>(-1))
+    .def_static("compute_msd",
+                &RouseBrownianSimulator::computeMSD,
+                py::arg("trajectory"),
+                py::arg("time_averaged") = false)
+    .def_static("compute_center_of_mass_msd",
+                &RouseBrownianSimulator::computeCenterOfMassMSD,
+                py::arg("trajectory"),
+                py::arg("time_averaged") = false);
 }
 
 #endif /* PYBIND_CALC_H */
