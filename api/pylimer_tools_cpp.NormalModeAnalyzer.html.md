@@ -1,6 +1,6 @@
 # NormalModeAnalyzer
 
-### *class* pylimer_tools_cpp.NormalModeAnalyzer(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), spring_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], spring_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)])
+### *class* pylimer_tools_cpp.NormalModeAnalyzer(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), spring_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], spring_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], nr_of_nodes: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 0)
 
 Bases: `pybind11_object`
 
@@ -15,6 +15,7 @@ Constructs the connectivity matrix from the given edges.
 * **Parameters:**
   * **spring_from** – Vector of starting node indices for springs/bonds
   * **spring_to** – Vector of ending node indices for springs/bonds
+  * **nr_of_nodes** – Optional total number of nodes (to include isolated vertices with index > max)
 
 ### Methods Summary
 

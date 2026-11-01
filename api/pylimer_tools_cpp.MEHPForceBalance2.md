@@ -103,9 +103,11 @@ Overloaded function.
 | [`get_initial_coordinates`](#pylimer_tools_cpp.MEHPForceBalance2.get_initial_coordinates)(self)                     | Get the initial coordinates of the crosslinkers and entanglement links.                                                                            |
 | [`get_neighbour_link_indices`](#pylimer_tools_cpp.MEHPForceBalance2.get_neighbour_link_indices)(network, link_idx)     | Get the indices of neighboring links for a given link.                                                                                             |
 | [`get_nr_of_active_nodes`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_nodes)(self[, tolerance])         | Get the number of active nodes (incl.                                                                                                              |
+| [`get_nr_of_active_partial_springs`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_partial_springs)(self[, ...])     | Get the number of active partial springs remaining after running the simulation.                                                                   |
 | [`get_nr_of_active_spring`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_spring)(self[, tolerance])        | Get the number of active springs remaining after running the simulation.                                                                           |
 | [`get_nr_of_active_springs`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs)(self[, tolerance])       | Get the number of active springs remaining after running the simulation.                                                                           |
 | [`get_nr_of_active_springs_in_dir`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_springs_in_dir)(self, direction)  | Get the number of active springs remaining after running the simulation.                                                                           |
+| [`get_nr_of_active_strands`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_active_strands)(self[, tolerance])       | Get the number of active strands remaining after running the simulation.                                                                           |
 | [`get_nr_of_atoms`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_atoms)(self)                             |                                                                                                                                                    |
 | [`get_nr_of_bonds`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_bonds)(self)                             |                                                                                                                                                    |
 | [`get_nr_of_extra_atoms`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_extra_atoms)(self)                       |                                                                                                                                                    |
@@ -113,7 +115,9 @@ Overloaded function.
 | [`get_nr_of_intra_chain_sliplinks`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_intra_chain_sliplinks)(self)             |                                                                                                                                                    |
 | [`get_nr_of_iterations`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_iterations)(self)                        | Returns the number of iterations used for force relaxation so far.                                                                                 |
 | [`get_nr_of_nodes`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_nodes)(self)                             | Get the number of nodes (crosslinkers) considered in this simulation.                                                                              |
-| [`get_nr_of_springs`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_springs)(self)                           | Get the number of springs considered in this simulation.                                                                                           |
+| [`get_nr_of_partial_springs`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_partial_springs)(self)                   | Get the number of partial springs considered in this simulation.                                                                                   |
+| [`get_nr_of_springs`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_springs)(self)                           | Get the number of springs (strands) considered in this simulation.                                                                                 |
+| [`get_nr_of_strands`](#pylimer_tools_cpp.MEHPForceBalance2.get_nr_of_strands)(self)                           | Get the number of strands considered in this simulation.                                                                                           |
 | [`get_overall_strand_lengths`](#pylimer_tools_cpp.MEHPForceBalance2.get_overall_strand_lengths)(self)                  | Get the sum of the lengths of the springs of each strand.                                                                                          |
 | [`get_pressure`](#pylimer_tools_cpp.MEHPForceBalance2.get_pressure)(self)                                | Returns the pressure at the current state of the simulation.                                                                                       |
 | [`get_soluble_weight_fraction`](#pylimer_tools_cpp.MEHPForceBalance2.get_soluble_weight_fraction)(self[, tolerance])    | Compute the weight fraction of springs connected to active springs (any depth).                                                                    |
@@ -344,6 +348,13 @@ excl. entanglement links [the slip-links created internally when e.g. constructi
 * **Parameters:**
   **tolerance** – springs under this length are considered inactive. A node is active if it has > 1 active springs.
 
+#### get_nr_of_active_partial_springs(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
+
+Get the number of active partial springs remaining after running the simulation.
+
+* **Parameters:**
+  **tolerance** – springs under this length are considered inactive
+
 #### get_nr_of_active_spring(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 > Get the number of active springs remaining after running the simulation.
@@ -363,6 +374,13 @@ excl. entanglement links [the slip-links created internally when e.g. constructi
   * **direction** – The direction in which to compute the active springs (0: x, 1: y, 2: z)
   * **tolerance** – springs under this length are considered inactive
 
+#### get_nr_of_active_strands(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
+
+Get the number of active strands remaining after running the simulation.
+
+* **Parameters:**
+  **tolerance** – strands under this length are considered inactive
+
 #### get_nr_of_atoms(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 #### get_nr_of_bonds(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [int](https://docs.python.org/3/builtins/functions.html#int)
@@ -381,12 +399,17 @@ Returns the number of iterations used for force relaxation so far.
 
 Get the number of nodes (crosslinkers) considered in this simulation.
 
+#### get_nr_of_partial_springs(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [int](https://docs.python.org/3/builtins/functions.html#int)
+
+Get the number of partial springs considered in this simulation.
+
 #### get_nr_of_springs(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
-Get the number of springs considered in this simulation.
+Get the number of springs (strands) considered in this simulation. Alias for get_nr_of_strands.
 
-* **Parameters:**
-  **tolerance** – springs under this length are considered inactive
+#### get_nr_of_strands(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [int](https://docs.python.org/3/builtins/functions.html#int)
+
+Get the number of strands considered in this simulation.
 
 #### get_overall_strand_lengths(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
 
@@ -427,7 +450,7 @@ Get the current spring lengths (norm of vector) divided by the spring partition 
 
 Helper method to debug and/or understand what happens to certain links when being displaced.
 
-#### run_force_relaxation(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), simplification_mode: [pylimer_tools_cpp.StructureSimplificationMode](pylimer_tools_cpp.StructureSimplificationMode.md#pylimer_tools_cpp.StructureSimplificationMode) = StructureSimplificationMode.NO_SIMPLIFICATION, inactive_removal_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-06, sle_solver: [pylimer_tools_cpp.SLESolver](pylimer_tools_cpp.SLESolver.md#pylimer_tools_cpp.SLESolver) = SLESolver.DEFAULT, tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-15, max_iterations: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 10000) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### run_force_relaxation(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), simplification_mode: [pylimer_tools_cpp.StructureSimplificationMode](pylimer_tools_cpp.StructureSimplificationMode.md#pylimer_tools_cpp.StructureSimplificationMode) = StructureSimplificationMode.NO_SIMPLIFICATION, inactive_removal_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-06, sle_solver: [pylimer_tools_cpp.SLESolver](pylimer_tools_cpp.SLESolver.md#pylimer_tools_cpp.SLESolver) = SLESolver.DEFAULT, tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-12, max_iterations: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 10000) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Run the simulation.
 

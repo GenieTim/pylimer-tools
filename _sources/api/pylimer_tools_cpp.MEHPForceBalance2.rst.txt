@@ -47,9 +47,11 @@ MEHPForceBalance2
       ~MEHPForceBalance2.get_initial_coordinates
       ~MEHPForceBalance2.get_neighbour_link_indices
       ~MEHPForceBalance2.get_nr_of_active_nodes
+      ~MEHPForceBalance2.get_nr_of_active_partial_springs
       ~MEHPForceBalance2.get_nr_of_active_spring
       ~MEHPForceBalance2.get_nr_of_active_springs
       ~MEHPForceBalance2.get_nr_of_active_springs_in_dir
+      ~MEHPForceBalance2.get_nr_of_active_strands
       ~MEHPForceBalance2.get_nr_of_atoms
       ~MEHPForceBalance2.get_nr_of_bonds
       ~MEHPForceBalance2.get_nr_of_extra_atoms
@@ -57,7 +59,9 @@ MEHPForceBalance2
       ~MEHPForceBalance2.get_nr_of_intra_chain_sliplinks
       ~MEHPForceBalance2.get_nr_of_iterations
       ~MEHPForceBalance2.get_nr_of_nodes
+      ~MEHPForceBalance2.get_nr_of_partial_springs
       ~MEHPForceBalance2.get_nr_of_springs
+      ~MEHPForceBalance2.get_nr_of_strands
       ~MEHPForceBalance2.get_overall_strand_lengths
       ~MEHPForceBalance2.get_pressure
       ~MEHPForceBalance2.get_soluble_weight_fraction
@@ -108,9 +112,11 @@ MEHPForceBalance2
    .. automethod:: get_initial_coordinates
    .. automethod:: get_neighbour_link_indices
    .. automethod:: get_nr_of_active_nodes
+   .. automethod:: get_nr_of_active_partial_springs
    .. automethod:: get_nr_of_active_spring
    .. automethod:: get_nr_of_active_springs
    .. automethod:: get_nr_of_active_springs_in_dir
+   .. automethod:: get_nr_of_active_strands
    .. automethod:: get_nr_of_atoms
    .. automethod:: get_nr_of_bonds
    .. automethod:: get_nr_of_extra_atoms
@@ -118,7 +124,9 @@ MEHPForceBalance2
    .. automethod:: get_nr_of_intra_chain_sliplinks
    .. automethod:: get_nr_of_iterations
    .. automethod:: get_nr_of_nodes
+   .. automethod:: get_nr_of_partial_springs
    .. automethod:: get_nr_of_springs
+   .. automethod:: get_nr_of_strands
    .. automethod:: get_overall_strand_lengths
    .. automethod:: get_pressure
    .. automethod:: get_soluble_weight_fraction
