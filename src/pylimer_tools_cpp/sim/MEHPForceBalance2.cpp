@@ -734,15 +734,14 @@ MEHPForceBalance2::runForceRelaxation(
     this->assembleOneOverSpringPartition(this->initialConfig);
   const double initialResidual = this->getDisplacementResidualNormFor(
     this->initialConfig, this->currentDisplacements, oneOverSpringPartitions);
-  std::cout << "Starting force balance procedure with a "
-            << SLESolverNames[solverChoice] << " (" << solverChoice << ")"
-            << " solver"
-            << ((solverChoice == SLESolver::DEFAULT ||
-                 solverChoice == SLESolver::AUTO)
-                  ? (" (resolved to " +
-                     SLESolverNames[effectiveSolverChoice] + ")")
-                  : "")
-            << ". Initial residual is " << initialResidual << std::endl;
+  std::cout
+    << "Starting force balance procedure with a "
+    << SLESolverNames[solverChoice] << " (" << solverChoice << ")"
+    << " solver"
+    << ((solverChoice == SLESolver::DEFAULT || solverChoice == SLESolver::AUTO)
+          ? (" (resolved to " + SLESolverNames[effectiveSolverChoice] + ")")
+          : "")
+    << ". Initial residual is " << initialResidual << std::endl;
   std::cout << "Simplification mode is " << simplificationMode << " ("
             << StructureSimplificationModeNames[simplificationMode] << ")"
             << std::endl;
@@ -758,41 +757,19 @@ MEHPForceBalance2::runForceRelaxation(
 
   // reserve triplet list
   std::vector<Eigen::Triplet<double>> triplets;
-  const bool isScalarSolver =
-    (effectiveSolverChoice == SLESolver::SIMPLICIAL_LLT ||
-     effectiveSolverChoice == SLESolver::SIMPLICIAL_LDLT ||
-     effectiveSolverChoice == SLESolver::SPARSE_LU ||
-     effectiveSolverChoice == SLESolver::SPARSE_QR ||
-     effectiveSolverChoice == SLESolver::CONJUGATE_GRADIENT ||
-     effectiveSolverChoice == SLESolver::CONJUGATE_GRADIENT_IDENTITY ||
-     effectiveSolverChoice == SLESolver::CONJUGATE_GRADIENT_DIAGONALIZED ||
-     effectiveSolverChoice == SLESolver::CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY ||
-     effectiveSolverChoice == SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT ||
-     effectiveSolverChoice == SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED ||
-     effectiveSolverChoice == SLESolver::LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY ||
-     effectiveSolverChoice == SLESolver::BICGSTAB ||
-     effectiveSolverChoice == SLESolver::BICGSTAB_DIAGONALIZED ||
-     effectiveSolverChoice == SLESolver::BICGSTAB_IDENTITY ||
-     effectiveSolverChoice == SLESolver::BICGSTAB_INCOMPLETE_LU ||
-     effectiveSolverChoice == SLESolver::METAL_CG ||
-     effectiveSolverChoice == SLESolver::METAL_BARZILAI_BORWEIN);
 #ifdef USE_METAL
   const bool isMetalSolver =
     (effectiveSolverChoice == SLESolver::METAL_CG ||
      effectiveSolverChoice == SLESolver::METAL_BARZILAI_BORWEIN);
 #endif
   // diagonal + the lower of the two components of each spring
-  triplets.reserve(isScalarSolver ? (this->initialConfig.nrOfLinks +
-                                     this->initialConfig.nrOfSprings * 2)
-                                  : (this->initialConfig.nrOfLinks * 3 +
-                                     this->initialConfig.nrOfSprings * 3 * 2));
+  triplets.reserve(this->initialConfig.nrOfLinks +
+                   this->initialConfig.nrOfSprings * 2);
   // reserve space for constants
   Eigen::VectorXd constants =
     Eigen::VectorXd(this->initialConfig.nrOfLinks * 3);
   // it's a bit more efficient to sum the diagonal ourselves
-  Eigen::VectorXd diagonal =
-    Eigen::VectorXd(isScalarSolver ? this->initialConfig.nrOfLinks
-                                   : (this->initialConfig.nrOfLinks * 3));
+  Eigen::VectorXd diagonal = Eigen::VectorXd(this->initialConfig.nrOfLinks);
 
   Eigen::SparseMatrix<double> sysMatrix;
   bool matrixNeedsRebuild = true;
@@ -811,114 +788,52 @@ MEHPForceBalance2::runForceRelaxation(
       triplets.clear();
       constants.resize(this->initialConfig.nrOfLinks * 3);
       constants.setZero();
-      diagonal.resize(isScalarSolver ? this->initialConfig.nrOfLinks
-                                     : (this->initialConfig.nrOfLinks * 3));
+      diagonal.resize(this->initialConfig.nrOfLinks);
       diagonal.setZero();
 
-      if (isScalarSolver) {
-        // Multi-RHS 3D Block formulation: keep scalar N x N network Laplacian
-        for (size_t springIdx = 0; springIdx < this->initialConfig.nrOfSprings;
-             ++springIdx) {
-          size_t idxA = this->initialConfig.springIndexA[springIdx];
-          size_t idxB = this->initialConfig.springIndexB[springIdx];
-          if (idxA == idxB) {
-            continue;
-          }
-          double oneOverContourLengthFraction =
-            1.0 / (this->initialConfig.springContourLength[springIdx]);
-          double multiplier = this->kappa * oneOverContourLengthFraction;
-          assert(idxA < this->initialConfig.nrOfLinks);
-          assert(idxB < this->initialConfig.nrOfLinks);
-
-          triplets.emplace_back(idxA, idxB, multiplier);
-          triplets.emplace_back(idxB, idxA, multiplier);
-          diagonal[idxA] -= multiplier;
-          diagonal[idxB] -= multiplier;
-
-          // Constants b in Ax = b (3 components per link)
-          constants.segment(3 * idxA, 3) -=
-            this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
-            multiplier;
-          constants.segment(3 * idxB, 3) +=
-            this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
-            multiplier;
-          if (this->is2D) {
-            constants[3 * idxA + 2] = 0.0;
-            constants[3 * idxB + 2] = 0.0;
-          }
+      // Scalar N x N network Laplacian
+      for (size_t springIdx = 0; springIdx < this->initialConfig.nrOfSprings;
+           ++springIdx) {
+        size_t idxA = this->initialConfig.springIndexA[springIdx];
+        size_t idxB = this->initialConfig.springIndexB[springIdx];
+        if (idxA == idxB) {
+          continue;
         }
+        double oneOverContourLengthFraction =
+          1.0 / (this->initialConfig.springContourLength[springIdx]);
+        double multiplier = this->kappa * oneOverContourLengthFraction;
+        assert(idxA < this->initialConfig.nrOfLinks);
+        assert(idxB < this->initialConfig.nrOfLinks);
 
-        for (size_t linkIdx = 0; linkIdx < this->initialConfig.nrOfLinks;
-             ++linkIdx) {
-          triplets.emplace_back(linkIdx, linkIdx, diagonal[linkIdx]);
-        }
-      } else {
-        // 3N x 3N formulation for CPU solvers
-        const size_t numDirs = this->is2D ? 2 : 3;
-        for (size_t springIdx = 0; springIdx < this->initialConfig.nrOfSprings;
-             ++springIdx) {
-          if (this->initialConfig.springIndexA[springIdx] ==
-              this->initialConfig.springIndexB[springIdx]) {
-            continue;
-          }
-          double oneOverContourLengthFraction =
-            1.0 / (this->initialConfig.springContourLength[springIdx]);
-          double multiplier = this->kappa * oneOverContourLengthFraction;
-          assert(this->initialConfig.springIndexA[springIdx] <
-                 this->initialConfig.nrOfLinks);
-          assert(this->initialConfig.springIndexB[springIdx] <
-                 this->initialConfig.nrOfLinks);
-          for (size_t dir = 0; dir < numDirs; ++dir) {
-            triplets.push_back(Eigen::Triplet<double>(
-              this->initialConfig.springIndexA[springIdx] * 3 + dir,
-              this->initialConfig.springIndexB[springIdx] * 3 + dir,
-              1. * multiplier));
-            triplets.push_back(Eigen::Triplet<double>(
-              this->initialConfig.springIndexB[springIdx] * 3 + dir,
-              this->initialConfig.springIndexA[springIdx] * 3 + dir,
-              1. * multiplier));
-          }
-          for (size_t dir = 0; dir < numDirs; ++dir) {
-            diagonal[3 * this->initialConfig.springIndexA[springIdx] + dir] -=
-              multiplier;
-            diagonal[3 * this->initialConfig.springIndexB[springIdx] + dir] -=
-              multiplier;
+        triplets.emplace_back(idxA, idxB, multiplier);
+        triplets.emplace_back(idxB, idxA, multiplier);
+        diagonal[idxA] -= multiplier;
+        diagonal[idxB] -= multiplier;
 
-            // the constants, b in Ax = b
-            constants[3 * this->initialConfig.springIndexA[springIdx] + dir] -=
-              this->initialConfig.springBoxOffset[3 * springIdx + dir] *
-              multiplier;
-            constants[3 * this->initialConfig.springIndexB[springIdx] + dir] +=
-              this->initialConfig.springBoxOffset[3 * springIdx + dir] *
-              multiplier;
-          }
+        // Constants b in Ax = b (3 components per link)
+        constants.segment(3 * idxA, 3) -=
+          this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
+          multiplier;
+        constants.segment(3 * idxB, 3) +=
+          this->initialConfig.springBoxOffset.segment(3 * springIdx, 3) *
+          multiplier;
+        if (this->is2D) {
+          constants[3 * idxA + 2] = 0.0;
+          constants[3 * idxB + 2] = 0.0;
         }
+      }
 
-        for (size_t linkIdx = 0; linkIdx < this->initialConfig.nrOfLinks;
-             ++linkIdx) {
-          for (size_t dir = 0; dir < numDirs; ++dir) {
-            triplets.push_back(
-              Eigen::Triplet<double>(linkIdx * 3 + dir,
-                                     linkIdx * 3 + dir,
-                                     diagonal(linkIdx * 3 + dir)));
-          }
-          if (this->is2D) {
-            triplets.push_back(
-              Eigen::Triplet<double>(linkIdx * 3 + 2, linkIdx * 3 + 2, 1.0));
-            constants[linkIdx * 3 + 2] =
-              this->initialConfig.coordinates[linkIdx * 3 + 2];
-          }
-        }
+      for (size_t linkIdx = 0; linkIdx < this->initialConfig.nrOfLinks;
+           ++linkIdx) {
+        triplets.emplace_back(linkIdx, linkIdx, diagonal[linkIdx]);
       }
 
       if (triplets.empty()) {
         break;
       }
 
-      sysMatrix.resize(isScalarSolver ? this->initialConfig.nrOfLinks
-                                      : (this->initialConfig.nrOfLinks * 3),
-                       isScalarSolver ? this->initialConfig.nrOfLinks
-                                      : (this->initialConfig.nrOfLinks * 3));
+      sysMatrix.resize(this->initialConfig.nrOfLinks,
+                       this->initialConfig.nrOfLinks);
       sysMatrix.setFromTriplets(triplets.begin(), triplets.end());
       sysMatrix.makeCompressed();
       matrixNeedsRebuild = false;
@@ -968,20 +883,6 @@ MEHPForceBalance2::runForceRelaxation(
               std::to_string(effectiveSolverChoice) + " (" +                   \
               std::to_string(SLESolverNames[effectiveSolverChoice]) +          \
               "). Solver info: " + std::to_string(solver.info()));
-
-#define COMPUTE_SOLVE(solver)                                                  \
-  if (constants.isZero(1e-9)) {                                                \
-    finalCoordinates = Eigen::VectorXd::Zero(constants.size());                \
-  } else {                                                                     \
-    solver.compute(sysMatrix);                                                 \
-    if (solver.info() != Eigen::Success) {                                     \
-      SOLVER_FAILED("System matrix computation failed");                       \
-    }                                                                          \
-    finalCoordinates = solver.solve(constants);                                \
-    if (solver.info() != Eigen::Success) {                                     \
-      SOLVER_FAILED("System could not be solved");                             \
-    }                                                                          \
-  }
 
 #define COMPUTE_SOLVE_SCALAR_DIRECT(solver)                                    \
   if (constants.isZero(1e-9)) {                                                \
@@ -1083,37 +984,48 @@ MEHPForceBalance2::runForceRelaxation(
     // Common parameters for gradient descent solvers
     constexpr double gradientDescentLearningRate = 0.01;
 
-    // Define common callback for gradient descent solvers to handle output and
-    // interrupts
-    auto createGradientDescentCallback = [&](size_t& iterationsDone) {
-      return [&](int currentIteration,
-                 const Eigen::VectorXd& currentSolution) -> bool {
-        // Temporarily update the current displacements for handleOutput
-        Eigen::VectorXd oldDisplacements = this->currentDisplacements;
-        this->currentDisplacements =
-          currentSolution - this->initialConfig.coordinates;
-
-        this->handleOutput(iterationsDone + currentIteration);
-        bool shouldStop = shouldInterrupt();
-
-        // Restore the previous displacements if not stopping
-        if (!shouldStop) {
-          this->currentDisplacements = oldDisplacements;
-        }
-
-        return shouldStop;
-      };
-    };
-
-    // Helper function to handle gradient descent solver results
-    auto handleGradientDescentResult = [&](int solverIterations) {
-      if (solverIterations >= maxIterations) {
-        this->exitReason = ExitReason::MAX_STEPS;
-      } else {
-        this->exitReason = ExitReason::X_TOLERANCE;
-      }
-      iterationsDone += solverIterations;
-    };
+#define SOLVE_SCALAR_GRADIENT_DESCENT(callSolve)                               \
+  if (constants.isZero(1e-9)) {                                                \
+    finalCoordinates = Eigen::VectorXd::Zero(constants.size());                \
+    this->exitReason = ExitReason::X_TOLERANCE;                                \
+  } else {                                                                     \
+    const size_t nLinks = this->initialConfig.nrOfLinks;                       \
+    Eigen::MatrixX3d B(nLinks, 3);                                             \
+    for (size_t i = 0; i < nLinks; ++i) {                                      \
+      B(i, 0) = constants[3 * i];                                              \
+      B(i, 1) = constants[3 * i + 1];                                          \
+      B(i, 2) = constants[3 * i + 2];                                          \
+    }                                                                          \
+    Eigen::MatrixX3d X(nLinks, 3);                                             \
+    int maxColIterations = 0;                                                  \
+    for (int col = 0; col < (this->is2D ? 2 : 3); ++col) {                     \
+      Eigen::VectorXd initCol(nLinks);                                         \
+      for (size_t i = 0; i < nLinks; ++i) {                                    \
+        initCol[i] = initialSolution[3 * i + col];                             \
+      }                                                                        \
+      int colIterations = 0;                                                   \
+      X.col(col) = callSolve(B.col(col), initCol, colIterations);              \
+      maxColIterations = std::max(maxColIterations, colIterations);            \
+      iterationsDone += colIterations;                                         \
+    }                                                                          \
+    if (this->is2D) {                                                          \
+      for (size_t i = 0; i < nLinks; ++i) {                                    \
+        X(i, 2) = this->initialConfig.coordinates[3 * i + 2];                  \
+      }                                                                        \
+    }                                                                          \
+    finalCoordinates.resize(3 * nLinks);                                       \
+    for (size_t i = 0; i < nLinks; ++i) {                                      \
+      finalCoordinates[3 * i] = X(i, 0);                                       \
+      finalCoordinates[3 * i + 1] = X(i, 1);                                   \
+      finalCoordinates[3 * i + 2] = X(i, 2);                                   \
+    }                                                                          \
+    if (maxColIterations >= maxIterations) {                                   \
+      this->exitReason = ExitReason::MAX_STEPS;                                \
+    } else {                                                                   \
+      this->exitReason = ExitReason::X_TOLERANCE;                              \
+    }                                                                          \
+  }                                                                            \
+  break;
 
     switch (effectiveSolverChoice) {
       // iterative solvers
@@ -1174,68 +1086,55 @@ MEHPForceBalance2::runForceRelaxation(
         SOLVE_ITERATIVE(solver);
       }
       case SLESolver::GRADIENT_DESCENT: {
-        int solverIterations = 0;
-        auto callback = createGradientDescentCallback(iterationsDone);
-
-        finalCoordinates = Eigen::gradientDescent(sysMatrix,
-                                                  constants,
-                                                  gradientDescentLearningRate,
-                                                  std::sqrt(residualReduction),
-                                                  maxIterations,
-                                                  solverIterations,
-                                                  initialSolution,
-                                                  // initial solution
-                                                  std::sqrt(initialResidual),
-                                                  // initial residual
-                                                  callback);
-
-        handleGradientDescentResult(solverIterations);
-        break;
+        SOLVE_SCALAR_GRADIENT_DESCENT([&](const Eigen::VectorXd& bCol,
+                                          const Eigen::VectorXd& initCol,
+                                          int& colIterations) {
+          return Eigen::gradientDescent(
+            sysMatrix,
+            bCol,
+            gradientDescentLearningRate,
+            std::sqrt(residualReduction),
+            maxIterations,
+            colIterations,
+            initCol,
+            -1.0,
+            [&](int, const Eigen::VectorXd&) { return shouldInterrupt(); });
+        });
       }
-      case SLESolver::DEFAULT:
-      case SLESolver::AUTO:
       case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT:
       case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG: {
-        int solverIterations = 0;
-        auto callback = createGradientDescentCallback(iterationsDone);
-
-        finalCoordinates = Eigen::gradientDescentBarzilaiBorwein(
-          sysMatrix,
-          constants,
-          gradientDescentLearningRate,
-          std::sqrt(residualReduction),
-          maxIterations,
-          solverIterations,
-          effectiveSolverChoice ==
-            SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT,
-          initialSolution,
-          // initial solution
-          std::sqrt(initialResidual),
-          // initial residual
-          callback);
-
-        handleGradientDescentResult(solverIterations);
-        break;
+        SOLVE_SCALAR_GRADIENT_DESCENT([&](const Eigen::VectorXd& bCol,
+                                          const Eigen::VectorXd& initCol,
+                                          int& colIterations) {
+          return Eigen::gradientDescentBarzilaiBorwein(
+            sysMatrix,
+            bCol,
+            gradientDescentLearningRate,
+            std::sqrt(residualReduction),
+            maxIterations,
+            colIterations,
+            effectiveSolverChoice ==
+              SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT,
+            initCol,
+            -1.0,
+            [&](int, const Eigen::VectorXd&) { return shouldInterrupt(); });
+        });
       }
       case SLESolver::GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM: {
-        int solverIterations = 0;
-        auto callback = createGradientDescentCallback(iterationsDone);
-
-        finalCoordinates = Eigen::gradientDescentHeavyBallBarzilaiBorwein(
-          sysMatrix,
-          constants,
-          gradientDescentLearningRate,
-          std::sqrt(residualReduction),
-          maxIterations,
-          solverIterations,
-          initialSolution,
-          // initial solution
-          std::sqrt(initialResidual),
-          // initial residual
-          callback);
-
-        handleGradientDescentResult(solverIterations);
-        break;
+        SOLVE_SCALAR_GRADIENT_DESCENT([&](const Eigen::VectorXd& bCol,
+                                          const Eigen::VectorXd& initCol,
+                                          int& colIterations) {
+          return Eigen::gradientDescentHeavyBallBarzilaiBorwein(
+            sysMatrix,
+            bCol,
+            gradientDescentLearningRate,
+            std::sqrt(residualReduction),
+            maxIterations,
+            colIterations,
+            initCol,
+            -1.0,
+            [&](int, const Eigen::VectorXd&) { return shouldInterrupt(); });
+        });
       }
       // direct solvers
       case SLESolver::SIMPLICIAL_LLT: {
@@ -1340,10 +1239,10 @@ MEHPForceBalance2::runForceRelaxation(
     }
 
 #undef SOLVER_FAILED
-#undef COMPUTE_SOLVE
 #undef ADD_ITERATIONS
 #undef SOLVE_ITERATIVE
 #undef SOLVE_DIRECT
+#undef SOLVE_SCALAR_GRADIENT_DESCENT
 
     this->currentDisplacements =
       finalCoordinates - this->initialConfig.coordinates;
@@ -1480,35 +1379,17 @@ MEHPForceBalance2::runForceRelaxation(
       if (shouldRebuildDueToThreshold) {
         matrixNeedsRebuild = true;
       } else {
-        if (isScalarSolver) {
-          for (const auto& bs : brokenSprings) {
-            sysMatrix.coeffRef(bs.idxA, bs.idxB) -= bs.multiplier;
-            sysMatrix.coeffRef(bs.idxB, bs.idxA) -= bs.multiplier;
-            sysMatrix.coeffRef(bs.idxA, bs.idxA) += bs.multiplier;
-            sysMatrix.coeffRef(bs.idxB, bs.idxB) += bs.multiplier;
+        for (const auto& bs : brokenSprings) {
+          sysMatrix.coeffRef(bs.idxA, bs.idxB) -= bs.multiplier;
+          sysMatrix.coeffRef(bs.idxB, bs.idxA) -= bs.multiplier;
+          sysMatrix.coeffRef(bs.idxA, bs.idxA) += bs.multiplier;
+          sysMatrix.coeffRef(bs.idxB, bs.idxB) += bs.multiplier;
 
-            constants.segment<3>(3 * bs.idxA) += bs.offset * bs.multiplier;
-            constants.segment<3>(3 * bs.idxB) -= bs.offset * bs.multiplier;
-            if (this->is2D) {
-              constants[3 * bs.idxA + 2] = 0.0;
-              constants[3 * bs.idxB + 2] = 0.0;
-            }
-          }
-        } else {
-          const size_t numDirs = this->is2D ? 2 : 3;
-          for (const auto& bs : brokenSprings) {
-            for (size_t dir = 0; dir < numDirs; ++dir) {
-              sysMatrix.coeffRef(3 * bs.idxA + dir, 3 * bs.idxB + dir) -=
-                bs.multiplier;
-              sysMatrix.coeffRef(3 * bs.idxB + dir, 3 * bs.idxA + dir) -=
-                bs.multiplier;
-              sysMatrix.coeffRef(3 * bs.idxA + dir, 3 * bs.idxA + dir) +=
-                bs.multiplier;
-              sysMatrix.coeffRef(3 * bs.idxB + dir, 3 * bs.idxB + dir) +=
-                bs.multiplier;
-              constants[3 * bs.idxA + dir] += bs.offset[dir] * bs.multiplier;
-              constants[3 * bs.idxB + dir] -= bs.offset[dir] * bs.multiplier;
-            }
+          constants.segment<3>(3 * bs.idxA) += bs.offset * bs.multiplier;
+          constants.segment<3>(3 * bs.idxB) -= bs.offset * bs.multiplier;
+          if (this->is2D) {
+            constants[3 * bs.idxA + 2] = 0.0;
+            constants[3 * bs.idxB + 2] = 0.0;
           }
         }
         matrixNeedsRebuild = false;

@@ -1750,9 +1750,9 @@ A strand is a chain of connected links between two crosslinks.
             throw std::invalid_argument("Unknown SLESolver string: " + s);
           }
         } else {
-          throw py::type_error(
-            "sle_solver must be a SLESolver enum or string ('auto', 'metal_cg', "
-            "'cg', etc.)");
+          throw py::type_error("sle_solver must be a SLESolver enum or string "
+                               "('auto', 'metal_cg', "
+                               "'cg', etc.)");
         }
         return sim.runForceRelaxation(
           simplificationMode,
