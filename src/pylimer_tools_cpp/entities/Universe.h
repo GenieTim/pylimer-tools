@@ -45,12 +45,14 @@ public:
   explicit Universe(double Lx = 1., double Ly = 1., double Lz = 1.);
   explicit Universe(const Box& box);
 
-  // rule of three:
-  // 1. destructor (to destroy the graph)
+  // rule of five:
+  // 1. destructor
   ~Universe() override;
   // 2. copy constructor
   Universe(const Universe& src);
-  // 3. copy assignment operator
+  // 3. move constructor
+  Universe(Universe&& other) noexcept;
+  // 4. copy/move assignment operator (copy-and-swap)
   Universe& operator=(Universe src);
 
   // equality operator
@@ -123,6 +125,12 @@ public:
   void initializeFromGraph(const igraph_t* ingraph);
   void removeAllAngles();
   void removeAllDihedralAngles();
+
+  void clearCaches() const override
+  {
+    this->cachedChainsWithCrosslinker_.clear();
+    this->cachedMolecules_.clear();
+  }
 
   // adjustments
   void resampleVelocities(double mean,
@@ -317,6 +325,11 @@ protected:
   std::map<int, double>
     massPerType = {}; // a dictionary with key: type, and value: weight per atom
   // of this atom type.
+
+  // caches for expensive structural decompositions
+  mutable std::unordered_map<int, std::vector<Molecule>>
+    cachedChainsWithCrosslinker_{};
+  mutable std::unordered_map<int, std::vector<Molecule>> cachedMolecules_{};
 
   // internal functions
   igraph_vs_t getVerticesOfType(int type) const;

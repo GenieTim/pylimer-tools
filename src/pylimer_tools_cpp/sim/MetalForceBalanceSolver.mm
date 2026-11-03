@@ -2827,8 +2827,8 @@ solveSLEMetalCG3D(const Eigen::SparseMatrix<double>& scalarA,
       }
     }
 
-    // Fallback to CPU double-precision solver on ill-conditioned systems when requested tolerance < 1e-6
-    if (enableCpuFallback && tolerance < 1e-6) {
+    // Fallback to CPU double-precision solver on ill-conditioned systems when GPU did not reach requested tolerance
+    if (enableCpuFallback) {
       double bNorm = b.norm();
       if (bNorm > 1e-20) {
         Eigen::VectorXd Ax = spmvMetal3D(scalarA, res);
@@ -3475,7 +3475,7 @@ solveSLEMetalCG(const Eigen::SparseMatrix<double>& A,
       res[i] = static_cast<double>(finalXPtr[i]);
     }
 
-    if (enableCpuFallback && tolerance < 1e-6) {
+    if (enableCpuFallback) {
       double bNorm = b.norm();
       if (bNorm > 1e-20) {
         Eigen::VectorXd Ax = spmvMetal(A, res);

@@ -14,26 +14,62 @@ extern "C"
 #include <vector>
 
 namespace pylimer_tools::entities {
-AtomGraphParent::AtomGraphParent() {}
+AtomGraphParent::AtomGraphParent()
+{
+  if (!igraph_has_attribute_table()) {
+    igraph_set_attribute_table(&igraph_cattribute_table);
+  }
+  igraph_empty(&this->graph, 0, IGRAPH_UNDIRECTED);
+}
 
-// rule of three:
-// 1. destructor (to destroy the graph)
+// rule of five:
 AtomGraphParent::~AtomGraphParent()
 {
-  // in addition to basic fields being deleted, we need to clean up the
-  // graph
   igraph_destroy(&this->graph);
 }
 
-// 2. copy constructor
-// AtomGraphParent(const AtomGraphParent &src) {
-//   igraph_copy(&this->graph, &src.graph);
-// };
-// 3. copy assignment operator
-// virtual AtomGraphParent &operator=(AtomGraphParent src) {
-//   std::swap(this->graph, src.graph);
-//   return *this;
-// };
+AtomGraphParent::AtomGraphParent(const AtomGraphParent& other)
+  : atomsHaveCustomAttributes(other.atomsHaveCustomAttributes)
+{
+  if (!igraph_has_attribute_table()) {
+    igraph_set_attribute_table(&igraph_cattribute_table);
+  }
+  igraph_copy(&this->graph, &other.graph);
+}
+
+AtomGraphParent&
+AtomGraphParent::operator=(const AtomGraphParent& other)
+{
+  if (this != &other) {
+    this->clearCaches();
+    igraph_destroy(&this->graph);
+    igraph_copy(&this->graph, &other.graph);
+    this->atomsHaveCustomAttributes = other.atomsHaveCustomAttributes;
+  }
+  return *this;
+}
+
+AtomGraphParent::AtomGraphParent(AtomGraphParent&& other) noexcept
+  : atomsHaveCustomAttributes(other.atomsHaveCustomAttributes)
+{
+  this->graph = other.graph;
+  igraph_empty(&other.graph, 0, IGRAPH_UNDIRECTED);
+  other.clearCaches();
+}
+
+AtomGraphParent&
+AtomGraphParent::operator=(AtomGraphParent&& other) noexcept
+{
+  if (this != &other) {
+    this->clearCaches();
+    igraph_destroy(&this->graph);
+    this->graph = other.graph;
+    this->atomsHaveCustomAttributes = other.atomsHaveCustomAttributes;
+    igraph_empty(&other.graph, 0, IGRAPH_UNDIRECTED);
+    other.clearCaches();
+  }
+  return *this;
+}
 
 /**
  * @brief Get the vertex ids connected to a specified vertex Id

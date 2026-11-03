@@ -66,7 +66,7 @@ MEHPForceBalance2::MEHPForceBalance2(
   }
 
   // use directly the graph for performance
-  igraph_t graph = u.getCopyOfGraph();
+  const igraph_t& graph = u.getGraph();
 
   // what we do:
   // 1. find starting points for depth-first search: degree > 2
@@ -432,7 +432,6 @@ MEHPForceBalance2::MEHPForceBalance2(
     }
   }
 
-  igraph_destroy(&graph);
   igraph_inclist_destroy(&incidenceList);
   igraph_adjlist_destroy(&adjacencyList);
 
@@ -719,15 +718,11 @@ MEHPForceBalance2::runForceRelaxation(
   /* array allocation */
   SLESolver effectiveSolverChoice = solverChoice;
   if (solverChoice == SLESolver::DEFAULT || solverChoice == SLESolver::AUTO) {
-#ifdef USE_METAL
-    if (isMetalAvailable()) {
-      effectiveSolverChoice = SLESolver::METAL_CG;
+    if (this->initialConfig.nrOfLinks > this->initialConfig.nrOfNodes) {
+      effectiveSolverChoice = SLESolver::BICGSTAB;
     } else {
       effectiveSolverChoice = SLESolver::CONJUGATE_GRADIENT;
     }
-#else
-    effectiveSolverChoice = SLESolver::CONJUGATE_GRADIENT;
-#endif
   }
 
   Eigen::VectorXd oneOverSpringPartitions =

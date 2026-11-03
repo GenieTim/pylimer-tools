@@ -31,12 +31,14 @@ public:
            MoleculeType type,
            const std::map<int, double>& massPerType);
 
-  // rule of three:
-  // 1. destructor (to destroy the graph)
+  // rule of five:
+  // 1. destructor
   ~Molecule() override;
   // 2. copy constructor
   Molecule(const Molecule& src);
-  // 3. copy assignment operator
+  // 3. move constructor
+  Molecule(Molecule&& other) noexcept;
+  // 4. copy/move assignment operator (copy-and-swap)
   Molecule& operator=(Molecule src);
 
   // other operators

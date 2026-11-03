@@ -139,7 +139,7 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
     numLinksFoundInIteration = 0;
     std::shuffle(
       atomsForNeighbourList.begin(), atomsForNeighbourList.end(), rng);
-    for (pylimer_tools::entities::Atom a1 : atomsForNeighbourList) {
+    for (const pylimer_tools::entities::Atom& a1 : atomsForNeighbourList) {
       size_t atomVertexIdx1 = universe.getIdxByAtomId(a1.getId());
       // make sure this atom does not yet have a pair
       if (pairOfAtom[atomVertexIdx1] != -1) {

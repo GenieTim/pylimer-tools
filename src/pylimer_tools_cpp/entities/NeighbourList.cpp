@@ -115,7 +115,8 @@ namespace entities {
       if (bucketIndex == indexBasis) {
         foundBasis = true;
       }
-      std::vector<size_t> atomIndices = this->neighbourBuckets.at(bucketIndex);
+      const std::vector<size_t>& atomIndices =
+        this->neighbourBuckets.at(bucketIndex);
       for (size_t atomIndex : atomIndices) {
         double distance =
           !unwrapped

@@ -40,38 +40,7 @@ count_found_cycle(const igraph_vector_int_t* vertices,
 
 Universe::Universe(const Box& box)
 {
-  /* turn on attribute handling: TODO: move to some main() function  */
-  if (!igraph_has_attribute_table()) {
-    igraph_set_attribute_table(&igraph_cattribute_table);
-  }
   this->box = box;
-
-  // igraph_vector_t gtypes, vtypes, etypes;
-  // igraph_strvector_t gnames, vnames, enames;
-
-  // igraph_vector_init(&gtypes, 0);
-  // igraph_vector_init(&vtypes, 0);
-  // igraph_vector_init(&etypes, 0);
-  // igraph_strvector_init(&gnames, 0);
-  // igraph_strvector_init(&vnames, 0);
-  // igraph_strvector_init(&enames, 0);
-
-  // start setting properties
-  igraph_empty(&this->graph, 0, IGRAPH_UNDIRECTED);
-
-  //
-  // igraph_cattribute_list(&this->graph, &gnames, &gtypes, &vnames, &vtypes,
-  //                        &enames, &etypes);
-
-  // // not sure if the above is really needed as we can destroy the vectors
-  // here already without problems
-  // /* Destroy */
-  // igraph_vector_destroy(&gtypes);
-  // igraph_vector_destroy(&vtypes);
-  // igraph_vector_destroy(&etypes);
-  // igraph_strvector_destroy(&gnames);
-  // igraph_strvector_destroy(&vnames);
-  // igraph_strvector_destroy(&enames);
 }
 
 Universe::Universe(const double Lx, const double Ly, const double Lz)
@@ -79,16 +48,13 @@ Universe::Universe(const double Lx, const double Ly, const double Lz)
 {
 }
 
-// 1. destructor (to destroy the graph)
-Universe::~Universe()
-{
-  // in addition to basic fields being deleted, we need to clean up the graph
-  // as is done in parent
-  igraph_destroy(&this->graph);
-};
+// rule of five:
+// 1. destructor
+Universe::~Universe() = default;
 
 // 2. copy constructor
 Universe::Universe(const Universe& src)
+  : AtomGraphParent(src)
 {
   this->timestep = src.timestep;
   this->NAtoms = src.NAtoms;
@@ -109,15 +75,38 @@ Universe::Universe(const Universe& src)
   // using copy assignement operators ourselfes
   this->box = src.box;
   this->atomIdToVertexIdx = src.atomIdToVertexIdx;
-  this->atomsHaveCustomAttributes = src.atomsHaveCustomAttributes;
   this->massPerType = src.massPerType;
-  igraph_copy(&this->graph, &src.graph);
 };
 
-// 3. copy assignment operator
+// 3. move constructor
+Universe::Universe(Universe&& other) noexcept
+  : AtomGraphParent(std::move(other))
+  , timestep(other.timestep)
+  , NAtoms(other.NAtoms)
+  , NBonds(other.NBonds)
+  , angleFrom(std::move(other.angleFrom))
+  , angleVia(std::move(other.angleVia))
+  , angleTo(std::move(other.angleTo))
+  , angleType(std::move(other.angleType))
+  , dihedralAngleFrom(std::move(other.dihedralAngleFrom))
+  , dihedralAngleVia1(std::move(other.dihedralAngleVia1))
+  , dihedralAngleVia2(std::move(other.dihedralAngleVia2))
+  , dihedralAngleTo(std::move(other.dihedralAngleTo))
+  , dihedralAngleType(std::move(other.dihedralAngleType))
+  , box(other.box)
+  , atomIdToVertexIdx(std::move(other.atomIdToVertexIdx))
+  , massPerType(std::move(other.massPerType))
+{
+  other.clearCaches();
+  other.NAtoms = 0;
+  other.NBonds = 0;
+}
+
+// 4. copy/move assignment operator (copy-and-swap)
 Universe&
 Universe::operator=(Universe src)
 {
+  this->clearCaches();
   std::swap(this->timestep, src.timestep);
   std::swap(this->NAtoms, src.NAtoms);
   std::swap(this->NBonds, src.NBonds);
@@ -137,10 +126,10 @@ Universe::operator=(Universe src)
 
   //
   std::swap(this->box, src.box);
-  std::swap(this->graph, src.graph);
   std::swap(this->atomsHaveCustomAttributes, src.atomsHaveCustomAttributes);
   std::swap(this->atomIdToVertexIdx, src.atomIdToVertexIdx);
   std::swap(this->massPerType, src.massPerType);
+  this->swapGraph(src);
 
   return *this;
 };
@@ -179,7 +168,7 @@ Universe::operator==(const Universe& other) const
 
   // start with comparing the connectivity
   igraph_t difference;
-  igraph_difference(&difference, &this->graph, &other.graph);
+  igraph_difference(&difference, &this->getGraph(), &other.getGraph());
   const igraph_integer_t diff_count = igraph_ecount(&difference);
   igraph_destroy(&difference);
   if (diff_count != 0) {
@@ -209,15 +198,16 @@ Universe::operator!=(const Universe& other) const
 void
 Universe::initializeFromGraph(const igraph_t* ingraph)
 {
-  igraph_destroy(&this->graph);
-  igraph_copy(&this->graph, ingraph);
-  this->NAtoms = igraph_vcount(&this->graph);
-  this->NBonds = igraph_ecount(&this->graph);
+  auto mutator = this->getMutableGraph();
+  igraph_destroy(mutator);
+  igraph_copy(mutator, ingraph);
+  this->NAtoms = igraph_vcount(mutator);
+  this->NBonds = igraph_ecount(mutator);
   // load the ids
   igraph_vector_t allIds;
   igraph_vector_init(&allIds, this->NAtoms);
-  VANV(&this->graph, "id", &allIds);
-  if (igraph_cattribute_VANV(&this->graph, "id", igraph_vss_all(), &allIds)) {
+  VANV(mutator, "id", &allIds);
+  if (igraph_cattribute_VANV(mutator, "id", igraph_vss_all(), &allIds)) {
     throw std::runtime_error(
       "Universes's graph's attribute id is not accessible.");
   };
@@ -284,7 +274,8 @@ Universe::addAtoms(
     }
   }
   // actually add the vertices
-  REQUIRE_IGRAPH_SUCCESS(igraph_add_vertices(&this->graph, NNewAtoms, 0));
+  auto mutator = this->getMutableGraph();
+  REQUIRE_IGRAPH_SUCCESS(igraph_add_vertices(mutator, NNewAtoms, 0));
   this->atomIdToVertexIdx.reserve(this->NAtoms + NNewAtoms);
   // do map for easy access afterwards
   // simultaneously, check that the input ids are unique
@@ -309,52 +300,50 @@ Universe::addAtoms(
     igraph_vector_t valueVec;
     igraph_vector_init(&valueVec, NNewAtoms);
     pylimer_tools::utils::StdVectorToIgraphVectorT(newIds, &valueVec);
-    igraph_cattribute_VAN_setv(&this->graph, "id", &valueVec);
+    igraph_cattribute_VAN_setv(mutator, "id", &valueVec);
     pylimer_tools::utils::StdVectorToIgraphVectorT(newX, &valueVec);
-    igraph_cattribute_VAN_setv(&this->graph, "x", &valueVec);
+    igraph_cattribute_VAN_setv(mutator, "x", &valueVec);
     pylimer_tools::utils::StdVectorToIgraphVectorT(newY, &valueVec);
-    igraph_cattribute_VAN_setv(&this->graph, "y", &valueVec);
+    igraph_cattribute_VAN_setv(mutator, "y", &valueVec);
     pylimer_tools::utils::StdVectorToIgraphVectorT(newZ, &valueVec);
-    igraph_cattribute_VAN_setv(&this->graph, "z", &valueVec);
+    igraph_cattribute_VAN_setv(mutator, "z", &valueVec);
     pylimer_tools::utils::StdVectorToIgraphVectorT(newTypes, &valueVec);
-    igraph_cattribute_VAN_setv(&this->graph, "type", &valueVec);
+    igraph_cattribute_VAN_setv(mutator, "type", &valueVec);
     pylimer_tools::utils::StdVectorToIgraphVectorT(newNx, &valueVec);
-    igraph_cattribute_VAN_setv(&this->graph, "nx", &valueVec);
+    igraph_cattribute_VAN_setv(mutator, "nx", &valueVec);
     pylimer_tools::utils::StdVectorToIgraphVectorT(newNy, &valueVec);
-    igraph_cattribute_VAN_setv(&this->graph, "ny", &valueVec);
+    igraph_cattribute_VAN_setv(mutator, "ny", &valueVec);
     pylimer_tools::utils::StdVectorToIgraphVectorT(newNz, &valueVec);
-    igraph_cattribute_VAN_setv(&this->graph, "nz", &valueVec);
+    igraph_cattribute_VAN_setv(mutator, "nz", &valueVec);
     if (!additionalData.empty()) {
       this->atomsHaveCustomAttributes = true;
       for (const auto& [key, value] : additionalData) {
         pylimer_tools::utils::StdVectorToIgraphVectorT(value, &valueVec);
-        igraph_cattribute_VAN_setv(&this->graph, key.c_str(), &valueVec);
+        igraph_cattribute_VAN_setv(mutator, key.c_str(), &valueVec);
       }
     }
     igraph_vector_destroy(&valueVec);
   } else {
     for (size_t i = 0; i < NNewAtoms; ++i) {
-      igraph_cattribute_VAN_set(
-        &this->graph, "id", this->NAtoms + i, newIds[i]);
-      igraph_cattribute_VAN_set(&this->graph, "x", this->NAtoms + i, newX[i]);
-      igraph_cattribute_VAN_set(&this->graph, "y", this->NAtoms + i, newY[i]);
-      igraph_cattribute_VAN_set(&this->graph, "z", this->NAtoms + i, newZ[i]);
-      igraph_cattribute_VAN_set(
-        &this->graph, "type", this->NAtoms + i, newTypes[i]);
-      igraph_cattribute_VAN_set(&this->graph, "nx", this->NAtoms + i, newNx[i]);
-      igraph_cattribute_VAN_set(&this->graph, "ny", this->NAtoms + i, newNy[i]);
-      igraph_cattribute_VAN_set(&this->graph, "nz", this->NAtoms + i, newNz[i]);
+      igraph_cattribute_VAN_set(mutator, "id", this->NAtoms + i, newIds[i]);
+      igraph_cattribute_VAN_set(mutator, "x", this->NAtoms + i, newX[i]);
+      igraph_cattribute_VAN_set(mutator, "y", this->NAtoms + i, newY[i]);
+      igraph_cattribute_VAN_set(mutator, "z", this->NAtoms + i, newZ[i]);
+      igraph_cattribute_VAN_set(mutator, "type", this->NAtoms + i, newTypes[i]);
+      igraph_cattribute_VAN_set(mutator, "nx", this->NAtoms + i, newNx[i]);
+      igraph_cattribute_VAN_set(mutator, "ny", this->NAtoms + i, newNy[i]);
+      igraph_cattribute_VAN_set(mutator, "nz", this->NAtoms + i, newNz[i]);
       if (!additionalData.empty()) {
         this->atomsHaveCustomAttributes = true;
         for (const auto& [key, value] : additionalData) {
           igraph_cattribute_VAN_set(
-            &this->graph, key.c_str(), this->NAtoms + i, value[i]);
+            mutator, key.c_str(), this->NAtoms + i, value[i]);
         }
       }
     }
   }
   // this->NAtoms += NNewAtoms;
-  this->NAtoms = igraph_vcount(&this->graph);
+  this->NAtoms = igraph_vcount(mutator);
 }
 
 void
@@ -366,16 +355,16 @@ Universe::replaceAtom(const long int id, const Atom& replacement)
                                 "as the one of the atom to be replaced.");
   }
   // this->atomIdToVertexIdx[replacement.getId()] = vertexIdx;
-  igraph_cattribute_VAN_set(&this->graph, "x", vertexIdx, replacement.getX());
-  igraph_cattribute_VAN_set(&this->graph, "y", vertexIdx, replacement.getY());
-  igraph_cattribute_VAN_set(&this->graph, "z", vertexIdx, replacement.getZ());
-  igraph_cattribute_VAN_set(&this->graph, "nx", vertexIdx, replacement.getNX());
-  igraph_cattribute_VAN_set(&this->graph, "ny", vertexIdx, replacement.getNY());
-  igraph_cattribute_VAN_set(&this->graph, "nz", vertexIdx, replacement.getNZ());
-  igraph_cattribute_VAN_set(
-    &this->graph, "type", vertexIdx, replacement.getType());
+  auto mutator = this->getMutableGraph();
+  igraph_cattribute_VAN_set(mutator, "x", vertexIdx, replacement.getX());
+  igraph_cattribute_VAN_set(mutator, "y", vertexIdx, replacement.getY());
+  igraph_cattribute_VAN_set(mutator, "z", vertexIdx, replacement.getZ());
+  igraph_cattribute_VAN_set(mutator, "nx", vertexIdx, replacement.getNX());
+  igraph_cattribute_VAN_set(mutator, "ny", vertexIdx, replacement.getNY());
+  igraph_cattribute_VAN_set(mutator, "nz", vertexIdx, replacement.getNZ());
+  igraph_cattribute_VAN_set(mutator, "type", vertexIdx, replacement.getType());
   for (const auto& [key, value] : replacement.getExtraData()) {
-    igraph_cattribute_VAN_set(&this->graph, key.c_str(), vertexIdx, value);
+    igraph_cattribute_VAN_set(mutator, key.c_str(), vertexIdx, value);
     this->atomsHaveCustomAttributes = true;
   }
 }
@@ -384,7 +373,8 @@ void
 Universe::replaceAtomType(const long int id, const int newType)
 {
   const long int vertexIdx = this->getIdxByAtomId(id);
-  igraph_cattribute_VAN_set(&this->graph, "type", vertexIdx, newType);
+  igraph_cattribute_VAN_set(
+    this->getMutableGraph(), "type", vertexIdx, newType);
 }
 
 void
@@ -406,11 +396,12 @@ Universe::resampleVelocities(const double mean,
   std::normal_distribution<double> dist(mean, variance);
 
   this->atomsHaveCustomAttributes = true;
+  auto mutator = this->getMutableGraph();
   for (igraph_integer_t i = 0; i < this->NAtoms; ++i) {
-    igraph_cattribute_VAN_set(&this->graph, "vx", i, dist(e2));
-    igraph_cattribute_VAN_set(&this->graph, "vy", i, dist(e2));
+    igraph_cattribute_VAN_set(mutator, "vx", i, dist(e2));
+    igraph_cattribute_VAN_set(mutator, "vy", i, dist(e2));
     if (!is2d) {
-      igraph_cattribute_VAN_set(&this->graph, "vz", i, dist(e2));
+      igraph_cattribute_VAN_set(mutator, "vz", i, dist(e2));
     }
   }
 }
@@ -423,15 +414,16 @@ Universe::removeAtoms(const std::vector<long int>& ids)
   for (size_t i = 0; i < ids.size(); ++i) {
     igraph_vector_int_set(&vertexIds, i, this->getIdxByAtomId(ids[i]));
   }
-  igraph_delete_vertices(&this->graph, igraph_vss_vector(&vertexIds));
+  auto mutator = this->getMutableGraph();
+  igraph_delete_vertices(mutator, igraph_vss_vector(&vertexIds));
   igraph_vector_int_destroy(&vertexIds);
 
   // now, we need to update the id-atomId map
   this->atomIdToVertexIdx.clear();
 
   igraph_vector_t atomIds;
-  igraph_vector_init(&atomIds, igraph_vcount(&this->graph));
-  igraph_cattribute_VANV(&this->graph, "id", igraph_vss_all(), &atomIds);
+  igraph_vector_init(&atomIds, igraph_vcount(mutator));
+  igraph_cattribute_VANV(mutator, "id", igraph_vss_all(), &atomIds);
 
   for (size_t i = 0; i < igraph_vector_size(&atomIds); i++) {
     long int atomId = castToIgraphInt(igraph_vector_get(&atomIds, i));
@@ -440,10 +432,10 @@ Universe::removeAtoms(const std::vector<long int>& ids)
 
   igraph_vector_destroy(&atomIds);
 
-  assert(igraph_vcount(&this->graph) == this->NAtoms - ids.size());
+  assert(igraph_vcount(mutator) == this->NAtoms - ids.size());
 
-  this->NAtoms = igraph_vcount(&this->graph);
-  this->NBonds = igraph_ecount(&this->graph);
+  this->NAtoms = igraph_vcount(mutator);
+  this->NBonds = igraph_ecount(mutator);
 }
 
 void
@@ -452,6 +444,7 @@ Universe::removeBonds(const std::vector<long int>& atomIdsFrom,
 {
   INVALIDARG_EXP_IFN(atomIdsFrom.size() == atomIdsTo.size(),
                      "Vertex ids from and to must have the same length.");
+  auto mutator = this->getMutableGraph();
   for (size_t i = 0; i < atomIdsFrom.size(); ++i) {
     std::vector<igraph_integer_t> edgeIds = this->getEdgeIdsFromTo(
       this->getIdxByAtomId(atomIdsFrom[i]), this->getIdxByAtomId(atomIdsTo[i]));
@@ -459,28 +452,28 @@ Universe::removeBonds(const std::vector<long int>& atomIdsFrom,
       igraph_vector_int_t edgeIdsV;
       igraph_vector_int_init(&edgeIdsV, edgeIds.size());
       pylimer_tools::utils::StdVectorToIgraphVectorT(edgeIds, &edgeIdsV);
-      igraph_delete_edges(&this->graph, igraph_ess_vector(&edgeIdsV));
+      igraph_delete_edges(mutator, igraph_ess_vector(&edgeIdsV));
       igraph_vector_int_destroy(&edgeIdsV);
     } else if (edgeIds.size() == 1) {
       assert(edgeIds[0] < this->getNrOfBonds());
-      igraph_delete_edges(&this->graph, igraph_ess_1(edgeIds[0]));
+      igraph_delete_edges(mutator, igraph_ess_1(edgeIds[0]));
     }
   }
 
-  this->NBonds = igraph_ecount(&this->graph);
+  this->NBonds = igraph_ecount(mutator);
 }
 
 void
 Universe::removeBondsOfType(const int bondType)
 {
-  RUNTIME_EXP_IFN(
-    igraph_cattribute_has_attr(&this->graph, IGRAPH_ATTRIBUTE_EDGE, "type"),
-    "The graph does not have any bond types associated.");
+  RUNTIME_EXP_IFN(igraph_cattribute_has_attr(
+                    &this->getGraph(), IGRAPH_ATTRIBUTE_EDGE, "type"),
+                  "The graph does not have any bond types associated.");
   // load types
   igraph_vector_t typesVec;
   igraph_vector_init(&typesVec, this->getNrOfBonds());
   REQUIRE_IGRAPH_SUCCESS(igraph_cattribute_EANV(
-    &this->graph, "type", igraph_ess_all(IGRAPH_EDGEORDER_ID), &typesVec));
+    &this->getGraph(), "type", igraph_ess_all(IGRAPH_EDGEORDER_ID), &typesVec));
   // enumerate the bonds to delete
   igraph_vector_int_t edges_to_remove;
   igraph_vector_int_init(&edges_to_remove, 0);
@@ -493,11 +486,12 @@ Universe::removeBondsOfType(const int bondType)
   igraph_vector_destroy(&typesVec);
 
   // actually remove the bonds
+  auto mutator = this->getMutableGraph();
   if (igraph_vector_int_size(&edges_to_remove) > 0) {
-    igraph_delete_edges(&this->graph, igraph_ess_vector(&edges_to_remove));
+    igraph_delete_edges(mutator, igraph_ess_vector(&edges_to_remove));
   }
   igraph_vector_int_destroy(&edges_to_remove);
-  this->NBonds = igraph_ecount(&this->graph);
+  this->NBonds = igraph_ecount(mutator);
 }
 
 void
@@ -582,17 +576,18 @@ Universe::addBonds(const size_t NNewBonds,
   }
   igraph_vector_int_resize(&newEdges, 2 * actualNrOfBondsAdded);
   // add the new edges
-  REQUIRE_IGRAPH_SUCCESS(igraph_add_edges(&this->graph, &newEdges, 0));
+  auto mutator = this->getMutableGraph();
+  REQUIRE_IGRAPH_SUCCESS(igraph_add_edges(mutator, &newEdges, 0));
   igraph_vector_int_destroy(&newEdges);
   if (actualNrOfBondsAdded > 0) {
     // add attributes
     if (hasExplicitBondTypes) {
-      const igraph_integer_t edgeCountAfter = igraph_ecount(&this->graph);
+      const igraph_integer_t edgeCountAfter = igraph_ecount(mutator);
       const igraph_integer_t edgeCountBefore =
         edgeCountAfter - static_cast<igraph_integer_t>(actualNrOfBondsAdded);
 
       const bool hasTypeAttribute =
-        igraph_cattribute_has_attr(&this->graph, IGRAPH_ATTRIBUTE_EDGE, "type");
+        igraph_cattribute_has_attr(mutator, IGRAPH_ATTRIBUTE_EDGE, "type");
 
       if (!hasTypeAttribute) {
         std::vector<int> allTypes(static_cast<size_t>(edgeCountAfter), -1);
@@ -605,12 +600,12 @@ Universe::addBonds(const size_t NNewBonds,
         pylimer_tools::utils::StdVectorToIgraphVectorT(allTypes,
                                                        &types_igraph_vec);
         REQUIRE_IGRAPH_SUCCESS(
-          igraph_cattribute_EAN_setv(&this->graph, "type", &types_igraph_vec));
+          igraph_cattribute_EAN_setv(mutator, "type", &types_igraph_vec));
         igraph_vector_destroy(&types_igraph_vec);
       } else {
         for (size_t i = 0; i < actualNrOfBondsAdded; ++i) {
           REQUIRE_IGRAPH_SUCCESS(igraph_cattribute_EAN_set(
-            &this->graph, "type", edgeCountBefore + i, addedBondTypes[i]));
+            mutator, "type", edgeCountBefore + i, addedBondTypes[i]));
         }
       }
     }
@@ -620,7 +615,7 @@ Universe::addBonds(const size_t NNewBonds,
     if (simplify) {
       this->simplify();
     } else {
-      this->NBonds = igraph_ecount(&this->graph);
+      this->NBonds = igraph_ecount(mutator);
     }
   }
 }
@@ -738,9 +733,10 @@ Universe::simplify()
   // let's take the mean.
   REQUIRE_IGRAPH_SUCCESS(igraph_attribute_combination_add(
     &comb, NULL, IGRAPH_ATTRIBUTE_COMBINE_MEAN, NULL));
-  igraph_simplify(&this->graph, /*multiple=*/1, /*loops=*/1, &comb);
+  auto mutator = this->getMutableGraph();
+  igraph_simplify(mutator, /*multiple=*/1, /*loops=*/1, &comb);
   igraph_attribute_combination_destroy(&comb);
-  this->NBonds = igraph_ecount(&this->graph);
+  this->NBonds = igraph_ecount(mutator);
 }
 
 /**
@@ -816,12 +812,14 @@ void
 Universe::setMasses(const std::map<int, double>& atomMassPerType)
 {
   this->massPerType = atomMassPerType;
+  this->clearCaches();
 }
 
 void
 Universe::setMassForType(const int atomType, const double mass)
 {
   this->massPerType[atomType] = mass;
+  this->clearCaches();
 }
 
 std::map<int, double>
@@ -847,7 +845,7 @@ Universe::getClusters() const
   igraph_graph_list_t components;
   igraph_graph_list_init(&components, 0);
   REQUIRE_IGRAPH_SUCCESS(
-    igraph_decompose(&graph, &components, IGRAPH_WEAK, -1, 0));
+    igraph_decompose(&this->getGraph(), &components, IGRAPH_WEAK, -1, 0));
   size_t NComponents = igraph_graph_list_size(&components);
   // std::cout << NComponents << " clusters found." << std::endl;
   clusters.reserve(NComponents);
@@ -902,8 +900,11 @@ Universe::getStrandAffiliation(const int crosslinkerType) const
 
   // do the depth-first search
   igraph_adjlist_t adjlist;
-  igraph_adjlist_init(
-    &this->graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+  igraph_adjlist_init(&this->getGraph(),
+                      &adjlist,
+                      IGRAPH_ALL,
+                      IGRAPH_LOOPS_TWICE,
+                      IGRAPH_MULTIPLE);
   std::vector<bool> visited = pylimer_tools::utils::initializeWithValue<bool>(
     this->getNrOfAtoms(), false);
   std::stack<long int> verticesToVisit;
@@ -960,13 +961,19 @@ Universe::getStrandAffiliation(const int crosslinkerType) const
 std::vector<Molecule>
 Universe::getMolecules(const int atomTypeToOmit) const
 {
+  auto it = this->cachedMolecules_.find(atomTypeToOmit);
+  if (it != this->cachedMolecules_.end()) {
+    return it->second;
+  }
+
   std::vector<Molecule> molecules;
   if (this->getNrOfAtoms() == 0) {
     return molecules;
   }
   // make a copy to remove crossLinkers from
   igraph_t graphWithoutCrosslinkers;
-  REQUIRE_IGRAPH_SUCCESS(igraph_copy(&graphWithoutCrosslinkers, &this->graph));
+  REQUIRE_IGRAPH_SUCCESS(
+    igraph_copy(&graphWithoutCrosslinkers, &this->getGraph()));
 
   // select vertices of type
   std::vector<igraph_integer_t> indicesToRemove =
@@ -1006,6 +1013,7 @@ Universe::getMolecules(const int atomTypeToOmit) const
   }
   igraph_graph_list_destroy(&components);
   igraph_destroy(&graphWithoutCrosslinkers);
+  this->cachedMolecules_[atomTypeToOmit] = molecules;
   return molecules;
 }
 
@@ -1051,6 +1059,11 @@ Universe::getVerticesByIndices(std::vector<igraph_integer_t> indices) const
 std::vector<Molecule>
 Universe::getChainsWithCrosslinker(const int crossLinkerType) const
 {
+  auto it = this->cachedChainsWithCrosslinker_.find(crossLinkerType);
+  if (it != this->cachedChainsWithCrosslinker_.end()) {
+    return it->second;
+  }
+
   std::vector<Molecule> molecules;
   if (this->getNrOfAtoms() == 0) {
     return molecules;
@@ -1059,7 +1072,8 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
     pylimer_tools::utils::initializeWithValue(this->getNrOfAtoms(), false);
   // make a copy to remove junctions from
   igraph_t graphWithoutJunctions;
-  REQUIRE_IGRAPH_SUCCESS(igraph_copy(&graphWithoutJunctions, &this->graph));
+  REQUIRE_IGRAPH_SUCCESS(
+    igraph_copy(&graphWithoutJunctions, &this->getGraph()));
   // select vertices of junctions type
   std::vector<int> vertexDegrees = this->getVertexDegrees();
   std::vector<int> vertexTypes = this->getPropertyValues<int>("type");
@@ -1133,7 +1147,7 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
         igraph_vector_int_t neighbors;
         igraph_vector_int_init(&neighbors, 0);
 
-        REQUIRE_IGRAPH_SUCCESS(igraph_neighbors(&graph,
+        REQUIRE_IGRAPH_SUCCESS(igraph_neighbors(&this->getGraph(),
                                                 &neighbors,
                                                 originalEndNodeVertexId,
                                                 IGRAPH_ALL,
@@ -1149,8 +1163,8 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
 
           if (vertexIsJunction[neighbourOriginalId]) {
             // found a crosslinker neighbour
-            long int originalNeighbourAtomId =
-              igraph_cattribute_VAN(&graph, "id", neighbourOriginalId);
+            long int originalNeighbourAtomId = igraph_cattribute_VAN(
+              &this->getGraph(), "id", neighbourOriginalId);
             atomsToAdd.push_back(neighbourOriginalId);
             bondsToAdd.push_back({ {
               originalEndNodeVertexId,
@@ -1180,14 +1194,14 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
 
         // deprecated additional loop check
         long int originalNeighbourAtomId = igraphRealToInt<long int>(
-          igraph_cattribute_VAN(&graph, "id", atomToAddOriginalIdx));
+          igraph_cattribute_VAN(&this->getGraph(), "id", atomToAddOriginalIdx));
         assert(originalNeighbourAtomId == 0 ||
                !pylimer_tools::utils::graphHasVertexWithProperty<long int>(
                  chain, "id", originalNeighbourAtomId));
 
         // including all attributes
         pylimer_tools::utils::copyVertexProperties(
-          &this->graph,
+          &this->getGraph(),
           atomToAddOriginalIdx,
           chain,
           newCrosslinkerVertexIdx,
@@ -1203,7 +1217,7 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
         RUNTIME_EXP_IFN(oldEIds.size() > 0,
                         "Expected at least one edge between the same atoms.");
         pylimer_tools::utils::copyEdgeProperties(
-          &this->graph,
+          &this->getGraph(),
           oldEIds[0],
           chain,
           igraph_ecount(chain) - 1,
@@ -1268,16 +1282,24 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
         igraph_t chain;
         REQUIRE_IGRAPH_SUCCESS(igraph_empty(&chain, 2, IGRAPH_UNDIRECTED));
         pylimer_tools::utils::copyVertexProperties(
-          &this->graph, junctionIdx, &chain, 0, vertexAndEdgeProperties.first);
+          &this->getGraph(),
+          junctionIdx,
+          &chain,
+          0,
+          vertexAndEdgeProperties.first);
         pylimer_tools::utils::copyVertexProperties(
-          &this->graph,
+          &this->getGraph(),
           connectedVertexIdx,
           &chain,
           1,
           vertexAndEdgeProperties.first);
         REQUIRE_IGRAPH_SUCCESS(igraph_add_edge(&chain, 0, 1));
         pylimer_tools::utils::copyEdgeProperties(
-          &this->graph, edgeIds[i], &chain, 0, vertexAndEdgeProperties.second);
+          &this->getGraph(),
+          edgeIds[i],
+          &chain,
+          0,
+          vertexAndEdgeProperties.second);
         molecules.emplace_back(this->box, &chain, molType, this->massPerType);
         igraph_destroy(&chain);
       }
@@ -1300,10 +1322,14 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
         igraph_t chain;
         REQUIRE_IGRAPH_SUCCESS(igraph_empty(&chain, 1, IGRAPH_UNDIRECTED));
         pylimer_tools::utils::copyVertexProperties(
-          &this->graph, junctionIdx, &chain, 0, vertexAndEdgeProperties.first);
+          &this->getGraph(),
+          junctionIdx,
+          &chain,
+          0,
+          vertexAndEdgeProperties.first);
         REQUIRE_IGRAPH_SUCCESS(igraph_add_edge(&chain, 0, 0));
         pylimer_tools::utils::copyEdgeProperties(
-          &this->graph, edgeId, &chain, 0, vertexAndEdgeProperties.second);
+          &this->getGraph(), edgeId, &chain, 0, vertexAndEdgeProperties.second);
         molecules.emplace_back(this->box, &chain, molType, this->massPerType);
         igraph_destroy(&chain);
       }
@@ -1315,6 +1341,7 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
   igraph_graph_list_destroy(&components);
   igraph_destroy(&graphWithoutJunctions);
 
+  this->cachedChainsWithCrosslinker_[crossLinkerType] = molecules;
   return molecules;
 };
 
@@ -1349,12 +1376,15 @@ Universe::identifyObviouslyDanglingAtoms(const bool distinguishFree) const
     pylimer_tools::utils::initializeWithValue(this->getNrOfBonds(), false);
   std::vector<int> vertexDegrees = this->getVertexDegrees();
   igraph_lazy_adjlist_t adjlist;
-  REQUIRE_IGRAPH_SUCCESS(igraph_lazy_adjlist_init(
-    &this->graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
+  REQUIRE_IGRAPH_SUCCESS(igraph_lazy_adjlist_init(&this->getGraph(),
+                                                  &adjlist,
+                                                  IGRAPH_ALL,
+                                                  IGRAPH_LOOPS_TWICE,
+                                                  IGRAPH_MULTIPLE));
   igraph_vector_int_t* neighbors = nullptr;
   igraph_lazy_inclist_t inclist;
   REQUIRE_IGRAPH_SUCCESS(igraph_lazy_inclist_init(
-    &this->graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
+    &this->getGraph(), &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
   igraph_vector_int_t* neighbourEdges = nullptr;
 
   for (igraph_integer_t startingVertexIdx = 0;
@@ -1402,7 +1432,7 @@ Universe::identifyObviouslyDanglingAtoms(const bool distinguishFree) const
         // by checking that such an edge exists in the graph
         igraph_integer_t a = 0;
         igraph_integer_t b = 0;
-        igraph_edge(&graph, neighbourEdge, &a, &b);
+        igraph_edge(&this->getGraph(), neighbourEdge, &a, &b);
         assert(a == currentVertexIdx || b == currentVertexIdx);
         assert(a == neighbourVertex || b == neighbourVertex);
 #endif
@@ -1536,7 +1566,7 @@ Universe::findLoops(const int crossLinkerType,
   igraph_vector_int_list_t e_results;
   igraph_vector_int_list_init(&e_results, 0);
 
-  REQUIRE_IGRAPH_SUCCESS(igraph_simple_cycles(&this->graph,
+  REQUIRE_IGRAPH_SUCCESS(igraph_simple_cycles(&this->getGraph(),
                                               &v_results,
                                               &e_results,
                                               IGRAPH_ALL,
@@ -1599,8 +1629,12 @@ Universe::countLoopLengths(const int maxLength) const
   pylimer_tools::utils::Counter<int> loopLengths;
 
   // TODO: shrink the graph by collapsing all 2-functional vertices?
-  REQUIRE_IGRAPH_SUCCESS(igraph_simple_cycles_callback(
-    &this->graph, IGRAPH_ALL, -1, maxLength, &count_found_cycle, &loopLengths));
+  REQUIRE_IGRAPH_SUCCESS(igraph_simple_cycles_callback(&this->getGraph(),
+                                                       IGRAPH_ALL,
+                                                       -1,
+                                                       maxLength,
+                                                       &count_found_cycle,
+                                                       &loopLengths));
 
   return loopLengths.asMap();
 }
@@ -1713,7 +1747,7 @@ Universe::findMinimalOrderLoopFrom(const long int loopStart,
     // for this specified neighbour, we search the simple paths
     // (multiple times as we, for memory issue prevention, increase the )
     REQUIRE_IGRAPH_SUCCESS(
-      igraph_get_all_simple_paths(&this->graph,
+      igraph_get_all_simple_paths(&this->getGraph(),
                                   &paths,
                                   startingCrosslinkerVertexId,
                                   igraph_vss_1(nextStepVertexId),
@@ -1848,7 +1882,7 @@ Universe::hasInfiniteStrand(const int crossLinkerType,
 
   // Use igraph's cycle detection with callback
   REQUIRE_IGRAPH_SUCCESS(
-    igraph_simple_cycles_callback(&this->graph,
+    igraph_simple_cycles_callback(&this->getGraph(),
                                   IGRAPH_ALL,
                                   -1,
                                   maxLength,
@@ -1873,7 +1907,7 @@ Universe::determineFunctionalityPerType() const
   igraph_vs_all(&allVertexIds);
   // complexity: O(|v|*d)
   REQUIRE_IGRAPH_SUCCESS(igraph_degree(
-    &this->graph, &degrees, allVertexIds, IGRAPH_ALL, IGRAPH_NO_LOOPS));
+    &this->getGraph(), &degrees, allVertexIds, IGRAPH_ALL, IGRAPH_NO_LOOPS));
 
   std::vector<int> types = this->getPropertyValues<int>("type");
   std::set<int> uniqueTypes(types.begin(), types.end());
@@ -1887,7 +1921,8 @@ Universe::determineFunctionalityPerType() const
 
   // complexity: O(|V|)
   igraph_vit_t vit;
-  REQUIRE_IGRAPH_SUCCESS(igraph_vit_create(&graph, allVertexIds, &vit));
+  REQUIRE_IGRAPH_SUCCESS(
+    igraph_vit_create(&this->getGraph(), allVertexIds, &vit));
   while (!IGRAPH_VIT_END(vit)) {
     long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
     result[types[vertexId]] =
@@ -1918,7 +1953,7 @@ Universe::determineEffectiveFunctionalityPerType() const
   igraph_vs_all(&allVertexIds);
   // complexity: O(|v|*d)
   REQUIRE_IGRAPH_SUCCESS(igraph_degree(
-    &this->graph, &degrees, allVertexIds, IGRAPH_ALL, IGRAPH_NO_LOOPS));
+    &this->getGraph(), &degrees, allVertexIds, IGRAPH_ALL, IGRAPH_NO_LOOPS));
 
   std::vector<int> types = this->getPropertyValues<int>("type");
   std::set<int> uniqueTypes(types.begin(), types.end());
@@ -1929,7 +1964,8 @@ Universe::determineEffectiveFunctionalityPerType() const
 
   // complexity: O(|V|)
   igraph_vit_t vit;
-  REQUIRE_IGRAPH_SUCCESS(igraph_vit_create(&graph, allVertexIds, &vit));
+  REQUIRE_IGRAPH_SUCCESS(
+    igraph_vit_create(&this->getGraph(), allVertexIds, &vit));
   while (!IGRAPH_VIT_END(vit)) {
     long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
     result[types[vertexId]] += igraph_vector_int_get(&degrees, vertexId);
@@ -2037,7 +2073,7 @@ Universe::computeWeightFractionOfClustersAssociatedWith(
 long int
 Universe::getAtomIdByIdx(const igraph_integer_t vertexId) const
 {
-  return igraphRealToInt<long int>(VAN(&this->graph, "id", vertexId));
+  return igraphRealToInt<long int>(VAN(&this->getGraph(), "id", vertexId));
 }
 
 /**
@@ -2108,7 +2144,8 @@ Universe::getAtoms() const
   std::vector<Atom> atoms;
   atoms.reserve(this->getNrOfAtoms());
   igraph_vit_t vit;
-  REQUIRE_IGRAPH_SUCCESS(igraph_vit_create(&graph, igraph_vss_all(), &vit));
+  REQUIRE_IGRAPH_SUCCESS(
+    igraph_vit_create(&this->getGraph(), igraph_vss_all(), &vit));
   while (!IGRAPH_VIT_END(vit)) {
     long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
     atoms.push_back(this->getAtomByVertexIdx(vertexId));
@@ -2213,7 +2250,7 @@ Universe::detectAngles() const
   // query all atoms
   igraph_vit_t vit;
   REQUIRE_IGRAPH_SUCCESS(
-    igraph_vit_create(&this->graph, igraph_vss_all(), &vit));
+    igraph_vit_create(&this->getGraph(), igraph_vss_all(), &vit));
   while (!IGRAPH_VIT_END(vit)) {
     const igraph_integer_t vertexIdx = IGRAPH_VIT_GET(vit);
     // find the connected atoms
@@ -2273,13 +2310,13 @@ Universe::detectDihedralAngles() const
   // query all atoms
   igraph_vit_t vit;
   REQUIRE_IGRAPH_SUCCESS(
-    igraph_vit_create(&this->graph, igraph_vss_all(), &vit));
+    igraph_vit_create(&this->getGraph(), igraph_vss_all(), &vit));
   while (!IGRAPH_VIT_END(vit)) {
     const long int vertexIdx = static_cast<long int>(IGRAPH_VIT_GET(vit));
     // find the connected atoms
     igraph_vector_int_list_t dihedral_paths_v;
     igraph_vector_int_list_init(&dihedral_paths_v, 4);
-    REQUIRE_IGRAPH_SUCCESS(igraph_get_all_simple_paths(&this->graph,
+    REQUIRE_IGRAPH_SUCCESS(igraph_get_all_simple_paths(&this->getGraph(),
                                                        &dihedral_paths_v,
                                                        vertexIdx,
                                                        igraph_vss_all(),
@@ -2500,17 +2537,18 @@ Universe::contractVerticesAlongBondType(const int bondType) const
     std::vector<igraph_integer_t> verticesToDelete;
     std::vector<bool> vertexAffectedThisIteration =
       pylimer_tools::utils::initializeWithValue<bool>(
-        igraph_vcount(&result.graph), false);
+        igraph_vcount(&result.getGraph()), false);
 
-    for (igraph_integer_t edgeIdx = 0; edgeIdx < igraph_ecount(&result.graph);
+    for (igraph_integer_t edgeIdx = 0;
+         edgeIdx < igraph_ecount(&result.getGraph());
          ++edgeIdx) {
       if (result.getEdgePropertyValue<int>("type", edgeIdx) == bondType) {
         lastRoundDidRemove = true;
 
         igraph_integer_t vertex1OfEdge;
         igraph_integer_t vertex2OfEdge;
-        REQUIRE_IGRAPH_SUCCESS(
-          igraph_edge(&result.graph, edgeIdx, &vertex1OfEdge, &vertex2OfEdge));
+        REQUIRE_IGRAPH_SUCCESS(igraph_edge(
+          &result.getGraph(), edgeIdx, &vertex1OfEdge, &vertex2OfEdge));
 
         if (vertexAffectedThisIteration[vertex1OfEdge] ||
             vertexAffectedThisIteration[vertex2OfEdge]) {
@@ -2526,7 +2564,7 @@ Universe::contractVerticesAlongBondType(const int bondType) const
           edgesToDelete.push_back(edgeIdx);
         } else {
           // Get incident edges of vertex1 to redirect to vertex2
-          REQUIRE_IGRAPH_SUCCESS(igraph_incident(&result.graph,
+          REQUIRE_IGRAPH_SUCCESS(igraph_incident(&result.getGraph(),
                                                  &edgesToCopy,
                                                  vertex1OfEdge,
                                                  IGRAPH_ALL,
@@ -2537,7 +2575,7 @@ Universe::contractVerticesAlongBondType(const int bondType) const
             if (edgeToCopy != edgeIdx) {
               // Add new edge from vertex2 to the other end
               igraph_integer_t otherVertex =
-                IGRAPH_OTHER(&result.graph, edgeToCopy, vertex1OfEdge);
+                IGRAPH_OTHER(&result.getGraph(), edgeToCopy, vertex1OfEdge);
               edgesToAdd.push_back(vertex2OfEdge);
               edgesToAdd.push_back(otherVertex);
 
@@ -2559,24 +2597,22 @@ Universe::contractVerticesAlongBondType(const int bondType) const
       break;
     }
 
+    auto mutator = result.getMutableGraph();
+
     // Batch add all new edges at once
     if (!edgesToAdd.empty()) {
       igraph_vector_int_t newEdgesVec;
       igraph_vector_int_init(&newEdgesVec, edgesToAdd.size());
       pylimer_tools::utils::StdVectorToIgraphVectorT(edgesToAdd, &newEdgesVec);
 
-      igraph_integer_t edgeCountBefore = igraph_ecount(&result.graph);
-      REQUIRE_IGRAPH_SUCCESS(
-        igraph_add_edges(&result.graph, &newEdgesVec, nullptr));
+      igraph_integer_t edgeCountBefore = igraph_ecount(mutator);
+      REQUIRE_IGRAPH_SUCCESS(igraph_add_edges(mutator, &newEdgesVec, nullptr));
 
       // Copy edge properties for all new edges
       for (const auto& copyPair : edgePropertyCopyPairs) {
         igraph_integer_t newEdgeIdx = edgeCountBefore + copyPair.second;
-        pylimer_tools::utils::copyEdgeProperties(&result.graph,
-                                                 copyPair.first,
-                                                 &result.graph,
-                                                 newEdgeIdx,
-                                                 edgeProperties);
+        pylimer_tools::utils::copyEdgeProperties(
+          mutator, copyPair.first, mutator, newEdgeIdx, edgeProperties);
       }
 
       igraph_vector_int_destroy(&newEdgesVec);
@@ -2597,15 +2633,15 @@ Universe::contractVerticesAlongBondType(const int bondType) const
       }
 
       REQUIRE_IGRAPH_SUCCESS(igraph_delete_vertices(
-        &result.graph, igraph_vss_vector(&verticesToDeleteVec)));
+        mutator, igraph_vss_vector(&verticesToDeleteVec)));
 
       igraph_vector_int_destroy(&verticesToDeleteVec);
     }
   }
 
   igraph_vector_int_destroy(&edgesToCopy);
-  result.NAtoms = igraph_vcount(&result.graph);
-  result.NBonds = igraph_ecount(&result.graph);
+  result.NAtoms = igraph_vcount(&result.getGraph());
+  result.NBonds = igraph_ecount(&result.getGraph());
   result.resetAtomIdMapping();
   result.removeAllAngles();
   result.removeAllDihedralAngles();
@@ -2664,7 +2700,7 @@ Universe::findVertexIdForProperty(const char* propertyName,
 {
   igraph_vector_t allValues;
   REQUIRE_IGRAPH_SUCCESS(igraph_vector_init(&allValues, this->getNrOfAtoms()));
-  VANV(&this->graph, propertyName, &allValues);
+  VANV(&this->getGraph(), propertyName, &allValues);
   for (int i = 0; i < this->NAtoms; ++i) {
     if (VECTOR(allValues)[i] == propertyValue) {
       igraph_vector_destroy(&allValues);
@@ -2915,11 +2951,11 @@ Universe::computeDs(const std::vector<long int>& bondFrom,
 
   std::string property = direction;
   REQUIRE_IGRAPH_SUCCESS(
-    igraph_cattribute_VANV(&this->graph,
+    igraph_cattribute_VANV(&this->getGraph(),
                            property.c_str(),
                            igraph_vss_vector(&vertexIdFrom),
                            &dValuesFrom));
-  REQUIRE_IGRAPH_SUCCESS(igraph_cattribute_VANV(&this->graph,
+  REQUIRE_IGRAPH_SUCCESS(igraph_cattribute_VANV(&this->getGraph(),
                                                 property.c_str(),
                                                 igraph_vss_vector(&vertexIdTo),
                                                 &dValuesTo));
@@ -3076,13 +3112,18 @@ Universe::computeMeanSquareEndToEndDistance(
   const bool onlyThoseWithTwoCrosslinkers,
   const bool implyImageFlags) const
 {
-  std::vector<Molecule> molecules =
-    this->getChainsWithCrosslinker(crossLinkerType);
+  if (this->cachedChainsWithCrosslinker_.find(crossLinkerType) ==
+      this->cachedChainsWithCrosslinker_.end()) {
+    this->cachedChainsWithCrosslinker_[crossLinkerType] =
+      this->getChainsWithCrosslinker(crossLinkerType);
+  }
+  const std::vector<Molecule>& molecules =
+    this->cachedChainsWithCrosslinker_[crossLinkerType];
 
   double meanEndToEndDistance = 0.0;
   int validMolecules = 0;
 
-  for (Molecule molecule : molecules) {
+  for (const Molecule& molecule : molecules) {
     if (!onlyThoseWithTwoCrosslinkers ||
         molecule.getAtomsOfType(crossLinkerType).size() == 2) {
       double dist = implyImageFlags
@@ -3140,14 +3181,14 @@ Universe::computeMeanBondLength() const
   // construct iterator
   igraph_eit_t bondIterator;
   REQUIRE_IGRAPH_SUCCESS(igraph_eit_create(
-    &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator));
+    &this->getGraph(), igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator));
 
   while (!IGRAPH_EIT_END(bondIterator)) {
     long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
     igraph_integer_t bondFrom;
     igraph_integer_t bondTo;
     REQUIRE_IGRAPH_SUCCESS(
-      igraph_edge(&this->graph, edgeId, &bondFrom, &bondTo));
+      igraph_edge(&this->getGraph(), edgeId, &bondFrom, &bondTo));
     // TODO: this is more intensive than needed
     // check whether the compiler optimizes this or not
     Atom atom1 = this->getAtomByVertexIdx(bondFrom);
@@ -3227,7 +3268,7 @@ Universe::resetAtomIdMapping()
 {
   this->atomIdToVertexIdx.clear();
   std::vector<int> atomIds = this->getPropertyValues<int>("id");
-  assert(atomIds.size() == igraph_vcount(&this->graph));
+  assert(atomIds.size() == igraph_vcount(&this->getGraph()));
   for (igraph_integer_t i = 0; i < atomIds.size(); i++) {
     this->atomIdToVertexIdx.emplace(atomIds[i], i);
   }
@@ -3242,15 +3283,17 @@ Universe::resetAtomIdMapping()
 bool
 Universe::validate() const
 {
-  RUNTIME_EXP_IFN(this->getNrOfAtoms() == igraph_vcount(&this->graph),
+  RUNTIME_EXP_IFN(this->getNrOfAtoms() == igraph_vcount(&this->getGraph()),
                   "Validation failed: " + std::to_string(this->getNrOfAtoms()) +
                     " atoms for " +
-                    std::to_string(igraph_vcount(&this->graph)) + " vertices.");
+                    std::to_string(igraph_vcount(&this->getGraph())) +
+                    " vertices.");
 
-  RUNTIME_EXP_IFN(this->getNrOfBonds() == igraph_ecount(&this->graph),
+  RUNTIME_EXP_IFN(this->getNrOfBonds() == igraph_ecount(&this->getGraph()),
                   "Validation failed: " + std::to_string(this->getNrOfBonds()) +
                     " bonds for " +
-                    std::to_string(igraph_ecount(&this->graph)) + " edges.");
+                    std::to_string(igraph_ecount(&this->getGraph())) +
+                    " edges.");
 
   return true;
 }
@@ -3283,30 +3326,31 @@ Universe::getNrOfBonds() const
 void
 Universe::setBox(const Box& passedBox, const bool rescaleAtomCoordinates)
 {
+  this->clearCaches();
   if (rescaleAtomCoordinates) {
     double scalingFactorX = passedBox.getLx() / this->box.getLx();
     double offsetX = passedBox.getLowX() - scalingFactorX * this->box.getLowX();
     igraph_vector_t xValueVec;
     REQUIRE_IGRAPH_SUCCESS(
       igraph_vector_init(&xValueVec, this->getNrOfAtoms()));
-    REQUIRE_IGRAPH_SUCCESS(
-      igraph_cattribute_VANV(&this->graph, "x", igraph_vss_all(), &xValueVec));
+    REQUIRE_IGRAPH_SUCCESS(igraph_cattribute_VANV(
+      &this->getGraph(), "x", igraph_vss_all(), &xValueVec));
 
     double scalingFactorY = passedBox.getLy() / this->box.getLy();
     double offsetY = passedBox.getLowY() - scalingFactorY * this->box.getLowY();
     igraph_vector_t yValueVec;
     REQUIRE_IGRAPH_SUCCESS(
       igraph_vector_init(&yValueVec, this->getNrOfAtoms()));
-    REQUIRE_IGRAPH_SUCCESS(
-      igraph_cattribute_VANV(&this->graph, "y", igraph_vss_all(), &yValueVec));
+    REQUIRE_IGRAPH_SUCCESS(igraph_cattribute_VANV(
+      &this->getGraph(), "y", igraph_vss_all(), &yValueVec));
 
     double scalingFactorZ = passedBox.getLz() / this->box.getLz();
     double offsetZ = passedBox.getLowZ() - scalingFactorZ * this->box.getLowZ();
     igraph_vector_t zValueVec;
     REQUIRE_IGRAPH_SUCCESS(
       igraph_vector_init(&zValueVec, this->getNrOfAtoms()));
-    REQUIRE_IGRAPH_SUCCESS(
-      igraph_cattribute_VANV(&this->graph, "z", igraph_vss_all(), &zValueVec));
+    REQUIRE_IGRAPH_SUCCESS(igraph_cattribute_VANV(
+      &this->getGraph(), "z", igraph_vss_all(), &zValueVec));
 
     for (size_t i = 0; i < this->getNrOfAtoms(); ++i) {
       igraph_vector_set(&xValueVec,
@@ -3323,12 +3367,13 @@ Universe::setBox(const Box& passedBox, const bool rescaleAtomCoordinates)
                           offsetZ);
     }
 
+    auto mutator = this->getMutableGraph();
     REQUIRE_IGRAPH_SUCCESS(
-      igraph_cattribute_VAN_setv(&this->graph, "x", &xValueVec));
+      igraph_cattribute_VAN_setv(mutator, "x", &xValueVec));
     REQUIRE_IGRAPH_SUCCESS(
-      igraph_cattribute_VAN_setv(&this->graph, "y", &yValueVec));
+      igraph_cattribute_VAN_setv(mutator, "y", &yValueVec));
     REQUIRE_IGRAPH_SUCCESS(
-      igraph_cattribute_VAN_setv(&this->graph, "z", &zValueVec));
+      igraph_cattribute_VAN_setv(mutator, "z", &zValueVec));
 
     igraph_vector_destroy(&xValueVec);
     igraph_vector_destroy(&yValueVec);

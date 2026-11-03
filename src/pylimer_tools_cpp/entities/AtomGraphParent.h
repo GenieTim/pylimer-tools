@@ -17,25 +17,77 @@ extern "C"
 #include <vector>
 
 namespace pylimer_tools::entities {
+
+class AtomGraphParent;
+
+/**
+ * @brief RAII guard for graph mutation that automatically invalidates caches
+ * on destruction or reassignment.
+ */
+class GraphMutator
+{
+public:
+  explicit GraphMutator(AtomGraphParent* parent, igraph_t* graph) noexcept
+    : parent_(parent)
+    , graph_(graph)
+  {
+  }
+
+  ~GraphMutator();
+
+  // Non-copyable
+  GraphMutator(const GraphMutator&) = delete;
+  GraphMutator& operator=(const GraphMutator&) = delete;
+
+  // Movable
+  GraphMutator(GraphMutator&& other) noexcept
+    : parent_(other.parent_)
+    , graph_(other.graph_)
+  {
+    other.parent_ = nullptr;
+    other.graph_ = nullptr;
+  }
+
+  GraphMutator& operator=(GraphMutator&& other) noexcept
+  {
+    if (this != &other) {
+      this->triggerInvalidation();
+      parent_ = other.parent_;
+      graph_ = other.graph_;
+      other.parent_ = nullptr;
+      other.graph_ = nullptr;
+    }
+    return *this;
+  }
+
+  [[nodiscard]] igraph_t* get() const noexcept { return graph_; }
+  [[nodiscard]] igraph_t& operator*() const noexcept { return *graph_; }
+  [[nodiscard]] igraph_t* operator->() const noexcept { return graph_; }
+  operator igraph_t*() const noexcept { return graph_; }
+
+private:
+  void triggerInvalidation();
+
+  AtomGraphParent* parent_{ nullptr };
+  igraph_t* graph_{ nullptr };
+};
+
 // abstract
 class AtomGraphParent
 {
 public:
+  using GraphMutator = pylimer_tools::entities::GraphMutator;
+
   AtomGraphParent();
 
-  // rule of three:
-  // 1. destructor (to destroy the graph)
+  // rule of five:
   virtual ~AtomGraphParent();
+  AtomGraphParent(const AtomGraphParent& other);
+  AtomGraphParent& operator=(const AtomGraphParent& other);
+  AtomGraphParent(AtomGraphParent&& other) noexcept;
+  AtomGraphParent& operator=(AtomGraphParent&& other) noexcept;
 
-  // 2. copy constructor
-  // AtomGraphParent(const AtomGraphParent &src) {
-  //   igraph_copy(&this->graph, &src.graph);
-  // };
-  // 3. copy assignment operator
-  // virtual AtomGraphParent &operator=(AtomGraphParent src) {
-  //   std::swap(this->graph, src.graph);
-  //   return *this;
-  // };
+  virtual void clearCaches() const {}
 
   /**
    * @brief Get a mutable copy of the underlying igraph_t structure wrapped in
@@ -53,6 +105,11 @@ public:
     igraph_t graphCopy;
     igraph_copy(&graphCopy, &this->graph);
     return graphCopy;
+  }
+
+  [[nodiscard]] const igraph_t& getGraph() const noexcept
+  {
+    return this->graph;
   }
 
   [[nodiscard]] std::vector<igraph_integer_t> getEdgeIdsFromTo(
@@ -336,8 +393,8 @@ public:
     INVALIDINDEX_EXP_IFN(vertexId < this->getNrOfVertices(),
                          "Index " + std::to_string(vertexId) +
                            " is out of bounds");
-    if (igraph_cattribute_VAN_set(
-          &this->graph, propertyName, vertexId, value)) {
+    auto mutator = this->getMutableGraph();
+    if (igraph_cattribute_VAN_set(mutator, propertyName, vertexId, value)) {
       throw std::runtime_error("Failed to set property value");
     }
     if (!this->atomsHaveCustomAttributes) {
@@ -618,11 +675,14 @@ public:
   template<class Archive>
   void serialize(Archive& ar)
   {
-    ar(graph);
+    ar(this->graph);
+    this->clearCaches();
   }
 
 protected:
-  igraph_t graph;
+  [[nodiscard]] GraphMutator getMutableGraph();
+  void swapGraph(AtomGraphParent& other) noexcept;
+
   bool atomsHaveCustomAttributes = false;
 
   std::vector<long int> getVerticesWithDegree(int degree) const;
@@ -664,7 +724,38 @@ protected:
   };
 
   [[nodiscard]] bool checkIfAtomsHaveCustomAttributes() const;
+
+private:
+  igraph_t graph;
 };
+
+inline void
+GraphMutator::triggerInvalidation()
+{
+  if (parent_) {
+    parent_->clearCaches();
+  }
+}
+
+inline GraphMutator::~GraphMutator()
+{
+  triggerInvalidation();
+}
+
+inline GraphMutator
+AtomGraphParent::getMutableGraph()
+{
+  return GraphMutator(this, &this->graph);
+}
+
+inline void
+AtomGraphParent::swapGraph(AtomGraphParent& other) noexcept
+{
+  std::swap(this->graph, other.graph);
+  this->clearCaches();
+  other.clearCaches();
+}
+
 } // namespace pylimer_tools::entities
 
 #endif

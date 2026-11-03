@@ -37,18 +37,19 @@ Molecule::Molecule(const Box& parentBox,
 void
 Molecule::initializeFromGraph(const igraph_t* inGraph)
 {
-  igraph_copy(&this->graph, inGraph);
-  this->size = igraph_vcount(&this->graph);
+  auto mutator = this->getMutableGraph();
+  igraph_destroy(mutator);
+  igraph_copy(mutator, inGraph);
+  this->size = igraph_vcount(mutator);
   // construct a key for this molecule: a concatenation of all ids in this
   // molecule
-  if (!igraph_cattribute_has_attr(
-        &this->graph, IGRAPH_ATTRIBUTE_VERTEX, "id")) {
+  if (!igraph_cattribute_has_attr(mutator, IGRAPH_ATTRIBUTE_VERTEX, "id")) {
     throw std::runtime_error("Molecule's graph does not have attribute id");
   }
   igraph_vector_t allIds;
   igraph_vector_init(&allIds, this->size);
-  VANV(&this->graph, "id", &allIds);
-  if (igraph_cattribute_VANV(&this->graph, "id", igraph_vss_all(), &allIds)) {
+  VANV(mutator, "id", &allIds);
+  if (igraph_cattribute_VANV(mutator, "id", igraph_vss_all(), &allIds)) {
     throw std::runtime_error(
       "Molecule's graph's attribute id is not accessible.");
   };
@@ -71,19 +72,31 @@ Molecule::initializeFromGraph(const igraph_t* inGraph)
   this->atomsHaveCustomAttributes = this->checkIfAtomsHaveCustomAttributes();
 };
 
-// rule of three:
-// 1. destructor (to destroy the graph)
-Molecule::~Molecule()
-{
-  // in addition to basic fields being deleted, we need to clean up the graph
-  // as is done in parent
-  igraph_destroy(&this->graph);
-};
-// 2. copy constructor
+// rule of five:
+Molecule::~Molecule() = default;
+
+// copy constructor
 Molecule::Molecule(const Molecule& src)
-  : Molecule(src.parent, &src.graph, src.typeOfThisMolecule, src.massPerType) {
-  };
-// 3. copy assignment operator
+  : Molecule(src.parent,
+             &src.getGraph(),
+             src.typeOfThisMolecule,
+             src.massPerType) {};
+
+// move constructor
+Molecule::Molecule(Molecule&& other) noexcept
+  : AtomGraphParent(std::move(other))
+  , parent(other.parent)
+  , typeOfThisMolecule(other.typeOfThisMolecule)
+  , size(other.size)
+  , key(std::move(other.key))
+  , massPerType(std::move(other.massPerType))
+  , atomIdToVertexIdx(std::move(other.atomIdToVertexIdx))
+{
+  other.clearCaches();
+  other.size = 0;
+}
+
+// copy/move assignment operator
 Molecule&
 Molecule::operator=(Molecule src)
 {
@@ -93,7 +106,8 @@ Molecule::operator=(Molecule src)
   std::swap(this->size, src.size);
   std::swap(this->key, src.key);
   std::swap(this->massPerType, src.massPerType);
-  std::swap(this->graph, src.graph);
+  std::swap(this->atomIdToVertexIdx, src.atomIdToVertexIdx);
+  this->swapGraph(src);
 
   return *this;
 };
@@ -103,7 +117,7 @@ bool
 Molecule::operator==(const Molecule& ref) const
 {
   igraph_t difference;
-  igraph_difference(&difference, &this->graph, &ref.graph);
+  igraph_difference(&difference, &this->getGraph(), &ref.getGraph());
   igraph_integer_t ecount = igraph_ecount(&difference);
   igraph_destroy(&difference);
   if (ecount != 0) {
@@ -213,7 +227,7 @@ Molecule::computeTotalMass()
 long int
 Molecule::getAtomIdByIdx(const igraph_integer_t vertexId) const
 {
-  return VAN(&this->graph, "id", vertexId);
+  return VAN(&this->getGraph(), "id", vertexId);
 };
 
 igraph_integer_t
