@@ -4582,3 +4582,120 @@ TEST_CASE("MEHPForceBalance2 2D Mode and Gamma Normalization (1A.5, 1A.8)",
     CHECK(gammaAuto > gammaVec.mean()); // Because nrOfSprings > nrOfStrands
   }
 }
+
+TEST_CASE("MEHPForceBalance2 Adaptive Solver Fallback (CG to BiCGSTAB)",
+          "[MEHPForceBalance2][solver][fallback][CG][BiCGSTAB]")
+{
+  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
+  std::string inputFile =
+    suspectedPath +
+    "/structure/"
+    "crosslinked_p_1_0.5_melt_100_a_158_100_xlinks_v_13.V-fixed.structure.out-"
+    "equilibration_do_crosslink.structure.out";
+  REQUIRE(std::filesystem::exists(inputFile));
+
+  pe::UniverseSequence universeSeq;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+
+  SECTION("Configuration getter and setter")
+  {
+    pcm::MEHPForceBalance2 fb(universe, 2, false);
+    CHECK(fb.getCGFallbackMaxIterations() == 20000);
+    fb.configCGFallbackMaxIterations(15000);
+    CHECK(fb.getCGFallbackMaxIterations() == 15000);
+    fb.configCGFallbackMaxIterations(0); // disable
+    CHECK(fb.getCGFallbackMaxIterations() == 0);
+  }
+
+  SECTION("Normal system converges with CG without triggering fallback")
+  {
+    pcm::MEHPForceBalance2 fb(universe, 2, false);
+    REQUIRE(fb.getNrOfLinks() <= fb.getNrOfNodes());
+
+    fb.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                          1e-6,
+                          pcm::SLESolver::DEFAULT,
+                          1e-12,
+                          50000);
+
+    CHECK(!fb.wasCGFallbackTriggered());
+    CHECK(fb.getEffectiveSolverChoice() == pcm::SLESolver::CONJUGATE_GRADIENT);
+    CHECK(fb.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+  }
+
+  SECTION("Fallback triggers when CG reaches iteration limit on system")
+  {
+    pcm::MEHPForceBalance2 fb(universe, 2, false);
+    REQUIRE(fb.getNrOfLinks() <= fb.getNrOfNodes());
+
+    // Normal CG takes ~99 iterations. Cap CG at 10 iterations:
+    fb.configCGFallbackMaxIterations(10);
+
+    fb.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                          1e-6,
+                          pcm::SLESolver::DEFAULT,
+                          1e-12,
+                          50000);
+
+    CHECK(fb.wasCGFallbackTriggered());
+    CHECK(fb.getEffectiveSolverChoice() == pcm::SLESolver::BICGSTAB);
+    CHECK(fb.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+  }
+
+  SECTION("Fallback disabled when cgFallbackMaxIterations <= 0")
+  {
+    pcm::MEHPForceBalance2 fb(universe, 2, false);
+    REQUIRE(fb.getNrOfLinks() <= fb.getNrOfNodes());
+
+    fb.configCGFallbackMaxIterations(0); // Disabled
+
+    fb.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                          1e-6,
+                          pcm::SLESolver::DEFAULT,
+                          1e-12,
+                          50000);
+
+    CHECK(!fb.wasCGFallbackTriggered());
+    CHECK(fb.getEffectiveSolverChoice() == pcm::SLESolver::CONJUGATE_GRADIENT);
+  }
+
+  SECTION("Ill-conditioned network is rescued by BiCGSTAB instead of stalling")
+  {
+    pcm::MEHPForceBalance2 fbStalled(universe, 2, false);
+    REQUIRE(fbStalled.getNrOfLinks() <= fbStalled.getNrOfNodes());
+
+    // Without fallback (cgFallbackMaxIterations = 0), CG capped at 25
+    // iterations stalls: residual is NOT reduced to the 1e-12 target
+    fbStalled.configCGFallbackMaxIterations(0);
+    fbStalled.runForceRelaxation(
+      pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+      1e-6,
+      pcm::SLESolver::DEFAULT,
+      1e-12,
+      25);
+    CHECK(!fbStalled.wasCGFallbackTriggered());
+    CHECK(fbStalled.getEffectiveSolverChoice() ==
+          pcm::SLESolver::CONJUGATE_GRADIENT);
+    double stalledResidual = fbStalled.getDisplacementResidualNorm();
+    CHECK(stalledResidual > 1e-10);
+
+    // With adaptive fallback enabled, CG hits the 25-iteration limit,
+    // automatically switches to BiCGSTAB, and BiCGSTAB rescues the relaxation
+    // to reach 1e-12 tolerance!
+    pcm::MEHPForceBalance2 fbRescued(universe, 2, false);
+    fbRescued.configCGFallbackMaxIterations(25);
+    fbRescued.runForceRelaxation(
+      pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+      1e-6,
+      pcm::SLESolver::DEFAULT,
+      1e-12,
+      50000);
+    CHECK(fbRescued.wasCGFallbackTriggered());
+    CHECK(fbRescued.getEffectiveSolverChoice() == pcm::SLESolver::BICGSTAB);
+    CHECK(fbRescued.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+    double rescuedResidual = fbRescued.getDisplacementResidualNorm();
+    CHECK(rescuedResidual < 2e-12);
+    CHECK(rescuedResidual * 1000.0 < stalledResidual);
+  }
+}

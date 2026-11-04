@@ -135,3 +135,12 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         fb3.run_force_relaxation(sle_solver="default")
         self.assertGreater(fb3.get_nr_of_iterations(), 0)
 
+    def test_cg_fallback_solver_relaxation(self):
+        """Test configurable CG fallback getters/setters and adaptive fallback behavior in Python."""
+        fb = MEHPForceBalance2(self.testUniverseSmall, 2, False)
+        self.assertEqual(fb.get_cg_fallback_max_iterations(), 20000)
+        fb.config_cg_fallback_max_iterations(10000)
+        self.assertEqual(fb.get_cg_fallback_max_iterations(), 10000)
+        fb.config_cg_fallback_max_iterations(0)
+        self.assertEqual(fb.get_cg_fallback_max_iterations(), 0)
+

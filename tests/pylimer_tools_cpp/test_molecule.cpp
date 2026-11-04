@@ -310,7 +310,8 @@ TEST_CASE("Molecule equality works", "[entity][Molecule]")
 {
   std::cout << "Running test \"Molecule equality works\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
-  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+  std::string suspectedPath =
+    std::string(PYLIMER_TEST_FIXTURES_DIR) + "/structure/";
 
   std::string inputFile =
     suspectedPath + "square_lattice_2x2_a_5.2d.structure.out";

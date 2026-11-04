@@ -14,10 +14,13 @@
 #include <nlopt.hpp>
 #include <random>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #ifdef CEREALIZABLE
 #include "../utils/CerealUtils.h"
 #include <cereal/access.hpp>
+#include <cereal/types/unordered_map.hpp>
+#include <cereal/types/vector.hpp>
 #endif
 
 namespace pylimer_tools::sim::mehp {
@@ -33,8 +36,12 @@ private:
 #endif
 
   // member properties
-  pylimer_tools::entities::Universe universe;
   pylimer_tools::entities::Box box;
+  size_t universeNrOfAtoms = 0;
+  std::vector<size_t> clusterSizes;
+  std::unordered_map<long int, size_t> atomIdToClusterIdx;
+
+  void extractUniverseMetadata(const pylimer_tools::entities::Universe& u);
   // state
   ExitReason exitReason = ExitReason::UNSET;
   bool simulationHasRun = false;
@@ -52,6 +59,9 @@ private:
   double inPlaceRebuildThreshold =
     0.15; // Threshold fraction of cumulative broken springs to rebuild CSR
           // (default 15%)
+  int cgFallbackMaxIterations = 20000;
+  bool cgFallbackTriggered = false;
+  SLESolver effectiveSolverChoiceState = SLESolver::DEFAULT;
 
 public:
   /**
@@ -108,10 +118,10 @@ public:
                     const ForceBalance2Network& net,
                     const bool is2D = false)
   {
-    this->universe = universe;
     this->is2D = is2D;
     this->initialConfig = net;
     this->box = pylimer_tools::entities::Box(net.L[0], net.L[1], net.L[2]);
+    this->extractUniverseMetadata(universe);
     this->completeInitialization();
   }
 
@@ -128,7 +138,6 @@ public:
                     Eigen::VectorXd springPartitions,
                     const bool is2D = false)
   {
-    this->universe = u;
     this->is2D = is2D;
 
     pylimer_tools::sim::mehp::ForceBalance2Network net2 = {};
@@ -176,6 +185,7 @@ public:
 
     this->initialConfig = net2;
     this->box = pylimer_tools::entities::Box(net1.L[0], net1.L[1], net1.L[2]);
+    this->extractUniverseMetadata(u);
     this->completeInitialization();
   }
 
@@ -272,12 +282,14 @@ public:
     ar(cereal::virtual_base_class<OutputSupportingSimulation>(this));
 
     // properties
-    ar(universe,
-       box,
+    ar(box,
        exitReason,
        simulationHasRun,
        initialConfig,
-       currentDisplacements);
+       currentDisplacements,
+       universeNrOfAtoms,
+       clusterSizes,
+       atomIdToClusterIdx);
 
     // configuration
     ar(is2D,
@@ -288,7 +300,8 @@ public:
        defaultBondLength,
        springBreakingLength,
        assumeNetworkIsComplete,
-       inPlaceRebuildThreshold);
+       inPlaceRebuildThreshold,
+       cgFallbackMaxIterations);
   }
 
   static MEHPForceBalance2 readRestartFile(std::string& file)
@@ -467,6 +480,11 @@ public:
    */
   double getDefaultMeanBondLength() const { return this->defaultBondLength; }
 
+  [[nodiscard]] size_t getNrOfAtomsInUniverse() const
+  {
+    return this->universeNrOfAtoms;
+  }
+
   double getVolume() override
   {
     return this->initialConfig.L[0] * this->initialConfig.L[1] *
@@ -620,6 +638,33 @@ public:
   double getInPlaceRebuildThreshold() const
   {
     return this->inPlaceRebuildThreshold;
+  }
+
+  /**
+   * @brief Configure the maximum iterations allowed for ConjugateGradient
+   * before automatically falling back to BiCGSTAB on ill-conditioned systems.
+   * Set to <= 0 to disable fallback.
+   *
+   * @param maxIters Max CG iterations (default: 20000)
+   */
+  void configCGFallbackMaxIterations(const int maxIters = 20000)
+  {
+    this->cgFallbackMaxIterations = maxIters;
+  }
+
+  [[nodiscard]] int getCGFallbackMaxIterations() const
+  {
+    return this->cgFallbackMaxIterations;
+  }
+
+  [[nodiscard]] bool wasCGFallbackTriggered() const
+  {
+    return this->cgFallbackTriggered;
+  }
+
+  [[nodiscard]] SLESolver getEffectiveSolverChoice() const
+  {
+    return this->effectiveSolverChoiceState;
   }
 
   /**

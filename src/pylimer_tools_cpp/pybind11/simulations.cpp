@@ -1617,7 +1617,7 @@ A strand is a chain of connected links between two crosslinks.
 
      Please cite :cite:t:`bernhard_phantom_2025` if you use this method.
       )pbdoc")
-    .def(py::init<pe::Universe, int, bool>(),
+    .def(py::init<const pe::Universe&, int, bool>(),
          R"pbdoc(
            Instantiate the simulator for a certain universe.
 
@@ -1632,7 +1632,7 @@ A strand is a chain of connected links between two crosslinks.
          py::arg("crosslinker_type") = 2,
          py::arg("is_2d") = false)
     .def(py::init<
-           pe::Universe,
+           const pe::Universe&,
            pylimer_tools::topo::entanglement_detection::AtomPairEntanglements,
            int,
            bool,
@@ -1652,7 +1652,7 @@ A strand is a chain of connected links between two crosslinks.
          py::arg("is_2d") = false,
          py::arg("entanglements_as_springs") = false)
 
-    .def(py::init<pe::Universe,
+    .def(py::init<const pe::Universe&,
                   size_t,
                   double,
                   double,
@@ -1778,7 +1778,7 @@ A strand is a chain of connected links between two crosslinks.
       py::arg("inactive_removal_cutoff") = 1e-6,
       py::arg_v("sle_solver", mehp::SLESolver::DEFAULT, "SLESolver.DEFAULT"),
       py::arg("tolerance") = 1e-12,
-      py::arg("max_iterations") = 10000)
+      py::arg("max_iterations") = 50000)
     .def("deform_to",
          &mehp::MEHPForceBalance2::deformTo,
          R"pbdoc(
@@ -1832,6 +1832,26 @@ A strand is a chain of connected links between two crosslinks.
          py::arg("threshold") = 0.15)
     .def("get_in_place_rebuild_threshold",
          &mehp::MEHPForceBalance2::getInPlaceRebuildThreshold)
+    .def("config_cg_fallback_max_iterations",
+         &mehp::MEHPForceBalance2::configCGFallbackMaxIterations,
+         R"pbdoc(
+           Configure the maximum iterations allowed for ConjugateGradient before
+           automatically falling back to BiCGSTAB on ill-conditioned systems.
+           Set to <= 0 to disable fallback. Default: 20000.
+          )pbdoc",
+         py::arg("max_iterations") = 20000)
+    .def("get_cg_fallback_max_iterations",
+         &mehp::MEHPForceBalance2::getCGFallbackMaxIterations)
+    .def("was_cg_fallback_triggered",
+         &mehp::MEHPForceBalance2::wasCGFallbackTriggered,
+         R"pbdoc(
+           Check whether the adaptive CG-to-BiCGSTAB fallback was triggered in the last relaxation.
+          )pbdoc")
+    .def("get_effective_solver_choice",
+         &mehp::MEHPForceBalance2::getEffectiveSolverChoice,
+         R"pbdoc(
+           Get the effective solver choice resolved or switched to during relaxation.
+          )pbdoc")
     .def("config_assume_network_is_complete",
          &mehp::MEHPForceBalance2::configAssumeNetworkIsComplete,
          R"pbdoc(

@@ -40,7 +40,6 @@ MEHPForceBalance2::MEHPForceBalance2(
   const bool is2D,
   const bool entanglementsAsSprings)
 {
-  this->universe = u;
   this->is2D = is2D;
   this->crossLinkerType = crossLinkerType;
   this->box = u.getBox();
@@ -196,8 +195,8 @@ MEHPForceBalance2::MEHPForceBalance2(
         } else if (pairOfAtom[currentVertex] >= 0) {
           // 2. entanglement
           auto [fst, snd] = pairsOfAtoms[pairOfAtom[currentVertex]];
-          fst = this->universe.getIdxByAtomId(fst);
-          snd = this->universe.getIdxByAtomId(snd);
+          fst = u.getIdxByAtomId(fst);
+          snd = u.getIdxByAtomId(snd);
           assert(fst == currentVertex || snd == currentVertex);
           addNewLink =
             entanglementsAsSprings || (oldVertexIdToNewLinkId[fst] < 0 &&
@@ -437,8 +436,8 @@ MEHPForceBalance2::MEHPForceBalance2(
 
   if (entanglementsAsSprings) {
     for (const auto& [fst, snd] : pairsOfAtoms) {
-      size_t fstVertexIdx = this->universe.getIdxByAtomId(fst);
-      size_t sndVertexIdx = this->universe.getIdxByAtomId(snd);
+      size_t fstVertexIdx = u.getIdxByAtomId(fst);
+      size_t sndVertexIdx = u.getIdxByAtomId(snd);
       const long int newLink1 = oldVertexIdToNewLinkId[fstVertexIdx];
       const long int newLink2 = oldVertexIdToNewLinkId[sndVertexIdx];
       assert(newLink1 >= 0);
@@ -544,11 +543,9 @@ MEHPForceBalance2::MEHPForceBalance2(
 
   for (size_t linkIdx = 0; linkIdx < nextLinkIdx; ++linkIdx) {
     this->initialConfig.oldAtomIds(linkIdx) =
-      this->universe.getPropertyValue<long int>(
-        "id", newLinkIdxToOldVertexIdx[linkIdx]);
+      u.getPropertyValue<long int>("id", newLinkIdxToOldVertexIdx[linkIdx]);
     this->initialConfig.oldAtomTypes(linkIdx) =
-      this->universe.getPropertyValue<int>("type",
-                                           newLinkIdxToOldVertexIdx[linkIdx]);
+      u.getPropertyValue<int>("type", newLinkIdxToOldVertexIdx[linkIdx]);
     this->initialConfig.coordinates.segment(3 * linkIdx, 3) =
       newLinkPositions[linkIdx];
     this->initialConfig.linkIsEntanglement(linkIdx) =
@@ -560,20 +557,20 @@ MEHPForceBalance2::MEHPForceBalance2(
 
   if (!entanglementsAsSprings) {
     size_t contourLengthSum = this->initialConfig.springContourLength.sum();
-    assert(contourLengthSum == this->universe.getNrOfBonds());
+    assert(contourLengthSum == u.getNrOfBonds());
     assert(this->initialConfig.linkIsEntanglement.count() ==
            entanglements.pairsOfAtoms.size());
     assert(this->initialConfig.springIsEntanglement.count() == 0);
     assert(contourLengthSum - this->initialConfig.nrOfSprings +
              2 * this->initialConfig.nrOfLinks -
              this->initialConfig.nrOfNodes ==
-           this->universe.getNrOfAtoms());
+           u.getNrOfAtoms());
   } else {
     assert(this->initialConfig.springContourLength.sum() ==
-           this->universe.getNrOfBonds() +
-             this->initialConfig.springIsEntanglement.count());
+           u.getNrOfBonds() + this->initialConfig.springIsEntanglement.count());
   }
 
+  this->extractUniverseMetadata(u);
   this->completeInitialization();
 }
 
@@ -582,8 +579,8 @@ MEHPForceBalance2::MEHPForceBalance2(
   const Network& net1,
   const bool is2D)
 {
-  this->universe = universe;
   this->is2D = is2D;
+  this->box = pylimer_tools::entities::Box(net1.L[0], net1.L[1], net1.L[2]);
 
   pylimer_tools::sim::mehp::ForceBalance2Network net2 = {};
 
@@ -657,7 +654,53 @@ MEHPForceBalance2::MEHPForceBalance2(
   this->configAssumeNetworkIsComplete(net1.assumeComplete);
   this->initialConfig = net2;
   this->box = pylimer_tools::entities::Box(net1.L[0], net1.L[1], net1.L[2]);
+  this->extractUniverseMetadata(universe);
   this->completeInitialization();
+}
+
+void
+MEHPForceBalance2::extractUniverseMetadata(
+  const pylimer_tools::entities::Universe& u)
+{
+  this->universeNrOfAtoms = u.getNrOfAtoms();
+  this->defaultBondLength = u.computeMeanBondLength();
+  this->clusterSizes.clear();
+  this->atomIdToClusterIdx.clear();
+
+  if (this->universeNrOfAtoms == 0) {
+    return;
+  }
+
+  igraph_vector_int_t membership;
+  igraph_vector_int_t csize;
+  igraph_integer_t no_clusters = 0;
+  igraph_vector_int_init(&membership, 0);
+  igraph_vector_int_init(&csize, 0);
+
+  if (igraph_connected_components(
+        &u.getGraph(), &membership, &csize, &no_clusters, IGRAPH_WEAK) ==
+      IGRAPH_SUCCESS) {
+    this->clusterSizes.resize(static_cast<size_t>(no_clusters));
+    for (igraph_integer_t i = 0; i < no_clusters; ++i) {
+      this->clusterSizes[static_cast<size_t>(i)] =
+        static_cast<size_t>(VECTOR(csize)[i]);
+    }
+    for (int linkIdx = 0; linkIdx < this->initialConfig.nrOfLinks; ++linkIdx) {
+      long int atomId = this->initialConfig.oldAtomIds[linkIdx];
+      if (atomId >= 0) {
+        try {
+          size_t v = static_cast<size_t>(u.getIdxByAtomId(atomId));
+          this->atomIdToClusterIdx[atomId] = static_cast<size_t>(
+            VECTOR(membership)[static_cast<igraph_integer_t>(v)]);
+        } catch (const std::exception&) {
+          // atom id not in universe
+        }
+      }
+    }
+  }
+
+  igraph_vector_int_destroy(&membership);
+  igraph_vector_int_destroy(&csize);
 }
 
 void
@@ -665,7 +708,6 @@ MEHPForceBalance2::completeInitialization()
 {
   this->currentDisplacements =
     Eigen::VectorXd::Zero(3 * this->initialConfig.nrOfLinks);
-  this->defaultBondLength = universe.computeMeanBondLength();
   RUNTIME_EXP_IFN(this->validateNetwork(), "Invalid internal state");
 }
 
@@ -724,6 +766,8 @@ MEHPForceBalance2::runForceRelaxation(
       effectiveSolverChoice = SLESolver::CONJUGATE_GRADIENT;
     }
   }
+  this->effectiveSolverChoiceState = effectiveSolverChoice;
+  this->cgFallbackTriggered = false;
 
   Eigen::VectorXd oneOverSpringPartitions =
     this->assembleOneOverSpringPartition(this->initialConfig);
@@ -1026,11 +1070,120 @@ MEHPForceBalance2::runForceRelaxation(
       // iterative solvers
       case SLESolver::CONJUGATE_GRADIENT:
       case SLESolver::CONJUGATE_GRADIENT_DIAGONALIZED: {
+        if (constants.isZero(1e-9)) {
+          finalCoordinates = Eigen::VectorXd::Zero(constants.size());
+          this->exitReason = ExitReason::X_TOLERANCE;
+          break;
+        }
+
         Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
                                  Eigen::Lower | Eigen::Upper,
                                  Eigen::DiagonalPreconditioner<double>>
           solver;
-        SOLVE_ITERATIVE(solver);
+        const double targetTol = std::sqrt(residualReduction);
+        solver.setTolerance(targetTol);
+        const int cgMaxIters =
+          (this->cgFallbackMaxIterations > 0)
+            ? std::min(maxIterations, this->cgFallbackMaxIterations)
+            : maxIterations;
+        solver.setMaxIterations(cgMaxIters);
+        solver.compute(sysMatrix);
+        if (solver.info() != Eigen::Success) {
+          SOLVER_FAILED("System matrix computation failed");
+        }
+
+        const size_t nLinks = this->initialConfig.nrOfLinks;
+        Eigen::MatrixX3d B(nLinks, 3);
+        for (size_t i = 0; i < nLinks; ++i) {
+          B(i, 0) = constants[3 * i];
+          B(i, 1) = constants[3 * i + 1];
+          B(i, 2) = constants[3 * i + 2];
+        }
+
+        Eigen::MatrixX3d X(nLinks, 3);
+        for (size_t i = 0; i < nLinks; ++i) {
+          X(i, 0) = initialSolution[3 * i];
+          X(i, 1) = initialSolution[3 * i + 1];
+          X(i, 2) = initialSolution[3 * i + 2];
+        }
+
+        const int numCols = this->is2D ? 2 : 3;
+        bool fallbackNeeded = false;
+
+        for (int col = 0; col < numCols; ++col) {
+          X.col(col) = solver.solve(B.col(col));
+          if (solver.info() != Eigen::Success &&
+              solver.info() != Eigen::NoConvergence) {
+            SOLVER_FAILED("System could not be solved");
+          }
+          iterationsDone += solver.iterations();
+
+          if (this->cgFallbackMaxIterations > 0 &&
+              (solver.info() == Eigen::NoConvergence ||
+               (solver.iterations() >= cgMaxIters &&
+                solver.error() > targetTol))) {
+            fallbackNeeded = true;
+            break;
+          }
+        }
+
+        if (fallbackNeeded) {
+          std::cout
+            << "ConjugateGradient did not converge within " << cgMaxIters
+            << " iterations (residual reduction target: " << residualReduction
+            << ", CG error: " << solver.error()
+            << "); automatically switching to BiCGSTAB to complete relaxation."
+            << std::endl;
+          this->cgFallbackTriggered = true;
+          effectiveSolverChoice = SLESolver::BICGSTAB;
+          this->effectiveSolverChoiceState = SLESolver::BICGSTAB;
+
+          Eigen::BiCGSTAB<Eigen::SparseMatrix<double>,
+                          Eigen::DiagonalPreconditioner<double>>
+            bicgstabSolver;
+          bicgstabSolver.setTolerance(targetTol);
+          bicgstabSolver.setMaxIterations(maxIterations);
+          bicgstabSolver.compute(sysMatrix);
+          if (bicgstabSolver.info() != Eigen::Success) {
+            SOLVER_FAILED(
+              "System matrix computation failed for BiCGSTAB fallback");
+          }
+
+          for (int col = 0; col < numCols; ++col) {
+            bool useGuess = X.col(col).allFinite() && !X.col(col).isZero();
+            if (useGuess) {
+              Eigen::VectorXd xGuess =
+                bicgstabSolver.solveWithGuess(B.col(col), X.col(col));
+              if (bicgstabSolver.info() == Eigen::Success) {
+                X.col(col) = xGuess;
+              } else {
+                X.col(col) = bicgstabSolver.solve(B.col(col));
+              }
+            } else {
+              X.col(col) = bicgstabSolver.solve(B.col(col));
+            }
+
+            if (bicgstabSolver.info() != Eigen::Success &&
+                bicgstabSolver.info() != Eigen::NoConvergence) {
+              SOLVER_FAILED("System could not be solved by BiCGSTAB fallback");
+            }
+            iterationsDone += bicgstabSolver.iterations();
+          }
+        }
+
+        if (this->is2D) {
+          for (size_t i = 0; i < nLinks; ++i) {
+            X(i, 2) = this->initialConfig.coordinates[3 * i + 2];
+          }
+        }
+        finalCoordinates.resize(3 * nLinks);
+        for (size_t i = 0; i < nLinks; ++i) {
+          finalCoordinates[3 * i] = X(i, 0);
+          finalCoordinates[3 * i + 1] = X(i, 1);
+          finalCoordinates[3 * i + 2] = X(i, 2);
+        }
+        this->exitReason = ExitReason::X_TOLERANCE;
+        break;
       }
       case SLESolver::CONJUGATE_GRADIENT_IDENTITY: {
         Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
@@ -2340,7 +2493,6 @@ MEHPForceBalance2::deformTo(const pylimer_tools::entities::Box& newBox)
   this->box.adjustCoordinatesTo(this->currentDisplacements, newBox);
   this->box.adjustCoordinatesTo(this->initialConfig.springBoxOffset, newBox);
   this->box = newBox;
-  this->universe.setBox(newBox, true);
   for (size_t i = 0; i < 3; ++i) {
     this->initialConfig.L[i] = this->box.getL(i);
     this->initialConfig.boxHalfs[i] = 0.5 * this->initialConfig.L[i];
@@ -3195,7 +3347,7 @@ MEHPForceBalance2::computeActiveWeightFraction(ForceBalance2Network& net,
   // normalize by the number of atoms
   const double nAtoms = this->assumeNetworkIsComplete
                           ? (this->inferNrOfAtomsFromNetwork(net))
-                          : this->universe.getNrOfAtoms();
+                          : static_cast<double>(this->universeNrOfAtoms);
   const double result =
     (nActiveAtomsFromSprings +
      (nEntanglementSprings > 0 ? 1. : 2.) * nActiveEntanglementLinks +
@@ -3374,37 +3526,30 @@ MEHPForceBalance2::countActiveClusteredAtoms(ForceBalance2Network& net,
            2 * nActiveEntanglementLinks;
   }
 
-  RUNTIME_EXP_IFN(this->universe.getNrOfAtoms() >= net.nrOfLinks,
+  RUNTIME_EXP_IFN(this->universeNrOfAtoms >= net.nrOfLinks,
                   "Expected number of atoms in universe to be at least "
                   "equal to the number of links, got " +
-                    std::to_string(this->universe.getNrOfAtoms()) + " < " +
+                    std::to_string(this->universeNrOfAtoms) + " < " +
                     std::to_string(net.nrOfLinks) + ".");
 
-  const std::vector<pylimer_tools::entities::Universe> clusters =
-    this->universe.getClusters();
-  std::vector<long int> vertexIdxToClusterIdx(this->universe.getNrOfAtoms());
-  for (size_t i = 0; i < clusters.size(); ++i) {
-    for (const pylimer_tools::entities::Atom& atom : clusters[i].getAtoms()) {
-      vertexIdxToClusterIdx[this->universe.getIdxByAtomId(atom.getId())] = i;
-    }
-  }
-
-  std::vector<bool> clusterIsActive(clusters.size(), false);
+  std::vector<bool> clusterIsActive(this->clusterSizes.size(), false);
 
   // find active atoms
   const std::vector<int> activeNodeIndices =
     this->getIndicesOfActiveNodes(net, u, tolerance);
 
   for (const long int& nodeIdx : activeNodeIndices) {
-    const long int universeAtomIdx =
-      this->universe.getIdxByAtomId(net.oldAtomIds[nodeIdx]);
-    clusterIsActive[vertexIdxToClusterIdx[universeAtomIdx]] = true;
+    const long int atomId = net.oldAtomIds[nodeIdx];
+    auto it = this->atomIdToClusterIdx.find(atomId);
+    if (it != this->atomIdToClusterIdx.end()) {
+      clusterIsActive[it->second] = true;
+    }
   }
 
   double nClusteredAtoms = 0.;
-  for (size_t i = 0; i < clusters.size(); ++i) {
+  for (size_t i = 0; i < this->clusterSizes.size(); ++i) {
     if (clusterIsActive[i]) {
-      nClusteredAtoms += clusters[i].getNrOfAtoms();
+      nClusteredAtoms += static_cast<double>(this->clusterSizes[i]);
     }
   }
 
@@ -3434,12 +3579,12 @@ MEHPForceBalance2::computeSolubleWeightFraction(ForceBalance2Network& net,
     this->countActiveClusteredAtoms(net, u, tolerance);
   const double nAtoms = this->assumeNetworkIsComplete
                           ? this->inferNrOfAtomsFromNetwork(net)
-                          : static_cast<double>(this->universe.getNrOfAtoms());
+                          : static_cast<double>(this->universeNrOfAtoms);
 
 #ifndef NDEBUG
-  if (this->assumeNetworkIsComplete && this->universe.getNrOfAtoms() > 0) {
+  if (this->assumeNetworkIsComplete && this->universeNrOfAtoms > 0) {
     assert(APPROX_EQUAL(this->inferNrOfAtomsFromNetwork(net),
-                        this->universe.getNrOfAtoms(),
+                        static_cast<double>(this->universeNrOfAtoms),
                         0.5));
   }
 #endif
