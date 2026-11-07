@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -422,12 +424,12 @@ adjusting the fraction of the contour length on both sides of the link.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>universe</strong> – The universe to simulate with</p></li>
-<li><p><strong>crosslinker_type</strong> – The atom type of the crosslinkers. Needed to reduce the network.</p></li>
-<li><p><strong>is2D</strong> – Whether to ignore the z direction.</p></li>
-<li><p><strong>kappa</strong> – The spring constant</p></li>
-<li><p><strong>remove_2functionalCrosslinkers</strong> – whether to keep or remove the 2-functional crosslinkers when setting up the network</p></li>
-<li><p><strong>remove_dangling_chains</strong> – whether to keep or remove obviously dangling chains when setting up the network</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.params.universe"></span><strong>universe</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.params.universe">¶</a> – The universe to simulate with</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.params.crosslinker_type">¶</a> – The atom type of the crosslinkers. Needed to reduce the network.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.params.is2D"></span><strong>is2D</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.params.is2D">¶</a> – Whether to ignore the z direction.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.params.kappa"></span><strong>kappa</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.params.kappa">¶</a> – The spring constant</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.params.remove_2functionalCrosslinkers"></span><strong>remove_2functionalCrosslinkers</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.params.remove_2functionalCrosslinkers">¶</a> – whether to keep or remove the 2-functional crosslinkers when setting up the network</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.params.remove_dangling_chains"></span><strong>remove_dangling_chains</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.params.remove_dangling_chains">¶</a> – whether to keep or remove obviously dangling chains when setting up the network</p></li>
 </ul>
 </dd>
 </dl>
@@ -678,7 +680,7 @@ adjusting the fraction of the contour length on both sides of the link.</p>
 <dd><p>Configure whether to run PBC on the bonds or not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>box_large_enough</strong> – If True, assume the box is large enough and don’t apply PBC on bonds.
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough.params.box_large_enough"></span><strong>box_large_enough</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough.params.box_large_enough">¶</a> – If True, assume the box is large enough and don’t apply PBC on bonds.
 If your bonds could get larger than half the box length,
 this must be kept False (default).</p>
 </dd>
@@ -698,7 +700,7 @@ you can call this method to have the “StructureSimplificationMode” also remo
 if they have a functionality of 2 or less while still being connected to its partner bead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>type</strong> – The atom type to treat as entanglement.</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.config_entanglement_type.params.type"></span><strong>type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_entanglement_type.params.type">¶</a> – The atom type to treat as entanglement.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -709,7 +711,7 @@ if they have a functionality of 2 or less while still being connected to its par
 <dd><p>Configure the <span class="math notranslate nohighlight">\(b\)</span> used e.g. for the topological Gamma-factor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>b</strong> – The mean bond length to use.</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.config_mean_bond_length.params.b"></span><strong>b</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_mean_bond_length.params.b">¶</a> – The mean bond length to use.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -720,7 +722,7 @@ if they have a functionality of 2 or less while still being connected to its par
 <dd><p>Configure every how many steps to simplify the structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>frequency</strong> – The number of steps between simplification. Default: 10.</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.config_simplification_frequency.params.frequency"></span><strong>frequency</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_simplification_frequency.params.frequency">¶</a> – The number of steps between simplification. Default: 10.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -735,7 +737,7 @@ Negative values will disable spring breaking.
 Default: -1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>distance_over_contour_length</strong> – The threshold for breaking springs.</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.config_spring_breaking_distance.params.distance_over_contour_length"></span><strong>distance_over_contour_length</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_spring_breaking_distance.params.distance_over_contour_length">¶</a> – The threshold for breaking springs.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -746,7 +748,7 @@ Default: -1.</p>
 <dd><p>Configure the spring constant used in the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>kappa</strong> – The spring constant.</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.config_spring_constant.params.kappa"></span><strong>kappa</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_spring_constant.params.kappa">¶</a> – The spring constant.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -757,7 +759,7 @@ Default: -1.</p>
 <dd><p>Set which values to log during the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>output_configuration</strong> – A list of OutputConfiguration structs
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.config_step_output.params.output_configuration"></span><strong>output_configuration</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_step_output.params.output_configuration">¶</a> – A list of OutputConfiguration structs
 specifying what values to log and how often</p>
 </dd>
 </dl>
@@ -783,9 +785,9 @@ All coordinates etc. will be scaled as needed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The force balance network</p></li>
-<li><p><strong>displacements</strong> – Current displacement vector</p></li>
-<li><p><strong>spring_idx</strong> – Index of the spring to evaluate</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance.params.network">¶</a> – The force balance network</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance.params.displacements"></span><strong>displacements</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance.params.displacements">¶</a> – Current displacement vector</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance.params.spring_idx"></span><strong>spring_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance.params.spring_idx">¶</a> – Index of the spring to evaluate</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -801,10 +803,10 @@ All coordinates etc. will be scaled as needed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The force balance network</p></li>
-<li><p><strong>displacements</strong> – Current displacement vector</p></li>
-<li><p><strong>spring_idx</strong> – Index of the spring to evaluate</p></li>
-<li><p><strong>link_idx</strong> – Index of the starting link</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from.params.network">¶</a> – The force balance network</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from.params.displacements"></span><strong>displacements</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from.params.displacements">¶</a> – Current displacement vector</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from.params.spring_idx"></span><strong>spring_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from.params.spring_idx">¶</a> – Index of the spring to evaluate</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from.params.link_idx"></span><strong>link_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from.params.link_idx">¶</a> – Index of the starting link</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -820,10 +822,10 @@ All coordinates etc. will be scaled as needed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The force balance network</p></li>
-<li><p><strong>displacements</strong> – Current displacement vector</p></li>
-<li><p><strong>spring_idx</strong> – Index of the spring to evaluate</p></li>
-<li><p><strong>link_idx</strong> – Index of the target link</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_to.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_to.params.network">¶</a> – The force balance network</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_to.params.displacements"></span><strong>displacements</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_to.params.displacements">¶</a> – Current displacement vector</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_to.params.spring_idx"></span><strong>spring_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_to.params.spring_idx">¶</a> – Index of the spring to evaluate</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_to.params.link_idx"></span><strong>link_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_to.params.link_idx">¶</a> – Index of the target link</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -907,7 +909,7 @@ this value is normalized by the number of strands rather than the number of chai
 <dd><p>Returns the number of active strands connected to each atom, atomId used as index</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tolerance</strong> – strands under this length are considered inactive</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_effective_functionality_of_atoms.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_effective_functionality_of_atoms.params.tolerance">¶</a> – strands under this length are considered inactive</p>
 </dd>
 </dl>
 </dd></dl>
@@ -946,8 +948,8 @@ where <span class="math notranslate nohighlight">\(\eta\)</span> is the index of
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>b02</strong> – The melt <span class="math notranslate nohighlight">\(&lt;b&gt;_0^2\)</span>: mean bond length squared; vgl. the required &lt;R_0^2&gt;, computed as phantom = N&lt;b&gt;^2; otherwise, it’s the slope in a &lt;R_0^2&gt; vs. N plot, also sometimes labelled <span class="math notranslate nohighlight">\(C_\infinity b^2\)</span>.</p></li>
-<li><p><strong>nr_of_chains</strong> – The value to normalize the sum of square distances by. Usually (and default if <span class="math notranslate nohighlight">\(&lt; 0\)</span>) the nr of springs.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor.params.b02"></span><strong>b02</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor.params.b02">¶</a> – The melt <span class="math notranslate nohighlight">\(&lt;b&gt;_0^2\)</span>: mean bond length squared; vgl. the required &lt;R_0^2&gt;, computed as phantom = N&lt;b&gt;^2; otherwise, it’s the slope in a &lt;R_0^2&gt; vs. N plot, also sometimes labelled <span class="math notranslate nohighlight">\(C_\infinity b^2\)</span>.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor.params.nr_of_chains"></span><strong>nr_of_chains</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor.params.nr_of_chains">¶</a> – The value to normalize the sum of square distances by. Usually (and default if <span class="math notranslate nohighlight">\(&lt; 0\)</span>) the nr of springs.</p></li>
 </ul>
 </dd>
 </dl>
@@ -966,8 +968,8 @@ where <span class="math notranslate nohighlight">\(\eta\)</span> is the index of
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>b02</strong> – The melt <span class="math notranslate nohighlight">\(&lt;b&gt;_0^2\)</span>: mean bond length squared; vgl. the required &lt;R_0^2&gt;, computed as phantom = N&lt;b&gt;^2; otherwise, it’s the slope in a &lt;R_0^2&gt; vs. N plot, also sometimes labelled <span class="math notranslate nohighlight">\(C_\infinity b^2\)</span>.</p></li>
-<li><p><strong>direction</strong> – The direction in which to compute the gamma factors (0: x, 1: y, 2: z)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_gamma_factors_in_dir.params.b02"></span><strong>b02</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_gamma_factors_in_dir.params.b02">¶</a> – The melt <span class="math notranslate nohighlight">\(&lt;b&gt;_0^2\)</span>: mean bond length squared; vgl. the required &lt;R_0^2&gt;, computed as phantom = N&lt;b&gt;^2; otherwise, it’s the slope in a &lt;R_0^2&gt; vs. N plot, also sometimes labelled <span class="math notranslate nohighlight">\(C_\infinity b^2\)</span>.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_gamma_factors_in_dir.params.direction"></span><strong>direction</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_gamma_factors_in_dir.params.direction">¶</a> – The direction in which to compute the gamma factors (0: x, 1: y, 2: z)</p></li>
 </ul>
 </dd>
 </dl>
@@ -980,7 +982,7 @@ where <span class="math notranslate nohighlight">\(\eta\)</span> is the index of
 Only crosslink ids are returned (not e.g. entanglement links).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tolerance</strong> – strands under this length are considered inactive. A node is active if it has &gt; 1 active strands.</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_ids_of_active_nodes.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_ids_of_active_nodes.params.tolerance">¶</a> – strands under this length are considered inactive. A node is active if it has &gt; 1 active strands.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -998,8 +1000,8 @@ Only crosslink ids are returned (not e.g. entanglement links).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The force balance network</p></li>
-<li><p><strong>link_idx</strong> – Index of the link to find neighbors for</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_neighbour_link_indices.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_neighbour_link_indices.params.network">¶</a> – The force balance network</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_neighbour_link_indices.params.link_idx"></span><strong>link_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_neighbour_link_indices.params.link_idx">¶</a> – Index of the link to find neighbors for</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1015,7 +1017,7 @@ Only crosslink ids are returned (not e.g. entanglement links).</p>
 excl. entanglement links [the slip-links created internally when e.g. constructing the simulator with random slip-links]).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tolerance</strong> – strands under this length are considered inactive. A node is active if it has &gt; 1 active strands.</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_nr_of_active_nodes.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_nr_of_active_nodes.params.tolerance">¶</a> – strands under this length are considered inactive. A node is active if it has &gt; 1 active strands.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1028,7 +1030,7 @@ excl. entanglement links [the slip-links created internally when e.g. constructi
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tolerance</strong> – springs under this length are considered inactive</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_nr_of_active_springs.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_nr_of_active_springs.params.tolerance">¶</a> – springs under this length are considered inactive</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1041,7 +1043,7 @@ excl. entanglement links [the slip-links created internally when e.g. constructi
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tolerance</strong> – strands under this length are considered inactive</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_nr_of_active_strands.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_nr_of_active_strands.params.tolerance">¶</a> – strands under this length are considered inactive</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1055,8 +1057,8 @@ excl. entanglement links [the slip-links created internally when e.g. constructi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>direction</strong> – The direction in which to compute the active strands (0: x, 1: y, 2: z)</p></li>
-<li><p><strong>tolerance</strong> – strands under this length are considered inactive</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_nr_of_active_strands_in_dir.params.direction"></span><strong>direction</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_nr_of_active_strands_in_dir.params.direction">¶</a> – The direction in which to compute the active strands (0: x, 1: y, 2: z)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_nr_of_active_strands_in_dir.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_nr_of_active_strands_in_dir.params.tolerance">¶</a> – strands under this length are considered inactive</p></li>
 </ul>
 </dd>
 </dl>
@@ -1132,8 +1134,8 @@ strands (any depth).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The force balance network</p></li>
-<li><p><strong>link_idx</strong> – Index of the slip-link</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_strand_partition_indices_of_sliplink.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_strand_partition_indices_of_sliplink.params.network">¶</a> – The force balance network</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.get_strand_partition_indices_of_sliplink.params.link_idx"></span><strong>link_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.get_strand_partition_indices_of_sliplink.params.link_idx">¶</a> – Index of the slip-link</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1216,17 +1218,17 @@ As a consequence though, you cannot simply benchmark only this method; you must 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>max_nr_of_steps</strong> – The maximum number of steps to do during the simulation.</p></li>
-<li><p><strong>x_tolerance</strong> – The tolerance of the displacements as an exit condition.</p></li>
-<li><p><strong>initial_residual_norm</strong> – The residual norm relative to which the relative tolerance is specified. Negative values mean, it will be replaced with the current one.</p></li>
-<li><p><strong>simplification_mode</strong> – How to simplify the structure during the minimization.</p></li>
-<li><p><strong>inactive_removal_cutoff</strong> – The tolerance in distance units of the partial spring length to count as active, relevant if simplification mode is specified to be something other than NO_SIMPLIFICATION.</p></li>
-<li><p><strong>do_inner_iterations</strong> – Whether to do inner iterations; usually, they are not helpful.</p></li>
-<li><p><strong>allow_sliplinks_to_pass_each_other</strong> – Whether slip-links can pass each other.</p></li>
-<li><p><strong>swapping_frequency</strong> – How often slip-links attempt to swap.</p></li>
-<li><p><strong>one_over_strand_partition_upper_limit</strong> – Super-secret parameter. Use 1, gradually increase (and then -1) if you want to publish.</p></li>
-<li><p><strong>nr_of_crosslink_swaps_allowed_per_sliplink</strong> – Use to steer whether slip-links can cross crosslinks when swapping is enabled.</p></li>
-<li><p><strong>disable_slipping</strong> – Whether slip-links should be prohibited from slipping.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.max_nr_of_steps"></span><strong>max_nr_of_steps</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.max_nr_of_steps">¶</a> – The maximum number of steps to do during the simulation.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.x_tolerance"></span><strong>x_tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.x_tolerance">¶</a> – The tolerance of the displacements as an exit condition.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.initial_residual_norm"></span><strong>initial_residual_norm</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.initial_residual_norm">¶</a> – The residual norm relative to which the relative tolerance is specified. Negative values mean, it will be replaced with the current one.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.simplification_mode"></span><strong>simplification_mode</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.simplification_mode">¶</a> – How to simplify the structure during the minimization.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.inactive_removal_cutoff"></span><strong>inactive_removal_cutoff</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.inactive_removal_cutoff">¶</a> – The tolerance in distance units of the partial spring length to count as active, relevant if simplification mode is specified to be something other than NO_SIMPLIFICATION.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.do_inner_iterations"></span><strong>do_inner_iterations</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.do_inner_iterations">¶</a> – Whether to do inner iterations; usually, they are not helpful.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.allow_sliplinks_to_pass_each_other"></span><strong>allow_sliplinks_to_pass_each_other</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.allow_sliplinks_to_pass_each_other">¶</a> – Whether slip-links can pass each other.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.swapping_frequency"></span><strong>swapping_frequency</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.swapping_frequency">¶</a> – How often slip-links attempt to swap.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.one_over_strand_partition_upper_limit"></span><strong>one_over_strand_partition_upper_limit</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.one_over_strand_partition_upper_limit">¶</a> – Super-secret parameter. Use 1, gradually increase (and then -1) if you want to publish.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.nr_of_crosslink_swaps_allowed_per_sliplink"></span><strong>nr_of_crosslink_swaps_allowed_per_sliplink</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.nr_of_crosslink_swaps_allowed_per_sliplink">¶</a> – Use to steer whether slip-links can cross crosslinks when swapping is enabled.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.disable_slipping"></span><strong>disable_slipping</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.run_force_relaxation.params.disable_slipping">¶</a> – Whether slip-links should be prohibited from slipping.</p></li>
 </ul>
 </dd>
 </dl>

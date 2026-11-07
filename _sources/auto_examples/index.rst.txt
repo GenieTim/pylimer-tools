@@ -104,7 +104,7 @@ Entanglements (slip-links) can be sampled in two distinct ways:
 1. **Discrete full-universe sampling**: Directly on explicit bead coordinates in a :class:`~pylimer_tools_cpp.Universe`.
 2. **Analytical Brownian-bridge sampling**: Directly on the crosslinkers and strand connectivity of a :class:`~pylimer_tools_cpp.CrosslinkerUniverse` without instantiating intermediate strand beads, reducing peak memory by up to 90%+ and supporting topological leaf peeling of dangling and soluble fractions.
 
-See :doc:`plot_entanglement_sampling_comparison` for a detailed benchmark and comparison of these methods.
+See :doc:`plot_entanglement_sampling_comparison` for a detailed benchmark and comparison of discrete vs. analytical sampling methods, and :doc:`plot_sliplink_vs_slipspring` for the difference between modeling entanglements as merged slip-links versus compliant Hookean slip-springs.
 
 
 .. raw:: html
@@ -183,6 +183,23 @@ See :doc:`plot_entanglement_sampling_comparison` for a detailed benchmark and co
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Deformation Experiment</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements impose constraints on polymer chain fluctuations.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_sliplink_vs_slipspring_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_sliplink_vs_slipspring`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Modeling Entanglements: Slip-Links vs. Slip-Springs</div>
     </div>
 
 

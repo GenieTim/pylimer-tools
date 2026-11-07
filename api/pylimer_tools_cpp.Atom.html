@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -540,8 +542,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>to_atom</strong> – The target atom</p></li>
-<li><p><strong>pbc_box</strong> – The periodic boundary conditions box</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Atom.compute_vector_to.params.to_atom"></span><strong>to_atom</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.compute_vector_to.params.to_atom">¶</a> – The target atom</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Atom.compute_vector_to.params.pbc_box"></span><strong>pbc_box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.compute_vector_to.params.pbc_box">¶</a> – The periodic boundary conditions box</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -557,8 +559,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>to_atom</strong> – The target atom</p></li>
-<li><p><strong>pbc_box</strong> – The periodic boundary conditions box</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Atom.distance_to.params.to_atom"></span><strong>to_atom</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.distance_to.params.to_atom">¶</a> – The target atom</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Atom.distance_to.params.pbc_box"></span><strong>pbc_box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.distance_to.params.pbc_box">¶</a> – The periodic boundary conditions box</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -573,7 +575,7 @@
 <dd><p>Compute the distance to another atom respecting the periodic image flags.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>to_atom</strong> – The target atom</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Atom.distance_to_unwrapped.params.to_atom"></span><strong>to_atom</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.distance_to_unwrapped.params.to_atom">¶</a> – The target atom</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Unwrapped distance to the target atom</p>
@@ -653,7 +655,7 @@
 <dd><p>Get a specific property value from the extra data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>property</strong> – The name of the property to retrieve</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Atom.get_property.params.property"></span><strong>property</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.get_property.params.property">¶</a> – The name of the property to retrieve</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The value of the specified property</p>
@@ -681,7 +683,7 @@
 <dd><p>Get the unwrapped coordinates of this atom.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>box</strong> – The simulation box to use for unwrapping</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Atom.get_unwrapped_coordinates.params.box"></span><strong>box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.get_unwrapped_coordinates.params.box">¶</a> – The simulation box to use for unwrapping</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A vector containing the unwrapped x, y, z coordinates</p>
@@ -695,7 +697,7 @@
 <dd><p>Get the unwrapped x coordinate of the atom.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>box</strong> – The simulation box to use for unwrapping</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Atom.get_unwrapped_x.params.box"></span><strong>box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.get_unwrapped_x.params.box">¶</a> – The simulation box to use for unwrapping</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The unwrapped x coordinate</p>
@@ -709,7 +711,7 @@
 <dd><p>Get the unwrapped y coordinate of the atom.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>box</strong> – The simulation box to use for unwrapping</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Atom.get_unwrapped_y.params.box"></span><strong>box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.get_unwrapped_y.params.box">¶</a> – The simulation box to use for unwrapping</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The unwrapped y coordinate</p>
@@ -723,7 +725,7 @@
 <dd><p>Get the unwrapped z coordinate of the atom.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>box</strong> – The simulation box to use for unwrapping</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Atom.get_unwrapped_z.params.box"></span><strong>box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.get_unwrapped_z.params.box">¶</a> – The simulation box to use for unwrapping</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The unwrapped z coordinate</p>
@@ -771,8 +773,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>other_atom</strong> – The other atom</p></li>
-<li><p><strong>pbc_box</strong> – The periodic boundary conditions box</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Atom.mean_position_with.params.other_atom"></span><strong>other_atom</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.mean_position_with.params.other_atom">¶</a> – The other atom</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Atom.mean_position_with.params.pbc_box"></span><strong>pbc_box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.mean_position_with.params.pbc_box">¶</a> – The periodic boundary conditions box</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -788,8 +790,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>other_atom</strong> – The other atom</p></li>
-<li><p><strong>pbc_box</strong> – The periodic boundary conditions box</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Atom.mean_position_with_unwrapped.params.other_atom"></span><strong>other_atom</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.mean_position_with_unwrapped.params.other_atom">¶</a> – The other atom</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Atom.mean_position_with_unwrapped.params.pbc_box"></span><strong>pbc_box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.mean_position_with_unwrapped.params.pbc_box">¶</a> – The periodic boundary conditions box</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -804,7 +806,7 @@
 <dd><p>Compute the vector to another atom respecting the periodic image flags.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>to_atom</strong> – The target atom</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Atom.vector_to_unwrapped.params.to_atom"></span><strong>to_atom</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Atom.vector_to_unwrapped.params.to_atom">¶</a> – The target atom</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Unwrapped vector to the target atom</p>

@@ -36,6 +36,7 @@ from pathlib import Path
 import sys
 
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import numpy as np
 
 # %%
@@ -43,30 +44,30 @@ import numpy as np
 # -------------------------------------------------
 # In a polymer network, strands between crosslinkers fluctuate thermally.
 # Under the affine network model and Gaussian chain approximation, the position
-# :math:`\\mathbf{r}(\\alpha)` of a bead at contour fraction :math:`\\alpha \\in (0, 1)`
-# on a strand connecting crosslinker anchors :math:`\\mathbf{R}_1` and :math:`\\mathbf{R}_2`
+# :math:`\mathbf{r}(\alpha)` of a bead at contour fraction :math:`\alpha \in (0, 1)`
+# on a strand connecting crosslinker anchors :math:`\mathbf{R}_1` and :math:`\mathbf{R}_2`
 # follows a **Brownian bridge** conditional on its endpoints:
 #
 # .. math::
 #
-#    \\mathbf{r}(\\alpha) \\sim \\mathcal{N}\\left( (1-\\alpha)\\mathbf{R}_1 + \\alpha\\mathbf{R}_2,\\;
-#    \\alpha(1-\\alpha) N b^2 / 3 \\,\\mathbf{I} \\right)
+#    \mathbf{r}(\alpha) \sim \mathcal{N}\left( (1-\alpha)\mathbf{R}_1 + \alpha\mathbf{R}_2,\;
+#    \alpha(1-\alpha) N b^2 / 3 \,\mathbf{I} \right)
 #
 # Where:
 #
 # - :math:`N` is the number of bonds in the strand,
 # - :math:`b` is the statistical segment length (Kuhn length or bead distance),
-# - :math:`\\alpha = k / N` is the fractional contour position of bead :math:`k`.
+# - :math:`\alpha = k / N` is the fractional contour position of bead :math:`k`.
 #
-# The traditional **Discrete Method** explicitly generates all :math:`N_{\\text{atoms}}` beads in
-# 3D space and constructs spatial cell lists to find pairs within cutoff :math:`r_{\\text{cut}}`.
+# The traditional **Discrete Method** explicitly generates all :math:`N_{\text{atoms}}` beads in
+# 3D space and constructs spatial cell lists to find pairs within cutoff :math:`r_{\text{cut}}`.
 #
 # The new **Analytical Method** skips bead coordinates entirely. It works directly on
-# :class:`~pylimer_tools_cpp.CrosslinkerUniverse` (:math:`N_{\\text{xlinks}} \\ll N_{\\text{atoms}}`),
-# selecting pairs of strands and sampling continuous contour positions :math:`\\alpha_1, \\alpha_2`
+# :class:`~pylimer_tools_cpp.CrosslinkerUniverse` (:math:`N_{\text{xlinks}} \ll N_{\text{atoms}}`),
+# selecting pairs of strands and sampling continuous contour positions :math:`\alpha_1, \alpha_2`
 # from their conditional Gaussian distributions. Furthermore, it incorporates **topological leaf
-# peeling** (:paramref:`filter_dangling_and_soluble=True`), guaranteeing that slip-links are
-# placed only on elastically active, load-bearing strands.
+# peeling** (``filter_dangling_and_soluble=True``), discarding candidate links that involve
+# dangling chains or soluble molecules.
 
 # %%
 # Loading Benchmark & Statistical Data
@@ -146,7 +147,6 @@ n_ent_ana_filt = data["n_ent_ana_filtered"]
 g_ana_unfilt = data["g_ana_unfiltered"]
 w_act_ana_unfilt = data["w_active_ana_unfiltered"]
 n_ent_ana_unfilt = data["n_ent_ana_unfiltered"]
-g_ana_springs = data["g_ana_springs"]
 target_n_ent = int(data["target_n_ent"])
 
 # %%
@@ -159,6 +159,17 @@ target_n_ent = int(data["target_n_ent"])
 # large networks.
 
 fig, (ax_mem, ax_time) = plt.subplots(1, 2, figsize=(11, 4.5))
+
+
+def format_k(x, pos):
+    if x >= 1e6:
+        return f"{x * 1e-6:.1f}".rstrip("0").rstrip(".") + "M"
+    if x >= 1e3:
+        return f"{int(x * 1e-3)}k"
+    return str(int(x))
+
+
+k_formatter = ticker.FuncFormatter(format_k)
 
 # Peak Memory
 ax_mem.plot(
@@ -189,7 +200,7 @@ pct_savings = (1.0 - mem_ana_last / mem_disc_last) * 100.0
 ax_mem.annotate(
     f"{pct_savings:.0f}% Memory\nReduction",
     xy=(max_atoms, mem_ana_last),
-    xytext=(max_atoms * 0.45, (mem_disc_last + mem_ana_last) / 2.0),
+    xytext=(max_atoms * 0.60, 75),
     arrowprops=dict(arrowstyle="->", color="#1b9e77", lw=1.5),
     fontsize=10,
     fontweight="bold",
@@ -199,6 +210,7 @@ ax_mem.annotate(
 
 ax_mem.set_xscale("log")
 ax_mem.set_yscale("log")
+ax_mem.xaxis.set_major_formatter(k_formatter)
 ax_mem.set_xlabel(r"Total Atoms in Network ($N_{\mathrm{atoms}}$)")
 ax_mem.set_ylabel("Peak Resident Memory (RSS) [MB]")
 ax_mem.set_title("Peak Memory Consumption")
@@ -225,10 +237,13 @@ ax_time.plot(
     label="Analytical (Universe-Free)",
 )
 
+ax_time.set_xscale("log")
+ax_time.set_yscale("log")
+ax_time.xaxis.set_major_formatter(k_formatter)
 ax_time.set_xlabel(r"Total Atoms in Network ($N_{\mathrm{atoms}}$)")
 ax_time.set_ylabel("Setup & Sampling Time [s]")
 ax_time.set_title("Setup & Sampling Execution Time")
-ax_time.grid(True, linestyle="--", alpha=0.5)
+ax_time.grid(True, which="both", linestyle="--", alpha=0.5)
 ax_time.legend(frameon=True)
 
 plt.tight_layout()
@@ -242,13 +257,13 @@ plt.show()
 #
 # Below, we compare:
 #
-# 1. **Contour position** :math:`\\alpha \\in (0, 1)`: Both distributions exhibit the characteristic
-#    bell curve peaked near :math:`\\alpha \\approx 0.5`. Beads near crosslinkers are spatially
+# 1. **Contour position** :math:`\alpha \in (0, 1)`: Both distributions exhibit the characteristic
+#    bell curve peaked near :math:`\alpha \approx 0.5`. Beads near crosslinkers are spatially
 #    pinned, whereas strand midpoints explore the largest conformational volume and are most
 #    likely to encounter neighboring strands.
-# 2. **Pair distance** :math:`r \\in [0, r_{\\text{cut}}]`: Both methods strictly adhere to the
-# sampling cutoff :math:`r_{\\text{cut}}`, producing identical Euclidean
-# distance distributions.
+# 2. **Pair distance** :math:`r \in [0, r_{\text{cut}}]`: Both methods strictly adhere to the
+#    sampling cutoff :math:`r_{\text{cut}}`, producing identical Euclidean
+#    distance distributions.
 
 fig, (ax_alpha, ax_dist) = plt.subplots(1, 2, figsize=(11, 4.5))
 
@@ -316,40 +331,47 @@ plt.show()
 # This introduces topological defects: **dangling ends** (chains connected to only one crosslinker)
 # and **soluble fractions** (unconnected clusters).
 #
-# When entanglements are sampled on defective networks, two strategies are possible:
+# When entanglements are sampled on defective networks, the parameter ``filter_dangling_and_soluble``
+# controls whether topological leaf peeling is applied before sampling:
 #
-# - **Unfiltered Sampling** (Discrete or Analytical with :paramref:`filter_dangling_and_soluble=False`):
-#   Entanglements are placed blindly across all strands. Slip-links that land on dangling ends or
-#   soluble molecules cannot bear macroscopic load and are mechanically inactive.
-# - **Topologically Filtered Sampling** (Analytical with :paramref:`filter_dangling_and_soluble=True`, default):
-#   Iterative leaf peeling prunes dangling chains and sol before sampling, placing all slip-links
-#   exclusively onto elastically active strands.
+# - **Topologically Filtered Sampling** (``filter_dangling_and_soluble=True``, default):
+#   Iterative leaf peeling identifies dangling chains and sol. Candidate entanglement pairs
+#   involving dangling or sol strands are discarded, placing slip-links exclusively onto
+#   elastically active gel strands. This matches the default behavior of discrete sampling in
+#   :class:`~pylimer_tools_cpp.MEHPForceBalance2`.
+# - **Unfiltered Sampling** (``filter_dangling_and_soluble=False``):
+#   Entanglements are placed across all strands. Slip-links that land on single dangling ends
+#   cannot sustain macroscopic affine stress and relax to zero force. However, entangling two
+#   dangling ends can bridge two crosslinkers in the gel, creating a new load-bearing path.
 #
-# We also compare modeling slip-links as **merged crosslink nodes** (:paramref:`entanglements_as_springs=False`)
-# versus **Hookean springs** (:paramref:`entanglements_as_springs=True`).
+# .. note::
+#
+#    If :class:`~pylimer_tools_cpp.MEHPForceBalance2` is run with simplification
+#    (e.g., :attr:`~pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_THEN_X2F`),
+#    dead-end dangling slip-links relax to zero force and are eliminated during minimization.
+#    Topological filtering during sampling prevents dead-end degrees of freedom from entering
+# the SLE system in the first place, saving substantial solver iterations
+# and memory.
 
 fig, (ax_mod, ax_frac) = plt.subplots(1, 2, figsize=(11, 4.5))
+
+# Convert G from MPa to Pa for clean axis numbers without leading zeros
+g_disc_pa = g_disc * 1e6
+g_ana_filt_pa = g_ana_filt * 1e6
+g_ana_unfilt_pa = g_ana_unfilt * 1e6
 
 # Shear modulus vs conversion
 ax_mod.plot(
     conversions,
-    g_disc,
+    g_disc_pa,
     "o--",
     color="#d95f02",
     linewidth=1.8,
-    label="Discrete (Unfiltered)",
+    label="Discrete (Filtered)",
 )
 ax_mod.plot(
     conversions,
-    g_ana_unfilt,
-    "^:",
-    color="#7570b3",
-    linewidth=1.8,
-    label="Analytical (Unfiltered)",
-)
-ax_mod.plot(
-    conversions,
-    g_ana_filt,
+    g_ana_filt_pa,
     "s-",
     color="#1b9e77",
     linewidth=2.2,
@@ -357,22 +379,21 @@ ax_mod.plot(
 )
 ax_mod.plot(
     conversions,
-    g_ana_springs,
-    "d-.",
-    color="#e7298a",
+    g_ana_unfilt_pa,
+    "^:",
+    color="#7570b3",
     linewidth=1.8,
-    label="Analytical (Filtered, Springs)",
+    label="Analytical (Unfiltered)",
 )
 
 ax_mod.set_xlabel("Crosslinker Conversion $p$")
-ax_mod.set_ylabel("Shear Modulus $G$ [MPa]")
+ax_mod.set_ylabel("Shear Modulus $G$ [Pa]")
 ax_mod.set_title("Equilibrium Shear Modulus vs. Conversion")
 ax_mod.grid(True, linestyle="--", alpha=0.5)
 ax_mod.legend(frameon=True, fontsize=9)
 
 # Active entanglement fraction vs conversion
 frac_active_filt = n_ent_ana_filt / target_n_ent
-frac_active_unfilt = w_act_ana_unfilt  # proportion on active backbone
 
 ax_frac.plot(
     conversions,
@@ -388,7 +409,7 @@ ax_frac.plot(
     "s-",
     color="#1b9e77",
     linewidth=2.2,
-    label="Filtered Active Entanglement Fraction",
+    label=r"Filtered Active Entanglement Fraction ($N_{\mathrm{active}} / N_{\mathrm{target}}$)",
 )
 
 ax_frac.set_xlabel("Crosslinker Conversion $p$")
@@ -403,7 +424,7 @@ plt.show()
 # %%
 # Method Comparison & Practical Guidance
 # --------------------------------------
-# The table below summarizes the key trade-offs between discrete and analytical sampling:
+# The table below summarizes key trade-offs between discrete and analytical sampling:
 #
 # .. list-table::
 #    :widths: 22 38 40
@@ -413,8 +434,8 @@ plt.show()
 #      - Discrete (Full Universe)
 #      - Analytical (Universe-Free)
 #    * - **Memory Footprint**
-#      - High: :math:`O(N_{\\text{atoms}})`, reaches gigabytes for large networks.
-#      - Minimal: :math:`O(N_{\\text{xlinks}} + N_{\\text{strands}})`, ~80–95% lower.
+#      - High: :math:`O(N_{\text{atoms}})`, reaches gigabytes for large networks.
+#      - Minimal: :math:`O(N_{\text{xlinks}} + N_{\text{strands}})`, ~80–95% lower.
 #    * - **Execution Speed**
 #      - Slower: requires placing every bead and building 3D neighbor cell lists.
 #      - Fast: samples conditional Gaussian distributions between crosslinkers directly.
@@ -422,8 +443,8 @@ plt.show()
 #      - Exact bead coordinates as generated by the Monte Carlo universe generator.
 #      - Assumes conditional Gaussian random walks (Brownian bridge) between anchors.
 #    * - **Topological Filtering**
-#      - Samples indiscriminately across all beads (unless manually cleaned).
-#      - Built-in iterative leaf peeling (:paramref:`filter_dangling_and_soluble=True`).
+#      - Built-in leaf peeling via ``skip_dangling_soluble_entanglements=True``.
+#      - Built-in iterative leaf peeling via ``filter_dangling_and_soluble=True``.
 #    * - **Ideal Use Case**
 #      - Downstream MD/DPD simulations requiring full 3D atom configurations.
 #      - MEHP Force Balance runs, high-throughput sweeps, and large networks.
@@ -438,13 +459,16 @@ plt.show()
 #    with high persistence lengths, actual bead paths may deviate from ideal Brownian bridges.
 #
 # 2. **Effective Entanglement Density in Defective Networks**:
-#    When setting a target number of entanglements :math:`N_{\\text{ent}}`:
+#    When setting a target number of entanglements :math:`N_{\text{ent}}`:
 #
-#    - With :paramref:`filter_dangling_and_soluble=True` (default), all :math:`N_{\\text{ent}}`
-#      links are concentrated onto the load-bearing gel fraction.
-#    - With :paramref:`filter_dangling_and_soluble=False` or discrete sampling, some links
-#      fall on dangling chains or sol complexes.
-#    - If matching physical experiments where nominal entanglement density is measured relative
+#    - With ``filter_dangling_and_soluble=True`` (default), candidate links involving
+#      dangling chains or sol are discarded, reducing the placed entanglements to
+#      roughly :math:`w_{\text{active}}^2 N_{\text{ent}}`.
+#    - With ``filter_dangling_and_soluble=False``, all :math:`N_{\text{ent}}` links are
+#      instantiated across the entire volume. Inactive dead-end links carry zero stress
+#      and are eliminated if :attr:`~pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_THEN_X2F`
+#      is used.
+#    - If matching physical experiments where nominal entanglement density is defined relative
 #      to total volume rather than the gel fraction, users can pass
-#      ``filter_dangling_and_soluble=False`` or scale the target :math:`N_{\\text{ent}}` by
-#      the active weight fraction.
+#      ``filter_dangling_and_soluble=False`` or scale target :math:`N_{\text{ent}}` by
+#      :math:`1 / w_{\text{active}}^2`.

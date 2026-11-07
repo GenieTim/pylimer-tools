@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -582,7 +584,7 @@ Otherwise, you can set it to true and therewith get some securities.</p>
 <p>Side-effect: if true, the relocations may also happen <em>to</em> a slip-spring next to a crosslink.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>(</strong><strong>bool</strong><strong>)</strong> (<em>allow_relocation_in_network</em>) – Whether to allow relocation in the network or not.</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.params.config_allow_relocation_in_network."></span><strong>config_allow_relocation_in_network.</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.params.config_allow_relocation_in_network.">¶</a><strong>(</strong><strong>bool</strong><strong>)</strong> (<em>allow_relocation_in_network</em>) – Whether to allow relocation in the network or not.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -595,10 +597,10 @@ If you use this, you should cite <span class="bibtex-citation" id="id3">Ramírez
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>values</strong> – a list of OutputConfiguration structs</p></li>
-<li><p><strong>num_corr_in</strong> – Number of correlations in</p></li>
-<li><p><strong>p</strong> – Parameter p for the autocorrelator</p></li>
-<li><p><strong>m</strong> – Parameter m for the autocorrelator</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.config_auto_correlator_output.params.values"></span><strong>values</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_auto_correlator_output.params.values">¶</a> – a list of OutputConfiguration structs</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.config_auto_correlator_output.params.num_corr_in"></span><strong>num_corr_in</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_auto_correlator_output.params.num_corr_in">¶</a> – Number of correlations in</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.config_auto_correlator_output.params.p"></span><strong>p</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_auto_correlator_output.params.p">¶</a> – Parameter p for the autocorrelator</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.config_auto_correlator_output.params.m"></span><strong>m</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_auto_correlator_output.params.m">¶</a> – Parameter m for the autocorrelator</p></li>
 </ul>
 </dd>
 </dl>
@@ -610,7 +612,7 @@ If you use this, you should cite <span class="bibtex-citation" id="id3">Ramírez
 <dd><p>Set which values to compute averages for.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>values</strong> – A list of OutputConfiguration structs specifying what to average</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.config_average_output.params.values"></span><strong>values</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_average_output.params.values">¶</a> – A list of OutputConfiguration structs specifying what to average</p>
 </dd>
 </dl>
 </dd></dl>
@@ -622,12 +624,12 @@ If you use this, you should cite <span class="bibtex-citation" id="id3">Ramírez
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>(</strong><strong>int</strong><strong>)</strong> (<em>atom_type_form_to</em>) – The nr of bonds to form in total. Use 0 to stop bond formation.</p></li>
-<li><p><strong>(</strong><strong>dict</strong><strong>)</strong> (<em>num_bonds_per_atom_type</em>) – The nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)</p></li>
-<li><p><strong>(</strong><strong>float</strong><strong>)</strong> (<em>bond_formation_dist</em>) – The maximum distance allowed to form bonds</p></li>
-<li><p><strong>(</strong><strong>int</strong><strong>)</strong> – attempt to form bonds every this many steps during the simulation run</p></li>
-<li><p><strong>(</strong><strong>int</strong><strong>)</strong> – The atom type to start forming bonds from.</p></li>
-<li><p><strong>(</strong><strong>int</strong><strong>)</strong> – The atom type to start forming bonds to.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.params.config_bond_formation."></span><strong>config_bond_formation.</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.params.config_bond_formation.">¶</a><strong>(</strong><strong>int</strong><strong>)</strong> (<em>atom_type_form_to</em>) – The nr of bonds to form in total. Use 0 to stop bond formation.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.params.config_bond_formation."></span><strong>config_bond_formation.</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.params.config_bond_formation.">¶</a><strong>(</strong><strong>dict</strong><strong>)</strong> (<em>num_bonds_per_atom_type</em>) – The nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.params.config_bond_formation."></span><strong>config_bond_formation.</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.params.config_bond_formation.">¶</a><strong>(</strong><strong>float</strong><strong>)</strong> (<em>bond_formation_dist</em>) – The maximum distance allowed to form bonds</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.params.config_bond_formation."></span><strong>config_bond_formation.</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.params.config_bond_formation.">¶</a><strong>(</strong><strong>int</strong><strong>)</strong> – attempt to form bonds every this many steps during the simulation run</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.params.config_bond_formation."></span><strong>config_bond_formation.</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.params.config_bond_formation.">¶</a><strong>(</strong><strong>int</strong><strong>)</strong> – The atom type to start forming bonds from.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.params.config_bond_formation."></span><strong>config_bond_formation.</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.params.config_bond_formation.">¶</a><strong>(</strong><strong>int</strong><strong>)</strong> – The atom type to start forming bonds to.</p></li>
 </ul>
 </dd>
 </dl>
@@ -651,7 +653,7 @@ If you use this, you should cite <span class="bibtex-citation" id="id3">Ramírez
 <dd><p>Configure the number of steps to do in one DPD sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>num_steps</strong> – Number of DPD steps per sequence</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.config_num_steps_dpd.params.num_steps"></span><strong>num_steps</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_num_steps_dpd.params.num_steps">¶</a> – Number of DPD steps per sequence</p>
 </dd>
 </dl>
 </dd></dl>
@@ -662,7 +664,7 @@ If you use this, you should cite <span class="bibtex-citation" id="id3">Ramírez
 <dd><p>Configure the number of steps to do in one MC sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>num_steps</strong> – Number of Monte Carlo steps per sequence</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.config_num_steps_mc.params.num_steps"></span><strong>num_steps</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_num_steps_mc.params.num_steps">¶</a> – Number of Monte Carlo steps per sequence</p>
 </dd>
 </dl>
 </dd></dl>
@@ -684,8 +686,8 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> – The file path to the restart file to write</p></li>
-<li><p><strong>output_every</strong> – How often to write the restart file (default: 50000)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.config_restart_output.params.file"></span><strong>file</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_restart_output.params.file">¶</a> – The file path to the restart file to write</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.config_restart_output.params.output_every"></span><strong>output_every</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_restart_output.params.output_every">¶</a> – How often to write the restart file (default: 50000)</p></li>
 </ul>
 </dd>
 </dl>
@@ -735,7 +737,7 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dd><p>Set which values to log.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>values</strong> – a list of OutputConfiguration structs</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.config_step_output.params.values"></span><strong>values</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.config_step_output.params.values">¶</a> – a list of OutputConfiguration structs</p>
 </dd>
 </dl>
 </dd></dl>
@@ -945,7 +947,7 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dd><p>Get a universe instance from the current coordinates (and connectivity).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>with_slipsprings</strong> – Whether to include slip-springs in the returned universe (default: True)</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.get_universe.params.with_slipsprings"></span><strong>with_slipsprings</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.get_universe.params.with_slipsprings">¶</a> – Whether to include slip-springs in the returned universe (default: True)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -967,7 +969,7 @@ Use the same version of pylimer-tools if you want to be sure that things work.</
 <dd><p>Read a restart file in order to continue a simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>file</strong> – The file path to the restart file to read</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.read_restart_file.params.file"></span><strong>file</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.read_restart_file.params.file">¶</a> – The file path to the restart file to read</p>
 </dd>
 </dl>
 </dd></dl>
@@ -996,7 +998,7 @@ this method should be called to update the current stress tensor etc.</p>
 <dd><p>Validate the neighbor list consistency for debugging purposes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>cutoff</strong> – Cutoff distance for validation</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DPDSimulator.validate_neighbour_list.params.cutoff"></span><strong>cutoff</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DPDSimulator.validate_neighbour_list.params.cutoff">¶</a> – Cutoff distance for validation</p>
 </dd>
 </dl>
 </dd></dl>

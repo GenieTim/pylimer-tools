@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -418,9 +420,9 @@ a specified distance of each other.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atoms</strong> – Vector of atoms to include in the neighbour list</p></li>
-<li><p><strong>box</strong> – The simulation box</p></li>
-<li><p><strong>cutoff</strong> – Maximum distance for neighbour searches</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NeighbourList.params.atoms"></span><strong>atoms</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NeighbourList.params.atoms">¶</a> – Vector of atoms to include in the neighbour list</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NeighbourList.params.box"></span><strong>box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NeighbourList.params.box">¶</a> – The simulation box</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NeighbourList.params.cutoff"></span><strong>cutoff</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NeighbourList.params.cutoff">¶</a> – Maximum distance for neighbour searches</p></li>
 </ul>
 </dd>
 </dl>
@@ -451,11 +453,11 @@ filling the neighbour list buckets.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atom</strong> – The reference atom</p></li>
-<li><p><strong>upper_cutoff</strong> – Maximum distance for neighbours</p></li>
-<li><p><strong>lower_cutoff</strong> – Minimum distance for neighbours</p></li>
-<li><p><strong>unwrapped</strong> – Whether to use unwrapped coordinates</p></li>
-<li><p><strong>expect_self</strong> – Whether to expect the atom itself in results</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NeighbourList.get_atoms_close_to.params.atom"></span><strong>atom</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NeighbourList.get_atoms_close_to.params.atom">¶</a> – The reference atom</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NeighbourList.get_atoms_close_to.params.upper_cutoff"></span><strong>upper_cutoff</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NeighbourList.get_atoms_close_to.params.upper_cutoff">¶</a> – Maximum distance for neighbours</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NeighbourList.get_atoms_close_to.params.lower_cutoff"></span><strong>lower_cutoff</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NeighbourList.get_atoms_close_to.params.lower_cutoff">¶</a> – Minimum distance for neighbours</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NeighbourList.get_atoms_close_to.params.unwrapped"></span><strong>unwrapped</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NeighbourList.get_atoms_close_to.params.unwrapped">¶</a> – Whether to use unwrapped coordinates</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NeighbourList.get_atoms_close_to.params.expect_self"></span><strong>expect_self</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NeighbourList.get_atoms_close_to.params.expect_self">¶</a> – Whether to expect the atom itself in results</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -473,8 +475,8 @@ but its neighbours cannot be queried either.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atom</strong> – The atom to remove</p></li>
-<li><p><strong>debug_hint</strong> – Optional debug information</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NeighbourList.remove_atom.params.atom"></span><strong>atom</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NeighbourList.remove_atom.params.atom">¶</a> – The atom to remove</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NeighbourList.remove_atom.params.debug_hint"></span><strong>debug_hint</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NeighbourList.remove_atom.params.debug_hint">¶</a> – Optional debug information</p></li>
 </ul>
 </dd>
 </dl>

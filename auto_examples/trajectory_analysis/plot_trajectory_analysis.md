@@ -154,7 +154,7 @@ msd_result = tidynamics.msd(
  )
 ```
 
-**Total running time of the script:** (5 minutes 53.084 seconds)
+**Total running time of the script:** (6 minutes 54.815 seconds)
 
 <a id="sphx-glr-download-auto-examples-trajectory-analysis-plot-trajectory-analysis-py"></a>
 

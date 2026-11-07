@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -418,9 +420,9 @@ atoms, bonds, angles, and the simulation box.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>Lx</strong> – Box length in x direction</p></li>
-<li><p><strong>Ly</strong> – Box length in y direction</p></li>
-<li><p><strong>Lz</strong> – Box length in z direction</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.params.Lx"></span><strong>Lx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.params.Lx">¶</a> – Box length in x direction</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.params.Ly"></span><strong>Ly</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.params.Ly">¶</a> – Box length in y direction</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.params.Lz"></span><strong>Lz</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.params.Lz">¶</a> – Box length in z direction</p></li>
 </ul>
 </dd>
 </dl>
@@ -689,10 +691,10 @@ just a method to preserve read &amp; write capabilities.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>angles_from</strong> – Vector of atom IDs for angle start points</p></li>
-<li><p><strong>angles_via</strong> – Vector of atom IDs for angle middle points</p></li>
-<li><p><strong>angles_to</strong> – Vector of atom IDs for angle end points</p></li>
-<li><p><strong>angle_types</strong> – Vector of angle types</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_angles.params.angles_from"></span><strong>angles_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_angles.params.angles_from">¶</a> – Vector of atom IDs for angle start points</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_angles.params.angles_via"></span><strong>angles_via</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_angles.params.angles_via">¶</a> – Vector of atom IDs for angle middle points</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_angles.params.angles_to"></span><strong>angles_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_angles.params.angles_to">¶</a> – Vector of atom IDs for angle end points</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_angles.params.angle_types"></span><strong>angle_types</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_angles.params.angle_types">¶</a> – Vector of angle types</p></li>
 </ul>
 </dd>
 </dl>
@@ -705,14 +707,14 @@ just a method to preserve read &amp; write capabilities.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ids</strong> – Vector of atom IDs</p></li>
-<li><p><strong>types</strong> – Vector of atom types</p></li>
-<li><p><strong>x</strong> – Vector of x coordinates</p></li>
-<li><p><strong>y</strong> – Vector of y coordinates</p></li>
-<li><p><strong>z</strong> – Vector of z coordinates</p></li>
-<li><p><strong>nx</strong> – Vector of periodic image flags in x direction</p></li>
-<li><p><strong>ny</strong> – Vector of periodic image flags in y direction</p></li>
-<li><p><strong>nz</strong> – Vector of periodic image flags in z direction</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_atoms.params.ids"></span><strong>ids</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_atoms.params.ids">¶</a> – Vector of atom IDs</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_atoms.params.types"></span><strong>types</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_atoms.params.types">¶</a> – Vector of atom types</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_atoms.params.x"></span><strong>x</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_atoms.params.x">¶</a> – Vector of x coordinates</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_atoms.params.y"></span><strong>y</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_atoms.params.y">¶</a> – Vector of y coordinates</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_atoms.params.z"></span><strong>z</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_atoms.params.z">¶</a> – Vector of z coordinates</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_atoms.params.nx"></span><strong>nx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_atoms.params.nx">¶</a> – Vector of periodic image flags in x direction</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_atoms.params.ny"></span><strong>ny</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_atoms.params.ny">¶</a> – Vector of periodic image flags in y direction</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_atoms.params.nz"></span><strong>nz</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_atoms.params.nz">¶</a> – Vector of periodic image flags in z direction</p></li>
 </ul>
 </dd>
 </dl>
@@ -773,9 +775,9 @@ If the connected atoms are not found, the bonds are silently skipped.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>bonds_from</strong> – Vector of atom IDs for bond start points</p></li>
-<li><p><strong>bonds_to</strong> – Vector of atom IDs for bond end points</p></li>
-<li><p><strong>bond_types</strong> – Vector of bond types</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_bonds_with_types.params.bonds_from"></span><strong>bonds_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_bonds_with_types.params.bonds_from">¶</a> – Vector of atom IDs for bond start points</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_bonds_with_types.params.bonds_to"></span><strong>bonds_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_bonds_with_types.params.bonds_to">¶</a> – Vector of atom IDs for bond end points</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_bonds_with_types.params.bond_types"></span><strong>bond_types</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_bonds_with_types.params.bond_types">¶</a> – Vector of bond types</p></li>
 </ul>
 </dd>
 </dl>
@@ -789,11 +791,11 @@ just a method to preserve read &amp; write capabilities.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>angles_from</strong> – Vector of atom IDs for dihedral start points</p></li>
-<li><p><strong>angles_via1</strong> – Vector of atom IDs for first middle points</p></li>
-<li><p><strong>angles_via2</strong> – Vector of atom IDs for second middle points</p></li>
-<li><p><strong>angles_to</strong> – Vector of atom IDs for dihedral end points</p></li>
-<li><p><strong>angle_types</strong> – Vector of dihedral angle types</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_dihedral_angles.params.angles_from"></span><strong>angles_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_dihedral_angles.params.angles_from">¶</a> – Vector of atom IDs for dihedral start points</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_dihedral_angles.params.angles_via1"></span><strong>angles_via1</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_dihedral_angles.params.angles_via1">¶</a> – Vector of atom IDs for first middle points</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_dihedral_angles.params.angles_via2"></span><strong>angles_via2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_dihedral_angles.params.angles_via2">¶</a> – Vector of atom IDs for second middle points</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_dihedral_angles.params.angles_to"></span><strong>angles_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_dihedral_angles.params.angles_to">¶</a> – Vector of atom IDs for dihedral end points</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.add_dihedral_angles.params.angle_types"></span><strong>angle_types</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.add_dihedral_angles.params.angle_types">¶</a> – Vector of dihedral angle types</p></li>
 </ul>
 </dd>
 </dl>
@@ -845,8 +847,8 @@ just a method to preserve read &amp; write capabilities.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atom_ids_to</strong> – Vector of destination atom IDs</p></li>
-<li><p><strong>atom_ids_from</strong> – Vector of source atom IDs</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_dxs.params.atom_ids_to"></span><strong>atom_ids_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_dxs.params.atom_ids_to">¶</a> – Vector of destination atom IDs</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_dxs.params.atom_ids_from"></span><strong>atom_ids_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_dxs.params.atom_ids_from">¶</a> – Vector of source atom IDs</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -862,8 +864,8 @@ just a method to preserve read &amp; write capabilities.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atom_ids_to</strong> – Vector of destination atom IDs</p></li>
-<li><p><strong>atom_ids_from</strong> – Vector of source atom IDs</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_dys.params.atom_ids_to"></span><strong>atom_ids_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_dys.params.atom_ids_to">¶</a> – Vector of destination atom IDs</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_dys.params.atom_ids_from"></span><strong>atom_ids_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_dys.params.atom_ids_from">¶</a> – Vector of source atom IDs</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -879,8 +881,8 @@ just a method to preserve read &amp; write capabilities.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atom_ids_to</strong> – Vector of destination atom IDs</p></li>
-<li><p><strong>atom_ids_from</strong> – Vector of source atom IDs</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_dzs.params.atom_ids_to"></span><strong>atom_ids_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_dzs.params.atom_ids_to">¶</a> – Vector of destination atom IDs</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_dzs.params.atom_ids_from"></span><strong>atom_ids_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_dzs.params.atom_ids_from">¶</a> – Vector of source atom IDs</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -903,8 +905,8 @@ Invalid strands (where said function returns 0.0 or -1.0) are ignored.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p></li>
-<li><p><strong>derive_image_flags</strong> – Whether to derive image flags from connectivity</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_end_to_end_distances.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_end_to_end_distances.params.crosslinker_type">¶</a> – The type of crosslinker atoms</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_end_to_end_distances.params.derive_image_flags"></span><strong>derive_image_flags</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_end_to_end_distances.params.derive_image_flags">¶</a> – Whether to derive image flags from connectivity</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -927,8 +929,8 @@ Invalid strands (where said function returns 0.0 or -1.0) are ignored.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p></li>
-<li><p><strong>derive_image_flags</strong> – Whether to derive image flags from connectivity</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_mean_end_to_end_distance.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_mean_end_to_end_distance.params.crosslinker_type">¶</a> – The type of crosslinker atoms</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_mean_end_to_end_distance.params.derive_image_flags"></span><strong>derive_image_flags</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_mean_end_to_end_distance.params.derive_image_flags">¶</a> – Whether to derive image flags from connectivity</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -951,9 +953,9 @@ Invalid strands (where said function returns 0.0 or -1.0) are ignored.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p></li>
-<li><p><strong>only_those_with_two_crosslinkers</strong> – Whether to only consider strands with two crosslinkers</p></li>
-<li><p><strong>derive_image_flags</strong> – Whether to derive image flags from connectivity</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance.params.crosslinker_type">¶</a> – The type of crosslinker atoms</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance.params.only_those_with_two_crosslinkers"></span><strong>only_those_with_two_crosslinkers</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance.params.only_those_with_two_crosslinkers">¶</a> – Whether to only consider strands with two crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance.params.derive_image_flags"></span><strong>derive_image_flags</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance.params.derive_image_flags">¶</a> – Whether to derive image flags from connectivity</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -968,7 +970,7 @@ Invalid strands (where said function returns 0.0 or -1.0) are ignored.</p>
 <dd><p>Compute the mean number of beads per strand.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.compute_mean_strand_length.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_mean_strand_length.params.crosslinker_type">¶</a> – The type of crosslinker atoms</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Mean strand length</p>
@@ -986,7 +988,7 @@ Invalid strands (where said function returns 0.0 or -1.0) are ignored.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.compute_number_average_molecular_weight.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_number_average_molecular_weight.params.crosslinker_type">¶</a> – The type of crosslinker atoms</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number average molecular weight</p>
@@ -1008,8 +1010,8 @@ the weight average molecular weight over the number average molecular weight.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dimensions</strong> – Number of dimensions (typically 3)</p></li>
-<li><p><strong>k_b</strong> – Boltzmann constant value</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_temperature.params.dimensions"></span><strong>dimensions</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_temperature.params.dimensions">¶</a> – Number of dimensions (typically 3)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.compute_temperature.params.k_b"></span><strong>k_b</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_temperature.params.k_b">¶</a> – Boltzmann constant value</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1040,7 +1042,7 @@ the weight average molecular weight over the number average molecular weight.</p
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.compute_weight_average_molecular_weight.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.compute_weight_average_molecular_weight.params.crosslinker_type">¶</a> – The type of crosslinker atoms</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Weight average molecular weight</p>
@@ -1063,7 +1065,7 @@ the weight average molecular weight over the number average molecular weight.</p
 <p>May result in new self-loops; use <a class="reference internal" href="#pylimer_tools_cpp.Universe.simplify" title="pylimer_tools_cpp.Universe.simplify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simplify()</span></code></a> to remove them.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>bond_type</strong> – The bond type to contract along</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.contract_vertices_along_bond_type.params.bond_type"></span><strong>bond_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.contract_vertices_along_bond_type.params.bond_type">¶</a> – The bond type to contract along</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1087,8 +1089,8 @@ It loops through all atoms and counts neighbors within specified distance ranges
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distances</strong> – The edges of the bins for distance counting</p></li>
-<li><p><strong>unwrapped</strong> – Whether to measure the distance in unwrapped coordinates or as PBC-corrected distance</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.count_atoms_in_skin_distance.params.distances"></span><strong>distances</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.count_atoms_in_skin_distance.params.distances">¶</a> – The edges of the bins for distance counting</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.count_atoms_in_skin_distance.params.unwrapped"></span><strong>unwrapped</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.count_atoms_in_skin_distance.params.unwrapped">¶</a> – Whether to measure the distance in unwrapped coordinates or as PBC-corrected distance</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1190,10 +1192,10 @@ Use a negative value to find all loops and paths.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>loop_start</strong> – The atom ID to start the search from</p></li>
-<li><p><strong>loop_step1</strong> – The first step to take, i.e., the first bond to follow</p></li>
-<li><p><strong>max_length</strong> – The maximum length of the loop to find, or -1 for no limit</p></li>
-<li><p><strong>skip_self_loops</strong> – Whether to skip self-loops (i.e., loops that start and end at the same atom; only relevant if <cite>loop_start</cite> is equal to <cite>loop_step1</cite>)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.find_minimal_order_loop_from.params.loop_start"></span><strong>loop_start</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.find_minimal_order_loop_from.params.loop_start">¶</a> – The atom ID to start the search from</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.find_minimal_order_loop_from.params.loop_step1"></span><strong>loop_step1</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.find_minimal_order_loop_from.params.loop_step1">¶</a> – The first step to take, i.e., the first bond to follow</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.find_minimal_order_loop_from.params.max_length"></span><strong>max_length</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.find_minimal_order_loop_from.params.max_length">¶</a> – The maximum length of the loop to find, or -1 for no limit</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.find_minimal_order_loop_from.params.skip_self_loops"></span><strong>skip_self_loops</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.find_minimal_order_loop_from.params.skip_self_loops">¶</a> – Whether to skip self-loops (i.e., loops that start and end at the same atom; only relevant if <cite>loop_start</cite> is equal to <cite>loop_step1</cite>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1225,7 +1227,7 @@ Use <code class="xref py py-meth docutils literal notranslate"><span class="pre"
 <dd><p>Find an atom by its ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>atom_id</strong> – The ID of the atom to find</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.get_atom.params.atom_id"></span><strong>atom_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_atom.params.atom_id">¶</a> – The ID of the atom to find</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The atom with the specified ID</p>
@@ -1239,7 +1241,7 @@ Use <code class="xref py py-meth docutils literal notranslate"><span class="pre"
 <dd><p>Find an atom by the ID of the vertex of the underlying graph.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_id</strong> – The vertex ID to query</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.get_atom_by_vertex_id.params.vertex_id"></span><strong>vertex_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_atom_by_vertex_id.params.vertex_id">¶</a> – The vertex ID to query</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The atom at the specified vertex</p>
@@ -1253,7 +1255,7 @@ Use <code class="xref py py-meth docutils literal notranslate"><span class="pre"
 <dd><p>Get the ID of the atom by the vertex ID of the underlying graph.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_id</strong> – The vertex index in the underlying graph</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.get_atom_id_by_vertex_idx.params.vertex_id"></span><strong>vertex_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_atom_id_by_vertex_idx.params.vertex_id">¶</a> – The vertex index in the underlying graph</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The atom ID corresponding to the vertex</p>
@@ -1302,7 +1304,7 @@ Use <code class="xref py py-meth docutils literal notranslate"><span class="pre"
 <p>Internally uses <a class="reference internal" href="#pylimer_tools_cpp.Universe.get_atoms_connected_to" title="pylimer_tools_cpp.Universe.get_atoms_connected_to"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_atoms_connected_to()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>atom</strong> – The atom to query connections for</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.get_atoms_connected_to.params.atom"></span><strong>atom</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_atoms_connected_to.params.atom">¶</a> – The atom to query connections for</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of connected atoms</p>
@@ -1316,7 +1318,7 @@ Use <code class="xref py py-meth docutils literal notranslate"><span class="pre"
 <dd><p>Get the atoms connected to a specified vertex ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_idx</strong> – The vertex index to query</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.get_atoms_connected_to_vertex.params.vertex_idx"></span><strong>vertex_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_atoms_connected_to_vertex.params.vertex_idx">¶</a> – The vertex index to query</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of connected atoms</p>
@@ -1360,7 +1362,7 @@ In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resul
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.get_chains_with_crosslinker.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_chains_with_crosslinker.params.crosslinker_type">¶</a> – The type of crosslinker atoms</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of chains including crosslinkers</p>
@@ -1387,7 +1389,7 @@ Unconnected, free atoms/beads become their own <a class="reference internal" hre
 <dd><p>Get the edge IDs incident to a specific vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_id</strong> – The ID of the vertex to query</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.get_edge_ids_from.params.vertex_id"></span><strong>vertex_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_edge_ids_from.params.vertex_id">¶</a> – The ID of the vertex to query</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of edge IDs connected to the vertex</p>
@@ -1402,8 +1404,8 @@ Unconnected, free atoms/beads become their own <a class="reference internal" hre
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vertex_id_from</strong> – The starting vertex ID</p></li>
-<li><p><strong>vertex_id_to</strong> – The ending vertex ID</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.get_edge_ids_from_to.params.vertex_id_from"></span><strong>vertex_id_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_edge_ids_from_to.params.vertex_id_from">¶</a> – The starting vertex ID</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.get_edge_ids_from_to.params.vertex_id_to"></span><strong>vertex_id_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_edge_ids_from_to.params.vertex_id_to">¶</a> – The ending vertex ID</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1450,7 +1452,7 @@ Specify the crosslinker_type to an existing type ID,
 then those atoms will be omitted, and this function returns chains instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>atom_type_to_omit</strong> – The type of atom to omit from the universe to end up with the desired molecules (e.g., the type of the crosslinkers).</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.get_molecules.params.atom_type_to_omit"></span><strong>atom_type_to_omit</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_molecules.params.atom_type_to_omit">¶</a> – The type of atom to omit from the universe to end up with the desired molecules (e.g., the type of the crosslinkers).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of molecules</p>
@@ -1468,7 +1470,7 @@ Useful e.g. to reduce the memory usage and runtime of
 <p>Further use <a class="reference internal" href="#pylimer_tools_cpp.Universe.simplify" title="pylimer_tools_cpp.Universe.simplify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simplify()</span></code></a> to remove primary loops.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.get_network_of_crosslinker.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_network_of_crosslinker.params.crosslinker_type">¶</a> – The type of crosslinker atoms</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Reduced network containing only crosslinkers</p>
@@ -1505,7 +1507,7 @@ Useful e.g. to reduce the memory usage and runtime of
 <dd><p>Count the number of immediate neighbors of an atom, specified by its ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>atom_id</strong> – The ID of the atom to query</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.get_nr_of_bonds_of_atom.params.atom_id"></span><strong>atom_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_nr_of_bonds_of_atom.params.atom_id">¶</a> – The ID of the atom to query</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of bonds connected to the atom</p>
@@ -1519,7 +1521,7 @@ Useful e.g. to reduce the memory usage and runtime of
 <dd><p>Count the number of immediate neighbors of an atom, specified by its vertex ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_id</strong> – The vertex ID of the atom to query</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.get_nr_of_bonds_of_vertex.params.vertex_id"></span><strong>vertex_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_nr_of_bonds_of_vertex.params.vertex_id">¶</a> – The vertex ID of the atom to query</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of bonds connected to the vertex</p>
@@ -1541,9 +1543,9 @@ Useful e.g. to reduce the memory usage and runtime of
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vertex_id_from</strong> – The starting vertex ID</p></li>
-<li><p><strong>vertex_id_to</strong> – The ending vertex ID</p></li>
-<li><p><strong>max_length</strong> – Maximum path length to consider (default: -1 for no limit)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.get_nr_of_edges_from_to.params.vertex_id_from"></span><strong>vertex_id_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_nr_of_edges_from_to.params.vertex_id_from">¶</a> – The starting vertex ID</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.get_nr_of_edges_from_to.params.vertex_id_to"></span><strong>vertex_id_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_nr_of_edges_from_to.params.vertex_id_to">¶</a> – The ending vertex ID</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.get_nr_of_edges_from_to.params.max_length"></span><strong>max_length</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_nr_of_edges_from_to.params.max_length">¶</a> – Maximum path length to consider (default: -1 for no limit)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1570,7 +1572,7 @@ Useful e.g. to reduce the memory usage and runtime of
 <dd><p>Get the vertex ID of the underlying graph for an atom with a specified ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>atom_id</strong> – The atom ID to look up</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.get_vertex_idx_by_atom_id.params.atom_id"></span><strong>atom_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.get_vertex_idx_by_atom_id.params.atom_id">¶</a> – The atom ID to look up</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The vertex index corresponding to the atom</p>
@@ -1595,7 +1597,7 @@ Useful e.g. to reduce the memory usage and runtime of
 <dd><p>Check whether this universe contains an atom with the specified ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>atom_id</strong> – The atom ID to check</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.has_atom_with_id.params.atom_id"></span><strong>atom_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.has_atom_with_id.params.atom_id">¶</a> – The atom ID to check</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if the atom exists in this universe, False otherwise</p>
@@ -1629,9 +1631,9 @@ Used internally for duplicate detection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>angle_from</strong> – First atom ID in the angle</p></li>
-<li><p><strong>angle_via</strong> – Middle atom ID in the angle</p></li>
-<li><p><strong>angle_to</strong> – Last atom ID in the angle</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.hash_angle_type.params.angle_from"></span><strong>angle_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.hash_angle_type.params.angle_from">¶</a> – First atom ID in the angle</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.hash_angle_type.params.angle_via"></span><strong>angle_via</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.hash_angle_type.params.angle_via">¶</a> – Middle atom ID in the angle</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.hash_angle_type.params.angle_to"></span><strong>angle_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.hash_angle_type.params.angle_to">¶</a> – Last atom ID in the angle</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1648,10 +1650,10 @@ Used internally for duplicate detection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>angle_from</strong> – First atom ID in the dihedral</p></li>
-<li><p><strong>angle_via1</strong> – Second atom ID in the dihedral</p></li>
-<li><p><strong>angle_via2</strong> – Third atom ID in the dihedral</p></li>
-<li><p><strong>angle_to</strong> – Fourth atom ID in the dihedral</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.hash_dihedral_angle_type.params.angle_from"></span><strong>angle_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.hash_dihedral_angle_type.params.angle_from">¶</a> – First atom ID in the dihedral</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.hash_dihedral_angle_type.params.angle_via1"></span><strong>angle_via1</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.hash_dihedral_angle_type.params.angle_via1">¶</a> – Second atom ID in the dihedral</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.hash_dihedral_angle_type.params.angle_via2"></span><strong>angle_via2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.hash_dihedral_angle_type.params.angle_via2">¶</a> – Third atom ID in the dihedral</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.hash_dihedral_angle_type.params.angle_to"></span><strong>angle_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.hash_dihedral_angle_type.params.angle_to">¶</a> – Fourth atom ID in the dihedral</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1667,8 +1669,8 @@ Used internally for duplicate detection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p></li>
-<li><p><strong>interpolation_factor</strong> – Factor for edge interpolation</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.interpolate_edges.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.interpolate_edges.params.crosslinker_type">¶</a> – The type of crosslinker atoms</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.interpolate_edges.params.interpolation_factor"></span><strong>interpolation_factor</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.interpolate_edges.params.interpolation_factor">¶</a> – Factor for edge interpolation</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1701,7 +1703,7 @@ This will not remove the atoms or bonds, just the stored dihedral angles.</p>
 <dd><p>Remove atoms and all associated bonds by their atom IDs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>atom_ids</strong> – Vector of atom IDs to remove</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.remove_atoms.params.atom_ids"></span><strong>atom_ids</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.remove_atoms.params.atom_ids">¶</a> – Vector of atom IDs to remove</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1713,8 +1715,8 @@ This will not remove the atoms or bonds, just the stored dihedral angles.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>bonds_from</strong> – Vector of starting atom IDs</p></li>
-<li><p><strong>bonds_to</strong> – Vector of ending atom IDs</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.remove_bonds.params.bonds_from"></span><strong>bonds_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.remove_bonds.params.bonds_from">¶</a> – Vector of starting atom IDs</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.remove_bonds.params.bonds_to"></span><strong>bonds_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.remove_bonds.params.bonds_to">¶</a> – Vector of ending atom IDs</p></li>
 </ul>
 </dd>
 </dl>
@@ -1726,7 +1728,7 @@ This will not remove the atoms or bonds, just the stored dihedral angles.</p>
 <dd><p>Remove bonds with a specific type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>bond_type</strong> – The bond type to remove</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.remove_bonds_by_type.params.bond_type"></span><strong>bond_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.remove_bonds_by_type.params.bond_type">¶</a> – The bond type to remove</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1738,8 +1740,8 @@ This will not remove the atoms or bonds, just the stored dihedral angles.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atom_id</strong> – ID of the atom to replace</p></li>
-<li><p><strong>replacement_atom</strong> – The atom with new properties</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.replace_atom.params.atom_id"></span><strong>atom_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.replace_atom.params.atom_id">¶</a> – ID of the atom to replace</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.replace_atom.params.replacement_atom"></span><strong>replacement_atom</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.replace_atom.params.replacement_atom">¶</a> – The atom with new properties</p></li>
 </ul>
 </dd>
 </dl>
@@ -1752,8 +1754,8 @@ This will not remove the atoms or bonds, just the stored dihedral angles.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atom_id</strong> – ID of the atom to modify</p></li>
-<li><p><strong>new_type</strong> – The new atom type</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.replace_atom_type.params.atom_id"></span><strong>atom_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.replace_atom_type.params.atom_id">¶</a> – ID of the atom to modify</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.replace_atom_type.params.new_type"></span><strong>new_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.replace_atom_type.params.new_type">¶</a> – The new atom type</p></li>
 </ul>
 </dd>
 </dl>
@@ -1766,10 +1768,10 @@ This will not remove the atoms or bonds, just the stored dihedral angles.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mean</strong> – Mean velocity</p></li>
-<li><p><strong>variance</strong> – Velocity variance</p></li>
-<li><p><strong>seed</strong> – Random seed for velocity generation</p></li>
-<li><p><strong>is_2d</strong> – Whether to omit sampling the z direction</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.resample_velocities.params.mean"></span><strong>mean</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.resample_velocities.params.mean">¶</a> – Mean velocity</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.resample_velocities.params.variance"></span><strong>variance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.resample_velocities.params.variance">¶</a> – Velocity variance</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.resample_velocities.params.seed"></span><strong>seed</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.resample_velocities.params.seed">¶</a> – Random seed for velocity generation</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.resample_velocities.params.is_2d"></span><strong>is_2d</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.resample_velocities.params.is_2d">¶</a> – Whether to omit sampling the z direction</p></li>
 </ul>
 </dd>
 </dl>
@@ -1782,8 +1784,8 @@ This will not remove the atoms or bonds, just the stored dihedral angles.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>box</strong> – The new box to assign</p></li>
-<li><p><strong>rescale_atoms</strong> – Whether to rescale atom positions</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.set_box.params.box"></span><strong>box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.set_box.params.box">¶</a> – The new box to assign</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.set_box.params.rescale_atoms"></span><strong>rescale_atoms</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.set_box.params.rescale_atoms">¶</a> – Whether to rescale atom positions</p></li>
 </ul>
 </dd>
 </dl>
@@ -1796,10 +1798,10 @@ This will not remove the atoms or bonds, just the stored dihedral angles.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lx</strong> – Length in x direction</p></li>
-<li><p><strong>ly</strong> – Length in y direction</p></li>
-<li><p><strong>lz</strong> – Length in z direction</p></li>
-<li><p><strong>rescale_atoms</strong> – Whether to rescale atom positions</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.set_box_lengths.params.lx"></span><strong>lx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.set_box_lengths.params.lx">¶</a> – Length in x direction</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.set_box_lengths.params.ly"></span><strong>ly</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.set_box_lengths.params.ly">¶</a> – Length in y direction</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.set_box_lengths.params.lz"></span><strong>lz</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.set_box_lengths.params.lz">¶</a> – Length in z direction</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.set_box_lengths.params.rescale_atoms"></span><strong>rescale_atoms</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.set_box_lengths.params.rescale_atoms">¶</a> – Whether to rescale atom positions</p></li>
 </ul>
 </dd>
 </dl>
@@ -1812,8 +1814,8 @@ This will not remove the atoms or bonds, just the stored dihedral angles.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atom_type</strong> – The atom type to set mass for</p></li>
-<li><p><strong>mass</strong> – The mass value to assign</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.set_mass.params.atom_type"></span><strong>atom_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.set_mass.params.atom_type">¶</a> – The atom type to set mass for</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.set_mass.params.mass"></span><strong>mass</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.set_mass.params.mass">¶</a> – The mass value to assign</p></li>
 </ul>
 </dd>
 </dl>
@@ -1825,7 +1827,7 @@ This will not remove the atoms or bonds, just the stored dihedral angles.</p>
 <dd><p>Set the mass per type of atom.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>mass_per_type</strong> – Map of atom types to their masses</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.set_masses.params.mass_per_type"></span><strong>mass_per_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.set_masses.params.mass_per_type">¶</a> – Map of atom types to their masses</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1836,7 +1838,7 @@ This will not remove the atoms or bonds, just the stored dihedral angles.</p>
 <dd><p>Set the timestep when this Universe was captured.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>timestep</strong> – The timestep value</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Universe.set_timestep.params.timestep"></span><strong>timestep</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.set_timestep.params.timestep">¶</a> – The timestep value</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1848,9 +1850,9 @@ This will not remove the atoms or bonds, just the stored dihedral angles.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vertex_id</strong> – The vertex ID to modify</p></li>
-<li><p><strong>property_name</strong> – Name of the property to set</p></li>
-<li><p><strong>value</strong> – Value to assign to the property</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.set_vertex_property.params.vertex_id"></span><strong>vertex_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.set_vertex_property.params.vertex_id">¶</a> – The vertex ID to modify</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.set_vertex_property.params.property_name"></span><strong>property_name</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.set_vertex_property.params.property_name">¶</a> – Name of the property to set</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Universe.set_vertex_property.params.value"></span><strong>value</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Universe.set_vertex_property.params.value">¶</a> – Value to assign to the property</p></li>
 </ul>
 </dd>
 </dl>

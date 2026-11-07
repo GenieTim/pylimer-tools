@@ -93,7 +93,7 @@ plt.ylabel("Count")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.049 seconds)
+**Total running time of the script:** (0 minutes 0.052 seconds)
 
 <a id="sphx-glr-download-auto-examples-structure-analysis-plot-structure-analysis-py"></a>
 

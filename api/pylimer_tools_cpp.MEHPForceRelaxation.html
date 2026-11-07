@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -420,13 +422,13 @@ Consequently, it offers a variety of configurable non-linear solvers using NLopt
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>universe</strong> – The universe to simulate with</p></li>
-<li><p><strong>crosslinker_type</strong> – The atom type of the crosslinkers. Needed to reduce the network.</p></li>
-<li><p><strong>is2d</strong> – Whether to ignore the z direction.</p></li>
-<li><p><strong>force_evaluator</strong> – The force evaluator to use</p></li>
-<li><p><strong>kappa</strong> – The spring constant</p></li>
-<li><p><strong>remove_2functional_crosslinkers</strong> – Whether to replace two-functional crosslinkers with a “normal” chain bead</p></li>
-<li><p><strong>remove_dangling_chains</strong> – Whether to remove dangling chains before running the simulation.
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.universe"></span><strong>universe</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.universe">¶</a> – The universe to simulate with</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.crosslinker_type">¶</a> – The atom type of the crosslinkers. Needed to reduce the network.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.is2d"></span><strong>is2d</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.is2d">¶</a> – Whether to ignore the z direction.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.force_evaluator"></span><strong>force_evaluator</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.force_evaluator">¶</a> – The force evaluator to use</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.kappa"></span><strong>kappa</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.kappa">¶</a> – The spring constant</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.remove_2functional_crosslinkers"></span><strong>remove_2functional_crosslinkers</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.remove_2functional_crosslinkers">¶</a> – Whether to replace two-functional crosslinkers with a “normal” chain bead</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.params.remove_dangling_chains"></span><strong>remove_dangling_chains</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.params.remove_dangling_chains">¶</a> – Whether to remove dangling chains before running the simulation.
 <strong>Caution</strong>: Removing the dangling chains will result in incorrect results fo the computation of
 <a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction" title="pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_soluble_weight_fraction()</span></code></a> and
 <a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction" title="pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_dangling_weight_fraction()</span></code></a></p></li>
@@ -571,7 +573,7 @@ Consequently, it offers a variety of configurable non-linear solvers using NLopt
 <dd><p>Configure whether to run PBC on the bonds or not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>box_large_enough</strong> – If True, assume the box is large enough and don’t apply PBC on bonds.
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough.params.box_large_enough"></span><strong>box_large_enough</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough.params.box_large_enough">¶</a> – If True, assume the box is large enough and don’t apply PBC on bonds.
 If your bonds could get larger than half the box length,
 this must be kept False (default).</p>
 </dd>
@@ -584,7 +586,7 @@ this must be kept False (default).</p>
 <dd><p>Configure the offset from the lower and upper bounds for the simulation to suggest another run.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>epsilon</strong> – The epsilon value to use for the rerun check
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon.params.epsilon"></span><strong>epsilon</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon.params.epsilon">¶</a> – The epsilon value to use for the rerun check
 (See: <a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.requires_another_run" title="pylimer_tools_cpp.MEHPForceRelaxation.requires_another_run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">requires_another_run()</span></code></a>)</p>
 </dd>
 </dl>
@@ -626,7 +628,7 @@ specifying what values to log and how often</p>
 <dd><p>Counts the active clustered atoms in the system.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tolerance</strong> – Springs under this length are considered inactive</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.count_active_clustered_atoms.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.count_active_clustered_atoms.params.tolerance">¶</a> – Springs under this length are considered inactive</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The number of active clustered atoms</p>
@@ -640,7 +642,7 @@ specifying what values to log and how often</p>
 <dd><p>Get the crosslinker chains that are active.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tolerance</strong> – Springs under this length are considered inactive</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_active_chains.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_active_chains.params.tolerance">¶</a> – Springs under this length are considered inactive</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of active crosslinker chains</p>
@@ -700,7 +702,7 @@ this value is normalized by the number of springs rather than the number of chai
 <p>Caution: ignores atom masses.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tolerance</strong> – Springs under this length are considered inactive</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction.params.tolerance">¶</a> – Springs under this length are considered inactive</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The dangling weight fraction</p>
@@ -725,7 +727,7 @@ this value is normalized by the number of springs rather than the number of chai
 <dd><p>Returns the number of active springs connected to each atom, atomId used as index.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tolerance</strong> – Springs under this length are considered inactive</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_effective_functionality_of_atoms.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_effective_functionality_of_atoms.params.tolerance">¶</a> – Springs under this length are considered inactive</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Vector with effective functionality for each atom (indexed by atom ID)</p>
@@ -771,11 +773,11 @@ where <span class="math notranslate nohighlight">\(\eta\)</span> is the index of
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>b0_squared</strong> – Part of the denominator in the equation of <span class="math notranslate nohighlight">\(\Gamma\)</span>.
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor.params.b0_squared"></span><strong>b0_squared</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor.params.b0_squared">¶</a> – Part of the denominator in the equation of <span class="math notranslate nohighlight">\(\Gamma\)</span>.
 If <span class="math notranslate nohighlight">\(-1.0\)</span> (default), the network is used for determination (which is not accurate), the system is assumed to be phantom.
 For real systems, the value could be determined by <a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance" title="pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_mean_squared_end_to_end_distance()</span></code></a>
 on the melt system, with subsequent division by the nr of bonds in the chain.</p></li>
-<li><p><strong>nr_of_chains</strong> – The value to normalize the sum of square distances by. Usually (and default if <span class="math notranslate nohighlight">\(&lt; 0\)</span>) the nr of chains.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor.params.nr_of_chains"></span><strong>nr_of_chains</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor.params.nr_of_chains">¶</a> – The value to normalize the sum of square distances by. Usually (and default if <span class="math notranslate nohighlight">\(&lt; 0\)</span>) the nr of chains.</p></li>
 </ul>
 </dd>
 </dl>
@@ -791,7 +793,7 @@ You can obtain this parameter e.g. by doing melt simulations at different length
 it’s the slope you obtain.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>b0_squared</strong> – Part of the denominator in the equation of <span class="math notranslate nohighlight">\(\Gamma\)</span>.
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factors.params.b0_squared"></span><strong>b0_squared</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factors.params.b0_squared">¶</a> – Part of the denominator in the equation of <span class="math notranslate nohighlight">\(\Gamma\)</span>.
 If <span class="math notranslate nohighlight">\(-1.0\)</span> (default), the network is used for determination (which is not accurate), the system is assumed to be phantom.
 For real systems, the value could be determined by <a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance" title="pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_mean_squared_end_to_end_distance()</span></code></a>
 on the melt system, with subsequent division by the nr of bonds in the chain.</p>
@@ -807,9 +809,9 @@ on the melt system, with subsequent division by the nr of bonds in the chain.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tolerance</strong> – Springs under this length are considered inactive. A node is active if it has &gt; 2 active springs.</p></li>
-<li><p><strong>minimum_nr_of_active_connections</strong> – Minimum number of active connections required for a node to be considered active</p></li>
-<li><p><strong>maximum_nr_of_active_connections</strong> – Maximum number of active connections allowed for a node to be considered active</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_ids_of_active_nodes.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_ids_of_active_nodes.params.tolerance">¶</a> – Springs under this length are considered inactive. A node is active if it has &gt; 2 active springs.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_ids_of_active_nodes.params.minimum_nr_of_active_connections"></span><strong>minimum_nr_of_active_connections</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_ids_of_active_nodes.params.minimum_nr_of_active_connections">¶</a> – Minimum number of active connections required for a node to be considered active</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_ids_of_active_nodes.params.maximum_nr_of_active_connections"></span><strong>maximum_nr_of_active_connections</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_ids_of_active_nodes.params.maximum_nr_of_active_connections">¶</a> – Maximum number of active connections allowed for a node to be considered active</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -825,9 +827,9 @@ on the melt system, with subsequent division by the nr of bonds in the chain.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tolerance</strong> – Springs under this length are considered inactive</p></li>
-<li><p><strong>minimumNrOfActiveConnections</strong> – A node is active if it has equal or more than this number of active springs</p></li>
-<li><p><strong>maximumNrOfActiveConnections</strong> – A node is active if it has equal or less than this number of active springs.
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_nodes.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_nodes.params.tolerance">¶</a> – Springs under this length are considered inactive</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_nodes.params.minimumNrOfActiveConnections"></span><strong>minimumNrOfActiveConnections</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_nodes.params.minimumNrOfActiveConnections">¶</a> – A node is active if it has equal or more than this number of active springs</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_nodes.params.maximumNrOfActiveConnections"></span><strong>maximumNrOfActiveConnections</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_nodes.params.maximumNrOfActiveConnections">¶</a> – A node is active if it has equal or less than this number of active springs.
 Use a value &lt; 0 to indicate that there is no maximum number of active connections</p></li>
 </ul>
 </dd>
@@ -843,7 +845,7 @@ Use a value &lt; 0 to indicate that there is no maximum number of active connect
 <dd><p>Get the number of active springs remaining after running the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tolerance</strong> – Springs under this length are considered inactive</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_springs.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_springs.params.tolerance">¶</a> – Springs under this length are considered inactive</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The number of active springs</p>
@@ -857,7 +859,7 @@ Use a value &lt; 0 to indicate that there is no maximum number of active connect
 <dd><p>Returns the number of active springs connected to each node.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tolerance</strong> – Springs under this length are considered inactive</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_springs_connected.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_active_springs_connected.params.tolerance">¶</a> – Springs under this length are considered inactive</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Vector with the number of active springs for each node</p>
@@ -893,7 +895,7 @@ Use a value &lt; 0 to indicate that there is no maximum number of active connect
 <dd><p>Get the number of springs considered in this simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tolerance</strong> – Springs under this length are considered inactive</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_springs.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_nr_of_springs.params.tolerance">¶</a> – Springs under this length are considered inactive</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The number of springs in the simulation</p>
@@ -942,7 +944,7 @@ springs (any depth).</p>
 <p>Caution: ignores atom masses.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tolerance</strong> – Springs under this length are considered inactive</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction.params.tolerance"></span><strong>tolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction.params.tolerance">¶</a> – Springs under this length are considered inactive</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The soluble weight fraction</p>
@@ -1021,11 +1023,11 @@ As a consequence though, you cannot simply benchmark only this method; you must 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>algorithm</strong> – The algorithm to use for the force relaxation. Choices: see <a class="reference external" href="https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/">NLopt Algorithms</a></p></li>
-<li><p><strong>maxNrOfSteps</strong> – The maximum number of steps to do during the simulation.</p></li>
-<li><p><strong>xTolerance</strong> – The tolerance of the displacements as an exit condition.</p></li>
-<li><p><strong>fTolerance</strong> – The tolerance of the force as an exit condition.</p></li>
-<li><p><strong>is2d</strong> – Specify true if you want to evaluate the force relation only in x and y direction.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.algorithm"></span><strong>algorithm</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.algorithm">¶</a> – The algorithm to use for the force relaxation. Choices: see <a class="reference external" href="https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/">NLopt Algorithms</a></p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.maxNrOfSteps"></span><strong>maxNrOfSteps</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.maxNrOfSteps">¶</a> – The maximum number of steps to do during the simulation.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.xTolerance"></span><strong>xTolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.xTolerance">¶</a> – The tolerance of the displacements as an exit condition.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.fTolerance"></span><strong>fTolerance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.fTolerance">¶</a> – The tolerance of the force as an exit condition.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.is2d"></span><strong>is2d</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.run_force_relaxation.params.is2d">¶</a> – Specify true if you want to evaluate the force relation only in x and y direction.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1037,7 +1039,7 @@ As a consequence though, you cannot simply benchmark only this method; you must 
 <dd><p>Reset the currently used force evaluator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>force_evaluator</strong> – The new force evaluator to use</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MEHPForceRelaxation.set_force_evaluator.params.force_evaluator"></span><strong>force_evaluator</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.set_force_evaluator.params.force_evaluator">¶</a> – The new force evaluator to use</p>
 </dd>
 </dl>
 </dd></dl>

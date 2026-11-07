@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -483,7 +485,7 @@
 <dd><p>Apply periodic boundary conditions (PBC): adjust the specified distances to fit into this box.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>distances</strong> – The distances to adjust</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Box.apply_pbc.params.distances"></span><strong>distances</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Box.apply_pbc.params.distances">¶</a> – The distances to adjust</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The adjusted distances</p>
@@ -503,8 +505,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>shear_magnitude</strong> – The shear magnitude (angle <span class="math notranslate nohighlight">\(\gamma\)</span>)</p></li>
-<li><p><strong>shear_direction</strong> – Direction of shear: 0 for x, 1 for y, 2 for z.
+<li><p><span class="target" id="pylimer_tools_cpp.Box.apply_simple_shear.params.shear_magnitude"></span><strong>shear_magnitude</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Box.apply_simple_shear.params.shear_magnitude">¶</a> – The shear magnitude (angle <span class="math notranslate nohighlight">\(\gamma\)</span>)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Box.apply_simple_shear.params.shear_direction"></span><strong>shear_direction</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Box.apply_simple_shear.params.shear_direction">¶</a> – Direction of shear: 0 for x, 1 for y, 2 for z.
 Use any other integer to disable shear.</p></li>
 </ul>
 </dd>
@@ -642,7 +644,7 @@ still need an infinite network,
 e.g., if the bonds need to be able to get longer than half the box.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>distances</strong> – The distances to compute offset for</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Box.get_offset.params.distances"></span><strong>distances</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Box.get_offset.params.distances">¶</a> – The distances to compute offset for</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The computed offset</p>
@@ -669,8 +671,8 @@ e.g., if the bonds need to be able to get longer than half the box.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>potential_offset</strong> – The offset to validate</p></li>
-<li><p><strong>abs_precision</strong> – Absolute precision for the validation</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Box.is_valid_offset.params.potential_offset"></span><strong>potential_offset</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Box.is_valid_offset.params.potential_offset">¶</a> – The offset to validate</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Box.is_valid_offset.params.abs_precision"></span><strong>abs_precision</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Box.is_valid_offset.params.abs_precision">¶</a> – Absolute precision for the validation</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

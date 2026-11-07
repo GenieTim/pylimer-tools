@@ -80,7 +80,7 @@ Configure whether a relocation step may happen when a slip-spring has ended at a
 Side-effect: if true, the relocations may also happen *to* a slip-spring next to a crosslink.
 
 * **Parameters:**
-  **(****bool****)** (*allow_relocation_in_network*) – Whether to allow relocation in the network or not.
+  **config_allow_relocation_in_network.****(****bool****)** (*allow_relocation_in_network*) – Whether to allow relocation in the network or not.
 
 #### config_auto_correlator_output(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), values: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[pylimer_tools_cpp.OutputConfiguration](pylimer_tools_cpp.OutputConfiguration.md#pylimer_tools_cpp.OutputConfiguration)], num_corr_in: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 32, p: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 16, m: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
@@ -105,12 +105,12 @@ Set which values to compute averages for.
 Configure how to do bond formation during the run.
 
 * **Parameters:**
-  * **(****int****)** (*atom_type_form_to*) – The nr of bonds to form in total. Use 0 to stop bond formation.
-  * **(****dict****)** (*num_bonds_per_atom_type*) – The nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)
-  * **(****float****)** (*bond_formation_dist*) – The maximum distance allowed to form bonds
-  * **(****int****)** – attempt to form bonds every this many steps during the simulation run
-  * **(****int****)** – The atom type to start forming bonds from.
-  * **(****int****)** – The atom type to start forming bonds to.
+  * **config_bond_formation.****(****int****)** (*atom_type_form_to*) – The nr of bonds to form in total. Use 0 to stop bond formation.
+  * **config_bond_formation.****(****dict****)** (*num_bonds_per_atom_type*) – The nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)
+  * **config_bond_formation.****(****float****)** (*bond_formation_dist*) – The maximum distance allowed to form bonds
+  * **config_bond_formation.****(****int****)** – attempt to form bonds every this many steps during the simulation run
+  * **config_bond_formation.****(****int****)** – The atom type to start forming bonds from.
+  * **config_bond_formation.****(****int****)** – The atom type to start forming bonds to.
 
 #### config_box_deformation(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), target_box: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 

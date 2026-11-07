@@ -57,7 +57,7 @@ Entanglements (slip-links) can be sampled in two distinct ways:
 1. **Discrete full-universe sampling**: Directly on explicit bead coordinates in a [`Universe`](../api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe).
 2. **Analytical Brownian-bridge sampling**: Directly on the crosslinkers and strand connectivity of a [`CrosslinkerUniverse`](../api/pylimer_tools_cpp.CrosslinkerUniverse.md#pylimer_tools_cpp.CrosslinkerUniverse) without instantiating intermediate strand beads, reducing peak memory by up to 90%+ and supporting topological leaf peeling of dangling and soluble fractions.
 
-See plot_entanglement_sampling_comparison for a detailed benchmark and comparison of these methods.
+See plot_entanglement_sampling_comparison for a detailed benchmark and comparison of discrete vs. analytical sampling methods, and plot_sliplink_vs_slipspring for the difference between modeling entanglements as merged slip-links versus compliant Hookean slip-springs.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
 <!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links to model entanglements instead of slip-links. See bernhard_phantom_2025">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_2_thumb.png)
@@ -80,6 +80,11 @@ See plot_entanglement_sampling_comparison for a detailed benchmark and compariso
 [Deformation Experiment](force_balance/plot_fb_deformation_exp.md)
 
   <div class="sphx-glr-thumbnail-title">Deformation Experiment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements impose constraints on polymer chain fluctuations.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_sliplink_vs_slipspring_thumb.png)
+
+[Modeling Entanglements: Slip-Links vs. Slip-Springs](force_balance/plot_sliplink_vs_slipspring.md)
+
+  <div class="sphx-glr-thumbnail-title">Modeling Entanglements: Slip-Links vs. Slip-Springs</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation (see gusev_numerical_2019) without slip-links or entanglements.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png)
 
 [Maximum Entropy Homogenization Procedure (MEHP)](force_balance/plot_force_relaxation.md)

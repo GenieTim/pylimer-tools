@@ -34,6 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -237,6 +238,7 @@
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -452,7 +454,7 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
 <li><p><strong>Discrete full-universe sampling</strong>: Directly on explicit bead coordinates in a <a class="reference internal" href="../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><code class="xref py py-class docutils literal notranslate"><span class="pre">Universe</span></code></a>.</p></li>
 <li><p><strong>Analytical Brownian-bridge sampling</strong>: Directly on the crosslinkers and strand connectivity of a <a class="reference internal" href="../api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse" title="pylimer_tools_cpp.CrosslinkerUniverse"><code class="xref py py-class docutils literal notranslate"><span class="pre">CrosslinkerUniverse</span></code></a> without instantiating intermediate strand beads, reducing peak memory by up to 90%+ and supporting topological leaf peeling of dangling and soluble fractions.</p></li>
 </ol>
-<p>See <span class="xref std std-doc">plot_entanglement_sampling_comparison</span> for a detailed benchmark and comparison of these methods.</p>
+<p>See <span class="xref std std-doc">plot_entanglement_sampling_comparison</span> for a detailed benchmark and comparison of discrete vs. analytical sampling methods, and <span class="xref std std-doc">plot_sliplink_vs_slipspring</span> for the difference between modeling entanglements as merged slip-links versus compliant Hookean slip-springs.</p>
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links to model entanglements instead of slip-links. See bernhard_phantom_2025"><img alt="" src="../_images/sphx_glr_plot_force_balance_2_thumb.png" />
 <p><a class="reference internal" href="force_balance/plot_force_balance_2.html"><span class="doc">Force Balance 2</span></a></p>
   <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
@@ -465,6 +467,9 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPForceBalance2 class in a deformation experiment."><img alt="" src="../_images/sphx_glr_plot_fb_deformation_exp_thumb.png" />
 <p><a class="reference internal" href="force_balance/plot_fb_deformation_exp.html"><span class="doc">Deformation Experiment</span></a></p>
   <div class="sphx-glr-thumbnail-title">Deformation Experiment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements impose constraints on polymer chain fluctuations."><img alt="" src="../_images/sphx_glr_plot_sliplink_vs_slipspring_thumb.png" />
+<p><a class="reference internal" href="force_balance/plot_sliplink_vs_slipspring.html"><span class="doc">Modeling Entanglements: Slip-Links vs. Slip-Springs</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Modeling Entanglements: Slip-Links vs. Slip-Springs</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation (see gusev_numerical_2019) without slip-links or entanglements."><img alt="" src="../_images/sphx_glr_plot_force_relaxation_thumb.png" />
 <p><a class="reference internal" href="force_balance/plot_force_relaxation.html"><span class="doc">Maximum Entropy Homogenization Procedure (MEHP)</span></a></p>
   <div class="sphx-glr-thumbnail-title">Maximum Entropy Homogenization Procedure (MEHP)</div>

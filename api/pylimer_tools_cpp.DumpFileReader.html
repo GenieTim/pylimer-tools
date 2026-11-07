@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -415,7 +417,7 @@
 <p>Initialize the dump file reader.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path_of_file_to_read</strong> – Path to the dump file to read</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DumpFileReader.params.path_of_file_to_read"></span><strong>path_of_file_to_read</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DumpFileReader.params.path_of_file_to_read">¶</a> – Path to the dump file to read</p>
 </dd>
 </dl>
 <p class="rubric">Methods Summary</p>
@@ -465,9 +467,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rowIndex</strong> – Index of the section/timestep to query</p></li>
-<li><p><strong>headerKey</strong> – Name of the header section to query</p></li>
-<li><p><strong>columnIndex</strong> – Index of the column within the header</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at.params.rowIndex"></span><strong>rowIndex</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at.params.rowIndex">¶</a> – Index of the section/timestep to query</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at.params.headerKey"></span><strong>headerKey</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at.params.headerKey">¶</a> – Name of the header section to query</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at.params.columnIndex"></span><strong>columnIndex</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DumpFileReader.get_numeric_values_for_at.params.columnIndex">¶</a> – Index of the column within the header</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -483,9 +485,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rowIndex</strong> – Index of the section/timestep to query</p></li>
-<li><p><strong>headerKey</strong> – Name of the header section to query</p></li>
-<li><p><strong>columnIndex</strong> – Index of the column within the header</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DumpFileReader.get_string_values_for_at.params.rowIndex"></span><strong>rowIndex</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DumpFileReader.get_string_values_for_at.params.rowIndex">¶</a> – Index of the section/timestep to query</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DumpFileReader.get_string_values_for_at.params.headerKey"></span><strong>headerKey</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DumpFileReader.get_string_values_for_at.params.headerKey">¶</a> – Name of the header section to query</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DumpFileReader.get_string_values_for_at.params.columnIndex"></span><strong>columnIndex</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DumpFileReader.get_string_values_for_at.params.columnIndex">¶</a> – Index of the column within the header</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -500,7 +502,7 @@
 <dd><p>Check whether the first section has the header specified.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>headerKey</strong> – Name of the header to check for</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DumpFileReader.has_key.params.headerKey"></span><strong>headerKey</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DumpFileReader.has_key.params.headerKey">¶</a> – Name of the header to check for</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if the header exists in the first section</p>
@@ -515,8 +517,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>headerKey</strong> – Name of the header section to check</p></li>
-<li><p><strong>columnName</strong> – Name of the column to look for</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DumpFileReader.key_has_column.params.headerKey"></span><strong>headerKey</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DumpFileReader.key_has_column.params.headerKey">¶</a> – Name of the header section to check</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DumpFileReader.key_has_column.params.columnName"></span><strong>columnName</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DumpFileReader.key_has_column.params.columnName">¶</a> – Name of the column to look for</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -532,9 +534,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>header_key</strong> – Name of the header section to check</p></li>
-<li><p><strong>dir_prefix</strong> – Prefix for the directional columns (default: “”)</p></li>
-<li><p><strong>dir_suffix</strong> – Suffix for the directional columns (default: “”)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DumpFileReader.key_has_directional_column.params.header_key"></span><strong>header_key</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DumpFileReader.key_has_directional_column.params.header_key">¶</a> – Name of the header section to check</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DumpFileReader.key_has_directional_column.params.dir_prefix"></span><strong>dir_prefix</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DumpFileReader.key_has_directional_column.params.dir_prefix">¶</a> – Prefix for the directional columns (default: “”)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.DumpFileReader.key_has_directional_column.params.dir_suffix"></span><strong>dir_suffix</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DumpFileReader.key_has_directional_column.params.dir_suffix">¶</a> – Suffix for the directional columns (default: “”)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

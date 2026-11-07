@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -418,7 +420,7 @@ where <span class="math notranslate nohighlight">\(r\)</span> is the spring [bet
 <p>Recommended optimization algorithm: “LD_LBFGS”</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>kappa</strong> – The spring constant <span class="math notranslate nohighlight">\(\kappa\)</span></p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.params.kappa"></span><strong>kappa</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.params.kappa">¶</a> – The spring constant <span class="math notranslate nohighlight">\(\kappa\)</span></p>
 </dd>
 </dl>
 <p class="rubric">Attributes Summary</p>
@@ -472,9 +474,9 @@ that returns a tuple of (force, gradient).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> – The dimensionality of the problem (the number of coordinates)</p></li>
-<li><p><strong>spring_distances</strong> – The sequential (x, y, z) spring distances as a vector</p></li>
-<li><p><strong>compute_gradient</strong> – If True, the gradient should be computed and returned</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_force_set_gradient.params.n"></span><strong>n</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_force_set_gradient.params.n">¶</a> – The dimensionality of the problem (the number of coordinates)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_force_set_gradient.params.spring_distances"></span><strong>spring_distances</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_force_set_gradient.params.spring_distances">¶</a> – The sequential (x, y, z) spring distances as a vector</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_force_set_gradient.params.compute_gradient"></span><strong>compute_gradient</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_force_set_gradient.params.compute_gradient">¶</a> – If True, the gradient should be computed and returned</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -505,10 +507,10 @@ that returns a tuple of (force, gradient).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>spring_distances</strong> – The three coordinate differences for one spring (list of 3 floats)</p></li>
-<li><p><strong>i</strong> – The row index of the stress tensor</p></li>
-<li><p><strong>j</strong> – The column index of the stress tensor</p></li>
-<li><p><strong>spring_index</strong> – The index of the spring being evaluated</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution.params.spring_distances"></span><strong>spring_distances</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution.params.spring_distances">¶</a> – The three coordinate differences for one spring (list of 3 floats)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution.params.i"></span><strong>i</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution.params.i">¶</a> – The row index of the stress tensor</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution.params.j"></span><strong>j</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution.params.j">¶</a> – The column index of the stress tensor</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution.params.spring_index"></span><strong>spring_index</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution.params.spring_index">¶</a> – The index of the spring being evaluated</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

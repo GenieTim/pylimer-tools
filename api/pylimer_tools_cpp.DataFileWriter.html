@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -425,7 +427,7 @@ and either <a class="reference internal" href="pylimer_tools_cpp.Universe.html#p
 <p>Initialize the writer with the universe to write.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>universe</strong> – The universe to write to the data file</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DataFileWriter.params.universe"></span><strong>universe</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DataFileWriter.params.universe">¶</a> – The universe to write to the data file</p>
 </dd>
 </dl>
 <p class="rubric">Methods Summary</p>
@@ -478,7 +480,7 @@ and either <a class="reference internal" href="pylimer_tools_cpp.Universe.html#p
 <dd><p>Set the (LAMMPS) atom style to use for writing the atoms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>atom_style</strong> – The LAMMPS atom style to use (default: AtomStyle.ANGLE)</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DataFileWriter.config_atom_style.params.atom_style"></span><strong>atom_style</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_atom_style.params.atom_style">¶</a> – The LAMMPS atom style to use (default: AtomStyle.ANGLE)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -489,7 +491,7 @@ and either <a class="reference internal" href="pylimer_tools_cpp.Universe.html#p
 <dd><p>Set whether to attempt to reset image flags so that output coordinates lie in the box.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>attempt_image_reset</strong> – Whether to attempt image flag reset (default: False)</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DataFileWriter.config_attempt_image_reset.params.attempt_image_reset"></span><strong>attempt_image_reset</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_attempt_image_reset.params.attempt_image_reset">¶</a> – Whether to attempt image flag reset (default: False)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -502,7 +504,7 @@ Needed in case the moleculeIdx in the output file should have any meaning.
 (e.g. with <a class="reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap" title="pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">config_molecule_idx_for_swap()</span></code></a>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>crosslinker_type</strong> – The atom type representing crosslinkers (default: 2)</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DataFileWriter.config_crosslinker_type.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_crosslinker_type.params.crosslinker_type">¶</a> – The atom type representing crosslinkers (default: 2)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -513,7 +515,7 @@ Needed in case the moleculeIdx in the output file should have any meaning.
 <dd><p>Set whether to include the angles from the universe in the file or not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>include_angles</strong> – Whether to include angles (default: True)</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DataFileWriter.config_include_angles.params.include_angles"></span><strong>include_angles</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_include_angles.params.include_angles">¶</a> – Whether to include angles (default: True)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -524,7 +526,7 @@ Needed in case the moleculeIdx in the output file should have any meaning.
 <dd><p>Set whether to include the dihedral angles from the universe in the file or not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>include_dihedral_angles</strong> – Whether to include dihedral angles (default: True)</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DataFileWriter.config_include_dihedral_angles.params.include_dihedral_angles"></span><strong>include_dihedral_angles</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_include_dihedral_angles.params.include_dihedral_angles">¶</a> – Whether to include dihedral angles (default: True)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -535,7 +537,7 @@ Needed in case the moleculeIdx in the output file should have any meaning.
 <dd><p>Set whether to include the velocities from the universe (if any) in the file or not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>include_velocities</strong> – Whether to include velocities (default: True)</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DataFileWriter.config_include_velocities.params.include_velocities"></span><strong>include_velocities</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_include_velocities.params.include_velocities">¶</a> – Whether to include velocities (default: True)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -548,7 +550,7 @@ identical per chain, but identical per position in the chain.
 That’s how you can have bond swapping with constant chain length distribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>enable_swappability</strong> – Whether to enable molecule index swappability (default: False)</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap.params.enable_swappability"></span><strong>enable_swappability</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_molecule_idx_for_swap.params.enable_swappability">¶</a> – Whether to enable molecule index swappability (default: False)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -559,7 +561,7 @@ That’s how you can have bond swapping with constant chain length distribution.
 <dd><p>Set whether to change the output coordinates to lie in the box or not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>move_into_box</strong> – Whether to move coordinates into box (default: False)</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DataFileWriter.config_move_into_box.params.move_into_box"></span><strong>move_into_box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_move_into_box.params.move_into_box">¶</a> – Whether to move coordinates into box (default: False)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -571,7 +573,7 @@ That’s how you can have bond swapping with constant chain length distribution.
 Re-indexing leads to atom IDs being in the range of 1 to the number of atoms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>reindex_atoms</strong> – Whether to reindex atoms (default: False)</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DataFileWriter.config_reindex_atoms.params.reindex_atoms"></span><strong>reindex_atoms</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DataFileWriter.config_reindex_atoms.params.reindex_atoms">¶</a> – Whether to reindex atoms (default: False)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -602,7 +604,7 @@ atom style with additional data.</p>
 so that the file can be read correctly again.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>atom_format</strong> – Custom format string for atoms (default: tab-separated standard format)</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DataFileWriter.set_custom_atom_format.params.atom_format"></span><strong>atom_format</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DataFileWriter.set_custom_atom_format.params.atom_format">¶</a> – Custom format string for atoms (default: tab-separated standard format)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -613,7 +615,7 @@ so that the file can be read correctly again.</p>
 <dd><p>Re-set the universe to write.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>universe</strong> – The new universe to write to the data file</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DataFileWriter.set_universe_to_write.params.universe"></span><strong>universe</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DataFileWriter.set_universe_to_write.params.universe">¶</a> – The new universe to write to the data file</p>
 </dd>
 </dl>
 </dd></dl>
@@ -624,7 +626,7 @@ so that the file can be read correctly again.</p>
 <dd><p>Actually do the writing to the disk.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>file</strong> – The path and file name to write to</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.DataFileWriter.write_to_file.params.file"></span><strong>file</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.DataFileWriter.write_to_file.params.file">¶</a> – The path and file name to write to</p>
 </dd>
 </dl>
 </dd></dl>

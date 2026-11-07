@@ -34,6 +34,7 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=bafda8c6" />
     
@@ -237,6 +238,7 @@
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -421,11 +423,11 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> – The object to cache.</p></li>
-<li><p><strong>file</strong> – A part of what’s used for the cache’s name. Ideally the file that is read,
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.do_cache.params.obj"></span><strong>obj</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.do_cache.params.obj">¶</a> – The object to cache.</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.do_cache.params.file"></span><strong>file</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.do_cache.params.file">¶</a> – A part of what’s used for the cache’s name. Ideally the file that is read,
 such that the filemtime of <cite>file</cite> can be used to check whether cache must be generated anew.</p></li>
-<li><p><strong>suffix</strong> – The file name’s suffix.</p></li>
-<li><p><strong>tmp_dir</strong> – The directory to store the cache in.</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.do_cache.params.suffix"></span><strong>suffix</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.do_cache.params.suffix">¶</a> – The file name’s suffix.</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.do_cache.params.tmp_dir"></span><strong>tmp_dir</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.do_cache.params.tmp_dir">¶</a> – The directory to store the cache in.</p></li>
 </ul>
 </dd>
 </dl>
@@ -438,11 +440,11 @@ such that the filemtime of <cite>file</cite> can be used to check whether cache 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> – A part of what’s used for the cache’s name. Ideally the file that is read,
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.get_cache_file_name.params.file"></span><strong>file</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.get_cache_file_name.params.file">¶</a> – A part of what’s used for the cache’s name. Ideally the file that is read,
 such that the filemtime of <cite>file</cite> can be used to check whether cache must be generated anew.</p></li>
-<li><p><strong>suffix</strong> – The file name’s suffix.</p></li>
-<li><p><strong>tmp_dir</strong> – The temporary directory.</p></li>
-<li><p><strong>old</strong> – Whether to use the old file naming scheme.</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.get_cache_file_name.params.suffix"></span><strong>suffix</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.get_cache_file_name.params.suffix">¶</a> – The file name’s suffix.</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.get_cache_file_name.params.tmp_dir"></span><strong>tmp_dir</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.get_cache_file_name.params.tmp_dir">¶</a> – The temporary directory.</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.get_cache_file_name.params.old"></span><strong>old</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.get_cache_file_name.params.old">¶</a> – Whether to use the old file naming scheme.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -458,8 +460,8 @@ such that the filemtime of <cite>file</cite> can be used to check whether cache 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cache_file</strong> – The cache file that is required to be newer.</p></li>
-<li><p><strong>dependencies</strong> – The list of files (or a single file path) that need to be older.</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.is_current_cache.params.cache_file"></span><strong>cache_file</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.is_current_cache.params.cache_file">¶</a> – The cache file that is required to be newer.</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.is_current_cache.params.dependencies"></span><strong>dependencies</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.is_current_cache.params.dependencies">¶</a> – The list of files (or a single file path) that need to be older.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -475,12 +477,12 @@ such that the filemtime of <cite>file</cite> can be used to check whether cache 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> – A part of what’s used for the cache’s name. Ideally the file that is read,
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.load_cache.params.file"></span><strong>file</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.load_cache.params.file">¶</a> – A part of what’s used for the cache’s name. Ideally the file that is read,
 such that the filemtime of <cite>file</cite> can be used to check whether cache must be generated anew.</p></li>
-<li><p><strong>suffix</strong> – The file name’s suffix.</p></li>
-<li><p><strong>disable_warnings</strong> – Whether to disable warnings about missing possibilities to check for filemtime.</p></li>
-<li><p><strong>tmp_dir</strong> – The directory to load the cache from.</p></li>
-<li><p><strong>anyway</strong> – Whether to ignore the cache’s modification time, and return the cached data anyway,
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.load_cache.params.suffix"></span><strong>suffix</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.load_cache.params.suffix">¶</a> – The file name’s suffix.</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.load_cache.params.disable_warnings"></span><strong>disable_warnings</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.load_cache.params.disable_warnings">¶</a> – Whether to disable warnings about missing possibilities to check for filemtime.</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.load_cache.params.tmp_dir"></span><strong>tmp_dir</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.load_cache.params.tmp_dir">¶</a> – The directory to load the cache from.</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.cache_utility.load_cache.params.anyway"></span><strong>anyway</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.cache_utility.load_cache.params.anyway">¶</a> – Whether to ignore the cache’s modification time, and return the cached data anyway,
 as if it were current.</p></li>
 </ul>
 </dd>
@@ -501,7 +503,7 @@ as if it were current.</p></li>
 <code class="docutils literal notranslate"><span class="pre">pandas.to_numeric</span></code> while remaining compatible with newer pandas versions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>df</strong> (<em>pd.DataFrame</em>) – DataFrame whose columns should be converted where possible</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools.utils.data_utility.apply_to_numeric_ignore_compat.params.df"></span><strong>df</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.data_utility.apply_to_numeric_ignore_compat.params.df">¶</a> (<em>pd.DataFrame</em>) – DataFrame whose columns should be converted where possible</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>DataFrame with numeric-like columns converted</p>
@@ -519,10 +521,10 @@ as if it were current.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><em>list</em></a><em> or </em><em>pd.DataFrame</em><em> or </em><em>pd.Series</em>) – The list, DataFrame, or Series to extract the last few entries from</p></li>
-<li><p><strong>percentage</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The percentage of entries to extract (default: 0.2)</p></li>
-<li><p><strong>min_n</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The minimum number of entries to extract (default: 25)</p></li>
-<li><p><strong>max_percentage</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The maximum percentage of entries to extract (default: 0.5)</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.data_utility.get_tail.params.data"></span><strong>data</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.data_utility.get_tail.params.data">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><em>list</em></a><em> or </em><em>pd.DataFrame</em><em> or </em><em>pd.Series</em>) – The list, DataFrame, or Series to extract the last few entries from</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.data_utility.get_tail.params.percentage"></span><strong>percentage</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.data_utility.get_tail.params.percentage">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The percentage of entries to extract (default: 0.2)</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.data_utility.get_tail.params.min_n"></span><strong>min_n</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.data_utility.get_tail.params.min_n">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The minimum number of entries to extract (default: 25)</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.data_utility.get_tail.params.max_percentage"></span><strong>max_percentage</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.data_utility.get_tail.params.max_percentage">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The maximum percentage of entries to extract (default: 0.5)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -544,10 +546,10 @@ but ideally <cite>percentage</cite> many percentage of the last entries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>pd.DataFrame</em>) – The DataFrame to unify the step-size for</p></li>
-<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>) – The column name indicating the column containing the step-nr</p></li>
-<li><p><strong>step_size</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em>, </em><em>optional</em>) – The step size to use for filtering (if None, computed automatically)</p></li>
-<li><p><strong>max_expected_step_size</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em>, </em><em>default=100</em>) – Used to get a warning if the computed step-size is larger</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.data_utility.unify_data_stepsizes.params.data"></span><strong>data</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.data_utility.unify_data_stepsizes.params.data">¶</a> (<em>pd.DataFrame</em>) – The DataFrame to unify the step-size for</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.data_utility.unify_data_stepsizes.params.key"></span><strong>key</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.data_utility.unify_data_stepsizes.params.key">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>) – The column name indicating the column containing the step-nr</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.data_utility.unify_data_stepsizes.params.step_size"></span><strong>step_size</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.data_utility.unify_data_stepsizes.params.step_size">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em>, </em><em>optional</em>) – The step size to use for filtering (if None, computed automatically)</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.data_utility.unify_data_stepsizes.params.max_expected_step_size"></span><strong>max_expected_step_size</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.data_utility.unify_data_stepsizes.params.max_expected_step_size">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em>, </em><em>default=100</em>) – Used to get a warning if the computed step-size is larger</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -577,8 +579,8 @@ Particularly useful when dealing with large datasets, e.g. output from long LAMM
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – dataframe to reduce</p></li>
-<li><p><strong>datetime_features</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em>]</em>) – list of column names that contain datetime data</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.optimize_dataframe.optimize.params.df"></span><strong>df</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.optimize_dataframe.optimize.params.df">¶</a> (<em>pd.DataFrame</em>) – dataframe to reduce</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.optimize_dataframe.optimize.params.datetime_features"></span><strong>datetime_features</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.optimize_dataframe.optimize.params.datetime_features">¶</a> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em>]</em>) – list of column names that contain datetime data</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -596,7 +598,7 @@ Particularly useful when dealing with large datasets, e.g. output from long LAMM
 <dd><p>Optimize the floating point type entries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>df</strong> (<em>pd.DataFrame</em>) – dataframe to reduce</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools.utils.optimize_dataframe.optimize_floats.params.df"></span><strong>df</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.optimize_dataframe.optimize_floats.params.df">¶</a> (<em>pd.DataFrame</em>) – dataframe to reduce</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>dataset with the column dtypes adjusted</p>
@@ -613,7 +615,7 @@ Particularly useful when dealing with large datasets, e.g. output from long LAMM
 <dd><p>Optimize the integer point type entries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>df</strong> (<em>pd.DataFrame</em>) – dataframe to reduce</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools.utils.optimize_dataframe.optimize_ints.params.df"></span><strong>df</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.optimize_dataframe.optimize_ints.params.df">¶</a> (<em>pd.DataFrame</em>) – dataframe to reduce</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>dataset with the column dtypes adjusted</p>
@@ -631,8 +633,8 @@ Particularly useful when dealing with large datasets, e.g. output from long LAMM
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – dataframe to reduce</p></li>
-<li><p><strong>datetime_features</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em>]</em>) – list of column names that contain datetime data</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.optimize_dataframe.optimize_objects.params.df"></span><strong>df</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.optimize_dataframe.optimize_objects.params.df">¶</a> (<em>pd.DataFrame</em>) – dataframe to reduce</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.optimize_dataframe.optimize_objects.params.datetime_features"></span><strong>datetime_features</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.optimize_dataframe.optimize_objects.params.datetime_features">¶</a> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em>]</em>) – list of column names that contain datetime data</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -651,11 +653,11 @@ Particularly useful when dealing with large datasets, e.g. output from long LAMM
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – dataframe to reduce</p></li>
-<li><p><strong>obj_to_category</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>) – convert non-datetime related objects to category dtype</p></li>
-<li><p><strong>subset</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em>] or </em><em>None</em>) – subset of columns to analyse</p></li>
-<li><p><strong>inplace</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>) – whether to modify the dataframe in place</p></li>
-<li><p><strong>print_stats</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>) – whether to print memory usage statistics</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.optimize_dataframe.reduce_mem_usage.params.df"></span><strong>df</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.optimize_dataframe.reduce_mem_usage.params.df">¶</a> (<em>pd.DataFrame</em>) – dataframe to reduce</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.optimize_dataframe.reduce_mem_usage.params.obj_to_category"></span><strong>obj_to_category</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.optimize_dataframe.reduce_mem_usage.params.obj_to_category">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>) – convert non-datetime related objects to category dtype</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.optimize_dataframe.reduce_mem_usage.params.subset"></span><strong>subset</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.optimize_dataframe.reduce_mem_usage.params.subset">¶</a> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em>] or </em><em>None</em>) – subset of columns to analyse</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.optimize_dataframe.reduce_mem_usage.params.inplace"></span><strong>inplace</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.optimize_dataframe.reduce_mem_usage.params.inplace">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>) – whether to modify the dataframe in place</p></li>
+<li><p><span class="target" id="pylimer_tools.utils.optimize_dataframe.reduce_mem_usage.params.print_stats"></span><strong>print_stats</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.utils.optimize_dataframe.reduce_mem_usage.params.print_stats">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>) – whether to print memory usage statistics</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

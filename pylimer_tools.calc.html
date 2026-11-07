@@ -34,6 +34,7 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=bafda8c6" />
     
@@ -237,6 +238,7 @@
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -437,13 +439,13 @@ or <cite>MEHPForceRelaxation</cite> classes from <cite>pylimer_tools_cpp</cite>.
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>networks</strong> (<em>Union</em><em>[</em><em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em><em>, </em><em>None</em><em>]</em>) – The networks to calculate the cycle rank for</p></li>
-<li><p><strong>nu</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>, </em><em>None</em><em>]</em>) – Number of elastically effective (active) strands per unit volume</p></li>
-<li><p><strong>mu</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>, </em><em>None</em><em>]</em>) – Number density of the elastically effective crosslinks</p></li>
-<li><p><strong>abs_tol</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.networks"></span><strong>networks</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.networks">¶</a> (<em>Union</em><em>[</em><em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em><em>, </em><em>None</em><em>]</em>) – The networks to calculate the cycle rank for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.nu"></span><strong>nu</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.nu">¶</a> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>, </em><em>None</em><em>]</em>) – Number of elastically effective (active) strands per unit volume</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.mu"></span><strong>mu</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.mu">¶</a> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>, </em><em>None</em><em>]</em>) – Number density of the elastically effective crosslinks</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.abs_tol"></span><strong>abs_tol</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.abs_tol">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
 Set to None to use only rel_tol</p></li>
-<li><p><strong>rel_tol</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The relative tolerance to categorize a chain as active (0: all, 1: none)</p></li>
-<li><p><strong>crosslinker_type</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The atom type of the crosslinkers/junctions</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.rel_tol"></span><strong>rel_tol</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.rel_tol">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The relative tolerance to categorize a chain as active (0: all, 1: none)</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_cycle_rank.params.crosslinker_type">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The atom type of the crosslinkers/junctions</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -470,12 +472,12 @@ Assumes the precursor-chains to be bifunctional.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The networks to compute <span class="math notranslate nohighlight">\(\mu_{eff}\)</span> for</p></li>
-<li><p><strong>abs_tol</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions.params.networks"></span><strong>networks</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions.params.networks">¶</a> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The networks to compute <span class="math notranslate nohighlight">\(\mu_{eff}\)</span> for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions.params.abs_tol"></span><strong>abs_tol</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions.params.abs_tol">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
 Set to None to use only rel_tol</p></li>
-<li><p><strong>rel_tol</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The relative tolerance to categorize a chain as active (0: all, 1: none)</p></li>
-<li><p><strong>crosslinker_type</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The atom type of the crosslinkers/junctions</p></li>
-<li><p><strong>min_num_effective_strands</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The number of elastically effective strands to qualify a junction as such</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions.params.rel_tol"></span><strong>rel_tol</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions.params.rel_tol">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The relative tolerance to categorize a chain as active (0: all, 1: none)</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions.params.crosslinker_type">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The atom type of the crosslinkers/junctions</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions.params.min_num_effective_strands"></span><strong>min_num_effective_strands</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_junctions.params.min_num_effective_strands">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The number of elastically effective strands to qualify a junction as such</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -510,11 +512,11 @@ or <cite>MEHPForceRelaxation</cite> classes from <cite>pylimer_tools_cpp</cite>.
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The networks to compute <span class="math notranslate nohighlight">\(\nu_{eff}\)</span> for</p></li>
-<li><p><strong>abs_tol</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_network.params.networks"></span><strong>networks</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_network.params.networks">¶</a> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The networks to compute <span class="math notranslate nohighlight">\(\nu_{eff}\)</span> for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_network.params.abs_tol"></span><strong>abs_tol</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_network.params.abs_tol">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The absolute tolerance to categorize a chain as active (min. end-to-end distance).
 Set to None to use only rel_tol</p></li>
-<li><p><strong>rel_tol</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The relative tolerance to categorize a chain as active (0: all, 1: none)</p></li>
-<li><p><strong>crosslinker_type</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The atom type of the crosslinkers/junctions</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_network.params.rel_tol"></span><strong>rel_tol</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_network.params.rel_tol">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The relative tolerance to categorize a chain as active (0: all, 1: none)</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_network.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_effective_nr_density_of_network.params.crosslinker_type">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The atom type of the crosslinkers/junctions</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -533,8 +535,8 @@ Set to None to use only rel_tol</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – A list of universes</p></li>
-<li><p><strong>accept_different_sizes</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>) – Toggle whether to throw an error when the Universes have different numbers of atoms</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_mean_universe_volume.params.networks"></span><strong>networks</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_mean_universe_volume.params.networks">¶</a> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – A list of universes</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_mean_universe_volume.params.accept_different_sizes"></span><strong>accept_different_sizes</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_mean_universe_volume.params.accept_different_sizes">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>) – Toggle whether to throw an error when the Universes have different numbers of atoms</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -571,10 +573,10 @@ Set to None to use only rel_tol</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The networks to compute the topological factor for</p></li>
-<li><p><strong>crosslinker_type</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The type of atoms to ignore (junctions, crosslinkers)</p></li>
-<li><p><strong>total_mass</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The <span class="math notranslate nohighlight">\(M\)</span> in the respective formula</p></li>
-<li><p><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em> or </em><em>None</em>) – The mean bond length. If None, it will be computed for each molecule in the first Universe</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_topological_factor.params.networks"></span><strong>networks</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_topological_factor.params.networks">¶</a> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The networks to compute the topological factor for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_topological_factor.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_topological_factor.params.crosslinker_type">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The type of atoms to ignore (junctions, crosslinkers)</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_topological_factor.params.total_mass"></span><strong>total_mass</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_topological_factor.params.total_mass">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The <span class="math notranslate nohighlight">\(M\)</span> in the respective formula</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.compute_topological_factor.params.b"></span><strong>b</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.compute_topological_factor.params.b">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em> or </em><em>None</em>) – The mean bond length. If None, it will be computed for each molecule in the first Universe</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -605,11 +607,11 @@ or <cite>MEHPForceRelaxation</cite> classes from <cite>pylimer_tools_cpp</cite>.
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The polymer systems to predict the shear modulus for</p></li>
-<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The temperature in your unit system</p></li>
-<li><p><strong>k_boltzmann</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – Boltzmann’s constant in your unit system</p></li>
-<li><p><strong>crosslinker_type</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The type of atoms to ignore (junctions, crosslinkers)</p></li>
-<li><p><strong>total_mass</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The <span class="math notranslate nohighlight">\(M\)</span> in the respective formula</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.predict_shear_modulus.params.networks"></span><strong>networks</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.predict_shear_modulus.params.networks">¶</a> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The polymer systems to predict the shear modulus for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.predict_shear_modulus.params.temperature"></span><strong>temperature</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.predict_shear_modulus.params.temperature">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The temperature in your unit system</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.predict_shear_modulus.params.k_boltzmann"></span><strong>k_boltzmann</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.predict_shear_modulus.params.k_boltzmann">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – Boltzmann’s constant in your unit system</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.predict_shear_modulus.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.predict_shear_modulus.params.crosslinker_type">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The type of atoms to ignore (junctions, crosslinkers)</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.mehp_utilities.predict_shear_modulus.params.total_mass"></span><strong>total_mass</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.mehp_utilities.predict_shear_modulus.params.total_mass">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – The <span class="math notranslate nohighlight">\(M\)</span> in the respective formula</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -646,14 +648,14 @@ Also, the systems are mostly assumed to be end-linked and monodisperse.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>g_e_1</strong> – The melt entanglement modulus <span class="math notranslate nohighlight">\(G_e(1) = k_B T \epsilon_e\)</span></p></li>
-<li><p><strong>temperature</strong> – The temperatures; defaults to room temperature (25 °C)</p></li>
-<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
-<li><p><strong>p</strong> – The crosslinker conversion</p></li>
-<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
-<li><p><strong>f</strong> – The functionality of the crosslinkers</p></li>
-<li><p><strong>beta</strong> – <span class="math notranslate nohighlight">\(P(F_b^{out})\)</span>, optional</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.g_e_1"></span><strong>g_e_1</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.g_e_1">¶</a> – The melt entanglement modulus <span class="math notranslate nohighlight">\(G_e(1) = k_B T \epsilon_e\)</span></p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.temperature"></span><strong>temperature</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.temperature">¶</a> – The temperatures; defaults to room temperature (25 °C)</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.network">¶</a> – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.crosslinker_type">¶</a> – The type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.p"></span><strong>p</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.p">¶</a> – The crosslinker conversion</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.r"></span><strong>r</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.r">¶</a> – The stoichiometric imbalance</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.f"></span><strong>f</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.f">¶</a> – The functionality of the crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.beta"></span><strong>beta</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus.params.beta">¶</a> – <span class="math notranslate nohighlight">\(P(F_b^{out})\)</span>, optional</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -669,15 +671,15 @@ Also, the systems are mostly assumed to be end-linked and monodisperse.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>p</strong> – The crosslinker conversion</p></li>
-<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
-<li><p><strong>f</strong> – The functionality of the crosslinkers</p></li>
-<li><p><strong>g_e_1</strong> – The melt entanglement modulus <span class="math notranslate nohighlight">\(G_e(1) = k_B T \epsilon_e\)</span></p></li>
-<li><p><strong>xlink_concentration_0</strong> – [A_f]_0, in 1/volume units</p></li>
-<li><p><strong>ureg</strong> – The unit registry to use</p></li>
-<li><p><strong>alpha</strong> – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, optional</p></li>
-<li><p><strong>temperature</strong> – The temperatures; defaults to room temperature</p></li>
-<li><p><strong>w_sol</strong> – The soluble fraction (to be removed)</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.p"></span><strong>p</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.p">¶</a> – The crosslinker conversion</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.r"></span><strong>r</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.r">¶</a> – The stoichiometric imbalance</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.f"></span><strong>f</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.f">¶</a> – The functionality of the crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.g_e_1"></span><strong>g_e_1</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.g_e_1">¶</a> – The melt entanglement modulus <span class="math notranslate nohighlight">\(G_e(1) = k_B T \epsilon_e\)</span></p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.xlink_concentration_0"></span><strong>xlink_concentration_0</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.xlink_concentration_0">¶</a> – [A_f]_0, in 1/volume units</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.ureg"></span><strong>ureg</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.ureg">¶</a> – The unit registry to use</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.alpha"></span><strong>alpha</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.alpha">¶</a> – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, optional</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.temperature"></span><strong>temperature</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.temperature">¶</a> – The temperatures; defaults to room temperature</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.w_sol"></span><strong>w_sol</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus.params.w_sol">¶</a> – The soluble fraction (to be removed)</p></li>
 </ul>
 </dd>
 </dl>
@@ -691,13 +693,13 @@ Also, the systems are mostly assumed to be end-linked and monodisperse.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>p</strong> – The crosslinker conversion</p></li>
-<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
-<li><p><strong>xlink_concentration_0</strong> – [A_f]_0, in 1/volume units</p></li>
-<li><p><strong>ureg</strong> – The unit registry to use</p></li>
-<li><p><strong>f</strong> – The functionality of the crosslinkers</p></li>
-<li><p><strong>alpha</strong> – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, optional</p></li>
-<li><p><strong>temperature</strong> – The temperatures; defaults to room temperature (25 °C)</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.p"></span><strong>p</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.p">¶</a> – The crosslinker conversion</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.r"></span><strong>r</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.r">¶</a> – The stoichiometric imbalance</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.xlink_concentration_0"></span><strong>xlink_concentration_0</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.xlink_concentration_0">¶</a> – [A_f]_0, in 1/volume units</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.ureg"></span><strong>ureg</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.ureg">¶</a> – The unit registry to use</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.f"></span><strong>f</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.f">¶</a> – The functionality of the crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.alpha"></span><strong>alpha</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.alpha">¶</a> – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, optional</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.temperature"></span><strong>temperature</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus.params.temperature">¶</a> – The temperatures; defaults to room temperature (25 °C)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -730,10 +732,10 @@ you would need to implement these formulas yourselves.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> – The extent of reaction in terms of the crosslinkers</p></li>
-<li><p><strong>f</strong> – The functionality of the the crosslinker</p></li>
-<li><p><strong>b2</strong> – The fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities.params.r"></span><strong>r</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities.params.r">¶</a> – The stoichiometric imbalance</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities.params.p"></span><strong>p</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities.params.p">¶</a> – The extent of reaction in terms of the crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities.params.f"></span><strong>f</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities.params.f">¶</a> – The functionality of the the crosslinker</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities.params.b2"></span><strong>b2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities.params.b2">¶</a> – The fraction of bifunctional chains; defaults to 1.0 for no monofunctional chains.
 Can be computed e.g. as <span class="math notranslate nohighlight">\(b_2 = \frac{2 \cdot [B_2]}{[B_1] + 2 \cdot [B_2]}\)</span></p></li>
 </ul>
 </dd>
@@ -753,21 +755,21 @@ Can be computed e.g. as <span class="math notranslate nohighlight">\(b_2 = \frac
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
-<li><p><strong>ureg</strong> – The unit registry to use</p></li>
-<li><p><strong>unit_style</strong> – The unit style to use to have the results in appropriate units</p></li>
-<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
-<li><p><strong>r</strong> – The stoichiometric imbalance. Optional if network is specified</p></li>
-<li><p><strong>p</strong> – The extent of reaction. Optional if network is specified</p></li>
-<li><p><strong>f</strong> – The functionality of the the crosslinker. Optional if network is specified</p></li>
-<li><p><strong>nu</strong> – The strand number density (nr of strands per volume) (ideally with units).
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.network">¶</a> – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.ureg"></span><strong>ureg</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.ureg">¶</a> – The unit registry to use</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.unit_style"></span><strong>unit_style</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.unit_style">¶</a> – The unit style to use to have the results in appropriate units</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.crosslinker_type">¶</a> – The type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.r"></span><strong>r</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.r">¶</a> – The stoichiometric imbalance. Optional if network is specified</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.p"></span><strong>p</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.p">¶</a> – The extent of reaction. Optional if network is specified</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.f"></span><strong>f</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.f">¶</a> – The functionality of the the crosslinker. Optional if network is specified</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.nu"></span><strong>nu</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.nu">¶</a> – The strand number density (nr of strands per volume) (ideally with units).
 Optional if network is specified</p></li>
-<li><p><strong>temperature</strong> – The temperature to compute the modulus at. Default: 298.15 K
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.temperature"></span><strong>temperature</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.temperature">¶</a> – The temperature to compute the modulus at. Default: 298.15 K
 Optional, can be passed to improve performance</p></li>
-<li><p><strong>functionality_per_type</strong> – a dictionary with key: type, and value: functionality of this atom type.
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.functionality_per_type"></span><strong>functionality_per_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.functionality_per_type">¶</a> – a dictionary with key: type, and value: functionality of this atom type.
 Optional, can be passed to improve performance</p></li>
-<li><p><strong>g_e_1</strong> – The melt entanglement modulus</p></li>
-<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.g_e_1"></span><strong>g_e_1</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.g_e_1">¶</a> – The melt entanglement modulus</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.b2"></span><strong>b2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition.params.b2">¶</a> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
@@ -800,7 +802,7 @@ This function computes the probability that a random B_2 unit will be dangling.<
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>p_f_b_out</strong> – <span class="math notranslate nohighlight">\(P(F_B^{out})\)</span></p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_dangling.params.p_f_b_out"></span><strong>p_f_b_out</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_dangling.params.p_f_b_out">¶</a> – <span class="math notranslate nohighlight">\(P(F_B^{out})\)</span></p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The probability that a bifunctional monomer is dangling</p>
@@ -815,7 +817,7 @@ This function computes the probability that a random B_2 unit will be dangling.<
 This function computes the probability that a random B_2 unit will be effective.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>p_f_b_out</strong> – <span class="math notranslate nohighlight">\(P(F_B^{out})\)</span></p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_effective.params.p_f_b_out"></span><strong>p_f_b_out</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_bifunctional_monomer_is_effective.params.p_f_b_out">¶</a> – <span class="math notranslate nohighlight">\(P(F_B^{out})\)</span></p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The probability that a bifunctional monomer is effective</p>
@@ -838,8 +840,8 @@ This is equal to the probability that only one of the arms is attached to the ge
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>functionality_of_monomer</strong> – f</p></li>
-<li><p><strong>p_f_a_out</strong> – <span class="math notranslate nohighlight">\(P(F_A^{out})\)</span></p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_dangling.params.functionality_of_monomer"></span><strong>functionality_of_monomer</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_dangling.params.functionality_of_monomer">¶</a> – f</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_dangling.params.p_f_a_out"></span><strong>p_f_a_out</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_dangling.params.p_f_a_out">¶</a> – <span class="math notranslate nohighlight">\(P(F_A^{out})\)</span></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -862,9 +864,9 @@ This is equal to the probability that only one of the arms is attached to the ge
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>functionality_of_monomer</strong> – f</p></li>
-<li><p><strong>expected_degree_of_effect</strong> – m</p></li>
-<li><p><strong>p_f_a_out</strong> – <span class="math notranslate nohighlight">\(P(F_A^{out})\)</span></p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_effective.params.functionality_of_monomer"></span><strong>functionality_of_monomer</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_effective.params.functionality_of_monomer">¶</a> – f</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_effective.params.expected_degree_of_effect"></span><strong>expected_degree_of_effect</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_effective.params.expected_degree_of_effect">¶</a> – m</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_effective.params.p_f_a_out"></span><strong>p_f_a_out</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_is_effective.params.p_f_a_out">¶</a> – <span class="math notranslate nohighlight">\(P(F_A^{out})\)</span></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -887,9 +889,9 @@ This function computes the probability that a random A_f unit will have i pendan
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>functionality_of_monomer</strong> – f</p></li>
-<li><p><strong>degree_of_ineffectiveness</strong> – i</p></li>
-<li><p><strong>p_f_a_out</strong> – <span class="math notranslate nohighlight">\(P(F_A^{out})\)</span></p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_with_degree_is_dangling.params.functionality_of_monomer"></span><strong>functionality_of_monomer</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_with_degree_is_dangling.params.functionality_of_monomer">¶</a> – f</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_with_degree_is_dangling.params.degree_of_ineffectiveness"></span><strong>degree_of_ineffectiveness</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_with_degree_is_dangling.params.degree_of_ineffectiveness">¶</a> – i</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_with_degree_is_dangling.params.p_f_a_out"></span><strong>p_f_a_out</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_crosslink_with_degree_is_dangling.params.p_f_a_out">¶</a> – <span class="math notranslate nohighlight">\(P(F_A^{out})\)</span></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -905,7 +907,7 @@ This function computes the probability that a random A_f unit will have i pendan
 <p>Literature: <span class="bibtex-citation" id="id20">Langley [<a class="reference internal" href="acknowledgements.html#id22" title="Neal R. Langley. Elastically Effective Strand Density in Polymer Networks. Macromolecules, 1(4):348–352, July 1968. doi:10.1021/ma60004a015.">Lan68</a>]</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>beta</strong> – <span class="math notranslate nohighlight">\(P(F_b^{out})\)</span>, see <a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities" title="pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_miller_macosko_probabilities()</span></code></a></p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor.params.beta"></span><strong>beta</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor.params.beta">¶</a> – <span class="math notranslate nohighlight">\(P(F_b^{out})\)</span>, see <a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities" title="pylimer_tools.calc.miller_macosko_theory.compute_miller_macosko_probabilities"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_miller_macosko_probabilities()</span></code></a></p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The Langley trapping factor</p>
@@ -920,13 +922,13 @@ This function computes the probability that a random A_f unit will have i pendan
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
-<li><p><strong>functionality_per_type</strong> – a dictionary with key: atom type, and value: functionality atoms with this type.</p></li>
-<li><p><strong>weight_fractions</strong> – a dictionary with the weight fraction of each type of atom</p></li>
-<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> – The extent of reaction in terms of the crosslinkers</p></li>
-<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.network">¶</a> – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.crosslinker_type">¶</a> – The type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.functionality_per_type"></span><strong>functionality_per_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.functionality_per_type">¶</a> – a dictionary with key: atom type, and value: functionality atoms with this type.</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.weight_fractions"></span><strong>weight_fractions</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.weight_fractions">¶</a> – a dictionary with the weight fraction of each type of atom</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.r"></span><strong>r</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.r">¶</a> – The stoichiometric imbalance</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.p"></span><strong>p</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.p">¶</a> – The extent of reaction in terms of the crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.b2"></span><strong>b2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone.params.b2">¶</a> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
@@ -949,13 +951,13 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The network to compute the weight fraction for</p></li>
-<li><p><strong>crosslinker_type</strong> – The atom type to use to split the molecules</p></li>
-<li><p><strong>functionality_per_type</strong> – a dictionary with key: type, and value: functionality of this atom type.</p></li>
-<li><p><strong>weight_fractions</strong> – a dictionary with the weight fraction of each type of atom</p></li>
-<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> – The extent of reaction in terms of the crosslinkers</p></li>
-<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.network">¶</a> – The network to compute the weight fraction for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.crosslinker_type">¶</a> – The atom type to use to split the molecules</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.functionality_per_type"></span><strong>functionality_per_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.functionality_per_type">¶</a> – a dictionary with key: type, and value: functionality of this atom type.</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.weight_fractions"></span><strong>weight_fractions</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.weight_fractions">¶</a> – a dictionary with the weight fraction of each type of atom</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.r"></span><strong>r</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.r">¶</a> – The stoichiometric imbalance</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.p"></span><strong>p</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.p">¶</a> – The extent of reaction in terms of the crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.b2"></span><strong>b2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains.params.b2">¶</a> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
@@ -979,15 +981,15 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
-<li><p><strong>weight_fractions</strong> – a dictionary with key: type, and value: weight fraction of type.
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.network">¶</a> – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.crosslinker_type">¶</a> – The type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.weight_fractions"></span><strong>weight_fractions</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.weight_fractions">¶</a> – a dictionary with key: type, and value: weight fraction of type.
 Pass if you want to omit the network.</p></li>
-<li><p><strong>functionality_per_type</strong> – a dictionary with key: type, and value: functionality of this atom type.
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.functionality_per_type"></span><strong>functionality_per_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.functionality_per_type">¶</a> – a dictionary with key: type, and value: functionality of this atom type.
 See: <a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.determine_functionality_per_type" title="pylimer_tools_cpp.Universe.determine_functionality_per_type"><code class="xref py py-meth docutils literal notranslate"><span class="pre">determine_functionality_per_type()</span></code></a>.</p></li>
-<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> – The extent of reaction in terms of the crosslinkers</p></li>
-<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.r"></span><strong>r</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.r">¶</a> – The stoichiometric imbalance</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.p"></span><strong>p</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.p">¶</a> – The extent of reaction in terms of the crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.b2"></span><strong>b2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material.params.b2">¶</a> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
@@ -1017,12 +1019,12 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> – The extent of reaction in terms of the crosslinkers</p></li>
-<li><p><strong>f</strong> – The functionality of the the crosslinker</p></li>
-<li><p><strong>w_f</strong> – The weight fraction of the crosslinkers</p></li>
-<li><p><strong>w_g</strong> – The weight fraction of ordinary chains</p></li>
-<li><p><strong>g</strong> – The functionality of the ordinary chains</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions.params.r"></span><strong>r</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions.params.r">¶</a> – The stoichiometric imbalance</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions.params.p"></span><strong>p</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions.params.p">¶</a> – The extent of reaction in terms of the crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions.params.f"></span><strong>f</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions.params.f">¶</a> – The functionality of the the crosslinker</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions.params.w_f"></span><strong>w_f</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions.params.w_f">¶</a> – The weight fraction of the crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions.params.w_g"></span><strong>w_g</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions.params.w_g">¶</a> – The weight fraction of ordinary chains</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions.params.g"></span><strong>g</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions.params.g">¶</a> – The functionality of the ordinary chains</p></li>
 </ul>
 </dd>
 </dl>
@@ -1042,9 +1044,9 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> – The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</p></li>
-<li><p><strong>f</strong> – functionality of the crosslinkers</p></li>
-<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_gelation_point.params.r"></span><strong>r</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_gelation_point.params.r">¶</a> – The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_gelation_point.params.f"></span><strong>f</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_gelation_point.params.f">¶</a> – functionality of the crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_gelation_point.params.b2"></span><strong>b2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_gelation_point.params.b2">¶</a> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
@@ -1061,9 +1063,9 @@ in a mixture of B1 and B2</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> – The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</p></li>
-<li><p><strong>f</strong> – functionality of the crosslinkers</p></li>
-<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_maximum_p.params.r"></span><strong>r</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_maximum_p.params.r">¶</a> – The stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_maximum_p.params.f"></span><strong>f</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_maximum_p.params.f">¶</a> – functionality of the crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_maximum_p.params.b2"></span><strong>b2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_maximum_p.params.b2">¶</a> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2. Since <cite>r</cite> already includes the number of active sites, this argument
 is not necessary.</p></li>
 </ul>
@@ -1087,9 +1089,9 @@ is not necessary.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The network to compute the weight fraction for</p></li>
-<li><p><strong>crosslinker_type</strong> – The atom type to use to split the molecules</p></li>
-<li><p><strong>functionality_per_type</strong> – a dictionary with key: type, and value: functionality of this atom type.</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_junction_points.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_junction_points.params.network">¶</a> – The network to compute the weight fraction for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_junction_points.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_junction_points.params.crosslinker_type">¶</a> – The atom type to use to split the molecules</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_junction_points.params.functionality_per_type"></span><strong>functionality_per_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_junction_points.params.functionality_per_type">¶</a> – a dictionary with key: type, and value: functionality of this atom type.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1111,11 +1113,11 @@ is not necessary.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The network to compute the weight fraction for</p></li>
-<li><p><strong>crosslinker_type</strong> – The atom type to use to split the molecules</p></li>
-<li><p><strong>functionality_per_type</strong> – a dictionary with key: type, and value: functionality of this atom type.</p></li>
-<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> – The extent of reaction in terms of the crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands.params.network">¶</a> – The network to compute the weight fraction for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands.params.crosslinker_type">¶</a> – The atom type to use to split the molecules</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands.params.functionality_per_type"></span><strong>functionality_per_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands.params.functionality_per_type">¶</a> – a dictionary with key: type, and value: functionality of this atom type.</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands.params.r"></span><strong>r</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands.params.r">¶</a> – The stoichiometric imbalance</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands.params.p"></span><strong>p</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_number_density_of_network_strands.params.p">¶</a> – The extent of reaction in terms of the crosslinkers</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1131,13 +1133,13 @@ is not necessary.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>w_sol</strong> – The weight fraction of soluble material</p></li>
-<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
-<li><p><strong>functionality_per_type</strong> – a dictionary with key: type, and value: functionality of this atom type</p></li>
-<li><p><strong>weight_fractions</strong> – a dictionary with the weight fraction of each type of atom</p></li>
-<li><p><strong>r</strong> – The stoichiometric imbalance</p></li>
-<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.w_sol"></span><strong>w_sol</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.w_sol">¶</a> – The weight fraction of soluble material</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.network">¶</a> – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.crosslinker_type">¶</a> – The type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.functionality_per_type"></span><strong>functionality_per_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.functionality_per_type">¶</a> – a dictionary with key: type, and value: functionality of this atom type</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.weight_fractions"></span><strong>weight_fractions</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.weight_fractions">¶</a> – a dictionary with the weight fraction of each type of atom</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.r"></span><strong>r</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.r">¶</a> – The stoichiometric imbalance</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.b2"></span><strong>b2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_p_from_w_sol.params.b2">¶</a> – The mole fraction of reactive sites in B2 among all reactive sites
 in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
@@ -1159,7 +1161,7 @@ in a mixture of B1 and B2</p></li>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>kwargs</strong> – See <a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition" title="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_modulus_decomposition()</span></code></a></p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools.calc.miller_macosko_theory.predict_shear_modulus.params.kwargs"></span><strong>kwargs</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.miller_macosko_theory.predict_shear_modulus.params.kwargs">¶</a> – See <a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition" title="pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_modulus_decomposition()</span></code></a></p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>G: The predicted shear modulus</p>
@@ -1179,7 +1181,7 @@ of reactive sites in B2 among all reactive sites in a mixture of B1 and B2.</p>
 <dd><p>Compute the number fractions of bifunctional and monofunctional strands.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools.calc.stoichiometric_relationships.compute_number_fractions.params.b2"></span><strong>b2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.stoichiometric_relationships.compute_number_fractions.params.b2">¶</a> – The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A tuple containing the number fractions (x_bifunctional, x_monofunctional)</p>
@@ -1197,10 +1199,10 @@ of reactive sites in B2 among all reactive sites in a mixture of B1 and B2.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mw_bifunctional</strong> – The molecular weight of the bifunctional strands</p></li>
-<li><p><strong>density</strong> – The density of the polymer network</p></li>
-<li><p><strong>mw_monofunctional</strong> – The molecular weight of the monofunctional strands. None if not present</p></li>
-<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.stoichiometric_relationships.compute_strand_number_density.params.mw_bifunctional"></span><strong>mw_bifunctional</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.stoichiometric_relationships.compute_strand_number_density.params.mw_bifunctional">¶</a> – The molecular weight of the bifunctional strands</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.stoichiometric_relationships.compute_strand_number_density.params.density"></span><strong>density</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.stoichiometric_relationships.compute_strand_number_density.params.density">¶</a> – The density of the polymer network</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.stoichiometric_relationships.compute_strand_number_density.params.mw_monofunctional"></span><strong>mw_monofunctional</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.stoichiometric_relationships.compute_strand_number_density.params.mw_monofunctional">¶</a> – The molecular weight of the monofunctional strands. None if not present</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.stoichiometric_relationships.compute_strand_number_density.params.b2"></span><strong>b2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.stoichiometric_relationships.compute_strand_number_density.params.b2">¶</a> – The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1220,9 +1222,9 @@ Makes some assumptions, e.g. the same density for both types of strands.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mw_bifunctional</strong> – The molecular weight of the bifunctional strands</p></li>
-<li><p><strong>mw_monofunctional</strong> – The molecular weight of the monofunctional strands. None if not present</p></li>
-<li><p><strong>b2</strong> – The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.stoichiometric_relationships.compute_weight_fractions.params.mw_bifunctional"></span><strong>mw_bifunctional</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.stoichiometric_relationships.compute_weight_fractions.params.mw_bifunctional">¶</a> – The molecular weight of the bifunctional strands</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.stoichiometric_relationships.compute_weight_fractions.params.mw_monofunctional"></span><strong>mw_monofunctional</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.stoichiometric_relationships.compute_weight_fractions.params.mw_monofunctional">¶</a> – The molecular weight of the monofunctional strands. None if not present</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.stoichiometric_relationships.compute_weight_fractions.params.b2"></span><strong>b2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.stoichiometric_relationships.compute_weight_fractions.params.b2">¶</a> – The mole fraction of reactive sites in B2 among all reactive sites in a mixture of B1 and B2</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1246,10 +1248,10 @@ Makes some assumptions, e.g. the same density for both types of strands.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
-<li><p><strong>f</strong> – The (target) functionality of the crosslinkers</p></li>
-<li><p><strong>functionality_per_type</strong> – A dictionary with key: type, and value: (target) functionality of this atom type</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion.params.network">¶</a> – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion.params.crosslinker_type">¶</a> – The type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion.params.f"></span><strong>f</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion.params.f">¶</a> – The (target) functionality of the crosslinkers</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion.params.functionality_per_type"></span><strong>functionality_per_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_crosslinker_conversion.params.functionality_per_type">¶</a> – A dictionary with key: type, and value: (target) functionality of this atom type</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1268,8 +1270,8 @@ Makes some assumptions, e.g. the same density for both types of strands.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_effective_crosslinker_functionalities.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_effective_crosslinker_functionalities.params.network">¶</a> – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_effective_crosslinker_functionalities.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_effective_crosslinker_functionalities.params.crosslinker_type">¶</a> – The type of the junctions/crosslinkers to select them in the network</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1288,8 +1290,8 @@ Makes some assumptions, e.g. the same density for both types of strands.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_effective_crosslinker_functionality.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_effective_crosslinker_functionality.params.network">¶</a> – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_effective_crosslinker_functionality.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_effective_crosslinker_functionality.params.crosslinker_type">¶</a> – The type of the junctions/crosslinkers to select them in the network</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1308,8 +1310,8 @@ Makes some assumptions, e.g. the same density for both types of strands.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a>) – The polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The atom type to compute the in-between vectors for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_end_to_end_vectors.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_end_to_end_vectors.params.network">¶</a> (<a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a>) – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_end_to_end_vectors.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_end_to_end_vectors.params.crosslinker_type">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The atom type to compute the in-between vectors for</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1339,9 +1341,9 @@ crosslinkers, make sure to remove them before calling this function</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – The atom type of crosslinker beads</p></li>
-<li><p><strong>functionality_per_type</strong> – A dictionary with key: type, and value: functionality of this atom type.
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_extent_of_reaction.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_extent_of_reaction.params.network">¶</a> – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_extent_of_reaction.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_extent_of_reaction.params.crosslinker_type">¶</a> – The atom type of crosslinker beads</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_extent_of_reaction.params.functionality_per_type"></span><strong>functionality_per_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_extent_of_reaction.params.functionality_per_type">¶</a> – A dictionary with key: type, and value: functionality of this atom type.
 If None: will use max functionality per type.</p></li>
 </ul>
 </dd>
@@ -1364,9 +1366,9 @@ and then counts them and the bifunctional ones.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – The atom type of crosslinker beads</p></li>
-<li><p><strong>functionality_per_type</strong> – A dictionary with key: type, and value: functionality of this atom type</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_fraction_of_bifunctional_reactive_sites.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_fraction_of_bifunctional_reactive_sites.params.network">¶</a> – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_fraction_of_bifunctional_reactive_sites.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_fraction_of_bifunctional_reactive_sites.params.crosslinker_type">¶</a> – The atom type of crosslinker beads</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_fraction_of_bifunctional_reactive_sites.params.functionality_per_type"></span><strong>functionality_per_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_fraction_of_bifunctional_reactive_sites.params.functionality_per_type">¶</a> – A dictionary with key: type, and value: functionality of this atom type</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1385,8 +1387,8 @@ and then counts them and the bifunctional ones.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The different configurations of the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The atom type to compute the in-between vectors for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_distances.params.networks"></span><strong>networks</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_distances.params.networks">¶</a> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The different configurations of the polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_distances.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_distances.params.crosslinker_type">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The atom type to compute the in-between vectors for</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1405,8 +1407,8 @@ and then counts them and the bifunctional ones.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>networks</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The different configurations of the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The atom type to compute the in-between vectors for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_vectors.params.networks"></span><strong>networks</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_vectors.params.networks">¶</a> (<em>Sequence</em><em>[</em><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><em>Universe</em></a><em>]</em>) – The different configurations of the polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_vectors.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_vectors.params.crosslinker_type">¶</a> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – The atom type to compute the in-between vectors for</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1436,12 +1438,12 @@ this will not be rounded/respected in any way.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
-<li><p><strong>functionality_per_type</strong> – A dictionary with key: type, and value: functionality of this atom type.
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance.params.network">¶</a> – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance.params.crosslinker_type">¶</a> – The type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance.params.functionality_per_type"></span><strong>functionality_per_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance.params.functionality_per_type">¶</a> – A dictionary with key: type, and value: functionality of this atom type.
 If <cite>None</cite>: will use max functionality per type.</p></li>
-<li><p><strong>ignore_types</strong> – A list of integers, the types to ignore for the imbalance (e.g. solvent atom types)</p></li>
-<li><p><strong>effective</strong> – Whether to use the effective functionality (if functionality_per_type is not passed)
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance.params.ignore_types"></span><strong>ignore_types</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance.params.ignore_types">¶</a> – A list of integers, the types to ignore for the imbalance (e.g. solvent atom types)</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance.params.effective"></span><strong>effective</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance.params.effective">¶</a> – Whether to use the effective functionality (if functionality_per_type is not passed)
 or the maximum functionality of the crosslinkers.</p></li>
 </ul>
 </dd>
@@ -1462,7 +1464,7 @@ Kept for compatibility reasons; just call
 <a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_weight_fractions" title="pylimer_tools_cpp.Universe.compute_weight_fractions"><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools_cpp.Universe.compute_weight_fractions()</span></code></a> instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>network</strong> – The polymer network to do the computation for</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools.calc.structure_analysis.compute_weight_fractions.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.compute_weight_fractions.params.network">¶</a> – The polymer network to do the computation for</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Using the type i as a key, this dict contains the weight fractions (<span class="math notranslate nohighlight">\(\frac{W_i}{W_{tot}}\)</span>)</p>
@@ -1482,10 +1484,10 @@ are counted as soluble</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> – The type of the junctions/crosslinkers to select them in the network</p></li>
-<li><p><strong>rel_tol</strong> – The fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified</p></li>
-<li><p><strong>abs_tol</strong> – The weight from which on a component is not soluble anymore</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material.params.network">¶</a> – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material.params.crosslinker_type">¶</a> – The type of the junctions/crosslinkers to select them in the network</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material.params.rel_tol"></span><strong>rel_tol</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material.params.rel_tol">¶</a> – The fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material.params.abs_tol"></span><strong>abs_tol</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material.params.abs_tol">¶</a> – The weight from which on a component is not soluble anymore</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1504,8 +1506,8 @@ are counted as soluble</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The network to compute the weight fraction for</p></li>
-<li><p><strong>crosslinker_type</strong> – The atom type to use to split the molecules</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone.params.network">¶</a> – The network to compute the weight fraction for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone.params.crosslinker_type">¶</a> – The atom type to use to split the molecules</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1536,8 +1538,8 @@ There are other methods that incorporate more.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The network to compute the weight fraction for</p></li>
-<li><p><strong>crosslinker_type</strong> – The atom type to use to split the molecules</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains.params.network">¶</a> – The network to compute the weight fraction for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains.params.crosslinker_type">¶</a> – The atom type to use to split the molecules</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1558,9 +1560,9 @@ that have a weight less than a certain fraction of the total weight.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> – The polymer network to do the computation for</p></li>
-<li><p><strong>rel_tol</strong> – The fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified</p></li>
-<li><p><strong>abs_tol</strong> – The weight from which on a component is not soluble anymore</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material.params.network"></span><strong>network</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material.params.network">¶</a> – The polymer network to do the computation for</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material.params.rel_tol"></span><strong>rel_tol</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material.params.rel_tol">¶</a> – The fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified</p></li>
+<li><p><span class="target" id="pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material.params.abs_tol"></span><strong>abs_tol</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material.params.abs_tol">¶</a> – The weight from which on a component is not soluble anymore</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

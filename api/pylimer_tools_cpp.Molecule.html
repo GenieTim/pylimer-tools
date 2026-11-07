@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -416,10 +418,10 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>box</strong> – The simulation box containing this molecule</p></li>
-<li><p><strong>graph</strong> – Pointer to the igraph structure representing connectivity</p></li>
-<li><p><strong>type</strong> – The type of molecule (see MoleculeType enum)</p></li>
-<li><p><strong>mass_map</strong> – Map of atom types to their masses</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.params.box"></span><strong>box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.params.box">¶</a> – The simulation box containing this molecule</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.params.graph"></span><strong>graph</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.params.graph">¶</a> – Pointer to the igraph structure representing connectivity</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.params.type"></span><strong>type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.params.type">¶</a> – The type of molecule (see MoleculeType enum)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.params.mass_map"></span><strong>mass_map</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.params.mass_map">¶</a> – Map of atom types to their masses</p></li>
 </ul>
 </dd>
 </dl>
@@ -672,8 +674,8 @@ In most cases, this is equal to the contour length.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p></li>
-<li><p><strong>close_loop</strong> – Whether to close the loop for calculations</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.compute_total_vector.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.compute_total_vector.params.crosslinker_type">¶</a> – The type of crosslinker atoms</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.compute_total_vector.params.close_loop"></span><strong>close_loop</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.compute_total_vector.params.close_loop">¶</a> – Whether to close the loop for calculations</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -689,10 +691,10 @@ In most cases, this is equal to the contour length.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atom_id_from</strong> – ID of the starting atom</p></li>
-<li><p><strong>atom_id_to</strong> – ID of the ending atom</p></li>
-<li><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p></li>
-<li><p><strong>require_order</strong> – Whether to require specific ordering</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.compute_vector_from_to.params.atom_id_from"></span><strong>atom_id_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.compute_vector_from_to.params.atom_id_from">¶</a> – ID of the starting atom</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.compute_vector_from_to.params.atom_id_to"></span><strong>atom_id_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.compute_vector_from_to.params.atom_id_to">¶</a> – ID of the ending atom</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.compute_vector_from_to.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.compute_vector_from_to.params.crosslinker_type">¶</a> – The type of crosslinker atoms</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.compute_vector_from_to.params.require_order"></span><strong>require_order</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.compute_vector_from_to.params.require_order">¶</a> – Whether to require specific ordering</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -707,7 +709,7 @@ In most cases, this is equal to the contour length.</p>
 <dd><p>Get an atom by its id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>atom_id</strong> – The atom ID to search for</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Molecule.get_atom_by_id.params.atom_id"></span><strong>atom_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_atom_by_id.params.atom_id">¶</a> – The atom ID to search for</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The atom with the specified ID</p>
@@ -721,7 +723,7 @@ In most cases, this is equal to the contour length.</p>
 <dd><p>Get an atom for a specific vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_idx</strong> – The vertex index to query</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Molecule.get_atom_by_vertex_idx.params.vertex_idx"></span><strong>vertex_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_atom_by_vertex_idx.params.vertex_idx">¶</a> – The vertex index to query</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The atom at the specified vertex</p>
@@ -735,7 +737,7 @@ In most cases, this is equal to the contour length.</p>
 <dd><p>Get the ID of the atom by the vertex ID of the underlying graph.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_id</strong> – The vertex index in the underlying graph</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Molecule.get_atom_id_by_vertex_idx.params.vertex_id"></span><strong>vertex_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_atom_id_by_vertex_idx.params.vertex_id">¶</a> – The vertex index in the underlying graph</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The atom ID corresponding to the vertex</p>
@@ -771,7 +773,7 @@ In most cases, this is equal to the contour length.</p>
 <dd><p>Get the atoms that have the specified number of bonds.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>degree</strong> – The number of bonds (degree/functionality)</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Molecule.get_atoms_by_degree.params.degree"></span><strong>degree</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_by_degree.params.degree">¶</a> – The number of bonds (degree/functionality)</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of atoms with the specified degree</p>
@@ -785,7 +787,7 @@ In most cases, this is equal to the contour length.</p>
 <dd><p>Get the atoms with the specified type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>type</strong> – The atom type to search for</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Molecule.get_atoms_by_type.params.type"></span><strong>type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_by_type.params.type">¶</a> – The atom type to search for</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of atoms with the specified type</p>
@@ -800,7 +802,7 @@ In most cases, this is equal to the contour length.</p>
 <p>Internally uses <a class="reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_connected_to" title="pylimer_tools_cpp.Molecule.get_atoms_connected_to"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_atoms_connected_to()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>atom</strong> – The atom to query connections for</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Molecule.get_atoms_connected_to.params.atom"></span><strong>atom</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_connected_to.params.atom">¶</a> – The atom to query connections for</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of connected atoms</p>
@@ -814,7 +816,7 @@ In most cases, this is equal to the contour length.</p>
 <dd><p>Get the atoms connected to a specified vertex id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_idx</strong> – The vertex index to query</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Molecule.get_atoms_connected_to_vertex.params.vertex_idx"></span><strong>vertex_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_connected_to_vertex.params.vertex_idx">¶</a> – The vertex index to query</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of connected atoms</p>
@@ -834,9 +836,9 @@ to start with the crosslink.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p></li>
-<li><p><strong>assumed_coordinates</strong> – Whether to assume coordinates are valid</p></li>
-<li><p><strong>close_loop</strong> – Whether to close loops</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.get_atoms_lined_up.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_lined_up.params.crosslinker_type">¶</a> – The type of crosslinker atoms</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.get_atoms_lined_up.params.assumed_coordinates"></span><strong>assumed_coordinates</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_lined_up.params.assumed_coordinates">¶</a> – Whether to assume coordinates are valid</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.get_atoms_lined_up.params.close_loop"></span><strong>close_loop</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_atoms_lined_up.params.close_loop">¶</a> – Whether to close loops</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -862,7 +864,7 @@ to start with the crosslink.</p>
 <dd><p>Get the edge IDs incident to a specific vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_id</strong> – The vertex to query</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Molecule.get_edge_ids_from.params.vertex_id"></span><strong>vertex_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_edge_ids_from.params.vertex_id">¶</a> – The vertex to query</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A vector of edge IDs connected to the vertex</p>
@@ -877,8 +879,8 @@ to start with the crosslink.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vertex_id_from</strong> – Starting vertex ID</p></li>
-<li><p><strong>vertex_id_to</strong> – Ending vertex ID</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.get_edge_ids_from_to.params.vertex_id_from"></span><strong>vertex_id_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_edge_ids_from_to.params.vertex_id_from">¶</a> – Starting vertex ID</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.get_edge_ids_from_to.params.vertex_id_to"></span><strong>vertex_id_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_edge_ids_from_to.params.vertex_id_to">¶</a> – Ending vertex ID</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -946,9 +948,9 @@ Use <code class="xref py py-meth docutils literal notranslate"><span class="pre"
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vertex_id_from</strong> – Starting vertex ID</p></li>
-<li><p><strong>vertex_id_to</strong> – Ending vertex ID</p></li>
-<li><p><strong>max_length</strong> – Maximum path length to consider (-1 for no limit)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.get_nr_of_edges_from_to.params.vertex_id_from"></span><strong>vertex_id_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_nr_of_edges_from_to.params.vertex_id_from">¶</a> – Starting vertex ID</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.get_nr_of_edges_from_to.params.vertex_id_to"></span><strong>vertex_id_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_nr_of_edges_from_to.params.vertex_id_to">¶</a> – Ending vertex ID</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.get_nr_of_edges_from_to.params.max_length"></span><strong>max_length</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_nr_of_edges_from_to.params.max_length">¶</a> – Maximum path length to consider (-1 for no limit)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -970,8 +972,8 @@ Use the argument <cite>close_loop</cite> to decide, whether this should be retur
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>crosslinker_type</strong> – The type of crosslinker atoms</p></li>
-<li><p><strong>close_loop</strong> – Whether to return the crosslinker twice for loops</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.get_strand_ends.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_strand_ends.params.crosslinker_type">¶</a> – The type of crosslinker atoms</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.Molecule.get_strand_ends.params.close_loop"></span><strong>close_loop</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_strand_ends.params.close_loop">¶</a> – Whether to return the crosslinker twice for loops</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -997,7 +999,7 @@ Use the argument <cite>close_loop</cite> to decide, whether this should be retur
 <dd><p>Get the vertex ID of the underlying graph for an atom with a specified ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>atom_id</strong> – The atom ID to look up</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.Molecule.get_vertex_idx_by_atom_id.params.atom_id"></span><strong>atom_id</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.Molecule.get_vertex_idx_by_atom_id.params.atom_id">¶</a> – The atom ID to look up</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The vertex index corresponding to the atom</p>

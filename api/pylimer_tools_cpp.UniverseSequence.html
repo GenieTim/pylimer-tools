@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -479,7 +481,7 @@ to have the UniverseSequence forget about already read universes.</p>
 by the dump file).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>index</strong> – The index of the universe to retrieve</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.UniverseSequence.at_index.params.index"></span><strong>index</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.UniverseSequence.at_index.params.index">¶</a> – The index of the universe to retrieve</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The Universe at the specified index</p>
@@ -509,13 +511,13 @@ Pay attention that the image flags are correct, otherwise, this data may not be 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atom_ids</strong> – List of atom IDs for which to compute the MSD</p></li>
-<li><p><strong>x_property</strong> – Name of the x-coordinate property in the dump file (e.g., “x”, “xu”, “xs”)</p></li>
-<li><p><strong>y_property</strong> – Name of the y-coordinate property in the dump file (e.g., “y”, “yu”, “ys”)</p></li>
-<li><p><strong>z_property</strong> – Name of the z-coordinate property in the dump file (e.g., “z”, “zu”, “zs”)</p></li>
-<li><p><strong>nr_of_origins</strong> – Number of time origins to use for averaging. Higher values provide better statistics but increase computation time (default: 25)</p></li>
-<li><p><strong>reduce_memory</strong> – If True, reduces memory usage by forgetting universes after processing them (default: False)</p></li>
-<li><p><strong>max_tau</strong> – Maximum time lag (tau) to compute. If -1, computes for all possible tau values. For better statistics, consider setting this to approximately half the sequence length (default: -1)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.atom_ids"></span><strong>atom_ids</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.atom_ids">¶</a> – List of atom IDs for which to compute the MSD</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.x_property"></span><strong>x_property</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.x_property">¶</a> – Name of the x-coordinate property in the dump file (e.g., “x”, “xu”, “xs”)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.y_property"></span><strong>y_property</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.y_property">¶</a> – Name of the y-coordinate property in the dump file (e.g., “y”, “yu”, “ys”)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.z_property"></span><strong>z_property</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.z_property">¶</a> – Name of the z-coordinate property in the dump file (e.g., “z”, “zu”, “zs”)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.nr_of_origins"></span><strong>nr_of_origins</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.nr_of_origins">¶</a> – Number of time origins to use for averaging. Higher values provide better statistics but increase computation time (default: 25)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.reduce_memory"></span><strong>reduce_memory</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.reduce_memory">¶</a> – If True, reduces memory usage by forgetting universes after processing them (default: False)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.max_tau"></span><strong>max_tau</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.UniverseSequence.compute_msd_for_atom_properties.params.max_tau">¶</a> – Maximum time lag (tau) to compute. If -1, computes for all possible tau values. For better statistics, consider setting this to approximately half the sequence length (default: -1)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -531,10 +533,10 @@ Pay attention that the image flags are correct, otherwise, this data may not be 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atom_ids</strong> – List of atom IDs for which to compute the MSD</p></li>
-<li><p><strong>nr_of_origins</strong> – Number of time origins to use for averaging. Higher values provide better statistics but increase computation time (default: 25)</p></li>
-<li><p><strong>reduce_memory</strong> – If True, reduces memory usage by forgetting universes after processing them (default: False)</p></li>
-<li><p><strong>max_tau</strong> – Maximum time lag (tau) to compute. If -1, computes for all possible tau values. For better statistics, consider setting this to approximately half the sequence length (default: -1)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.UniverseSequence.compute_msd_for_atoms.params.atom_ids"></span><strong>atom_ids</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.UniverseSequence.compute_msd_for_atoms.params.atom_ids">¶</a> – List of atom IDs for which to compute the MSD</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.UniverseSequence.compute_msd_for_atoms.params.nr_of_origins"></span><strong>nr_of_origins</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.UniverseSequence.compute_msd_for_atoms.params.nr_of_origins">¶</a> – Number of time origins to use for averaging. Higher values provide better statistics but increase computation time (default: 25)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.UniverseSequence.compute_msd_for_atoms.params.reduce_memory"></span><strong>reduce_memory</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.UniverseSequence.compute_msd_for_atoms.params.reduce_memory">¶</a> – If True, reduces memory usage by forgetting universes after processing them (default: False)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.UniverseSequence.compute_msd_for_atoms.params.max_tau"></span><strong>max_tau</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.UniverseSequence.compute_msd_for_atoms.params.max_tau">¶</a> – Maximum time lag (tau) to compute. If -1, computes for all possible tau values. For better statistics, consider setting this to approximately half the sequence length (default: -1)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

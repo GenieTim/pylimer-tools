@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -419,7 +421,7 @@ For moderately sized and small files, we recommend to use the Python interface i
 <p>Initialize the AveFileReader with a file path.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>file_path</strong> – Path to the averages file to read</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.AveFileReader.params.file_path"></span><strong>file_path</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.AveFileReader.params.file_path">¶</a> – Path to the averages file to read</p>
 </dd>
 </dl>
 <p class="rubric">Methods Summary</p>
@@ -456,8 +458,8 @@ For moderately sized and small files, we recommend to use the Python interface i
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>column_index</strong> – Index of the column to autocorrelate</p></li>
-<li><p><strong>delta_indices</strong> – List of delta indices for the autocorrelation</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.AveFileReader.autocorrelate_column.params.column_index"></span><strong>column_index</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.AveFileReader.autocorrelate_column.params.column_index">¶</a> – Index of the column to autocorrelate</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.AveFileReader.autocorrelate_column.params.delta_indices"></span><strong>delta_indices</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.AveFileReader.autocorrelate_column.params.delta_indices">¶</a> – List of delta indices for the autocorrelation</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -474,9 +476,9 @@ For moderately sized and small files, we recommend to use the Python interface i
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>column_index1</strong> – Index of the first column</p></li>
-<li><p><strong>column_index2</strong> – Index of the second column</p></li>
-<li><p><strong>delta_indices</strong> – List of delta indices for the autocorrelation</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.AveFileReader.autocorrelate_column_difference.params.column_index1"></span><strong>column_index1</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.AveFileReader.autocorrelate_column_difference.params.column_index1">¶</a> – Index of the first column</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.AveFileReader.autocorrelate_column_difference.params.column_index2"></span><strong>column_index2</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.AveFileReader.autocorrelate_column_difference.params.column_index2">¶</a> – Index of the second column</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.AveFileReader.autocorrelate_column_difference.params.delta_indices"></span><strong>delta_indices</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.AveFileReader.autocorrelate_column_difference.params.delta_indices">¶</a> – List of delta indices for the autocorrelation</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

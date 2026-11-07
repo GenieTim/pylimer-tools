@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -418,9 +420,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>spring_from</strong> – Vector of starting node indices for springs/bonds</p></li>
-<li><p><strong>spring_to</strong> – Vector of ending node indices for springs/bonds</p></li>
-<li><p><strong>nr_of_nodes</strong> – Optional total number of nodes (to include isolated vertices with index &gt; max)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.params.spring_from"></span><strong>spring_from</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.params.spring_from">¶</a> – Vector of starting node indices for springs/bonds</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.params.spring_to"></span><strong>spring_to</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.params.spring_to">¶</a> – Vector of ending node indices for springs/bonds</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.params.nr_of_nodes"></span><strong>nr_of_nodes</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.params.nr_of_nodes">¶</a> – Optional total number of nodes (to include isolated vertices with index &gt; max)</p></li>
 </ul>
 </dd>
 </dl>
@@ -493,8 +495,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>num_moments</strong> – Number of moments to compute (default: 1024)</p></li>
-<li><p><strong>num_random_vectors</strong> – Number of random Rademacher vectors for trace estimation (default: 20)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm.params.num_moments"></span><strong>num_moments</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm.params.num_moments">¶</a> – Number of moments to compute (default: 1024)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm.params.num_random_vectors"></span><strong>num_random_vectors</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm.params.num_random_vectors">¶</a> – Number of random Rademacher vectors for trace estimation (default: 20)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -511,9 +513,9 @@ accelerated with Apple Silicon Metal compute kernels with multi-RHS block batchi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>num_moments</strong> – Number of moments to compute (default: 1024)</p></li>
-<li><p><strong>num_random_vectors</strong> – Number of random Rademacher vectors for trace estimation (default: 20)</p></li>
-<li><p><strong>batch_size</strong> – Number of RHS vectors batched into each Block-SpMM (default: 4)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm_metal.params.num_moments"></span><strong>num_moments</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm_metal.params.num_moments">¶</a> – Number of moments to compute (default: 1024)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm_metal.params.num_random_vectors"></span><strong>num_random_vectors</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm_metal.params.num_random_vectors">¶</a> – Number of random Rademacher vectors for trace estimation (default: 20)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm_metal.params.batch_size"></span><strong>batch_size</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.compute_chebyshev_moments_kpm_metal.params.batch_size">¶</a> – Number of RHS vectors batched into each Block-SpMM (default: 4)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -529,9 +531,9 @@ accelerated with Apple Silicon Metal compute kernels with multi-RHS block batchi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lambda_grid</strong> – Eigenvalue points at which to evaluate DOS</p></li>
-<li><p><strong>num_moments</strong> – Number of Chebyshev moments (default: 1024)</p></li>
-<li><p><strong>num_random_vectors</strong> – Number of random vectors (default: 20)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.compute_density_of_states_kpm.params.lambda_grid"></span><strong>lambda_grid</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.compute_density_of_states_kpm.params.lambda_grid">¶</a> – Eigenvalue points at which to evaluate DOS</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.compute_density_of_states_kpm.params.num_moments"></span><strong>num_moments</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.compute_density_of_states_kpm.params.num_moments">¶</a> – Number of Chebyshev moments (default: 1024)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.compute_density_of_states_kpm.params.num_random_vectors"></span><strong>num_random_vectors</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.compute_density_of_states_kpm.params.num_random_vectors">¶</a> – Number of random vectors (default: 20)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -546,7 +548,7 @@ accelerated with Apple Silicon Metal compute kernels with multi-RHS block batchi
 <dd><p>Evaluate the loss modulus <span class="math notranslate nohighlight">\(G''(\omega)\)</span>. Yet misses the conversion factor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>omega</strong> – Angular frequencies</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus.params.omega"></span><strong>omega</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus.params.omega">¶</a> – Angular frequencies</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Loss modulus values</p>
@@ -561,10 +563,10 @@ accelerated with Apple Silicon Metal compute kernels with multi-RHS block batchi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>omega</strong> – Angular frequencies to evaluate</p></li>
-<li><p><strong>num_moments</strong> – Number of Chebyshev moments (default: 1024)</p></li>
-<li><p><strong>num_random_vectors</strong> – Number of random vectors (default: 20)</p></li>
-<li><p><strong>num_quadrature_points</strong> – Number of Gauss-Chebyshev quadrature points (default: 2048)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.omega"></span><strong>omega</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.omega">¶</a> – Angular frequencies to evaluate</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.num_moments"></span><strong>num_moments</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.num_moments">¶</a> – Number of Chebyshev moments (default: 1024)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.num_random_vectors"></span><strong>num_random_vectors</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.num_random_vectors">¶</a> – Number of random vectors (default: 20)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.num_quadrature_points"></span><strong>num_quadrature_points</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus_kpm.params.num_quadrature_points">¶</a> – Number of Gauss-Chebyshev quadrature points (default: 2048)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -579,7 +581,7 @@ accelerated with Apple Silicon Metal compute kernels with multi-RHS block batchi
 <dd><p>Evaluate the storage modulus <span class="math notranslate nohighlight">\(G'(\omega)\)</span>. Yet misses the conversion factor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>omega</strong> – Angular frequencies</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus.params.omega"></span><strong>omega</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus.params.omega">¶</a> – Angular frequencies</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Storage modulus values</p>
@@ -594,10 +596,10 @@ accelerated with Apple Silicon Metal compute kernels with multi-RHS block batchi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>omega</strong> – Angular frequencies to evaluate</p></li>
-<li><p><strong>num_moments</strong> – Number of Chebyshev moments (default: 1024)</p></li>
-<li><p><strong>num_random_vectors</strong> – Number of random vectors (default: 20)</p></li>
-<li><p><strong>num_quadrature_points</strong> – Number of Gauss-Chebyshev quadrature points (default: 2048)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm.params.omega"></span><strong>omega</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm.params.omega">¶</a> – Angular frequencies to evaluate</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm.params.num_moments"></span><strong>num_moments</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm.params.num_moments">¶</a> – Number of Chebyshev moments (default: 1024)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm.params.num_random_vectors"></span><strong>num_random_vectors</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm.params.num_random_vectors">¶</a> – Number of random vectors (default: 20)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm.params.num_quadrature_points"></span><strong>num_quadrature_points</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus_kpm.params.num_quadrature_points">¶</a> – Number of Gauss-Chebyshev quadrature points (default: 2048)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -612,7 +614,7 @@ accelerated with Apple Silicon Metal compute kernels with multi-RHS block batchi
 <dd><p>Evaluate stress autocorrelation <span class="math notranslate nohighlight">\(C(t)\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>t</strong> – The time at which to evaluate the stress autocorrelation</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation.params.t"></span><strong>t</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation.params.t">¶</a> – The time at which to evaluate the stress autocorrelation</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Stress autocorrelation values</p>
@@ -627,10 +629,10 @@ accelerated with Apple Silicon Metal compute kernels with multi-RHS block batchi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> – Time points to evaluate</p></li>
-<li><p><strong>num_moments</strong> – Number of Chebyshev moments (default: 1024)</p></li>
-<li><p><strong>num_random_vectors</strong> – Number of random vectors (default: 20)</p></li>
-<li><p><strong>num_quadrature_points</strong> – Number of Gauss-Chebyshev quadrature points (default: 2048)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.t"></span><strong>t</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.t">¶</a> – Time points to evaluate</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.num_moments"></span><strong>num_moments</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.num_moments">¶</a> – Number of Chebyshev moments (default: 1024)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.num_random_vectors"></span><strong>num_random_vectors</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.num_random_vectors">¶</a> – Number of random vectors (default: 20)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.num_quadrature_points"></span><strong>num_quadrature_points</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation_kpm.params.num_quadrature_points">¶</a> – Number of Gauss-Chebyshev quadrature points (default: 2048)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -646,9 +648,9 @@ accelerated with Apple Silicon Metal compute kernels with multi-RHS block batchi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>solver</strong> – Solver method to use (NormalModeSolver enum or string: ‘auto’, ‘dense_lapack’, ‘dense_eigen’, ‘sparse_slicing’, ‘metal’; default: NormalModeSolver.AUTO)</p></li>
-<li><p><strong>compute_eigenvectors</strong> – Whether to also compute eigenvectors (default: False)</p></li>
-<li><p><strong>decompose_components</strong> – Whether to decompose the graph into connected components (default: True)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues.params.solver"></span><strong>solver</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues.params.solver">¶</a> – Solver method to use (NormalModeSolver enum or string: ‘auto’, ‘dense_lapack’, ‘dense_eigen’, ‘sparse_slicing’, ‘metal’; default: NormalModeSolver.AUTO)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues.params.compute_eigenvectors"></span><strong>compute_eigenvectors</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues.params.compute_eigenvectors">¶</a> – Whether to also compute eigenvectors (default: False)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues.params.decompose_components"></span><strong>decompose_components</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues.params.decompose_components">¶</a> – Whether to decompose the graph into connected components (default: True)</p></li>
 </ul>
 </dd>
 </dl>
@@ -661,8 +663,8 @@ accelerated with Apple Silicon Metal compute kernels with multi-RHS block batchi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nr_of_eigenvalues</strong> – Number of smallest eigenvalues to find</p></li>
-<li><p><strong>compute_eigenvectors</strong> – Whether to also compute eigenvectors (default: False)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues.params.nr_of_eigenvalues"></span><strong>nr_of_eigenvalues</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues.params.nr_of_eigenvalues">¶</a> – Number of smallest eigenvalues to find</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues.params.compute_eigenvectors"></span><strong>compute_eigenvectors</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues.params.compute_eigenvectors">¶</a> – Whether to also compute eigenvectors (default: False)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -732,7 +734,7 @@ accelerated with Apple Silicon Metal compute kernels with multi-RHS block batchi
 <dd><p>Set the eigenvalues, e.g. if you use an external solver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>eigenvalues</strong> – Vector of eigenvalues to set</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues.params.eigenvalues"></span><strong>eigenvalues</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues.params.eigenvalues">¶</a> – Vector of eigenvalues to set</p>
 </dd>
 </dl>
 </dd></dl>
@@ -743,7 +745,7 @@ accelerated with Apple Silicon Metal compute kernels with multi-RHS block batchi
 <dd><p>Set eigenvectors, e.g. if you use an external solver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>eigenvectors</strong> – Matrix of eigenvectors to set</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors.params.eigenvectors"></span><strong>eigenvectors</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors.params.eigenvectors">¶</a> – Matrix of eigenvectors to set</p>
 </dd>
 </dl>
 </dd></dl>

@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=bafda8c6" />
     
@@ -235,6 +236,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
@@ -430,9 +432,9 @@ Kuhn segment parameters conflicts with the generator producing Gaussian bond sta
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lx</strong> – Box length in x-direction (default: 10.0).</p></li>
-<li><p><strong>ly</strong> – Box length in y-direction (default: 10.0).</p></li>
-<li><p><strong>lz</strong> – Box length in z-direction (default: 10.0).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.params.lx"></span><strong>lx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.params.lx">¶</a> – Box length in x-direction (default: 10.0).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.params.ly"></span><strong>ly</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.params.ly">¶</a> – Box length in y-direction (default: 10.0).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.params.lz"></span><strong>lz</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.params.lz">¶</a> – Box length in z-direction (default: 10.0).</p></li>
 </ul>
 </dd>
 </dl>
@@ -583,10 +585,10 @@ Kuhn segment parameters conflicts with the generator producing Gaussian bond sta
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nr_of_crosslinkers</strong> – Number of crosslinkers to add.</p></li>
-<li><p><strong>crosslinker_functionality</strong> – Functionality of the crosslinkers (default: 4).</p></li>
-<li><p><strong>crosslinker_type</strong> – Atom type of the crosslinkers (default: 2).</p></li>
-<li><p><strong>white_noise</strong> – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers.params.nr_of_crosslinkers"></span><strong>nr_of_crosslinkers</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers.params.nr_of_crosslinkers">¶</a> – Number of crosslinkers to add.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers.params.crosslinker_functionality"></span><strong>crosslinker_functionality</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers.params.crosslinker_functionality">¶</a> – Functionality of the crosslinkers (default: 4).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers.params.crosslinker_type">¶</a> – Atom type of the crosslinkers (default: 2).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers.params.white_noise"></span><strong>white_noise</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers.params.white_noise">¶</a> – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).</p></li>
 </ul>
 </dd>
 </dl>
@@ -599,9 +601,9 @@ Kuhn segment parameters conflicts with the generator producing Gaussian bond sta
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>coordinates</strong> – Coordinates of the crosslinkers as a flat array [x1, y1, z1, x2, y2, z2, …].</p></li>
-<li><p><strong>crosslinker_functionality</strong> – Functionality of the crosslinkers (default: 4).</p></li>
-<li><p><strong>crosslinker_type</strong> – Atom type of the crosslinkers (default: 2).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers_at.params.coordinates"></span><strong>coordinates</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers_at.params.coordinates">¶</a> – Coordinates of the crosslinkers as a flat array [x1, y1, z1, x2, y2, z2, …].</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers_at.params.crosslinker_functionality"></span><strong>crosslinker_functionality</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers_at.params.crosslinker_functionality">¶</a> – Functionality of the crosslinkers (default: 4).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers_at.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers_at.params.crosslinker_type">¶</a> – Atom type of the crosslinkers (default: 2).</p></li>
 </ul>
 </dd>
 </dl>
@@ -614,12 +616,12 @@ Kuhn segment parameters conflicts with the generator producing Gaussian bond sta
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nr_of_strands</strong> – Number of strands to add.</p></li>
-<li><p><strong>strand_length</strong> – Length of each strand.</p></li>
-<li><p><strong>crosslinker_functionality</strong> – Functionality of the crosslinkers (default: 4).</p></li>
-<li><p><strong>crosslinker_type</strong> – Atom type of the crosslinkers (default: 2).</p></li>
-<li><p><strong>strand_atom_type</strong> – Atom type of the beads that are not at the ends (default: 1).</p></li>
-<li><p><strong>white_noise</strong> – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.nr_of_strands"></span><strong>nr_of_strands</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.nr_of_strands">¶</a> – Number of strands to add.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.strand_length"></span><strong>strand_length</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.strand_length">¶</a> – Length of each strand.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.crosslinker_functionality"></span><strong>crosslinker_functionality</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.crosslinker_functionality">¶</a> – Functionality of the crosslinkers (default: 4).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.crosslinker_type">¶</a> – Atom type of the crosslinkers (default: 2).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.strand_atom_type"></span><strong>strand_atom_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.strand_atom_type">¶</a> – Atom type of the beads that are not at the ends (default: 1).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.white_noise"></span><strong>white_noise</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands.params.white_noise">¶</a> – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).</p></li>
 </ul>
 </dd>
 </dl>
@@ -658,13 +660,13 @@ For common patterns, consider using the more specific methods like
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nr_of_strands</strong> – Number of strands to add.</p></li>
-<li><p><strong>strand_length</strong> – Length of each strand (list of integers).</p></li>
-<li><p><strong>crosslink_selector</strong> – Function that takes (strand_index, bead_index, total_beads) and returns (should_convert, functionality).</p></li>
-<li><p><strong>default_crosslinker_functionality</strong> – Default functionality for crosslinks (used for positioning).</p></li>
-<li><p><strong>crosslinker_type</strong> – Atom type of the crosslinkers (default: 2).</p></li>
-<li><p><strong>strand_atom_type</strong> – Atom type of the beads that stay (default: 1).</p></li>
-<li><p><strong>white_noise</strong> – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.nr_of_strands"></span><strong>nr_of_strands</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.nr_of_strands">¶</a> – Number of strands to add.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.strand_length"></span><strong>strand_length</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.strand_length">¶</a> – Length of each strand (list of integers).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.crosslink_selector"></span><strong>crosslink_selector</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.crosslink_selector">¶</a> – Function that takes (strand_index, bead_index, total_beads) and returns (should_convert, functionality).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.default_crosslinker_functionality"></span><strong>default_crosslinker_functionality</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.default_crosslinker_functionality">¶</a> – Default functionality for crosslinks (used for positioning).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.crosslinker_type">¶</a> – Atom type of the crosslinkers (default: 2).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.strand_atom_type"></span><strong>strand_atom_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.strand_atom_type">¶</a> – Atom type of the beads that stay (default: 1).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.white_noise"></span><strong>white_noise</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands.params.white_noise">¶</a> – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).</p></li>
 </ul>
 </dd>
 </dl>
@@ -677,9 +679,9 @@ For common patterns, consider using the more specific methods like
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nr_of_monofunctional_strands</strong> – Number of monofunctional strands to add.</p></li>
-<li><p><strong>monofunctional_strand_length</strong> – Vector specifying the length of each strand in beads.</p></li>
-<li><p><strong>monofunctional_strand_atom_type</strong> – Atom type for the strand beads (default: 4).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_monofunctional_strands.params.nr_of_monofunctional_strands"></span><strong>nr_of_monofunctional_strands</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_monofunctional_strands.params.nr_of_monofunctional_strands">¶</a> – Number of monofunctional strands to add.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_monofunctional_strands.params.monofunctional_strand_length"></span><strong>monofunctional_strand_length</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_monofunctional_strands.params.monofunctional_strand_length">¶</a> – Vector specifying the length of each strand in beads.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_monofunctional_strands.params.monofunctional_strand_atom_type"></span><strong>monofunctional_strand_atom_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_monofunctional_strands.params.monofunctional_strand_atom_type">¶</a> – Atom type for the strand beads (default: 4).</p></li>
 </ul>
 </dd>
 </dl>
@@ -692,13 +694,13 @@ For common patterns, consider using the more specific methods like
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nr_of_strands</strong> – Number of strands to add.</p></li>
-<li><p><strong>strand_length</strong> – Length of each strand.</p></li>
-<li><p><strong>functionalization_probability</strong> – Proportion of beads that are made crosslink.</p></li>
-<li><p><strong>crosslinker_functionality</strong> – Functionality of the crosslinkers (default: 4).</p></li>
-<li><p><strong>crosslinker_type</strong> – Atom type of the crosslinkers (default: 2).</p></li>
-<li><p><strong>strand_atom_type</strong> – Atom type of the beads that stay (default: 1).</p></li>
-<li><p><strong>white_noise</strong> – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.nr_of_strands"></span><strong>nr_of_strands</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.nr_of_strands">¶</a> – Number of strands to add.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.strand_length"></span><strong>strand_length</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.strand_length">¶</a> – Length of each strand.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.functionalization_probability"></span><strong>functionalization_probability</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.functionalization_probability">¶</a> – Proportion of beads that are made crosslink.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.crosslinker_functionality"></span><strong>crosslinker_functionality</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.crosslinker_functionality">¶</a> – Functionality of the crosslinkers (default: 4).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.crosslinker_type">¶</a> – Atom type of the crosslinkers (default: 2).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.strand_atom_type"></span><strong>strand_atom_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.strand_atom_type">¶</a> – Atom type of the beads that stay (default: 1).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.white_noise"></span><strong>white_noise</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands.params.white_noise">¶</a> – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).</p></li>
 </ul>
 </dd>
 </dl>
@@ -711,14 +713,14 @@ For common patterns, consider using the more specific methods like
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nr_of_strands</strong> – Number of strands to add.</p></li>
-<li><p><strong>strand_length</strong> – Length of each strand.</p></li>
-<li><p><strong>spacing_between_crosslinks</strong> – Number of beads between crosslinks.</p></li>
-<li><p><strong>offset_to_first_crosslink</strong> – Offset from start of strand to first crosslink (0-based, default: 0).</p></li>
-<li><p><strong>crosslinker_functionality</strong> – Functionality of the crosslinkers (default: 4).</p></li>
-<li><p><strong>crosslinker_type</strong> – Atom type of the crosslinkers (default: 2).</p></li>
-<li><p><strong>strand_atom_type</strong> – Atom type of the beads that stay (default: 1).</p></li>
-<li><p><strong>white_noise</strong> – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.nr_of_strands"></span><strong>nr_of_strands</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.nr_of_strands">¶</a> – Number of strands to add.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.strand_length"></span><strong>strand_length</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.strand_length">¶</a> – Length of each strand.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.spacing_between_crosslinks"></span><strong>spacing_between_crosslinks</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.spacing_between_crosslinks">¶</a> – Number of beads between crosslinks.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.offset_to_first_crosslink"></span><strong>offset_to_first_crosslink</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.offset_to_first_crosslink">¶</a> – Offset from start of strand to first crosslink (0-based, default: 0).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.crosslinker_functionality"></span><strong>crosslinker_functionality</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.crosslinker_functionality">¶</a> – Functionality of the crosslinkers (default: 4).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.crosslinker_type"></span><strong>crosslinker_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.crosslinker_type">¶</a> – Atom type of the crosslinkers (default: 2).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.strand_atom_type"></span><strong>strand_atom_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.strand_atom_type">¶</a> – Atom type of the beads that stay (default: 1).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.white_noise"></span><strong>white_noise</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands.params.white_noise">¶</a> – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).</p></li>
 </ul>
 </dd>
 </dl>
@@ -731,10 +733,10 @@ For common patterns, consider using the more specific methods like
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nr_of_solvent_chains</strong> – Number of solvent chains to add.</p></li>
-<li><p><strong>solvent_chain_length</strong> – Length of each solvent chain in beads.</p></li>
-<li><p><strong>solvent_atom_type</strong> – Atom type for solvent chain beads (default: 3).</p></li>
-<li><p><strong>white_noise</strong> – Whether to use white noise (true) or blue noise (false) for positioning (default: true).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains.params.nr_of_solvent_chains"></span><strong>nr_of_solvent_chains</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains.params.nr_of_solvent_chains">¶</a> – Number of solvent chains to add.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains.params.solvent_chain_length"></span><strong>solvent_chain_length</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains.params.solvent_chain_length">¶</a> – Length of each solvent chain in beads.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains.params.solvent_atom_type"></span><strong>solvent_atom_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains.params.solvent_atom_type">¶</a> – Atom type for solvent chain beads (default: 3).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains.params.white_noise"></span><strong>white_noise</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains.params.white_noise">¶</a> – Whether to use white noise (true) or blue noise (false) for positioning (default: true).</p></li>
 </ul>
 </dd>
 </dl>
@@ -754,12 +756,12 @@ the stars can alternatively be created using <a class="reference internal" href=
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nr_of_stars</strong> – Number of star crosslinkers to add</p></li>
-<li><p><strong>functionality</strong> – Functionality of each star crosslinker (number of strands)</p></li>
-<li><p><strong>beads_per_strand</strong> – Number of beads in each strand</p></li>
-<li><p><strong>crosslinker_atom_type</strong> – Atom type for the crosslinker</p></li>
-<li><p><strong>strand_atom_type</strong> – Atom type for the strand beads</p></li>
-<li><p><strong>white_noise</strong> – Whether to use white noise positioning</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.nr_of_stars"></span><strong>nr_of_stars</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.nr_of_stars">¶</a> – Number of star crosslinkers to add</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.functionality"></span><strong>functionality</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.functionality">¶</a> – Functionality of each star crosslinker (number of strands)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.beads_per_strand"></span><strong>beads_per_strand</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.beads_per_strand">¶</a> – Number of beads in each strand</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.crosslinker_atom_type"></span><strong>crosslinker_atom_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.crosslinker_atom_type">¶</a> – Atom type for the crosslinker</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.strand_atom_type"></span><strong>strand_atom_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.strand_atom_type">¶</a> – Atom type for the strand beads</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.white_noise"></span><strong>white_noise</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers.params.white_noise">¶</a> – Whether to use white noise positioning</p></li>
 </ul>
 </dd>
 </dl>
@@ -774,9 +776,9 @@ To link them to crosslinkers, use some of the <code class="code docutils literal
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nr_of_strands</strong> – Number of strands to add.</p></li>
-<li><p><strong>strand_lengths</strong> – A list of integers representing the number of beads of each of the strands.</p></li>
-<li><p><strong>strand_atom_type</strong> – Type of atoms for the strands (default: 1).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_strands.params.nr_of_strands"></span><strong>nr_of_strands</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_strands.params.nr_of_strands">¶</a> – Number of strands to add.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_strands.params.strand_lengths"></span><strong>strand_lengths</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_strands.params.strand_lengths">¶</a> – A list of integers representing the number of beads of each of the strands.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.add_strands.params.strand_atom_type"></span><strong>strand_atom_type</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_strands.params.strand_atom_type">¶</a> – Type of atoms for the strands (default: 1).</p></li>
 </ul>
 </dd>
 </dl>
@@ -788,7 +790,7 @@ To link them to crosslinkers, use some of the <code class="code docutils literal
 <dd><p>Set the number of Monte-Carlo steps during bond length equilibration.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n_steps</strong> – Number of MC steps to perform (default: 2000)</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps.params.n_steps"></span><strong>n_steps</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps.params.n_steps">¶</a> – Number of MC steps to perform (default: 2000)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1105,8 +1107,8 @@ as chosen by the parameters associated with the strand.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>strand_idx</strong> – Index of the strand to be linked.</p></li>
-<li><p><strong>c_infinity</strong> – As needed for the end-to-end distribution, given by <span class="math notranslate nohighlight">\(\langle R^2\rangle_0 = C_{\infty} N b^2\)</span> (default: 1.0).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.link_strand.params.strand_idx"></span><strong>strand_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand.params.strand_idx">¶</a> – Index of the strand to be linked.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.link_strand.params.c_infinity"></span><strong>c_infinity</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand.params.c_infinity">¶</a> – As needed for the end-to-end distribution, given by <span class="math notranslate nohighlight">\(\langle R^2\rangle_0 = C_{\infty} N b^2\)</span> (default: 1.0).</p></li>
 </ul>
 </dd>
 </dl>
@@ -1125,8 +1127,8 @@ as those will determine the indices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>strand_idx</strong> – Index of the strand to be linked.</p></li>
-<li><p><strong>link_idx</strong> – Index of the crosslinker to be linked.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.link_strand_to.params.strand_idx"></span><strong>strand_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to.params.strand_idx">¶</a> – Index of the strand to be linked.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.link_strand_to.params.link_idx"></span><strong>link_idx</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to.params.link_idx">¶</a> – Index of the crosslinker to be linked.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1148,7 +1150,7 @@ linking to an end with a distance 0.</p></li>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>c_infinity</strong> – Statistical parameter for end-to-end distance calculation</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.link_strand_to_strand.params.c_infinity"></span><strong>c_infinity</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to_strand.params.c_infinity">¶</a> – Statistical parameter for end-to-end distance calculation</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if a successful link was made, False if no suitable pair was found</p>
@@ -1168,9 +1170,9 @@ and should return a BackTrackStatus value:
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>linking_controller</strong> – Callback function that controls the linking process.
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.link_strands_callback.params.linking_controller"></span><strong>linking_controller</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_callback.params.linking_controller">¶</a> – Callback function that controls the linking process.
 Function signature: (MCUniverseGenerator, int) -&gt; BackTrackStatus</p></li>
-<li><p><strong>c_infinity</strong> – As needed for the end-to-end distribution, given by <span class="math notranslate nohighlight">\(\langle R^2\rangle_0 = C_{\infty} N b^2\)</span>.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.link_strands_callback.params.c_infinity"></span><strong>c_infinity</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_callback.params.c_infinity">¶</a> – As needed for the end-to-end distribution, given by <span class="math notranslate nohighlight">\(\langle R^2\rangle_0 = C_{\infty} N b^2\)</span>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1184,8 +1186,8 @@ until a certain crosslink conversion is reached.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>crosslinker_conversion</strong> – Target conversion of crosslinkers (0: no connections to crosslinks; 1: all crosslinkers fully connected).</p></li>
-<li><p><strong>c_infinity</strong> – As needed for the end-to-end distribution, given by <span class="math notranslate nohighlight">\(\langle R^2\rangle_0 = C_{\infty} N b^2\)</span>.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion.params.crosslinker_conversion"></span><strong>crosslinker_conversion</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion.params.crosslinker_conversion">¶</a> – Target conversion of crosslinkers (0: no connections to crosslinks; 1: all crosslinkers fully connected).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion.params.c_infinity"></span><strong>c_infinity</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion.params.c_infinity">¶</a> – As needed for the end-to-end distribution, given by <span class="math notranslate nohighlight">\(\langle R^2\rangle_0 = C_{\infty} N b^2\)</span>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1199,8 +1201,8 @@ until a certain soluble fraction is reached.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>soluble_fraction</strong> – Target soluble fraction (0: all material is soluble; 1: no material is soluble).</p></li>
-<li><p><strong>c_infinity</strong> – As needed for the end-to-end distribution, given by <span class="math notranslate nohighlight">\(\langle R^2\rangle_0 = C_{\infty} N b^2\)</span> (default: 1.0).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction.params.soluble_fraction"></span><strong>soluble_fraction</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction.params.soluble_fraction">¶</a> – Target soluble fraction (0: all material is soluble; 1: no material is soluble).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction.params.c_infinity"></span><strong>c_infinity</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction.params.c_infinity">¶</a> – As needed for the end-to-end distribution, given by <span class="math notranslate nohighlight">\(\langle R^2\rangle_0 = C_{\infty} N b^2\)</span> (default: 1.0).</p></li>
 </ul>
 </dd>
 </dl>
@@ -1226,8 +1228,8 @@ the requested <cite>target_strand_conversion</cite>, since that one is taken rel
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>target_strand_conversion</strong> – Target conversion of free strand ends (0.0 to 1.0)</p></li>
-<li><p><strong>c_infinity</strong> – Statistical parameter for end-to-end distance calculation</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion.params.target_strand_conversion"></span><strong>target_strand_conversion</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion.params.target_strand_conversion">¶</a> – Target conversion of free strand ends (0.0 to 1.0)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion.params.c_infinity"></span><strong>c_infinity</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion.params.c_infinity">¶</a> – Statistical parameter for end-to-end distance calculation</p></li>
 </ul>
 </dd>
 </dl>
@@ -1246,7 +1248,7 @@ to have the crosslinks in their statistically most probable position.</p>
 <dd><p>Remove soluble fraction (as determined by phantom force relaxation) of the strands and crosslinks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rescale_box</strong> – Whether to rescale the box dimensions to maintain constant density (default: true).</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction.params.rescale_box"></span><strong>rescale_box</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction.params.rescale_box">¶</a> – Whether to rescale the box dimensions to maintain constant density (default: true).</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1259,13 +1261,13 @@ without generating all strand beads or constructing a Universe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nr_of_entanglements_to_sample</strong> – Target number of entanglements to sample.</p></li>
-<li><p><strong>upper_cutoff</strong> – Upper cutoff distance between entangled beads.</p></li>
-<li><p><strong>lower_cutoff</strong> – Lower cutoff distance between entangled beads (default: 0.0).</p></li>
-<li><p><strong>minimum_nr_of_entanglements</strong> – Minimum number of entanglements required (default: 0).</p></li>
-<li><p><strong>same_strand_cutoff</strong> – Minimum contour separation on the same strand (default: 3.0).</p></li>
-<li><p><strong>seed</strong> – Optional random seed (uses generator RNG if empty).</p></li>
-<li><p><strong>filter_dangling_and_soluble</strong> – Filter out dangling and soluble strands (default: True).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.nr_of_entanglements_to_sample"></span><strong>nr_of_entanglements_to_sample</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.nr_of_entanglements_to_sample">¶</a> – Target number of entanglements to sample.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.upper_cutoff"></span><strong>upper_cutoff</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.upper_cutoff">¶</a> – Upper cutoff distance between entangled beads.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.lower_cutoff"></span><strong>lower_cutoff</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.lower_cutoff">¶</a> – Lower cutoff distance between entangled beads (default: 0.0).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.minimum_nr_of_entanglements"></span><strong>minimum_nr_of_entanglements</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.minimum_nr_of_entanglements">¶</a> – Minimum number of entanglements required (default: 0).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.same_strand_cutoff"></span><strong>same_strand_cutoff</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.same_strand_cutoff">¶</a> – Minimum contour separation on the same strand (default: 3.0).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.seed"></span><strong>seed</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.seed">¶</a> – Optional random seed (uses generator RNG if empty).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.filter_dangling_and_soluble"></span><strong>filter_dangling_and_soluble</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements.params.filter_dangling_and_soluble">¶</a> – Filter out dangling and soluble strands (default: True).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1283,8 +1285,8 @@ Also used for the target crosslinker partner sampling.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distance</strong> – Mean distance between beads.</p></li>
-<li><p><strong>update_mean_squared</strong> – Whether to update the mean squared distance as well, deduced from the assumed gaussian distribution in 3D (default: true).</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance.params.distance"></span><strong>distance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance.params.distance">¶</a> – Mean distance between beads.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance.params.update_mean_squared"></span><strong>update_mean_squared</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance.params.update_mean_squared">¶</a> – Whether to update the mean squared distance as well, deduced from the assumed gaussian distribution in 3D (default: true).</p></li>
 </ul>
 </dd>
 </dl>
@@ -1297,8 +1299,8 @@ Also used for the target crosslinker partner sampling.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mean_squared_distance</strong> – Mean squared distance between beads</p></li>
-<li><p><strong>update_mean</strong> – Whether to update the mean bead distance as well, deduced from the assumed gaussian distribution in 3D (default: true)</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance.params.mean_squared_distance"></span><strong>mean_squared_distance</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance.params.mean_squared_distance">¶</a> – Mean squared distance between beads</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance.params.update_mean"></span><strong>update_mean</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance.params.update_mean">¶</a> – Whether to update the mean bead distance as well, deduced from the assumed gaussian distribution in 3D (default: true)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1310,7 +1312,7 @@ Also used for the target crosslinker partner sampling.</p>
 <dd><p>Set the seed for the random generator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>seed</strong> – Random seed value for reproducible results.</p>
+<dd class="field-odd"><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.set_seed.params.seed"></span><strong>seed</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed.params.seed">¶</a> – Random seed value for reproducible results.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1334,9 +1336,9 @@ Useful only for performance improvements in large systems.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>std_multiplier</strong> – The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance.params.std_multiplier"></span><strong>std_multiplier</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance.params.std_multiplier">¶</a> – The Z-Score, the multiplier of the standard deviation of the end-to-end distribution.
 E.g., 3. for 99.9994% of all conformations.</p></li>
-<li><p><strong>in_sqrt_multiplier</strong> – The multiplier with the <span class="math notranslate nohighlight">\(N\)</span> in the square root. Probably <span class="math notranslate nohighlight">\(&lt;b^2&gt;\)</span>.</p></li>
+<li><p><span class="target" id="pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance.params.in_sqrt_multiplier"></span><strong>in_sqrt_multiplier</strong><a class="paramlink headerlink reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance.params.in_sqrt_multiplier">¶</a> – The multiplier with the <span class="math notranslate nohighlight">\(N\)</span> in the square root. Probably <span class="math notranslate nohighlight">\(&lt;b^2&gt;\)</span>.</p></li>
 </ul>
 </dd>
 </dl>
