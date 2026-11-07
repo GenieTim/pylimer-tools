@@ -31,6 +31,7 @@ This example illustrates:
 """
 
 import argparse
+import importlib.util
 from pathlib import Path
 import sys
 
@@ -79,12 +80,26 @@ import numpy as np
 
 
 def _get_cache_path() -> Path:
-    base = (
-        Path(__file__).resolve().parent
-        if "__file__" in globals()
-        else Path.cwd() / "examples" / "force_balance"
-    )
-    return base / "data" / "entanglement_sampling_comparison_cache.npz"
+    candidates = (
+        [Path(__file__).resolve().parent] if "__file__" in globals() else []
+    ) + [Path.cwd()]
+    filename = "entanglement_sampling_comparison_cache.npz"
+    for cur in candidates:
+        for p in [cur] + list(cur.parents):
+            if (p / "data" / filename).is_file():
+                return (p / "data" / filename).resolve()
+            if (p / "examples" / "force_balance" / "data" / filename).is_file():
+                return (p / "examples" / "force_balance" /
+                        "data" / filename).resolve()
+    for cur in candidates:
+        for p in [cur] + list(cur.parents):
+            if (p / "examples" / "force_balance" / "data").is_dir():
+                return (p / "examples" / "force_balance" /
+                        "data" / filename).resolve()
+            if p.name == "force_balance" and (p / "data").is_dir():
+                return (p / "data" / filename).resolve()
+    return (Path.cwd() / "examples" / "force_balance" /
+            "data" / filename).resolve()
 
 
 cache_path = _get_cache_path()
@@ -100,9 +115,14 @@ args, _ = parser.parse_known_args(
 
 if args.recompute or not cache_path.exists():
     print(f"Recomputing benchmark data and saving to {cache_path}...")
-    from data.generate_cache import main as recompute_cache  # type: ignore
-
-    recompute_cache()
+    gen_script = cache_path.parent / "generate_cache.py"
+    spec = importlib.util.spec_from_file_location("generate_cache", gen_script)
+    if spec and spec.loader:
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        mod.main()
+    else:
+        raise RuntimeError(f"Could not load generator script at {gen_script}")
 
 data = np.load(cache_path)
 
