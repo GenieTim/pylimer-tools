@@ -7,12 +7,17 @@ import numpy as np
 
 from pylimer_tools_cpp import (
     Box,
+    CrosslinkerUniverse,
+    MCUniverseGenerator,
     MEHPForceRelaxation,
     MEHPForceBalance2,
     SLESolver,
+    StrandPairEntanglements,
+    StructureSimplificationMode,
     NonGaussianSpringForceEvaluator,
     SimpleSpringMEHPForceEvaluator,
     inverse_langevin,
+    randomly_sample_entanglements_analytical,
 )
 
 if __name__ == "__main__":
@@ -98,10 +103,9 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             fb.run_force_relaxation(sle_solver=SLESolver.METAL_CG)
             self.assertGreater(fb.get_nr_of_iterations(), 0)
         except RuntimeError as e:
-            if (
-                "Metal acceleration is not enabled" in str(e)
-                or "Metal GPU backend is not available" in str(e)
-            ):
+            if "Metal acceleration is not enabled" in str(
+                e
+            ) or "Metal GPU backend is not available" in str(e):
                 self.skipTest(f"Metal not available: {e}")
             else:
                 raise
@@ -110,13 +114,13 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         """Test that MEHPForceBalance2 with METAL_BARZILAI_BORWEIN completes force relaxation."""
         try:
             fb = MEHPForceBalance2(self.testUniverseSmall, 2, False)
-            fb.run_force_relaxation(sle_solver=SLESolver.METAL_BARZILAI_BORWEIN)
+            fb.run_force_relaxation(
+                sle_solver=SLESolver.METAL_BARZILAI_BORWEIN)
             self.assertGreater(fb.get_nr_of_iterations(), 0)
         except RuntimeError as e:
-            if (
-                "Metal acceleration is not enabled" in str(e)
-                or "Metal GPU backend is not available" in str(e)
-            ):
+            if "Metal acceleration is not enabled" in str(
+                e
+            ) or "Metal GPU backend is not available" in str(e):
                 self.skipTest(f"Metal not available: {e}")
             else:
                 raise
@@ -144,3 +148,95 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         fb.config_cg_fallback_max_iterations(0)
         self.assertEqual(fb.get_cg_fallback_max_iterations(), 0)
 
+    def test_analytical_entanglement_sampling_and_universe_free_force_balance(
+            self):
+        """Test Universe-free analytical entanglement sampling and MEHPForceBalance / MEHPForceBalance2."""
+        gen = MCUniverseGenerator(22.0, 22.0, 22.0)
+        gen.set_seed(123456)
+        gen.set_mean_squared_bead_distance(1.0)
+        gen.config_nr_of_mc_steps(0)
+
+        gen.add_crosslinkers(60, 4, 2, True)
+        gen.add_strands(110, [25] * 110, 1)
+        gen.add_monofunctional_strands(10, [15] * 10, 4)
+        gen.link_strands_to_conversion(0.88)
+
+        cu = gen.get_crosslinker_universe()
+        self.assertIsInstance(cu, CrosslinkerUniverse)
+        self.assertEqual(len(cu.xlink_x), 60)
+        self.assertEqual(len(cu.beads_in_strand), 120)
+
+        box = gen.get_box()
+        self.assertAlmostEqual(box.get_lx(), 22.0)
+
+        es_direct = randomly_sample_entanglements_analytical(
+            cu,
+            box,
+            nr_of_samples=40,
+            upper_cutoff=2.5,
+            lower_cutoff=0.2,
+            minimum_nr_of_samples=10,
+            same_strand_cutoff=3.0,
+            seed="py_seed_42",
+            filter_dangling_and_soluble=True,
+        )
+        self.assertIsInstance(es_direct, StrandPairEntanglements)
+        self.assertGreaterEqual(len(es_direct), 10)
+        self.assertLessEqual(len(es_direct), 40)
+
+        es_gen = gen.sample_entanglements(
+            nr_of_entanglements_to_sample=40,
+            upper_cutoff=2.5,
+            lower_cutoff=0.2,
+            minimum_nr_of_entanglements=10,
+            same_strand_cutoff=3.0,
+            seed="py_seed_42",
+            filter_dangling_and_soluble=True,
+        )
+        self.assertEqual(len(es_gen), len(es_direct))
+        self.assertEqual(es_gen.strand_idx_1, es_direct.strand_idx_1)
+        self.assertEqual(es_gen.strand_idx_2, es_direct.strand_idx_2)
+
+        # MEHPForceBalance (v1) without Universe
+        fb1 = gen.get_force_balance(es_gen)
+        self.assertTrue(fb1.validate_network())
+
+        # MEHPForceBalance2 (merged entanglement links) without Universe
+        fb2 = gen.get_force_balance2(
+            es_gen, crosslinker_type=2, entanglements_as_springs=False
+        )
+        fb2.validate_network()
+        fb2.run_force_relaxation(
+            simplification_mode=StructureSimplificationMode.INACTIVE_THEN_X2F
+        )
+        self.assertGreater(fb2.get_active_weight_fraction(), 0.0)
+        self.assertGreater(fb2.get_soluble_weight_fraction(), 0.0)
+        self.assertAlmostEqual(
+            fb2.get_active_weight_fraction()
+            + fb2.get_dangling_weight_fraction()
+            + fb2.get_soluble_weight_fraction(),
+            1.0,
+            places=6,
+        )
+        self.assertGreater(fb2.get_gamma_factor(1.0), 0.0)
+
+        # MEHPForceBalance2 (entanglements as springs) without Universe
+        fb2_springs = gen.get_force_balance2(
+            es_gen, crosslinker_type=2, entanglements_as_springs=True
+        )
+        fb2_springs.validate_network()
+        self.assertEqual(fb2_springs.get_nr_of_extra_atoms(), 2 * len(es_gen))
+        self.assertEqual(fb2_springs.get_nr_of_extra_bonds(), len(es_gen))
+        fb2_springs.run_force_relaxation(
+            simplification_mode=StructureSimplificationMode.INACTIVE_THEN_X2F
+        )
+        self.assertAlmostEqual(
+            fb2_springs.get_soluble_weight_fraction(),
+            fb2.get_soluble_weight_fraction(),
+            places=6,
+        )
+        self.assertAlmostEqual(
+            fb2_springs.get_active_weight_fraction(),
+            fb2.get_active_weight_fraction(),
+            places=6,
+        )

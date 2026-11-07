@@ -1090,6 +1090,11 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("variance"),
          py::arg("seed") = "",
          py::arg("is_2d") = false)
+    .def("clear_caches",
+         &Universe::clearCaches,
+         R"pbdoc(
+         Clear internal caches of decomposed molecules and chains with crosslinkers to reclaim memory.
+         )pbdoc")
     .def("add_bonds",
          py::overload_cast<const std::vector<long int>&,
                            const std::vector<long int>&>(&Universe::addBonds),

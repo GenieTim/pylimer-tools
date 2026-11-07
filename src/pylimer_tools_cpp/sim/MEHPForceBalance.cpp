@@ -2,6 +2,7 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
+#include "../topo/EntanglementDetector.h"
 #include "../utils/StringUtils.h"
 #include "../utils/VectorUtils.h"
 // #include "../utils/MemoryUtil.h"
@@ -907,6 +908,97 @@ MEHPForceBalance::randomlyAddSliplinks(const size_t nrOfSliplinksToSample,
   INVALIDARG_EXP_IFN(cutoff > 0.0,
                      "Expected a cutoff > 0.0, got " + std::to_string(cutoff) +
                        ".");
+  if (this->universe.getNrOfAtoms() == 0 &&
+      this->initialConfig.nrOfSprings > 0) {
+    CrosslinkerUniverse crosslinkerUniverse;
+    const size_t nNodes = this->initialConfig.nrOfNodes;
+    crosslinkerUniverse.xlinkX.resize(nNodes);
+    crosslinkerUniverse.xlinkY.resize(nNodes);
+    crosslinkerUniverse.xlinkZ.resize(nNodes);
+    crosslinkerUniverse.xlinkTypes.resize(nNodes, this->crossLinkerType);
+    for (size_t i = 0; i < nNodes; ++i) {
+      crosslinkerUniverse.xlinkX[i] =
+        this->initialConfig.coordinates[3 * i + 0];
+      crosslinkerUniverse.xlinkY[i] =
+        this->initialConfig.coordinates[3 * i + 1];
+      crosslinkerUniverse.xlinkZ[i] =
+        this->initialConfig.coordinates[3 * i + 2];
+      if (i < static_cast<size_t>(this->initialConfig.oldAtomTypes.size())) {
+        crosslinkerUniverse.xlinkTypes[i] = this->initialConfig.oldAtomTypes[i];
+      }
+    }
+    const size_t nSprings = this->initialConfig.nrOfSprings;
+    // Nodes of degree one that are not crosslinkers are chain ends
+    // (e.g., dangling or free ends, whose initial coordinates are mere
+    // placeholders); model them as free (unanchored) random-walk ends
+    // rather than as fixed anchors.
+    std::vector<size_t> nodeDegree(nNodes, 0);
+    for (size_t s = 0; s < nSprings; ++s) {
+      nodeDegree[this->initialConfig.springIndexA[s]] += 1;
+      nodeDegree[this->initialConfig.springIndexB[s]] += 1;
+    }
+    const auto isFreeEnd = [&](const size_t node) {
+      return nodeDegree[node] == 1 &&
+             crosslinkerUniverse.xlinkTypes[node] != this->crossLinkerType;
+    };
+    crosslinkerUniverse.strandFrom.resize(nSprings);
+    crosslinkerUniverse.strandTo.resize(nSprings);
+    crosslinkerUniverse.beadsInStrand.resize(nSprings);
+    const double b2 = (this->defaultBondLength > 0.0)
+                        ? (this->defaultBondLength * this->defaultBondLength)
+                        : 1.0;
+    crosslinkerUniverse.meanSquaredBeadDistanceInStrand.assign(nSprings, b2);
+    // springs whose anchored end is B, such that the contour fraction
+    // sampled from the anchor has to be mirrored w.r.t. the spring direction
+    std::vector<bool> springIsReversed(nSprings, false);
+    for (size_t s = 0; s < nSprings; ++s) {
+      const size_t nodeA = this->initialConfig.springIndexA[s];
+      const size_t nodeB = this->initialConfig.springIndexB[s];
+      const bool aIsFree = isFreeEnd(nodeA);
+      const bool bIsFree = isFreeEnd(nodeB);
+      // the number of bonds between the two nodes
+      const int nBonds = static_cast<int>(
+        std::round(this->initialConfig.springsContourLength[s]));
+      // CrosslinkerUniverse strand ends are not beads themselves, unless
+      // they are free ends: then, they are the first/last bead of the strand
+      const int nFreeEnds =
+        static_cast<int>(aIsFree) + static_cast<int>(bIsFree);
+      crosslinkerUniverse.beadsInStrand[s] =
+        std::max(0, nBonds - 1 + nFreeEnds);
+      if (aIsFree && !bIsFree) {
+        crosslinkerUniverse.strandFrom[s] = static_cast<long int>(nodeB);
+        crosslinkerUniverse.strandTo[s] = -1;
+        springIsReversed[s] = true;
+      } else {
+        crosslinkerUniverse.strandFrom[s] =
+          aIsFree ? -1 : static_cast<long int>(nodeA);
+        crosslinkerUniverse.strandTo[s] =
+          bIsFree ? -1 : static_cast<long int>(nodeB);
+      }
+    }
+
+    auto entanglements = pylimer_tools::topo::entanglement_detection::
+      randomlyFindEntanglementsAnalytical(this->box,
+                                          crosslinkerUniverse,
+                                          nrOfSliplinksToSample,
+                                          cutoff,
+                                          0.0,
+                                          minimumNrOfSliplinks,
+                                          sameStrandCutoff,
+                                          seed > 0 ? std::to_string(seed) : "",
+                                          false);
+    for (size_t e = 0; e < entanglements.size(); ++e) {
+      if (springIsReversed[entanglements.strandIdx1[e]]) {
+        entanglements.alpha1[e] = 1.0 - entanglements.alpha1[e];
+      }
+      if (springIsReversed[entanglements.strandIdx2[e]]) {
+        entanglements.alpha2[e] = 1.0 - entanglements.alpha2[e];
+      }
+    }
+
+    this->addSlipLinks(entanglements);
+    return entanglements.size();
+  }
   // RUNTIME_EXP_IFN(this->initialConfig.nrOfLinks ==
   //                   this->initialConfig.nrOfNodes,
   //                 "Slip-links are only added randomly when no other "

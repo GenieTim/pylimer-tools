@@ -1197,7 +1197,12 @@ MCUniverseGenerator::convertToForceRelaxationNetwork() const
   }
   forceRelaxationNetwork.nrOfNodes = nCrosslinks + nDanglingEnds + nFreeEnds;
   forceRelaxationNetwork.oldAtomIds =
-    Eigen::ArrayXi::Zero(forceRelaxationNetwork.nrOfNodes);
+    forceRelaxationNetwork.nrOfNodes > 0
+      ? Eigen::ArrayXi(
+          Eigen::ArrayXi::LinSpaced(forceRelaxationNetwork.nrOfNodes,
+                                    0,
+                                    forceRelaxationNetwork.nrOfNodes - 1))
+      : Eigen::ArrayXi(Eigen::ArrayXi::Zero(0));
   forceRelaxationNetwork.coordinates =
     Eigen::VectorXd(forceRelaxationNetwork.nrOfNodes * 3);
   forceRelaxationNetwork.springIndicesOfLinks.reserve(
@@ -1359,13 +1364,17 @@ MCUniverseGenerator::convertToForceBalanceNetwork() const
   forceBalanceNetwork.nrOfNodes = nCrosslinks + nDanglingEnds + nFreeEnds;
   forceBalanceNetwork.nrOfLinks = forceBalanceNetwork.nrOfNodes;
   forceBalanceNetwork.oldAtomIds =
-    Eigen::ArrayXi::Zero(forceBalanceNetwork.nrOfNodes);
+    forceBalanceNetwork.nrOfNodes > 0
+      ? Eigen::ArrayXi(Eigen::ArrayXi::LinSpaced(
+          forceBalanceNetwork.nrOfNodes, 0, forceBalanceNetwork.nrOfNodes - 1))
+      : Eigen::ArrayXi(Eigen::ArrayXi::Zero(0));
   forceBalanceNetwork.coordinates =
     Eigen::VectorXd(forceBalanceNetwork.nrOfNodes * 3);
   forceBalanceNetwork.linkIsSliplink =
     Eigen::ArrayXb::Zero(forceBalanceNetwork.nrOfLinks);
   forceBalanceNetwork.nrOfCrosslinkSwapsEndured = Eigen::ArrayXi::Zero(0);
-  forceBalanceNetwork.springIndicesOfLinks.reserve(nCrosslinks);
+  forceBalanceNetwork.springIndicesOfLinks.reserve(
+    forceBalanceNetwork.nrOfNodes);
   forceBalanceNetwork.oldAtomTypes =
     Eigen::ArrayXi::Zero(forceBalanceNetwork.nrOfNodes);
   // crosslinks first, in order to keep consistent numbering
@@ -1472,6 +1481,7 @@ MCUniverseGenerator::convertToForceBalanceNetwork() const
     forceBalanceNetwork.linkIndicesOfSprings.push_back(linkIndices);
     forceBalanceNetwork.localToGlobalSpringIndex.push_back(
       { static_cast<size_t>(i) });
+    forceBalanceNetwork.springToMoleculeIds.push_back(static_cast<size_t>(i));
   }
 
   forceBalanceNetwork.springPartCoordinateIndexA =
@@ -1508,6 +1518,383 @@ MCUniverseGenerator::convertToForceBalanceNetwork() const
   return forceBalanceNetwork;
 }
 
+pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+MCUniverseGenerator::sampleEntanglements(
+  const size_t nrOfEntanglementsToSample,
+  const double upperCutoff,
+  const double lowerCutoff,
+  const size_t minimumNrOfEntanglements,
+  const double sameStrandCutoff,
+  const std::string& seed,
+  const bool filterDanglingAndSoluble) const
+{
+  const std::string effectiveSeed =
+    seed.empty() ? this->getCurrentSeed() : seed;
+  return pylimer_tools::topo::entanglement_detection::
+    randomlyFindEntanglementsAnalytical(this->box,
+                                        this->simplifiedUniverse,
+                                        nrOfEntanglementsToSample,
+                                        upperCutoff,
+                                        lowerCutoff,
+                                        minimumNrOfEntanglements,
+                                        sameStrandCutoff,
+                                        effectiveSeed,
+                                        filterDanglingAndSoluble);
+}
+
+pylimer_tools::sim::mehp::ForceBalanceNetwork
+MCUniverseGenerator::convertToForceBalanceNetwork(
+  const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
+    entanglements) const
+{
+  return this->getForceBalance(entanglements).getNetwork();
+}
+
+pylimer_tools::sim::mehp::ForceBalance2Network
+MCUniverseGenerator::convertToForceBalance2Network(
+  const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
+    entanglements,
+  const int crossLinkerType,
+  const bool entanglementsAsSprings) const
+{
+  pylimer_tools::sim::mehp::ForceBalance2Network net;
+  net.L[0] = this->box.getLx();
+  net.L[1] = this->box.getLy();
+  net.L[2] = this->box.getLz();
+  for (size_t dir = 0; dir < 3; ++dir) {
+    net.boxHalfs[dir] = net.L[dir] * 0.5;
+  }
+
+  const size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+  const size_t nPolymerStrands = this->simplifiedUniverse.strandFrom.size();
+  const size_t nEntanglements = entanglements.size();
+  INVALIDARG_EXP_IFN(
+    entanglements.strandIdx2.size() == nEntanglements &&
+      entanglements.alpha1.size() == nEntanglements &&
+      entanglements.alpha2.size() == nEntanglements &&
+      static_cast<size_t>(entanglements.x.size()) == nEntanglements &&
+      static_cast<size_t>(entanglements.y.size()) == nEntanglements &&
+      static_cast<size_t>(entanglements.z.size()) == nEntanglements,
+    "Inconsistent StrandPairEntanglements vector sizes.");
+
+  const auto beadTypeOfStrand = [this](const size_t s) -> int {
+    return (s < this->simplifiedUniverse.strandBeadType.size())
+             ? this->simplifiedUniverse.strandBeadType[s]
+             : 1;
+  };
+
+  size_t nDanglingEnds = 0;
+  size_t nFreeEnds = 0;
+  std::vector<size_t> danglingEndPartners;
+  std::vector<int> danglingEndTypes;
+  std::vector<int> freeEndTypes;
+  for (size_t s = 0; s < nPolymerStrands; ++s) {
+    const long int from = this->simplifiedUniverse.strandFrom[s];
+    const long int to = this->simplifiedUniverse.strandTo[s];
+    const int beadType = beadTypeOfStrand(s);
+    if (from >= 0 && to < 0) {
+      nDanglingEnds += 1;
+      danglingEndPartners.push_back(static_cast<size_t>(from));
+      danglingEndTypes.push_back(beadType);
+    } else if (from < 0 && to >= 0) {
+      nDanglingEnds += 1;
+      danglingEndPartners.push_back(static_cast<size_t>(to));
+      danglingEndTypes.push_back(beadType);
+    } else if (from < 0 && to < 0) {
+      nFreeEnds += 2;
+      freeEndTypes.push_back(beadType);
+      freeEndTypes.push_back(beadType);
+    }
+  }
+
+  const size_t nrOfNodes = nCrosslinks + nDanglingEnds + nFreeEnds;
+  const size_t nrOfEntanglementLinks =
+    entanglementsAsSprings ? (2 * nEntanglements) : nEntanglements;
+  const size_t nrOfLinks = nrOfNodes + nrOfEntanglementLinks;
+
+  net.nrOfNodes = nrOfNodes;
+  net.nrOfLinks = nrOfLinks;
+  net.coordinates = Eigen::VectorXd::Zero(3 * nrOfLinks);
+  net.linkIsEntanglement = Eigen::ArrayXb::Constant(nrOfLinks, false);
+  net.oldAtomIds = nrOfLinks > 0
+                     ? Eigen::ArrayXi(Eigen::ArrayXi::LinSpaced(
+                         nrOfLinks, 0, static_cast<int>(nrOfLinks) - 1))
+                     : Eigen::ArrayXi(Eigen::ArrayXi::Zero(0));
+  net.oldAtomTypes = Eigen::ArrayXi::Ones(nrOfLinks);
+
+  for (size_t xl = 0; xl < nCrosslinks; ++xl) {
+    Eigen::Vector3d pos(this->simplifiedUniverse.xlinkX[xl],
+                        this->simplifiedUniverse.xlinkY[xl],
+                        this->simplifiedUniverse.xlinkZ[xl]);
+    this->box.handlePBC(pos);
+    net.coordinates.segment<3>(3 * xl) = pos;
+    net.oldAtomTypes(xl) = this->simplifiedUniverse.xlinkTypes[xl];
+  }
+
+  for (size_t dIdx = 0; dIdx < nDanglingEnds; ++dIdx) {
+    const size_t nodeIdx = nCrosslinks + dIdx;
+    const size_t partnerXl = danglingEndPartners[dIdx];
+    net.coordinates.segment<3>(3 * nodeIdx) =
+      net.coordinates.segment<3>(3 * partnerXl);
+    net.oldAtomTypes(nodeIdx) = danglingEndTypes[dIdx];
+  }
+
+  for (size_t fIdx = 0; fIdx < nFreeEnds; ++fIdx) {
+    const size_t nodeIdx = nCrosslinks + nDanglingEnds + fIdx;
+    net.coordinates.segment<3>(3 * nodeIdx).setZero();
+    net.oldAtomTypes(nodeIdx) = freeEndTypes[fIdx];
+  }
+
+  struct StrandEntanglementPlacement
+  {
+    double alpha;
+    size_t beadIdx;
+    size_t entIdx;
+    size_t linkIdx;
+  };
+  std::vector<std::vector<StrandEntanglementPlacement>> entanglementsOnStrand(
+    nPolymerStrands);
+
+  const bool hasSeparatePositions =
+    (static_cast<size_t>(entanglements.position1.size()) ==
+       3 * nEntanglements &&
+     static_cast<size_t>(entanglements.position2.size()) == 3 * nEntanglements);
+
+  for (size_t e = 0; e < nEntanglements; ++e) {
+    const size_t s1 = entanglements.strandIdx1[e];
+    const size_t s2 = entanglements.strandIdx2[e];
+    INVALIDARG_EXP_IFN(s1 < nPolymerStrands && s2 < nPolymerStrands,
+                       "Entanglement strand index out of range.");
+    const double a1 = std::clamp(entanglements.alpha1[e], 0.0, 1.0);
+    const double a2 = std::clamp(entanglements.alpha2[e], 0.0, 1.0);
+    const size_t k1 =
+      (e < entanglements.beadIdx1.size()) ? entanglements.beadIdx1[e] : 0;
+    const size_t k2 =
+      (e < entanglements.beadIdx2.size()) ? entanglements.beadIdx2[e] : 0;
+
+    if (!entanglementsAsSprings) {
+      const size_t linkIdx = nrOfNodes + e;
+      Eigen::Vector3d mid(
+        entanglements.x[e], entanglements.y[e], entanglements.z[e]);
+      this->box.handlePBC(mid);
+      net.coordinates.segment<3>(3 * linkIdx) = mid;
+      net.linkIsEntanglement(linkIdx) = true;
+      net.oldAtomTypes(linkIdx) = beadTypeOfStrand(s1);
+
+      entanglementsOnStrand[s1].push_back(
+        StrandEntanglementPlacement{ a1, k1, e, linkIdx });
+      entanglementsOnStrand[s2].push_back(
+        StrandEntanglementPlacement{ a2, k2, e, linkIdx });
+    } else {
+      const size_t linkIdx1 = nrOfNodes + 2 * e;
+      const size_t linkIdx2 = nrOfNodes + 2 * e + 1;
+      Eigen::Vector3d pos1 =
+        hasSeparatePositions
+          ? Eigen::Vector3d(entanglements.position1.segment<3>(3 * e))
+          : Eigen::Vector3d(
+              entanglements.x[e], entanglements.y[e], entanglements.z[e]);
+      Eigen::Vector3d pos2 =
+        hasSeparatePositions
+          ? Eigen::Vector3d(entanglements.position2.segment<3>(3 * e))
+          : Eigen::Vector3d(
+              entanglements.x[e], entanglements.y[e], entanglements.z[e]);
+      this->box.handlePBC(pos1);
+      this->box.handlePBC(pos2);
+      net.coordinates.segment<3>(3 * linkIdx1) = pos1;
+      net.coordinates.segment<3>(3 * linkIdx2) = pos2;
+      net.linkIsEntanglement(linkIdx1) = true;
+      net.linkIsEntanglement(linkIdx2) = true;
+      net.oldAtomTypes(linkIdx1) = beadTypeOfStrand(s1);
+      net.oldAtomTypes(linkIdx2) = beadTypeOfStrand(s2);
+
+      entanglementsOnStrand[s1].push_back(
+        StrandEntanglementPlacement{ a1, k1, e, linkIdx1 });
+      entanglementsOnStrand[s2].push_back(
+        StrandEntanglementPlacement{ a2, k2, e, linkIdx2 });
+    }
+  }
+
+  const size_t nrOfTotalStrands =
+    nPolymerStrands + (entanglementsAsSprings ? nEntanglements : 0);
+  const size_t nrOfTotalSprings =
+    nPolymerStrands +
+    (entanglementsAsSprings ? (3 * nEntanglements) : (2 * nEntanglements));
+
+  net.nrOfStrands = nrOfTotalStrands;
+  net.nrOfSprings = nrOfTotalSprings;
+  net.springIndicesOfStrand.resize(nrOfTotalStrands);
+  net.linkIndicesOfStrand.resize(nrOfTotalStrands);
+  net.strandIndicesOfLink.assign(nrOfLinks, std::vector<size_t>());
+
+  net.springIndexA = Eigen::ArrayXi::Zero(nrOfTotalSprings);
+  net.springIndexB = Eigen::ArrayXi::Zero(nrOfTotalSprings);
+  net.springCoordinateIndexA = Eigen::ArrayXi::Zero(3 * nrOfTotalSprings);
+  net.springCoordinateIndexB = Eigen::ArrayXi::Zero(3 * nrOfTotalSprings);
+  net.springContourLength = Eigen::VectorXd::Zero(nrOfTotalSprings);
+  net.springBoxOffset = Eigen::VectorXd::Zero(3 * nrOfTotalSprings);
+  net.springIsEntanglement = Eigen::ArrayXb::Constant(nrOfTotalSprings, false);
+  net.strandIndexOfSpring = Eigen::ArrayXi::Constant(nrOfTotalSprings, -1);
+
+  size_t handledDanglingIdx = 0;
+  size_t handledFreeIdx = 0;
+  size_t nextSpringIdx = 0;
+
+  for (size_t s = 0; s < nPolymerStrands; ++s) {
+    const long int rawFrom = this->simplifiedUniverse.strandFrom[s];
+    const long int rawTo = this->simplifiedUniverse.strandTo[s];
+    const int nBeads = this->simplifiedUniverse.beadsInStrand[s];
+
+    size_t nodeFrom = 0;
+    size_t nodeTo = 0;
+    double totalBonds = 1.0;
+
+    if (rawFrom >= 0 && rawTo >= 0) {
+      nodeFrom = static_cast<size_t>(rawFrom);
+      nodeTo = static_cast<size_t>(rawTo);
+      totalBonds = static_cast<double>(nBeads + 1);
+    } else if (rawFrom >= 0 && rawTo < 0) {
+      nodeFrom = static_cast<size_t>(rawFrom);
+      nodeTo = nCrosslinks + handledDanglingIdx++;
+      totalBonds = static_cast<double>(std::max(1, nBeads));
+    } else if (rawFrom < 0 && rawTo >= 0) {
+      nodeFrom = static_cast<size_t>(rawTo);
+      nodeTo = nCrosslinks + handledDanglingIdx++;
+      totalBonds = static_cast<double>(std::max(1, nBeads));
+    } else {
+      nodeFrom = nCrosslinks + nDanglingEnds + handledFreeIdx;
+      nodeTo = nodeFrom + 1;
+      handledFreeIdx += 2;
+      totalBonds = static_cast<double>(std::max(1, nBeads - 1));
+    }
+
+    auto& placements = entanglementsOnStrand[s];
+    std::sort(placements.begin(),
+              placements.end(),
+              [](const StrandEntanglementPlacement& a,
+                 const StrandEntanglementPlacement& b) {
+                if (std::abs(a.alpha - b.alpha) > 1e-12) {
+                  return a.alpha < b.alpha;
+                }
+                if (a.beadIdx != b.beadIdx) {
+                  return a.beadIdx < b.beadIdx;
+                }
+                return a.entIdx < b.entIdx;
+              });
+
+    const size_t kEnt = placements.size();
+    const size_t nSubSprings = kEnt + 1;
+
+    net.linkIndicesOfStrand[s].reserve(nSubSprings + 1);
+    net.springIndicesOfStrand[s].reserve(nSubSprings);
+    net.linkIndicesOfStrand[s].push_back(nodeFrom);
+    for (size_t m = 0; m < kEnt; ++m) {
+      net.linkIndicesOfStrand[s].push_back(placements[m].linkIdx);
+    }
+    net.linkIndicesOfStrand[s].push_back(nodeTo);
+
+    for (const size_t linkIdx : net.linkIndicesOfStrand[s]) {
+      pylimer_tools::utils::addIfNotContained(net.strandIndicesOfLink[linkIdx],
+                                              s);
+    }
+
+    // Compute unwrapped positions along strand s for exact PBC box offsets
+    const Eigen::Vector3d pStart = net.coordinates.segment<3>(3 * nodeFrom);
+    Eigen::Vector3d strandChord =
+      net.coordinates.segment<3>(3 * nodeTo) - pStart;
+    this->box.handlePBC(strandChord);
+    const Eigen::Vector3d pEnd = pStart + strandChord;
+
+    std::vector<Eigen::Vector3d> unwrappedPositions(nSubSprings + 1);
+    unwrappedPositions[0] = pStart;
+    unwrappedPositions[nSubSprings] = pEnd;
+    for (size_t m = 0; m < kEnt; ++m) {
+      const Eigen::Vector3d chordPos =
+        pStart + placements[m].alpha * strandChord;
+      Eigen::Vector3d diff =
+        net.coordinates.segment<3>(3 * placements[m].linkIdx) - chordPos;
+      this->box.handlePBC(diff);
+      unwrappedPositions[m + 1] = chordPos + diff;
+    }
+
+    // Compute contour lengths of the sub-springs summing to totalBonds
+    std::vector<double> subContourLengths(nSubSprings, 0.0);
+    double prevBondPos = 0.0;
+    for (size_t m = 0; m < kEnt; ++m) {
+      double bondPos = placements[m].alpha * totalBonds;
+      if (std::abs(bondPos - std::round(bondPos)) < 1e-7) {
+        bondPos = std::round(bondPos);
+      }
+      const double minAllowed = prevBondPos + 1e-6;
+      const double maxAllowed =
+        totalBonds - static_cast<double>(kEnt - m) * 1e-6;
+      bondPos = std::clamp(bondPos, minAllowed, maxAllowed);
+      subContourLengths[m] = bondPos - prevBondPos;
+      prevBondPos = bondPos;
+    }
+    subContourLengths[kEnt] = std::max(1e-6, totalBonds - prevBondPos);
+
+    for (size_t m = 0; m < nSubSprings; ++m) {
+      const size_t spIdx = nextSpringIdx++;
+      const size_t linkA = net.linkIndicesOfStrand[s][m];
+      const size_t linkB = net.linkIndicesOfStrand[s][m + 1];
+
+      net.springIndicesOfStrand[s].push_back(spIdx);
+      net.strandIndexOfSpring(spIdx) = static_cast<int>(s);
+      net.springIndexA(spIdx) = static_cast<int>(linkA);
+      net.springIndexB(spIdx) = static_cast<int>(linkB);
+      for (size_t dir = 0; dir < 3; ++dir) {
+        net.springCoordinateIndexA(3 * spIdx + dir) =
+          static_cast<int>(3 * linkA + dir);
+        net.springCoordinateIndexB(3 * spIdx + dir) =
+          static_cast<int>(3 * linkB + dir);
+      }
+      net.springContourLength(spIdx) = subContourLengths[m];
+
+      const Eigen::Vector3d shouldBeDist =
+        unwrappedPositions[m + 1] - unwrappedPositions[m];
+      const Eigen::Vector3d isDist = net.coordinates.segment<3>(3 * linkB) -
+                                     net.coordinates.segment<3>(3 * linkA);
+      net.springBoxOffset.segment<3>(3 * spIdx) = shouldBeDist - isDist;
+      assert(
+        this->box.isValidOffset(net.springBoxOffset.segment<3>(3 * spIdx)));
+    }
+  }
+
+  if (entanglementsAsSprings) {
+    for (size_t e = 0; e < nEntanglements; ++e) {
+      const size_t entStrandIdx = nPolymerStrands + e;
+      const size_t spIdx = nextSpringIdx++;
+      const size_t link1 = nrOfNodes + 2 * e;
+      const size_t link2 = nrOfNodes + 2 * e + 1;
+
+      net.linkIndicesOfStrand[entStrandIdx] = { link1, link2 };
+      net.springIndicesOfStrand[entStrandIdx] = { spIdx };
+      pylimer_tools::utils::addIfNotContained(net.strandIndicesOfLink[link1],
+                                              entStrandIdx);
+      pylimer_tools::utils::addIfNotContained(net.strandIndicesOfLink[link2],
+                                              entStrandIdx);
+
+      net.strandIndexOfSpring(spIdx) = static_cast<int>(entStrandIdx);
+      net.springIsEntanglement(spIdx) = true;
+      net.springContourLength(spIdx) = 1.0;
+      net.springIndexA(spIdx) = static_cast<int>(link1);
+      net.springIndexB(spIdx) = static_cast<int>(link2);
+      for (size_t dir = 0; dir < 3; ++dir) {
+        net.springCoordinateIndexA(3 * spIdx + dir) =
+          static_cast<int>(3 * link1 + dir);
+        net.springCoordinateIndexB(3 * spIdx + dir) =
+          static_cast<int>(3 * link2 + dir);
+      }
+      net.springBoxOffset.segment<3>(3 * spIdx) =
+        this->box.getOffset(net.coordinates.segment<3>(3 * link2) -
+                            net.coordinates.segment<3>(3 * link1));
+    }
+  }
+
+  assert(nextSpringIdx == nrOfTotalSprings);
+  return net;
+}
+
 pylimer_tools::sim::mehp::MEHPForceBalance
 MCUniverseGenerator::getForceBalance() const
 {
@@ -1518,23 +1905,90 @@ MCUniverseGenerator::getForceBalance() const
     Eigen::VectorXd::Ones(net.nrOfSprings);
   pylimer_tools::sim::mehp::MEHPForceBalance balance =
     pylimer_tools::sim::mehp::MEHPForceBalance(net, springPartitions);
+  balance.configMeanBondLength(this->beadDistance);
   assert(balance.validateNetwork());
   return balance;
+}
+
+pylimer_tools::sim::mehp::MEHPForceBalance
+MCUniverseGenerator::getForceBalance(
+  const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
+    entanglements) const
+{
+  pylimer_tools::sim::mehp::MEHPForceBalance balance = this->getForceBalance();
+  balance.addSlipLinks(entanglements);
+  assert(balance.validateNetwork());
+  return balance;
+}
+
+pylimer_tools::sim::mehp::MEHPForceBalance
+MCUniverseGenerator::getForceBalance(const size_t nrOfEntanglementsToSample,
+                                     const double upperCutoff,
+                                     const double lowerCutoff,
+                                     const size_t minimumNrOfEntanglements,
+                                     const double sameStrandCutoff,
+                                     const std::string& seed,
+                                     const bool filterDanglingAndSoluble) const
+{
+  const auto entanglements =
+    this->sampleEntanglements(nrOfEntanglementsToSample,
+                              upperCutoff,
+                              lowerCutoff,
+                              minimumNrOfEntanglements,
+                              sameStrandCutoff,
+                              seed,
+                              filterDanglingAndSoluble);
+  return this->getForceBalance(entanglements);
 }
 
 pylimer_tools::sim::mehp::MEHPForceBalance2
 MCUniverseGenerator::getForceBalance2() const
 {
-  const pylimer_tools::sim::mehp::ForceBalanceNetwork net =
-    this->convertToForceBalanceNetwork();
+  return this->getForceBalance2(
+    pylimer_tools::topo::entanglement_detection::StrandPairEntanglements(),
+    2,
+    false);
+}
 
-  const Eigen::VectorXd springPartitions =
-    Eigen::VectorXd::Ones(net.nrOfSprings);
+pylimer_tools::sim::mehp::MEHPForceBalance2
+MCUniverseGenerator::getForceBalance2(
+  const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
+    entanglements,
+  const int crossLinkerType,
+  const bool entanglementsAsSprings) const
+{
+  const pylimer_tools::sim::mehp::ForceBalance2Network net =
+    this->convertToForceBalance2Network(
+      entanglements, crossLinkerType, entanglementsAsSprings);
   pylimer_tools::sim::mehp::MEHPForceBalance2 balance =
-    pylimer_tools::sim::mehp::MEHPForceBalance2(net, springPartitions);
+    pylimer_tools::sim::mehp::MEHPForceBalance2(net);
+  balance.configMeanBondLength(this->beadDistance);
   balance.configAssumeNetworkIsComplete(true);
   assert(balance.validateNetwork());
   return balance;
+}
+
+pylimer_tools::sim::mehp::MEHPForceBalance2
+MCUniverseGenerator::getForceBalance2(const size_t nrOfEntanglementsToSample,
+                                      const double upperCutoff,
+                                      const double lowerCutoff,
+                                      const size_t minimumNrOfEntanglements,
+                                      const double sameStrandCutoff,
+                                      const std::string& seed,
+                                      const bool filterDanglingAndSoluble,
+                                      const bool entanglementsAsSprings,
+                                      const int crossLinkerType) const
+{
+  const auto entanglements =
+    this->sampleEntanglements(nrOfEntanglementsToSample,
+                              upperCutoff,
+                              lowerCutoff,
+                              minimumNrOfEntanglements,
+                              sameStrandCutoff,
+                              seed,
+                              filterDanglingAndSoluble);
+  return this->getForceBalance2(
+    entanglements, crossLinkerType, entanglementsAsSprings);
 }
 
 void

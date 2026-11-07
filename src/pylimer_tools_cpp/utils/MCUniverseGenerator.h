@@ -8,6 +8,7 @@
 #include "../sim/MEHPForceBalance2.h"
 #include "../sim/MEHPForceRelaxation.h"
 #include "../sim/MEHPUtilityStructures.h"
+#include "../topo/EntanglementDetector.h"
 #include "../utils/BoolUtils.h"
 #include "RandomWalker.h"
 #include "StringUtils.h"
@@ -47,41 +48,7 @@ enum BackTrackStatus
   TRACK_BACKWARD,
 };
 
-struct CrosslinkerUniverse
-{
-  std::vector<int> xlinkTypes;
-  std::vector<double> xlinkX;
-  std::vector<double> xlinkY;
-  std::vector<double> xlinkZ;
-  std::vector<std::vector<long int>> strandsOfXlink;
-  std::vector<int> xlinkChainId;
-
-  std::vector<long int> strandFrom;
-  std::vector<long int> strandTo;
-  std::vector<int> beadsInStrand;
-  std::vector<int> strandBeadType;
-  std::vector<double> beadDistanceInStrand;
-  std::vector<double> meanSquaredBeadDistanceInStrand;
-
-#ifdef CEREALIZABLE
-  template<class Archive>
-  void serialize(Archive& ar)
-  {
-    ar(xlinkTypes,
-       xlinkX,
-       xlinkY,
-       xlinkZ,
-       strandsOfXlink,
-       xlinkChainId,
-       strandFrom,
-       strandTo,
-       beadsInStrand,
-       strandBeadType,
-       beadDistanceInStrand,
-       meanSquaredBeadDistanceInStrand);
-  }
-#endif
-};
+using CrosslinkerUniverse = pylimer_tools::sim::mehp::CrosslinkerUniverse;
 
 class MaxDistanceProvider
 {
@@ -499,6 +466,47 @@ public:
   void removeSolubleFraction(bool rescale = true);
 
   /**
+   * @brief Get the internal CrosslinkerUniverse representation without
+   * sampling bead coordinates or constructing a Universe.
+   *
+   * @return const CrosslinkerUniverse&
+   */
+  const CrosslinkerUniverse& getCrosslinkerUniverse() const
+  {
+    return this->simplifiedUniverse;
+  }
+
+  /**
+   * @brief Get the simulation box.
+   *
+   * @return const pylimer_tools::entities::Box&
+   */
+  const pylimer_tools::entities::Box& getBox() const { return this->box; }
+
+  /**
+   * @brief Analytically and probabilistically sample entanglements directly on
+   * the internal CrosslinkerUniverse without constructing a Universe.
+   *
+   * @param nrOfEntanglementsToSample
+   * @param upperCutoff
+   * @param lowerCutoff
+   * @param minimumNrOfEntanglements
+   * @param sameStrandCutoff
+   * @param seed
+   * @param filterDanglingAndSoluble
+   * @return
+   * pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+   */
+  pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+  sampleEntanglements(size_t nrOfEntanglementsToSample,
+                      double upperCutoff,
+                      double lowerCutoff = 0.,
+                      size_t minimumNrOfEntanglements = 0,
+                      double sameStrandCutoff = 3.,
+                      const std::string& seed = "",
+                      bool filterDanglingAndSoluble = true) const;
+
+  /**
    * @brief Convert the current simplified universe into a force relaxation
    * network
    *
@@ -517,9 +525,65 @@ public:
   pylimer_tools::sim::mehp::ForceBalanceNetwork convertToForceBalanceNetwork()
     const;
 
+  /**
+   * @brief Convert the current simplified universe and sampled entanglements to
+   * a useable structure for MEHPForceBalance without constructing a Universe
+   *
+   * @param entanglements
+   * @return pylimer_tools::sim::mehp::ForceBalanceNetwork
+   */
+  pylimer_tools::sim::mehp::ForceBalanceNetwork convertToForceBalanceNetwork(
+    const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
+      entanglements) const;
+
+  /**
+   * @brief Convert the current simplified universe and sampled entanglements to
+   * a useable structure for MEHPForceBalance2 without constructing a Universe
+   *
+   * @param entanglements
+   * @param crossLinkerType
+   * @param entanglementsAsSprings
+   * @return pylimer_tools::sim::mehp::ForceBalance2Network
+   */
+  pylimer_tools::sim::mehp::ForceBalance2Network convertToForceBalance2Network(
+    const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
+      entanglements = {},
+    int crossLinkerType = 2,
+    bool entanglementsAsSprings = false) const;
+
   pylimer_tools::sim::mehp::MEHPForceBalance getForceBalance() const;
 
+  pylimer_tools::sim::mehp::MEHPForceBalance getForceBalance(
+    const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
+      entanglements) const;
+
+  pylimer_tools::sim::mehp::MEHPForceBalance getForceBalance(
+    size_t nrOfEntanglementsToSample,
+    double upperCutoff,
+    double lowerCutoff = 0.,
+    size_t minimumNrOfEntanglements = 0,
+    double sameStrandCutoff = 3.,
+    const std::string& seed = "",
+    bool filterDanglingAndSoluble = true) const;
+
   pylimer_tools::sim::mehp::MEHPForceBalance2 getForceBalance2() const;
+
+  pylimer_tools::sim::mehp::MEHPForceBalance2 getForceBalance2(
+    const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
+      entanglements,
+    int crossLinkerType = 2,
+    bool entanglementsAsSprings = false) const;
+
+  pylimer_tools::sim::mehp::MEHPForceBalance2 getForceBalance2(
+    size_t nrOfEntanglementsToSample,
+    double upperCutoff,
+    double lowerCutoff = 0.,
+    size_t minimumNrOfEntanglements = 0,
+    double sameStrandCutoff = 3.,
+    const std::string& seed = "",
+    bool filterDanglingAndSoluble = true,
+    bool entanglementsAsSprings = false,
+    int crossLinkerType = 2) const;
 
   /**
    * @brief Run force relaxation to improve the statistics of the crosslinked

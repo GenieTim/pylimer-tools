@@ -1338,6 +1338,14 @@ A strand is a chain of connected links between two crosslinks.
           Caution: ignores atom masses.
      )pbdoc",
          py::arg("tolerance") = 1e-3)
+    .def("get_active_weight_fraction",
+         &mehp::MEHPForceBalance::getActiveWeightFraction,
+         R"pbdoc(
+          Compute the weight fraction of active strands
+
+          Caution: ignores atom masses.
+     )pbdoc",
+         py::arg("tolerance") = 1e-3)
     .def("add_sliplinks",
          py::overload_cast<const std::vector<size_t>&,
                            const std::vector<size_t>&,
@@ -2015,6 +2023,14 @@ A strand is a chain of connected links between two crosslinks.
          &mehp::MEHPForceBalance2::getDanglingWeightFraction,
          R"pbdoc(
            Compute the weight fraction of non-active springs
+
+           Caution: ignores atom masses.
+      )pbdoc",
+         py::arg("tolerance") = 1e-3)
+    .def("get_active_weight_fraction",
+         &mehp::MEHPForceBalance2::getActiveWeightFraction,
+         R"pbdoc(
+           Compute the weight fraction of active springs
 
            Caution: ignores atom masses.
       )pbdoc",

@@ -651,11 +651,93 @@ MEHPForceBalance2::MEHPForceBalance2(
     net2.oldAtomTypes[i] = this->crossLinkerType;
   }
 
-  this->configAssumeNetworkIsComplete(net1.assumeComplete);
   this->initialConfig = net2;
   this->box = pylimer_tools::entities::Box(net1.L[0], net1.L[1], net1.L[2]);
   this->extractUniverseMetadata(universe);
+  this->configAssumeNetworkIsComplete(net1.assumeComplete);
   this->completeInitialization();
+}
+
+void
+MEHPForceBalance2::extractNetworkMetadata(const ForceBalance2Network& net)
+{
+  const double inferredAtoms = std::round(this->inferNrOfAtomsFromNetwork(net));
+  this->universeNrOfAtoms = static_cast<size_t>(std::max(0.0, inferredAtoms));
+  this->clusterSizes.clear();
+  this->atomIdToClusterIdx.clear();
+
+  if (this->universeNrOfAtoms == 0 || net.nrOfLinks == 0) {
+    return;
+  }
+
+  std::vector<bool> linkVisited(net.nrOfLinks, false);
+  std::vector<bool> strandVisited(net.nrOfStrands, false);
+  std::vector<size_t> queue;
+  queue.reserve(net.nrOfLinks);
+
+  for (size_t startLink = 0; startLink < net.nrOfLinks; ++startLink) {
+    if (linkVisited[startLink] || net.linkIsEntanglement[startLink]) {
+      continue;
+    }
+
+    const size_t clusterIdx = this->clusterSizes.size();
+    double clusterAtomCount = 0.0;
+    queue.clear();
+    linkVisited[startLink] = true;
+    queue.push_back(startLink);
+
+    size_t qHead = 0;
+    while (qHead < queue.size()) {
+      const size_t currLink = queue[qHead++];
+      if (!net.linkIsEntanglement[currLink]) {
+        clusterAtomCount += 1.0;
+        if (currLink < static_cast<size_t>(net.oldAtomIds.size()) &&
+            net.oldAtomIds[currLink] >= 0) {
+          this->atomIdToClusterIdx[net.oldAtomIds[currLink]] = clusterIdx;
+        }
+      }
+
+      for (const size_t strandIdx : net.strandIndicesOfLink[currLink]) {
+        if (strandIdx >= net.nrOfStrands || strandVisited[strandIdx]) {
+          continue;
+        }
+        const auto& springs = net.springIndicesOfStrand[strandIdx];
+        if (springs.empty()) {
+          continue;
+        }
+        if (springs.size() == 1 && net.springIsEntanglement[springs[0]]) {
+          // Do not merge covalent clusters across entanglement springs,
+          // matching igraph_connected_components on Universe::getGraph()
+          continue;
+        }
+        strandVisited[strandIdx] = true;
+        double strandBonds = 0.0;
+        for (const size_t spIdx : springs) {
+          strandBonds += net.springContourLength[spIdx];
+        }
+        clusterAtomCount += (strandBonds - 1.0);
+
+        const auto& strandLinks = net.linkIndicesOfStrand[strandIdx];
+        if (!strandLinks.empty()) {
+          const size_t endA = strandLinks.front();
+          const size_t endB = strandLinks.back();
+          if (endA < net.nrOfLinks && !linkVisited[endA] &&
+              !net.linkIsEntanglement[endA]) {
+            linkVisited[endA] = true;
+            queue.push_back(endA);
+          }
+          if (endB < net.nrOfLinks && !linkVisited[endB] &&
+              !net.linkIsEntanglement[endB]) {
+            linkVisited[endB] = true;
+            queue.push_back(endB);
+          }
+        }
+      }
+    }
+
+    this->clusterSizes.push_back(
+      static_cast<size_t>(std::max(0.0, std::round(clusterAtomCount))));
+  }
 }
 
 void
@@ -3519,11 +3601,12 @@ MEHPForceBalance2::countActiveClusteredAtoms(ForceBalance2Network& net,
     double nActiveEntanglementLinks = (clusteredToActiveLinks.cast<double>() *
                                        net.linkIsEntanglement.cast<double>())
                                         .sum();
-    // since the entanglement links come from two atoms,
-    // we have to count them twice
+    // since the entanglement links come from two atoms (unless modeled as
+    // entanglement springs), we have to count them twice
     // TODO: currently, the weight of the atoms is ignored
     return nAtomsInActiveStrands + nActiveCrossLinks +
-           2 * nActiveEntanglementLinks;
+           (net.springIsEntanglement.any() ? 1. : 2.) *
+             nActiveEntanglementLinks;
   }
 
   RUNTIME_EXP_IFN(this->universeNrOfAtoms >= net.nrOfLinks,

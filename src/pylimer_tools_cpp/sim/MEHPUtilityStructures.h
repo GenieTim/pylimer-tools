@@ -140,6 +140,42 @@ typedef std::vector<std::vector<size_t>> ArrayXArrayXi;
 typedef std::vector<std::set<size_t>> ArrayXArrayXiUnique;
 typedef std::vector<std::vector<double>> ArrayXArrayXd;
 
+struct CrosslinkerUniverse
+{
+  std::vector<int> xlinkTypes;
+  std::vector<double> xlinkX;
+  std::vector<double> xlinkY;
+  std::vector<double> xlinkZ;
+  std::vector<std::vector<long int>> strandsOfXlink;
+  std::vector<int> xlinkChainId;
+
+  std::vector<long int> strandFrom;
+  std::vector<long int> strandTo;
+  std::vector<int> beadsInStrand;
+  std::vector<int> strandBeadType;
+  std::vector<double> beadDistanceInStrand;
+  std::vector<double> meanSquaredBeadDistanceInStrand;
+
+#ifdef CEREALIZABLE
+  template<class Archive>
+  void serialize(Archive& ar)
+  {
+    ar(xlinkTypes,
+       xlinkX,
+       xlinkY,
+       xlinkZ,
+       strandsOfXlink,
+       xlinkChainId,
+       strandFrom,
+       strandTo,
+       beadsInStrand,
+       strandBeadType,
+       beadDistanceInStrand,
+       meanSquaredBeadDistanceInStrand);
+  }
+#endif
+};
+
 // improved structures using Eigen
 struct Network
 {

@@ -42,6 +42,7 @@ private:
   std::unordered_map<long int, size_t> atomIdToClusterIdx;
 
   void extractUniverseMetadata(const pylimer_tools::entities::Universe& u);
+  void extractNetworkMetadata(const ForceBalance2Network& net);
   // state
   ExitReason exitReason = ExitReason::UNSET;
   bool simulationHasRun = false;
@@ -620,6 +621,9 @@ public:
   void configAssumeNetworkIsComplete(const bool assumeNetworkIsComplete = false)
   {
     this->assumeNetworkIsComplete = assumeNetworkIsComplete;
+    if (assumeNetworkIsComplete && this->universeNrOfAtoms == 0) {
+      this->extractNetworkMetadata(this->initialConfig);
+    }
   }
 
   /**
@@ -776,7 +780,8 @@ public:
            static_cast<double>(net.nrOfSprings) +
            static_cast<double>(
              2 * net.nrOfLinks - net.nrOfNodes // count entanglement links twice
-           );
+             ) -
+           static_cast<double>(2 * net.springIsEntanglement.count());
   }
 
   double inferNrOfAtomsFromNetwork() const

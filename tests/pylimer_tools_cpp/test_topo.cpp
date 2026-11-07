@@ -76,6 +76,172 @@ TEST_CASE("Entanglement Detector throws", "[analysis][EntanglementDetector]")
 {
   pe::Universe universe = pe::Universe(15.0, 15.0, 15.0);
   CHECK_THROWS(pt::randomlyFindEntanglements(universe, 10, 1., 2.));
+
+  pylimer_tools::sim::mehp::CrosslinkerUniverse crosslinkerUniverse;
+  pe::Box box(15.0, 15.0, 15.0);
+  CHECK_THROWS(pt::randomlyFindEntanglementsAnalytical(
+    box, crosslinkerUniverse, 10, 1.0, 2.0));
+  CHECK_THROWS(pt::randomlyFindEntanglementsAnalytical(
+    box, crosslinkerUniverse, 5, 2.0, 0.0, 10));
+}
+
+TEST_CASE("Analytical Entanglement Detector samples valid entanglements on "
+          "CrosslinkerUniverse",
+          "[analysis][EntanglementDetector][analytical]")
+{
+  pe::Box box(20.0, 20.0, 20.0);
+  pylimer_tools::sim::mehp::CrosslinkerUniverse cu;
+
+  // Create 8 crosslinkers in a cube and connect them with active strands,
+  // plus some dangling and soluble strands to test topological leaf peeling
+  cu.xlinkTypes = {
+    2, 2, 2, 2, 2, 2, 2, 2, 2
+  }; // 8 active + 1 leaf crosslinker
+  cu.xlinkX = { 5., 15., 5., 15., 5., 15., 5., 15., 10. };
+  cu.xlinkY = { 5., 5., 15., 15., 5., 5., 15., 15., 10. };
+  cu.xlinkZ = { 5., 5., 5., 5., 15., 15., 15., 15., 10. };
+  cu.xlinkChainId = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+  cu.strandsOfXlink.resize(9);
+
+  auto addStrand = [&](long int from, long int to, int nBeads) {
+    size_t sIdx = cu.strandFrom.size();
+    cu.strandFrom.push_back(from);
+    cu.strandTo.push_back(to);
+    cu.beadsInStrand.push_back(nBeads);
+    cu.strandBeadType.push_back(1);
+    cu.beadDistanceInStrand.push_back(0.96);
+    cu.meanSquaredBeadDistanceInStrand.push_back(1.0);
+    if (from >= 0) {
+      cu.strandsOfXlink[from].push_back(sIdx);
+    }
+    if (to >= 0 && to != from) {
+      cu.strandsOfXlink[to].push_back(sIdx);
+    }
+  };
+
+  // 12 edges of the cube (each crosslinker 0..7 has degree 3 -> active!)
+  addStrand(0, 1, 25);
+  addStrand(2, 3, 25);
+  addStrand(4, 5, 25);
+  addStrand(6, 7, 25);
+  addStrand(0, 2, 25);
+  addStrand(1, 3, 25);
+  addStrand(4, 6, 25);
+  addStrand(5, 7, 25);
+  addStrand(0, 4, 25);
+  addStrand(1, 5, 25);
+  addStrand(2, 6, 25);
+  addStrand(3, 7, 25);
+
+  // Strand 12: bridge to leaf crosslinker 8 (degree 1 -> peeled away by leaf
+  // peeling!)
+  addStrand(0, 8, 25);
+  // Strand 13: dangling strand attached to crosslinker 1
+  addStrand(1, -1, 25);
+  // Strand 14: free soluble strand
+  addStrand(-1, -1, 25);
+
+  SECTION("Respects topological filtering, cutoffs, and determinism")
+  {
+    const double lowerCutoff = 0.5;
+    const double upperCutoff = 2.5;
+    const double sameStrandCutoff = 4.0;
+
+    pt::StrandPairEntanglements es1 =
+      pt::randomlyFindEntanglementsAnalytical(box,
+                                              cu,
+                                              40,
+                                              upperCutoff,
+                                              lowerCutoff,
+                                              10,
+                                              sameStrandCutoff,
+                                              "analytical_seed_42",
+                                              true);
+    pt::StrandPairEntanglements es2 =
+      pt::randomlyFindEntanglementsAnalytical(box,
+                                              cu,
+                                              40,
+                                              upperCutoff,
+                                              lowerCutoff,
+                                              10,
+                                              sameStrandCutoff,
+                                              "analytical_seed_42",
+                                              true);
+
+    REQUIRE(es1.size() >= 10);
+    CHECK(es1.size() <= 40);
+    // Determinism check
+    REQUIRE(es1.size() == es2.size());
+    CHECK(es1.strandIdx1 == es2.strandIdx1);
+    CHECK(es1.strandIdx2 == es2.strandIdx2);
+    CHECK(es1.beadIdx1 == es2.beadIdx1);
+    CHECK(es1.beadIdx2 == es2.beadIdx2);
+    CHECK(es1.x.isApprox(es2.x));
+    CHECK(es1.y.isApprox(es2.y));
+    CHECK(es1.z.isApprox(es2.z));
+
+    for (size_t e = 0; e < es1.size(); ++e) {
+      // Strands 12, 13, 14 are topologically inactive and must be filtered out
+      CHECK(es1.strandIdx1[e] < 12);
+      CHECK(es1.strandIdx2[e] < 12);
+      CHECK(es1.alpha1[e] > 0.0);
+      CHECK(es1.alpha1[e] < 1.0);
+      CHECK(es1.alpha2[e] > 0.0);
+      CHECK(es1.alpha2[e] < 1.0);
+      if (es1.strandIdx1[e] == es1.strandIdx2[e]) {
+        const double contourDiff =
+          std::abs(static_cast<double>(es1.beadIdx1[e]) -
+                   static_cast<double>(es1.beadIdx2[e]));
+        CHECK(contourDiff >= sameStrandCutoff);
+      }
+
+      Eigen::Vector3d p1 = es1.position1.segment<3>(3 * e);
+      Eigen::Vector3d p2 = es1.position2.segment<3>(3 * e);
+      Eigen::Vector3d diff = p2 - p1;
+      box.handlePBC(diff);
+      CHECK(diff.norm() >= lowerCutoff - 1e-9);
+      CHECK(diff.norm() <= upperCutoff + 1e-9);
+    }
+
+    // Conversion to AtomPairEntanglements
+    pt::AtomPairEntanglements atomPairs = es1.toAtomPairEntanglements(cu);
+    CHECK(atomPairs.pairsOfAtoms.size() == es1.size());
+    for (const auto& pair : atomPairs.pairsOfAtoms) {
+      CHECK(pair.first != pair.second);
+      CHECK(atomPairs.pairOfAtom[pair.first - 1] >= 0);
+      CHECK(atomPairs.pairOfAtom[pair.second - 1] >= 0);
+      CHECK(atomPairs.pairOfAtom[pair.first - 1] ==
+            atomPairs.pairOfAtom[pair.second - 1]);
+    }
+  }
+
+  SECTION(
+    "Purely soluble/dangling network yields 0 entanglements when filtered")
+  {
+    pylimer_tools::sim::mehp::CrosslinkerUniverse solubleCu;
+    solubleCu.xlinkTypes = { 2, 2 };
+    solubleCu.xlinkX = { 5., 7. };
+    solubleCu.xlinkY = { 5., 7. };
+    solubleCu.xlinkZ = { 5., 7. };
+    solubleCu.xlinkChainId = { -1, -1 };
+    solubleCu.strandsOfXlink = { { 0, 1 }, { 0 } };
+    solubleCu.strandFrom = { 0, 0, -1 };
+    solubleCu.strandTo = { 1, -1, -1 };
+    solubleCu.beadsInStrand = { 20, 20, 20 };
+    solubleCu.strandBeadType = { 1, 1, 1 };
+    solubleCu.beadDistanceInStrand = { 1., 1., 1. };
+    solubleCu.meanSquaredBeadDistanceInStrand = { 1., 1., 1. };
+
+    pt::StrandPairEntanglements filtered =
+      pt::randomlyFindEntanglementsAnalytical(
+        box, solubleCu, 15, 4.0, 0.0, 0, 2.0, "seed_sol", true);
+    CHECK(filtered.size() == 0);
+
+    pt::StrandPairEntanglements unfiltered =
+      pt::randomlyFindEntanglementsAnalytical(
+        box, solubleCu, 15, 4.0, 0.0, 5, 2.0, "seed_sol", false);
+    CHECK(unfiltered.size() >= 5);
+  }
 }
 
 TEST_CASE("Entanglement Detector respects distance cut-off",

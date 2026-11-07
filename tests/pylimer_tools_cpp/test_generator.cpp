@@ -1851,6 +1851,128 @@ TEST_CASE("linkStrandsToStrandsToConversion also works with free strands",
   CHECK_NOTHROW(generator.linkStrandsToStrandsToConversion(0.9));
 }
 
+TEST_CASE(
+  "MCUniverseGenerator analytical entanglements bypass Universe to "
+  "MEHPForceBalance and MEHPForceBalance2",
+  "[generator][MCUniverseGenerator][EntanglementDetector][MEHPForceBalance2]")
+{
+  pu::MCUniverseGenerator generator(25.0, 25.0, 25.0);
+  generator.setSeed(424242);
+  generator.setMeanSquaredBeadDistance(1.0);
+  generator.configNrOfMCSteps(0);
+
+  generator.addCrosslinkers(80, 4, 2, true);
+  generator.addStrands(150, pu::initializeWithValue(150, 30), 1);
+  generator.addMonofunctionalStrands(15, pu::initializeWithValue(15, 20), 4);
+  generator.addStrands(
+    10, pu::initializeWithValue(10, 25), 3); // stays partially free
+  generator.linkStrandsToConversion(0.88);
+
+  const size_t expectedAtoms = generator.getCurrentNrOfAtoms();
+
+  auto entanglements =
+    generator.sampleEntanglements(60, 2.5, 0.2, 20, 3.0, "ent_seed_123", true);
+  REQUIRE(entanglements.size() >= 20);
+  CHECK(entanglements.size() <= 60);
+
+  SECTION("MEHPForceBalance (v1) direct from generator with entanglements")
+  {
+    auto fb = generator.getForceBalance(entanglements);
+    CHECK(fb.validateNetwork());
+    CHECK(fb.getNrOfSprings() == 150 + 15 + 10);
+    CHECK(fb.getNrOfPartialSprings() ==
+          fb.getNrOfSprings() + 2 * entanglements.size());
+
+    fb.runForceRelaxation(5000, 1e-9);
+    CHECK(fb.validateNetwork());
+    CHECK(fb.getGammaFactor(1.0) > 0.0);
+    CHECK(fb.getActiveWeightFraction() > 0.0);
+    CHECK(fb.getSolubleWeightFraction() > 0.0);
+  }
+
+  SECTION("MEHPForceBalance::randomlyAddSliplinks without Universe")
+  {
+    auto fb = generator.getForceBalance();
+    const size_t added = fb.randomlyAddSliplinks(30, 2.5, 0.0, 10, 42);
+    CHECK(added >= 10);
+    CHECK(fb.validateNetwork());
+  }
+
+  SECTION("MEHPForceBalance2 with entanglements as merged links (no Universe)")
+  {
+    auto fb2 = generator.getForceBalance2(entanglements, 2, false);
+    CHECK_NOTHROW(fb2.validateNetwork());
+    CHECK(fb2.inferNrOfAtomsFromNetwork() == expectedAtoms);
+    CHECK(fb2.getNumExtraAtoms() == entanglements.size());
+    CHECK(fb2.getNumExtraBonds() == 0);
+
+    // Compare weight fractions and gamma with Universe-constructed
+    // MEHPForceBalance2
+    auto atomPairs =
+      entanglements.toAtomPairEntanglements(generator.getCrosslinkerUniverse());
+    pe::Universe universe = generator.getUniverse();
+    CHECK(universe.getNrOfAtoms() == expectedAtoms);
+
+    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2Univ(
+      universe, atomPairs, 2, false, false);
+    CHECK_NOTHROW(fb2Univ.validateNetwork());
+
+    // Run both with INACTIVE_THEN_X2F simplification
+    fb2.runForceRelaxation(
+      pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F,
+      1e-7);
+    fb2Univ.runForceRelaxation(
+      pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F,
+      1e-7);
+
+    CHECK_NOTHROW(fb2.validateNetwork());
+    CHECK_THAT(
+      fb2.getSolubleWeightFraction(),
+      Catch::Matchers::WithinAbs(fb2Univ.getSolubleWeightFraction(), 1e-6));
+    CHECK_THAT(
+      fb2.getActiveWeightFraction(),
+      Catch::Matchers::WithinAbs(fb2Univ.getActiveWeightFraction(), 1e-6));
+    CHECK_THAT(
+      fb2.getDanglingWeightFraction(),
+      Catch::Matchers::WithinAbs(fb2Univ.getDanglingWeightFraction(), 1e-6));
+    CHECK_THAT(fb2.getGammaFactor(1.0),
+               Catch::Matchers::WithinRel(fb2Univ.getGammaFactor(1.0), 0.1));
+  }
+
+  SECTION("MEHPForceBalance2 with entanglements as springs (no Universe)")
+  {
+    auto fb2Springs = generator.getForceBalance2(entanglements, 2, true);
+    CHECK_NOTHROW(fb2Springs.validateNetwork());
+    CHECK(fb2Springs.inferNrOfAtomsFromNetwork() == expectedAtoms);
+    CHECK(fb2Springs.getNumExtraAtoms() == 2 * entanglements.size());
+    CHECK(fb2Springs.getNumExtraBonds() == entanglements.size());
+
+    auto atomPairs =
+      entanglements.toAtomPairEntanglements(generator.getCrosslinkerUniverse());
+    pe::Universe universe = generator.getUniverse();
+    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2UnivSprings(
+      universe, atomPairs, 2, false, true);
+
+    fb2Springs.runForceRelaxation(
+      pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F,
+      1e-7);
+    fb2UnivSprings.runForceRelaxation(
+      pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F,
+      1e-7);
+
+    CHECK_NOTHROW(fb2Springs.validateNetwork());
+    CHECK_THAT(fb2Springs.getSolubleWeightFraction(),
+               Catch::Matchers::WithinAbs(
+                 fb2UnivSprings.getSolubleWeightFraction(), 1e-6));
+    CHECK_THAT(fb2Springs.getActiveWeightFraction(),
+               Catch::Matchers::WithinAbs(
+                 fb2UnivSprings.getActiveWeightFraction(), 1e-6));
+    CHECK_THAT(fb2Springs.getDanglingWeightFraction(),
+               Catch::Matchers::WithinAbs(
+                 fb2UnivSprings.getDanglingWeightFraction(), 1e-6));
+  }
+}
+
 #ifdef CEREALIZABLE
 TEST_CASE(
   "MaxDistanceProvider implementations can be serialized and deserialized",

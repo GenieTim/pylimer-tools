@@ -1114,7 +1114,7 @@ public:
     // normalize by the number of atoms
     const double nActiveNodes = this->getNrOfActiveNodes(tolerance);
     return (allActiveAtomsPerChains.matrix().sum() + nActiveNodes) /
-           (static_cast<double>(this->universe.getNrOfAtoms()));
+           this->getTotalNrOfAtoms(net);
   }
 
   /**
@@ -1190,6 +1190,17 @@ public:
       return 0.;
     }
 
+    if (this->universe.getNrOfAtoms() == 0) {
+      const auto [springIsActive, linkIsActive] =
+        this->findClusteredToActive(net, u, springPartitions, tolerance);
+      const Eigen::ArrayXd clusteredAtomsPerSpring =
+        springIsActive.cast<double>() *
+        (net->springsContourLength.array() -
+         Eigen::ArrayXd::Ones(net->nrOfSprings));
+      return clusteredAtomsPerSpring.sum() +
+             static_cast<double>(linkIsActive.count());
+    }
+
     const std::vector<pylimer_tools::entities::Universe> clusters =
       this->universe.getClusters();
     std::vector<long int> atomIdxToClusterIdx(this->universe.getNrOfAtoms());
@@ -1246,8 +1257,25 @@ public:
       this->countActiveClusteredAtoms(net, u, springPartitions, tolerance);
     // finally, normalize by the number of atoms.
     // NOTE: currently, the weight of the atoms is ignored
-    return 1. - (nActiveClusteredAtoms /
-                 (static_cast<double>(this->universe.getNrOfAtoms())));
+    return 1. - (nActiveClusteredAtoms / this->getTotalNrOfAtoms(net));
+  }
+
+  /**
+   * @brief Get the total number of atoms, either from the universe, or, if
+   * no universe is available, inferred from the network's springs and nodes.
+   *
+   * @param net
+   * @return double
+   */
+  double getTotalNrOfAtoms(const ForceBalanceNetwork* net) const
+  {
+    if (this->universe.getNrOfAtoms() > 0) {
+      return static_cast<double>(this->universe.getNrOfAtoms());
+    }
+    // each spring has (contour length - 1) atoms in between its two nodes
+    return net->springsContourLength.sum() -
+           static_cast<double>(net->nrOfSprings) +
+           static_cast<double>(net->nrOfNodes);
   }
 
   /**
@@ -1437,6 +1465,35 @@ public:
   int getNrOfIterations() const { return this->nrOfStepsDone; }
 
   ExitReason getExitReason() const { return this->exitReason; }
+
+  /**
+   * @brief Add slip-links from (e.g., analytically) sampled strand pair
+   * entanglements
+   *
+   * @param entanglements the strand pairs, contour fractions and positions
+   */
+  void addSlipLinks(
+    const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
+      entanglements)
+  {
+    if (entanglements.size() == 0) {
+      return;
+    }
+    const std::vector<double> xs(
+      entanglements.x.data(), entanglements.x.data() + entanglements.x.size());
+    const std::vector<double> ys(
+      entanglements.y.data(), entanglements.y.data() + entanglements.y.size());
+    const std::vector<double> zs(
+      entanglements.z.data(), entanglements.z.data() + entanglements.z.size());
+    this->addSlipLinks(entanglements.strandIdx1,
+                       entanglements.strandIdx2,
+                       xs,
+                       ys,
+                       zs,
+                       entanglements.alpha1,
+                       entanglements.alpha2,
+                       false);
+  }
 
   void addSlipLinks(const std::vector<size_t>& strandIdx1,
                     const std::vector<size_t>& strandIdx2,
