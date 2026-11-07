@@ -36,6 +36,7 @@ extensions = [
     "sphinx_automodapi.automodapi",
     "sphinx_copybutton",
     "sphinx_gallery.gen_gallery",
+    "sphinx_paramlinks",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.githubpages",

@@ -18,4 +18,4 @@ Entanglements (slip-links) can be sampled in two distinct ways:
 1. **Discrete full-universe sampling**: Directly on explicit bead coordinates in a :class:`~pylimer_tools_cpp.Universe`.
 2. **Analytical Brownian-bridge sampling**: Directly on the crosslinkers and strand connectivity of a :class:`~pylimer_tools_cpp.CrosslinkerUniverse` without instantiating intermediate strand beads, reducing peak memory by up to 90%+ and supporting topological leaf peeling of dangling and soluble fractions.
 
-See :doc:`plot_entanglement_sampling_comparison` for a detailed benchmark and comparison of these methods.
+See :doc:`plot_entanglement_sampling_comparison` for a detailed benchmark and comparison of discrete vs. analytical sampling methods, and :doc:`plot_sliplink_vs_slipspring` for the difference between modeling entanglements as merged slip-links versus compliant Hookean slip-springs.

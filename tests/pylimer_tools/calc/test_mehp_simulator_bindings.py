@@ -240,3 +240,48 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             fb2.get_active_weight_fraction(),
             places=6,
         )
+
+    def test_mehp2_sampling_filtering_and_simplification_modes(self):
+        """Test interaction between sampling-time topological filtering and MEHPForceBalance2 simplification."""
+        gen = MCUniverseGenerator(25.0, 25.0, 25.0)
+        gen.set_seed(42)
+        gen.add_strands(100, [20] * 100)
+        gen.add_crosslinkers(50, 4)
+        gen.link_strands_to_conversion(0.85)
+
+        # 1. Filtered sampling discards dangling/soluble candidate pairs
+        # upfront
+        es_filt = gen.sample_entanglements(
+            30, 2.5, 0.0, 0, 3.0, "seed_f", filter_dangling_and_soluble=True
+        )
+        es_unfilt = gen.sample_entanglements(
+            30, 2.5, 0.0, 0, 3.0, "seed_f", filter_dangling_and_soluble=False
+        )
+        self.assertLessEqual(len(es_filt), len(es_unfilt))
+
+        # 2. Compare MEHPForceBalance2 behavior
+        fb_filt = gen.get_force_balance2(
+            es_filt, crosslinker_type=2, entanglements_as_springs=False
+        )
+        fb_unfilt = gen.get_force_balance2(
+            es_unfilt, crosslinker_type=2, entanglements_as_springs=False
+        )
+
+        # Unfiltered network initially contains more extra atoms/links from
+        # dangling chains
+        self.assertGreater(
+            fb_unfilt.get_nr_of_extra_atoms(), fb_filt.get_nr_of_extra_atoms()
+        )
+
+        # Running simplification prunes inactive dangling elements
+        fb_filt.run_force_relaxation(
+            simplification_mode=StructureSimplificationMode.INACTIVE_THEN_X2F
+        )
+        fb_unfilt.run_force_relaxation(
+            simplification_mode=StructureSimplificationMode.INACTIVE_THEN_X2F
+        )
+
+        self.assertGreater(fb_filt.get_gamma_factor(1.0), 0.0)
+        self.assertGreater(fb_unfilt.get_gamma_factor(1.0), 0.0)
+        self.assertGreater(fb_filt.get_active_weight_fraction(), 0.0)
+        self.assertGreater(fb_unfilt.get_active_weight_fraction(), 0.0)
