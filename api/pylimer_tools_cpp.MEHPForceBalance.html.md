@@ -46,6 +46,7 @@ Instantiate the simulator for a certain universe.
 | [`evaluate_spring_distance`](#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance)(self, network, ...)      | Evaluate the distance vector for a specific spring.                                                                                                                                                                                                                                       |
 | [`evaluate_spring_distance_from`](#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_from)(self, network, ...) | Evaluate the spring distance from a specific link.                                                                                                                                                                                                                                        |
 | [`evaluate_spring_distance_to`](#pylimer_tools_cpp.MEHPForceBalance.evaluate_spring_distance_to)(self, network, ...)   | Evaluate the spring distance to a specific link.                                                                                                                                                                                                                                          |
+| [`get_active_weight_fraction`](#pylimer_tools_cpp.MEHPForceBalance.get_active_weight_fraction)(self[, tolerance])     | Compute the weight fraction of active strands                                                                                                                                                                                                                                             |
 | [`get_average_strand_length`](#pylimer_tools_cpp.MEHPForceBalance.get_average_strand_length)(self)                   | Get the average length of the strands.                                                                                                                                                                                                                                                    |
 | [`get_coordinates`](#pylimer_tools_cpp.MEHPForceBalance.get_coordinates)(self)                             | Get the current coordinates of the crosslinkers and entanglement links.                                                                                                                                                                                                                   |
 | [`get_crosslinker_universe`](#pylimer_tools_cpp.MEHPForceBalance.get_crosslinker_universe)(self)                    | Returns the universe [of crosslinkers] with the positions of the current state of the simulation.                                                                                                                                                                                         |
@@ -223,6 +224,12 @@ Evaluate the spring distance to a specific link.
   * **link_idx** – Index of the target link
 * **Returns:**
   3D distance vector to the specified link
+
+#### get_active_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
+
+Compute the weight fraction of active strands
+
+Caution: ignores atom masses.
 
 #### get_average_strand_length(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 

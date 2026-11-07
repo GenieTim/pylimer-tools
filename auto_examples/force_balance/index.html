@@ -198,7 +198,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -238,6 +238,7 @@
 <li class="toctree-l3"><a class="reference internal" href="plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_fb_deformation_exp.html">Deformation Experiment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -305,6 +306,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">do_random_walk_chain_from_to_mc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -315,6 +317,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.Box.html">Box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.CrosslinkerUniverse.html">CrosslinkerUniverse</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.DPDSimulator.html">DPDSimulator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
@@ -347,6 +350,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
@@ -398,7 +402,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
@@ -413,6 +417,14 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
 <li><p><a class="reference internal" href="../../api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><code class="xref py py-class docutils literal notranslate"><span class="pre">MEHPForceBalance</span></code></a>: A Force Balance implementation, which uses just Hookean springs, but allows the use of slip-links to model entanglements,</p></li>
 <li><p><a class="reference internal" href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><code class="xref py py-class docutils literal notranslate"><span class="pre">MEHPForceBalance2</span></code></a>: The faster implementation of the Force Balance procedure, without allowing for slip-links, but allowing the modelling of entanglements as static links, like tetrafunctional crosslinks.</p></li>
 </ul>
+<section id="sampling-entanglements">
+<h2>Sampling Entanglements<a class="headerlink" href="#sampling-entanglements" title="Link to this heading">¶</a></h2>
+<p>Entanglements (slip-links) can be sampled in two distinct ways:</p>
+<ol class="arabic simple">
+<li><p><strong>Discrete full-universe sampling</strong>: Directly on explicit bead coordinates in a <a class="reference internal" href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><code class="xref py py-class docutils literal notranslate"><span class="pre">Universe</span></code></a>.</p></li>
+<li><p><strong>Analytical Brownian-bridge sampling</strong>: Directly on the crosslinkers and strand connectivity of a <a class="reference internal" href="../../api/pylimer_tools_cpp.CrosslinkerUniverse.html#pylimer_tools_cpp.CrosslinkerUniverse" title="pylimer_tools_cpp.CrosslinkerUniverse"><code class="xref py py-class docutils literal notranslate"><span class="pre">CrosslinkerUniverse</span></code></a> without instantiating intermediate strand beads, reducing peak memory by up to 90%+ and supporting topological leaf peeling of dangling and soluble fractions.</p></li>
+</ol>
+<p>See <a class="reference internal" href="plot_entanglement_sampling_comparison.html"><span class="doc">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</span></a> for a detailed benchmark and comparison of these methods.</p>
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links to model entanglements instead of slip-links. See bernhard_phantom_2025"><img alt="" src="../../_images/sphx_glr_plot_force_balance_2_thumb.png" />
 <p><a class="reference internal" href="plot_force_balance_2.html"><span class="doc">Force Balance 2</span></a></p>
   <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
@@ -428,8 +440,12 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation (see gusev_numerical_2019) without slip-links or entanglements."><img alt="" src="../../_images/sphx_glr_plot_force_relaxation_thumb.png" />
 <p><a class="reference internal" href="plot_force_relaxation.html"><span class="doc">Maximum Entropy Homogenization Procedure (MEHP)</span></a></p>
   <div class="sphx-glr-thumbnail-title">Maximum Entropy Homogenization Procedure (MEHP)</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as slip-links or localized crosslink constraints."><img alt="" src="../../_images/sphx_glr_plot_entanglement_sampling_comparison_thumb.png" />
+<p><a class="reference internal" href="plot_entanglement_sampling_comparison.html"><span class="doc">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</div>
 </div></div><div class="toctree-wrapper compound">
 </div>
+</section>
 </section>
 
         </article>
@@ -475,8 +491,27 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Force Balance, Maximum Entropy Homogenization Procedures</a><ul>
+<li><a class="reference internal" href="#sampling-entanglements">Sampling Entanglements</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

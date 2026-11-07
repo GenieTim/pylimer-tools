@@ -24,6 +24,8 @@ MCUniverseGenerator
       ~MCUniverseGenerator.config_primary_loop_probability
       ~MCUniverseGenerator.config_secondary_loop_probability
       ~MCUniverseGenerator.disable_max_distance
+      ~MCUniverseGenerator.get_box
+      ~MCUniverseGenerator.get_crosslinker_universe
       ~MCUniverseGenerator.get_current_crosslinker_conversion
       ~MCUniverseGenerator.get_current_nr_of_atoms
       ~MCUniverseGenerator.get_current_nr_of_bonds
@@ -45,6 +47,7 @@ MCUniverseGenerator
       ~MCUniverseGenerator.link_strands_to_strands_to_conversion
       ~MCUniverseGenerator.relax_crosslinks
       ~MCUniverseGenerator.remove_soluble_fraction
+      ~MCUniverseGenerator.sample_entanglements
       ~MCUniverseGenerator.set_bead_distance
       ~MCUniverseGenerator.set_mean_squared_bead_distance
       ~MCUniverseGenerator.set_seed
@@ -68,6 +71,8 @@ MCUniverseGenerator
    .. automethod:: config_primary_loop_probability
    .. automethod:: config_secondary_loop_probability
    .. automethod:: disable_max_distance
+   .. automethod:: get_box
+   .. automethod:: get_crosslinker_universe
    .. automethod:: get_current_crosslinker_conversion
    .. automethod:: get_current_nr_of_atoms
    .. automethod:: get_current_nr_of_bonds
@@ -89,6 +94,7 @@ MCUniverseGenerator
    .. automethod:: link_strands_to_strands_to_conversion
    .. automethod:: relax_crosslinks
    .. automethod:: remove_soluble_fraction
+   .. automethod:: sample_entanglements
    .. automethod:: set_bead_distance
    .. automethod:: set_mean_squared_bead_distance
    .. automethod:: set_seed

@@ -30,6 +30,7 @@ MEHPForceBalance
       ~MEHPForceBalance.evaluate_spring_distance
       ~MEHPForceBalance.evaluate_spring_distance_from
       ~MEHPForceBalance.evaluate_spring_distance_to
+      ~MEHPForceBalance.get_active_weight_fraction
       ~MEHPForceBalance.get_average_strand_length
       ~MEHPForceBalance.get_coordinates
       ~MEHPForceBalance.get_crosslinker_universe
@@ -103,6 +104,7 @@ MEHPForceBalance
    .. automethod:: evaluate_spring_distance
    .. automethod:: evaluate_spring_distance_from
    .. automethod:: evaluate_spring_distance_to
+   .. automethod:: get_active_weight_fraction
    .. automethod:: get_average_strand_length
    .. automethod:: get_coordinates
    .. automethod:: get_crosslinker_universe

@@ -24,6 +24,7 @@ Instantiate this Universe (Collection of Molecules) providing the box lengths.
 | [`add_bonds`](#pylimer_tools_cpp.Universe.add_bonds)(\*args, \*\*kwargs)                     | Overloaded function.                                                                                                                                                                                             |
 | [`add_bonds_with_types`](#pylimer_tools_cpp.Universe.add_bonds_with_types)(self, bonds_from, ...)       | Add bonds to the underlying atoms, edges to the underlying graph.                                                                                                                                                |
 | [`add_dihedral_angles`](#pylimer_tools_cpp.Universe.add_dihedral_angles)(self, angles_from, ...)       | Add dihedral angles to the Universe.                                                                                                                                                                             |
+| [`clear_caches`](#pylimer_tools_cpp.Universe.clear_caches)(self)                                | Clear internal caches of decomposed molecules and chains with crosslinkers to reclaim memory.                                                                                                                    |
 | [`compute_angles`](#pylimer_tools_cpp.Universe.compute_angles)(self)                              | Compute the angle of each angle in the molecule, respecting periodic boundaries.                                                                                                                                 |
 | [`compute_bond_lengths`](#pylimer_tools_cpp.Universe.compute_bond_lengths)(self)                        | Compute the length of each bond in the molecule, respecting periodic boundaries.                                                                                                                                 |
 | [`compute_bond_vectors`](#pylimer_tools_cpp.Universe.compute_bond_vectors)(self)                        | Compute the vectors of each bond in the molecule, respecting periodic boundaries.                                                                                                                                |
@@ -176,6 +177,10 @@ just a method to preserve read & write capabilities.
   * **angles_via2** – Vector of atom IDs for second middle points
   * **angles_to** – Vector of atom IDs for dihedral end points
   * **angle_types** – Vector of dihedral angle types
+
+#### clear_caches(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+
+Clear internal caches of decomposed molecules and chains with crosslinkers to reclaim memory.
 
 #### compute_angles(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
 

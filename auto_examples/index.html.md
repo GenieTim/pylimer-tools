@@ -50,6 +50,15 @@ Here, we distinguish the following three different implementations:
 - [`MEHPForceBalance`](../api/pylimer_tools_cpp.MEHPForceBalance.html.md#pylimer_tools_cpp.MEHPForceBalance): A Force Balance implementation, which uses just Hookean springs, but allows the use of slip-links to model entanglements,
 - [`MEHPForceBalance2`](../api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2): The faster implementation of the Force Balance procedure, without allowing for slip-links, but allowing the modelling of entanglements as static links, like tetrafunctional crosslinks.
 
+### Sampling Entanglements
+
+Entanglements (slip-links) can be sampled in two distinct ways:
+
+1. **Discrete full-universe sampling**: Directly on explicit bead coordinates in a [`Universe`](../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe).
+2. **Analytical Brownian-bridge sampling**: Directly on the crosslinkers and strand connectivity of a [`CrosslinkerUniverse`](../api/pylimer_tools_cpp.CrosslinkerUniverse.html.md#pylimer_tools_cpp.CrosslinkerUniverse) without instantiating intermediate strand beads, reducing peak memory by up to 90%+ and supporting topological leaf peeling of dangling and soluble fractions.
+
+See plot_entanglement_sampling_comparison for a detailed benchmark and comparison of these methods.
+
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
 <!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links to model entanglements instead of slip-links. See bernhard_phantom_2025">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_2_thumb.png)
 
@@ -76,6 +85,11 @@ Here, we distinguish the following three different implementations:
 [Maximum Entropy Homogenization Procedure (MEHP)](force_balance/plot_force_relaxation.html.md)
 
   <div class="sphx-glr-thumbnail-title">Maximum Entropy Homogenization Procedure (MEHP)</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as slip-links or localized crosslink constraints.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_sampling_comparison_thumb.png)
+
+[Comparing Slip-Link Sampling Methods: Discrete vs. Analytical](force_balance/plot_entanglement_sampling_comparison.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>
 

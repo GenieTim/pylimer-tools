@@ -73,6 +73,7 @@ Overloaded function.
 
 | [`config_assume_network_is_complete`](#pylimer_tools_cpp.MEHPForceBalance2.config_assume_network_is_complete)(self[, ...])    | Configure whether the network is assumed to be complete.                                                                                           |
 |----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`config_cg_fallback_max_iterations`](#pylimer_tools_cpp.MEHPForceBalance2.config_cg_fallback_max_iterations)(self[, ...])    | Configure the maximum iterations allowed for ConjugateGradient before automatically falling back to BiCGSTAB on ill-conditioned systems.           |
 | [`config_in_place_rebuild_threshold`](#pylimer_tools_cpp.MEHPForceBalance2.config_in_place_rebuild_threshold)(self[, ...])    | Configure threshold fraction of cumulative broken springs to rebuild CSR sparse pattern.                                                           |
 | [`config_mean_bond_length`](#pylimer_tools_cpp.MEHPForceBalance2.config_mean_bond_length)(self[, b])                | Configure the $b$ used e.g. for the topological Gamma-factor.                                                                                      |
 | [`config_spring_breaking_distance`](#pylimer_tools_cpp.MEHPForceBalance2.config_spring_breaking_distance)(self[, ...])      | Configure the "force" (distance over contour length) at which the bonds break.                                                                     |
@@ -82,7 +83,9 @@ Overloaded function.
 | [`evaluate_spring_vector`](#pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector)(self, network, ...)        | Evaluate the distance vector for a specific spring.                                                                                                |
 | [`evaluate_spring_vector_from`](#pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector_from)(self, network, ...)   | Evaluate the spring vector in the direction from a specific link.                                                                                  |
 | [`evaluate_spring_vector_to`](#pylimer_tools_cpp.MEHPForceBalance2.evaluate_spring_vector_to)(self, network, ...)     | Evaluate the spring vector in the direction to a specific link.                                                                                    |
+| [`get_active_weight_fraction`](#pylimer_tools_cpp.MEHPForceBalance2.get_active_weight_fraction)(self[, tolerance])     | Compute the weight fraction of active springs                                                                                                      |
 | [`get_average_spring_length`](#pylimer_tools_cpp.MEHPForceBalance2.get_average_spring_length)(self)                   | Get the average length of the springs.                                                                                                             |
+| [`get_cg_fallback_max_iterations`](#pylimer_tools_cpp.MEHPForceBalance2.get_cg_fallback_max_iterations)(self)              |                                                                                                                                                    |
 | [`get_coordinates`](#pylimer_tools_cpp.MEHPForceBalance2.get_coordinates)(self)                             | Get the current coordinates of the crosslinkers and entanglement links.                                                                            |
 | [`get_crosslinker_universe`](#pylimer_tools_cpp.MEHPForceBalance2.get_crosslinker_universe)(self)                    | Returns the universe [of crosslinkers] with the positions of the current state of the simulation.                                                  |
 | [`get_current_spring_lengths`](#pylimer_tools_cpp.MEHPForceBalance2.get_current_spring_lengths)(self)                  | Get the spring lengths (Euclidean distances of the spring vectors).                                                                                |
@@ -92,6 +95,7 @@ Overloaded function.
 | [`get_displacement_residual_norm`](#pylimer_tools_cpp.MEHPForceBalance2.get_displacement_residual_norm)(self)              | Get the current link displacement residual norm.                                                                                                   |
 | [`get_displacements`](#pylimer_tools_cpp.MEHPForceBalance2.get_displacements)(self)                           | Get the current link displacements.                                                                                                                |
 | [`get_effective_functionality_of_atoms`](#pylimer_tools_cpp.MEHPForceBalance2.get_effective_functionality_of_atoms)(self[, ...]) | Returns the number of active springs connected to each atom, atomId used as index                                                                  |
+| [`get_effective_solver_choice`](#pylimer_tools_cpp.MEHPForceBalance2.get_effective_solver_choice)(self)                 | Get the effective solver choice resolved or switched to during relaxation.                                                                         |
 | [`get_exit_reason`](#pylimer_tools_cpp.MEHPForceBalance2.get_exit_reason)(self)                             | Returns the reason for termination of the simulation                                                                                               |
 | [`get_force_magnitude_vector`](#pylimer_tools_cpp.MEHPForceBalance2.get_force_magnitude_vector)(self)                  | Evaluate the norm of the force on each (slip- or cross-) link.                                                                                     |
 | [`get_force_on`](#pylimer_tools_cpp.MEHPForceBalance2.get_force_on)(self, link_idx)                      | Evaluate the force on a particular (slip- or cross-) link.                                                                                         |
@@ -130,6 +134,7 @@ Overloaded function.
 | [`set_displacements`](#pylimer_tools_cpp.MEHPForceBalance2.set_displacements)(self, arg0)                     | Set the current link displacements.                                                                                                                |
 | [`set_spring_contour_lengths`](#pylimer_tools_cpp.MEHPForceBalance2.set_spring_contour_lengths)(self, arg0)            | Set/overwrite the contour lengths.                                                                                                                 |
 | [`validate_network`](#pylimer_tools_cpp.MEHPForceBalance2.validate_network)(self)                            | Validates the internal structures.                                                                                                                 |
+| [`was_cg_fallback_triggered`](#pylimer_tools_cpp.MEHPForceBalance2.was_cg_fallback_triggered)(self)                   | Check whether the adaptive CG-to-BiCGSTAB fallback was triggered in the last relaxation.                                                           |
 
 ### Attributes Documentation
 
@@ -150,6 +155,12 @@ This is useful to reduce memory between MC generator and force balance,
 since the universe representation with all the in-between beads does not need to be stored.
 However, currently, the removal procedures are not loss-free.
 Therefore, use this with care.
+
+#### config_cg_fallback_max_iterations(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), max_iterations: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 20000) → [None](https://docs.python.org/3/builtins/constants.html#None)
+
+Configure the maximum iterations allowed for ConjugateGradient before
+automatically falling back to BiCGSTAB on ill-conditioned systems.
+Set to <= 0 to disable fallback. Default: 20000.
 
 #### config_in_place_rebuild_threshold(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), threshold: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.15) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
@@ -228,10 +239,18 @@ Evaluate the spring vector in the direction to a specific link.
 * **Returns:**
   3D distance vector to the specified link
 
+#### get_active_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
+
+Compute the weight fraction of active springs
+
+Caution: ignores atom masses.
+
 #### get_average_spring_length(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Get the average length of the springs. Note that in contrast to `getGammaFactor()`,
 this value is normalized by the number of springs rather than the number of chains.
+
+#### get_cg_fallback_max_iterations(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 #### get_coordinates(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
@@ -274,6 +293,10 @@ Returns the number of active springs connected to each atom, atomId used as inde
 
 * **Parameters:**
   **tolerance** – springs under this length are considered inactive
+
+#### get_effective_solver_choice(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [pylimer_tools_cpp.SLESolver](pylimer_tools_cpp.SLESolver.html.md#pylimer_tools_cpp.SLESolver)
+
+Get the effective solver choice resolved or switched to during relaxation.
 
 #### get_exit_reason(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [pylimer_tools_cpp.ExitReason](pylimer_tools_cpp.ExitReason.html.md#pylimer_tools_cpp.ExitReason)
 
@@ -450,7 +473,7 @@ Get the current spring lengths (norm of vector) divided by the spring partition 
 
 Helper method to debug and/or understand what happens to certain links when being displaced.
 
-#### run_force_relaxation(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), simplification_mode: [pylimer_tools_cpp.StructureSimplificationMode](pylimer_tools_cpp.StructureSimplificationMode.html.md#pylimer_tools_cpp.StructureSimplificationMode) = StructureSimplificationMode.NO_SIMPLIFICATION, inactive_removal_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-06, sle_solver: [object](https://docs.python.org/3/builtins/functions.html#object) = SLESolver.DEFAULT, tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-12, max_iterations: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 10000) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### run_force_relaxation(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), simplification_mode: [pylimer_tools_cpp.StructureSimplificationMode](pylimer_tools_cpp.StructureSimplificationMode.html.md#pylimer_tools_cpp.StructureSimplificationMode) = StructureSimplificationMode.NO_SIMPLIFICATION, inactive_removal_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-06, sle_solver: [object](https://docs.python.org/3/builtins/functions.html#object) = SLESolver.DEFAULT, tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-12, max_iterations: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 50000) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Run the simulation.
 
@@ -480,3 +503,7 @@ Can be used e.g. as `assert fb.validate_network()`.
 
 * **Returns:**
   True if validation passes, raises exception otherwise
+
+#### was_cg_fallback_triggered(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2)) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
+
+Check whether the adaptive CG-to-BiCGSTAB fallback was triggered in the last relaxation.

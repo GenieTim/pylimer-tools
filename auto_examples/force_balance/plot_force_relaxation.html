@@ -22,7 +22,7 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 
 <link rel="alternate" type="text/markdown" href="plot_force_relaxation.html.md">
-<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Network Generation" href="../network_generator/index.html"><link rel="prev" title="Deformation Experiment" href="plot_fb_deformation_exp.html">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Comparing Slip-Link Sampling Methods: Discrete vs. Analytical" href="plot_entanglement_sampling_comparison.html"><link rel="prev" title="Deformation Experiment" href="plot_fb_deformation_exp.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>Maximum Entropy Homogenization Procedure (MEHP) - pylimer-tools</title>
@@ -238,6 +238,7 @@
 <li class="toctree-l3"><a class="reference internal" href="plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_fb_deformation_exp.html">Deformation Experiment</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -305,6 +306,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">do_random_walk_chain_from_to_mc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -315,6 +317,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.Box.html">Box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.ComputedDoubleValues.html">ComputedDoubleValues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.ComputedIntValues.html">ComputedIntValues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.CrosslinkerUniverse.html">CrosslinkerUniverse</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.DPDSimulator.html">DPDSimulator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
@@ -347,6 +350,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.SimplifiedBalance2Network.html">SimplifiedBalance2Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.SimplifiedNetwork.html">SimplifiedNetwork</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.StrandPairEntanglements.html">StrandPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.StructureSimplificationMode.html">StructureSimplificationMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.Universe.html">Universe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.UniverseSequence.html">UniverseSequence</a></li>
@@ -566,7 +570,7 @@ Phantom Shear Modulus [MPa] (Custom Evaluator):  0.006117500021057896
 </span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64"><span class="n">shear_modulus</span></a><span class="p">,</span><span class="w">
 </span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 4.070 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 2.326 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-force-balance-plot-force-relaxation-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/8a3b73ff619f54b0e90bf2cc3f37e6a9/plot_force_relaxation.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_force_relaxation.ipynb</span></code></a></p>
@@ -586,12 +590,12 @@ Phantom Shear Modulus [MPa] (Custom Evaluator):  0.006117500021057896
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../network_generator/index.html">
+          <a class="next-page" href="plot_entanglement_sampling_comparison.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Network Generation</div>
+                <div class="title">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

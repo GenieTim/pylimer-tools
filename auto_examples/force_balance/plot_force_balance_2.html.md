@@ -18,8 +18,8 @@ See Bernhard and Gusev [[BG25](../../acknowledgements.html.md#id12)]
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 9-76 -->
 ```none
-Final residual (should be close to 0): 1.1285578150358625e-12
-Shear Modulus [MPa]:  0.09647900266520894
+Final residual (should be close to 0): 1.0249229924360185e-12
+Shear Modulus [MPa]:  0.08325662964596268
 ```
 
 <br/>
@@ -92,7 +92,7 @@ shear_modulus = (
 print("Shear Modulus [MPa]: ", shear_modulus)
 ```
 
-**Total running time of the script:** (0 minutes 0.415 seconds)
+**Total running time of the script:** (0 minutes 0.268 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-2-py"></a>
 

@@ -1,0 +1,49 @@
+StrandPairEntanglements
+=======================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: StrandPairEntanglements
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~StrandPairEntanglements.alpha_1
+      ~StrandPairEntanglements.alpha_2
+      ~StrandPairEntanglements.bead_idx_1
+      ~StrandPairEntanglements.bead_idx_2
+      ~StrandPairEntanglements.position_1
+      ~StrandPairEntanglements.position_2
+      ~StrandPairEntanglements.strand_idx_1
+      ~StrandPairEntanglements.strand_idx_2
+      ~StrandPairEntanglements.x
+      ~StrandPairEntanglements.y
+      ~StrandPairEntanglements.z
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~StrandPairEntanglements.size
+      ~StrandPairEntanglements.to_atom_pair_entanglements
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: alpha_1
+   .. autoattribute:: alpha_2
+   .. autoattribute:: bead_idx_1
+   .. autoattribute:: bead_idx_2
+   .. autoattribute:: position_1
+   .. autoattribute:: position_2
+   .. autoattribute:: strand_idx_1
+   .. autoattribute:: strand_idx_2
+   .. autoattribute:: x
+   .. autoattribute:: y
+   .. autoattribute:: z
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: size
+   .. automethod:: to_atom_pair_entanglements

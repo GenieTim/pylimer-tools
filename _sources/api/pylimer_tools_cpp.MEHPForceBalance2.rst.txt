@@ -17,6 +17,7 @@ MEHPForceBalance2
    .. autosummary::
 
       ~MEHPForceBalance2.config_assume_network_is_complete
+      ~MEHPForceBalance2.config_cg_fallback_max_iterations
       ~MEHPForceBalance2.config_in_place_rebuild_threshold
       ~MEHPForceBalance2.config_mean_bond_length
       ~MEHPForceBalance2.config_spring_breaking_distance
@@ -26,7 +27,9 @@ MEHPForceBalance2
       ~MEHPForceBalance2.evaluate_spring_vector
       ~MEHPForceBalance2.evaluate_spring_vector_from
       ~MEHPForceBalance2.evaluate_spring_vector_to
+      ~MEHPForceBalance2.get_active_weight_fraction
       ~MEHPForceBalance2.get_average_spring_length
+      ~MEHPForceBalance2.get_cg_fallback_max_iterations
       ~MEHPForceBalance2.get_coordinates
       ~MEHPForceBalance2.get_crosslinker_universe
       ~MEHPForceBalance2.get_current_spring_lengths
@@ -36,6 +39,7 @@ MEHPForceBalance2
       ~MEHPForceBalance2.get_displacement_residual_norm
       ~MEHPForceBalance2.get_displacements
       ~MEHPForceBalance2.get_effective_functionality_of_atoms
+      ~MEHPForceBalance2.get_effective_solver_choice
       ~MEHPForceBalance2.get_exit_reason
       ~MEHPForceBalance2.get_force_magnitude_vector
       ~MEHPForceBalance2.get_force_on
@@ -74,6 +78,7 @@ MEHPForceBalance2
       ~MEHPForceBalance2.set_displacements
       ~MEHPForceBalance2.set_spring_contour_lengths
       ~MEHPForceBalance2.validate_network
+      ~MEHPForceBalance2.was_cg_fallback_triggered
 
    .. rubric:: Attributes Documentation
 
@@ -82,6 +87,7 @@ MEHPForceBalance2
    .. rubric:: Methods Documentation
 
    .. automethod:: config_assume_network_is_complete
+   .. automethod:: config_cg_fallback_max_iterations
    .. automethod:: config_in_place_rebuild_threshold
    .. automethod:: config_mean_bond_length
    .. automethod:: config_spring_breaking_distance
@@ -91,7 +97,9 @@ MEHPForceBalance2
    .. automethod:: evaluate_spring_vector
    .. automethod:: evaluate_spring_vector_from
    .. automethod:: evaluate_spring_vector_to
+   .. automethod:: get_active_weight_fraction
    .. automethod:: get_average_spring_length
+   .. automethod:: get_cg_fallback_max_iterations
    .. automethod:: get_coordinates
    .. automethod:: get_crosslinker_universe
    .. automethod:: get_current_spring_lengths
@@ -101,6 +109,7 @@ MEHPForceBalance2
    .. automethod:: get_displacement_residual_norm
    .. automethod:: get_displacements
    .. automethod:: get_effective_functionality_of_atoms
+   .. automethod:: get_effective_solver_choice
    .. automethod:: get_exit_reason
    .. automethod:: get_force_magnitude_vector
    .. automethod:: get_force_on
@@ -139,3 +148,4 @@ MEHPForceBalance2
    .. automethod:: set_displacements
    .. automethod:: set_spring_contour_lengths
    .. automethod:: validate_network
+   .. automethod:: was_cg_fallback_triggered

@@ -30,48 +30,51 @@ Initialize a new MCUniverseGenerator with specified box dimensions.
 
 ### Methods Summary
 
-| [`add_crosslinkers`](#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers)(self, nr_of_crosslinkers[, ...])   | Add crosslinkers at random positions.                                                                                               |
-|------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| [`add_crosslinkers_at`](#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers_at)(self, coordinates[, ...])       | Add crosslinkers at specific coordinates.                                                                                           |
-| [`add_end_functionalized_strands`](#pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands)(self, ...[, ...])    | Add strands with crosslinkers at the ends.                                                                                          |
-| [`add_functionalized_strands`](#pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands)(self, ...[, ...])        | Add strands with custom crosslink placement using a selector function.                                                              |
-| [`add_monofunctional_strands`](#pylimer_tools_cpp.MCUniverseGenerator.add_monofunctional_strands)(self, ...[, ...])        | Add multiple monofunctional strands with specified bead types.                                                                      |
-| [`add_randomly_functionalized_strands`](#pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands)(self, ...)      | Add strands with randomly distributed crosslinkers in between.                                                                      |
-| [`add_regularly_spaced_functionalized_strands`](#pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands)(...)    | Add strands with regularly spaced crosslinkers in between.                                                                          |
-| [`add_solvent_chains`](#pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains)(self, ...[, ...])                | Randomly distribute additional, free chains.                                                                                        |
-| [`add_star_crosslinkers`](#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers)(self, nr_of_stars, ...)       | Add star-like crosslinkers with pre-connected strands (useful e.g. for tetra-PEG networks).                                         |
-| [`add_strands`](#pylimer_tools_cpp.MCUniverseGenerator.add_strands)(self, nr_of_strands, strand_lengths)    | Add strands.                                                                                                                        |
-| [`config_nr_of_mc_steps`](#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps)(self[, n_steps])              | Set the number of Monte-Carlo steps during bond length equilibration.                                                               |
-| [`config_primary_loop_probability`](#pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability)(self[, ...])        | Configure an additional weight reduction for the primary loop formation.                                                            |
-| [`config_secondary_loop_probability`](#pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability)(self[, ...])      | Configure an additional weight reduction for the secondary loop formation.                                                          |
-| [`disable_max_distance`](#pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance)(self)                          | Disable the maximum distance provider to allow unlimited distance sampling.                                                         |
-| [`get_current_crosslinker_conversion`](#pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion)(self)            | Get the current conversion of crosslinkers, i.e., the fraction of crosslinkers that have been linked to strands.                    |
-| [`get_current_nr_of_atoms`](#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_atoms)(self)                       | Get the current number of atoms that the universe would/will have.                                                                  |
-| [`get_current_nr_of_bonds`](#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_bonds)(self)                       | Get the current number of bonds that the universe would/will have.                                                                  |
-| [`get_current_strand_conversion`](#pylimer_tools_cpp.MCUniverseGenerator.get_current_strand_conversion)(self)                 | Get the current conversion of strands, i.e., the fraction of strand ends that have been consumed.                                   |
-| [`get_force_balance`](#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance)(self)                             | Get an instance of the force balance procedure.                                                                                     |
-| [`get_force_balance2`](#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2)(self)                            | Get an instance of the force balance procedure.                                                                                     |
-| [`get_force_relaxation`](#pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation)(self)                          | Get an instance of the force relaxation procedure.                                                                                  |
-| [`get_mean_bead_distance`](#pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance)(self)                        | Get the currently configured mean bead distance.                                                                                    |
-| [`get_mean_squared_bead_distance`](#pylimer_tools_cpp.MCUniverseGenerator.get_mean_squared_bead_distance)(self)                | Get the currently configured mean squared bead distance.                                                                            |
-| [`get_nr_of_atoms`](#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_atoms)(self)                               | Get the current number of atoms that the universe would/will have.                                                                  |
-| [`get_nr_of_bonds`](#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_bonds)(self)                               | Get the current number of bonds that the universe would/will have.                                                                  |
-| [`get_universe`](#pylimer_tools_cpp.MCUniverseGenerator.get_universe)(self)                                  | Fetch the current (or final) state of the universe.                                                                                 |
-| [`link_strand`](#pylimer_tools_cpp.MCUniverseGenerator.link_strand)(self, strand_idx[, c_infinity])         | Link one particular strand to a crosslinker.                                                                                        |
-| [`link_strand_to`](#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to)(self, strand_idx, link_idx)          | Link a strand to a specific crosslinker.                                                                                            |
-| [`link_strand_to_strand`](#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to_strand)(self[, c_infinity])           | Link two free strand ends together directly.                                                                                        |
-| [`link_strands_callback`](#pylimer_tools_cpp.MCUniverseGenerator.link_strands_callback)(self, linking_controller)     | Link strands to crosslinkers using a custom callback function to control when to stop.                                              |
-| [`link_strands_to_conversion`](#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion)(self, ...[, ...])        | Actually link the previously added strands to the previously added crosslinkers, until a certain crosslink conversion is reached.   |
-| [`link_strands_to_soluble_fraction`](#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction)(self, ...)         | Actually link the previously added strands to the previously added crosslinkers, until a certain soluble fraction is reached.       |
-| [`link_strands_to_strands_to_conversion`](#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion)(self, ...)    | Link free strand ends to each other until target conversion is reached.                                                             |
-| [`relax_crosslinks`](#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks)(self)                              | Run force relaxation with the crosslinkers and their strands, to have the crosslinks in their statistically most probable position. |
-| [`remove_soluble_fraction`](#pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction)(self[, rescale_box])        | Remove soluble fraction (as determined by phantom force relaxation) of the strands and crosslinks.                                  |
-| [`set_bead_distance`](#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance)(self, distance[, ...])            | Set the mean distance between beads when doing MC stepping.                                                                         |
-| [`set_mean_squared_bead_distance`](#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance)(self, ...[, ...])    | Set the mean squared distance between beads.                                                                                        |
-| [`set_seed`](#pylimer_tools_cpp.MCUniverseGenerator.set_seed)(self, seed)                                | Set the seed for the random generator.                                                                                              |
-| [`use_linear_max_distance`](#pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance)(self, multiplier)           | Converts the $N$ to a maximum distance within which to sample.                                                                      |
-| [`use_zscore_max_distance`](#pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance)(self, std_multiplier)       | Converts the $N$ to a maximum distance within which to sample.                                                                      |
-| [`validate`](#pylimer_tools_cpp.MCUniverseGenerator.validate)(self)                                      | Check whether the internal state of the generator is valid.                                                                         |
+| [`add_crosslinkers`](#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers)(self, nr_of_crosslinkers[, ...])   | Add crosslinkers at random positions.                                                                                                                                  |
+|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`add_crosslinkers_at`](#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers_at)(self, coordinates[, ...])       | Add crosslinkers at specific coordinates.                                                                                                                              |
+| [`add_end_functionalized_strands`](#pylimer_tools_cpp.MCUniverseGenerator.add_end_functionalized_strands)(self, ...[, ...])    | Add strands with crosslinkers at the ends.                                                                                                                             |
+| [`add_functionalized_strands`](#pylimer_tools_cpp.MCUniverseGenerator.add_functionalized_strands)(self, ...[, ...])        | Add strands with custom crosslink placement using a selector function.                                                                                                 |
+| [`add_monofunctional_strands`](#pylimer_tools_cpp.MCUniverseGenerator.add_monofunctional_strands)(self, ...[, ...])        | Add multiple monofunctional strands with specified bead types.                                                                                                         |
+| [`add_randomly_functionalized_strands`](#pylimer_tools_cpp.MCUniverseGenerator.add_randomly_functionalized_strands)(self, ...)      | Add strands with randomly distributed crosslinkers in between.                                                                                                         |
+| [`add_regularly_spaced_functionalized_strands`](#pylimer_tools_cpp.MCUniverseGenerator.add_regularly_spaced_functionalized_strands)(...)    | Add strands with regularly spaced crosslinkers in between.                                                                                                             |
+| [`add_solvent_chains`](#pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains)(self, ...[, ...])                | Randomly distribute additional, free chains.                                                                                                                           |
+| [`add_star_crosslinkers`](#pylimer_tools_cpp.MCUniverseGenerator.add_star_crosslinkers)(self, nr_of_stars, ...)       | Add star-like crosslinkers with pre-connected strands (useful e.g. for tetra-PEG networks).                                                                            |
+| [`add_strands`](#pylimer_tools_cpp.MCUniverseGenerator.add_strands)(self, nr_of_strands, strand_lengths)    | Add strands.                                                                                                                                                           |
+| [`config_nr_of_mc_steps`](#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps)(self[, n_steps])              | Set the number of Monte-Carlo steps during bond length equilibration.                                                                                                  |
+| [`config_primary_loop_probability`](#pylimer_tools_cpp.MCUniverseGenerator.config_primary_loop_probability)(self[, ...])        | Configure an additional weight reduction for the primary loop formation.                                                                                               |
+| [`config_secondary_loop_probability`](#pylimer_tools_cpp.MCUniverseGenerator.config_secondary_loop_probability)(self[, ...])      | Configure an additional weight reduction for the secondary loop formation.                                                                                             |
+| [`disable_max_distance`](#pylimer_tools_cpp.MCUniverseGenerator.disable_max_distance)(self)                          | Disable the maximum distance provider to allow unlimited distance sampling.                                                                                            |
+| [`get_box`](#pylimer_tools_cpp.MCUniverseGenerator.get_box)(self)                                       | Get the simulation box of the generator.                                                                                                                               |
+| [`get_crosslinker_universe`](#pylimer_tools_cpp.MCUniverseGenerator.get_crosslinker_universe)(self)                      | Get a copy of the internal CrosslinkerUniverse (crosslinker coordinates and strand topology) without instantiating individual strand beads or constructing a Universe. |
+| [`get_current_crosslinker_conversion`](#pylimer_tools_cpp.MCUniverseGenerator.get_current_crosslinker_conversion)(self)            | Get the current conversion of crosslinkers, i.e., the fraction of crosslinkers that have been linked to strands.                                                       |
+| [`get_current_nr_of_atoms`](#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_atoms)(self)                       | Get the current number of atoms that the universe would/will have.                                                                                                     |
+| [`get_current_nr_of_bonds`](#pylimer_tools_cpp.MCUniverseGenerator.get_current_nr_of_bonds)(self)                       | Get the current number of bonds that the universe would/will have.                                                                                                     |
+| [`get_current_strand_conversion`](#pylimer_tools_cpp.MCUniverseGenerator.get_current_strand_conversion)(self)                 | Get the current conversion of strands, i.e., the fraction of strand ends that have been consumed.                                                                      |
+| [`get_force_balance`](#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance)(\*args, \*\*kwargs)               | Overloaded function.                                                                                                                                                   |
+| [`get_force_balance2`](#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2)(\*args, \*\*kwargs)              | Overloaded function.                                                                                                                                                   |
+| [`get_force_relaxation`](#pylimer_tools_cpp.MCUniverseGenerator.get_force_relaxation)(self)                          | Get an instance of the force relaxation procedure.                                                                                                                     |
+| [`get_mean_bead_distance`](#pylimer_tools_cpp.MCUniverseGenerator.get_mean_bead_distance)(self)                        | Get the currently configured mean bead distance.                                                                                                                       |
+| [`get_mean_squared_bead_distance`](#pylimer_tools_cpp.MCUniverseGenerator.get_mean_squared_bead_distance)(self)                | Get the currently configured mean squared bead distance.                                                                                                               |
+| [`get_nr_of_atoms`](#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_atoms)(self)                               | Get the current number of atoms that the universe would/will have.                                                                                                     |
+| [`get_nr_of_bonds`](#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_bonds)(self)                               | Get the current number of bonds that the universe would/will have.                                                                                                     |
+| [`get_universe`](#pylimer_tools_cpp.MCUniverseGenerator.get_universe)(self)                                  | Fetch the current (or final) state of the universe.                                                                                                                    |
+| [`link_strand`](#pylimer_tools_cpp.MCUniverseGenerator.link_strand)(self, strand_idx[, c_infinity])         | Link one particular strand to a crosslinker.                                                                                                                           |
+| [`link_strand_to`](#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to)(self, strand_idx, link_idx)          | Link a strand to a specific crosslinker.                                                                                                                               |
+| [`link_strand_to_strand`](#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to_strand)(self[, c_infinity])           | Link two free strand ends together directly.                                                                                                                           |
+| [`link_strands_callback`](#pylimer_tools_cpp.MCUniverseGenerator.link_strands_callback)(self, linking_controller)     | Link strands to crosslinkers using a custom callback function to control when to stop.                                                                                 |
+| [`link_strands_to_conversion`](#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion)(self, ...[, ...])        | Actually link the previously added strands to the previously added crosslinkers, until a certain crosslink conversion is reached.                                      |
+| [`link_strands_to_soluble_fraction`](#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction)(self, ...)         | Actually link the previously added strands to the previously added crosslinkers, until a certain soluble fraction is reached.                                          |
+| [`link_strands_to_strands_to_conversion`](#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion)(self, ...)    | Link free strand ends to each other until target conversion is reached.                                                                                                |
+| [`relax_crosslinks`](#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks)(self)                              | Run force relaxation with the crosslinkers and their strands, to have the crosslinks in their statistically most probable position.                                    |
+| [`remove_soluble_fraction`](#pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction)(self[, rescale_box])        | Remove soluble fraction (as determined by phantom force relaxation) of the strands and crosslinks.                                                                     |
+| [`sample_entanglements`](#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements)(self, ...[, ...])              | Sample entanglements analytically and topologically directly from the generator's CrosslinkerUniverse without generating all strand beads or constructing a Universe.  |
+| [`set_bead_distance`](#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance)(self, distance[, ...])            | Set the mean distance between beads when doing MC stepping.                                                                                                            |
+| [`set_mean_squared_bead_distance`](#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance)(self, ...[, ...])    | Set the mean squared distance between beads.                                                                                                                           |
+| [`set_seed`](#pylimer_tools_cpp.MCUniverseGenerator.set_seed)(self, seed)                                | Set the seed for the random generator.                                                                                                                                 |
+| [`use_linear_max_distance`](#pylimer_tools_cpp.MCUniverseGenerator.use_linear_max_distance)(self, multiplier)           | Converts the $N$ to a maximum distance within which to sample.                                                                                                         |
+| [`use_zscore_max_distance`](#pylimer_tools_cpp.MCUniverseGenerator.use_zscore_max_distance)(self, std_multiplier)       | Converts the $N$ to a maximum distance within which to sample.                                                                                                         |
+| [`validate`](#pylimer_tools_cpp.MCUniverseGenerator.validate)(self)                                      | Check whether the internal state of the generator is valid.                                                                                                            |
 
 ### Methods Documentation
 
@@ -252,6 +255,21 @@ Set to 0. to disable the formation of secondary loops.
 Disable the maximum distance provider to allow unlimited distance sampling.
 This may slow down performance for large systems but ensures complete sampling.
 
+#### get_box(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box)
+
+Get the simulation box of the generator.
+
+* **Returns:**
+  The Box object.
+
+#### get_crosslinker_universe(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [pylimer_tools_cpp.CrosslinkerUniverse](pylimer_tools_cpp.CrosslinkerUniverse.md#pylimer_tools_cpp.CrosslinkerUniverse)
+
+Get a copy of the internal CrosslinkerUniverse (crosslinker coordinates and strand topology)
+without instantiating individual strand beads or constructing a Universe.
+
+* **Returns:**
+  The CrosslinkerUniverse struct.
+
 #### get_current_crosslinker_conversion(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Get the current conversion of crosslinkers, i.e., the fraction of crosslinkers
@@ -281,21 +299,85 @@ Get the current conversion of strands, i.e., the fraction of strand ends that ha
 * **Returns:**
   Strand conversion as a fraction between 0 and 1.
 
-#### get_force_balance(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [pylimer_tools_cpp.MEHPForceBalance](pylimer_tools_cpp.MEHPForceBalance.md#pylimer_tools_cpp.MEHPForceBalance)
+#### get_force_balance(\*args, \*\*kwargs)
 
-Get an instance of the force balance procedure.
-This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
+Overloaded function.
 
-* **Returns:**
-  Configured MEHPForceBalance instance.
+1. get_force_balance(self: pylimer_tools_cpp.MCUniverseGenerator) -> pylimer_tools_cpp.MEHPForceBalance
+   > Get an instance of the force balance procedure.
+   > This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
+   > * **return:**
+   >   Configured MEHPForceBalance instance.
+2. get_force_balance(self: pylimer_tools_cpp.MCUniverseGenerator, entanglements: pylimer_tools_cpp.StrandPairEntanglements) -> pylimer_tools_cpp.MEHPForceBalance
+   > Get an instance of the force balance procedure with pre-sampled entanglements,
+   > bypassing the creation of a Universe.
+   > * **param entanglements:**
+   >   Sampled StrandPairEntanglements.
+   > * **return:**
+   >   Configured MEHPForceBalance instance.
+3. get_force_balance(self: pylimer_tools_cpp.MCUniverseGenerator, nr_of_entanglements_to_sample: typing.SupportsInt, upper_cutoff: typing.SupportsFloat, lower_cutoff: typing.SupportsFloat = 0.0, minimum_nr_of_entanglements: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 3.0, seed: str = ‘’, filter_dangling_and_soluble: bool = True) -> pylimer_tools_cpp.MEHPForceBalance
+   > Sample entanglements analytically and return a configured MEHPForceBalance instance,
+   > bypassing the creation of a Universe.
+   > * **param nr_of_entanglements_to_sample:**
+   >   Target number of entanglements to sample.
+   > * **param upper_cutoff:**
+   >   Upper cutoff distance between entangled beads.
+   > * **param lower_cutoff:**
+   >   Lower cutoff distance between entangled beads (default: 0.0).
+   > * **param minimum_nr_of_entanglements:**
+   >   Minimum number of entanglements required (default: 0).
+   > * **param same_strand_cutoff:**
+   >   Minimum contour separation on the same strand (default: 3.0).
+   > * **param seed:**
+   >   Optional random seed (uses generator RNG if empty).
+   > * **param filter_dangling_and_soluble:**
+   >   Filter out dangling and soluble strands (default: True).
+   > * **return:**
+   >   Configured MEHPForceBalance instance.
 
-#### get_force_balance2(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [pylimer_tools_cpp.MEHPForceBalance2](pylimer_tools_cpp.MEHPForceBalance2.md#pylimer_tools_cpp.MEHPForceBalance2)
+#### get_force_balance2(\*args, \*\*kwargs)
 
-Get an instance of the force balance procedure.
-This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
+Overloaded function.
 
-* **Returns:**
-  Configured MEHPForceBalance2 instance.
+1. get_force_balance2(self: pylimer_tools_cpp.MCUniverseGenerator) -> pylimer_tools_cpp.MEHPForceBalance2
+   > Get an instance of the force balance procedure.
+   > This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
+   > * **return:**
+   >   Configured MEHPForceBalance2 instance.
+2. get_force_balance2(self: pylimer_tools_cpp.MCUniverseGenerator, entanglements: pylimer_tools_cpp.StrandPairEntanglements, crosslinker_type: typing.SupportsInt = 2, entanglements_as_springs: bool = False) -> pylimer_tools_cpp.MEHPForceBalance2
+   > Get an instance of the MEHPForceBalance2 procedure with pre-sampled entanglements,
+   > bypassing the creation of a Universe.
+   > * **param entanglements:**
+   >   Sampled StrandPairEntanglements.
+   > * **param crosslinker_type:**
+   >   Crosslinker atom type (default: 2).
+   > * **param entanglements_as_springs:**
+   >   Whether to represent entanglements as springs between two split nodes (default: False).
+   > * **return:**
+   >   Configured MEHPForceBalance2 instance.
+3. get_force_balance2(self: pylimer_tools_cpp.MCUniverseGenerator, nr_of_entanglements_to_sample: typing.SupportsInt, upper_cutoff: typing.SupportsFloat, lower_cutoff: typing.SupportsFloat = 0.0, minimum_nr_of_entanglements: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 3.0, seed: str = ‘’, filter_dangling_and_soluble: bool = True, entanglements_as_springs: bool = False, crosslinker_type: typing.SupportsInt = 2) -> pylimer_tools_cpp.MEHPForceBalance2
+   > Sample entanglements analytically and return a configured MEHPForceBalance2 instance,
+   > bypassing the creation of a Universe.
+   > * **param nr_of_entanglements_to_sample:**
+   >   Target number of entanglements to sample.
+   > * **param upper_cutoff:**
+   >   Upper cutoff distance between entangled beads.
+   > * **param lower_cutoff:**
+   >   Lower cutoff distance between entangled beads (default: 0.0).
+   > * **param minimum_nr_of_entanglements:**
+   >   Minimum number of entanglements required (default: 0).
+   > * **param same_strand_cutoff:**
+   >   Minimum contour separation on the same strand (default: 3.0).
+   > * **param seed:**
+   >   Optional random seed (uses generator RNG if empty).
+   > * **param filter_dangling_and_soluble:**
+   >   Filter out dangling and soluble strands (default: True).
+   > * **param entanglements_as_springs:**
+   >   Whether to represent entanglements as springs between two split nodes (default: False).
+   > * **param crosslinker_type:**
+   >   Crosslinker atom type (default: 2).
+   > * **return:**
+   >   Configured MEHPForceBalance2 instance.
 
 #### get_force_relaxation(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator)) → [pylimer_tools_cpp.MEHPForceRelaxation](pylimer_tools_cpp.MEHPForceRelaxation.md#pylimer_tools_cpp.MEHPForceRelaxation)
 
@@ -444,6 +526,22 @@ Remove soluble fraction (as determined by phantom force relaxation) of the stran
 
 * **Parameters:**
   **rescale_box** – Whether to rescale the box dimensions to maintain constant density (default: true).
+
+#### sample_entanglements(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_entanglements_to_sample: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), upper_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), lower_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.0, minimum_nr_of_entanglements: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 0, same_strand_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 3.0, seed: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '', filter_dangling_and_soluble: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [pylimer_tools_cpp.StrandPairEntanglements](pylimer_tools_cpp.StrandPairEntanglements.md#pylimer_tools_cpp.StrandPairEntanglements)
+
+Sample entanglements analytically and topologically directly from the generator’s CrosslinkerUniverse
+without generating all strand beads or constructing a Universe.
+
+* **Parameters:**
+  * **nr_of_entanglements_to_sample** – Target number of entanglements to sample.
+  * **upper_cutoff** – Upper cutoff distance between entangled beads.
+  * **lower_cutoff** – Lower cutoff distance between entangled beads (default: 0.0).
+  * **minimum_nr_of_entanglements** – Minimum number of entanglements required (default: 0).
+  * **same_strand_cutoff** – Minimum contour separation on the same strand (default: 3.0).
+  * **seed** – Optional random seed (uses generator RNG if empty).
+  * **filter_dangling_and_soluble** – Filter out dangling and soluble strands (default: True).
+* **Returns:**
+  Sampled StrandPairEntanglements.
 
 #### set_bead_distance(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), distance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), update_mean_squared: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
 

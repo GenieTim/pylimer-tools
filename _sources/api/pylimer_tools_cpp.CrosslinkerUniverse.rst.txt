@@ -1,0 +1,39 @@
+CrosslinkerUniverse
+===================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: CrosslinkerUniverse
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~CrosslinkerUniverse.bead_distance_in_strand
+      ~CrosslinkerUniverse.beads_in_strand
+      ~CrosslinkerUniverse.mean_squared_bead_distance_in_strand
+      ~CrosslinkerUniverse.strand_bead_type
+      ~CrosslinkerUniverse.strand_from
+      ~CrosslinkerUniverse.strand_to
+      ~CrosslinkerUniverse.strands_of_xlink
+      ~CrosslinkerUniverse.xlink_chain_id
+      ~CrosslinkerUniverse.xlink_types
+      ~CrosslinkerUniverse.xlink_x
+      ~CrosslinkerUniverse.xlink_y
+      ~CrosslinkerUniverse.xlink_z
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: bead_distance_in_strand
+   .. autoattribute:: beads_in_strand
+   .. autoattribute:: mean_squared_bead_distance_in_strand
+   .. autoattribute:: strand_bead_type
+   .. autoattribute:: strand_from
+   .. autoattribute:: strand_to
+   .. autoattribute:: strands_of_xlink
+   .. autoattribute:: xlink_chain_id
+   .. autoattribute:: xlink_types
+   .. autoattribute:: xlink_x
+   .. autoattribute:: xlink_y
+   .. autoattribute:: xlink_z

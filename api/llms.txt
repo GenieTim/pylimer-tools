@@ -199,6 +199,7 @@
 - [do_random_walk_chain_from_to_mc](pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html.md): Do a random walk from one point to another.
 - [inverse_langevin](pylimer_tools_cpp.inverse_langevin.html.md): A somewhat accurate (for $x &#92;in (-1, 1)$) implementation of the inverse Langevin function.
 - [randomly_sample_entanglements](pylimer_tools_cpp.randomly_sample_entanglements.html.md): Randomly find pairs of atoms that are close together and could be
+- [randomly_sample_entanglements_analytical](pylimer_tools_cpp.randomly_sample_entanglements_analytical.html.md): Overloaded function.
 - [split_csv](pylimer_tools_cpp.split_csv.html.md): Read a file containing a number of CSVs. Returns them split up.
 - [version_information](pylimer_tools_cpp.version_information.html.md): Returns  a string of the the current version, incl. git hash and date of compilation.
 - [Atom](pylimer_tools_cpp.Atom.html.md): Bases: &#96;pybind11_object&#96;
@@ -209,6 +210,7 @@
 - [Box](pylimer_tools_cpp.Box.html.md): Bases: &#96;pybind11_object&#96;
 - [ComputedDoubleValues](pylimer_tools_cpp.ComputedDoubleValues.html.md): Bases: &#96;IntEnum&#96;
 - [ComputedIntValues](pylimer_tools_cpp.ComputedIntValues.html.md): Bases: &#96;IntEnum&#96;
+- [CrosslinkerUniverse](pylimer_tools_cpp.CrosslinkerUniverse.html.md): Bases: &#96;pybind11_object&#96;
 - [DPDSimulator](pylimer_tools_cpp.DPDSimulator.html.md): Bases: &#96;pybind11_object&#96;
 - [DataFileReader](pylimer_tools_cpp.DataFileReader.html.md): Bases: &#96;pybind11_object&#96;
 - [DataFileWriter](pylimer_tools_cpp.DataFileWriter.html.md): Bases: &#96;pybind11_object&#96;
@@ -241,6 +243,7 @@
 - [SimplifiedBalance2Network](pylimer_tools_cpp.SimplifiedBalance2Network.html.md): Bases: &#96;pybind11_object&#96;
 - [SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.html.md): Bases: &#96;pybind11_object&#96;
 - [SimplifiedNetwork](pylimer_tools_cpp.SimplifiedNetwork.html.md): Bases: &#96;pybind11_object&#96;
+- [StrandPairEntanglements](pylimer_tools_cpp.StrandPairEntanglements.html.md): Bases: &#96;pybind11_object&#96;
 - [StructureSimplificationMode](pylimer_tools_cpp.StructureSimplificationMode.html.md): Bases: &#96;Enum&#96;
 - [Universe](pylimer_tools_cpp.Universe.html.md): Bases: &#96;pybind11_object&#96;
 - [UniverseSequence](pylimer_tools_cpp.UniverseSequence.html.md): Bases: &#96;pybind11_object&#96;

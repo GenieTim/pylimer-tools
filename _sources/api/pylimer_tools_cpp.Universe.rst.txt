@@ -15,6 +15,7 @@ Universe
       ~Universe.add_bonds
       ~Universe.add_bonds_with_types
       ~Universe.add_dihedral_angles
+      ~Universe.clear_caches
       ~Universe.compute_angles
       ~Universe.compute_bond_lengths
       ~Universe.compute_bond_vectors
@@ -100,6 +101,7 @@ Universe
    .. automethod:: add_bonds
    .. automethod:: add_bonds_with_types
    .. automethod:: add_dihedral_angles
+   .. automethod:: clear_caches
    .. automethod:: compute_angles
    .. automethod:: compute_bond_lengths
    .. automethod:: compute_bond_vectors
