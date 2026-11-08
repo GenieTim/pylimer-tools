@@ -119,7 +119,7 @@ sphinx_gallery_conf = {
         "pylimer_tools_cpp": None,
         "pylimer_tools": None,
     },
-    "ignore_pattern": r"(__init__|_.*)\.py",
+    "ignore_pattern": r"(^|[/\\])_.*\.py$",
 }
 
 intersphinx_mapping = get_intersphinx_mapping(

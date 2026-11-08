@@ -4,7 +4,7 @@ Utility script to recompute and update all precomputed cached datasets
 for the force_balance examples.
 
 Usage:
-    python recompute_caches.py [-j WORKERS] [--parallel-caches]
+    python _recompute_caches.py [-j WORKERS] [--parallel-caches]
                                [--link-vs-spring-only] [--slipping-vs-fixed-only] [--sampling-only]
 """
 
