@@ -13,5 +13,5 @@ fi
 # Format Python code
 if [ -n "$PYTHON" ]; then
   $PYTHON -m ruff format ./src/pylimer_tools ./examples ./tests 2>/dev/null || true
-  find ./src/pylimer_tools ./tests ./examples \( -name "*.py" -o -name "*.pyi" \) -exec $PYTHON -m autopep8 --in-place --aggressive {} + 2>/dev/null || true
+  find ./src/pylimer_tools ./tests ./examples \( -name "*.py" -o -name "*.pyi" \) -exec $PYTHON -m autopep8 --in-place --aggressive --ignore=E402 {} + 2>/dev/null || true
 fi
