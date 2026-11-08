@@ -2469,10 +2469,11 @@ MCUniverseGenerator::evaluatePartnerProbability(
   }
   const Eigen::Vector3d dist = this->getVectorBetween(from, to);
   double thisWeight = -1.;
-  if (dist.norm() < maxDistance || maxDistance < 0.) {
+  const double distSq = dist.squaredNorm();
+  if (maxDistance < 0. || distSq < maxDistance * maxDistance) {
     thisWeight =
       static_cast<double>(this->remainingCrossLinkerFunctionality[to]) *
-      std::exp(dist.squaredNorm() * normalisationFactorInExponential);
+      std::exp(distSq * normalisationFactorInExponential);
     const int strand1 = this->simplifiedUniverse.xlinkChainId[from];
     const int strand2 = this->simplifiedUniverse.xlinkChainId[to];
     if (to == from || (respectXlinkChains && strand1 == strand2)) {

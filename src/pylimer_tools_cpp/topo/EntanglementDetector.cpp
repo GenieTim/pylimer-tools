@@ -393,7 +393,9 @@ randomlyFindEntanglementsV2(const pylimer_tools::entities::Universe& universe,
           coordinates.segment(3 * atomVertexIdx1, 3);
         box.handlePBC(distance);
 
-        if (distance.norm() < lowerCutoff || distance.norm() > upperCutoff) {
+        const double dist2 = distance.squaredNorm();
+        if (dist2 < lowerCutoff * lowerCutoff ||
+            dist2 > upperCutoff * upperCutoff) {
           continue;
         }
 
@@ -642,11 +644,14 @@ namespace {
       return (mu <= r) ? 1.0 : 0.0;
     }
 
-    const double invSqrt2Sigma = 1.0 / (std::sqrt(2.0) * sigma);
+    static const double sqrt2 = std::sqrt(2.0);
+    static const double twoOverSqrtPi = 2.0 / std::sqrt(M_PI);
+    static const double invSqrt2Pi = 1.0 / std::sqrt(2.0 * M_PI);
+
+    const double invSqrt2Sigma = 1.0 / (sqrt2 * sigma);
     if (mu <= 1e-7 * sigma) {
       const double u = r * invSqrt2Sigma;
       const double eps = mu * invSqrt2Sigma;
-      const double twoOverSqrtPi = 2.0 / std::sqrt(M_PI);
       const double expMinusU2 = std::exp(-u * u);
       const double f0 = std::erf(u) - twoOverSqrtPi * u * expMinusU2;
       const double corr =
@@ -655,17 +660,27 @@ namespace {
     }
 
     const double a = (r - mu) * invSqrt2Sigma;
+    if (a <= -6.0) {
+      return 0.0;
+    }
+    if (a >= 6.0) {
+      return 1.0;
+    }
+
     const double b = (r + mu) * invSqrt2Sigma;
+    const double erfcB = (b < 6.0) ? std::erfc(b) : 0.0;
     double erfDiff = 0.0;
     if (a < 0.0) {
-      erfDiff = 0.5 * (std::erfc(-a) - std::erfc(b));
+      erfDiff = 0.5 * (std::erfc(-a) - erfcB);
     } else {
-      erfDiff = 1.0 - 0.5 * (std::erfc(a) + std::erfc(b));
+      erfDiff = 1.0 - 0.5 * (std::erfc(a) + erfcB);
     }
 
     const double b2MinusA2 = (2.0 * r * mu) / (sigma * sigma);
-    const double expDiff = -std::exp(-a * a) * std::expm1(-b2MinusA2);
-    const double expTerm = (sigma / (std::sqrt(2.0 * M_PI) * mu)) * expDiff;
+    const double expDiff = (b2MinusA2 < 36.0)
+                             ? -std::exp(-a * a) * std::expm1(-b2MinusA2)
+                             : std::exp(-a * a);
+    const double expTerm = ((sigma * invSqrt2Pi) / mu) * expDiff;
     return std::clamp(erfDiff - expTerm, 0.0, 1.0);
   }
 
@@ -677,11 +692,14 @@ namespace {
     if (sigma <= 1e-12) {
       return (mu >= rMin && mu <= rMax) ? 1.0 : 0.0;
     }
-    // Quick 7-sigma range rejection
-    if (mu - 7.0 * sigma > rMax || mu + 7.0 * sigma < rMin) {
+    // Quick 6-sigma range rejection (Gaussian tail beyond 6 sigma has P < 1e-9)
+    if (mu - 6.0 * sigma > rMax || mu + 6.0 * sigma < rMin) {
       return 0.0;
     }
     const double fMax = isotropic3DGaussianRadialCDF(rMax, mu, sigma);
+    if (fMax <= 0.0) {
+      return 0.0;
+    }
     const double fMin =
       (rMin > 0.0) ? isotropic3DGaussianRadialCDF(rMin, mu, sigma) : 0.0;
     return std::clamp(fMax - fMin, 0.0, 1.0);
@@ -998,6 +1016,24 @@ randomlyFindEntanglementsAnalytical(
   std::vector<size_t> candidateOrder(totalInternalBeads);
   std::iota(candidateOrder.begin(), candidateOrder.end(), 0);
 
+  // Cached mean positions and standard deviations for all internal beads
+  std::vector<Eigen::Vector3d> beadMean(totalInternalBeads);
+  std::vector<double> beadSigma(totalInternalBeads);
+  const std::function<void(const size_t)> updateStrandBeadCache =
+    [&](const size_t s) {
+      const StrandModel& sm = strands[s];
+      const size_t baseOffset = strandInternalOffset[s];
+      const size_t nInt = static_cast<size_t>(sm.nInternalBeads);
+      for (size_t m = 0; m < nInt; ++m) {
+        const double alpha = sm.internalIdxToAlpha(m);
+        sm.evaluateConditionalDistribution(
+          alpha, beadMean[baseOffset + m], beadSigma[baseOffset + m]);
+      }
+    };
+  for (size_t s = 0; s < nStrands; ++s) {
+    updateStrandBeadCache(s);
+  }
+
   struct CandidatePartner
   {
     size_t globalInternalIdx;
@@ -1047,16 +1083,16 @@ randomlyFindEntanglementsAnalytical(
 
       // 1. Sample 3D position r1 of bead b1 from its conditional Gaussian
       // bridge
-      Eigen::Vector3d mu1;
-      double sigma1 = 0.0;
-      sm1.evaluateConditionalDistribution(alpha1, mu1, sigma1);
+      const Eigen::Vector3d& mu1 = beadMean[globalIdx1];
+      const double sigma1 = beadSigma[globalIdx1];
       const Eigen::Vector3d r1 =
         mu1 + sigma1 *
                 Eigen::Vector3d(stdNormal(rng), stdNormal(rng), stdNormal(rng));
 
-      // Temporarily pin (alpha1, r1) on s1 so same-strand loop closure
-      // conditions on r(alpha1) = r1
-      sm1.insertPinnedPoint(alpha1, r1);
+      // Defer pinning (alpha1, r1) on s1 until actually needed:
+      // it is only needed if evaluating a same-strand partner (s1 == s2) or
+      // upon successfully forming an entanglement.
+      bool s1Pinned = false;
 
       // 2. Query nearby strands around r1
       Eigen::Vector3d r1Wrapped = r1;
@@ -1079,8 +1115,9 @@ randomlyFindEntanglementsAnalytical(
         // Fast strand-level bounding sphere filter
         Eigen::Vector3d midDiff = sm2.midpoint - r1Wrapped;
         box.handlePBC(midDiff);
-        if (midDiff.norm() >
-            sm2.halfChordLen + 4.5 * sm2.maxSigma + upperCutoff) {
+        const double maxStrandDist =
+          sm2.halfChordLen + 4.5 * sm2.maxSigma + upperCutoff;
+        if (midDiff.squaredNorm() > maxStrandDist * maxStrandDist) {
           continue;
         }
 
@@ -1101,13 +1138,33 @@ randomlyFindEntanglementsAnalytical(
             }
           }
 
-          const double alpha2 = sm2.internalIdxToAlpha(m2);
           Eigen::Vector3d mu2;
           double sigma2 = 0.0;
-          sm2.evaluateConditionalDistribution(alpha2, mu2, sigma2);
+          if (s1 == s2) {
+            if (!s1Pinned) {
+              sm1.insertPinnedPoint(alpha1, r1);
+              s1Pinned = true;
+            }
+            const double alpha2 = sm1.internalIdxToAlpha(m2);
+            sm1.evaluateConditionalDistribution(alpha2, mu2, sigma2);
+          } else {
+            mu2 = beadMean[globalIdx2];
+            sigma2 = beadSigma[globalIdx2];
+          }
 
           Eigen::Vector3d deltaMu = mu2 - r1;
           box.handlePBC(deltaMu);
+
+          const double maxDist = upperCutoff + 6.0 * sigma2;
+          if (deltaMu.squaredNorm() > maxDist * maxDist) {
+            continue;
+          }
+          if (lowerCutoff > 0.0) {
+            const double minDist = lowerCutoff - 6.0 * sigma2;
+            if (minDist > 0.0 && deltaMu.squaredNorm() < minDist * minDist) {
+              continue;
+            }
+          }
           const double distMu = deltaMu.norm();
 
           const double p =
@@ -1121,7 +1178,9 @@ randomlyFindEntanglementsAnalytical(
       }
 
       if (partners.empty()) {
-        sm1.removePinnedPoint(alpha1);
+        if (s1Pinned) {
+          sm1.removePinnedPoint(alpha1);
+        }
         continue;
       }
 
@@ -1129,7 +1188,9 @@ randomlyFindEntanglementsAnalytical(
       // shell)
       const double pAny = 1.0 - survivalProb;
       if (uniform01(rng) >= pAny) {
-        sm1.removePinnedPoint(alpha1);
+        if (s1Pinned) {
+          sm1.removePinnedPoint(alpha1);
+        }
         continue;
       }
 
@@ -1160,12 +1221,23 @@ randomlyFindEntanglementsAnalytical(
       const Eigen::Vector3d d = sampleDisplacementInShell3D(
         lowerCutoff, upperCutoff, chosen.deltaMu, chosen.sigma, rng);
 
+      // Ensure (alpha1, r1) is pinned on s1
+      if (!s1Pinned) {
+        sm1.insertPinnedPoint(alpha1, r1);
+        s1Pinned = true;
+      }
+
       // Pin (alpha2, r2) in strand s2's unwrapped coordinate frame
       const Eigen::Vector3d r2InS2Frame = (chosen.meanPos - chosen.deltaMu) + d;
       sm2.insertPinnedPoint(alpha2, r2InS2Frame);
 
       beadIsPaired[globalIdx1] = 1;
       beadIsPaired[chosen.globalInternalIdx] = 1;
+
+      updateStrandBeadCache(s1);
+      if (s2 != s1) {
+        updateStrandBeadCache(s2);
+      }
 
       if (!filterDanglingAndSoluble || (!sm1.isIgnored && !sm2.isIgnored)) {
         result.strandIdx1.push_back(s1);

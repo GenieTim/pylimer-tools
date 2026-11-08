@@ -12,10 +12,15 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 from datetime import datetime
+from pathlib import Path
+import sys
 
 from intersphinx_registry import get_intersphinx_mapping
 
 import pylimer_tools_cpp
+
+# Add examples directory to sys.path for Sphinx-Gallery helper modules
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "examples"))
 
 # -- Project information -----------------------------------------------------
 
@@ -114,6 +119,7 @@ sphinx_gallery_conf = {
         "pylimer_tools_cpp": None,
         "pylimer_tools": None,
     },
+    "ignore_pattern": r"(__init__|_.*)\.py",
 }
 
 intersphinx_mapping = get_intersphinx_mapping(

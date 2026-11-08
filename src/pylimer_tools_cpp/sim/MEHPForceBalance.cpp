@@ -109,8 +109,18 @@ MEHPForceBalance::runForceRelaxation(
             << oneOverSpringPartitionUpperLimit << std::endl;
   double currentResidual = initialResidual;
   double previousResidual = initialResidual;
-  double intermediateResidual = 0.0;
   size_t iterationsDone = 0;
+
+  std::vector<std::vector<size_t>> partialSpringIndicesOfLinks(
+    this->initialConfig.nrOfLinks);
+  const std::function<void()> refreshPartialSpringIndices = [&]() {
+    partialSpringIndicesOfLinks.resize(this->initialConfig.nrOfLinks);
+    for (size_t i = 0; i < this->initialConfig.nrOfLinks; ++i) {
+      partialSpringIndicesOfLinks[i] =
+        this->getPartialSpringIndicesOfLink(this->initialConfig, i);
+    }
+  };
+  refreshPartialSpringIndices();
 
   this->prepareAllOutputs();
 
@@ -164,14 +174,10 @@ MEHPForceBalance::runForceRelaxation(
           this->initialConfig,
           this->currentSpringPartitionsVec,
           oneOverSpringPartitionUpperLimit);
+        refreshPartialSpringIndices();
       }
     }
     maxDistanceMoved = 0.0;
-
-    // intermediateResidual =
-    //   this->getDisplacementResidualNormFor(this->initialConfig,
-    //                                        this->currentDisplacements,
-    //                                        oneOverSpringPartitions);
 
     // place slip-link
     if (!disableSlipping) {
@@ -201,7 +207,8 @@ MEHPForceBalance::runForceRelaxation(
                                          this->currentDisplacements,
                                          this->currentSpringPartitionsVec,
                                          link_idx,
-                                         oneOverSpringPartitionUpperLimit);
+                                         oneOverSpringPartitionUpperLimit,
+                                         partialSpringIndicesOfLinks[link_idx]);
           maxDistanceMoved = std::max(maxDistanceMoved, displacementDone);
           innerIterationsDone += 1;
         } while (doInnerIterations && innerIterationsDone < 50);
@@ -211,9 +218,6 @@ MEHPForceBalance::runForceRelaxation(
                                              this->currentSpringPartitionsVec,
                                              oneOverSpringPartitionUpperLimit);
     }
-
-    intermediateResidual = this->getDisplacementResidualNormFor(
-      this->initialConfig, this->currentDisplacements, oneOverSpringPartitions);
 
     // place crosslinkers
     if (iterateForDisplacements) {
@@ -225,7 +229,8 @@ MEHPForceBalance::runForceRelaxation(
                                        this->currentDisplacements,
                                        this->currentSpringPartitionsVec,
                                        link_idx,
-                                       oneOverSpringPartitionUpperLimit);
+                                       oneOverSpringPartitionUpperLimit,
+                                       partialSpringIndicesOfLinks[link_idx]);
         if (distanceMoved > maxDistanceMoved) {
           maxDistanceMoved = distanceMoved;
           indexOfMaxDistanceMoved = link_idx;
@@ -260,9 +265,13 @@ MEHPForceBalance::runForceRelaxation(
     previousResidual = currentResidual;
     iterationsDone += 1;
     if (iterationsDone % this->simplificationFrequency == 0) {
-      this->breakTooLongSprings(this->initialConfig,
-                                this->currentDisplacements,
-                                this->currentSpringPartitionsVec);
+      const size_t numBroken =
+        this->breakTooLongSprings(this->initialConfig,
+                                  this->currentDisplacements,
+                                  this->currentSpringPartitionsVec);
+      if (numBroken > 0) {
+        refreshPartialSpringIndices();
+      }
       size_t nRemoved = 0;
       size_t nRemovedThisLoop = 0;
 
@@ -343,6 +352,7 @@ MEHPForceBalance::runForceRelaxation(
           this->initialConfig,
           this->currentSpringPartitionsVec,
           oneOverSpringPartitionUpperLimit);
+        refreshPartialSpringIndices();
       }
     }
     this->handleOutput(iterationsDone);
@@ -3030,15 +3040,18 @@ MEHPForceBalance::updateSpringPartition(
                        std::to_string(linkIdx) + " is not one. Network has " +
                        std::to_string(net.nrOfNodes) + " cross- of " +
                        std::to_string(net.nrOfLinks) + " links.");
-  std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
+  const std::vector<size_t>& springIndices = net.springIndicesOfLinks[linkIdx];
   assert(springIndices.size() == 1 || springIndices.size() == 2);
-  if (springIndices.size() == 2 && springIndices[0] == springIndices[1]) {
-    springIndices.pop_back();
-  }
+  const size_t numSprings =
+    (springIndices.size() == 2 && springIndices[0] == springIndices[1])
+      ? 1
+      : springIndices.size();
   double residualNorm = 0.0;
   int residualNormContributions = 0;
-  for (const size_t springIndex : springIndices) {
-    std::vector<size_t> springsPartners = net.linkIndicesOfSprings[springIndex];
+  for (size_t sIdx = 0; sIdx < numSprings; ++sIdx) {
+    const size_t springIndex = springIndices[sIdx];
+    const std::vector<size_t>& springsPartners =
+      net.linkIndicesOfSprings[springIndex];
     for (size_t partner_idx = 1; partner_idx < springsPartners.size() - 1;
          ++partner_idx) {
       if (springsPartners[partner_idx] == linkIdx) {
@@ -4519,6 +4532,24 @@ MEHPForceBalance::displaceToMeanPosition(
   const size_t linkIdx,
   const double oneOverSpringPartitionUpperLimit) const
 {
+  return this->displaceToMeanPosition(
+    net,
+    u,
+    springPartitions,
+    linkIdx,
+    oneOverSpringPartitionUpperLimit,
+    this->getPartialSpringIndicesOfLink(net, linkIdx));
+}
+
+double
+MEHPForceBalance::displaceToMeanPosition(
+  const ForceBalanceNetwork& net,
+  Eigen::VectorXd& u,
+  const Eigen::VectorXd& springPartitions,
+  const size_t linkIdx,
+  const double oneOverSpringPartitionUpperLimit,
+  const std::vector<size_t>& partialSpringIndices) const
+{
 #ifndef NDEBUG
   const Eigen::Vector3d forceBefore = this->getForceOn(
     net, u, springPartitions, linkIdx, oneOverSpringPartitionUpperLimit);
@@ -4528,9 +4559,6 @@ MEHPForceBalance::displaceToMeanPosition(
     Eigen::Vector3d::Zero(); // = remainingDisplacement.array();
   double objectiveDisplacementContributors = 0.0;
   bool cautionPrimaryLoop = false;
-
-  const std::vector<size_t> partialSpringIndices =
-    this->getPartialSpringIndicesOfLink(net, linkIdx);
 
   for (const size_t globalSpringIndex : partialSpringIndices) {
     assert(net.springPartIndexA[globalSpringIndex] == linkIdx ||

@@ -1863,10 +1863,13 @@ public:
                        "The requested link does not exist");
     std::vector<size_t> partialSpringIndices;
 
-    const std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
+    const std::vector<size_t>& springIndices =
+      net.springIndicesOfLinks[linkIdx];
+    partialSpringIndices.reserve(springIndices.size() * 2);
 
     for (const size_t springIdx : springIndices) {
-      for (size_t partialSpringIdx : net.localToGlobalSpringIndex[springIdx]) {
+      for (const size_t partialSpringIdx :
+           net.localToGlobalSpringIndex[springIdx]) {
         if (this->isPartOfSpring(net, linkIdx, partialSpringIdx)) {
           partialSpringIndices.push_back(partialSpringIdx);
         }
@@ -2181,6 +2184,14 @@ public:
     const Eigen::VectorXd& springPartitions,
     const size_t linkIdx,
     const double oneOverSpringPartitionUpperLimit = 1.0) const;
+
+  double displaceToMeanPosition(
+    const ForceBalanceNetwork& net,
+    Eigen::VectorXd& u,
+    const Eigen::VectorXd& springPartitions,
+    const size_t linkIdx,
+    const double oneOverSpringPartitionUpperLimit,
+    const std::vector<size_t>& partialSpringIndices) const;
 
   /**
    * @brief Translate the spring partition vector to its 3*size

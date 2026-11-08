@@ -55,9 +55,6 @@ namespace sim {
                                 coordinates.segment(3 * (i + 1), 3))
                                  .squaredNorm();
 
-        double currentProbability =
-          std::exp(normalisationFactorInExponential * (bondLen21 + bondLen22));
-
         Eigen::Vector3d displacement =
           stepSize * Eigen::Vector3d(displacementSamplingDist(rng),
                                      displacementSamplingDist(rng),
@@ -74,12 +71,18 @@ namespace sim {
                              coordinates.segment(3 * (i + 1), 3))
                               .squaredNorm();
 
-        double newProbability = std::exp(normalisationFactorInExponential *
-                                         (newBondLen21 + newBondLen22));
+        const double deltaBondLen2 =
+          (newBondLen21 + newBondLen22) - (bondLen21 + bondLen22);
 
-        if ((newProbability / currentProbability) >
-            //((bondLen21 + bondLen22) - (newBondLen21 + newBondLen22)) >
-            probabilitySamplingDist(rng)) {
+        // Metropolis acceptance criterion:
+        // P_new / P_old = exp(normalisationFactorInExponential *
+        // deltaBondLen2). Since normalisationFactorInExponential < 0, if
+        // deltaBondLen2 <= 0 the energy decreases or stays equal (acceptance
+        // prob >= 1), so the move is accepted unconditionally without
+        // evaluating exp() or RNG.
+        if (deltaBondLen2 <= 0.0 ||
+            std::exp(normalisationFactorInExponential * deltaBondLen2) >
+              probabilitySamplingDist(rng)) {
           coordinates.segment(3 * i, 3) += displacement;
           numLastStepsAccepted += 1;
         }

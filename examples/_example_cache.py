@@ -17,7 +17,9 @@ from typing import Any, Callable, Dict, Optional, Union
 import numpy as np
 
 
-def get_example_cache_path(filename: str, example_folder: str = "force_balance") -> Path:
+def get_example_cache_path(
+    filename: str, example_folder: str = "force_balance"
+) -> Path:
     """Resolve the filesystem path to an example's cached data file (.npz).
 
     Searches intelligently from current working directory, caller file location,
@@ -27,7 +29,7 @@ def get_example_cache_path(filename: str, example_folder: str = "force_balance")
     Parameters
     ----------
     filename : str
-        Name of the cache file (e.g. "sliplink_vs_slipspring_cache.npz").
+        Name of the cache file (e.g. "entanglement_link_vs_spring_cache.npz").
     example_folder : str, default="force_balance"
         Subfolder within ``examples/`` where the cache resides.
 
@@ -55,7 +57,8 @@ def get_example_cache_path(filename: str, example_folder: str = "force_balance")
                 return (p / "data" / filename).resolve()
             # Check p/examples/<example_folder>/data/filename
             if (p / "examples" / example_folder / "data" / filename).is_file():
-                return (p / "examples" / example_folder / "data" / filename).resolve()
+                return (p / "examples" / example_folder /
+                        "data" / filename).resolve()
             # Check p/<example_folder>/data/filename
             if (p / example_folder / "data" / filename).is_file():
                 return (p / example_folder / "data" / filename).resolve()
@@ -64,6 +67,8 @@ def get_example_cache_path(filename: str, example_folder: str = "force_balance")
     for start_dir in list(candidates):
         cur = start_dir
         for p in [cur] + list(cur.parents):
+            if (p / example_folder / "data").is_dir():
+                return ((p / example_folder / "data") / filename).resolve()
             target_dir = p / "examples" / example_folder / "data"
             if target_dir.is_dir():
                 return (target_dir / filename).resolve()
@@ -124,25 +129,9 @@ def compute_ensemble_statistics(
     sem = std / np.sqrt(n)
 
     # Calculate Student's t critical value
-    try:
-        from scipy import stats
+    from scipy import stats
 
-        t_crit = float(stats.t.ppf((1.0 + confidence) / 2.0, df=n - 1))
-    except Exception:
-        # Fallback t-table approximations if scipy is unavailable
-        t_table = {
-            2: 12.706,
-            3: 4.303,
-            4: 3.182,
-            5: 2.776,
-            6: 2.571,
-            7: 2.447,
-            8: 2.365,
-            9: 2.306,
-            10: 2.262,
-        }
-        t_crit = t_table.get(n, 1.96 if confidence == 0.95 else 2.58)
-
+    t_crit = float(stats.t.ppf((1.0 + confidence) / 2.0, df=n - 1))
     ci = t_crit * sem
     return {
         "mean": mean,
@@ -155,6 +144,59 @@ def compute_ensemble_statistics(
     }
 
 
+def resolve_max_workers(max_workers: Optional[int] = None) -> int:
+    """Resolve the effective number of worker processes for parallel simulation tasks.
+
+    Checks:
+    1. Explicit ``max_workers`` argument (if provided and >= 1).
+    2. CLI arguments: ``--workers N``, ``-j N``, or ``--workers=N`` in ``sys.argv``.
+    3. Environment variables: ``PYLIMER_NUM_WORKERS`` or ``PYLIMER_MAX_WORKERS``.
+    4. Default fallback: available CPU cores via ``os.cpu_count() or 1``.
+
+    Parameters
+    ----------
+    max_workers : int, optional
+        Explicit number of workers requested.
+
+    Returns
+    -------
+    int
+        Positive integer for the number of workers to use.
+    """
+    if max_workers is not None and max_workers >= 1:
+        return max_workers
+
+    # Check CLI arguments in sys.argv
+    for i, arg in enumerate(sys.argv):
+        if arg in ("--workers", "-j") and i + 1 < len(sys.argv):
+            try:
+                val = int(sys.argv[i + 1])
+                if val >= 1:
+                    return val
+            except ValueError:
+                pass
+        elif arg.startswith("--workers="):
+            try:
+                val = int(arg.split("=", 1)[1])
+                if val >= 1:
+                    return val
+            except ValueError:
+                pass
+
+    # Check environment variables
+    for env_var in ("PYLIMER_NUM_WORKERS", "PYLIMER_MAX_WORKERS"):
+        val_str = os.environ.get(env_var, "")
+        if val_str:
+            try:
+                val = int(val_str)
+                if val >= 1:
+                    return val
+            except ValueError:
+                pass
+
+    return max(1, os.cpu_count() or 1)
+
+
 def should_recompute(recompute_flag: bool = False) -> bool:
     """Determine whether cached data should be recomputed.
 
@@ -165,7 +207,8 @@ def should_recompute(recompute_flag: bool = False) -> bool:
         return True
     if "--recompute" in sys.argv:
         return True
-    if os.environ.get("PYLIMER_RECOMPUTE_CACHE", "").lower() in ("1", "true", "yes"):
+    if os.environ.get("PYLIMER_RECOMPUTE_CACHE",
+                      "").lower() in ("1", "true", "yes"):
         return True
     return False
 

@@ -6,16 +6,21 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
 
 Here, we distinguish the following three different implementations:
 
-- :class:`~pylimer_tools_cpp.MEHPForceRelaxation`: An MEHP implementation that allows to use non-linear force potentials,
-- :class:`~pylimer_tools_cpp.MEHPForceBalance`: A Force Balance implementation, which uses just Hookean springs, but allows the use of slip-links to model entanglements,
-- :class:`~pylimer_tools_cpp.MEHPForceBalance2`: The faster implementation of the Force Balance procedure, without allowing for slip-links, but allowing the modelling of entanglements as static links, like tetrafunctional crosslinks.
+- :class:`~pylimer_tools_cpp.MEHPForceRelaxation`: An MEHP implementation that allows the use of non-linear force potentials,
+- :class:`~pylimer_tools_cpp.MEHPForceBalance`: A Force Balance implementation using Hookean springs that supports slip-links with optional dynamic contour slipping (or fixed links via ``disable_slipping=True``),
+- :class:`~pylimer_tools_cpp.MEHPForceBalance2`: The faster implementation of the Force Balance procedure, representing entanglements as fixed 4-functional links (like tetrafunctional crosslinks) or compliant Hookean springs, without contour slipping.
 
 Sampling Entanglements
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Entanglements (slip-links) can be sampled in two distinct ways:
+Entanglements can be sampled in two distinct ways:
 
 1. **Discrete full-universe sampling**: Directly on explicit bead coordinates in a :class:`~pylimer_tools_cpp.Universe`.
 2. **Analytical Brownian-bridge sampling**: Directly on the crosslinkers and strand connectivity of a :class:`~pylimer_tools_cpp.CrosslinkerUniverse` without instantiating intermediate strand beads, reducing peak memory by up to 90%+ and supporting topological leaf peeling of dangling and soluble fractions.
 
-See :doc:`plot_entanglement_sampling_comparison` for a detailed benchmark and comparison of discrete vs. analytical sampling methods, and :doc:`plot_sliplink_vs_slipspring` for the difference between modeling entanglements as merged slip-links versus compliant Hookean slip-springs.
+See:
+
+- :doc:`plot_entanglement_sampling_comparison` for a detailed benchmark and comparison of discrete vs. analytical sampling methods,
+- :doc:`plot_entanglement_link_vs_spring` for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,
+- :doc:`plot_slipping_vs_fixed_links` for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
+- :doc:`plot_inactive_removal_and_sampling` for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling.

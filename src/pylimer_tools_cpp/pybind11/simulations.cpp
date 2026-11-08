@@ -256,8 +256,12 @@ the simulation or optimization procedure.)pbdoc")
      i.e., no "normal strand beads" in between, in order to reduce the degrees of freedom
      and therewith improve performance of the solver.
 
-     A note on the terminology: a spring is the connection between two links (crosslink, entanglement-link/slip-link).
-     A strand is a chain of connected links between two crosslinks.
+     A note on terminology:
+     - A **spring** (or partial spring) is the Hookean connection between two adjacent links
+       (which may be a chemical crosslink or an entanglement link / slip-link).
+     - A **strand** is the full chain of connected links and springs between two chemical crosslinks.
+     - For the distinction between chemical crosslinks, non-slipping entanglement links,
+       entanglement springs, and dynamic slip-links, see :doc:`/nomenclature`.
  )pbdoc")
     .def_readonly("box_lengths", &mehp::ForceBalanceNetwork::L)
     .def_readonly("volume", &mehp::ForceBalanceNetwork::vol)
@@ -951,12 +955,12 @@ A strand is a chain of connected links between two crosslinks.
     A small simulation tool for quickly minimizing the force between the crosslinker beads.
 
     This is the second implementation in the group of MEHP provided by this package.
-    The distinct feature here is the slip-links: a form of entanglement,
-    represented as an entanglement link, just like a four-functional crosslink,
-    but with the ability to slip along the two associated strands, therewith
-    adjusting the fraction of the contour length on both sides of the link.
+    The distinct feature here is slip-links: entanglements represented as links
+    with the option to dynamically slip along the two associated strands (via ``disable_slipping=False``)
+    or remain fixed at their contour positions (via ``disable_slipping=True``).
 
-    Please cite :cite:t:`bernhard_phantom_2025` if you use this method.
+    See :doc:`/nomenclature` for details on entanglement terminology and the rationale
+    for fixed links, and cite :cite:t:`bernhard_phantom_2025` if you use this method.
     )pbdoc")
     .def(py::init<pe::Universe, int, bool, bool, bool>(),
          R"pbdoc(
@@ -1620,8 +1624,8 @@ A strand is a chain of connected links between two crosslinks.
      This is the third implementation of the MEHP. 
      It's the fastest implementation by using a simple spring model only, disabling the non-linear
      periodic boundary conditions, and instead builds a sparse linear system of equations that's readily solved.
-     However, it allows entanglements to be represented as additional links or/and springs,
-     although without slipping along the chain.
+     However, it allows entanglements to be represented as additional fixed links or/and springs,
+     without slipping along the chain contour (see :doc:`/nomenclature`).
 
      Please cite :cite:t:`bernhard_phantom_2025` if you use this method.
       )pbdoc")

@@ -55,6 +55,25 @@ Polymer-Specific Terms
 **End-to-End Distance**
     The Euclidean distance between the two terminal atoms of a linear polymer chain.
 
+.. _nomenclature_entanglements:
+
+Entanglement & Force Balance Terms
+----------------------------------
+
+**Entanglement Link**
+    A topological entanglement represented as a single merged 4-functional junction node pinning two chains (:cite:t:`bernhard_phantom_2025`).
+    In :class:`~pylimer_tools_cpp.MEHPForceBalance2`, its contour position is fixed—it does not slip along the chain contour.
+
+**Entanglement Spring**
+    A representation where entangled chains remain separate and are coupled by a compliant Hookean spring (:class:`~pylimer_tools_cpp.MEHPForceBalance2` with ``entanglements_as_springs=True``). Like entanglement links, it does not slip along the chain contour.
+
+**Slip-Link / Slip-Spring**
+    An entanglement link or spring that is permitted to slide dynamically along the polymer chain contour to equalize strand tensions.
+    Supported in :class:`~pylimer_tools_cpp.MEHPForceBalance` (via ``disable_slipping=False``), but omitted in :class:`~pylimer_tools_cpp.MEHPForceBalance2` where links are fixed because slipping was found to be an unnecessary complication that artificially softens the plateau modulus (:cite:t:`bernhard_phantom_2025`).
+
+**Spring vs. Strand**
+    In the force balance network (:class:`~pylimer_tools_cpp.SimplifiedBalanceNetwork`), a **strand** is the full chain connecting two chemical crosslinks, while a **spring** (or partial spring) is an individual Hookean connection between two adjacent links (crosslinks or entanglement links).
+
 Mass vs. Weight Terminology
 ---------------------------
 

@@ -1,10 +1,10 @@
 r"""
-Comparing Slip-Link Sampling Methods: Discrete vs. Analytical
-=============================================================
+Comparing Entanglement Sampling Methods: Discrete vs. Analytical
+=================================================================
 
 In polymer network elasticity simulations using the Maximum Entropy Homogenization
 Procedure (MEHP) and Force Balance (:cite:t:`gusev_numerical_2019`, :cite:t:`bernhard_phantom_2025`),
-entanglements are represented as slip-links or localized crosslink constraints.
+entanglements are represented as localized topological constraints (entanglement links or springs).
 
 Historically, sampling entanglements required instantiating the complete bead-spring
 :class:`~pylimer_tools_cpp.Universe` (:meth:`~pylimer_tools_cpp.MCUniverseGenerator.get_universe`)
@@ -32,8 +32,8 @@ This example illustrates:
 """
 
 # %%
-# Background: The Memory Wall in Slip-Link Sampling
-# -------------------------------------------------
+# Background: The Memory Wall in Entanglement Sampling
+# ----------------------------------------------------
 # In a polymer network, strands between crosslinkers fluctuate thermally.
 # Under the affine network model and Gaussian chain approximation, the position
 # :math:`\mathbf{r}(\alpha)` of a bead at contour fraction :math:`\alpha \in (0, 1)`
@@ -61,46 +61,57 @@ This example illustrates:
 # peeling** (``filter_dangling_and_soluble=True``), discarding candidate links that involve
 # dangling chains or soluble molecules.
 
+from concurrent.futures import ProcessPoolExecutor, as_completed
 import json
 import os
 from pathlib import Path
 import subprocess
 import sys
 import time
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 from scipy import stats
 
-from pylimer_tools.io.bead_spring_parameter_provider import (
-    ParameterType,
-    get_parameters_for_polymer,
-)
-from pylimer_tools.utils.example_cache import (
+# Ensure examples/ is on sys.path when script is executed directly
+if "__file__" in globals():
+    _examples_dir = str(Path(__file__).resolve().parents[1])
+    if _examples_dir not in sys.path:
+        sys.path.insert(0, _examples_dir)
+
+from _example_cache import (  # noqa: E402
     compute_ensemble_statistics,
     get_example_cache_path,
     load_or_compute_cache,
+    resolve_max_workers,
 )
-import pylimer_tools_cpp as pt
+from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
+    ParameterType,
+    get_parameters_for_polymer,
+)
+import pylimer_tools_cpp as pt  # noqa: E402
+
 
 # %%
 # Benchmark 1: Scaling Benchmark (Peak Memory & Runtime)
 # ------------------------------------------------------
 # We measure peak resident memory (RSS) and execution time across network sizes
-# ranging from 200 to 4,000 strands (up to 200,000+ beads).
-# Subprocesses isolate memory measurements per condition to prevent accumulation.
+# ranging from 200 to 10,000 strands (up to 200,000+ beads).
+# Subprocesses isolate memory measurements per condition to prevent
+# accumulation.
 
 
 def run_scaling_benchmark(
-    sizes: Sequence[int] = (200, 500, 1000, 2000, 4000, 6000),
+    sizes: Sequence[int] = (200, 500, 1000, 2000, 4000, 7000, 10000),
     strand_len: int = 50,
     seed: int = 42,
 ) -> Dict[str, np.ndarray]:
     """Measure peak memory and runtime for discrete and analytical methods across system sizes."""
     print("Running Scaling Benchmark across system sizes...")
-    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer(
+        "PDMS", parameter_type=ParameterType.GAUSSIAN)
     bead_density = params.get_bead_density()
     cutoff = params.get_sampling_cutoff()
     ent_density = params.get_entanglement_density()
@@ -124,6 +135,7 @@ n_ent = int(ent_density * vol)
 
 t0 = time.perf_counter()
 gen = pt.MCUniverseGenerator(L, L, L)
+gen.config_nr_of_mc_steps(200)
 gen.set_seed(seed)
 gen.set_mean_squared_bead_distance(1.0)
 gen.add_strands(n_strands, [strand_len] * n_strands)
@@ -176,19 +188,27 @@ print(json.dumps({"mode": mode, "n_strands": n_strands, "n_atoms": n_atoms, "tim
                 str(cutoff),
                 str(ent_density),
             ]
-            res = subprocess.run(cmd, capture_output=True, text=True, check=True)
-            lines = [l for l in res.stdout.strip().split("\n") if l.startswith("{")]
+            res = subprocess.run(
+                cmd, capture_output=True, text=True, check=True)
+            lines = [l for l in res.stdout.strip().split("\n")
+                     if l.startswith("{")]
             record = json.loads(lines[-1])
             if mode == "discrete":
                 disc_atoms.append(record["n_atoms"])
                 disc_time.append(record["time"])
                 disc_rss.append(record["rss_mb"])
-                print(f"Discrete:   N_atoms={record['n_atoms']:6d} | Time={record['time']:6.2f}s | RSS={record['rss_mb']:6.1f} MB")
+                print(
+                    f"Discrete:   N_atoms={record['n_atoms']:6d} | Time={
+                        record['time']:6.2f}s | RSS={record['rss_mb']:6.1f} MB"
+                )
             else:
                 ana_atoms.append(record["n_atoms"])
                 ana_time.append(record["time"])
                 ana_rss.append(record["rss_mb"])
-                print(f"Analytical: N_atoms={record['n_atoms']:6d} | Time={record['time']:6.2f}s | RSS={record['rss_mb']:6.1f} MB")
+                print(
+                    f"Analytical: N_atoms={record['n_atoms']:6d} | Time={
+                        record['time']:6.2f}s | RSS={record['rss_mb']:6.1f} MB"
+                )
 
     return {
         "scaling_atoms": np.array(ana_atoms),
@@ -207,14 +227,15 @@ print(json.dumps({"mode": mode, "n_strands": n_strands, "n_atoms": n_atoms, "tim
 
 
 def run_distribution_comparison(
-    n_strands: int = 4000,
+    n_strands: int = 10000,
     strand_len: int = 50,
     conversion: float = 0.95,
     seed: int = 123,
 ) -> Dict[str, np.ndarray]:
     """Sample entanglements and compare contour position alpha and spatial distance distributions."""
     print("Running Conformational Distribution Comparison...")
-    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer(
+        "PDMS", parameter_type=ParameterType.GAUSSIAN)
     b = params.get("<b>").to(params.get("distance_units")).magnitude
     bead_density = params.get_bead_density()
     cutoff = params.get_sampling_cutoff()
@@ -226,6 +247,7 @@ def run_distribution_comparison(
     n_ent = int(ent_density * vol)
 
     gen = pt.MCUniverseGenerator(L, L, L)
+    gen.config_nr_of_mc_steps(200)
     gen.set_seed(seed)
     gen.set_bead_distance(b)
     gen.set_mean_squared_bead_distance(b**2)
@@ -234,7 +256,8 @@ def run_distribution_comparison(
     gen.link_strands_to_conversion(conversion)
 
     # 1. Analytical sampling (Brownian bridge)
-    es = gen.sample_entanglements(n_ent, cutoff, 0.0, 0, 3.0, "ana_seed", False)
+    es = gen.sample_entanglements(
+        n_ent, cutoff, 0.0, 0, 3.0, "ana_seed", False)
     alpha_ana = np.concatenate([np.array(es.alpha_1), np.array(es.alpha_2)])
 
     pos1 = np.array(es.position_1).reshape(-1, 3)
@@ -247,7 +270,9 @@ def run_distribution_comparison(
     # 2. Discrete sampling on explicit Universe beads
     u = gen.get_universe()
     cu = gen.get_crosslinker_universe()
-    atom_pairs = pt.randomly_sample_entanglements(u, n_ent, cutoff, 0.0, 0, 3.0, "disc_seed")
+    atom_pairs = pt.randomly_sample_entanglements(
+        u, n_ent, cutoff, 0.0, 0, 3.0, "disc_seed"
+    )
 
     n_xlinks = len(cu.xlink_x)
     offsets = [n_xlinks]
@@ -275,7 +300,10 @@ def run_distribution_comparison(
         atom2 = u.get_atom(a2)
         dist_disc.append(atom1.distance_to(atom2, box))
 
-    print(f"Sampled {len(dist_ana)} analytical pairs, {len(dist_disc)} discrete pairs.")
+    print(
+        f"Sampled {
+            len(dist_ana)} analytical pairs, {
+            len(dist_disc)} discrete pairs.")
     return {
         "alpha_analytical": np.array(alpha_ana),
         "dist_analytical": np.array(dist_ana),
@@ -288,26 +316,117 @@ def run_distribution_comparison(
 # Benchmark 3: Crosslinker Conversion Sweep & Multi-Seed Ensembles
 # ----------------------------------------------------------------
 # We evaluate how defective networks behave across crosslinker conversion :math:`p \in [0.75, 1.00]`.
-# Multi-seed repetitions provide empirical variance and Student's t 95% confidence intervals.
+# Multi-seed repetitions provide empirical variance and Student's t 95%
+# confidence intervals.
+
+
+def _simulate_conversion_sweep_single_repeat(
+    r: int,
+    seed: int,
+    L: float,
+    b: float,
+    n_strands: int,
+    strand_len: int,
+    conversions: Sequence[float],
+    n_ent: int,
+    cutoff: float,
+    r02: float,
+    vol: float,
+    gamma_conv: float,
+) -> Tuple[
+    int,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+]:
+    """Execute a single Monte Carlo repeat for the conversion sweep benchmark."""
+    n_p = len(conversions)
+    g_d = np.zeros(n_p)
+    w_d = np.zeros(n_p)
+    g_af = np.zeros(n_p)
+    w_af = np.zeros(n_p)
+    n_af = np.zeros(n_p)
+    g_au = np.zeros(n_p)
+    w_au = np.zeros(n_p)
+    n_au = np.zeros(n_p)
+    g_as = np.zeros(n_p)
+
+    for i, p in enumerate(conversions):
+        gen = pt.MCUniverseGenerator(L, L, L)
+        gen.config_nr_of_mc_steps(200)
+        gen.set_seed(seed)
+        gen.set_bead_distance(b)
+        gen.set_mean_squared_bead_distance(b**2)
+        gen.add_strands(n_strands, [strand_len] * n_strands)
+        gen.add_crosslinkers(int(0.5 * n_strands), 4)
+        gen.link_strands_to_conversion(p)
+
+        # 1. Discrete Full Universe
+        u = gen.get_universe()
+        fb_disc = pt.MEHPForceBalance2(
+            u,
+            nr_of_entanglements_to_sample=n_ent,
+            upper_sampling_cutoff=cutoff,
+            entanglements_as_springs=False,
+        )
+        fb_disc.run_force_relaxation()
+        g_d[i] = gamma_conv * fb_disc.get_gamma_factor(r02) / vol
+        w_d[i] = fb_disc.get_active_weight_fraction()
+
+        # 2. Analytical Filtered (Default)
+        es_filt = gen.sample_entanglements(
+            n_ent, cutoff, 0.0, 0, 3.0, f"seed_f_{seed}", True
+        )
+        fb_filt = gen.get_force_balance2(es_filt, 2, False)
+        fb_filt.run_force_relaxation()
+        g_af[i] = gamma_conv * fb_filt.get_gamma_factor(r02) / vol
+        w_af[i] = fb_filt.get_active_weight_fraction()
+        n_af[i] = len(es_filt)
+
+        # 3. Analytical Unfiltered
+        es_unfilt = gen.sample_entanglements(
+            n_ent, cutoff, 0.0, 0, 3.0, f"seed_u_{seed}", False
+        )
+        fb_unfilt = gen.get_force_balance2(es_unfilt, 2, False)
+        fb_unfilt.run_force_relaxation()
+        g_au[i] = gamma_conv * fb_unfilt.get_gamma_factor(r02) / vol
+        w_au[i] = fb_unfilt.get_active_weight_fraction()
+        n_au[i] = len(es_unfilt)
+
+        # 4. Analytical with Hookean Springs
+        fb_springs = gen.get_force_balance2(es_filt, 2, True)
+        fb_springs.run_force_relaxation()
+        g_as[i] = gamma_conv * fb_springs.get_gamma_factor(r02) / vol
+
+    return r, g_d, w_d, g_af, w_af, n_af, g_au, w_au, n_au, g_as
 
 
 def run_conversion_sweep(
     conversions: Sequence[float] = (0.75, 0.80, 0.85, 0.90, 0.95, 1.00),
-    n_strands: int = 1200,
+    n_strands: int = 10000,
     strand_len: int = 50,
-    n_repeats: int = 5,
+    n_repeats: int = 10,
     base_seed: int = 777,
+    max_workers: Optional[int] = None,
 ) -> Dict[str, Any]:
     """Compare modulus, active fractions, and active entanglement count across conversions."""
     print("Running Conversion Sweep across multi-seed ensembles...")
-    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+    params = get_parameters_for_polymer(
+        "PDMS", parameter_type=ParameterType.GAUSSIAN)
     b = params.get("<b>").to(params.get("distance_units")).magnitude
     bead_density = params.get_bead_density()
     cutoff = params.get_sampling_cutoff()
     ent_density = params.get_entanglement_density()
     r02 = params.get("R02").to(params.get("distance_units") ** 2).magnitude
     kbt = params.get("T") * params.get("kb")
-    gamma_conv = ((kbt / ((params.get("distance_units")) ** 3)).to("MPa")).magnitude
+    gamma_conv = (
+        (kbt / ((params.get("distance_units")) ** 3)).to("MPa")).magnitude
 
     n_atoms = n_strands * strand_len + int(0.5 * n_strands)
     vol = n_atoms / bead_density
@@ -325,51 +444,71 @@ def run_conversion_sweep(
     n_au_all = np.zeros((n_p, n_repeats))
     g_as_all = np.zeros((n_p, n_repeats))
 
-    for r in range(n_repeats):
-        seed = base_seed + 101 * r
-        print(f"Repeat {r + 1}/{n_repeats} (seed={seed})...")
+    tasks = [
+        (
+            r,
+            base_seed + 101 * r,
+            L,
+            b,
+            n_strands,
+            strand_len,
+            conversions,
+            n_ent,
+            cutoff,
+            r02,
+            vol,
+            gamma_conv,
+        )
+        for r in range(n_repeats)
+    ]
 
-        for i, p in enumerate(conversions):
-            gen = pt.MCUniverseGenerator(L, L, L)
-            gen.set_seed(seed)
-            gen.set_bead_distance(b)
-            gen.set_mean_squared_bead_distance(b**2)
-            gen.add_strands(n_strands, [strand_len] * n_strands)
-            gen.add_crosslinkers(int(0.5 * n_strands), 4)
-            gen.link_strands_to_conversion(p)
+    workers = min(resolve_max_workers(max_workers), n_repeats)
 
-            # 1. Discrete Full Universe
-            u = gen.get_universe()
-            fb_disc = pt.MEHPForceBalance2(
-                u,
-                nr_of_entanglements_to_sample=n_ent,
-                upper_sampling_cutoff=cutoff,
-                entanglements_as_springs=False,
+    if workers > 1 and n_repeats > 1:
+        print(
+            f"Executing {n_repeats} conversion sweep repeats in parallel across {workers} worker processes..."
+        )
+        completed = 0
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            futures = [
+                executor.submit(
+                    _simulate_conversion_sweep_single_repeat, *task)
+                for task in tasks
+            ]
+            for fut in as_completed(futures):
+                r, g_d, w_d, g_af, w_af, n_af, g_au, w_au, n_au, g_as = fut.result()
+                g_d_all[:, r] = g_d
+                w_d_all[:, r] = w_d
+                g_af_all[:, r] = g_af
+                w_af_all[:, r] = w_af
+                n_af_all[:, r] = n_af
+                g_au_all[:, r] = g_au
+                w_au_all[:, r] = w_au
+                n_au_all[:, r] = n_au
+                g_as_all[:, r] = g_as
+                completed += 1
+                print(
+                    f"  [Conversion Sweep] Completed repeat {completed}/{
+                        n_repeats
+                    } (repeat index {r + 1})..."
+                )
+    else:
+        for task in tasks:
+            r, g_d, w_d, g_af, w_af, n_af, g_au, w_au, n_au, g_as = (
+                _simulate_conversion_sweep_single_repeat(*task)
             )
-            fb_disc.run_force_relaxation()
-            g_d_all[i, r] = gamma_conv * fb_disc.get_gamma_factor(r02) / vol
-            w_d_all[i, r] = fb_disc.get_active_weight_fraction()
-
-            # 2. Analytical Filtered (Default)
-            es_filt = gen.sample_entanglements(n_ent, cutoff, 0.0, 0, 3.0, f"seed_f_{seed}", True)
-            fb_filt = gen.get_force_balance2(es_filt, 2, False)
-            fb_filt.run_force_relaxation()
-            g_af_all[i, r] = gamma_conv * fb_filt.get_gamma_factor(r02) / vol
-            w_af_all[i, r] = fb_filt.get_active_weight_fraction()
-            n_af_all[i, r] = len(es_filt)
-
-            # 3. Analytical Unfiltered
-            es_unfilt = gen.sample_entanglements(n_ent, cutoff, 0.0, 0, 3.0, f"seed_u_{seed}", False)
-            fb_unfilt = gen.get_force_balance2(es_unfilt, 2, False)
-            fb_unfilt.run_force_relaxation()
-            g_au_all[i, r] = gamma_conv * fb_unfilt.get_gamma_factor(r02) / vol
-            w_au_all[i, r] = fb_unfilt.get_active_weight_fraction()
-            n_au_all[i, r] = len(es_unfilt)
-
-            # 4. Analytical with Hookean Springs
-            fb_springs = gen.get_force_balance2(es_filt, 2, True)
-            fb_springs.run_force_relaxation()
-            g_as_all[i, r] = gamma_conv * fb_springs.get_gamma_factor(r02) / vol
+            g_d_all[:, r] = g_d
+            w_d_all[:, r] = w_d
+            g_af_all[:, r] = g_af
+            w_af_all[:, r] = w_af
+            n_af_all[:, r] = n_af
+            g_au_all[:, r] = g_au
+            w_au_all[:, r] = w_au
+            n_au_all[:, r] = n_au
+            g_as_all[:, r] = g_as
+            print(
+                f"  [Conversion Sweep] Completed repeat {
+                    r + 1}/{n_repeats}...")
 
     stat_gd = compute_ensemble_statistics(g_d_all, axis=1)
     stat_wd = compute_ensemble_statistics(w_d_all, axis=1)
@@ -404,12 +543,12 @@ def run_conversion_sweep(
     }
 
 
-def run_all_benchmarks() -> Dict[str, Any]:
+def run_all_benchmarks(max_workers: Optional[int] = None) -> Dict[str, Any]:
     """Execute all benchmark suites and compile into a single dataset dictionary."""
     combined: Dict[str, Any] = {}
     combined.update(run_scaling_benchmark())
     combined.update(run_distribution_comparison())
-    combined.update(run_conversion_sweep())
+    combined.update(run_conversion_sweep(max_workers=max_workers))
     return combined
 
 
@@ -423,38 +562,41 @@ def run_all_benchmarks() -> Dict[str, Any]:
 # The dataset can be recomputed from scratch at any time by passing ``--recompute``
 # to this script or setting ``PYLIMER_RECOMPUTE_CACHE=1``.
 
-cache_path = get_example_cache_path("entanglement_sampling_comparison_cache.npz", "force_balance")
-data = load_or_compute_cache(cache_path, run_all_benchmarks)
+if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
+    cache_path = get_example_cache_path(
+        "entanglement_sampling_comparison_cache.npz", "force_balance"
+    )
+    data = load_or_compute_cache(cache_path, run_all_benchmarks)
 
-scaling_atoms = data["scaling_atoms"]
-scaling_time_disc = data["scaling_time_discrete"]
-scaling_rss_disc = data["scaling_rss_discrete"]
-scaling_time_ana = data["scaling_time_analytical"]
-scaling_rss_ana = data["scaling_rss_analytical"]
+    scaling_atoms = data["scaling_atoms"]
+    scaling_time_disc = data["scaling_time_discrete"]
+    scaling_rss_disc = data["scaling_rss_discrete"]
+    scaling_time_ana = data["scaling_time_analytical"]
+    scaling_rss_ana = data["scaling_rss_analytical"]
 
-alpha_ana = data["alpha_analytical"]
-dist_ana = data["dist_analytical"]
-alpha_disc = data["alpha_discrete"]
-dist_disc = data["dist_discrete"]
+    alpha_ana = data["alpha_analytical"]
+    dist_ana = data["dist_analytical"]
+    alpha_disc = data["alpha_discrete"]
+    dist_disc = data["dist_discrete"]
 
-conversions = data["conversions"]
-g_disc = data["g_discrete"]
-w_act_disc = data["w_active_discrete"]
-g_ana_filt = data["g_ana_filtered"]
-w_act_ana_filt = data["w_active_ana_filtered"]
-n_ent_ana_filt = data["n_ent_ana_filtered"]
-g_ana_unfilt = data["g_ana_unfiltered"]
-w_act_ana_unfilt = data["w_active_ana_unfiltered"]
-n_ent_ana_unfilt = data["n_ent_ana_unfiltered"]
-target_n_ent = int(data["target_n_ent"])
+    conversions = data["conversions"]
+    g_disc = data["g_discrete"]
+    w_act_disc = data["w_active_discrete"]
+    g_ana_filt = data["g_ana_filtered"]
+    w_act_ana_filt = data["w_active_ana_filtered"]
+    n_ent_ana_filt = data["n_ent_ana_filtered"]
+    g_ana_unfilt = data["g_ana_unfiltered"]
+    w_act_ana_unfilt = data["w_active_ana_unfiltered"]
+    n_ent_ana_unfilt = data["n_ent_ana_unfiltered"]
+    target_n_ent = int(data["target_n_ent"])
 
-# Optional confidence interval arrays from multi-seed ensembles
-g_disc_ci = data.get("g_discrete_ci")
-g_ana_filt_ci = data.get("g_ana_filtered_ci")
-g_ana_unfilt_ci = data.get("g_ana_unfiltered_ci")
-w_act_disc_ci = data.get("w_active_discrete_ci")
-w_act_ana_filt_ci = data.get("w_active_ana_filtered_ci")
-n_repeats = int(data.get("n_repeats", 1))
+    # Optional confidence interval arrays from multi-seed ensembles
+    g_disc_ci = data.get("g_discrete_ci")
+    g_ana_filt_ci = data.get("g_ana_filtered_ci")
+    g_ana_unfilt_ci = data.get("g_ana_unfiltered_ci")
+    w_act_disc_ci = data.get("w_active_discrete_ci")
+    w_act_ana_filt_ci = data.get("w_active_ana_filtered_ci")
+    n_repeats = int(data.get("n_repeats", 1))
 
 # %%
 # Comparison 1: Memory Footprint & Runtime Scaling
@@ -465,95 +607,94 @@ n_repeats = int(data.get("n_repeats", 1))
 # footprint virtually flat and reducing peak RAM by 80% to over 90% on
 # large networks.
 
-fig, (ax_mem, ax_time) = plt.subplots(1, 2, figsize=(11, 4.5))
+if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
+    fig, (ax_mem, ax_time) = plt.subplots(1, 2, figsize=(11, 4.5))
 
+    def format_k(x, pos):
+        if x >= 1e6:
+            return f"{x * 1e-6:.1f}".rstrip("0").rstrip(".") + "M"
+        if x >= 1e3:
+            return f"{int(x * 1e-3)}k"
+        return str(int(x))
 
-def format_k(x, pos):
-    if x >= 1e6:
-        return f"{x * 1e-6:.1f}".rstrip("0").rstrip(".") + "M"
-    if x >= 1e3:
-        return f"{int(x * 1e-3)}k"
-    return str(int(x))
+    k_formatter = ticker.FuncFormatter(format_k)
 
+    # Peak Memory
+    ax_mem.plot(
+        scaling_atoms,
+        scaling_rss_disc,
+        "o-",
+        color="#d95f02",
+        linewidth=2,
+        markersize=6,
+        label="Discrete (Full Universe)",
+    )
+    ax_mem.plot(
+        scaling_atoms,
+        scaling_rss_ana,
+        "s-",
+        color="#1b9e77",
+        linewidth=2,
+        markersize=6,
+        label="Analytical (Universe-Free)",
+    )
 
-k_formatter = ticker.FuncFormatter(format_k)
+    max_atoms = scaling_atoms[-1]
+    mem_disc_last = float(scaling_rss_disc[-1])
+    mem_ana_last = float(scaling_rss_ana[-1])
+    pct_savings = (1.0 - mem_ana_last / mem_disc_last) * 100.0
 
-# Peak Memory
-ax_mem.plot(
-    scaling_atoms,
-    scaling_rss_disc,
-    "o-",
-    color="#d95f02",
-    linewidth=2,
-    markersize=6,
-    label="Discrete (Full Universe)",
-)
-ax_mem.plot(
-    scaling_atoms,
-    scaling_rss_ana,
-    "s-",
-    color="#1b9e77",
-    linewidth=2,
-    markersize=6,
-    label="Analytical (Universe-Free)",
-)
+    ax_mem.annotate(
+        f"{pct_savings:.0f}% Memory\nReduction",
+        xy=(max_atoms, mem_ana_last),
+        xytext=(max_atoms * 0.60, 75),
+        arrowprops=dict(arrowstyle="->", color="#1b9e77", lw=1.5),
+        fontsize=10,
+        fontweight="bold",
+        color="#1b9e77",
+        bbox=dict(boxstyle="round,pad=0.3", fc="#e6f5f0", ec="#1b9e77", lw=1),
+    )
 
-max_atoms = scaling_atoms[-1]
-mem_disc_last = float(scaling_rss_disc[-1])
-mem_ana_last = float(scaling_rss_ana[-1])
-pct_savings = (1.0 - mem_ana_last / mem_disc_last) * 100.0
+    ax_mem.set_xscale("log")
+    ax_mem.set_yscale("log")
+    ax_mem.xaxis.set_major_formatter(k_formatter)
+    ax_mem.set_xlabel(r"Total Atoms in Network ($N_{\mathrm{atoms}}$)")
+    ax_mem.set_ylabel("Peak Resident Memory (RSS) [MB]")
+    ax_mem.set_title("Peak Memory Consumption")
+    ax_mem.grid(True, which="both", linestyle="--", alpha=0.5)
+    ax_mem.legend(frameon=True)
 
-ax_mem.annotate(
-    f"{pct_savings:.0f}% Memory\nReduction",
-    xy=(max_atoms, mem_ana_last),
-    xytext=(max_atoms * 0.60, 75),
-    arrowprops=dict(arrowstyle="->", color="#1b9e77", lw=1.5),
-    fontsize=10,
-    fontweight="bold",
-    color="#1b9e77",
-    bbox=dict(boxstyle="round,pad=0.3", fc="#e6f5f0", ec="#1b9e77", lw=1),
-)
+    # Runtime
+    ax_time.plot(
+        scaling_atoms,
+        scaling_time_disc,
+        "o-",
+        color="#d95f02",
+        linewidth=2,
+        markersize=6,
+        label="Discrete (Full Universe)",
+    )
+    ax_time.plot(
+        scaling_atoms,
+        scaling_time_ana,
+        "s-",
+        color="#1b9e77",
+        linewidth=2,
+        markersize=6,
+        label="Analytical (Universe-Free)",
+    )
 
-ax_mem.set_xscale("log")
-ax_mem.set_yscale("log")
-ax_mem.xaxis.set_major_formatter(k_formatter)
-ax_mem.set_xlabel(r"Total Atoms in Network ($N_{\mathrm{atoms}}$)")
-ax_mem.set_ylabel("Peak Resident Memory (RSS) [MB]")
-ax_mem.set_title("Peak Memory Consumption")
-ax_mem.grid(True, which="both", linestyle="--", alpha=0.5)
-ax_mem.legend(frameon=True)
+    ax_time.set_xscale("log")
+    ax_time.set_yscale("log")
+    ax_time.xaxis.set_major_formatter(k_formatter)
+    ax_time.set_xlabel(r"Total Atoms in Network ($N_{\mathrm{atoms}}$)")
+    ax_time.set_ylabel("Setup & Sampling Time [s]")
+    ax_time.set_title("Setup & Sampling Execution Time")
+    ax_time.grid(True, which="both", linestyle="--", alpha=0.5)
+    ax_time.legend(frameon=True)
 
-# Runtime
-ax_time.plot(
-    scaling_atoms,
-    scaling_time_disc,
-    "o-",
-    color="#d95f02",
-    linewidth=2,
-    markersize=6,
-    label="Discrete (Full Universe)",
-)
-ax_time.plot(
-    scaling_atoms,
-    scaling_time_ana,
-    "s-",
-    color="#1b9e77",
-    linewidth=2,
-    markersize=6,
-    label="Analytical (Universe-Free)",
-)
-
-ax_time.set_xscale("log")
-ax_time.set_yscale("log")
-ax_time.xaxis.set_major_formatter(k_formatter)
-ax_time.set_xlabel(r"Total Atoms in Network ($N_{\mathrm{atoms}}$)")
-ax_time.set_ylabel("Setup & Sampling Time [s]")
-ax_time.set_title("Setup & Sampling Execution Time")
-ax_time.grid(True, which="both", linestyle="--", alpha=0.5)
-ax_time.legend(frameon=True)
-
-plt.tight_layout()
-plt.show()
+    plt.tight_layout()
+    plt.show()
 
 # %%
 # Comparison 2: Conformational Statistics (Contour & Spatial Distributions)
@@ -571,64 +712,66 @@ plt.show()
 #    sampling cutoff :math:`r_{\text{cut}}`, producing identical Euclidean
 #    distance distributions.
 
-fig, (ax_alpha, ax_dist) = plt.subplots(1, 2, figsize=(11, 4.5))
+if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
+    fig, (ax_alpha, ax_dist) = plt.subplots(1, 2, figsize=(11, 4.5))
 
-# Contour fraction distribution
-bins_alpha = np.linspace(0.0, 1.0, 35)
-ax_alpha.hist(
-    alpha_disc,
-    bins=bins_alpha,
-    density=True,
-    alpha=0.5,
-    color="#d95f02",
-    label="Discrete Beads",
-    edgecolor="white",
-)
-ax_alpha.hist(
-    alpha_ana,
-    bins=bins_alpha,
-    density=True,
-    alpha=0.5,
-    color="#1b9e77",
-    label="Analytical Bridge",
-    edgecolor="white",
-)
+    # Contour fraction distribution
+    bins_alpha = np.linspace(0.0, 1.0, 35)
+    ax_alpha.hist(
+        alpha_disc,
+        bins=bins_alpha,
+        density=True,
+        alpha=0.5,
+        color="#d95f02",
+        label="Discrete Beads",
+        edgecolor="white",
+    )
+    ax_alpha.hist(
+        alpha_ana,
+        bins=bins_alpha,
+        density=True,
+        alpha=0.5,
+        color="#1b9e77",
+        label="Analytical Bridge",
+        edgecolor="white",
+    )
 
-ax_alpha.set_xlabel(r"Contour Position $\alpha \in (0, 1)$ along Strand")
-ax_alpha.set_ylabel("Probability Density")
-ax_alpha.set_title("Entanglement Position along Strands")
-ax_alpha.grid(True, linestyle="--", alpha=0.5)
-ax_alpha.legend(frameon=True)
+    ax_alpha.set_xlabel(r"Contour Position $\alpha \in (0, 1)$ along Strand")
+    ax_alpha.set_ylabel("Probability Density")
+    ax_alpha.set_title("Entanglement Position along Strands")
+    ax_alpha.grid(True, linestyle="--", alpha=0.5)
+    ax_alpha.legend(frameon=True)
 
-# Pair distance distribution
-bins_dist = np.linspace(0.0, float(np.max(dist_disc)) * 1.02, 35)
-ax_dist.hist(
-    dist_disc,
-    bins=bins_dist,
-    density=True,
-    alpha=0.5,
-    color="#d95f02",
-    label="Discrete Pairs",
-    edgecolor="white",
-)
-ax_dist.hist(
-    dist_ana,
-    bins=bins_dist,
-    density=True,
-    alpha=0.5,
-    color="#1b9e77",
-    label="Analytical Pairs",
-    edgecolor="white",
-)
+    # Pair distance distribution
+    bins_dist = np.linspace(0.0, float(np.max(dist_disc)) * 1.02, 35)
+    ax_dist.hist(
+        dist_disc,
+        bins=bins_dist,
+        density=True,
+        alpha=0.5,
+        color="#d95f02",
+        label="Discrete Pairs",
+        edgecolor="white",
+    )
+    ax_dist.hist(
+        dist_ana,
+        bins=bins_dist,
+        density=True,
+        alpha=0.5,
+        color="#1b9e77",
+        label="Analytical Pairs",
+        edgecolor="white",
+    )
 
-ax_dist.set_xlabel(r"Pair Separation Distance $r$ [code units]")
-ax_dist.set_ylabel("Probability Density")
-ax_dist.set_title(r"Entanglement Pair Separation ($r \leq r_{\mathrm{cut}}$)")
-ax_dist.grid(True, linestyle="--", alpha=0.5)
-ax_dist.legend(frameon=True)
+    ax_dist.set_xlabel(r"Pair Separation Distance $r$ [code units]")
+    ax_dist.set_ylabel("Probability Density")
+    ax_dist.set_title(
+        r"Entanglement Pair Separation ($r \leq r_{\mathrm{cut}}$)")
+    ax_dist.grid(True, linestyle="--", alpha=0.5)
+    ax_dist.legend(frameon=True)
 
-plt.tight_layout()
-plt.show()
+    plt.tight_layout()
+    plt.show()
 
 # %%
 # Comparison 3: Crosslinker Conversion & Topological Filtering
@@ -642,173 +785,174 @@ plt.show()
 #
 # - **Topologically Filtered Sampling** (``filter_dangling_and_soluble=True``, default):
 #   Iterative leaf peeling identifies dangling chains and sol. Candidate entanglement pairs
-#   involving dangling or sol strands are discarded, placing slip-links exclusively onto
+#   involving dangling or sol strands are discarded, placing entanglement links exclusively onto
 #   elastically active gel strands. This matches the default behavior of discrete sampling in
 #   :class:`~pylimer_tools_cpp.MEHPForceBalance2`.
 # - **Unfiltered Sampling** (``filter_dangling_and_soluble=False``):
-#   Entanglements are placed across all strands. Slip-links that land on single dangling ends
+#   Entanglements are placed across all strands. Entanglement links that land on single dangling ends
 #   cannot sustain macroscopic affine stress and relax to zero force.
 #
 # When multi-seed ensembles are enabled, shaded confidence bands and error bars show the
 # **95% Student's t confidence interval** across independent realizations.
 
-fig, (ax_mod, ax_frac) = plt.subplots(1, 2, figsize=(11, 4.5))
+if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
+    fig, (ax_mod, ax_frac) = plt.subplots(1, 2, figsize=(11, 4.5))
 
-# Convert G from MPa to Pa for clean axis display
-g_disc_pa = g_disc * 1e6
-g_ana_filt_pa = g_ana_filt * 1e6
-g_ana_unfilt_pa = g_ana_unfilt * 1e6
+    # Convert G from MPa to Pa for clean axis display
+    g_disc_pa = g_disc * 1e6
+    g_ana_filt_pa = g_ana_filt * 1e6
+    g_ana_unfilt_pa = g_ana_unfilt * 1e6
 
-# Shear modulus vs conversion
-ax_mod.plot(
-    conversions,
-    g_disc_pa,
-    "o--",
-    color="#d95f02",
-    linewidth=1.8,
-    label="Discrete (Filtered)",
-)
-if g_disc_ci is not None:
-    g_d_ci_pa = g_disc_ci * 1e6
-    ax_mod.fill_between(
-        conversions,
-        g_disc_pa - g_d_ci_pa,
-        g_disc_pa + g_d_ci_pa,
-        color="#d95f02",
-        alpha=0.15,
-    )
-    ax_mod.errorbar(
+    # Shear modulus vs conversion
+    ax_mod.plot(
         conversions,
         g_disc_pa,
-        yerr=g_d_ci_pa,
-        fmt="none",
-        ecolor="#d95f02",
-        capsize=3,
-        elinewidth=1.0,
+        "o--",
+        color="#d95f02",
+        linewidth=1.8,
+        label="Discrete (Filtered)",
     )
+    if g_disc_ci is not None:
+        g_d_ci_pa = g_disc_ci * 1e6
+        ax_mod.fill_between(
+            conversions,
+            g_disc_pa - g_d_ci_pa,
+            g_disc_pa + g_d_ci_pa,
+            color="#d95f02",
+            alpha=0.15,
+        )
+        ax_mod.errorbar(
+            conversions,
+            g_disc_pa,
+            yerr=g_d_ci_pa,
+            fmt="none",
+            ecolor="#d95f02",
+            capsize=3,
+            elinewidth=1.0,
+        )
 
-ax_mod.plot(
-    conversions,
-    g_ana_filt_pa,
-    "s-",
-    color="#1b9e77",
-    linewidth=2.2,
-    label="Analytical (Filtered, Default)",
-)
-if g_ana_filt_ci is not None:
-    g_af_ci_pa = g_ana_filt_ci * 1e6
-    ax_mod.fill_between(
-        conversions,
-        g_ana_filt_pa - g_af_ci_pa,
-        g_ana_filt_pa + g_af_ci_pa,
-        color="#1b9e77",
-        alpha=0.2,
-    )
-    ax_mod.errorbar(
+    ax_mod.plot(
         conversions,
         g_ana_filt_pa,
-        yerr=g_af_ci_pa,
-        fmt="none",
-        ecolor="#1b9e77",
-        capsize=3,
-        elinewidth=1.0,
+        "s-",
+        color="#1b9e77",
+        linewidth=2.2,
+        label="Analytical (Filtered, Default)",
     )
+    if g_ana_filt_ci is not None:
+        g_af_ci_pa = g_ana_filt_ci * 1e6
+        ax_mod.fill_between(
+            conversions,
+            g_ana_filt_pa - g_af_ci_pa,
+            g_ana_filt_pa + g_af_ci_pa,
+            color="#1b9e77",
+            alpha=0.2,
+        )
+        ax_mod.errorbar(
+            conversions,
+            g_ana_filt_pa,
+            yerr=g_af_ci_pa,
+            fmt="none",
+            ecolor="#1b9e77",
+            capsize=3,
+            elinewidth=1.0,
+        )
 
-ax_mod.plot(
-    conversions,
-    g_ana_unfilt_pa,
-    "^:",
-    color="#7570b3",
-    linewidth=1.8,
-    label="Analytical (Unfiltered)",
-)
-if g_ana_unfilt_ci is not None:
-    g_au_ci_pa = g_ana_unfilt_ci * 1e6
-    ax_mod.fill_between(
-        conversions,
-        g_ana_unfilt_pa - g_au_ci_pa,
-        g_ana_unfilt_pa + g_au_ci_pa,
-        color="#7570b3",
-        alpha=0.15,
-    )
-    ax_mod.errorbar(
+    ax_mod.plot(
         conversions,
         g_ana_unfilt_pa,
-        yerr=g_au_ci_pa,
-        fmt="none",
-        ecolor="#7570b3",
-        capsize=3,
-        elinewidth=1.0,
+        "^:",
+        color="#7570b3",
+        linewidth=1.8,
+        label="Analytical (Unfiltered)",
     )
+    if g_ana_unfilt_ci is not None:
+        g_au_ci_pa = g_ana_unfilt_ci * 1e6
+        ax_mod.fill_between(
+            conversions,
+            g_ana_unfilt_pa - g_au_ci_pa,
+            g_ana_unfilt_pa + g_au_ci_pa,
+            color="#7570b3",
+            alpha=0.15,
+        )
+        ax_mod.errorbar(
+            conversions,
+            g_ana_unfilt_pa,
+            yerr=g_au_ci_pa,
+            fmt="none",
+            ecolor="#7570b3",
+            capsize=3,
+            elinewidth=1.0,
+        )
 
-ax_mod.set_xlabel("Crosslinker Conversion $p$")
-ax_mod.set_ylabel("Shear Modulus $G$ [Pa]")
-ax_mod.set_title("Equilibrium Shear Modulus vs. Conversion")
-ax_mod.grid(True, linestyle="--", alpha=0.5)
-ax_mod.legend(frameon=True, fontsize=9)
+    ax_mod.set_xlabel("Crosslinker Conversion $p$")
+    ax_mod.set_ylabel("Shear Modulus $G$ [Pa]")
+    ax_mod.set_title("Equilibrium Shear Modulus vs. Conversion")
+    ax_mod.grid(True, linestyle="--", alpha=0.5)
+    ax_mod.legend(frameon=True, fontsize=9)
 
-# Active entanglement fraction vs conversion
-frac_active_filt = n_ent_ana_filt / float(target_n_ent)
+    # Active entanglement fraction vs conversion
+    frac_active_filt = n_ent_ana_filt / float(target_n_ent)
 
-ax_frac.plot(
-    conversions,
-    w_act_disc,
-    "o--",
-    color="#d95f02",
-    linewidth=1.8,
-    label=r"Active Weight Fraction $w_{\mathrm{active}}$",
-)
-if w_act_disc_ci is not None:
-    ax_frac.fill_between(
-        conversions,
-        w_act_disc - w_act_disc_ci,
-        w_act_disc + w_act_disc_ci,
-        color="#d95f02",
-        alpha=0.15,
-    )
-    ax_frac.errorbar(
+    ax_frac.plot(
         conversions,
         w_act_disc,
-        yerr=w_act_disc_ci,
-        fmt="none",
-        ecolor="#d95f02",
-        capsize=3,
+        "o--",
+        color="#d95f02",
+        linewidth=1.8,
+        label=r"Active Weight Fraction $w_{\mathrm{active}}$",
     )
+    if w_act_disc_ci is not None:
+        ax_frac.fill_between(
+            conversions,
+            w_act_disc - w_act_disc_ci,
+            w_act_disc + w_act_disc_ci,
+            color="#d95f02",
+            alpha=0.15,
+        )
+        ax_frac.errorbar(
+            conversions,
+            w_act_disc,
+            yerr=w_act_disc_ci,
+            fmt="none",
+            ecolor="#d95f02",
+            capsize=3,
+        )
 
-ax_frac.plot(
-    conversions,
-    frac_active_filt,
-    "s-",
-    color="#1b9e77",
-    linewidth=2.2,
-    label=r"Filtered Active Entanglement Fraction ($N_{\mathrm{active}} / N_{\mathrm{target}}$)",
-)
-if w_act_ana_filt_ci is not None:
-    frac_ci = w_act_ana_filt_ci
-    ax_frac.fill_between(
-        conversions,
-        frac_active_filt - frac_ci,
-        frac_active_filt + frac_ci,
-        color="#1b9e77",
-        alpha=0.2,
-    )
-    ax_frac.errorbar(
+    ax_frac.plot(
         conversions,
         frac_active_filt,
-        yerr=frac_ci,
-        fmt="none",
-        ecolor="#1b9e77",
-        capsize=3,
+        "s-",
+        color="#1b9e77",
+        linewidth=2.2,
+        label=r"Filtered Active Entanglement Fraction ($N_{\mathrm{active}} / N_{\mathrm{target}}$)",
     )
+    if w_act_ana_filt_ci is not None:
+        frac_ci = w_act_ana_filt_ci
+        ax_frac.fill_between(
+            conversions,
+            frac_active_filt - frac_ci,
+            frac_active_filt + frac_ci,
+            color="#1b9e77",
+            alpha=0.2,
+        )
+        ax_frac.errorbar(
+            conversions,
+            frac_active_filt,
+            yerr=frac_ci,
+            fmt="none",
+            ecolor="#1b9e77",
+            capsize=3,
+        )
 
-ax_frac.set_xlabel("Crosslinker Conversion $p$")
-ax_frac.set_ylabel("Fraction")
-ax_frac.set_title("Network Activity & Effective Entanglements")
-ax_frac.grid(True, linestyle="--", alpha=0.5)
-ax_frac.legend(frameon=True, fontsize=9)
+    ax_frac.set_xlabel("Crosslinker Conversion $p$")
+    ax_frac.set_ylabel("Fraction")
+    ax_frac.set_title("Network Activity & Effective Entanglements")
+    ax_frac.grid(True, linestyle="--", alpha=0.5)
+    ax_frac.legend(frameon=True, fontsize=9)
 
-plt.tight_layout()
-plt.show()
+    plt.tight_layout()
+    plt.show()
 
 # %%
 # Method Comparison & Practical Guidance
