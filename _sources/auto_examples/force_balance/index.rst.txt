@@ -41,9 +41,176 @@ See:
 
 .. thumbnail-parent-div-open
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links to model entanglements instead of slip-links. See bernhard_phantom_2025">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_2_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_force_balance_2`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MEHP implementation with slip-springs to homogenize a polymer network and predict its equilibrium shear modulus.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_force_balance`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Force Balance</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of polydispersity on the shear modulus of end-linked polymer networks.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_polydispersity_study`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Polydispersity Study</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPForceBalance2 class in a deformation experiment.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_fb_deformation_exp_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_fb_deformation_exp`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Deformation Experiment</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation (see gusev_numerical_2019) without slip-links or entanglements.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_force_relaxation`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Maximum Entropy Homogenization Procedure (MEHP)</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements impose constraints on polymer chain fluctuations.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_link_vs_spring_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_entanglement_link_vs_spring`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Modeling Entanglements: Entanglement Links vs. Entanglement Springs</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In the first-generation Maximum Entropy Homogenization Procedure (MEHP) Force Balance (~pylimer_tools_cpp.MEHPForceBalance, bernhard_phantom_2025), topological entanglements can be modeled with dynamic mobility along the polymer chain contour.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_slipping_vs_fixed_links`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as localized topological constraints (entanglement links or springs).">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_sampling_comparison_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_entanglement_sampling_comparison`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Comparing Entanglement Sampling Methods: Discrete vs. Analytical</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In polymer network modeling via the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), networks generated below or near full conversion contain significant fractions of dangling chains, sol fractions, and topological loops.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_inactive_removal_and_sampling_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_inactive_removal_and_sampling`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Inactive Strand & Entanglement Removal in Force Balance 2</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
 
     </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/force_balance/plot_force_balance_2
+   /auto_examples/force_balance/plot_force_balance
+   /auto_examples/force_balance/plot_polydispersity_study
+   /auto_examples/force_balance/plot_fb_deformation_exp
+   /auto_examples/force_balance/plot_force_relaxation
+   /auto_examples/force_balance/plot_entanglement_link_vs_spring
+   /auto_examples/force_balance/plot_slipping_vs_fixed_links
+   /auto_examples/force_balance/plot_entanglement_sampling_comparison
+   /auto_examples/force_balance/plot_inactive_removal_and_sampling
 

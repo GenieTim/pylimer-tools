@@ -23,9 +23,32 @@ Refer to the full documentation of the DPD simulator in the :class:`~pylimer_too
 
 .. thumbnail-parent-div-open
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools.">
+
+.. only:: html
+
+  .. image:: /auto_examples/dpd_simulations/images/thumb/sphx_glr_plot_dpd_simulation_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/dpd_simulations/plot_dpd_simulation`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Dissipative Particle Dynamics (DPD) Simulations</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
 
     </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/dpd_simulations/plot_dpd_simulation
 

@@ -55,6 +55,8 @@ Understanding these terms is crucial for effective use of the library.
 
 ## Entanglement & Force Balance Terms
 
+![Entanglement Links](_static/images/entanglement_links.svg)![Entanglement Springs](_static/images/entanglement_springs.svg)
+
 **Entanglement Link**
 : A topological entanglement represented as a single merged 4-functional junction node pinning two chains (Bernhard and Gusev [[BG25](acknowledgements.html.md#id12)]).
   In [`MEHPForceBalance2`](api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2), its contour position is fixed—it does not slip along the chain contour.
@@ -68,6 +70,8 @@ Understanding these terms is crucial for effective use of the library.
 
 **Spring vs. Strand**
 : In the force balance network ([`SimplifiedBalanceNetwork`](api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html.md#pylimer_tools_cpp.SimplifiedBalanceNetwork)), a **strand** is the full chain connecting two chemical crosslinks, while a **spring** (or partial spring) is an individual Hookean connection between two adjacent links (crosslinks or entanglement links).
+
+![Illustration of a Slip-Link sliding along a chain contour](_static/images/illustration-slip-link.svg)
 
 ## Mass vs. Weight Terminology
 
@@ -118,6 +122,6 @@ These functions actually calculate molecular masses, not weights. See [Mass vs. 
 : Configuration parameters can be reset to default values by calling the corresponding `config_...()` function with no arguments.
 
 **Index Conventions**
-: - Atom indices: Based on LAMMPS atom IDs (typically 1-based)
+: - Atom indices: Based on LAMMPS atom IDs (typically 1-based, but can be arbitrary integers, not necessarily contiguous)
   - Array indices: Python-style 0-based indexing for internal arrays
   - Graph indices: Internal graph numbering (may differ from atom IDs)

@@ -20,11 +20,56 @@ Entanglements can be sampled in two distinct ways:
 
 See:
 
-- [Comparing Slip-Link Sampling Methods: Discrete vs. Analytical](plot_entanglement_sampling_comparison.md) for a detailed benchmark and comparison of discrete vs. analytical sampling methods,
-- plot_entanglement_link_vs_spring for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,
-- plot_slipping_vs_fixed_links for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
-- plot_inactive_removal_and_sampling for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling.
+- [Comparing Entanglement Sampling Methods: Discrete vs. Analytical](plot_entanglement_sampling_comparison.md) for a detailed benchmark and comparison of discrete vs. analytical sampling methods,
+- [Modeling Entanglements: Entanglement Links vs. Entanglement Springs](plot_entanglement_link_vs_spring.md) for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,
+- [Entanglement Mobility: Dynamic Slipping vs. Fixed Links](plot_slipping_vs_fixed_links.md) for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
+- [Inactive Strand & Entanglement Removal in Force Balance 2](plot_inactive_removal_and_sampling.md) for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open -->
+<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links to model entanglements instead of slip-links. See bernhard_phantom_2025">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_2_thumb.png)
+
+[Force Balance 2](plot_force_balance_2.md)
+
+  <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MEHP implementation with slip-springs to homogenize a polymer network and predict its equilibrium shear modulus.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_thumb.png)
+
+[Force Balance](plot_force_balance.md)
+
+  <div class="sphx-glr-thumbnail-title">Force Balance</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of polydispersity on the shear modulus of end-linked polymer networks.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png)
+
+[Polydispersity Study](plot_polydispersity_study.md)
+
+  <div class="sphx-glr-thumbnail-title">Polydispersity Study</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPForceBalance2 class in a deformation experiment.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_fb_deformation_exp_thumb.png)
+
+[Deformation Experiment](plot_fb_deformation_exp.md)
+
+  <div class="sphx-glr-thumbnail-title">Deformation Experiment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation (see gusev_numerical_2019) without slip-links or entanglements.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png)
+
+[Maximum Entropy Homogenization Procedure (MEHP)](plot_force_relaxation.md)
+
+  <div class="sphx-glr-thumbnail-title">Maximum Entropy Homogenization Procedure (MEHP)</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements impose constraints on polymer chain fluctuations.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_link_vs_spring_thumb.png)
+
+[Modeling Entanglements: Entanglement Links vs. Entanglement Springs](plot_entanglement_link_vs_spring.md)
+
+  <div class="sphx-glr-thumbnail-title">Modeling Entanglements: Entanglement Links vs. Entanglement Springs</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In the first-generation Maximum Entropy Homogenization Procedure (MEHP) Force Balance (~pylimer_tools_cpp.MEHPForceBalance, bernhard_phantom_2025), topological entanglements can be modeled with dynamic mobility along the polymer chain contour.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png)
+
+[Entanglement Mobility: Dynamic Slipping vs. Fixed Links](plot_slipping_vs_fixed_links.md)
+
+  <div class="sphx-glr-thumbnail-title">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as localized topological constraints (entanglement links or springs).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_sampling_comparison_thumb.png)
+
+[Comparing Entanglement Sampling Methods: Discrete vs. Analytical](plot_entanglement_sampling_comparison.md)
+
+  <div class="sphx-glr-thumbnail-title">Comparing Entanglement Sampling Methods: Discrete vs. Analytical</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network modeling via the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), networks generated below or near full conversion contain significant fractions of dangling chains, sol fractions, and topological loops.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_inactive_removal_and_sampling_thumb.png)
+
+[Inactive Strand & Entanglement Removal in Force Balance 2](plot_inactive_removal_and_sampling.md)
+
+  <div class="sphx-glr-thumbnail-title">Inactive Strand & Entanglement Removal in Force Balance 2</div>
+</div>
 <!-- thumbnail-parent-div-close --></div>

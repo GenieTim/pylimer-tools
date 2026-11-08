@@ -22,9 +22,32 @@ The corresponding class is :class:`~pylimer_tools_cpp.NormalModeAnalyzer`.
 
 .. thumbnail-parent-div-open
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the NormalModeAnalyzer in pylimer-tools to predict the loss and storage modulus of polymer networks using exact eigenvalue solvers or the Kernel Polynomial Method (KPM).">
+
+.. only:: html
+
+  .. image:: /auto_examples/normal_mode_analysis/images/thumb/sphx_glr_plot_normal_mode_analysis_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/normal_mode_analysis/plot_normal_mode_analysis`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Normal Mode Analysis (NMA)</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
 
     </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/normal_mode_analysis/plot_normal_mode_analysis
 

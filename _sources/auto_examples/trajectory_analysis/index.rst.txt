@@ -22,9 +22,32 @@ For more information, refer to the documentation of the :class:`~pylimer_tools_c
 
 .. thumbnail-parent-div-open
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to analyze a polymer trajectory using pylimer-tools, including mean square displacement (MSD) and radius of gyration calculation.">
+
+.. only:: html
+
+  .. image:: /auto_examples/trajectory_analysis/images/thumb/sphx_glr_plot_trajectory_analysis_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/trajectory_analysis/plot_trajectory_analysis`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Trajectory Analysis</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
 
     </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/trajectory_analysis/plot_trajectory_analysis
 

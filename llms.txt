@@ -201,12 +201,50 @@
 - [Command Line Interface](cli.html.md): Apart from the Python API, pylimer-tools provides a command line interface (CLI) for various functio...
 - [Examples](auto_examples/index.html.md): The following gallery contains example scripts demonstrating the usage of various features in pylime...
 - [Dissipative Particle Dynamics (DPD) Simulations](auto_examples/dpd_simulations/index.html.md): pylimer-tools provides a powerful framework for simulating coarse-grained polymer systems using Diss...
+- [NOTE](auto_examples/dpd_simulations/plot_dpd_simulation.html.md): Go to the end
 - [Force Balance, Maximum Entropy Homogenization Procedures](auto_examples/force_balance/index.html.md): pylimer-tools provides three implementations of the Force Balance:cite:p:bernhard_phantom_2025, Maxi...
+- [NOTE](auto_examples/force_balance/plot_force_balance_2.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_force_balance.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_polydispersity_study.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_fb_deformation_exp.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_force_relaxation.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_entanglement_link_vs_spring.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_slipping_vs_fixed_links.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_entanglement_sampling_comparison.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_inactive_removal_and_sampling.html.md): Go to the end
 - [Network Generation](auto_examples/network_generator/index.html.md): pylimer-tools includes a powerful Monte Carlo-based network generator for creating realistic polymer...
+- [NOTE](auto_examples/network_generator/plot_save_network.html.md): Go to the end
+- [NOTE](auto_examples/network_generator/plot_simple_crosslinked_network.html.md): Go to the end
+- [NOTE](auto_examples/network_generator/plot_add_angles.html.md): Go to the end
+- [NOTE](auto_examples/network_generator/plot_polydisperse_system.html.md): Go to the end
+- [NOTE](auto_examples/network_generator/plot_multi_component_system.html.md): Go to the end
+- [NOTE](auto_examples/network_generator/plot_monte_carlo_configuration.html.md): Go to the end
+- [NOTE](auto_examples/network_generator/plot_vulcanized_network.html.md): Go to the end
+- [NOTE](auto_examples/network_generator/plot_custom_crosslinking_callback.html.md): Go to the end
+- [NOTE](auto_examples/network_generator/plot_tetra_peg_network.html.md): Go to the end
 - [Normal Mode Analysis](auto_examples/normal_mode_analysis/index.html.md): pylimer-tools provides a normal mode analysis (NMA) implementation to predict the loss and storage m...
+- [NOTE](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md): Go to the end
 - [File I/O: Readers &amp; Writers](auto_examples/readers_writers/index.html.md): pylimer-tools provides comprehensive support for reading and writing various LAMMPS file formats, en...
+- [NOTE](auto_examples/readers_writers/plot_unit_conversion.html.md): Go to the end
+- [NOTE](auto_examples/readers_writers/plot_pylimer_tools_output_reader.html.md): Go to the end
+- [NOTE](auto_examples/readers_writers/plot_correlated_averages_reader.html.md): Go to the end
+- [NOTE](auto_examples/readers_writers/plot_histogram_reader.html.md): Go to the end
+- [NOTE](auto_examples/readers_writers/plot_performance_caching.html.md): Go to the end
+- [NOTE](auto_examples/readers_writers/plot_convert_trajectory_to_frame.html.md): Go to the end
+- [NOTE](auto_examples/readers_writers/plot_log_thermo_file_reader.html.md): Go to the end
+- [NOTE](auto_examples/readers_writers/plot_dump_file_reader.html.md): Go to the end
+- [NOTE](auto_examples/readers_writers/plot_time_averaged_data_reader.html.md): Go to the end
+- [NOTE](auto_examples/readers_writers/plot_convert_for_bond_swapping.html.md): Go to the end
+- [NOTE](auto_examples/readers_writers/plot_data_file_reader.html.md): Go to the end
+- [NOTE](auto_examples/readers_writers/plot_memory_efficient_dump_file_reading.html.md): Go to the end
+- [NOTE](auto_examples/readers_writers/plot_data_file_writer.html.md): Go to the end
 - [Structure Analysis](auto_examples/structure_analysis/index.html.md): pylimer-tools offers various tools to manipulate and analyze the topology of polymer networks.
+- [NOTE](auto_examples/structure_analysis/plot_decompose_structure.html.md): Go to the end
+- [NOTE](auto_examples/structure_analysis/plot_loop_analysis.html.md): Go to the end
+- [NOTE](auto_examples/structure_analysis/plot_end_to_end_distribution.html.md): Go to the end
+- [NOTE](auto_examples/structure_analysis/plot_structure_analysis.html.md): Go to the end
 - [Trajectory Analysis](auto_examples/trajectory_analysis/index.html.md): pylimer-tools provides advanced tools for analyzing molecular dynamics trajectories, particularly fo...
+- [NOTE](auto_examples/trajectory_analysis/plot_trajectory_analysis.html.md): Go to the end
 - [Acknowledgements](acknowledgements.html.md): Please refer to the CITATION.cff file,
 - [src](modules.html.md): &#42; pylimer_tools package
 - [pylimer_tools package](pylimer_tools.html.md): &#42; pylimer_tools.calc package
@@ -275,48 +313,13 @@
 - [STOP](api/pylimer_tools_cpp.STOP.html.md): Stop the linking process
 - [TRACK_BACKWARD](api/pylimer_tools_cpp.TRACK_BACKWARD.html.md): Track backward in the linking process
 - [TRACK_FORWARD](api/pylimer_tools_cpp.TRACK_FORWARD.html.md): Continue linking forward
-- [NOTE](auto_examples/dpd_simulations/plot_dpd_simulation.html.md): Go to the end
 - [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.672&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
-- [NOTE](auto_examples/force_balance/plot_entanglement_sampling_comparison.html.md): Go to the end
-- [NOTE](auto_examples/force_balance/plot_fb_deformation_exp.html.md): Go to the end
-- [NOTE](auto_examples/force_balance/plot_force_balance.html.md): Go to the end
-- [NOTE](auto_examples/force_balance/plot_force_balance_2.html.md): Go to the end
-- [NOTE](auto_examples/force_balance/plot_force_relaxation.html.md): Go to the end
-- [NOTE](auto_examples/force_balance/plot_polydispersity_study.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_sliplink_vs_slipspring.html.md): Go to the end
-- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;05:38.849&#42;&#42; total execution time for 7 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
-- [NOTE](auto_examples/network_generator/plot_add_angles.html.md): Go to the end
-- [NOTE](auto_examples/network_generator/plot_custom_crosslinking_callback.html.md): Go to the end
-- [NOTE](auto_examples/network_generator/plot_monte_carlo_configuration.html.md): Go to the end
-- [NOTE](auto_examples/network_generator/plot_multi_component_system.html.md): Go to the end
-- [NOTE](auto_examples/network_generator/plot_polydisperse_system.html.md): Go to the end
-- [NOTE](auto_examples/network_generator/plot_save_network.html.md): Go to the end
-- [NOTE](auto_examples/network_generator/plot_simple_crosslinked_network.html.md): Go to the end
-- [NOTE](auto_examples/network_generator/plot_tetra_peg_network.html.md): Go to the end
-- [NOTE](auto_examples/network_generator/plot_vulcanized_network.html.md): Go to the end
+- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;05:35.702&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 - [Computation times](auto_examples/network_generator/sg_execution_times.html.md): &#42;&#42;02:20.935&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
-- [NOTE](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.html.md): Go to the end
 - [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:16.700&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
-- [NOTE](auto_examples/readers_writers/plot_convert_for_bond_swapping.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_convert_trajectory_to_frame.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_correlated_averages_reader.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_data_file_reader.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_data_file_writer.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_dump_file_reader.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_histogram_reader.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_log_thermo_file_reader.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_memory_efficient_dump_file_reading.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_performance_caching.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_pylimer_tools_output_reader.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_time_averaged_data_reader.html.md): Go to the end
-- [NOTE](auto_examples/readers_writers/plot_unit_conversion.html.md): Go to the end
 - [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:16.553&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
 - [Computation times](auto_examples/sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
-- [NOTE](auto_examples/structure_analysis/plot_decompose_structure.html.md): Go to the end
-- [NOTE](auto_examples/structure_analysis/plot_end_to_end_distribution.html.md): Go to the end
-- [NOTE](auto_examples/structure_analysis/plot_loop_analysis.html.md): Go to the end
-- [NOTE](auto_examples/structure_analysis/plot_structure_analysis.html.md): Go to the end
 - [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.268&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
-- [NOTE](auto_examples/trajectory_analysis/plot_trajectory_analysis.html.md): Go to the end
 - [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;06:54.815&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
-- [Computation times](sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from all galleries&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;15:29.644&#42;&#42; total execution time for 38 files &#42;&#42;from all galleries&#42;&#42;:
