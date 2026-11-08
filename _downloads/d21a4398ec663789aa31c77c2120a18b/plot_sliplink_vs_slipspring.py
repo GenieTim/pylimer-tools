@@ -21,7 +21,8 @@ representations for sampled entanglements via the ``entanglements_as_springs`` p
 This example illustrates:
 
 - **Topological Differences**: Number of extra nodes, degrees of freedom, and springs introduced.
-- **Elastic Compliance**: How the shear modulus :math:`G` scales with entanglement density under both models.
+- **Elastic Compliance & Scaling**: How the shear modulus :math:`G` scales with entanglement density under both models.
+- **Statistical Significance**: Multi-seed ensemble sampling with 95% confidence intervals and committed caching.
 - **Physical Guidance**: When to choose slip-links versus slip-springs.
 """
 
@@ -53,135 +54,230 @@ This example illustrates:
 #   The entanglement spring acts in series with the strand segments, adding compliance and
 #   reducing the effective stiffness of the entanglement constraint.
 
+from typing import Any, Dict, Sequence
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 from pylimer_tools.io.bead_spring_parameter_provider import (
     ParameterType,
     get_parameters_for_polymer,
 )
+from pylimer_tools.utils.example_cache import (
+    compute_ensemble_statistics,
+    get_example_cache_path,
+    load_or_compute_cache,
+)
 from pylimer_tools_cpp import MCUniverseGenerator
 
 # %%
-# Setting Up the Model Polymer Network
-# ------------------------------------
-# We generate a model crosslinked PDMS network using :class:`~pylimer_tools_cpp.MCUniverseGenerator`.
-# The analytical Brownian-bridge method directly samples entanglements from the crosslinker
-# universe without requiring intermediate bead allocation.
+# Multi-Seed Simulation Procedure
+# -------------------------------
+# To ensure statistically meaningful conclusions, we generate independent Monte Carlo
+# network realizations across multiple random seeds and sample entanglements stochastically.
+#
+# To keep CI execution and documentation builds fast (< 1 s) while allowing deep statistical
+# sampling (multiple seeds and complex systems), the results are cached into a committed
+# ``.npz`` archive and loaded automatically. You can rerun the live multi-seed computation
+# at any time by passing ``--recompute`` or setting ``PYLIMER_RECOMPUTE_CACHE=1``.
 
-params = get_parameters_for_polymer(
-    "PDMS", parameter_type=ParameterType.GAUSSIAN)
-b = params.get("<b>").to(params.get("distance_units")).magnitude
-bead_density = params.get_bead_density()
-cutoff = params.get_sampling_cutoff()
-nominal_ent_density = params.get_entanglement_density()
-r02 = params.get("R02").to(params.get("distance_units") ** 2).magnitude
-kbt = params.get("T") * params.get("kb")
-gamma_conv = (
-    (kbt / ((params.get("distance_units")) ** 3)).to("MPa")).magnitude
 
-n_strands = 600
-strand_len = 40
-n_atoms = n_strands * strand_len + int(0.5 * n_strands)
-vol = n_atoms / bead_density
-box_l = vol ** (1.0 / 3.0)
+def run_sliplink_vs_slipspring_simulation(
+    density_factors: Sequence[float] = (0.0, 0.5, 1.0, 1.5, 2.0),
+    n_strands: int = 1000,
+    strand_len: int = 50,
+    conversion: float = 0.95,
+    n_repeats: int = 8,
+    base_seed: int = 123,
+) -> Dict[str, Any]:
+    """Evaluate shear modulus and extra degrees of freedom across entanglement densities.
 
-gen = MCUniverseGenerator(box_l, box_l, box_l)
-gen.set_seed(123)
-gen.set_bead_distance(b)
-gen.set_mean_squared_bead_distance(b**2)
-gen.add_strands(n_strands, [strand_len] * n_strands)
-gen.add_crosslinkers(int(0.5 * n_strands), 4)
-gen.link_strands_to_conversion(0.95)
+    Averages over independent network realizations and stochastic entanglement samplings
+    to provide statistically robust comparisons with Student's t 95% confidence intervals.
+    """
+    params = get_parameters_for_polymer("PDMS", parameter_type=ParameterType.GAUSSIAN)
+    b = params.get("<b>").to(params.get("distance_units")).magnitude
+    bead_density = params.get_bead_density()
+    cutoff = params.get_sampling_cutoff()
+    nominal_ent_density = params.get_entanglement_density()
+    r02 = params.get("R02").to(params.get("distance_units") ** 2).magnitude
+    kbt = params.get("T") * params.get("kb")
+    gamma_conv = ((kbt / ((params.get("distance_units")) ** 3)).to("MPa")).magnitude
 
-nominal_n_ent = int(nominal_ent_density * vol)
-print(f"Network volume: {vol:.1f}, Nominal entanglements: {nominal_n_ent}")
+    n_atoms = n_strands * strand_len + int(0.5 * n_strands)
+    vol = n_atoms / bead_density
+    box_l = vol ** (1.0 / 3.0)
+    nominal_n_ent = int(nominal_ent_density * vol)
+
+    all_g_links = np.zeros((len(density_factors), n_repeats))
+    all_g_springs = np.zeros((len(density_factors), n_repeats))
+    all_extra_links = np.zeros((len(density_factors), n_repeats))
+    all_extra_springs = np.zeros((len(density_factors), n_repeats))
+
+    for r in range(n_repeats):
+        seed = base_seed + 101 * r
+        gen = MCUniverseGenerator(box_l, box_l, box_l)
+        gen.set_seed(seed)
+        gen.set_bead_distance(b)
+        gen.set_mean_squared_bead_distance(b**2)
+        gen.add_strands(n_strands, [strand_len] * n_strands)
+        gen.add_crosslinkers(int(0.5 * n_strands), 4)
+        gen.link_strands_to_conversion(conversion)
+
+        for i, factor in enumerate(density_factors):
+            n_target = int(factor * nominal_n_ent)
+
+            if n_target == 0:
+                # Bare unentangled crosslinker network
+                fb_bare = gen.get_force_balance2()
+                fb_bare.run_force_relaxation()
+                g_pa = (gamma_conv * fb_bare.get_gamma_factor(r02) / vol) * 1e6
+                all_g_links[i, r] = g_pa
+                all_g_springs[i, r] = g_pa
+                all_extra_links[i, r] = 0
+                all_extra_springs[i, r] = 0
+            else:
+                # Sample entanglements using seeded Brownian bridge
+                es = gen.sample_entanglements(
+                    n_target, cutoff, 0.0, 0, 3.0, f"ent_{seed}_{factor}", True
+                )
+
+                # 1. Slip-Links (merged junction nodes)
+                fb_l = gen.get_force_balance2(
+                    es, crosslinker_type=2, entanglements_as_springs=False
+                )
+                all_extra_links[i, r] = fb_l.get_nr_of_extra_atoms()
+                fb_l.run_force_relaxation()
+                all_g_links[i, r] = (gamma_conv * fb_l.get_gamma_factor(r02) / vol) * 1e6
+
+                # 2. Slip-Springs (explicit Hookean coupling springs)
+                fb_s = gen.get_force_balance2(
+                    es, crosslinker_type=2, entanglements_as_springs=True
+                )
+                all_extra_springs[i, r] = fb_s.get_nr_of_extra_atoms()
+                fb_s.run_force_relaxation()
+                all_g_springs[i, r] = (gamma_conv * fb_s.get_gamma_factor(r02) / vol) * 1e6
+
+    # Compute statistical moments and 95% confidence intervals across seeds
+    stat_links = compute_ensemble_statistics(all_g_links, axis=1)
+    stat_springs = compute_ensemble_statistics(all_g_springs, axis=1)
+    stat_extra_l = compute_ensemble_statistics(all_extra_links, axis=1)
+    stat_extra_s = compute_ensemble_statistics(all_extra_springs, axis=1)
+
+    return {
+        "density_factors": np.array(density_factors),
+        "n_repeats": np.array(n_repeats),
+        "nominal_n_ent": np.array(nominal_n_ent),
+        "vol": np.array(vol),
+        "g_links_mean": stat_links["mean"],
+        "g_links_std": stat_links["std"],
+        "g_links_sem": stat_links["sem"],
+        "g_links_ci": stat_links["ci"],
+        "g_links_all": all_g_links,
+        "g_springs_mean": stat_springs["mean"],
+        "g_springs_std": stat_springs["std"],
+        "g_springs_sem": stat_springs["sem"],
+        "g_springs_ci": stat_springs["ci"],
+        "g_springs_all": all_g_springs,
+        "extra_atoms_links_mean": stat_extra_l["mean"],
+        "extra_atoms_links_std": stat_extra_l["std"],
+        "extra_atoms_springs_mean": stat_extra_s["mean"],
+        "extra_atoms_springs_std": stat_extra_s["std"],
+    }
+
 
 # %%
-# Sweeping Entanglement Density: Links vs. Springs
+# Loading Cached Data or Recomputing
+# ----------------------------------
+# Resolves the committed cache file or recomputes when requested:
+
+cache_path = get_example_cache_path("sliplink_vs_slipspring_cache.npz", "force_balance")
+data = load_or_compute_cache(cache_path, run_sliplink_vs_slipspring_simulation)
+
+density_factors = data["density_factors"]
+n_repeats = int(data.get("n_repeats", 5))
+
+g_links_mean = data["g_links_mean"]
+g_links_ci = data["g_links_ci"]
+
+g_springs_mean = data["g_springs_mean"]
+g_springs_ci = data["g_springs_ci"]
+
+extra_links_mean = data["extra_atoms_links_mean"]
+extra_springs_mean = data["extra_atoms_springs_mean"]
+
+# %%
+# Visualizing Mechanical & Structural Differences
 # ------------------------------------------------
-# We evaluate the equilibrium shear modulus across varying entanglement levels,
-# from unentangled phantom networks (density factor 0.0) up to twice the nominal
-# entanglement density (density factor 2.0).
-
-density_factors = [0.0, 0.5, 1.0, 1.5, 2.0]
-g_links = []
-g_springs = []
-extra_atoms_links = []
-extra_atoms_springs = []
-
-for factor in density_factors:
-    n_target = int(factor * nominal_n_ent)
-
-    if n_target == 0:
-        # Bare unentangled crosslinker network
-        fb_bare = gen.get_force_balance2()
-        fb_bare.run_force_relaxation()
-        g_pa = (gamma_conv * fb_bare.get_gamma_factor(r02) / vol) * 1e6
-        g_links.append(g_pa)
-        g_springs.append(g_pa)
-        extra_atoms_links.append(0)
-        extra_atoms_springs.append(0)
-    else:
-        # Sample entanglements using identical seed for fair comparison
-        es = gen.sample_entanglements(
-            n_target, cutoff, 0.0, 0, 3.0, "ent_seed", True)
-
-        # 1. Slip-Links (merged junction nodes)
-        fb_l = gen.get_force_balance2(
-            es, crosslinker_type=2, entanglements_as_springs=False
-        )
-        extra_atoms_links.append(fb_l.get_nr_of_extra_atoms())
-        fb_l.run_force_relaxation()
-        g_l_pa = (gamma_conv * fb_l.get_gamma_factor(r02) / vol) * 1e6
-        g_links.append(g_l_pa)
-
-        # 2. Slip-Springs (explicit Hookean coupling springs)
-        fb_s = gen.get_force_balance2(
-            es, crosslinker_type=2, entanglements_as_springs=True
-        )
-        extra_atoms_springs.append(fb_s.get_nr_of_extra_atoms())
-        fb_s.run_force_relaxation()
-        g_s_pa = (gamma_conv * fb_s.get_gamma_factor(r02) / vol) * 1e6
-        g_springs.append(g_s_pa)
-
-# %%
-# Visualizing the Mechanical & Structural Differences
-# ---------------------------------------------------
 # The plots below compare:
 #
 # 1. **Equilibrium Shear Modulus :math:`G` vs. Entanglement Density**:
 #    Slip-links exhibit a strong, near-linear increase in modulus with entanglement density
 #    due to rigid node coalescing. In contrast, slip-springs display a softer, sublinear
-#    response that saturates because the intermediate spring provides elastic compliance.
+#    response that saturates because the intermediate spring provides series elastic compliance.
+#    Shaded error bands and error bars represent the **95% Student's t confidence interval**
+#    computed across independent network and sampling realizations.
 # 2. **System Degrees of Freedom (Extra Nodes)**:
 #    Slip-springs introduce exactly twice as many extra node coordinates into the linear
 #    system of equations as slip-links.
 
 fig, (ax_mod, ax_dof) = plt.subplots(1, 2, figsize=(11, 4.5))
 
-# Modulus comparison
+# Modulus comparison with shaded 95% confidence intervals and error bars
 ax_mod.plot(
     density_factors,
-    g_links,
+    g_links_mean,
     "s-",
     color="#d95f02",
     linewidth=2,
     markersize=6,
-    label="Slip-Links (Merged Nodes)",
+    label=f"Slip-Links (Merged Nodes, N={n_repeats})",
 )
+ax_mod.fill_between(
+    density_factors,
+    g_links_mean - g_links_ci,
+    g_links_mean + g_links_ci,
+    color="#d95f02",
+    alpha=0.2,
+    label="95% Confidence Interval",
+)
+ax_mod.errorbar(
+    density_factors,
+    g_links_mean,
+    yerr=g_links_ci,
+    fmt="none",
+    ecolor="#d95f02",
+    capsize=4,
+    elinewidth=1.2,
+)
+
 ax_mod.plot(
     density_factors,
-    g_springs,
+    g_springs_mean,
     "o-",
     color="#1b9e77",
     linewidth=2,
     markersize=6,
-    label="Slip-Springs (Hookean Springs)",
+    label=f"Slip-Springs (Hookean Springs, N={n_repeats})",
+)
+ax_mod.fill_between(
+    density_factors,
+    g_springs_mean - g_springs_ci,
+    g_springs_mean + g_springs_ci,
+    color="#1b9e77",
+    alpha=0.2,
+)
+ax_mod.errorbar(
+    density_factors,
+    g_springs_mean,
+    yerr=g_springs_ci,
+    fmt="none",
+    ecolor="#1b9e77",
+    capsize=4,
+    elinewidth=1.2,
 )
 
-ax_mod.set_xlabel(
-    r"Entanglement Density Factor ($N_{\mathrm{ent}} / N_{\mathrm{nominal}}$)"
-)
+ax_mod.set_xlabel(r"Entanglement Density Factor ($N_{\mathrm{ent}} / N_{\mathrm{nominal}}$)")
 ax_mod.set_ylabel(r"Shear Modulus $G$ [Pa]")
 ax_mod.set_title("Equilibrium Shear Modulus vs. Entanglement Density")
 ax_mod.grid(True, linestyle="--", alpha=0.5)
@@ -190,7 +286,7 @@ ax_mod.legend(frameon=True)
 # System size comparison
 ax_dof.plot(
     density_factors,
-    extra_atoms_links,
+    extra_links_mean,
     "s-",
     color="#d95f02",
     linewidth=2,
@@ -199,7 +295,7 @@ ax_dof.plot(
 )
 ax_dof.plot(
     density_factors,
-    extra_atoms_springs,
+    extra_springs_mean,
     "o-",
     color="#1b9e77",
     linewidth=2,
@@ -207,9 +303,7 @@ ax_dof.plot(
     label=r"Slip-Springs: $N_{\mathrm{extra}} = 2 N_{\mathrm{ent}}$",
 )
 
-ax_dof.set_xlabel(
-    r"Entanglement Density Factor ($N_{\mathrm{ent}} / N_{\mathrm{nominal}}$)"
-)
+ax_dof.set_xlabel(r"Entanglement Density Factor ($N_{\mathrm{ent}} / N_{\mathrm{nominal}}$)")
 ax_dof.set_ylabel("Extra Nodes Added to SLE")
 ax_dof.set_title("System Size / Extra Degrees of Freedom")
 ax_dof.grid(True, linestyle="--", alpha=0.5)

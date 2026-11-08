@@ -41,16 +41,16 @@ See [Comparing Slip-Link Sampling Methods: Discrete vs. Analytical](plot_entangl
 [Deformation Experiment](plot_fb_deformation_exp.md)
 
   <div class="sphx-glr-thumbnail-title">Deformation Experiment</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements impose constraints on polymer chain fluctuations.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_sliplink_vs_slipspring_thumb.png)
-
-[Modeling Entanglements: Slip-Links vs. Slip-Springs](plot_sliplink_vs_slipspring.md)
-
-  <div class="sphx-glr-thumbnail-title">Modeling Entanglements: Slip-Links vs. Slip-Springs</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation (see gusev_numerical_2019) without slip-links or entanglements.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png)
 
 [Maximum Entropy Homogenization Procedure (MEHP)](plot_force_relaxation.md)
 
   <div class="sphx-glr-thumbnail-title">Maximum Entropy Homogenization Procedure (MEHP)</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements impose constraints on polymer chain fluctuations.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_sliplink_vs_slipspring_thumb.png)
+
+[Modeling Entanglements: Slip-Links vs. Slip-Springs](plot_sliplink_vs_slipspring.md)
+
+  <div class="sphx-glr-thumbnail-title">Modeling Entanglements: Slip-Links vs. Slip-Springs</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as slip-links or localized crosslink constraints.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_sampling_comparison_thumb.png)
 
 [Comparing Slip-Link Sampling Methods: Discrete vs. Analytical](plot_entanglement_sampling_comparison.md)

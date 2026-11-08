@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css?v=dd72e65a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=bafda8c6" />
     
@@ -238,8 +238,8 @@
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_sliplink_vs_slipspring.html">Modeling Entanglements: Slip-Links vs. Slip-Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Slip-Link Sampling Methods: Discrete vs. Analytical</a></li>
 </ul>
 </li>
@@ -672,6 +672,81 @@ Particularly useful when dealing with large datasets, e.g. output from long LAMM
 </section>
 <section id="module-pylimer_tools.utils">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pylimer_tools.utils" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.utils.compute_ensemble_statistics">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.</span></span><span class="sig-name descname"><span class="pre">compute_ensemble_statistics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.95</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.15)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pylimer_tools/utils/example_cache.html#compute_ensemble_statistics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.utils.compute_ensemble_statistics" title="Link to this definition">¶</a></dt>
+<dd><p>Compute ensemble mean, standard deviation, standard error, and Student’s t confidence interval.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>np.ndarray</em><em> or </em><em>array-like</em>) – Array of observations where one axis corresponds to independent repetitions/seeds.</p></li>
+<li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em>, </em><em>default=-1</em>) – Axis representing independent repetitions.</p></li>
+<li><p><strong>confidence</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>, </em><em>default=0.95</em>) – Confidence level for the two-sided interval (e.g. 0.95 for 95% CI).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary containing:
+- <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>: Sample mean along <code class="docutils literal notranslate"><span class="pre">axis</span></code>.
+- <code class="docutils literal notranslate"><span class="pre">&quot;std&quot;</span></code>: Sample standard deviation (ddof=1) along <code class="docutils literal notranslate"><span class="pre">axis</span></code>.
+- <code class="docutils literal notranslate"><span class="pre">&quot;sem&quot;</span></code>: Standard error of the mean along <code class="docutils literal notranslate"><span class="pre">axis</span></code>.
+- <code class="docutils literal notranslate"><span class="pre">&quot;ci&quot;</span></code>: Half-width of the confidence interval (<span class="math notranslate nohighlight">\(t_{\text{crit}} \times \text{SEM}\)</span>).
+- <code class="docutils literal notranslate"><span class="pre">&quot;ci_lower&quot;</span></code>: Lower bound (<span class="math notranslate nohighlight">\(\text{mean} - \text{ci}\)</span>).
+- <code class="docutils literal notranslate"><span class="pre">&quot;ci_upper&quot;</span></code>: Upper bound (<span class="math notranslate nohighlight">\(\text{mean} + \text{ci}\)</span>).
+- <code class="docutils literal notranslate"><span class="pre">&quot;n&quot;</span></code>: Number of independent repetitions.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.utils.get_example_cache_path">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.</span></span><span class="sig-name descname"><span class="pre">get_example_cache_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'force_balance'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><span class="pre">Path</span></a></span></span><a class="reference internal" href="_modules/pylimer_tools/utils/example_cache.html#get_example_cache_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.utils.get_example_cache_path" title="Link to this definition">¶</a></dt>
+<dd><p>Resolve the filesystem path to an example’s cached data file (.npz).</p>
+<p>Searches intelligently from current working directory, caller file location,
+and repository root to find existing data files, or creates the target directory
+structure for new caches.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>) – Name of the cache file (e.g. “sliplink_vs_slipspring_cache.npz”).</p></li>
+<li><p><strong>example_folder</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em>, </em><em>default=&quot;force_balance&quot;</em>) – Subfolder within <code class="docutils literal notranslate"><span class="pre">examples/</span></code> where the cache resides.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Absolute path to the cache file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.utils.load_or_compute_cache">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.</span></span><span class="sig-name descname"><span class="pre">load_or_compute_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.15)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.15)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.15)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pylimer_tools/utils/example_cache.html#load_or_compute_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pylimer_tools.utils.load_or_compute_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Load precomputed data from cache or execute computation and save results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cache_path</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em> or </em><em>Path</em>) – Target file path (.npz).</p></li>
+<li><p><strong>compute_fn</strong> (<em>callable</em>) – Function returning a dictionary of numpy arrays or serializable values.</p></li>
+<li><p><strong>*args</strong> (<em>Any</em>) – Positional arguments passed to <code class="docutils literal notranslate"><span class="pre">compute_fn</span></code>.</p></li>
+<li><p><strong>recompute</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a><em>, </em><em>default=False</em>) – Force recomputation even if cache file exists.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a><em>, </em><em>default=True</em>) – Print status messages about cache hits or computation.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Keyword arguments passed to <code class="docutils literal notranslate"><span class="pre">compute_fn</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary containing cached or newly computed arrays.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 
@@ -753,7 +828,12 @@ Particularly useful when dealing with large datasets, e.g. output from long LAMM
 <li><a class="reference internal" href="#pylimer_tools.utils.optimize_dataframe.reduce_mem_usage"><code class="docutils literal notranslate"><span class="pre">reduce_mem_usage()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-pylimer_tools.utils">Module contents</a></li>
+<li><a class="reference internal" href="#module-pylimer_tools.utils">Module contents</a><ul>
+<li><a class="reference internal" href="#pylimer_tools.utils.compute_ensemble_statistics"><code class="docutils literal notranslate"><span class="pre">compute_ensemble_statistics()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.utils.get_example_cache_path"><code class="docutils literal notranslate"><span class="pre">get_example_cache_path()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.utils.load_or_compute_cache"><code class="docutils literal notranslate"><span class="pre">load_or_compute_cache()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -772,5 +852,6 @@ Particularly useful when dealing with large datasets, e.g. output from long LAMM
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="_static/sg-tags.js?v=d80f6fa4"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>

@@ -106,23 +106,6 @@ See :doc:`plot_entanglement_sampling_comparison` for a detailed benchmark and co
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements impose constraints on polymer chain fluctuations.">
-
-.. only:: html
-
-  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_sliplink_vs_slipspring_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/force_balance/plot_sliplink_vs_slipspring`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Modeling Entanglements: Slip-Links vs. Slip-Springs</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation (see gusev_numerical_2019) without slip-links or entanglements.">
 
 .. only:: html
@@ -135,6 +118,23 @@ See :doc:`plot_entanglement_sampling_comparison` for a detailed benchmark and co
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Maximum Entropy Homogenization Procedure (MEHP)</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements impose constraints on polymer chain fluctuations.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_sliplink_vs_slipspring_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_sliplink_vs_slipspring`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Modeling Entanglements: Slip-Links vs. Slip-Springs</div>
     </div>
 
 
@@ -169,7 +169,7 @@ See :doc:`plot_entanglement_sampling_comparison` for a detailed benchmark and co
    /auto_examples/force_balance/plot_force_balance
    /auto_examples/force_balance/plot_polydispersity_study
    /auto_examples/force_balance/plot_fb_deformation_exp
-   /auto_examples/force_balance/plot_sliplink_vs_slipspring
    /auto_examples/force_balance/plot_force_relaxation
+   /auto_examples/force_balance/plot_sliplink_vs_slipspring
    /auto_examples/force_balance/plot_entanglement_sampling_comparison
 

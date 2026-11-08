@@ -80,16 +80,16 @@ See plot_entanglement_sampling_comparison for a detailed benchmark and compariso
 [Deformation Experiment](force_balance/plot_fb_deformation_exp.html.md)
 
   <div class="sphx-glr-thumbnail-title">Deformation Experiment</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements impose constraints on polymer chain fluctuations.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_sliplink_vs_slipspring_thumb.png)
-
-[Modeling Entanglements: Slip-Links vs. Slip-Springs](force_balance/plot_sliplink_vs_slipspring.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Modeling Entanglements: Slip-Links vs. Slip-Springs</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation (see gusev_numerical_2019) without slip-links or entanglements.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png)
 
 [Maximum Entropy Homogenization Procedure (MEHP)](force_balance/plot_force_relaxation.html.md)
 
   <div class="sphx-glr-thumbnail-title">Maximum Entropy Homogenization Procedure (MEHP)</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements impose constraints on polymer chain fluctuations.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_sliplink_vs_slipspring_thumb.png)
+
+[Modeling Entanglements: Slip-Links vs. Slip-Springs](force_balance/plot_sliplink_vs_slipspring.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Modeling Entanglements: Slip-Links vs. Slip-Springs</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as slip-links or localized crosslink constraints.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_sampling_comparison_thumb.png)
 
 [Comparing Slip-Link Sampling Methods: Discrete vs. Analytical](force_balance/plot_entanglement_sampling_comparison.html.md)

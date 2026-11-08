@@ -147,6 +147,9 @@
     * [`optimize_objects()`](pylimer_tools.utils.html.md#pylimer_tools.utils.optimize_dataframe.optimize_objects)
     * [`reduce_mem_usage()`](pylimer_tools.utils.html.md#pylimer_tools.utils.optimize_dataframe.reduce_mem_usage)
   * [Module contents](pylimer_tools.utils.html.md#module-pylimer_tools.utils)
+    * [`compute_ensemble_statistics()`](pylimer_tools.utils.html.md#pylimer_tools.utils.compute_ensemble_statistics)
+    * [`get_example_cache_path()`](pylimer_tools.utils.html.md#pylimer_tools.utils.get_example_cache_path)
+    * [`load_or_compute_cache()`](pylimer_tools.utils.html.md#pylimer_tools.utils.load_or_compute_cache)
 
 ## Submodules
 
