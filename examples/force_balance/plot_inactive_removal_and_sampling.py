@@ -81,10 +81,11 @@ from pathlib import Path
 import sys
 from typing import Any, Dict, Optional, Sequence, Tuple
 
-# Ensure examples/ is on sys.path before importing _example_cache
-_examples_dir = str(Path(__file__).resolve().parents[1])
-if _examples_dir not in sys.path:
-    sys.path.insert(0, _examples_dir)
+# Ensure examples/ is on sys.path when script is executed directly
+if "__file__" in globals():
+    _examples_dir = str(Path(__file__).resolve().parents[1])
+    if _examples_dir not in sys.path:
+        sys.path.insert(0, _examples_dir)
 
 
 from _example_cache import (  # noqa: E402
