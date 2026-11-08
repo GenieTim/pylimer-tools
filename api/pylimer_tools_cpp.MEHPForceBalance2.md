@@ -9,8 +9,8 @@ A small simulation tool for quickly minimizing the force between the crosslinker
 This is the third implementation of the MEHP.
 It’s the fastest implementation by using a simple spring model only, disabling the non-linear
 periodic boundary conditions, and instead builds a sparse linear system of equations that’s readily solved.
-However, it allows entanglements to be represented as additional links or/and springs,
-although without slipping along the chain.
+However, it allows entanglements to be represented as additional fixed links or/and springs,
+without slipping along the chain contour (see [Nomenclature](../nomenclature.md)).
 
 Please cite Bernhard and Gusev [[BG25](../acknowledgements.md#id12)] if you use this method.
 

@@ -11,8 +11,13 @@ Consists usually only of the cross- and slip-links (and their connectivity),
 i.e., no “normal strand beads” in between, in order to reduce the degrees of freedom
 and therewith improve performance of the solver.
 
-A note on the terminology: a spring is the connection between two links (crosslink, entanglement-link/slip-link).
-A strand is a chain of connected links between two crosslinks.
+A note on terminology:
+- A **spring** (or partial spring) is the Hookean connection between two adjacent links
+
+> (which may be a chemical crosslink or an entanglement link / slip-link).
+- A **strand** is the full chain of connected links and springs between two chemical crosslinks.
+- For the distinction between chemical crosslinks, non-slipping entanglement links,
+  entanglement springs, and dynamic slip-links, see [Nomenclature](../nomenclature.md).
 
 ### Attributes Summary
 

@@ -34,25 +34,5 @@ There are exponentially many paths between two crosslinkers of a network,
 and you may run out of memory when using these functions, if your network is lattice-like.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to decompose a crosslinked polymer network into chains and analyze its structure using pylimer-tools.">![](auto_examples/structure_analysis/images/thumb/sphx_glr_plot_decompose_structure_thumb.png)
-
-[Decompose/Split Structure](plot_decompose_structure.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Decompose/Split Structure</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to find and analyze loops in polymer networks using pylimer-tools.">![](auto_examples/structure_analysis/images/thumb/sphx_glr_plot_loop_analysis_thumb.png)
-
-[Loop Finding and Analysis](plot_loop_analysis.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Loop Finding and Analysis</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to analyze the end-to-end distribution of polymer chains using pylimer-tools. It reads a structure file, computes the end-to-end distances, and plots the distribution of these distances.">![](auto_examples/structure_analysis/images/thumb/sphx_glr_plot_end_to_end_distribution_thumb.png)
-
-[End-to-End Distribution](plot_end_to_end_distribution.html.md)
-
-  <div class="sphx-glr-thumbnail-title">End-to-End Distribution</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to analyze the structure of a crosslinked polymer network to get the stoichiometric imbalance r, the crosslinker conversion p or the functionality of the crosslinker f.">![](auto_examples/structure_analysis/images/thumb/sphx_glr_plot_structure_analysis_thumb.png)
-
-[Extract Synthesis Parameters](plot_structure_analysis.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Extract Synthesis Parameters</div>
-</div>
+<!-- thumbnail-parent-div-open -->
 <!-- thumbnail-parent-div-close --></div>

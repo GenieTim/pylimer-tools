@@ -8,10 +8,5 @@ This includes reading trajectory data and computing various properties.
 For more information, refer to the documentation of the [`UniverseSequence`](../../api/pylimer_tools_cpp.UniverseSequence.html.md#pylimer_tools_cpp.UniverseSequence) class and the [`Universe`](../../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) class for a list of methods available for property computations.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to analyze a polymer trajectory using pylimer-tools, including mean square displacement (MSD) and radius of gyration calculation.">![](auto_examples/trajectory_analysis/images/thumb/sphx_glr_plot_trajectory_analysis_thumb.png)
-
-[Trajectory Analysis](plot_trajectory_analysis.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Trajectory Analysis</div>
-</div>
+<!-- thumbnail-parent-div-open -->
 <!-- thumbnail-parent-div-close --></div>

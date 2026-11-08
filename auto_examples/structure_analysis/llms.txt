@@ -195,8 +195,8 @@
 
 - [Structure Analysis](index.html.md): pylimer-tools offers various tools to manipulate and analyze the topology of polymer networks.
 - [NOTE](plot_decompose_structure.html.md): Go to the end
-- [NOTE](plot_loop_analysis.html.md): Go to the end
 - [NOTE](plot_end_to_end_distribution.html.md): Go to the end
+- [NOTE](plot_loop_analysis.html.md): Go to the end
 - [NOTE](plot_structure_analysis.html.md): Go to the end
 - [Computation times](sg_execution_times.html.md): &#42;&#42;00:00.268&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
 

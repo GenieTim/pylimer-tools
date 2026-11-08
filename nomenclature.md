@@ -51,6 +51,24 @@ Understanding these terms is crucial for effective use of the library.
 **End-to-End Distance**
 : The Euclidean distance between the two terminal atoms of a linear polymer chain.
 
+<a id="nomenclature-entanglements"></a>
+
+## Entanglement & Force Balance Terms
+
+**Entanglement Link**
+: A topological entanglement represented as a single merged 4-functional junction node pinning two chains (Bernhard and Gusev [[BG25](acknowledgements.md#id12)]).
+  In [`MEHPForceBalance2`](api/pylimer_tools_cpp.MEHPForceBalance2.md#pylimer_tools_cpp.MEHPForceBalance2), its contour position is fixed—it does not slip along the chain contour.
+
+**Entanglement Spring**
+: A representation where entangled chains remain separate and are coupled by a compliant Hookean spring ([`MEHPForceBalance2`](api/pylimer_tools_cpp.MEHPForceBalance2.md#pylimer_tools_cpp.MEHPForceBalance2) with `entanglements_as_springs=True`). Like entanglement links, it does not slip along the chain contour.
+
+**Slip-Link / Slip-Spring**
+: An entanglement link or spring that is permitted to slide dynamically along the polymer chain contour to equalize strand tensions.
+  Supported in [`MEHPForceBalance`](api/pylimer_tools_cpp.MEHPForceBalance.md#pylimer_tools_cpp.MEHPForceBalance) (via `disable_slipping=False`), but omitted in [`MEHPForceBalance2`](api/pylimer_tools_cpp.MEHPForceBalance2.md#pylimer_tools_cpp.MEHPForceBalance2) where links are fixed because slipping was found to be an unnecessary complication that artificially softens the plateau modulus (Bernhard and Gusev [[BG25](acknowledgements.md#id12)]).
+
+**Spring vs. Strand**
+: In the force balance network ([`SimplifiedBalanceNetwork`](api/pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork)), a **strand** is the full chain connecting two chemical crosslinks, while a **spring** (or partial spring) is an individual Hookean connection between two adjacent links (crosslinks or entanglement links).
+
 ## Mass vs. Weight Terminology
 
 #### NOTE

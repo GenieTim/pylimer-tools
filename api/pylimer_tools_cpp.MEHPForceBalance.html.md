@@ -7,12 +7,12 @@ Bases: `pybind11_object`
 A small simulation tool for quickly minimizing the force between the crosslinker beads.
 
 This is the second implementation in the group of MEHP provided by this package.
-The distinct feature here is the slip-links: a form of entanglement,
-represented as an entanglement link, just like a four-functional crosslink,
-but with the ability to slip along the two associated strands, therewith
-adjusting the fraction of the contour length on both sides of the link.
+The distinct feature here is slip-links: entanglements represented as links
+with the option to dynamically slip along the two associated strands (via `disable_slipping=False`)
+or remain fixed at their contour positions (via `disable_slipping=True`).
 
-Please cite Bernhard and Gusev [[BG25](../acknowledgements.html.md#id12)] if you use this method.
+See [Nomenclature](../nomenclature.html.md) for details on entanglement terminology and the rationale
+for fixed links, and cite Bernhard and Gusev [[BG25](../acknowledgements.html.md#id12)] if you use this method.
 
 Instantiate the simulator for a certain universe.
 

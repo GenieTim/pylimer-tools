@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**05:34.338** total execution time for 7 files **from auto_examples/force_balance**:
+**05:38.849** total execution time for 7 files **from auto_examples/force_balance**:
 
 .. container::
 
@@ -35,14 +35,14 @@ Computation times
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py` (``plot_polydispersity_study.py``)
      - 05:28.732
      - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_sliplink_vs_slipspring.py` (``plot_sliplink_vs_slipspring.py``)
+     - 00:05.720
+     - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py` (``plot_force_relaxation.py``)
      - 00:02.972
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_sampling_comparison.py` (``plot_entanglement_sampling_comparison.py``)
-     - 00:01.587
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_sliplink_vs_slipspring.py` (``plot_sliplink_vs_slipspring.py``)
-     - 00:00.339
+     - 00:00.717
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``plot_force_balance_2.py``)
      - 00:00.272

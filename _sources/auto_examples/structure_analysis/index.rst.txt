@@ -52,86 +52,9 @@ Finally, to find the shortest loop a specific atom is involved in, you can use t
 
 .. thumbnail-parent-div-open
 
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to decompose a crosslinked polymer network into chains and analyze its structure using pylimer-tools.">
-
-.. only:: html
-
-  .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_decompose_structure_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/structure_analysis/plot_decompose_structure`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Decompose/Split Structure</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to find and analyze loops in polymer networks using pylimer-tools.">
-
-.. only:: html
-
-  .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_loop_analysis_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/structure_analysis/plot_loop_analysis`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Loop Finding and Analysis</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to analyze the end-to-end distribution of polymer chains using pylimer-tools. It reads a structure file, computes the end-to-end distances, and plots the distribution of these distances.">
-
-.. only:: html
-
-  .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_end_to_end_distribution_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/structure_analysis/plot_end_to_end_distribution`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">End-to-End Distribution</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to analyze the structure of a crosslinked polymer network to get the stoichiometric imbalance r, the crosslinker conversion p or the functionality of the crosslinker f.">
-
-.. only:: html
-
-  .. image:: /auto_examples/structure_analysis/images/thumb/sphx_glr_plot_structure_analysis_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/structure_analysis/plot_structure_analysis`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Extract Synthesis Parameters</div>
-    </div>
-
-
 .. thumbnail-parent-div-close
 
 .. raw:: html
 
     </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/structure_analysis/plot_decompose_structure
-   /auto_examples/structure_analysis/plot_loop_analysis
-   /auto_examples/structure_analysis/plot_end_to_end_distribution
-   /auto_examples/structure_analysis/plot_structure_analysis
 
