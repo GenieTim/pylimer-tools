@@ -5,9 +5,16 @@ on:
   push:
     branches:
       - workflow_dispatch
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+      - "*.rst"
+      - ".gitignore"
+      - ".github/workflows/publish-documentation-html.yml"
+      - ".github/workflows/check-*.yml"
 
 concurrency:
-  group: ${{ github.workflow }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -20,12 +27,12 @@ jobs:
         with:
           submodules: "recursive"
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip"
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             .\vendor\*-Windows

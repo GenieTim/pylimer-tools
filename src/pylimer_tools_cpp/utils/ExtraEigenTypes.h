@@ -5,6 +5,10 @@
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 
+#ifdef OPENMP_FOUND
+#include <omp.h>
+#endif
+
 namespace Eigen {
 
 typedef Array<long int, 3, 1> Array3li;

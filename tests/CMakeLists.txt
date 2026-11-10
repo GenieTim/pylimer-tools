@@ -97,20 +97,9 @@ add_library(test_sources
         pylimer_tools_cpp/test_counter.cpp
 )
 
-IF (WIN32)
-    message(AUTHOR_WARNING "On Windows, OpenMP will not be used")
-    # elseif(CODE_COVERAGE)
-    # 		message(AUTHOR_WARNING "Code-coverage is enabled, openmp will not be used")
-else ()
-    find_package(OpenMP)
-    if (OpenMP_CXX_FOUND)
-        include_directories(${OpenMP_CXX_INCLUDE_DIRS})
-        target_link_libraries(test_sources PUBLIC OpenMP::OpenMP_CXX)
-        add_definitions(-DOPENMP_FOUND=true)
-        message(STATUS "Found OpenMP")
-    else ()
-        message(AUTHOR_WARNING "Did not find OpenMP")
-    endif ()
+if (OpenMP_CXX_FOUND AND NOT WIN32 AND NOT CODE_COVERAGE)
+    target_link_libraries(test_sources PUBLIC OpenMP::OpenMP_CXX)
+    message(STATUS "OpenMP enabled for tests")
 endif ()
 
 add_dependencies(test_sources pylimer_tools)
@@ -118,14 +107,19 @@ include_directories(${igraph_INCLUDE_DIRS})
 include_directories(${Spectra_INCLUDE_DIRS})
 include_directories(${nlopt_INCLUDE_DIRS})
 include_directories(${cereal_INCLUDE_DIRS})
-include_directories(${EIGEN3_INCLUDE_DIRS})
-include_directories(${EIGEN3_INCLUDE_DIRS}/Eigen3)
+if (EIGEN3_INCLUDE_DIRS)
+    include_directories(${EIGEN3_INCLUDE_DIRS})
+    if (EXISTS "${EIGEN3_INCLUDE_DIRS}/Eigen3")
+        include_directories(${EIGEN3_INCLUDE_DIRS}/Eigen3)
+    endif ()
+endif ()
 message("Found igraph for tests. Including ${igraph_INCLUDE_DIRS}, linking to ${igraph_LIBRARIES}")
 
 target_link_libraries(test_sources
         PRIVATE
         Catch2::Catch2
         pylimer_tools
+        Eigen3::Eigen
 )
 
 add_executable(pylimer_tests pylimer_tools_cpp/test.cpp)

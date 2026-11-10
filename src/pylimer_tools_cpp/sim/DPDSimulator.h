@@ -104,9 +104,12 @@ namespace dpd {
 
     ////////////////////////////////////////////////////////////////
     // randomness
+    std::string currentSeedString = "";
     std::mt19937 e2;
+    std::vector<std::mt19937> threadRNGs;
     std::uniform_real_distribution<double> uniform_rand_mean0std1;
     std::uniform_real_distribution<double> uniform_rand_between_0_1;
+    int numOmpThreads = 0;
 
     ////////////////////////////////////////////////////////////////
     // universe structure
@@ -707,6 +710,24 @@ namespace dpd {
     }
 
     /**
+     * @brief Initialize thread-private PRNGs for thread-safe OpenMP execution
+     */
+    void initThreadRNGs()
+    {
+#ifdef OPENMP_FOUND
+      int nThreads =
+        this->numOmpThreads > 0 ? this->numOmpThreads : omp_get_max_threads();
+      this->threadRNGs.resize(nThreads);
+      for (int t = 0; t < nThreads; ++t) {
+        std::string threadSeed =
+          this->currentSeedString + "_omp_thread_" + std::to_string(t);
+        std::seed_seq seedSeq(threadSeed.begin(), threadSeed.end());
+        this->threadRNGs[t] = std::mt19937(seedSeq);
+      }
+#endif
+    }
+
+    /**
      * @brief Get the number of OpenMP threads being used
      *
      * @return Number of OpenMP threads (1 if OpenMP not available)
@@ -714,7 +735,8 @@ namespace dpd {
     int getNumOmpThreads() const
     {
 #ifdef OPENMP_FOUND
-      return omp_get_max_threads();
+      return this->numOmpThreads > 0 ? this->numOmpThreads
+                                     : omp_get_max_threads();
 #endif
       return 1; // no OpenMP found, so only one thread
     }
@@ -727,7 +749,10 @@ namespace dpd {
     void setNumOmpThreads(int numThreads)
     {
 #ifdef OPENMP_FOUND
+      RUNTIME_EXP_IFN(numThreads > 0, "Number of threads must be positive.");
+      this->numOmpThreads = numThreads;
       omp_set_num_threads(numThreads);
+      this->initThreadRNGs();
 #else
       RUNTIME_EXP_IFN(numThreads == 1,
                       "Cannot set number of OpenMP threads, OpenMP not found.");
@@ -822,6 +847,7 @@ namespace dpd {
       }
       // neighbourlist
       ar(neighbourlist);
+      this->initThreadRNGs();
     }
 
     static DPDSimulator readRestartFile(std::string filename)

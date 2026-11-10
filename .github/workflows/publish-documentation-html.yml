@@ -1,13 +1,24 @@
 name: Publish HTML Documentation
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
       - main
+    paths:
+      - "docs/**"
+      - "src/**"
+      - "examples/**"
+      - "requirements.txt"
+      - "setup.py"
+      - "CMakeLists.txt"
+      - "vendor/**"
+      - "bin/make-docs.sh"
+      - ".github/workflows/publish-documentation-html.yml"
 
 concurrency:
-  group: ${{ github.workflow }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -20,11 +31,12 @@ jobs:
         with:
           submodules: "recursive"
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: "pip"
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cache/pip
@@ -38,9 +50,9 @@ jobs:
             ./docs/auto_examples
             ./docs/gen_modules
             ./docs-html
-          key: ${{ runner.os }}-pip-3.12.6-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-docs-3.12-${{ hashFiles('**/requirements.txt', 'docs/**') }}
           restore-keys: |
-            ${{ runner.os }}-pip-3.12.6-
+            ${{ runner.os }}-docs-3.12-
 
       - name: Install Dependencies
         run: pip install -r requirements.txt

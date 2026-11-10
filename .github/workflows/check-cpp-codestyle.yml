@@ -1,6 +1,22 @@
 name: C/C++ Code Style Check
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - "src/**.cpp"
+      - "src/**.h"
+      - "tests/**.cpp"
+      - "tests/**.h"
+      - ".clang-format"
+      - ".github/workflows/check-cpp-codestyle.yml"
+  pull_request:
+    paths:
+      - "src/**.cpp"
+      - "src/**.h"
+      - "tests/**.cpp"
+      - "tests/**.h"
+      - ".clang-format"
+      - ".github/workflows/check-cpp-codestyle.yml"
 
 jobs:
   formatting-check:
@@ -14,11 +30,9 @@ jobs:
     steps:
       - name: Check out source repository
         uses: actions/checkout@v4
-        with:
-          submodules: "recursive"
 
       - name: Run clang-format style check on C/C++ code
-        uses: jidicula/clang-format-action@v4.17.0
+        uses: jidicula/clang-format-action@v4.18.0
         with:
           clang-format-version: "21"
           check-path: ${{ matrix.path }}

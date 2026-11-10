@@ -318,7 +318,8 @@ Molecule::computeRadiusOfGyration()
 
   // TODO: might want to use the raw values, use std::accumulate or
   // std::reduce
-#pragma omp parallel for reduction(+ : meanX, meanY, meanZ)
+#pragma omp parallel for reduction(                                            \
+    + : meanX, meanY, meanZ, totalMass) if (allAtoms.size() > 500)
   for (const Atom& a : allAtoms) {
     meanX += this->massPerType.at(a.getType()) * a.getUnwrappedX(this->parent);
     // meanNx += a.getNX();
@@ -408,10 +409,6 @@ Molecule::getAtoms() const
   std::vector<Atom> results;
   size_t nrOfAtoms = this->getNrOfAtoms();
   results.reserve(nrOfAtoms);
-
-  // #pragma omp declare reduction (merge : std::vector<Atom> :
-  // omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end()))
-  // #pragma omp parallel for reduction(merge: results)
   for (size_t i = 0; i < nrOfAtoms; ++i) {
     results.push_back(this->getAtomByVertexIdx(i));
   }

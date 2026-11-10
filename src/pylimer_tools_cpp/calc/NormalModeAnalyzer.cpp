@@ -1,6 +1,10 @@
 #include "./NormalModeAnalyzer.h"
 
+#include "../utils/ExtraEigenTypes.h"
 #include "../utils/utilityMacros.h"
+#ifdef OPENMP_FOUND
+#include <omp.h>
+#endif
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
 #include <Eigen/Sparse>
@@ -987,7 +991,9 @@ NormalModeAnalyzer::computeChebyshevMomentsKPM(size_t numMoments,
   if (n == 0 || numMoments == 0)
     return Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numMoments));
 
-  auto [c, w] = getSpectralScalingParameters(0.01);
+  std::pair<double, double> scaling = getSpectralScalingParameters(0.01);
+  const double c = scaling.first;
+  const double w = scaling.second;
 
   Eigen::VectorXd avgMoments =
     Eigen::VectorXd::Zero(static_cast<Eigen::Index>(numMoments));
@@ -997,30 +1003,31 @@ NormalModeAnalyzer::computeChebyshevMomentsKPM(size_t numMoments,
 
   double scale = 1.0 / std::sqrt(static_cast<double>(n));
 
-  // Preallocate work vectors to avoid heap allocation churn in the recurrence
-  Eigen::VectorXd v(n);
-  Eigen::VectorXd u0(n);
-  Eigen::VectorXd u1(n);
-  Eigen::VectorXd u_prev(n);
-  Eigen::VectorXd u_curr(n);
-  Eigen::VectorXd u_next(n);
-  Eigen::VectorXd y(n);
-
+  // Pre-generate random vectors deterministically in sequence
+  std::vector<Eigen::VectorXd> randomVectors(numRandomVectors,
+                                             Eigen::VectorXd(n));
   for (size_t r = 0; r < numRandomVectors; ++r) {
     for (Eigen::Index i = 0; i < n; ++i) {
-      v[i] = coin(rng) ? scale : -scale;
+      randomVectors[r][i] = coin(rng) ? scale : -scale;
     }
+  }
 
-    u0 = v;
+#ifdef OPENMP_FOUND
+#pragma omp parallel for reduction(+ : avgMoments) schedule(dynamic)
+#endif
+  for (size_t r = 0; r < numRandomVectors; ++r) {
+    const Eigen::VectorXd& v = randomVectors[r];
+    Eigen::VectorXd u0 = v;
     avgMoments[0] += v.dot(u0);
 
     if (numMoments > 1) {
-      y.noalias() = this->assembledConnectivityMatrix * u0;
-      u1 = (y - c * u0) / w;
+      Eigen::VectorXd y = this->assembledConnectivityMatrix * u0;
+      Eigen::VectorXd u1 = (y - c * u0) / w;
       avgMoments[1] += v.dot(u1);
 
-      u_prev = u0;
-      u_curr = u1;
+      Eigen::VectorXd u_prev = u0;
+      Eigen::VectorXd u_curr = u1;
+      Eigen::VectorXd u_next(n);
       for (size_t m = 1; m < numMoments - 1; ++m) {
         y.noalias() = this->assembledConnectivityMatrix * u_curr;
         u_next = (2.0 / w) * (y - c * u_curr) - u_prev;
@@ -1043,7 +1050,9 @@ NormalModeAnalyzer::computeChebyshevMomentsKPMMetal(size_t numMoments,
 {
 #ifdef USE_METAL
   if (isMetalAvailable()) {
-    auto [c, w] = getSpectralScalingParameters(0.01);
+    std::pair<double, double> scaling = getSpectralScalingParameters(0.01);
+    const double c = scaling.first;
+    const double w = scaling.second;
     return pylimer_tools::calc::computeChebyshevMomentsKPMMetal(
       this->assembledConnectivityMatrix,
       numMoments,
@@ -1069,7 +1078,9 @@ NormalModeAnalyzer::computeEffectiveSpectrumKPM(
   if (n == 0 || numMoments == 0 || numQuadraturePoints == 0)
     return;
 
-  auto [c, w] = getSpectralScalingParameters(0.01);
+  std::pair<double, double> scaling = getSpectralScalingParameters(0.01);
+  const double c = scaling.first;
+  const double w = scaling.second;
   Eigen::VectorXd mu =
     computeChebyshevMomentsKPMMetal(numMoments, numRandomVectors);
 
@@ -1106,7 +1117,9 @@ NormalModeAnalyzer::computeDensityOfStatesKPM(const Eigen::ArrayXd& lambdaGrid,
   if (n == 0)
     return Eigen::ArrayXd::Zero(lambdaGrid.size());
 
-  auto [c, w] = getSpectralScalingParameters(0.01);
+  std::pair<double, double> scaling = getSpectralScalingParameters(0.01);
+  const double c = scaling.first;
+  const double w = scaling.second;
   Eigen::VectorXd mu =
     computeChebyshevMomentsKPMMetal(numMoments, numRandomVectors);
 

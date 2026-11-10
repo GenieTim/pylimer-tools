@@ -32,54 +32,57 @@ run_timed() {
   return $exit_code
 }
 
-# pip/skbuild uses ninja as a generator,
-# however, it uses a bundled one in a virtual env
-# therefore, we need to delete vendor caches
-if [ -d "_skbuild" ]; then
-  rm -rf ./_skbuild
-fi
-
-# Cleanup stale coverage files
-cd "$ROOT_DIR" || exit 2
-find . -name "*.gcda" -delete
-find . -name "*.gcno" -delete
-
-# first, run cpp tests
-# (build them first)
-export WITH_ERROR=0
-run_timed "Build Tests" "$ROOT_DIR/bin/build-tests.sh" || exit 3
-
-cd "$ROOT_DIR/tests/build" || exit 2
-
-GENERATOR_BIN="make"
-if command -v ninja; then
-  GENERATOR_BIN="ninja"
-fi
-
-ls ./*
-echo "======== Starting gcov ========"
-find . -name "*Universe.cpp.gcov" -exec cat {} \;
-MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp run_timed "Run Tests (gcov)" "$GENERATOR_BIN" pylimer_tests-gcov
-find . -name "*Universe.cpp.gcov" -exec cat {} \;
-echo "========== /ran gcov =========="
-echo "======= Analyzing output ======"
-ls
-for of in ./*_test_output.log.txt; do
-  echo "==== $of ===="
-  cat "$of"
-  echo "==== /$of ===="
-  if grep -q "FAILED:" "$of"; then
-    echo "!!!!! TESTS FAILED !!!!!"
-    exit 6
+# First, run cpp tests (build them first) if enabled
+if [ "${RUN_CPP_TESTS:-1}" != "0" ]; then
+  # pip/skbuild uses ninja as a generator,
+  # however, it uses a bundled one in a virtual env
+  # therefore, we need to delete vendor caches
+  if [ -d "_skbuild" ]; then
+    rm -rf ./_skbuild
   fi
-done
-echo "====== /Analyzing output ======"
-ls ./*
 
-cd "$ROOT_DIR" || exit 8
+  # Cleanup stale coverage files
+  cd "$ROOT_DIR" || exit 2
+  find . -name "*.gcda" -delete
+  find . -name "*.gcno" -delete
 
-if command -v npx; then
-  run_timed "C++ Coverage Badge" npx -y lcov-badge2 -l "C++ Code Coverage" -o ".github/cpp-coverage.svg" tests/build/pylimer_tests-gcov.info || echo "Failed to generate coverage badge"
+  export WITH_ERROR=0
+  run_timed "Build Tests" "$ROOT_DIR/bin/build-tests.sh" || exit 3
+
+  cd "$ROOT_DIR/tests/build" || exit 2
+
+  GENERATOR_BIN="make"
+  if command -v ninja; then
+    GENERATOR_BIN="ninja"
+  fi
+
+  ls ./*
+  echo "======== Starting gcov ========"
+  find . -name "*Universe.cpp.gcov" -exec cat {} \;
+  MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp run_timed "Run Tests (gcov)" "$GENERATOR_BIN" pylimer_tests-gcov
+  find . -name "*Universe.cpp.gcov" -exec cat {} \;
+  echo "========== /ran gcov =========="
+  echo "======= Analyzing output ======"
+  ls
+  for of in ./*_test_output.log.txt; do
+    echo "==== $of ===="
+    cat "$of"
+    echo "==== /$of ===="
+    if grep -q "FAILED:" "$of"; then
+      echo "!!!!! TESTS FAILED !!!!!"
+      exit 6
+    fi
+  done
+  echo "====== /Analyzing output ======"
+  ls ./*
+
+  cd "$ROOT_DIR" || exit 8
+
+  if command -v npx; then
+    run_timed "C++ Coverage Badge" npx -y lcov-badge2 -l "C++ Code Coverage" -o ".github/cpp-coverage.svg" tests/build/pylimer_tests-gcov.info || echo "Failed to generate coverage badge"
+  fi
+else
+  echo "=== Skipping C++ build and Catch2 tests (RUN_CPP_TESTS=0: no C++ changes & cache hit) ==="
 fi
 
 # then, build/install project for Python

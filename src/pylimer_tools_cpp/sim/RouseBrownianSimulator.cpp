@@ -3,6 +3,9 @@
 #include "../utils/utilityMacros.h"
 #include <algorithm>
 #include <cmath>
+#ifdef OPENMP_FOUND
+#include <omp.h>
+#endif
 
 namespace pylimer_tools::sim {
 
@@ -578,6 +581,9 @@ RouseBrownianSimulator::computeMSD(
       msd(static_cast<Eigen::Index>(t)) = sumSq / static_cast<double>(N);
     }
   } else {
+#ifdef OPENMP_FOUND
+#pragma omp parallel for schedule(dynamic, 16) if (M > 64)
+#endif
     for (size_t tau = 0; tau < M; ++tau) {
       double sumSq = 0.0;
       size_t count = M - tau;
@@ -616,6 +622,9 @@ RouseBrownianSimulator::computeCenterOfMassMSD(
       msd(static_cast<Eigen::Index>(t)) = (cms[t] - cms[0]).squaredNorm();
     }
   } else {
+#ifdef OPENMP_FOUND
+#pragma omp parallel for schedule(dynamic, 16) if (M > 64)
+#endif
     for (size_t tau = 0; tau < M; ++tau) {
       double sumSq = 0.0;
       size_t count = M - tau;
@@ -667,6 +676,9 @@ RouseBrownianSimulator::computeEndToEndAutocorrelation(
     double meanNormSq = totalNormSq / static_cast<double>(M);
     double normFactor = (meanNormSq > 1e-12) ? meanNormSq : 1.0;
 
+#ifdef OPENMP_FOUND
+#pragma omp parallel for schedule(dynamic, 16) if (M > 64)
+#endif
     for (size_t tau = 0; tau < M; ++tau) {
       double sumDot = 0.0;
       size_t count = M - tau;

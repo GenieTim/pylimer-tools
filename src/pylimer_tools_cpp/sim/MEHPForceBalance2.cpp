@@ -842,11 +842,7 @@ MEHPForceBalance2::runForceRelaxation(
   /* array allocation */
   SLESolver effectiveSolverChoice = solverChoice;
   if (solverChoice == SLESolver::DEFAULT || solverChoice == SLESolver::AUTO) {
-    if (this->initialConfig.nrOfLinks > this->initialConfig.nrOfNodes) {
-      effectiveSolverChoice = SLESolver::BICGSTAB;
-    } else {
-      effectiveSolverChoice = SLESolver::CONJUGATE_GRADIENT;
-    }
+    effectiveSolverChoice = SLESolver::CONJUGATE_GRADIENT;
   }
   this->effectiveSolverChoiceState = effectiveSolverChoice;
   this->cgFallbackTriggered = false;
@@ -1169,9 +1165,14 @@ MEHPForceBalance2::runForceRelaxation(
             ? std::min(maxIterations, this->cgFallbackMaxIterations)
             : maxIterations;
         solver.setMaxIterations(cgMaxIters);
+        bool fallbackNeeded = false;
         solver.compute(sysMatrix);
         if (solver.info() != Eigen::Success) {
-          SOLVER_FAILED("System matrix computation failed");
+          if (this->cgFallbackMaxIterations > 0) {
+            fallbackNeeded = true;
+          } else {
+            SOLVER_FAILED("System matrix computation failed");
+          }
         }
 
         const size_t nLinks = this->initialConfig.nrOfLinks;
@@ -1190,30 +1191,35 @@ MEHPForceBalance2::runForceRelaxation(
         }
 
         const int numCols = this->is2D ? 2 : 3;
-        bool fallbackNeeded = false;
 
-        for (int col = 0; col < numCols; ++col) {
-          X.col(col) = solver.solve(B.col(col));
-          if (solver.info() != Eigen::Success &&
-              solver.info() != Eigen::NoConvergence) {
-            SOLVER_FAILED("System could not be solved");
-          }
-          iterationsDone += solver.iterations();
-
-          if (this->cgFallbackMaxIterations > 0 &&
-              (solver.info() == Eigen::NoConvergence ||
-               (solver.iterations() >= cgMaxIters &&
-                solver.error() > targetTol))) {
-            fallbackNeeded = true;
-            break;
+        if (!fallbackNeeded) {
+          for (int col = 0; col < numCols; ++col) {
+            X.col(col) = solver.solve(B.col(col));
+            if (this->cgFallbackMaxIterations > 0 &&
+                (solver.info() != Eigen::Success ||
+                 (solver.iterations() >= cgMaxIters &&
+                  solver.error() > targetTol))) {
+              iterationsDone += solver.iterations();
+              fallbackNeeded = true;
+              break;
+            }
+            if (solver.info() != Eigen::Success &&
+                solver.info() != Eigen::NoConvergence) {
+              SOLVER_FAILED("System could not be solved");
+            }
+            iterationsDone += solver.iterations();
           }
         }
 
         if (fallbackNeeded) {
+          const double cgErr = (solver.info() == Eigen::Success ||
+                                solver.info() == Eigen::NoConvergence)
+                                 ? solver.error()
+                                 : -1.0;
           std::cout
             << "ConjugateGradient did not converge within " << cgMaxIters
             << " iterations (residual reduction target: " << residualReduction
-            << ", CG error: " << solver.error()
+            << ", CG error: " << cgErr
             << "); automatically switching to BiCGSTAB to complete relaxation."
             << std::endl;
           this->cgFallbackTriggered = true;

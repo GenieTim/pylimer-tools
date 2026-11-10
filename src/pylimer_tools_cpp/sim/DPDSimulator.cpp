@@ -297,6 +297,7 @@ DPDSimulator::refreshCurrentState()
 void
 DPDSimulator::reseedRandomness(const std::string& seed)
 {
+  this->currentSeedString = seed;
   // initialize the random number generator
   if (seed == "") {
     std::random_device rd;
@@ -305,6 +306,7 @@ DPDSimulator::reseedRandomness(const std::string& seed)
     std::seed_seq seed2(seed.begin(), seed.end());
     this->e2 = std::mt19937(seed2);
   }
+  this->initThreadRNGs();
 }
 
 /**
@@ -683,7 +685,7 @@ DPDSimulator::computeForces(
   // we use our own parallelization -> disable the one by Eigen
   Eigen::setNbThreads(1);
 #pragma omp parallel for reduction(+ : stressTensor, pressure)                 \
-  schedule(static, 16)
+  schedule(static, 16) if (this->bondPartnersA.size() > 500)
   for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
     // attractive force -> reduces pressure in the system
     pressure -= this->k * bondDistances.segment(3 * i, 3).squaredNorm();
@@ -695,8 +697,21 @@ DPDSimulator::computeForces(
   timer.section(DPDPerformanceSections::PAIR_FORCE);
 
   // actually loop the atoms
-#pragma omp parallel
+#pragma omp parallel num_threads(this->getNumOmpThreads())
   {
+#ifdef OPENMP_FOUND
+    const int tid = omp_get_thread_num();
+    const int numThreads = omp_get_num_threads();
+#else
+    const int tid = 0;
+    const int numThreads = 1;
+#endif
+    std::mt19937& localRng = (numThreads == 1 || this->threadRNGs.empty())
+                               ? this->e2
+                               : this->threadRNGs[tid];
+    std::uniform_real_distribution<double> localDist =
+      this->uniform_rand_mean0std1;
+
     const double sigmaOverSqrtDt = this->sigma / std::sqrt(dt);
     // pre-allocate the neighbor indices array
     Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
@@ -769,7 +784,7 @@ DPDSimulator::computeForces(
 
         // random force
         const double constant_rnd_prefix = one_minus_rnorm * sigmaOverSqrtDt;
-        const double random_val = this->uniform_rand_mean0std1(this->e2);
+        const double random_val = localDist(localRng);
 
         pairForceConst += constant_rnd_prefix * random_val;
 
@@ -810,7 +825,7 @@ DPDSimulator::startMeasuringMSDForAtoms(
   // Translate atom IDS to indices of the local structure
   Eigen::ArrayXi coordinateIndices =
     Eigen::ArrayXi(3 * atomIdsToMeasure.size());
-#pragma omp parallel for
+#pragma omp parallel for if (atomIdsToMeasure.size() > 500)
   for (size_t i = 0; i < atomIdsToMeasure.size(); ++i) {
     const size_t atomId = atomIdsToMeasure[i];
     const size_t index = this->universe.getIdxByAtomId(atomId);
@@ -1718,9 +1733,8 @@ DPDSimulator::getBondLengths()
     this->box.handlePBC(bondDistances);
   }
 
-  Eigen::VectorXd bondLengths =
-    Eigen::VectorXd::Zero(this->numBonds + this->numSlipSprings);
-#pragma omp parallel for
+  Eigen::VectorXd bondLengths(this->numBonds + this->numSlipSprings);
+#pragma omp parallel for if ((this->numBonds + this->numSlipSprings) > 1000)
   for (size_t i = 0; i < (this->numBonds + this->numSlipSprings); ++i) {
     const double b = bondDistances.segment(3 * i, 3).norm();
     bondLengths[i] = b;

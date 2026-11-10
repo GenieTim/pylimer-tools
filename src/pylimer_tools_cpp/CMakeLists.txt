@@ -190,19 +190,10 @@ elseif (LAPACKE_FOUND)
 endif ()
 
 # OpenMP support
-if (WIN32)
-    message(STATUS "Windows detected: OpenMP disabled")
-elseif (CODE_COVERAGE)
-    message(STATUS "Code coverage enabled: OpenMP disabled")
-else ()
-    find_package(OpenMP)
-    if (OpenMP_CXX_FOUND)
-        target_link_libraries(pylimer_tools PUBLIC OpenMP::OpenMP_CXX)
-        target_compile_definitions(pylimer_tools PUBLIC OPENMP_FOUND=1)
-        message(STATUS "OpenMP found and enabled")
-    else ()
-        message(STATUS "OpenMP not found")
-    endif ()
+if (OpenMP_CXX_FOUND AND NOT WIN32 AND NOT CODE_COVERAGE)
+    target_link_libraries(pylimer_tools PUBLIC OpenMP::OpenMP_CXX)
+    target_compile_definitions(pylimer_tools PUBLIC OPENMP_FOUND=1)
+    message(STATUS "OpenMP enabled for pylimer_tools")
 endif ()
 
 # ==============================================================================

@@ -391,21 +391,27 @@ UniverseSequence::computeDistanceFromToAtoms(
   }
 
   // assemble all distances
-  std::vector<double> results;
-  results.reserve(atomIdsTo.size() * (this->getLength() - startingIndex + 1));
-  for (size_t universe_idx = startingIndex; universe_idx < this->getLength();
-       ++universe_idx) {
+  size_t numFrames =
+    this->getLength() > startingIndex ? (this->getLength() - startingIndex) : 0;
+  size_t pairsPerFrame = atomIdsTo.size();
+  std::vector<double> results(numFrames * pairsPerFrame);
+#ifdef OPENMP_FOUND
+#pragma omp parallel for schedule(dynamic) if (numFrames > 4)
+#endif
+  for (size_t f = 0; f < numFrames; ++f) {
+    size_t universe_idx = startingIndex + f;
     std::unordered_map<long int, int> atomIdToAtomIndex;
     atomIdToAtomIndex.reserve(atoms[universe_idx].size());
     for (size_t j = 0; j < atoms[universe_idx].size(); ++j) {
-      atomIdToAtomIndex[atoms[universe_idx][j].getId()] = j;
+      atomIdToAtomIndex[atoms[universe_idx][j].getId()] = static_cast<int>(j);
     }
-    for (size_t j = 0; j < atomIdsFrom.size(); ++j) {
+    for (size_t j = 0; j < pairsPerFrame; ++j) {
       Atom atomFrom = atoms[universe_idx][atomIdToAtomIndex.at(atomIdsFrom[j])];
       Atom atomTo = atoms[universe_idx][atomIdToAtomIndex.at(atomIdsTo[j])];
-      results.push_back((atomTo.getUnwrappedCoordinates(boxes[universe_idx]) -
-                         atomFrom.getUnwrappedCoordinates(boxes[universe_idx]))
-                          .norm());
+      results[f * pairsPerFrame + j] =
+        (atomTo.getUnwrappedCoordinates(boxes[universe_idx]) -
+         atomFrom.getUnwrappedCoordinates(boxes[universe_idx]))
+          .norm();
     }
   }
 
@@ -465,21 +471,26 @@ UniverseSequence::computeVectorFromToAtoms(
   }
 
   // assemble all distances
-  std::vector<Eigen::Vector3d> results;
-  results.reserve(atomIdsTo.size() * (this->getLength() - startingIndex + 1));
-  for (size_t universe_idx = startingIndex; universe_idx < this->getLength();
-       ++universe_idx) {
+  size_t numFrames =
+    this->getLength() > startingIndex ? (this->getLength() - startingIndex) : 0;
+  size_t pairsPerFrame = atomIdsTo.size();
+  std::vector<Eigen::Vector3d> results(numFrames * pairsPerFrame);
+#ifdef OPENMP_FOUND
+#pragma omp parallel for schedule(dynamic) if (numFrames > 4)
+#endif
+  for (size_t f = 0; f < numFrames; ++f) {
+    size_t universe_idx = startingIndex + f;
     std::unordered_map<long int, int> atomIdToAtomIndex;
     atomIdToAtomIndex.reserve(atoms[universe_idx].size());
     for (size_t j = 0; j < atoms[universe_idx].size(); ++j) {
-      atomIdToAtomIndex[atoms[universe_idx][j].getId()] = j;
+      atomIdToAtomIndex[atoms[universe_idx][j].getId()] = static_cast<int>(j);
     }
-    for (size_t j = 0; j < atomIdsFrom.size(); ++j) {
+    for (size_t j = 0; j < pairsPerFrame; ++j) {
       Atom atomFrom = atoms[universe_idx][atomIdToAtomIndex.at(atomIdsFrom[j])];
       Atom atomTo = atoms[universe_idx][atomIdToAtomIndex.at(atomIdsTo[j])];
-      results.push_back(
+      results[f * pairsPerFrame + j] =
         (atomTo.getUnwrappedCoordinates(boxes[universe_idx]) -
-         atomFrom.getUnwrappedCoordinates(boxes[universe_idx])));
+         atomFrom.getUnwrappedCoordinates(boxes[universe_idx]));
     }
   }
 

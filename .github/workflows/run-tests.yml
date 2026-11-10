@@ -6,9 +6,16 @@ on:
     branches:
       - master
       - main
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+      - "*.rst"
+      - ".gitignore"
+      - ".github/workflows/publish-documentation-html.yml"
+      - ".github/workflows/check-*.yml"
 
 concurrency:
-  group: ${{ github.workflow }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -22,21 +29,44 @@ jobs:
         with:
           submodules: "recursive"
 
-      - uses: actions/cache@v4
+      - name: Detect file changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            cpp:
+              - "src/pylimer_tools_cpp/**"
+              - "tests/pylimer_tools_cpp/**"
+              - "CMakeLists.txt"
+              - "tests/CMakeLists.txt"
+              - "vendor/**"
+              - "setup.py"
+              - "bin/build-tests.sh"
+              - "bin/config-tests-build.sh"
+              - ".github/workflows/run-tests.yml"
+
+      - name: Setup Ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ runner.os }}-py-3.13
+          max-size: 2G
+
+      - name: Cache built C++ extension
+        id: cpp-ext-cache
+        uses: actions/cache@v4
         with:
           path: |
-            ./build
-            ./vendor/igraph
-            ./vendor/igraph-skbuild
-            ./vendor/nlopt
-            ./vendor/nlopt-skbuild
-            ./vendor/cereal
-            ./vendor/cereal-skbuild
-            ./tests/build
-            ~/.cache/ccache
-          key: pt-${{ runner.os }}-py-3.13
+            src/*.so
+            src/*.dylib
+            src/*.pyd
+            build
+            tests/build
+            ./vendor/igraph*
+            ./vendor/nlopt*
+            ./vendor/cereal*
+          key: cpp-ext-${{ runner.os }}-py-3.13-${{ hashFiles('src/pylimer_tools_cpp/**', 'tests/pylimer_tools_cpp/**', 'CMakeLists.txt', 'tests/CMakeLists.txt', 'setup.py', 'vendor/**', 'requirements.txt') }}
           restore-keys: |
-            pt-${{ runner.os }}-py-3.13
+            cpp-ext-${{ runner.os }}-py-3.13-
 
       - uses: actions/setup-python@v5
         with:
@@ -47,7 +77,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Install dev dependencies
-        run: sudo apt-get install bison flex lcov libeigen3-dev ccache
+        run: sudo apt-get install -y bison flex lcov libeigen3-dev ninja-build
 
       - name: Run Tests
         run: ./bin/run-tests-short.sh
@@ -55,8 +85,7 @@ jobs:
           CI: true
           CMAKE_BUILD_TYPE: RelWithDebInfo
           ENABLE_LEAK_ANALYSIS: "1"
-          CCACHE_DIR: ~/.cache/ccache
-          CCACHE_MAXSIZE: 500M
+          RUN_CPP_TESTS: ${{ (steps.filter.outputs.cpp == 'true' || steps.cpp-ext-cache.outputs.cache-hit != 'true' || github.event_name == 'workflow_dispatch') && '1' || '0' }}
 
       # Generate Coverage Badge
       - name: Install Badge Generator

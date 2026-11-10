@@ -24,6 +24,9 @@ extern "C"
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#ifdef OPENMP_FOUND
+#include <omp.h>
+#endif
 
 namespace pylimer_tools::entities {
 
@@ -789,15 +792,17 @@ Universe::countAtomsInSkinDistance(const std::vector<double>& distances,
   NeighbourList neighbourList = NeighbourList(
     atoms, this->getBox(), pylimer_tools::utils::last<double>(distances));
 
+#ifdef OPENMP_FOUND
+#pragma omp parallel for schedule(dynamic) if (distances.size() > 4)
+#endif
   for (size_t i = 1; i < distances.size(); ++i) {
+    size_t countForBin = 0;
     for (const Atom& a : atoms) {
       std::vector<Atom> closeAtoms = neighbourList.getAtomsCloseTo(
         a, distances[i], distances[i - 1], unwrapped, true);
-      // std::cout << closeAtoms.size() << " atoms close to " << a.getId()
-      //           << " between " << distances[i] << " and " << distances[i -
-      //           1] << std::endl;
-      result[i - 1] += closeAtoms.size();
+      countForBin += closeAtoms.size();
     }
+    result[i - 1] = countForBin;
   }
 
   return result;

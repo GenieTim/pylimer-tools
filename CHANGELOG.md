@@ -2,6 +2,21 @@
 
 ## main
 
+### OpenMP Parallelization, Thread-Safety & Build Optimizations
+- **OpenMP Configuration & macOS `libomp` Discovery (`vendor/openmp.CMakeLists.cmake`)**:
+  - Automatically detect Homebrew `libomp` on macOS with Clang/AppleClang (`OpenMP_ROOT`, `brew --prefix libomp`, `/opt/homebrew/opt/libomp`, `/usr/local/opt/libomp`) and unify OpenMP configuration across `pylimer_tools` and `test_sources`.
+  - Include `<omp.h>` in `ExtraEigenTypes.h` when `OPENMP_FOUND` is enabled and add Catch2 unit tests for OpenMP `Eigen::VectorXd` and `Eigen::Matrix3d` parallel reductions.
+- **Parallelized Algorithms & Thread-Safety**:
+  - Parallelize `NormalModeAnalyzer::computeChebyshevMomentsKPM` across Rademacher trace estimation vectors with deterministic pre-generated random vectors and OpenMP `Eigen::VectorXd` reductions.
+  - Parallelize `ResistanceDistanceAnalysis::computeAllPairsEffectiveResistance` and `computeKirchhoffIndex`.
+  - Parallelize `RouseBrownianSimulator::computeMSD`, `computeCenterOfMassMSD`, and `computeEndToEndAutocorrelation` over lag times $\tau$.
+  - Parallelize `Universe::countAtomsInSkinDistance` and `UniverseSequence::computeDistanceFromToAtoms` / `computeVectorFromToAtoms`.
+  - Add thread-private PRNGs (`threadRNGs`, `initThreadRNGs`) and persistent thread count configuration (`setNumOmpThreads`, `getNumOmpThreads`) in `DPDSimulator` to eliminate data races on `std::mt19937` during multi-threaded pair-force evaluation.
+  - Fix missing `totalMass` reduction clause in `Molecule::computeRadiusOfGyration` and add loop size guards (`if (...)`) to avoid OpenMP overhead on small inputs.
+- **Build System & CI Workflows**:
+  - Propagate `EIGEN3_INCLUDE_DIRS` from `Eigen3::Eigen` target properties in `vendor/eigen.CMakeLists.cmake` and link `Eigen3::Eigen` directly in `tests/CMakeLists.txt`.
+  - Optimize GitHub Actions workflows with path triggers, `ccache`, Ninja build generator, and conditional C++ test execution (`RUN_CPP_TESTS`) when only Python files are modified.
+
 ### Analytical Brownian-Bridge Entanglement Sampling & Universe-Free Force Balance
 - **Analytical Entanglement Detection (`EntanglementDetector`)**:
   - Implement `randomlyFindEntanglementsAnalytical` (`randomly_sample_entanglements_analytical`) to probabilistically sample spatial slip-links directly on a `CrosslinkerUniverse` using conditional Brownian-bridge and random-walk Gaussian distributions between crosslinker anchors without instantiating explicit 3D bead coordinates or constructing an intermediate `Universe`.
@@ -27,7 +42,8 @@
   - Raise dense-to-sparse eigenvalue threshold to $n = 5000$ where dense LAPACK (`LAPACKE_dsyevr` MRRR) is up to ~29x faster than sparse slicing and fits in < 200 MB RAM, while preserving sparse slicing for large scales ($N > 55,000$, where dense matrix allocation requires $> 24$ GB RAM).
   - Automatically accelerate `computeEffectiveSpectrumKPM` and `computeDensityOfStatesKPM` via `computeChebyshevMomentsKPMMetal` when Metal GPU acceleration is available (> 25x speedup for large systems), falling back seamlessly to CPU when unavailable.
 - **MEHPForceBalance2**:
-  - Add `SLESolver::AUTO` enum (`"auto"`) and optimize `SLESolver::DEFAULT` / `SLESolver::AUTO` to automatically resolve to `SLESolver::METAL_CG` (GPU 3-RHS multi-column SpMM Conjugate Gradient with Jacobi preconditioning and zero-mode projection) when Apple Silicon Metal is available, and `SLESolver::CONJUGATE_GRADIENT` (CPU scalar $N \times N$ 3-RHS system) otherwise. This replaces the un-preconditioned $3N \times 3N$ Barzilai-Borwein gradient descent default which required thousands of iterations on realistic systems ($N > 55,000$).
+  - Always default `SLESolver::DEFAULT` and `SLESolver::AUTO` to `SLESolver::CONJUGATE_GRADIENT` with automatic non-convergence and breakdown fallback to `BiCGSTAB`, ensuring robust and optimal iterative performance across all network topologies (including networks with more links than nodes).
+  - Add `SLESolver::AUTO` enum (`"auto"`) and Python string aliases (`"auto"`, `"default"`, `"cg"`).
   - Add adaptive solver fallback from `ConjugateGradient` to `BiCGSTAB` when CG reaches a configurable iteration threshold without converging (`configCGFallbackMaxIterations` / `getCGFallbackMaxIterations`, `wasCGFallbackTriggered`, `getEffectiveSolverChoice`, default `20000` iterations), and increase the default `max_iterations` in Python `run_force_relaxation` to `50000`.
   - Replace full `Universe` member storage in `MEHPForceBalance2` with lightweight pre-extracted atom and cluster metadata (`extractUniverseMetadata`, `getNrOfAtomsInUniverse`) and `const Universe&` `pybind11` constructor bindings, eliminating deep `Universe` copies on instantiation and repeated `getClusters()` decompositions in `countActiveClusteredAtoms`.
   - Allow `sle_solver` in Python `run_force_relaxation` to accept both `SLESolver` enum instances and string descriptors (`"auto"`, `"metal_cg"`, `"cg"`, etc.).

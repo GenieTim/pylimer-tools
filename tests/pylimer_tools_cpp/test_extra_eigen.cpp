@@ -260,3 +260,60 @@ TEST_CASE("Eigen serialization with cereal", "[Eigen][serialization]")
   }
 }
 #endif
+
+#ifdef OPENMP_FOUND
+TEST_CASE("OpenMP Eigen reduction works", "[Eigen][OpenMP]")
+{
+  std::cout << "Running test \"OpenMP Eigen reduction works\"" << std::endl;
+
+  SECTION("VectorXd parallel reduction")
+  {
+    const int numElements = 100;
+    const int numIterations = 500;
+    Eigen::VectorXd expected = Eigen::VectorXd::Zero(numElements);
+    Eigen::VectorXd reduced = Eigen::VectorXd::Zero(numElements);
+
+    for (int i = 0; i < numIterations; ++i) {
+      expected.array() += static_cast<double>(i + 1);
+    }
+
+#pragma omp parallel for reduction(+ : reduced) schedule(static)
+    for (int i = 0; i < numIterations; ++i) {
+      Eigen::VectorXd local =
+        Eigen::VectorXd::Constant(numElements, static_cast<double>(i + 1));
+      reduced += local;
+    }
+
+    REQUIRE(reduced.size() == expected.size());
+    for (int i = 0; i < numElements; ++i) {
+      CHECK(reduced[i] == Catch::Approx(expected[i]));
+    }
+  }
+
+  SECTION("Matrix3d parallel reduction")
+  {
+    const int numIterations = 200;
+    Eigen::Matrix3d expected = Eigen::Matrix3d::Zero();
+    Eigen::Matrix3d reduced = Eigen::Matrix3d::Zero();
+
+    for (int i = 0; i < numIterations; ++i) {
+      Eigen::Matrix3d m;
+      m << i, i * 2, i * 3, i * 4, i * 5, i * 6, i * 7, i * 8, i * 9;
+      expected += m;
+    }
+
+#pragma omp parallel for reduction(+ : reduced) schedule(static)
+    for (int i = 0; i < numIterations; ++i) {
+      Eigen::Matrix3d m;
+      m << i, i * 2, i * 3, i * 4, i * 5, i * 6, i * 7, i * 8, i * 9;
+      reduced += m;
+    }
+
+    for (int r = 0; r < 3; ++r) {
+      for (int c = 0; c < 3; ++c) {
+        CHECK(reduced(r, c) == Catch::Approx(expected(r, c)));
+      }
+    }
+  }
+}
+#endif

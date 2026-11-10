@@ -4624,6 +4624,24 @@ TEST_CASE("MEHPForceBalance2 Adaptive Solver Fallback (CG to BiCGSTAB)",
     CHECK(fb.getExitReason() == pcm::ExitReason::X_TOLERANCE);
   }
 
+  SECTION("Default solver is ConjugateGradient even when links > nodes")
+  {
+    pcm::MEHPForceBalance2 fb(universe, 50, 4.0, 0.0, 50, 3.0, "12345");
+    REQUIRE(fb.getNetwork().nrOfLinks > fb.getNetwork().nrOfNodes);
+
+    fb.runForceRelaxation(pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+                          1e-6,
+                          pcm::SLESolver::DEFAULT,
+                          1e-12,
+                          50000);
+
+    CHECK(
+      (fb.getEffectiveSolverChoice() == pcm::SLESolver::CONJUGATE_GRADIENT ||
+       (fb.wasCGFallbackTriggered() &&
+        fb.getEffectiveSolverChoice() == pcm::SLESolver::BICGSTAB)));
+    CHECK(fb.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+  }
+
   SECTION("Fallback triggers when CG reaches iteration limit on system")
   {
     pcm::MEHPForceBalance2 fb(universe, 2, false);

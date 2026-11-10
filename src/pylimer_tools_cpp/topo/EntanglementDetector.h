@@ -7,9 +7,6 @@
 #include <Eigen/Dense>
 #include <string>
 #include <vector>
-#ifdef OPENMP_FOUND
-#include <omp.h>
-#endif
 
 namespace pylimer_tools::topo::entanglement_detection {
 

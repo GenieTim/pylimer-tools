@@ -7,6 +7,9 @@
 #include <limits>
 #include <queue>
 #include <unordered_set>
+#ifdef OPENMP_FOUND
+#include <omp.h>
+#endif
 
 namespace pylimer_tools::topo {
 
@@ -358,6 +361,9 @@ ResistanceDistanceAnalysis::computeAllPairsEffectiveResistance(
 
   Eigen::Index N = static_cast<Eigen::Index>(numNodes_);
   Eigen::MatrixXd R(N, N);
+#ifdef OPENMP_FOUND
+#pragma omp parallel for schedule(static) if (numNodes_ > 128)
+#endif
   for (size_t i = 0; i < numNodes_; ++i) {
     for (size_t j = 0; j < numNodes_; ++j) {
       if (i == j) {
@@ -391,6 +397,9 @@ ResistanceDistanceAnalysis::computeKirchhoffIndex() const
 
   Eigen::MatrixXd R = computeAllPairsEffectiveResistance();
   double K = 0.0;
+#ifdef OPENMP_FOUND
+#pragma omp parallel for reduction(+ : K) schedule(static) if (numNodes_ > 128)
+#endif
   for (size_t i = 0; i < numNodes_; ++i) {
     for (size_t j = i + 1; j < numNodes_; ++j) {
       K += R(static_cast<Eigen::Index>(i), static_cast<Eigen::Index>(j));
