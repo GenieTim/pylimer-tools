@@ -116,7 +116,7 @@ writer.config_molecule_idx_for_swap(True)
 writer.config_molecule_idx_for_swap(True)
 ```
 
-**Total running time of the script:** (0 minutes 0.004 seconds)
+**Total running time of the script:** (0 minutes 0.005 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-data-file-writer-py"></a>
 

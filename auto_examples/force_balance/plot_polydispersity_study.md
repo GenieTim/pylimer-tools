@@ -126,7 +126,7 @@ There are many things you would want to do differently in a real study, for exam
 - Change the polymer type and network properties as desired to match the experimental system.
 - Save the universe to a file for reproducibility and further analysis.
 
-**Total running time of the script:** (5 minutes 28.732 seconds)
+**Total running time of the script:** (6 minutes 10.563 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-polydispersity-study-py"></a>
 

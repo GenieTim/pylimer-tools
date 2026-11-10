@@ -538,7 +538,7 @@ Practical Recommendations
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.416 seconds)
+   **Total running time of the script:** (0 minutes 0.392 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_entanglement_link_vs_spring.py:

@@ -64,7 +64,7 @@ if not os.path.exists("generated_structures"):
 writer.write_to_file("generated_structures/simple_crosslinked_network.data")
 ```
 
-**Total running time of the script:** (0 minutes 0.513 seconds)
+**Total running time of the script:** (0 minutes 0.580 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-simple-crosslinked-network-py"></a>
 

@@ -463,7 +463,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 | **System Size (SLE)** | Smaller ($+ N_{\text{ent}}$ nodes, $0$ extra bonds).                                                                                                                    | Larger ($+ 2 N_{\text{ent}}$ nodes, $+ N_{\text{ent}}$ extra springs).                     |
 | **Recommended Use**   | Standard affine/phantom homogenization where entanglements act as effective crosslinks (Bernhard and Gusev [[BG25](../../acknowledgements.md#id12)]). | Studies exploring inter-chain interaction compliance or finite-range topological coupling. |
 
-**Total running time of the script:** (0 minutes 0.416 seconds)
+**Total running time of the script:** (0 minutes 0.392 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-link-vs-spring-py"></a>
 

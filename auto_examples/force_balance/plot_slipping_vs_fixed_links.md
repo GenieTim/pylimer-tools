@@ -465,7 +465,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 | **Convergence Speed**          | Fast; 2-3× fewer iterations.                                                                                                            | Slower; non-linear coupled partition optimization.                                                                            |
 | **Recommended Implementation** | Use [`MEHPForceBalance2`](../../api/pylimer_tools_cpp.MEHPForceBalance2.md#pylimer_tools_cpp.MEHPForceBalance2) (links are fixed by design). | Historical curiosity in [`MEHPForceBalance`](../../api/pylimer_tools_cpp.MEHPForceBalance.md#pylimer_tools_cpp.MEHPForceBalance). |
 
-**Total running time of the script:** (0 minutes 0.323 seconds)
+**Total running time of the script:** (0 minutes 0.332 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-slipping-vs-fixed-links-py"></a>
 

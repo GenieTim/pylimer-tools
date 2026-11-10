@@ -2,7 +2,7 @@
 
 # Computation times
 
-**05:35.702** total execution time for 9 files **from auto_examples/force_balance**:
+**06:18.947** total execution time for 9 files **from auto_examples/force_balance**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -19,12 +19,12 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                                                    | Time      |   Mem (MB) |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Polydispersity Study](plot_polydispersity_study.html.md#sphx-glr-auto-examples-force-balance-plot-polydispersity-study-py) (`plot_polydispersity_study.py`)                                                                     | 05:28.732 |          0 |
-| [Maximum Entropy Homogenization Procedure (MEHP)](plot_force_relaxation.html.md#sphx-glr-auto-examples-force-balance-plot-force-relaxation-py) (`plot_force_relaxation.py`)                                                  | 00:02.972 |          0 |
-| [Comparing Entanglement Sampling Methods: Discrete vs. Analytical](plot_entanglement_sampling_comparison.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`plot_entanglement_sampling_comparison.py`) | 00:01.700 |          0 |
-| [Inactive Strand & Entanglement Removal in Force Balance 2](plot_inactive_removal_and_sampling.html.md#sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py) (`plot_inactive_removal_and_sampling.py`)              | 00:00.850 |          0 |
-| [Modeling Entanglements: Entanglement Links vs. Entanglement Springs](plot_entanglement_link_vs_spring.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-link-vs-spring-py) (`plot_entanglement_link_vs_spring.py`)        | 00:00.416 |          0 |
-| [Entanglement Mobility: Dynamic Slipping vs. Fixed Links](plot_slipping_vs_fixed_links.html.md#sphx-glr-auto-examples-force-balance-plot-slipping-vs-fixed-links-py) (`plot_slipping_vs_fixed_links.py`)                            | 00:00.323 |          0 |
-| [Force Balance 2](plot_force_balance_2.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-2-py) (`plot_force_balance_2.py`)                                                                                    | 00:00.272 |          0 |
-| [Force Balance](plot_force_balance.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-py) (`plot_force_balance.py`)                                                                                          | 00:00.233 |          0 |
-| [Deformation Experiment](plot_fb_deformation_exp.html.md#sphx-glr-auto-examples-force-balance-plot-fb-deformation-exp-py) (`plot_fb_deformation_exp.py`)                                                                       | 00:00.203 |          0 |
+| [Polydispersity Study](plot_polydispersity_study.html.md#sphx-glr-auto-examples-force-balance-plot-polydispersity-study-py) (`plot_polydispersity_study.py`)                                                                     | 06:10.563 |          0 |
+| [Maximum Entropy Homogenization Procedure (MEHP)](plot_force_relaxation.html.md#sphx-glr-auto-examples-force-balance-plot-force-relaxation-py) (`plot_force_relaxation.py`)                                                  | 00:03.975 |          0 |
+| [Comparing Entanglement Sampling Methods: Discrete vs. Analytical](plot_entanglement_sampling_comparison.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`plot_entanglement_sampling_comparison.py`) | 00:01.793 |          0 |
+| [Inactive Strand & Entanglement Removal in Force Balance 2](plot_inactive_removal_and_sampling.html.md#sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py) (`plot_inactive_removal_and_sampling.py`)              | 00:00.876 |          0 |
+| [Force Balance 2](plot_force_balance_2.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-2-py) (`plot_force_balance_2.py`)                                                                                    | 00:00.413 |          0 |
+| [Modeling Entanglements: Entanglement Links vs. Entanglement Springs](plot_entanglement_link_vs_spring.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-link-vs-spring-py) (`plot_entanglement_link_vs_spring.py`)        | 00:00.392 |          0 |
+| [Entanglement Mobility: Dynamic Slipping vs. Fixed Links](plot_slipping_vs_fixed_links.html.md#sphx-glr-auto-examples-force-balance-plot-slipping-vs-fixed-links-py) (`plot_slipping_vs_fixed_links.py`)                            | 00:00.332 |          0 |
+| [Force Balance](plot_force_balance.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-py) (`plot_force_balance.py`)                                                                                          | 00:00.308 |          0 |
+| [Deformation Experiment](plot_fb_deformation_exp.html.md#sphx-glr-auto-examples-force-balance-plot-fb-deformation-exp-py) (`plot_fb_deformation_exp.py`)                                                                       | 00:00.296 |          0 |

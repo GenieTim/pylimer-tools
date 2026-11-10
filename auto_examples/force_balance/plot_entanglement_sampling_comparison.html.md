@@ -1027,7 +1027,7 @@ The table below summarizes key trade-offs between discrete and analytical sampli
      `filter_dangling_and_soluble=False` or scale target $N_{\text{ent}}$ by
      $1 / w_{\text{active}}^2$.
 
-**Total running time of the script:** (0 minutes 1.700 seconds)
+**Total running time of the script:** (0 minutes 1.793 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 

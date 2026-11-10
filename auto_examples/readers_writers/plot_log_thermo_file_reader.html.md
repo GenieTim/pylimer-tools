@@ -73,7 +73,7 @@ plt.ylabel("Temperature [LJ-units]")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.049 seconds)
+**Total running time of the script:** (0 minutes 0.068 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-log-thermo-file-reader-py"></a>
 

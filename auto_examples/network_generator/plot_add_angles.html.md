@@ -87,7 +87,7 @@ if not os.path.exists("generated_structures"):
 writer.write_to_file("generated_structures/polymer_network_with_angles.data")
 ```
 
-**Total running time of the script:** (0 minutes 0.544 seconds)
+**Total running time of the script:** (0 minutes 0.609 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-add-angles-py"></a>
 

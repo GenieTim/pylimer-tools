@@ -203,8 +203,7 @@
 - [NOTE](plot_slipping_vs_fixed_links.html.md): Go to the end
 - [NOTE](plot_entanglement_sampling_comparison.html.md): Go to the end
 - [NOTE](plot_inactive_removal_and_sampling.html.md): Go to the end
-- [NOTE](plot_sliplink_vs_slipspring.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;05:35.702&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;06:18.947&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 
 ## Optional
 

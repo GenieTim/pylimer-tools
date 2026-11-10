@@ -7511,13 +7511,13 @@ Processing frame 74310 with 32 atoms
 Processing frame 74320 with 32 atoms
 
 --- Memory Usage Report ---
-Memory before processing: 241.81 MB
-Memory after processing:  241.81 MB
+Memory before processing: 903.82 MB
+Memory after processing:  903.82 MB
 Memory used by script:    0.00 MB
 Dump file size:           83.32 MB
 ```
 
-**Total running time of the script:** (0 minutes 15.766 seconds)
+**Total running time of the script:** (0 minutes 22.311 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py"></a>
 

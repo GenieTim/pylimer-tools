@@ -24,7 +24,7 @@ Convert [LAMMPS units](https://docs.lammps.org/units.html) to SI or other unit s
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 18-40 -->
 ```none
-/opt/hostedtoolcache/Python/3.12.6/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:177: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
+/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:177: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
   warnings.warn(
 LJ 1 Pressure in Pascal: 101325.0
 ```
@@ -54,7 +54,7 @@ temperature_si = (
 print(f"LJ 1 Pressure in Pascal: {pressure_si}")
 ```
 
-**Total running time of the script:** (0 minutes 0.201 seconds)
+**Total running time of the script:** (0 minutes 0.198 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-unit-conversion-py"></a>
 

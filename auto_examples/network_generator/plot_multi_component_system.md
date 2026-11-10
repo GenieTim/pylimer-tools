@@ -16,11 +16,11 @@ Create complex systems with multiple components:
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 8-88 -->
 ```none
-Starting network generation at 2026-10-25 10:59:42.756703
+Starting network generation at 2026-11-10 08:32:05.332622
 Adding crosslinkers...
 Adding solvent chains...
 Adding and linking polymer strands...
-Network generation completed at 2026-10-25 10:59:43.161593
+Network generation completed at 2026-11-10 08:32:05.793428
 ```
 
 <br/>
@@ -106,7 +106,7 @@ writer.write_to_file(
     "generated_structures/multi_component_polymer_network.data")
 ```
 
-**Total running time of the script:** (0 minutes 0.419 seconds)
+**Total running time of the script:** (0 minutes 0.476 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-multi-component-system-py"></a>
 
