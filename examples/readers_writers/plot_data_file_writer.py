@@ -93,4 +93,34 @@ writer.config_molecule_idx_for_swap(False)
 # Sets the molecule index for each atom based on the distance from the
 # next junction
 writer.config_molecule_idx_for_swap(True)
-writer.config_molecule_idx_for_swap(True)
+
+# %%
+# Visualizing Generated Atom Coordinates
+# --------------------------------------
+# We display the 3D coordinates of the generated atoms:
+
+import matplotlib.pyplot as plt
+
+coords = [a.get_coordinates() for a in universe.get_atoms()]
+xs = [p[0] for p in coords]
+ys = [p[1] for p in coords]
+zs = [p[2] for p in coords]
+
+fig = plt.figure(figsize=(7, 5))
+ax = fig.add_subplot(111, projection="3d")
+sc = ax.scatter(
+    xs,
+    ys,
+    zs,
+    c=zs,
+    cmap="viridis",
+    s=30,
+    edgecolor="k",
+    alpha=0.8)
+ax.set_xlabel("X")
+ax.set_ylabel("Y")
+ax.set_zlabel("Z")
+ax.set_title("Generated Atom Coordinates for Data File Export")
+fig.colorbar(sc, ax=ax, label="Z coordinate", pad=0.1)
+plt.tight_layout()
+plt.show()

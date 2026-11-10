@@ -120,6 +120,44 @@ def recompute_inactive_removal_and_sampling(
     )
 
 
+def recompute_sampling_cutoff_effect(
+    max_workers: Optional[int] = None,
+) -> None:
+    """Recompute the multi-seed ensemble dataset for plot_sampling_cutoff_effect."""
+    from plot_sampling_cutoff_effect import run_sampling_cutoff_simulation
+
+    cache_path = get_example_cache_path(
+        "sampling_cutoff_effect_cache.npz", "force_balance"
+    )
+    print(
+        f"\n--- Recomputing Sampling Cutoff Effect cache ({cache_path.name}) ---")
+    load_or_compute_cache(
+        cache_path,
+        run_sampling_cutoff_simulation,
+        recompute=True,
+        max_workers=max_workers,
+    )
+
+
+def recompute_polydispersity_study(
+    max_workers: Optional[int] = None,
+) -> None:
+    """Recompute the multi-seed ensemble dataset for plot_polydispersity_study."""
+    from plot_polydispersity_study import run_polydispersity_simulation
+
+    cache_path = get_example_cache_path(
+        "polydispersity_study_cache.npz", "force_balance"
+    )
+    print(
+        f"\n--- Recomputing Polydispersity Study cache ({cache_path.name}) ---")
+    load_or_compute_cache(
+        cache_path,
+        run_polydispersity_simulation,
+        recompute=True,
+        max_workers=max_workers,
+    )
+
+
 def _run_cache_task(task_name: str, workers: Optional[int]) -> str:
     """Worker wrapper to execute an individual cache recomputation task."""
     if task_name == "link_vs_spring":
@@ -130,6 +168,10 @@ def _run_cache_task(task_name: str, workers: Optional[int]) -> str:
         recompute_entanglement_sampling_comparison(max_workers=workers)
     elif task_name == "inactive_removal":
         recompute_inactive_removal_and_sampling(max_workers=workers)
+    elif task_name == "sampling_cutoff":
+        recompute_sampling_cutoff_effect(max_workers=workers)
+    elif task_name == "polydispersity":
+        recompute_polydispersity_study(max_workers=workers)
     else:
         raise ValueError(f"Unknown task name: {task_name}")
     return task_name
@@ -171,6 +213,16 @@ def main():
         action="store_true",
         help="Recompute only inactive removal and sampling cache",
     )
+    parser.add_argument(
+        "--sampling-cutoff-only",
+        action="store_true",
+        help="Recompute only sampling cutoff effect cache",
+    )
+    parser.add_argument(
+        "--polydispersity-only",
+        action="store_true",
+        help="Recompute only polydispersity study cache",
+    )
     args = parser.parse_args()
 
     total_workers = resolve_max_workers(args.workers)
@@ -181,6 +233,8 @@ def main():
         or args.slipping_vs_fixed_only
         or args.sampling_only
         or args.inactive_removal_only
+        or args.sampling_cutoff_only
+        or args.polydispersity_only
     )
     if run_all or args.link_vs_spring_only:
         tasks_to_run.append("link_vs_spring")
@@ -190,6 +244,10 @@ def main():
         tasks_to_run.append("sampling")
     if run_all or args.inactive_removal_only:
         tasks_to_run.append("inactive_removal")
+    if run_all or args.sampling_cutoff_only:
+        tasks_to_run.append("sampling_cutoff")
+    if run_all or args.polydispersity_only:
+        tasks_to_run.append("polydispersity")
 
     print(
         f"Recomputing {len(tasks_to_run)} cache task(s) with total available workers = {

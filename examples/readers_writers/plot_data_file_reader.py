@@ -55,6 +55,39 @@ for universe in sequence:
     print(f"Loaded universe with {universe.get_nr_of_atoms()} atoms")
 
 # %%
+# Visualizing Loaded Network Statistics
+# -------------------------------------
+import matplotlib.pyplot as plt
+import numpy as np
+
+names = ["Melt (single)", "Diamond (imperfect)", "Diamond (fixed)"]
+universes = [
+    one_universe_seq.at_index(0),
+    sequence.at_index(0),
+    sequence.at_index(1)]
+atom_counts = [u.get_nr_of_atoms() for u in universes]
+bond_counts = [u.get_nr_of_bonds() for u in universes]
+
+x = np.arange(len(names))
+width = 0.35
+
+fig, ax = plt.subplots(figsize=(7, 4.5))
+ax.bar(
+    x - width / 2, atom_counts, width, label="Atoms", color="#4C72B0", edgecolor="black"
+)
+ax.bar(
+    x + width / 2, bond_counts, width, label="Bonds", color="#55A868", edgecolor="black"
+)
+ax.set_xticks(x)
+ax.set_xticklabels(names)
+ax.set_ylabel("Count", fontsize=11)
+ax.set_title("Atom and Bond Counts of Loaded Structures", fontsize=12)
+ax.legend()
+ax.grid(True, axis="y", linestyle=":", alpha=0.6)
+plt.tight_layout()
+plt.show()
+
+# %%
 # Please note that the ``hybrid`` and ``tdpd`` atom styles are not fully supported.
 #
 # If your data files don't hint the atom style in the line that starts with "Atom",

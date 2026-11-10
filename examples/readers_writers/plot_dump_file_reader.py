@@ -46,3 +46,21 @@ dump_file_reader = DumpFileReader(
     os.path.join(file_path, "lammps_dump_small_3step.lammpstrj")
 )
 print(f"Dump file contains {dump_file_reader.get_length()} frames")
+
+# %%
+# Visualizing Box Dimensions Across Trajectory Frames
+# ---------------------------------------------------
+import matplotlib.pyplot as plt
+
+frame_indices = list(range(len(sequence)))
+box_volumes = [sequence.at_index(i).get_box().get_volume()
+               for i in frame_indices]
+
+plt.figure(figsize=(6, 4))
+plt.plot(frame_indices, box_volumes, marker="o", color="#4C72B0", lw=2)
+plt.xlabel("Frame Index", fontsize=11)
+plt.ylabel("Box Volume [$\\sigma^3$]", fontsize=11)
+plt.title("Simulation Box Volume Across Trajectory Frames", fontsize=12)
+plt.grid(True, linestyle=":", alpha=0.6)
+plt.tight_layout()
+plt.show()

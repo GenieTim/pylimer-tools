@@ -3,8 +3,11 @@
 ## main
 
 ### OpenMP Parallelization, Thread-Safety & Build Optimizations
-- **OpenMP Configuration & macOS `libomp` Discovery (`vendor/openmp.CMakeLists.cmake`)**:
+- **OpenMP Configuration & macOS `libomp` Discovery (`vendor/openmp.CMakeLists.cmake`, `setup.py`)**:
   - Automatically detect Homebrew `libomp` on macOS with Clang/AppleClang (`OpenMP_ROOT`, `brew --prefix libomp`, `/opt/homebrew/opt/libomp`, `/usr/local/opt/libomp`) and unify OpenMP configuration across `pylimer_tools` and `test_sources`.
+  - Include `openmp.CMakeLists.cmake` before LAPACKE/BLAS discovery to ensure `FindBLAS` does not probe OpenMP without Homebrew hints, and purge any stale LLVM `libomp` cache entries to prevent `OMP: Error #15` duplicate runtime conflicts with Homebrew's `openblas`.
+  - Enforce full-path linking to Homebrew's `libomp.dylib` on imported `OpenMP::OpenMP_CXX` / `OpenMP::OpenMP_C` targets to prevent linker flags from searching conflicting LLVM library directories.
+  - Automatically forward detected Homebrew `libomp` paths from `setup.py` during Python extension builds.
   - Include `<omp.h>` in `ExtraEigenTypes.h` when `OPENMP_FOUND` is enabled and add Catch2 unit tests for OpenMP `Eigen::VectorXd` and `Eigen::Matrix3d` parallel reductions.
 - **Parallelized Algorithms & Thread-Safety**:
   - Parallelize `NormalModeAnalyzer::computeChebyshevMomentsKPM` across Rademacher trace estimation vectors with deterministic pre-generated random vectors and OpenMP `Eigen::VectorXd` reductions.

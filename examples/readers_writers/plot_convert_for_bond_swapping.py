@@ -49,5 +49,26 @@ writer.write_to_file(output_file)
 print(f"Optimized system capable of bond swapping written to: {output_file}")
 
 # %%
+# Chain Length Distribution Verification
+# --------------------------------------
+# We verify the molecule size distribution across the prepared melt system:
+
+import matplotlib.pyplot as plt
+
+chain_lengths = [m.get_nr_of_atoms() for m in universe.get_molecules(2)]
+
+plt.figure(figsize=(6, 4))
+plt.hist(chain_lengths, bins=20, color="#4C72B0", edgecolor="white", alpha=0.8)
+plt.xlabel("Beads per Chain", fontsize=11)
+plt.ylabel("Number of Chains", fontsize=11)
+plt.title(
+    f"Chain Length Distribution (Total: {len(chain_lengths)} chains)",
+    fontsize=12,
+)
+plt.grid(True, linestyle=":", alpha=0.5)
+plt.tight_layout()
+plt.show()
+
+# %%
 # To convert it back to the molecule index relating to their current connectivity,
 # simply repeat the process with ``config_molecule_idx_for_swap(False)``

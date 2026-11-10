@@ -59,6 +59,37 @@ cmake_args = [
 if os.environ.get("CMAKE_ARGS"):
     cmake_args.extend(os.environ.get("CMAKE_ARGS", "").split())
 
+# On macOS, detect Homebrew's libomp to prevent duplicate OpenMP runtime
+# with system libraries like openblas (which dynamically links Homebrew's libomp)
+if platform.system() == "Darwin":
+    brew_libomp = None
+    for candidate in ["/opt/homebrew/opt/libomp", "/usr/local/opt/libomp"]:
+        if Path(candidate).is_dir() and (Path(candidate) / "lib" / "libomp.dylib").exists():
+            brew_libomp = candidate
+            break
+    if not brew_libomp:
+        try:
+            res = subprocess.run(
+                ["brew", "--prefix", "libomp"],
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=5,
+            )
+            out = res.stdout.strip()
+            if out and Path(out).is_dir() and (Path(out) / "lib" / "libomp.dylib").exists():
+                brew_libomp = out
+        except Exception:
+            pass
+    if brew_libomp:
+        print(f"macOS: configuring Homebrew libomp from {brew_libomp}")
+        cmake_args.extend([
+            f"-DOpenMP_ROOT={brew_libomp}",
+            f"-DOpenMP_libomp_LIBRARY={brew_libomp}/lib/libomp.dylib",
+            f"-DOpenMP_CXX_INCLUDE_DIR={brew_libomp}/include",
+            f"-DOpenMP_C_INCLUDE_DIR={brew_libomp}/include",
+        ])
+
 print(f"Building with CMake build type: {build_type}")
 print(f"Using {multiprocessing.cpu_count()} parallel jobs")
 

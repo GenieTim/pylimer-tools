@@ -43,3 +43,29 @@ final_universe = sequence.at_index(len(sequence) - 1)
 writer = DataFileWriter(final_universe)
 writer.config_include_angles(True)
 writer.write_to_file("generated_structures/final_configuration.data")
+
+# %%
+# Visualizing Extracted Frame Structure
+# -------------------------------------
+# We analyze and plot the bond length distribution in the extracted final
+# frame:
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+bond_lengths = [np.linalg.norm(vec)
+                for vec in final_universe.compute_bond_vectors()]
+
+plt.figure(figsize=(6, 4))
+plt.hist(bond_lengths, bins=25, color="#4C72B0", edgecolor="white", alpha=0.8)
+plt.xlabel(r"Bond Length [$\sigma$]", fontsize=11)
+plt.ylabel("Count", fontsize=11)
+plt.title(
+    f"Bond Length Distribution in Extracted Frame (Step {
+        final_universe.get_timestep()
+    })",
+    fontsize=12,
+)
+plt.grid(True, linestyle=":", alpha=0.5)
+plt.tight_layout()
+plt.show()
