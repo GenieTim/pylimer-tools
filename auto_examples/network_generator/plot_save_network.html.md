@@ -14,12 +14,7 @@ to download the full example code.
 
 This example shows how to save a generated polymer network to a LAMMPS data file.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-32 -->
-```none
-Network saved to: generated_structures/polymer_network.data
-```
-
-<br/>
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-40 -->
 ```Python
 from pathlib import Path
 
@@ -27,7 +22,14 @@ from pylimer_tools_cpp import AtomStyle, DataFileWriter, MCUniverseGenerator
 
 # Generate network
 generator = MCUniverseGenerator(45, 45, 45)
-# ... configure and generate ...
+generator.set_seed(12345)
+generator.set_bead_distance(1.0)
+generator.add_crosslinkers(50, 4)
+generator.add_strands(
+    nr_of_strands=100,
+    strand_lengths=[20 for _ in range(100)],
+)
+generator.link_strands_to_conversion(crosslinker_conversion=0.9)
 universe = generator.get_universe()
 
 # Create output directory
@@ -46,7 +48,44 @@ writer.write_to_file(str(output_file))
 print(f"Network saved to: {output_file}")
 ```
 
-**Total running time of the script:** (0 minutes 0.001 seconds)
+```none
+Network saved to: generated_structures/polymer_network.data
+```
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 41-43 -->
+
+## Network Structure Summary
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 43-68 -->
+```Python
+import matplotlib.pyplot as plt
+
+metrics = ["Atoms", "Bonds"]
+values = [universe.get_nr_of_atoms(), universe.get_nr_of_bonds()]
+
+plt.figure(figsize=(5, 3.5))
+bars = plt.bar(
+    metrics, values, color=["#4C72B0", "#55A868"], edgecolor="black", width=0.4
+)
+for bar in bars:
+    yval = bar.get_height()
+    plt.text(
+        bar.get_x() + bar.get_width() / 2.0,
+        yval + 20,
+        f"{yval:,}",
+        ha="center",
+        va="bottom",
+        fontsize=10,
+    )
+
+plt.ylabel("Count", fontsize=11)
+plt.title(f"Saved Network ({universe.get_nr_of_atoms():,} atoms)", fontsize=12)
+plt.grid(True, axis="y", linestyle=":", alpha=0.6)
+plt.tight_layout()
+plt.show()
+```
+
+**Total running time of the script:** (0 minutes 0.359 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-save-network-py"></a>
 

@@ -30,7 +30,7 @@ if not os.path.exists("generated_structures"):
 For large trajectories, frames are loaded on-demand
 Load a LAMMPS dump trajectory file (replace with your file)
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 21-46 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 21-47 -->
 ```Python
 def _find_fixtures_dir() -> Path:
     for cur in (
@@ -59,7 +59,37 @@ writer.config_include_angles(True)
 writer.write_to_file("generated_structures/final_configuration.data")
 ```
 
-**Total running time of the script:** (0 minutes 0.118 seconds)
+<!-- GENERATED FROM PYTHON SOURCE LINES 48-52 -->
+
+## Visualizing Extracted Frame Structure
+
+We analyze and plot the bond length distribution in the extracted final
+frame:
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 52-72 -->
+```Python
+import matplotlib.pyplot as plt
+import numpy as np
+
+bond_lengths = [np.linalg.norm(vec)
+                for vec in final_universe.compute_bond_vectors()]
+
+plt.figure(figsize=(6, 4))
+plt.hist(bond_lengths, bins=25, color="#4C72B0", edgecolor="white", alpha=0.8)
+plt.xlabel(r"Bond Length [$\sigma$]", fontsize=11)
+plt.ylabel("Count", fontsize=11)
+plt.title(
+    f"Bond Length Distribution in Extracted Frame (Step {
+        final_universe.get_timestep()
+    })",
+    fontsize=12,
+)
+plt.grid(True, linestyle=":", alpha=0.5)
+plt.tight_layout()
+plt.show()
+```
+
+**Total running time of the script:** (0 minutes 0.197 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"></a>
 

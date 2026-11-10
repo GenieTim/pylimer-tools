@@ -22,7 +22,7 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 
 <link rel="alternate" type="text/markdown" href="plot_unit_conversion.html.md">
-<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="pylimer-tools Output Reader" href="plot_pylimer_tools_output_reader.html"><link rel="prev" title="File I/O: Readers &amp; Writers" href="index.html">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Dump File Reader" href="plot_dump_file_reader.html"><link rel="prev" title="Time-Averaged Data Reader" href="plot_time_averaged_data_reader.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>Unit Conversion - pylimer-tools</title>
@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx_paramlinks.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx_paramlinks.css?v=dd72e65a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=bafda8c6" />
     
@@ -199,7 +199,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -234,25 +234,26 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance.html">Force Balance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance.html">Force Balance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_entanglement_link_vs_spring.html">Modeling Entanglements: Entanglement Links vs. Entanglement Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_slipping_vs_fixed_links.html">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_sampling_cutoff_effect.html">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. Analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_inactive_removal_and_sampling.html">Inactive Strand &amp; Entanglement Removal in Force Balance 2</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_save_network.html">Save Generated Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_custom_crosslinking_callback.html">Custom Crosslinking with Callback Functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_tetra_peg_network.html">Tetra-PEG Network Generation</a></li>
 </ul>
@@ -262,18 +263,18 @@
 </ul>
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">File I/O: Readers &amp; Writers</a><input aria-label="Toggle navigation of File I/O: Readers &amp; Writers" checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_data_file_reader.html">Data File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_memory_efficient_dump_file_reading.html">Memory-Efficient Dump File Reading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_data_file_reader.html">Data File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_data_file_writer.html">Data File Writer</a></li>
 </ul>
 </li>
@@ -406,7 +407,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
@@ -427,15 +428,8 @@ to download the full example code.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">nano</span></code> - attogram, nanometer, nanosecond</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">lj</span></code> - Lennard-Jones reduced units (requires polymer specification)</p></li>
 </ul>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:177: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
-  warnings.warn(
-LJ 1 Pressure in Pascal: 101325.0
-</pre></div>
-</div>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools</span><span class="nn">.</span><span class="nn">io</span><span class="nn">.</span><span class="nn">unit_styles</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pylimer_tools-io-unit_styles sphx-glr-backref-type-py-class reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory" title="pylimer_tools.io.unit_styles.UnitStyleFactory"><span class="n">UnitStyleFactory</span></a><span class="w">
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools</span><span class="nn">.</span><span class="nn">io</span><span class="nn">.</span><span class="nn">unit_styles</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pylimer_tools-io-unit_styles sphx-glr-backref-type-py-class reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory" title="pylimer_tools.io.unit_styles.UnitStyleFactory"><span class="n">UnitStyleFactory</span></a><span class="w">
 </span><span class="w">
 </span><span class="c1"># Create unit style factory</span><span class="w">
 </span><a class="sphx-glr-backref-module-pylimer_tools-io-unit_styles sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory" title="pylimer_tools.io.unit_styles.UnitStyleFactory"><span class="n">unit_factory</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools-io-unit_styles sphx-glr-backref-type-py-class reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory" title="pylimer_tools.io.unit_styles.UnitStyleFactory"><span class="n">UnitStyleFactory</span></a><span class="p">(</span><span class="p">)</span><span class="w">
@@ -448,16 +442,52 @@ LJ 1 Pressure in Pascal: 101325.0
 </span><a class="sphx-glr-backref-module-pylimer_tools-io-unit_styles sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyle" title="pylimer_tools.io.unit_styles.UnitStyle"><span class="n">lj_units</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools-io-unit_styles sphx-glr-backref-type-py-method reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style" title="pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style"><span class="n">unit_factory</span><span class="o">.</span><span class="n">get_unit_style</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">lj</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">polymer</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">pdms</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
 </span><span class="w">
 </span><span class="c1"># Convert pressure from LAMMPS units to SI</span><span class="w">
-</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">pressure_si</span></a> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <a class="sphx-glr-backref-module-pint sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Unit" title="pint.Unit"><span class="n">real_units</span><span class="o">.</span><span class="n">pressure</span></a><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Pa</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span>  <span class="c1"># type: ignore</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">pressure_real_pa</span></a> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <a class="sphx-glr-backref-module-pint sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Unit" title="pint.Unit"><span class="n">real_units</span><span class="o">.</span><span class="n">pressure</span></a><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Pa</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span>  <span class="c1"># type: ignore</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">pressure_lj_pa</span></a> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <a class="sphx-glr-backref-module-pint sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="pint.Quantity"><span class="n">lj_units</span><span class="o">.</span><span class="n">pressure</span></a><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Pa</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span>  <span class="c1"># type: ignore</span><span class="w">
 </span><span class="w">
-</span><span class="c1"># Convert temperature (already in Kelvin for 'real' units)</span><span class="w">
-</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">temperature_si</span></a> <span class="o">=</span> <span class="p">(</span><span class="w">
-</span>    <span class="mf">273.15</span> <span class="o">*</span><span class="w">
-</span>    <a class="sphx-glr-backref-module-pint sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Unit" title="pint.Unit"><span class="n">real_units</span><span class="o">.</span><span class="n">temperature</span></a><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">K</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span>  <span class="c1"># type: ignore</span><span class="w">
-</span><span class="w">
-</span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="s2">LJ 1 Pressure in Pascal: </span><span class="si">{</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">pressure_si</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="s2">1 </span><span class="s2">'</span><span class="s2">real</span><span class="s2">'</span><span class="s2"> pressure (atm) in Pascal: </span><span class="si">{</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">pressure_real_pa</span></a><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Pa</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="s2">1 </span><span class="s2">'</span><span class="s2">lj</span><span class="s2">'</span><span class="s2"> pressure in Pascal: </span><span class="si">{</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">pressure_lj_pa</span></a><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Pa</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.198 seconds)</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:177: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
+  warnings.warn(
+1 'real' pressure (atm) in Pascal: 101325.00 Pa
+1 'lj' pressure in Pascal: 17600000.00 Pa
+</pre></div>
+</div>
+<section id="comparison-across-unit-styles">
+<h2>Comparison Across Unit Styles<a class="headerlink" href="#comparison-across-unit-styles" title="Link to this heading">¶</a></h2>
+<p>We compare the SI equivalent of 1 pressure unit across all supported
+LAMMPS styles:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">styles</span></a> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="s2">real</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">metal</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">si</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">nano</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">lj</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">pressures_in_pa</span></a> <span class="o">=</span> <span class="p">[</span><span class="p">]</span><span class="w">
+</span><span class="k">for</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">style</span></a> <span class="ow">in</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">styles</span></a><span class="p">:</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-pylimer_tools-io-unit_styles sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyle" title="pylimer_tools.io.unit_styles.UnitStyle"><span class="n">u</span></a> <span class="o">=</span> <span class="p">(</span><span class="w">
+</span>        <a class="sphx-glr-backref-module-pylimer_tools-io-unit_styles sphx-glr-backref-type-py-method reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style" title="pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style"><span class="n">unit_factory</span><span class="o">.</span><span class="n">get_unit_style</span></a><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">style</span></a><span class="p">,</span> <span class="n">polymer</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">pdms</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>        <span class="k">if</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">style</span></a> <span class="o">==</span> <span class="s2">&quot;</span><span class="s2">lj</span><span class="s2">&quot;</span><span class="w">
+</span>        <span class="k">else</span> <a class="sphx-glr-backref-module-pylimer_tools-io-unit_styles sphx-glr-backref-type-py-method reference internal" href="../../pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style" title="pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style"><span class="n">unit_factory</span><span class="o">.</span><span class="n">get_unit_style</span></a><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">style</span></a><span class="p">)</span><span class="w">
+</span>    <span class="p">)</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">pressures_in_pa</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <a class="sphx-glr-backref-module-pint sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="pint.Quantity"><span class="n">u</span><span class="o">.</span><span class="n">pressure</span></a><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Pa</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="matplotlib.pyplot.figure"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-container sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/container_api.html#matplotlib.container.BarContainer" title="matplotlib.container.BarContainer"><span class="n">bars</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.bar.html#matplotlib.pyplot.bar" title="matplotlib.pyplot.bar"><span class="n">plt</span><span class="o">.</span><span class="n">bar</span></a><span class="p">(</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">styles</span></a><span class="p">,</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">pressures_in_pa</span></a><span class="p">,</span><span class="w">
+</span>    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">#4C72B0</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">black</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span><span class="w">
+</span>    <span class="n">width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.yscale.html#matplotlib.pyplot.yscale" title="matplotlib.pyplot.yscale"><span class="n">plt</span><span class="o">.</span><span class="n">yscale</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">log</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.xlabel.html#matplotlib.pyplot.xlabel" title="matplotlib.pyplot.xlabel"><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">LAMMPS Unit Style</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.ylabel.html#matplotlib.pyplot.ylabel" title="matplotlib.pyplot.ylabel"><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">1 Unit of Pressure [Pa] (log scale)</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.title.html#matplotlib.pyplot.title" title="matplotlib.pyplot.title"><span class="n">plt</span><span class="o">.</span><span class="n">title</span></a><span class="p">(</span><span class="w">
+</span>    <span class="s2">&quot;</span><span class="s2">Pressure Conversion to SI (Pa) Across LAMMPS Unit Styles</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>    <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.grid.html#matplotlib.pyplot.grid" title="matplotlib.pyplot.grid"><span class="n">plt</span><span class="o">.</span><span class="n">grid</span></a><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">both</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">y</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">:</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tight_layout.html#matplotlib.pyplot.tight_layout" title="matplotlib.pyplot.tight_layout"><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../../_images/sphx_glr_plot_unit_conversion_001.png" srcset="../../_images/sphx_glr_plot_unit_conversion_001.png" alt="Pressure Conversion to SI (Pa) Across LAMMPS Unit Styles" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.416 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-readers-writers-plot-unit-conversion-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/87b8395119e9cf38ac4c73f6c2755e19/plot_unit_conversion.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_unit_conversion.ipynb</span></code></a></p>
@@ -471,29 +501,30 @@ LJ 1 Pressure in Pascal: 101325.0
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
 </section>
+</section>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="plot_pylimer_tools_output_reader.html">
+          <a class="next-page" href="plot_dump_file_reader.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">pylimer-tools Output Reader</div>
+                <div class="title">Dump File Reader</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="index.html">
+          <a class="prev-page" href="plot_time_averaged_data_reader.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">File I/O: Readers &amp; Writers</div>
+                <div class="title">Time-Averaged Data Reader</div>
                 
               </div>
             </a>
@@ -515,8 +546,27 @@ LJ 1 Pressure in Pascal: 101325.0
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Unit Conversion</a><ul>
+<li><a class="reference internal" href="#comparison-across-unit-styles">Comparison Across Unit Styles</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

@@ -14,13 +14,7 @@ to download the full example code.
 
 The generated networks can include topological information.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-72 -->
-```none
-Added 4487 angles to the system
-Added 4487 angles and 4804 dihedral angles.
-```
-
-<br/>
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-73 -->
 ```Python
 # sphinx_gallery_thumbnail_path = '_static/thumbnails/network_generator/plot_add_angles.png'
 import os
@@ -87,7 +81,57 @@ if not os.path.exists("generated_structures"):
 writer.write_to_file("generated_structures/polymer_network_with_angles.data")
 ```
 
-**Total running time of the script:** (0 minutes 0.609 seconds)
+```none
+Added 4487 angles to the system
+Added 4487 angles and 4804 dihedral angles.
+```
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 74-77 -->
+
+## Visualizing Topology Element Counts
+
+We plot the counts of all generated topological elements:
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 77-113 -->
+```Python
+import matplotlib.pyplot as plt
+
+categories = ["Atoms", "Bonds", "Angles", "Dihedrals"]
+counts = [
+    universe.get_nr_of_atoms(),
+    universe.get_nr_of_bonds(),
+    universe.get_nr_of_angles(),
+    universe.get_nr_of_dihedral_angles(),
+]
+
+plt.figure(figsize=(6.5, 4))
+bars = plt.bar(
+    categories,
+    counts,
+    color=["#4C72B0", "#55A868", "#DD8452", "#C44E52"],
+    edgecolor="black",
+    linewidth=0.8,
+    width=0.5,
+)
+for bar in bars:
+    yval = bar.get_height()
+    plt.text(
+        bar.get_x() + bar.get_width() / 2.0,
+        yval + 50,
+        f"{yval:,}",
+        ha="center",
+        va="bottom",
+        fontsize=10,
+    )
+
+plt.ylabel("Count", fontsize=11)
+plt.title("Network Topology Elements with Detected Angles", fontsize=12)
+plt.grid(True, axis="y", linestyle=":", alpha=0.6)
+plt.tight_layout()
+plt.show()
+```
+
+**Total running time of the script:** (0 minutes 0.680 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-add-angles-py"></a>
 

@@ -162,3 +162,52 @@ if not os.path.exists("generated_structures"):
 
 writer.write_to_file("generated_structures/tetra_peg_network.data")
 print("Network saved to 'generated_structures/tetra_peg_network.data'")
+
+# %%
+# Visualizing Strand Topology Breakdown
+# -------------------------------------
+# We analyze and plot the distribution of strand types after crosslinking:
+
+import matplotlib.pyplot as plt
+
+chains = universe.get_chains_with_crosslinker(2)
+strand_type_counts = {
+    "Network Strands": sum(
+        1
+        for c in chains
+        if c.get_strand_type()
+        not in (MoleculeType.DANGLING_CHAIN, MoleculeType.FREE_CHAIN)
+    ),
+    "Dangling Chains": sum(
+        1 for c in chains if c.get_strand_type() == MoleculeType.DANGLING_CHAIN
+    ),
+    "Free Chains": sum(
+        1 for c in chains if c.get_strand_type() == MoleculeType.FREE_CHAIN
+    ),
+}
+
+plt.figure(figsize=(6.5, 4))
+bars = plt.bar(
+    strand_type_counts.keys(),
+    strand_type_counts.values(),
+    color=["#4C72B0", "#DD8452", "#C44E52"],
+    edgecolor="black",
+    linewidth=0.8,
+    width=0.5,
+)
+for bar in bars:
+    yval = bar.get_height()
+    plt.text(
+        bar.get_x() + bar.get_width() / 2.0,
+        yval + 5,
+        f"{yval:,}",
+        ha="center",
+        va="bottom",
+        fontsize=10,
+    )
+
+plt.ylabel("Number of Strands", fontsize=11)
+plt.title("Tetra-PEG Network Strand Classification", fontsize=12)
+plt.grid(True, axis="y", linestyle=":", alpha=0.6)
+plt.tight_layout()
+plt.show()

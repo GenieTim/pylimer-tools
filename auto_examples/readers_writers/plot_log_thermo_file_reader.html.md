@@ -24,7 +24,7 @@ The log file reader automatically:
 Relevant documentation: [`read_log_file()`](../../pylimer_tools.io.html.md#pylimer_tools.io.read_lammps_output_file.read_log_file)
 and [`extract_thermo_params()`](../../pylimer_tools.io.html.md#pylimer_tools.io.extract_thermo_data.extract_thermo_params)
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 18-58 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 18-60 -->
 ```none
 Temperature range: 0.00 - 0.36
 Final pressure: -0.170444
@@ -65,15 +65,17 @@ print(
 print("Final pressure: {:.6f}".format(thermo_data["Press"].iloc[-1]))
 
 # Plot temperature evolution
+plt.figure()
 plt.plot(thermo_data["Step"], thermo_data["Temp"])
 plt.xlabel("Simulation Step")
 plt.ylabel("Temperature [LJ-units]")
-plt.show()
-plt.ylabel("Temperature [LJ-units]")
+plt.title("Thermodynamic Temperature Evolution")
+plt.grid(True, linestyle=":", alpha=0.6)
+plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.068 seconds)
+**Total running time of the script:** (0 minutes 0.103 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-log-thermo-file-reader-py"></a>
 

@@ -22,15 +22,9 @@ Convert [LAMMPS units](https://docs.lammps.org/units.html) to SI or other unit s
 - `nano` - attogram, nanometer, nanosecond
 - `lj` - Lennard-Jones reduced units (requires polymer specification)
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 18-40 -->
-```none
-/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:177: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
-  warnings.warn(
-LJ 1 Pressure in Pascal: 101325.0
-```
-
-<br/>
+<!-- GENERATED FROM PYTHON SOURCE LINES 18-39 -->
 ```Python
+import matplotlib.pyplot as plt
 from pylimer_tools.io.unit_styles import UnitStyleFactory
 
 # Create unit style factory
@@ -44,17 +38,60 @@ metal_units = unit_factory.get_unit_style("metal")
 lj_units = unit_factory.get_unit_style("lj", polymer="pdms")
 
 # Convert pressure from LAMMPS units to SI
-pressure_si = (1 * real_units.pressure).to("Pa").magnitude  # type: ignore
+pressure_real_pa = (1 * real_units.pressure).to("Pa").magnitude  # type: ignore
+pressure_lj_pa = (1 * lj_units.pressure).to("Pa").magnitude  # type: ignore
 
-# Convert temperature (already in Kelvin for 'real' units)
-temperature_si = (
-    273.15 *
-    real_units.temperature).to("K").magnitude  # type: ignore
-
-print(f"LJ 1 Pressure in Pascal: {pressure_si}")
+print(f"1 'real' pressure (atm) in Pascal: {pressure_real_pa:.2f} Pa")
+print(f"1 'lj' pressure in Pascal: {pressure_lj_pa:.2f} Pa")
 ```
 
-**Total running time of the script:** (0 minutes 0.198 seconds)
+```none
+/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/pylimer_tools/io/unit_styles.py:177: UserWarning: LJ unit styles are derived. Reference used: https://doi.org/10.1021/acs.macromol.9b02428
+  warnings.warn(
+1 'real' pressure (atm) in Pascal: 101325.00 Pa
+1 'lj' pressure in Pascal: 17600000.00 Pa
+```
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 40-44 -->
+
+## Comparison Across Unit Styles
+
+We compare the SI equivalent of 1 pressure unit across all supported
+LAMMPS styles:
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 44-73 -->
+```Python
+styles = ["real", "metal", "si", "nano", "lj"]
+pressures_in_pa = []
+for style in styles:
+    u = (
+        unit_factory.get_unit_style(style, polymer="pdms")
+        if style == "lj"
+        else unit_factory.get_unit_style(style)
+    )
+    pressures_in_pa.append((1 * u.pressure).to("Pa").magnitude)
+
+plt.figure(figsize=(7, 4.5))
+bars = plt.bar(
+    styles,
+    pressures_in_pa,
+    color="#4C72B0",
+    edgecolor="black",
+    linewidth=0.8,
+    width=0.5,
+)
+plt.yscale("log")
+plt.xlabel("LAMMPS Unit Style", fontsize=11)
+plt.ylabel("1 Unit of Pressure [Pa] (log scale)", fontsize=11)
+plt.title(
+    "Pressure Conversion to SI (Pa) Across LAMMPS Unit Styles",
+    fontsize=12)
+plt.grid(True, which="both", axis="y", linestyle=":", alpha=0.6)
+plt.tight_layout()
+plt.show()
+```
+
+**Total running time of the script:** (0 minutes 0.416 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-unit-conversion-py"></a>
 

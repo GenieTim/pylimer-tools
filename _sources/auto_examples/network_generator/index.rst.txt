@@ -55,40 +55,6 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Here&#x27;s a minimal example of creating a crosslinked polymer network:">
-
-.. only:: html
-
-  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_simple_crosslinked_network_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/network_generator/plot_simple_crosslinked_network`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Simple Crosslinked Network</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="The generated networks can include topological information.">
-
-.. only:: html
-
-  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_add_angles_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/network_generator/plot_add_angles`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Adding Topology Information</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MCUniverseGenerator to create a polydisperse end-linked polymer network with varying strand lengths.">
 
 .. only:: html
@@ -106,18 +72,18 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Create complex systems with multiple components:">
+    <div class="sphx-glr-thumbcontainer" tooltip="Here&#x27;s a minimal example of creating a crosslinked polymer network:">
 
 .. only:: html
 
-  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_multi_component_system_thumb.png
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_simple_crosslinked_network_thumb.png
     :alt:
 
-  :doc:`/auto_examples/network_generator/plot_multi_component_system`
+  :doc:`/auto_examples/network_generator/plot_simple_crosslinked_network`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Multi-Component System</div>
+      <div class="sphx-glr-thumbnail-title">Simple Crosslinked Network</div>
     </div>
 
 
@@ -140,6 +106,23 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="The generated networks can include topological information.">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_add_angles_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/network_generator/plot_add_angles`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Adding Topology Information</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="In this example, we create a vulcanized network using the pylimer-tools library.">
 
 .. only:: html
@@ -152,6 +135,23 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Generate Vulcanized Networks</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Create complex systems with multiple components:">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_multi_component_system_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/network_generator/plot_multi_component_system`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Multi-Component System</div>
     </div>
 
 
@@ -200,12 +200,12 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
    :hidden:
 
    /auto_examples/network_generator/plot_save_network
-   /auto_examples/network_generator/plot_simple_crosslinked_network
-   /auto_examples/network_generator/plot_add_angles
    /auto_examples/network_generator/plot_polydisperse_system
-   /auto_examples/network_generator/plot_multi_component_system
+   /auto_examples/network_generator/plot_simple_crosslinked_network
    /auto_examples/network_generator/plot_monte_carlo_configuration
+   /auto_examples/network_generator/plot_add_angles
    /auto_examples/network_generator/plot_vulcanized_network
+   /auto_examples/network_generator/plot_multi_component_system
    /auto_examples/network_generator/plot_custom_crosslinking_callback
    /auto_examples/network_generator/plot_tetra_peg_network
 

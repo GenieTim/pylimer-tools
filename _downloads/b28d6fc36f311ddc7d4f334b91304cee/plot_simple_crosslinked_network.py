@@ -47,3 +47,43 @@ if not os.path.exists("generated_structures"):
     os.makedirs("generated_structures")
 
 writer.write_to_file("generated_structures/simple_crosslinked_network.data")
+
+# %%
+# Crosslinker Functionality Distribution
+# --------------------------------------
+# We analyze and visualize the effective functionality of the crosslinker
+# nodes after linking:
+
+from collections import Counter
+import matplotlib.pyplot as plt
+
+crosslinkers = universe.get_atoms_by_type(2)
+degrees = universe.get_vertex_degrees()
+func_counts = Counter(
+    degrees[universe.get_vertex_idx_by_atom_id(a.get_id())] for a in crosslinkers
+)
+
+plt.figure(figsize=(6, 4))
+labels = [f"{k}-functional" for k in sorted(func_counts.keys())]
+values = [func_counts[k] for k in sorted(func_counts.keys())]
+bars = plt.bar(
+    labels, values, color="#4C72B0", edgecolor="black", linewidth=0.8, width=0.5
+)
+
+for bar in bars:
+    yval = bar.get_height()
+    plt.text(
+        bar.get_x() + bar.get_width() / 2.0,
+        yval + 1,
+        f"{yval}",
+        ha="center",
+        va="bottom",
+        fontsize=10,
+    )
+
+plt.xlabel("Effective Crosslinker Functionality", fontsize=11)
+plt.ylabel("Number of Crosslinkers", fontsize=11)
+plt.title("Crosslinker Functionality Distribution", fontsize=12)
+plt.grid(True, axis="y", linestyle=":", alpha=0.6)
+plt.tight_layout()
+plt.show()

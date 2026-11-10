@@ -109,7 +109,9 @@ See:
 - :doc:`plot_entanglement_sampling_comparison` for a detailed benchmark and comparison of discrete vs. analytical sampling methods,
 - :doc:`plot_entanglement_link_vs_spring` for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,
 - :doc:`plot_slipping_vs_fixed_links` for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
-- :doc:`plot_inactive_removal_and_sampling` for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling.
+- :doc:`plot_inactive_removal_and_sampling` for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling,
+- :doc:`plot_polydispersity_study` for the effect of precursor strand length polydispersity on equilibrium shear modulus and defect fractions, and
+- :doc:`plot_sampling_cutoff_effect` for the effect of the slip-link sampling cut-off distance on the equilibrium shear modulus in Force Balance 2, investigating pre-strain distortions, link vs. spring representations, and interactions with strand length :math:`N`, conversion :math:`p`, and stoichiometric imbalance :math:`r`.
 
 
 .. raw:: html
@@ -125,24 +127,24 @@ See:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links to model entanglements instead of slip-links. See bernhard_phantom_2025">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPForceBalance2 class in a deformation experiment.">
 
 .. only:: html
 
-  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_2_thumb.png
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_fb_deformation_exp_thumb.png
     :alt:
 
-  :doc:`/auto_examples/force_balance/plot_force_balance_2`
+  :doc:`/auto_examples/force_balance/plot_fb_deformation_exp`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
+      <div class="sphx-glr-thumbnail-title">Deformation Experiment</div>
     </div>
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MEHP implementation with slip-springs to homogenize a polymer network and predict its equilibrium shear modulus.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019) with slip-links to homogenize a polymer network and predict its equilibrium shear modulus.">
 
 .. only:: html
 
@@ -159,35 +161,18 @@ See:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of polydispersity on the shear modulus of end-linked polymer networks.">
+    <div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a modernized, high-performance implementation of the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025).">
 
 .. only:: html
 
-  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_2_thumb.png
     :alt:
 
-  :doc:`/auto_examples/force_balance/plot_polydispersity_study`
+  :doc:`/auto_examples/force_balance/plot_force_balance_2`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Polydispersity Study</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPForceBalance2 class in a deformation experiment.">
-
-.. only:: html
-
-  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_fb_deformation_exp_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/force_balance/plot_fb_deformation_exp`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Deformation Experiment</div>
+      <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
     </div>
 
 
@@ -239,6 +224,40 @@ See:
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of polymer strand length polydispersity on the equilibrium shear modulus and topological network structure of end-linked polymer networks.">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_polydispersity_study`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Polydispersity Study</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In polymer network simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements are introduced by sampling candidate pairs of chain beads that lie within a spatial proximity cut-off:">
+
+.. only:: html
+
+  .. image:: /auto_examples/force_balance/images/thumb/sphx_glr_plot_sampling_cutoff_effect_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/force_balance/plot_sampling_cutoff_effect`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</div>
     </div>
 
 
@@ -335,40 +354,6 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Here&#x27;s a minimal example of creating a crosslinked polymer network:">
-
-.. only:: html
-
-  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_simple_crosslinked_network_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/network_generator/plot_simple_crosslinked_network`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Simple Crosslinked Network</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="The generated networks can include topological information.">
-
-.. only:: html
-
-  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_add_angles_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/network_generator/plot_add_angles`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Adding Topology Information</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MCUniverseGenerator to create a polydisperse end-linked polymer network with varying strand lengths.">
 
 .. only:: html
@@ -386,18 +371,18 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Create complex systems with multiple components:">
+    <div class="sphx-glr-thumbcontainer" tooltip="Here&#x27;s a minimal example of creating a crosslinked polymer network:">
 
 .. only:: html
 
-  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_multi_component_system_thumb.png
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_simple_crosslinked_network_thumb.png
     :alt:
 
-  :doc:`/auto_examples/network_generator/plot_multi_component_system`
+  :doc:`/auto_examples/network_generator/plot_simple_crosslinked_network`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Multi-Component System</div>
+      <div class="sphx-glr-thumbnail-title">Simple Crosslinked Network</div>
     </div>
 
 
@@ -420,6 +405,23 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="The generated networks can include topological information.">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_add_angles_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/network_generator/plot_add_angles`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Adding Topology Information</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="In this example, we create a vulcanized network using the pylimer-tools library.">
 
 .. only:: html
@@ -432,6 +434,23 @@ the current implementation is more powerful, as needed for :cite:t:`bernhard_pha
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Generate Vulcanized Networks</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Create complex systems with multiple components:">
+
+.. only:: html
+
+  .. image:: /auto_examples/network_generator/images/thumb/sphx_glr_plot_multi_component_system_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/network_generator/plot_multi_component_system`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Multi-Component System</div>
     </div>
 
 
@@ -544,23 +563,6 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Convert LAMMPS units to SI or other unit systems:">
-
-.. only:: html
-
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_unit_conversion_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/readers_writers/plot_unit_conversion`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Unit Conversion</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Read output from pylimer-tools&#x27; own simulators.">
 
 .. only:: html
@@ -573,23 +575,6 @@ The library supports four main file I/O operations:
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">pylimer-tools Output Reader</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="Read correlation functions from fix ave/correlate and fix ave/correlate/long commands.">
-
-.. only:: html
-
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_correlated_averages_reader_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/readers_writers/plot_correlated_averages_reader`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Correlated Averages Reader</div>
     </div>
 
 
@@ -629,23 +614,6 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Take a later entry from a LAMMPS trajectory and save it as a data file.">
-
-.. only:: html
-
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_trajectory_to_frame_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/readers_writers/plot_convert_trajectory_to_frame`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame to Data File</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command.">
 
 .. only:: html
@@ -663,18 +631,18 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The DumpFileReader processes LAMMPS trajectory files. Is has a practical interface to read frames from a trajectory file and access them as Universe objects in the UniverseSequence class.">
+    <div class="sphx-glr-thumbcontainer" tooltip="Read correlation functions from fix ave/correlate and fix ave/correlate/long commands.">
 
 .. only:: html
 
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_dump_file_reader_thumb.png
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_correlated_averages_reader_thumb.png
     :alt:
 
-  :doc:`/auto_examples/readers_writers/plot_dump_file_reader`
+  :doc:`/auto_examples/readers_writers/plot_correlated_averages_reader`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Dump File Reader</div>
+      <div class="sphx-glr-thumbnail-title">Correlated Averages Reader</div>
     </div>
 
 
@@ -697,6 +665,57 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Convert LAMMPS units to SI or other unit systems:">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_unit_conversion_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/readers_writers/plot_unit_conversion`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Unit Conversion</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The DumpFileReader processes LAMMPS trajectory files. Is has a practical interface to read frames from a trajectory file and access them as Universe objects in the UniverseSequence class.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_dump_file_reader_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/readers_writers/plot_dump_file_reader`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Dump File Reader</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Take a later entry from a LAMMPS trajectory and save it as a data file.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_trajectory_to_frame_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/readers_writers/plot_convert_trajectory_to_frame`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame to Data File</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="LAMMPS bond swapping can significantly speed up equilibration for polymer networks. However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly. Here&#x27;s how you could re-set the molecule indices for bond swapping with constant chain lengths.">
 
 .. only:: html
@@ -714,23 +733,6 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects.">
-
-.. only:: html
-
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_data_file_reader_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/readers_writers/plot_data_file_reader`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Data File Reader</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="The UniverseSequence class provides automatic memory management.">
 
 .. only:: html
@@ -743,6 +745,23 @@ The library supports four main file I/O operations:
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Memory-Efficient Dump File Reading</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_data_file_reader_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/readers_writers/plot_data_file_reader`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Data File Reader</div>
     </div>
 
 

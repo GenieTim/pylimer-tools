@@ -20,11 +20,12 @@ Assuming your `pylimer_tools` version was compiled with OpenMP,
 to run this in parallel, you can use the typical OpenMP environment variables,
 e.g., in the terminal before running your script: `export OMP_NUM_THREADS=4` to use 4 threads.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 13-52 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 13-53 -->
 ```Python
 import os
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import pandas as pd
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
@@ -62,13 +63,13 @@ dpd_simulator = DPDSimulator(
 )
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 53-56 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 54-57 -->
 
 Note that the random seed does not guarantee the same results across different runs,
 as the DPD algorithm is inherently stochastic and will produce different results
 if you use more than one processor.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 56-99 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 57-100 -->
 ```Python
 # Randomly sample slip-springs
 dpd_simulator.create_slip_springs(num=100)
@@ -117,11 +118,11 @@ print("DPD simulation completed.")
 DPD simulation completed.
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 100-101 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 101-102 -->
 
 read the output file and actually plot something
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 101-115 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 102-118 -->
 ```Python
 df = pd.read_csv("dpd_simulation_output.txt", sep="\\s+")
 _ = df.plot(
@@ -137,9 +138,11 @@ _ = df.plot(
     layout=(3, 2),
     figsize=(10, 10),
 )
+plt.tight_layout()
+plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 4.917 seconds)
+**Total running time of the script:** (0 minutes 6.037 seconds)
 
 <a id="sphx-glr-download-auto-examples-dpd-simulations-plot-dpd-simulation-py"></a>
 

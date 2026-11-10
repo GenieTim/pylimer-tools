@@ -17,13 +17,7 @@ Is has a practical interface to read frames from a trajectory file
 and access them as [`Universe`](../../api/pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe) objects
 in the [`UniverseSequence`](../../api/pylimer_tools_cpp.UniverseSequence.md#pylimer_tools_cpp.UniverseSequence) class.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 11-49 -->
-```none
-Trajectory contains 1 frames
-Dump file contains 3 frames
-```
-
-<br/>
+<!-- GENERATED FROM PYTHON SOURCE LINES 11-50 -->
 ```Python
 import os
 from pathlib import Path
@@ -64,7 +58,34 @@ dump_file_reader = DumpFileReader(
 print(f"Dump file contains {dump_file_reader.get_length()} frames")
 ```
 
-**Total running time of the script:** (0 minutes 0.002 seconds)
+```none
+Trajectory contains 1 frames
+Dump file contains 3 frames
+```
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 51-53 -->
+
+## Visualizing Box Dimensions Across Trajectory Frames
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 53-67 -->
+```Python
+import matplotlib.pyplot as plt
+
+frame_indices = list(range(len(sequence)))
+box_volumes = [sequence.at_index(i).get_box().get_volume()
+               for i in frame_indices]
+
+plt.figure(figsize=(6, 4))
+plt.plot(frame_indices, box_volumes, marker="o", color="#4C72B0", lw=2)
+plt.xlabel("Frame Index", fontsize=11)
+plt.ylabel("Box Volume [$\\sigma^3$]", fontsize=11)
+plt.title("Simulation Box Volume Across Trajectory Frames", fontsize=12)
+plt.grid(True, linestyle=":", alpha=0.6)
+plt.tight_layout()
+plt.show()
+```
+
+**Total running time of the script:** (0 minutes 0.084 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-dump-file-reader-py"></a>
 

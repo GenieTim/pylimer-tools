@@ -49,9 +49,11 @@ print(
 print("Final pressure: {:.6f}".format(thermo_data["Press"].iloc[-1]))
 
 # Plot temperature evolution
+plt.figure()
 plt.plot(thermo_data["Step"], thermo_data["Temp"])
 plt.xlabel("Simulation Step")
 plt.ylabel("Temperature [LJ-units]")
-plt.show()
-plt.ylabel("Temperature [LJ-units]")
+plt.title("Thermodynamic Temperature Evolution")
+plt.grid(True, linestyle=":", alpha=0.6)
+plt.tight_layout()
 plt.show()

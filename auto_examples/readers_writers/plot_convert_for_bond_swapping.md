@@ -63,12 +63,37 @@ print(f"Optimized system capable of bond swapping written to: {output_file}")
 Optimized system capable of bond swapping written to: /home/runner/work/pylimer-tools/pylimer-tools/examples/readers_writers/generated_structures/for_swap_melt_83_a_100.structure.out
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 52-54 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 52-55 -->
+
+## Chain Length Distribution Verification
+
+We verify the molecule size distribution across the prepared melt system:
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 55-72 -->
+```Python
+import matplotlib.pyplot as plt
+
+chain_lengths = [m.get_nr_of_atoms() for m in universe.get_molecules(2)]
+
+plt.figure(figsize=(6, 4))
+plt.hist(chain_lengths, bins=20, color="#4C72B0", edgecolor="white", alpha=0.8)
+plt.xlabel("Beads per Chain", fontsize=11)
+plt.ylabel("Number of Chains", fontsize=11)
+plt.title(
+    f"Chain Length Distribution (Total: {len(chain_lengths)} chains)",
+    fontsize=12,
+)
+plt.grid(True, linestyle=":", alpha=0.5)
+plt.tight_layout()
+plt.show()
+```
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 73-75 -->
 
 To convert it back to the molecule index relating to their current connectivity,
 simply repeat the process with `config_molecule_idx_for_swap(False)`
 
-**Total running time of the script:** (0 minutes 0.045 seconds)
+**Total running time of the script:** (0 minutes 0.145 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-for-bond-swapping-py"></a>
 

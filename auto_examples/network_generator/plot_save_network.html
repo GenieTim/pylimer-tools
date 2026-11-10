@@ -7,12 +7,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/network_generator/plot_save_network.html" />
 <meta property="og:site_name" content="pylimer-tools" />
-<meta property="og:description" content="This example shows how to save a generated polymer network to a LAMMPS data file., from pathlib import Path from pylimer_tools_cpp import AtomStyle, DataFileWriter, MCUniverseGenerator# Generate ne..." />
+<meta property="og:description" content="This example shows how to save a generated polymer network to a LAMMPS data file. from pathlib import Path from pylimer_tools_cpp import AtomStyle, DataFileWriter, MCUniverseGenerator# Generate net..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
-<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_network_generator_plot_save_network_a0bea176.png" />
-<meta property="og:image:alt" content="This example shows how to save a generated polymer network to a LAMMPS data file., from pathlib import Path from pylimer_tools_cpp import AtomStyle, DataFileWriter, MCUniverseGenerator# Generate ne..." />
-<meta name="description" content="This example shows how to save a generated polymer network to a LAMMPS data file., from pathlib import Path from pylimer_tools_cpp import AtomStyle, DataFileWriter, MCUniverseGenerator# Generate ne..." />
+<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_network_generator_plot_save_network_4cc2fd90.png" />
+<meta property="og:image:alt" content="This example shows how to save a generated polymer network to a LAMMPS data file. from pathlib import Path from pylimer_tools_cpp import AtomStyle, DataFileWriter, MCUniverseGenerator# Generate net..." />
+<meta name="description" content="This example shows how to save a generated polymer network to a LAMMPS data file. from pathlib import Path from pylimer_tools_cpp import AtomStyle, DataFileWriter, MCUniverseGenerator# Generate net..." />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/png" href="/_static/favicon/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/_static/favicon/favicon.svg" />
@@ -22,7 +22,7 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 
 <link rel="alternate" type="text/markdown" href="plot_save_network.html.md">
-<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Simple Crosslinked Network" href="plot_simple_crosslinked_network.html"><link rel="prev" title="Network Generation" href="index.html">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Generate a Polydisperse Polymer Network" href="plot_polydisperse_system.html"><link rel="prev" title="Network Generation" href="index.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>Save Generated Network - pylimer-tools</title>
@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx_paramlinks.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx_paramlinks.css?v=dd72e65a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=bafda8c6" />
     
@@ -199,7 +199,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -234,25 +234,26 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance.html">Force Balance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance.html">Force Balance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_entanglement_link_vs_spring.html">Modeling Entanglements: Entanglement Links vs. Entanglement Springs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_slipping_vs_fixed_links.html">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_sampling_cutoff_effect.html">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. Analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_inactive_removal_and_sampling.html">Inactive Strand &amp; Entanglement Removal in Force Balance 2</a></li>
 </ul>
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Save Generated Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_multi_component_system.html">Multi-Component System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_multi_component_system.html">Multi-Component System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_custom_crosslinking_callback.html">Custom Crosslinking with Callback Functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_tetra_peg_network.html">Tetra-PEG Network Generation</a></li>
 </ul>
@@ -262,18 +263,18 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../readers_writers/index.html">File I/O: Readers &amp; Writers</a><input aria-label="Toggle navigation of File I/O: Readers &amp; Writers" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_pylimer_tools_output_reader.html">pylimer-tools Output Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_histogram_reader.html">Histogram Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_performance_caching.html">Performance and Caching</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_log_thermo_file_reader.html">Log &amp; Thermo File Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_correlated_averages_reader.html">Correlated Averages Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_data_file_reader.html">Data File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_memory_efficient_dump_file_reading.html">Memory-Efficient Dump File Reading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_data_file_reader.html">Data File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_data_file_writer.html">Data File Writer</a></li>
 </ul>
 </li>
@@ -406,7 +407,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
@@ -419,19 +420,20 @@ to download the full example code.</p>
 <section class="sphx-glr-example-title" id="save-generated-network">
 <span id="sphx-glr-auto-examples-network-generator-plot-save-network-py"></span><h1>Save Generated Network<a class="headerlink" href="#save-generated-network" title="Link to this heading">¶</a></h1>
 <p>This example shows how to save a generated polymer network to a LAMMPS data file.</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Network saved to: generated_structures/polymer_network.data
-</pre></div>
-</div>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a><span class="w">
 </span><span class="w">
 </span><span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">AtomStyle</span><span class="p">,</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class reference internal" href="../../api/pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.DataFileWriter"><span class="n">DataFileWriter</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="n">MCUniverseGenerator</span></a><span class="w">
 </span><span class="w">
 </span><span class="c1"># Generate network</span><span class="w">
 </span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="n">generator</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="n">MCUniverseGenerator</span></a><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">45</span><span class="p">)</span><span class="w">
-</span><span class="c1"># ... configure and generate ...</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.set_seed" title="pylimer_tools_cpp.MCUniverseGenerator.set_seed"><span class="n">generator</span><span class="o">.</span><span class="n">set_seed</span></a><span class="p">(</span><span class="mi">12345</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance"><span class="n">generator</span><span class="o">.</span><span class="n">set_bead_distance</span></a><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers" title="pylimer_tools_cpp.MCUniverseGenerator.add_crosslinkers"><span class="n">generator</span><span class="o">.</span><span class="n">add_crosslinkers</span></a><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.add_strands" title="pylimer_tools_cpp.MCUniverseGenerator.add_strands"><span class="n">generator</span><span class="o">.</span><span class="n">add_strands</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">nr_of_strands</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="w">
+</span>    <span class="n">strand_lengths</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="p">]</span><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion"><span class="n">generator</span><span class="o">.</span><span class="n">link_strands_to_conversion</span></a><span class="p">(</span><span class="n">crosslinker_conversion</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span><span class="w">
 </span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="n">universe</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.get_universe" title="pylimer_tools_cpp.MCUniverseGenerator.get_universe"><span class="n">generator</span><span class="o">.</span><span class="n">get_universe</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span><span class="w">
 </span><span class="c1"># Create output directory</span><span class="w">
@@ -449,7 +451,38 @@ to download the full example code.</p>
 </span><span class="w">
 </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="s2">Network saved to: </span><span class="si">{</span><a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="pathlib.PosixPath"><span class="n">output_file</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.001 seconds)</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Network saved to: generated_structures/polymer_network.data
+</pre></div>
+</div>
+<section id="network-structure-summary">
+<h2>Network Structure Summary<a class="headerlink" href="#network-structure-summary" title="Link to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">metrics</span></a> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="s2">Atoms</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">Bonds</span><span class="s2">&quot;</span><span class="p">]</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">values</span></a> <span class="o">=</span> <span class="p">[</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_nr_of_atoms" title="pylimer_tools_cpp.Universe.get_nr_of_atoms"><span class="n">universe</span><span class="o">.</span><span class="n">get_nr_of_atoms</span></a><span class="p">(</span><span class="p">)</span><span class="p">,</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_nr_of_bonds" title="pylimer_tools_cpp.Universe.get_nr_of_bonds"><span class="n">universe</span><span class="o">.</span><span class="n">get_nr_of_bonds</span></a><span class="p">(</span><span class="p">)</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="matplotlib.pyplot.figure"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-container sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/container_api.html#matplotlib.container.BarContainer" title="matplotlib.container.BarContainer"><span class="n">bars</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.bar.html#matplotlib.pyplot.bar" title="matplotlib.pyplot.bar"><span class="n">plt</span><span class="o">.</span><span class="n">bar</span></a><span class="p">(</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">metrics</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">values</span></a><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">#4C72B0</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">#55A868</span><span class="s2">&quot;</span><span class="p">]</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">black</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.4</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="k">for</span> <a class="sphx-glr-backref-module-matplotlib-patches sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.patches.Rectangle.html#matplotlib.patches.Rectangle" title="matplotlib.patches.Rectangle"><span class="n">bar</span></a> <span class="ow">in</span> <a class="sphx-glr-backref-module-matplotlib-container sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/container_api.html#matplotlib.container.BarContainer" title="matplotlib.container.BarContainer"><span class="n">bars</span></a><span class="p">:</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64"><span class="n">yval</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-matplotlib-patches sphx-glr-backref-type-py-method reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.patches.Rectangle.html#matplotlib.patches.Rectangle.get_height" title="matplotlib.patches.Rectangle.get_height"><span class="n">bar</span><span class="o">.</span><span class="n">get_height</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.text.html#matplotlib.pyplot.text" title="matplotlib.pyplot.text"><span class="n">plt</span><span class="o">.</span><span class="n">text</span></a><span class="p">(</span><span class="w">
+</span>        <a class="sphx-glr-backref-module-matplotlib-patches sphx-glr-backref-type-py-method reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.patches.Rectangle.html#matplotlib.patches.Rectangle.get_x" title="matplotlib.patches.Rectangle.get_x"><span class="n">bar</span><span class="o">.</span><span class="n">get_x</span></a><span class="p">(</span><span class="p">)</span> <span class="o">+</span> <a class="sphx-glr-backref-module-matplotlib-patches sphx-glr-backref-type-py-method reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.patches.Rectangle.html#matplotlib.patches.Rectangle.get_width" title="matplotlib.patches.Rectangle.get_width"><span class="n">bar</span><span class="o">.</span><span class="n">get_width</span></a><span class="p">(</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span><span class="w">
+</span>        <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64"><span class="n">yval</span></a> <span class="o">+</span> <span class="mi">20</span><span class="p">,</span><span class="w">
+</span>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64"><span class="n">yval</span></a><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>        <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">center</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>        <span class="n">va</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">bottom</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>        <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="w">
+</span>    <span class="p">)</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.ylabel.html#matplotlib.pyplot.ylabel" title="matplotlib.pyplot.ylabel"><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Count</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.title.html#matplotlib.pyplot.title" title="matplotlib.pyplot.title"><span class="n">plt</span><span class="o">.</span><span class="n">title</span></a><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="s2">Saved Network (</span><span class="si">{</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-method reference internal" href="../../api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.get_nr_of_atoms" title="pylimer_tools_cpp.Universe.get_nr_of_atoms"><span class="n">universe</span><span class="o">.</span><span class="n">get_nr_of_atoms</span></a><span class="p">(</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> atoms)</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.grid.html#matplotlib.pyplot.grid" title="matplotlib.pyplot.grid"><span class="n">plt</span><span class="o">.</span><span class="n">grid</span></a><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">y</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">:</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tight_layout.html#matplotlib.pyplot.tight_layout" title="matplotlib.pyplot.tight_layout"><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../../_images/sphx_glr_plot_save_network_001.png" srcset="../../_images/sphx_glr_plot_save_network_001.png" alt="Saved Network (2,050 atoms)" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.359 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-network-generator-plot-save-network-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/1f64c9ed17f112e3d009ed280ded35d8/plot_save_network.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_save_network.ipynb</span></code></a></p>
@@ -463,18 +496,19 @@ to download the full example code.</p>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
 </section>
+</section>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="plot_simple_crosslinked_network.html">
+          <a class="next-page" href="plot_polydisperse_system.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Simple Crosslinked Network</div>
+                <div class="title">Generate a Polydisperse Polymer Network</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -507,8 +541,27 @@ to download the full example code.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Save Generated Network</a><ul>
+<li><a class="reference internal" href="#network-structure-summary">Network Structure Summary</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

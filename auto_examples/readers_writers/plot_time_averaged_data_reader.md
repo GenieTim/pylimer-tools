@@ -23,7 +23,7 @@ and [`read_sectioned_averages_file()`](../../pylimer_tools.io.md#pylimer_tools.i
 - Vector quantities (multiple values per output timestep)
 - Multi-section files with varying column structures
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 17-59 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 17-64 -->
 ```none
 Timestep 100: 3 data points
 Timestep 200: 3 data points
@@ -34,6 +34,8 @@ Timestep 300: 3 data points
 ```Python
 import os
 from pathlib import Path
+
+import matplotlib.pyplot as plt
 
 from pylimer_tools.io.read_lammps_output_file import read_averages_file
 
@@ -62,7 +64,10 @@ averages.plot(
     xlabel="Time Step",
     ylabel="Something",
     title="Averaged Data Plot",
+    grid=True,
 )
+plt.tight_layout()
+plt.show()
 
 vec_averages_file = str(_fixtures_dir / "example_vec_avg_file.out.vec-avg.txt")
 
@@ -75,7 +80,7 @@ for timestep, group in sectioned_data.groupby("TimeStep"):
     print(f"Timestep {timestep}: {len(group)} data points")
 ```
 
-**Total running time of the script:** (0 minutes 0.080 seconds)
+**Total running time of the script:** (0 minutes 0.106 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-time-averaged-data-reader-py"></a>
 

@@ -194,16 +194,17 @@
 ## Pages in this subsection
 
 - [Force Balance, Maximum Entropy Homogenization Procedures](index.html.md): pylimer-tools provides three implementations of the Force Balance:cite:p:bernhard_phantom_2025, Maxi...
-- [NOTE](plot_force_balance_2.html.md): Go to the end
-- [NOTE](plot_force_balance.html.md): Go to the end
-- [NOTE](plot_polydispersity_study.html.md): Go to the end
 - [NOTE](plot_fb_deformation_exp.html.md): Go to the end
+- [NOTE](plot_force_balance.html.md): Go to the end
+- [NOTE](plot_force_balance_2.html.md): Go to the end
 - [NOTE](plot_force_relaxation.html.md): Go to the end
 - [NOTE](plot_entanglement_link_vs_spring.html.md): Go to the end
 - [NOTE](plot_slipping_vs_fixed_links.html.md): Go to the end
+- [NOTE](plot_polydispersity_study.html.md): Go to the end
+- [NOTE](plot_sampling_cutoff_effect.html.md): Go to the end
 - [NOTE](plot_entanglement_sampling_comparison.html.md): Go to the end
 - [NOTE](plot_inactive_removal_and_sampling.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;06:18.947&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;00:09.962&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 
 ## Optional
 

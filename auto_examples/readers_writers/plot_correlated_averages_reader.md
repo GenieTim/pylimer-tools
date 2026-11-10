@@ -14,10 +14,12 @@ to download the full example code.
 
 Read correlation functions from `fix ave/correlate` and `fix ave/correlate/long` commands.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-40 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-49 -->
 ```Python
 import os
 from pathlib import Path
+
+import matplotlib.pyplot as plt
 
 from pylimer_tools.io.read_lammps_output_file import read_correlation_file
 
@@ -44,12 +46,19 @@ last_timestep = correlation_data["Timestep"].max()
 last_correlation = correlation_data[correlation_data["Timestep"]
                                     == last_timestep]
 
-_ = last_correlation.plot(
-    x="Time", y=[
-        "c_pA1*c_pA1", "c_pA2*c_pA2", "c_pA3*c_pA3"])
+ax = last_correlation.plot(
+    x="Time",
+    y=["c_pA1*c_pA1", "c_pA2*c_pA2", "c_pA3*c_pA3"],
+    title=f"Correlation Functions at Step {last_timestep}",
+    grid=True,
+)
+ax.set_xlabel("Correlation Time")
+ax.set_ylabel("Correlation Value")
+plt.tight_layout()
+plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.066 seconds)
+**Total running time of the script:** (0 minutes 0.103 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-correlated-averages-reader-py"></a>
 

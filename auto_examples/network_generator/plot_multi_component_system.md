@@ -14,16 +14,7 @@ to download the full example code.
 
 Create complex systems with multiple components:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-88 -->
-```none
-Starting network generation at 2026-11-10 08:32:05.332622
-Adding crosslinkers...
-Adding solvent chains...
-Adding and linking polymer strands...
-Network generation completed at 2026-11-10 08:32:05.793428
-```
-
-<br/>
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-89 -->
 ```Python
 import datetime
 import os
@@ -106,7 +97,62 @@ writer.write_to_file(
     "generated_structures/multi_component_polymer_network.data")
 ```
 
-**Total running time of the script:** (0 minutes 0.476 seconds)
+```none
+Starting network generation at 2026-11-10 12:09:41.665492
+Adding crosslinkers...
+Adding solvent chains...
+Adding and linking polymer strands...
+Network generation completed at 2026-11-10 12:09:42.119586
+```
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 90-93 -->
+
+## Component Composition Visualization
+
+We plot the distribution of atoms across all network components:
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 93-131 -->
+```Python
+import matplotlib.pyplot as plt
+
+type_labels = {
+    1: "Polymer Strands\n(Type 1)",
+    2: "Crosslinkers\n(Type 2)",
+    3: "Solvent Beads\n(Type 3)",
+    4: "Monofunctional\n(Type 4)",
+}
+counts = {
+    type_labels[t]: len(universe.get_atoms_by_type(t))
+    for t in sorted(type_labels.keys())
+}
+
+plt.figure(figsize=(8, 4.5))
+bars = plt.bar(
+    counts.keys(),
+    counts.values(),
+    color=["#4C72B0", "#DD8452", "#55A868", "#C44E52"],
+    edgecolor="black",
+    linewidth=0.8,
+)
+for bar in bars:
+    yval = bar.get_height()
+    plt.text(
+        bar.get_x() + bar.get_width() / 2.0,
+        yval + 15,
+        f"{yval:,}",
+        ha="center",
+        va="bottom",
+        fontsize=10,
+    )
+
+plt.ylabel("Number of Atoms", fontsize=11)
+plt.title("Atom Distribution Across Network Components", fontsize=12)
+plt.grid(True, axis="y", linestyle=":", alpha=0.6)
+plt.tight_layout()
+plt.show()
+```
+
+**Total running time of the script:** (0 minutes 0.574 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-multi-component-system-py"></a>
 

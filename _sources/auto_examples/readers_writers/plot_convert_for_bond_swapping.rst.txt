@@ -83,7 +83,46 @@ Here's how you could re-set the molecule indices for bond swapping with constant
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-54
+.. GENERATED FROM PYTHON SOURCE LINES 52-55
+
+Chain Length Distribution Verification
+--------------------------------------
+We verify the molecule size distribution across the prepared melt system:
+
+.. GENERATED FROM PYTHON SOURCE LINES 55-72
+
+.. code-block:: Python
+
+
+    import matplotlib.pyplot as plt
+
+    chain_lengths = [m.get_nr_of_atoms() for m in universe.get_molecules(2)]
+
+    plt.figure(figsize=(6, 4))
+    plt.hist(chain_lengths, bins=20, color="#4C72B0", edgecolor="white", alpha=0.8)
+    plt.xlabel("Beads per Chain", fontsize=11)
+    plt.ylabel("Number of Chains", fontsize=11)
+    plt.title(
+        f"Chain Length Distribution (Total: {len(chain_lengths)} chains)",
+        fontsize=12,
+    )
+    plt.grid(True, linestyle=":", alpha=0.5)
+    plt.tight_layout()
+    plt.show()
+
+
+
+
+.. image-sg:: /auto_examples/readers_writers/images/sphx_glr_plot_convert_for_bond_swapping_001.png
+   :alt: Chain Length Distribution (Total: 429 chains)
+   :srcset: /auto_examples/readers_writers/images/sphx_glr_plot_convert_for_bond_swapping_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 73-75
 
 To convert it back to the molecule index relating to their current connectivity,
 simply repeat the process with ``config_molecule_idx_for_swap(False)``
@@ -91,7 +130,7 @@ simply repeat the process with ``config_molecule_idx_for_swap(False)``
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.045 seconds)
+   **Total running time of the script:** (0 minutes 0.145 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_convert_for_bond_swapping.py:

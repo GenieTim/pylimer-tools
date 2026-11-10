@@ -29,7 +29,7 @@ Assuming your ``pylimer_tools`` version was compiled with OpenMP,
 to run this in parallel, you can use the typical OpenMP environment variables,
 e.g., in the terminal before running your script: :code:`export OMP_NUM_THREADS=4` to use 4 threads.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-52
+.. GENERATED FROM PYTHON SOURCE LINES 13-53
 
 .. code-block:: Python
 
@@ -37,6 +37,7 @@ e.g., in the terminal before running your script: :code:`export OMP_NUM_THREADS=
     import os
     from pathlib import Path
 
+    import matplotlib.pyplot as plt
     import pandas as pd
 
     from pylimer_tools.io.read_lammps_output_file import read_data_file
@@ -79,13 +80,13 @@ e.g., in the terminal before running your script: :code:`export OMP_NUM_THREADS=
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-56
+.. GENERATED FROM PYTHON SOURCE LINES 54-57
 
 Note that the random seed does not guarantee the same results across different runs,
 as the DPD algorithm is inherently stochastic and will produce different results
 if you use more than one processor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-99
+.. GENERATED FROM PYTHON SOURCE LINES 57-100
 
 .. code-block:: Python
 
@@ -145,11 +146,11 @@ if you use more than one processor.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-101
+.. GENERATED FROM PYTHON SOURCE LINES 101-102
 
 read the output file and actually plot something
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-115
+.. GENERATED FROM PYTHON SOURCE LINES 102-118
 
 .. code-block:: Python
 
@@ -167,6 +168,8 @@ read the output file and actually plot something
         layout=(3, 2),
         figsize=(10, 10),
     )
+    plt.tight_layout()
+    plt.show()
 
 
 
@@ -182,7 +185,7 @@ read the output file and actually plot something
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.917 seconds)
+   **Total running time of the script:** (0 minutes 6.037 seconds)
 
 
 .. _sphx_glr_download_auto_examples_dpd_simulations_plot_dpd_simulation.py:

@@ -48,7 +48,7 @@ The :class:`~pylimer_tools_cpp.UniverseSequence` class provides automatic memory
 For large trajectories, frames are loaded on-demand
 Load a LAMMPS dump trajectory file (replace with your file)
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-62
+.. GENERATED FROM PYTHON SOURCE LINES 20-65
 
 .. code-block:: Python
 
@@ -75,10 +75,13 @@ Load a LAMMPS dump trajectory file (replace with your file)
     process = psutil.Process(os.getpid())
     mem_before = process.memory_info().rss
 
+    frame_indices = []
+    memory_samples = []
+
     for i in range(0, sequence.get_length(), 10):  # Every 10th frame
         universe = sequence.at_index(i)
-        # Process universe
-        # …
+        frame_indices.append(i)
+        memory_samples.append(process.memory_info().rss / (1024 * 1024))
         print(f"Processing frame {i} with {universe.get_nr_of_atoms()} atoms")
         # Then, optional: free memory for the frame
         sequence.forget_at_index(i)
@@ -93,7 +96,7 @@ Load a LAMMPS dump trajectory file (replace with your file)
     print(f"Memory after processing:  {mem_after / (1024 * 1024):.2f} MB")
     print(
         f"Memory used by script:    {(mem_after - mem_before) / (1024 * 1024):.2f} MB")
-    print(f"Dump file size:           {dump_file_size / (1024 * 1024):.2f} MB")
+
 
 
 
@@ -7537,9 +7540,49 @@ Load a LAMMPS dump trajectory file (replace with your file)
     Processing frame 74320 with 32 atoms
 
     --- Memory Usage Report ---
-    Memory before processing: 903.82 MB
-    Memory after processing:  903.82 MB
+    Memory before processing: 246.65 MB
+    Memory after processing:  246.65 MB
     Memory used by script:    0.00 MB
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 66-70
+
+Memory Stability Visualization
+------------------------------
+Demonstrating that on-demand loading with ``forget_at_index`` maintains
+a flat memory profile:
+
+.. GENERATED FROM PYTHON SOURCE LINES 70-82
+
+.. code-block:: Python
+
+
+    import matplotlib.pyplot as plt
+
+    plt.figure(figsize=(6.5, 4))
+    plt.plot(frame_indices, memory_samples, marker="o", color="#4C72B0", lw=2)
+    plt.xlabel("Trajectory Frame Index", fontsize=11)
+    plt.ylabel("Process RSS [MB]", fontsize=11)
+    plt.title("Memory Footprint with On-Demand Frame Loading", fontsize=12)
+    plt.grid(True, linestyle=":", alpha=0.6)
+    plt.tight_layout()
+    plt.show()
+    print(f"Dump file size:           {dump_file_size / (1024 * 1024):.2f} MB")
+
+
+
+.. image-sg:: /auto_examples/readers_writers/images/sphx_glr_plot_memory_efficient_dump_file_reading_001.png
+   :alt: Memory Footprint with On-Demand Frame Loading
+   :srcset: /auto_examples/readers_writers/images/sphx_glr_plot_memory_efficient_dump_file_reading_001.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
     Dump file size:           83.32 MB
 
 
@@ -7548,7 +7591,7 @@ Load a LAMMPS dump trajectory file (replace with your file)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 22.311 seconds)
+   **Total running time of the script:** (0 minutes 21.983 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_memory_efficient_dump_file_reading.py:

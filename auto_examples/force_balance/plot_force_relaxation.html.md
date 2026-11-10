@@ -16,18 +16,12 @@ This example demonstrates how to use
 the “original” MEHP implementation (see Gusev [[Gus19](../../acknowledgements.html.md#id8)])
 without slip-links or entanglements.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 10-155 -->
-```none
-Phantom Shear Modulus [MPa]:  0.00611750001673971
-Phantom Shear Modulus [MPa] (Langevin):  0.006117508743626068
-Phantom Shear Modulus [MPa] (Custom Evaluator):  0.006117500021057896
-```
-
-<br/>
+<!-- GENERATED FROM PYTHON SOURCE LINES 10-150 -->
 ```Python
 import os
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from pylimer_tools.io.bead_spring_parameter_provider import (
@@ -128,15 +122,12 @@ force_evaluator = SimpleSpringMEHPForceEvaluator()
 mehp_relax.set_force_evaluator(force_evaluator)
 while mehp_relax.requires_another_run():
     mehp_relax.run_force_relaxation()
-shear_modulus = (
+shear_modulus_linear = (
     gamma_conversion_factor
     * np.sum(mehp_relax.get_gamma_factors(r02_slope_magnitude))
     / universe.get_volume()
 )
-print(
-    "Phantom Shear Modulus [MPa]: ",
-    shear_modulus,
-)
+print(f"Phantom Shear Modulus [MPa] (Linear): {shear_modulus_linear:.4f}")
 
 # 2. MEHPForceRelaxation with Langevin force potential
 mehp_relax = MEHPForceRelaxation(universe)
@@ -144,15 +135,12 @@ force_evaluator = NonGaussianSpringForceEvaluator()
 mehp_relax.set_force_evaluator(force_evaluator)
 while mehp_relax.requires_another_run():
     mehp_relax.run_force_relaxation()
-shear_modulus = (
+shear_modulus_langevin = (
     gamma_conversion_factor
     * np.sum(mehp_relax.get_gamma_factors(r02_slope_magnitude))
     / universe.get_volume()
 )
-print(
-    "Phantom Shear Modulus [MPa] (Langevin): ",
-    shear_modulus,
-)
+print(f"Phantom Shear Modulus [MPa] (Langevin): {shear_modulus_langevin:.4f}")
 
 # 3. MEHPForceRelaxation with Custom Force Evaluator
 custom_evaluator = CustomForceEvaluator(kappa=1.0)
@@ -160,18 +148,62 @@ mehp_relax = MEHPForceRelaxation(universe)
 mehp_relax.set_force_evaluator(custom_evaluator)
 while mehp_relax.requires_another_run():
     mehp_relax.run_force_relaxation()
-shear_modulus = (
+shear_modulus_custom = (
     gamma_conversion_factor
     * np.sum(mehp_relax.get_gamma_factors(r02_slope_magnitude))
     / universe.get_volume()
 )
 print(
-    "Phantom Shear Modulus [MPa] (Custom Evaluator): ",
-    shear_modulus,
-)
+    f"Phantom Shear Modulus [MPa] (Custom Evaluator): {
+        shear_modulus_custom:.4f}")
 ```
 
-**Total running time of the script:** (0 minutes 3.975 seconds)
+```none
+Phantom Shear Modulus [MPa] (Linear): 0.0061
+Phantom Shear Modulus [MPa] (Langevin): 0.0061
+Phantom Shear Modulus [MPa] (Custom Evaluator): 0.0061
+```
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 151-155 -->
+
+## Comparison of Force Evaluators
+
+We visualize the predicted equilibrium phantom shear modulus for each
+force evaluator.
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 155-184 -->
+```Python
+labels = [
+    "Simple Spring\n(Linear)",
+    "Non-Gaussian\n(Langevin)",
+    "Custom\n(Harmonic)"]
+moduli = [shear_modulus_linear, shear_modulus_langevin, shear_modulus_custom]
+colors = ["#4C72B0", "#55A868", "#DD8452"]
+
+plt.figure(figsize=(7, 5))
+bars = plt.bar(
+    labels, moduli, color=colors, edgecolor="black", linewidth=0.8, width=0.5
+)
+
+for bar in bars:
+    yval = bar.get_height()
+    plt.text(
+        bar.get_x() + bar.get_width() / 2.0,
+        yval + 0.0001,
+        f"{yval:.4f} MPa",
+        ha="center",
+        va="bottom",
+        fontsize=10,
+    )
+
+plt.ylabel("Phantom Shear Modulus [MPa]", fontsize=11)
+plt.title("Comparison of Force Evaluators in MEHP Force Relaxation", fontsize=12)
+plt.grid(True, axis="y", linestyle=":", alpha=0.6)
+plt.tight_layout()
+plt.show()
+```
+
+**Total running time of the script:** (0 minutes 4.060 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-relaxation-py"></a>
 

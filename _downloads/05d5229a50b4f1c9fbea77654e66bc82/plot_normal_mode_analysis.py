@@ -12,6 +12,7 @@ Reference: :cite:t:`gusev_molecular_2024`
 import os
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -85,7 +86,7 @@ df = pd.DataFrame(
     }
 )
 df.set_index("Frequency", inplace=True)
-_ = df.plot(
+ax = df.plot(
     title="Normal Mode Analysis: Exact vs KPM Moduli",
     loglog=True,
     style={
@@ -94,4 +95,9 @@ _ = df.plot(
         "Storage Modulus (KPM)": "b--",
         "Loss Modulus (KPM)": "r--",
     },
+    grid=True,
 )
+ax.set_xlabel("Frequency [rad/s]")
+ax.set_ylabel("Modulus [a.u.]")
+plt.tight_layout()
+plt.show()

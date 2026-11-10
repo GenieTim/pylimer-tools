@@ -23,29 +23,26 @@ See:
 - [Comparing Entanglement Sampling Methods: Discrete vs. Analytical](plot_entanglement_sampling_comparison.html.md) for a detailed benchmark and comparison of discrete vs. analytical sampling methods,
 - [Modeling Entanglements: Entanglement Links vs. Entanglement Springs](plot_entanglement_link_vs_spring.html.md) for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,
 - [Entanglement Mobility: Dynamic Slipping vs. Fixed Links](plot_slipping_vs_fixed_links.html.md) for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
-- [Inactive Strand & Entanglement Removal in Force Balance 2](plot_inactive_removal_and_sampling.html.md) for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling.
+- [Inactive Strand & Entanglement Removal in Force Balance 2](plot_inactive_removal_and_sampling.html.md) for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling,
+- [Polydispersity Study](plot_polydispersity_study.html.md) for the effect of precursor strand length polydispersity on equilibrium shear modulus and defect fractions, and
+- [Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2](plot_sampling_cutoff_effect.html.md) for the effect of the slip-link sampling cut-off distance on the equilibrium shear modulus in Force Balance 2, investigating pre-strain distortions, link vs. spring representations, and interactions with strand length $N$, conversion $p$, and stoichiometric imbalance $r$.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a faster implementation of the MEHP force balance method, which uses static links to model entanglements instead of slip-links. See bernhard_phantom_2025">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_2_thumb.png)
-
-[Force Balance 2](plot_force_balance_2.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MEHP implementation with slip-springs to homogenize a polymer network and predict its equilibrium shear modulus.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_thumb.png)
-
-[Force Balance](plot_force_balance.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Force Balance</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of polydispersity on the shear modulus of end-linked polymer networks.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png)
-
-[Polydispersity Study](plot_polydispersity_study.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Polydispersity Study</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPForceBalance2 class in a deformation experiment.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_fb_deformation_exp_thumb.png)
+<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPForceBalance2 class in a deformation experiment.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_fb_deformation_exp_thumb.png)
 
 [Deformation Experiment](plot_fb_deformation_exp.html.md)
 
   <div class="sphx-glr-thumbnail-title">Deformation Experiment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019) with slip-links to homogenize a polymer network and predict its equilibrium shear modulus.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_thumb.png)
+
+[Force Balance](plot_force_balance.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Force Balance</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="MEHPForceBalance2 is a modernized, high-performance implementation of the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_balance_2_thumb.png)
+
+[Force Balance 2](plot_force_balance_2.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation (see gusev_numerical_2019) without slip-links or entanglements.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png)
 
 [Maximum Entropy Homogenization Procedure (MEHP)](plot_force_relaxation.html.md)
@@ -61,6 +58,16 @@ See:
 [Entanglement Mobility: Dynamic Slipping vs. Fixed Links](plot_slipping_vs_fixed_links.html.md)
 
   <div class="sphx-glr-thumbnail-title">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of polymer strand length polydispersity on the equilibrium shear modulus and topological network structure of end-linked polymer networks.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png)
+
+[Polydispersity Study](plot_polydispersity_study.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Polydispersity Study</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements are introduced by sampling candidate pairs of chain beads that lie within a spatial proximity cut-off:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_sampling_cutoff_effect_thumb.png)
+
+[Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2](plot_sampling_cutoff_effect.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as localized topological constraints (entanglement links or springs).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_sampling_comparison_thumb.png)
 
 [Comparing Entanglement Sampling Methods: Discrete vs. Analytical](plot_entanglement_sampling_comparison.html.md)

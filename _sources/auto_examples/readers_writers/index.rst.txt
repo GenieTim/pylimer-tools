@@ -28,23 +28,6 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Convert LAMMPS units to SI or other unit systems:">
-
-.. only:: html
-
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_unit_conversion_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/readers_writers/plot_unit_conversion`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Unit Conversion</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Read output from pylimer-tools&#x27; own simulators.">
 
 .. only:: html
@@ -57,23 +40,6 @@ The library supports four main file I/O operations:
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">pylimer-tools Output Reader</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="Read correlation functions from fix ave/correlate and fix ave/correlate/long commands.">
-
-.. only:: html
-
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_correlated_averages_reader_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/readers_writers/plot_correlated_averages_reader`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Correlated Averages Reader</div>
     </div>
 
 
@@ -113,23 +79,6 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Take a later entry from a LAMMPS trajectory and save it as a data file.">
-
-.. only:: html
-
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_trajectory_to_frame_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/readers_writers/plot_convert_trajectory_to_frame`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame to Data File</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Read LAMMPS log files containing thermodynamic output from the thermo command.">
 
 .. only:: html
@@ -147,18 +96,18 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The DumpFileReader processes LAMMPS trajectory files. Is has a practical interface to read frames from a trajectory file and access them as Universe objects in the UniverseSequence class.">
+    <div class="sphx-glr-thumbcontainer" tooltip="Read correlation functions from fix ave/correlate and fix ave/correlate/long commands.">
 
 .. only:: html
 
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_dump_file_reader_thumb.png
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_correlated_averages_reader_thumb.png
     :alt:
 
-  :doc:`/auto_examples/readers_writers/plot_dump_file_reader`
+  :doc:`/auto_examples/readers_writers/plot_correlated_averages_reader`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Dump File Reader</div>
+      <div class="sphx-glr-thumbnail-title">Correlated Averages Reader</div>
     </div>
 
 
@@ -181,6 +130,57 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Convert LAMMPS units to SI or other unit systems:">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_unit_conversion_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/readers_writers/plot_unit_conversion`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Unit Conversion</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The DumpFileReader processes LAMMPS trajectory files. Is has a practical interface to read frames from a trajectory file and access them as Universe objects in the UniverseSequence class.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_dump_file_reader_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/readers_writers/plot_dump_file_reader`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Dump File Reader</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Take a later entry from a LAMMPS trajectory and save it as a data file.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_trajectory_to_frame_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/readers_writers/plot_convert_trajectory_to_frame`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame to Data File</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="LAMMPS bond swapping can significantly speed up equilibration for polymer networks. However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly. Here&#x27;s how you could re-set the molecule indices for bond swapping with constant chain lengths.">
 
 .. only:: html
@@ -198,23 +198,6 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects.">
-
-.. only:: html
-
-  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_data_file_reader_thumb.png
-    :alt:
-
-  :doc:`/auto_examples/readers_writers/plot_data_file_reader`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Data File Reader</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="The UniverseSequence class provides automatic memory management.">
 
 .. only:: html
@@ -227,6 +210,23 @@ The library supports four main file I/O operations:
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Memory-Efficient Dump File Reading</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects.">
+
+.. only:: html
+
+  .. image:: /auto_examples/readers_writers/images/thumb/sphx_glr_plot_data_file_reader_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/readers_writers/plot_data_file_reader`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Data File Reader</div>
     </div>
 
 
@@ -257,17 +257,17 @@ The library supports four main file I/O operations:
 .. toctree::
    :hidden:
 
-   /auto_examples/readers_writers/plot_unit_conversion
    /auto_examples/readers_writers/plot_pylimer_tools_output_reader
-   /auto_examples/readers_writers/plot_correlated_averages_reader
    /auto_examples/readers_writers/plot_histogram_reader
    /auto_examples/readers_writers/plot_performance_caching
-   /auto_examples/readers_writers/plot_convert_trajectory_to_frame
    /auto_examples/readers_writers/plot_log_thermo_file_reader
-   /auto_examples/readers_writers/plot_dump_file_reader
+   /auto_examples/readers_writers/plot_correlated_averages_reader
    /auto_examples/readers_writers/plot_time_averaged_data_reader
+   /auto_examples/readers_writers/plot_unit_conversion
+   /auto_examples/readers_writers/plot_dump_file_reader
+   /auto_examples/readers_writers/plot_convert_trajectory_to_frame
    /auto_examples/readers_writers/plot_convert_for_bond_swapping
-   /auto_examples/readers_writers/plot_data_file_reader
    /auto_examples/readers_writers/plot_memory_efficient_dump_file_reading
+   /auto_examples/readers_writers/plot_data_file_reader
    /auto_examples/readers_writers/plot_data_file_writer
 

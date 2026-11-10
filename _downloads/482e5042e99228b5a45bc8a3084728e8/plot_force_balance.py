@@ -1,15 +1,16 @@
 #!/usr/bin/env python
-"""
+r"""
 Force Balance
 =============
 
-This example demonstrates how to use the MEHP implementation with slip-springs
-to homogenize a polymer network and predict its equilibrium shear modulus.
+This example demonstrates how to use the Maximum Entropy Homogenization Procedure (MEHP)
+(:cite:t:`gusev_numerical_2019`) with slip-links to homogenize a polymer network and predict
+its equilibrium shear modulus.
 """
 
-import os
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from pylimer_tools.io.bead_spring_parameter_provider import (
@@ -43,22 +44,22 @@ universe = read_data_file(
     str(_fixtures_dir / "structure/network_100_a_46.structure.out")
 )
 assert isinstance(universe, Universe)
+vol = universe.get_volume()
 
-# 2. MEHPForceBalance: Hookean springs, allows slip-links
+# MEHPForceBalance: Hookean springs, with slip-links
 mehp_fb = MEHPForceBalance.construct_with_random_sliplinks(
     universe,
-    nr_of_sliplinks_to_sample=int(
-        params.get_entanglement_density() * universe.get_volume()
-    ),
+    nr_of_sliplinks_to_sample=int(params.get_entanglement_density() * vol),
     upper_sampling_cutoff=params.get_sampling_cutoff(),
 )
 mehp_fb.run_force_relaxation(max_nr_of_steps=1000)
 
 print(
-    "Final residual (should be close to 0):", mehp_fb.get_displacement_residual_norm()
+    "Final residual (should be close to 0):",
+    mehp_fb.get_displacement_residual_norm(),
 )
 
-# apply conversion factors, measure resulting shear modulus
+# Apply conversion factors, measure resulting shear modulus
 r02_slope = params.get("R02")
 r02_slope_magnitude = r02_slope.to(params.get("distance_units") ** 2).magnitude
 kbt = params.get("T") * params.get("kb")
@@ -66,12 +67,96 @@ gamma_conversion_factor = (
     (kbt / ((params.get("distance_units")) ** 3)).to("MPa").magnitude
 )
 
-shear_modulus = (
+gamma_factors = mehp_fb.get_gamma_factors(r02_slope_magnitude)
+shear_modulus = gamma_conversion_factor * np.sum(gamma_factors) / vol
+print(f"Shear Modulus [MPa]: {shear_modulus:.4f}")
+
+# Directional shear moduli
+gx = (
     gamma_conversion_factor
-    * np.sum(mehp_fb.get_gamma_factors(r02_slope_magnitude))
-    / universe.get_volume()
+    * np.sum(mehp_fb.get_gamma_factors_in_dir(r02_slope_magnitude, 0))
+    / vol
 )
-print(
-    "Shear Modulus [MPa]: ",
-    shear_modulus,
+gy = (
+    gamma_conversion_factor
+    * np.sum(mehp_fb.get_gamma_factors_in_dir(r02_slope_magnitude, 1))
+    / vol
 )
+gz = (
+    gamma_conversion_factor
+    * np.sum(mehp_fb.get_gamma_factors_in_dir(r02_slope_magnitude, 2))
+    / vol
+)
+
+# %%
+# Visualization
+# -------------
+# We plot the distribution of strand elastic factors :math:`\Gamma` and the directional
+# shear moduli :math:`G_x, G_y, G_z` compared to the total shear modulus
+# :math:`G`.
+
+active_gammas = gamma_factors[gamma_factors > 1e-4]
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+# Panel 1: Gamma distribution
+ax1.hist(
+    active_gammas,
+    bins=30,
+    color="#4C72B0",
+    edgecolor="white",
+    alpha=0.8,
+    density=True,
+    label="Active Strands",
+)
+ax1.axvline(
+    0.5,
+    color="#C44E52",
+    linestyle="--",
+    lw=2,
+    label=r"Phantom Reference ($\Gamma = 0.5$)",
+)
+ax1.axvline(
+    np.mean(active_gammas),
+    color="#2CA02C",
+    linestyle="-",
+    lw=2,
+    label=rf"Mean $\langle\Gamma\rangle = {np.mean(active_gammas):.2f}$",
+)
+ax1.set_xlabel(r"Strand Elastic Factor ($\Gamma_i$)", fontsize=11)
+ax1.set_ylabel("Probability Density", fontsize=11)
+ax1.set_title("Distribution of Strand Elastic Factors", fontsize=12)
+ax1.grid(True, linestyle=":", alpha=0.5)
+ax1.legend(loc="upper right", framealpha=0.9)
+
+# Panel 2: Directional Moduli
+labels = ["Total ($G$)", r"$G_x$", r"$G_y$", r"$G_z$"]
+values = [shear_modulus, gx, gy, gz]
+colors = ["#1F77B4", "#4C72B0", "#55A868", "#DD8452"]
+
+bars = ax2.bar(labels, values, color=colors, edgecolor="black", linewidth=0.8)
+ax2.axhline(
+    shear_modulus / 3.0,
+    color="navy",
+    linestyle=":",
+    alpha=0.7,
+    label=r"Isotropic Avg ($G / 3$)",
+)
+for bar in bars:
+    yval = bar.get_height()
+    ax2.text(
+        bar.get_x() + bar.get_width() / 2.0,
+        yval + 0.002,
+        f"{yval:.4f}",
+        ha="center",
+        va="bottom",
+        fontsize=9,
+    )
+
+ax2.set_ylabel("Shear Modulus [MPa]", fontsize=11)
+ax2.set_title("Shear Modulus & Directional Decomposition", fontsize=12)
+ax2.grid(True, axis="y", linestyle=":", alpha=0.5)
+ax2.legend(loc="upper left", framealpha=0.9)
+
+plt.tight_layout()
+plt.show()

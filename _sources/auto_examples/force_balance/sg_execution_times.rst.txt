@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**06:18.947** total execution time for 9 files **from auto_examples/force_balance**:
+**00:09.962** total execution time for 10 files **from auto_examples/force_balance**:
 
 .. container::
 
@@ -32,11 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py` (``plot_polydispersity_study.py``)
-     - 06:10.563
-     - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py` (``plot_force_relaxation.py``)
-     - 00:03.975
+     - 00:04.060
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_sampling_comparison.py` (``plot_entanglement_sampling_comparison.py``)
      - 00:01.793
@@ -44,8 +41,14 @@ Computation times
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_inactive_removal_and_sampling.py` (``plot_inactive_removal_and_sampling.py``)
      - 00:00.876
      - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_sampling_cutoff_effect.py` (``plot_sampling_cutoff_effect.py``)
+     - 00:00.751
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py` (``plot_force_balance.py``)
+     - 00:00.709
+     - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``plot_force_balance_2.py``)
-     - 00:00.413
+     - 00:00.428
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_link_vs_spring.py` (``plot_entanglement_link_vs_spring.py``)
      - 00:00.392
@@ -53,8 +56,8 @@ Computation times
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_slipping_vs_fixed_links.py` (``plot_slipping_vs_fixed_links.py``)
      - 00:00.332
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py` (``plot_force_balance.py``)
-     - 00:00.308
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py` (``plot_polydispersity_study.py``)
+     - 00:00.327
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py` (``plot_fb_deformation_exp.py``)
      - 00:00.296

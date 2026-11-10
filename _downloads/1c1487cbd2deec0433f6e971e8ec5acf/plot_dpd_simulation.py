@@ -14,6 +14,7 @@ e.g., in the terminal before running your script: :code:`export OMP_NUM_THREADS=
 import os
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import pandas as pd
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
@@ -112,3 +113,5 @@ _ = df.plot(
     layout=(3, 2),
     figsize=(10, 10),
 )
+plt.tight_layout()
+plt.show()

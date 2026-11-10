@@ -27,7 +27,7 @@ solvers or the Kernel Polynomial Method (KPM).
 
 Reference: :cite:t:`gusev_molecular_2024`
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-73
+.. GENERATED FROM PYTHON SOURCE LINES 11-74
 
 .. code-block:: Python
 
@@ -35,6 +35,7 @@ Reference: :cite:t:`gusev_molecular_2024`
     import os
     from pathlib import Path
 
+    import matplotlib.pyplot as plt
     import numpy as np
     import pandas as pd
 
@@ -100,14 +101,14 @@ Reference: :cite:t:`gusev_molecular_2024`
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-78
+.. GENERATED FROM PYTHON SOURCE LINES 75-79
 
 .. todo:
   Apply conversion factors where necessary
 
 Plot and compare the results
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-98
+.. GENERATED FROM PYTHON SOURCE LINES 79-104
 
 .. code-block:: Python
 
@@ -121,7 +122,7 @@ Plot and compare the results
         }
     )
     df.set_index("Frequency", inplace=True)
-    _ = df.plot(
+    ax = df.plot(
         title="Normal Mode Analysis: Exact vs KPM Moduli",
         loglog=True,
         style={
@@ -130,7 +131,12 @@ Plot and compare the results
             "Storage Modulus (KPM)": "b--",
             "Loss Modulus (KPM)": "r--",
         },
+        grid=True,
     )
+    ax.set_xlabel("Frequency [rad/s]")
+    ax.set_ylabel("Modulus [a.u.]")
+    plt.tight_layout()
+    plt.show()
 
 
 
@@ -144,7 +150,7 @@ Plot and compare the results
 
  .. code-block:: none
 
-    /home/runner/work/pylimer-tools/pylimer-tools/examples/normal_mode_analysis/plot_normal_mode_analysis.py:87: Pandas4Warning: The inplace keyword in DataFrame.set_index is deprecated and will be removed in a future version (PDEP-8).
+    /home/runner/work/pylimer-tools/pylimer-tools/examples/normal_mode_analysis/plot_normal_mode_analysis.py:88: Pandas4Warning: The inplace keyword in DataFrame.set_index is deprecated and will be removed in a future version (PDEP-8).
     See https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace for more details.
       df.set_index("Frequency", inplace=True)
 
@@ -154,7 +160,7 @@ Plot and compare the results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 12.360 seconds)
+   **Total running time of the script:** (0 minutes 22.892 seconds)
 
 
 .. _sphx_glr_download_auto_examples_normal_mode_analysis_plot_normal_mode_analysis.py:

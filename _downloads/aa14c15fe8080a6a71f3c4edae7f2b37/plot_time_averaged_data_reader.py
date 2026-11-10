@@ -18,6 +18,8 @@ and :func:`~pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_fil
 import os
 from pathlib import Path
 
+import matplotlib.pyplot as plt
+
 from pylimer_tools.io.read_lammps_output_file import read_averages_file
 
 
@@ -45,7 +47,10 @@ averages.plot(
     xlabel="Time Step",
     ylabel="Something",
     title="Averaged Data Plot",
+    grid=True,
 )
+plt.tight_layout()
+plt.show()
 
 vec_averages_file = str(_fixtures_dir / "example_vec_avg_file.out.vec-avg.txt")
 
