@@ -1,6 +1,6 @@
 # MCUniverseGenerator
 
-### *class* pylimer_tools_cpp.MCUniverseGenerator(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), lx: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 10.0, ly: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 10.0, lz: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 10.0)
+### *class* pylimer_tools_cpp.MCUniverseGenerator(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), lx: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 10.0, ly: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 10.0, lz: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 10.0)
 
 Bases: `pybind11_object`
 
@@ -68,7 +68,9 @@ Initialize a new MCUniverseGenerator with specified box dimensions.
 | [`link_strands_to_strands_to_conversion`](#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_strands_to_conversion)(self, ...)    | Link free strand ends to each other until target conversion is reached.                                                                                                |
 | [`relax_crosslinks`](#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks)(self)                              | Run force relaxation with the crosslinkers and their strands, to have the crosslinks in their statistically most probable position.                                    |
 | [`remove_soluble_fraction`](#pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction)(self[, rescale_box])        | Remove soluble fraction (as determined by phantom force relaxation) of the strands and crosslinks.                                                                     |
-| [`sample_entanglements`](#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements)(self, ...[, ...])              | Sample entanglements analytically and topologically directly from the generator's CrosslinkerUniverse without generating all strand beads or constructing a Universe.  |
+| [`sample_entanglements`](#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements)(self, ...[, ...])              | Sample entanglements directly from the generator's CrosslinkerUniverse without generating all strand beads or constructing a Universe.                                 |
+| [`sample_entanglements_analytical`](#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements_analytical)(self, ...[, ...])   | Sample entanglements analytically and probabilistically from the generator's CrosslinkerUniverse using Brownian bridge conditional Gaussian distributions.             |
+| [`sample_entanglements_on_demand`](#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements_on_demand)(self, ...[, ...])    | Sample entanglements from the generator's CrosslinkerUniverse using per-strand bounding boxes and on-demand Brownian bridge bead resampling.                           |
 | [`set_bead_distance`](#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance)(self, distance[, ...])            | Set the mean distance between beads when doing MC stepping.                                                                                                            |
 | [`set_mean_squared_bead_distance`](#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance)(self, ...[, ...])    | Set the mean squared distance between beads.                                                                                                                           |
 | [`set_seed`](#pylimer_tools_cpp.MCUniverseGenerator.set_seed)(self, seed)                                | Set the seed for the random generator.                                                                                                                                 |
@@ -78,7 +80,7 @@ Initialize a new MCUniverseGenerator with specified box dimensions.
 
 ### Methods Documentation
 
-#### add_crosslinkers(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_crosslinkers: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), crosslinker_functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 4, crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_crosslinkers(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_crosslinkers: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), crosslinker_functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 4, crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add crosslinkers at random positions.
 
@@ -88,7 +90,7 @@ Add crosslinkers at random positions.
   * **crosslinker_type** – Atom type of the crosslinkers (default: 2).
   * **white_noise** – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).
 
-#### add_crosslinkers_at(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), coordinates: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], crosslinker_functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 4, crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_crosslinkers_at(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), coordinates: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], crosslinker_functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 4, crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add crosslinkers at specific coordinates.
 
@@ -97,7 +99,7 @@ Add crosslinkers at specific coordinates.
   * **crosslinker_functionality** – Functionality of the crosslinkers (default: 4).
   * **crosslinker_type** – Atom type of the crosslinkers (default: 2).
 
-#### add_end_functionalized_strands(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_strands: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), strand_length: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], crosslinker_functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 4, crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_end_functionalized_strands(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_strands: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), strand_length: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], crosslinker_functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 4, crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add strands with crosslinkers at the ends.
 
@@ -109,7 +111,7 @@ Add strands with crosslinkers at the ends.
   * **strand_atom_type** – Atom type of the beads that are not at the ends (default: 1).
   * **white_noise** – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).
 
-#### add_functionalized_strands(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_strands: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), strand_length: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], crosslink_selector: [collections.abc.Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[bool](https://docs.python.org/3/builtins/functions.html#bool), [int](https://docs.python.org/3/builtins/functions.html#int)]], default_crosslinker_functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_functionalized_strands(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_strands: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), strand_length: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], crosslink_selector: [collections.abc.Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)], [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[bool](https://docs.python.org/3/builtins/functions.html#bool), [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]], default_crosslinker_functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add strands with custom crosslink placement using a selector function.
 
@@ -150,7 +152,7 @@ generator.add_functionalized_strands(
   * **strand_atom_type** – Atom type of the beads that stay (default: 1).
   * **white_noise** – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).
 
-#### add_monofunctional_strands(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_monofunctional_strands: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), monofunctional_strand_length: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], monofunctional_strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 4) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_monofunctional_strands(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_monofunctional_strands: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), monofunctional_strand_length: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], monofunctional_strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 4) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add multiple monofunctional strands with specified bead types.
 
@@ -159,7 +161,7 @@ Add multiple monofunctional strands with specified bead types.
   * **monofunctional_strand_length** – Vector specifying the length of each strand in beads.
   * **monofunctional_strand_atom_type** – Atom type for the strand beads (default: 4).
 
-#### add_randomly_functionalized_strands(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_strands: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), strand_length: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], functionalization_probability: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), crosslinker_functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 4, crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_randomly_functionalized_strands(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_strands: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), strand_length: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], functionalization_probability: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), crosslinker_functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 4, crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add strands with randomly distributed crosslinkers in between.
 
@@ -172,7 +174,7 @@ Add strands with randomly distributed crosslinkers in between.
   * **strand_atom_type** – Atom type of the beads that stay (default: 1).
   * **white_noise** – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).
 
-#### add_regularly_spaced_functionalized_strands(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_strands: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), strand_length: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], spacing_between_crosslinks: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), offset_to_first_crosslink: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 0, crosslinker_functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 4, crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_regularly_spaced_functionalized_strands(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_strands: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), strand_length: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], spacing_between_crosslinks: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), offset_to_first_crosslink: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0, crosslinker_functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 4, crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add strands with regularly spaced crosslinkers in between.
 
@@ -186,7 +188,7 @@ Add strands with regularly spaced crosslinkers in between.
   * **strand_atom_type** – Atom type of the beads that stay (default: 1).
   * **white_noise** – Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).
 
-#### add_solvent_chains(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_solvent_chains: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), solvent_chain_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), solvent_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 3, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_solvent_chains(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_solvent_chains: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), solvent_chain_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), solvent_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 3, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Randomly distribute additional, free chains.
 
@@ -196,7 +198,7 @@ Randomly distribute additional, free chains.
   * **solvent_atom_type** – Atom type for solvent chain beads (default: 3).
   * **white_noise** – Whether to use white noise (true) or blue noise (false) for positioning (default: true).
 
-#### add_star_crosslinkers(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_stars: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), beads_per_strand: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), crosslinker_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_star_crosslinkers(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_stars: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), beads_per_strand: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), crosslinker_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1, white_noise: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add star-like crosslinkers with pre-connected strands (useful e.g. for tetra-PEG networks).
 Each star crosslinker will have the specified functionality with strands already attached.
@@ -214,7 +216,7 @@ the stars can alternatively be created using [`add_crosslinkers()`](#pylimer_too
   * **strand_atom_type** – Atom type for the strand beads
   * **white_noise** – Whether to use white noise positioning
 
-#### add_strands(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_strands: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), strand_lengths: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_strands(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_strands: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), strand_lengths: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], strand_atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add strands.
 Adds them unconnected at first.
@@ -225,14 +227,14 @@ To link them to crosslinkers, use some of the `link_strand_` methods.
   * **strand_lengths** – A list of integers representing the number of beads of each of the strands.
   * **strand_atom_type** – Type of atoms for the strands (default: 1).
 
-#### config_nr_of_mc_steps(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), n_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2000) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_nr_of_mc_steps(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), n_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2000) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set the number of Monte-Carlo steps during bond length equilibration.
 
 * **Parameters:**
   **n_steps** – Number of MC steps to perform (default: 2000)
 
-#### config_primary_loop_probability(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), probability: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_primary_loop_probability(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), probability: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure an additional weight reduction for the primary loop formation.
 
@@ -241,7 +243,7 @@ This results in more primary loops for shorter chains than for longer ones.
 
 Set to 0. to disable the formation of primary loops.
 
-#### config_secondary_loop_probability(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), probability: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_secondary_loop_probability(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), probability: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure an additional weight reduction for the secondary loop formation.
 
@@ -315,8 +317,8 @@ Overloaded function.
    >   Sampled StrandPairEntanglements.
    > * **return:**
    >   Configured MEHPForceBalance instance.
-3. get_force_balance(self: pylimer_tools_cpp.MCUniverseGenerator, nr_of_entanglements_to_sample: typing.SupportsInt, upper_cutoff: typing.SupportsFloat, lower_cutoff: typing.SupportsFloat = 0.0, minimum_nr_of_entanglements: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 3.0, seed: str = ‘’, filter_dangling_and_soluble: bool = True) -> pylimer_tools_cpp.MEHPForceBalance
-   > Sample entanglements analytically and return a configured MEHPForceBalance instance,
+3. get_force_balance(self: pylimer_tools_cpp.MCUniverseGenerator, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = ‘’, filtering_mode: pylimer_tools_cpp.EntanglementFilteringMode = EntanglementFilteringMode.OMIT_INACTIVE, method: pylimer_tools_cpp.EntanglementSamplingMethod = EntanglementSamplingMethod.ANALYTICAL) -> pylimer_tools_cpp.MEHPForceBalance
+   > Sample entanglements and return a configured MEHPForceBalance instance,
    > bypassing the creation of a Universe.
    > * **param nr_of_entanglements_to_sample:**
    >   Target number of entanglements to sample.
@@ -330,8 +332,10 @@ Overloaded function.
    >   Minimum contour separation on the same strand (default: 3.0).
    > * **param seed:**
    >   Optional random seed (uses generator RNG if empty).
-   > * **param filter_dangling_and_soluble:**
-   >   Filter out dangling and soluble strands (default: True).
+   > * **param filtering_mode:**
+   >   Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
+   > * **param method:**
+   >   Entanglement sampling method (default: EntanglementSamplingMethod.ANALYTICAL).
    > * **return:**
    >   Configured MEHPForceBalance instance.
 
@@ -344,7 +348,7 @@ Overloaded function.
    > This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
    > * **return:**
    >   Configured MEHPForceBalance2 instance.
-2. get_force_balance2(self: pylimer_tools_cpp.MCUniverseGenerator, entanglements: pylimer_tools_cpp.StrandPairEntanglements, crosslinker_type: typing.SupportsInt = 2, entanglements_as_springs: bool = False) -> pylimer_tools_cpp.MEHPForceBalance2
+2. get_force_balance2(self: pylimer_tools_cpp.MCUniverseGenerator, entanglements: pylimer_tools_cpp.StrandPairEntanglements, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, entanglements_as_springs: bool = False) -> pylimer_tools_cpp.MEHPForceBalance2
    > Get an instance of the MEHPForceBalance2 procedure with pre-sampled entanglements,
    > bypassing the creation of a Universe.
    > * **param entanglements:**
@@ -355,8 +359,8 @@ Overloaded function.
    >   Whether to represent entanglements as springs between two split nodes (default: False).
    > * **return:**
    >   Configured MEHPForceBalance2 instance.
-3. get_force_balance2(self: pylimer_tools_cpp.MCUniverseGenerator, nr_of_entanglements_to_sample: typing.SupportsInt, upper_cutoff: typing.SupportsFloat, lower_cutoff: typing.SupportsFloat = 0.0, minimum_nr_of_entanglements: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 3.0, seed: str = ‘’, filter_dangling_and_soluble: bool = True, entanglements_as_springs: bool = False, crosslinker_type: typing.SupportsInt = 2) -> pylimer_tools_cpp.MEHPForceBalance2
-   > Sample entanglements analytically and return a configured MEHPForceBalance2 instance,
+3. get_force_balance2(self: pylimer_tools_cpp.MCUniverseGenerator, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = ‘’, filtering_mode: pylimer_tools_cpp.EntanglementFilteringMode = EntanglementFilteringMode.OMIT_INACTIVE, entanglements_as_springs: bool = False, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, method: pylimer_tools_cpp.EntanglementSamplingMethod = EntanglementSamplingMethod.ANALYTICAL) -> pylimer_tools_cpp.MEHPForceBalance2
+   > Sample entanglements and return a configured MEHPForceBalance2 instance,
    > bypassing the creation of a Universe.
    > * **param nr_of_entanglements_to_sample:**
    >   Target number of entanglements to sample.
@@ -370,12 +374,14 @@ Overloaded function.
    >   Minimum contour separation on the same strand (default: 3.0).
    > * **param seed:**
    >   Optional random seed (uses generator RNG if empty).
-   > * **param filter_dangling_and_soluble:**
-   >   Filter out dangling and soluble strands (default: True).
+   > * **param filtering_mode:**
+   >   Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
    > * **param entanglements_as_springs:**
    >   Whether to represent entanglements as springs between two split nodes (default: False).
    > * **param crosslinker_type:**
    >   Crosslinker atom type (default: 2).
+   > * **param method:**
+   >   Entanglement sampling method (default: EntanglementSamplingMethod.ANALYTICAL).
    > * **return:**
    >   Configured MEHPForceBalance2 instance.
 
@@ -424,7 +430,7 @@ Use this method to actually (MC) place beads between the crosslinks and retrieve
 * **Returns:**
   The generated Universe object containing all atoms, bonds, and their coordinates.
 
-#### link_strand(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), strand_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), c_infinity: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### link_strand(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), strand_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), c_infinity: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Link one particular strand to a crosslinker.
 This strand will have one bond made, to an appropriate crosslinker,
@@ -434,7 +440,7 @@ as chosen by the parameters associated with the strand.
   * **strand_idx** – Index of the strand to be linked.
   * **c_infinity** – As needed for the end-to-end distribution, given by $\langle R^2\rangle_0 = C_{\infty} N b^2$ (default: 1.0).
 
-#### link_strand_to(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), strand_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### link_strand_to(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), strand_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Link a strand to a specific crosslinker.
 This assumes that you keep track of the order in which you added the crosslinkers and strands,
@@ -447,7 +453,7 @@ Be aware that some few methods may change the cross-link or strand indices.
   * **strand_idx** – Index of the strand to be linked.
   * **link_idx** – Index of the crosslinker to be linked.
 
-#### link_strand_to_strand(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), c_infinity: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
+#### link_strand_to_strand(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), c_infinity: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
 
 Link two free strand ends together directly.
 This method finds free strand ends and combines them into a single strand based on
@@ -463,7 +469,7 @@ end-to-end distance probability distributions.
 * **Returns:**
   True if a successful link was made, False if no suitable pair was found
 
-#### link_strands_callback(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), linking_controller: [collections.abc.Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], [pylimer_tools_cpp.BackTrackStatus](pylimer_tools_cpp.BackTrackStatus.html.md#pylimer_tools_cpp.BackTrackStatus)], c_infinity: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### link_strands_callback(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), linking_controller: [collections.abc.Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), [int](https://docs.python.org/3/builtins/functions.html#int)], [pylimer_tools_cpp.BackTrackStatus](pylimer_tools_cpp.BackTrackStatus.html.md#pylimer_tools_cpp.BackTrackStatus)], c_infinity: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Link strands to crosslinkers using a custom callback function to control when to stop.
 
@@ -478,7 +484,7 @@ and should return a BackTrackStatus value:
     Function signature: (MCUniverseGenerator, int) -> BackTrackStatus
   * **c_infinity** – As needed for the end-to-end distribution, given by $\langle R^2\rangle_0 = C_{\infty} N b^2$.
 
-#### link_strands_to_conversion(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), crosslinker_conversion: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), c_infinity: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### link_strands_to_conversion(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), crosslinker_conversion: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), c_infinity: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Actually link the previously added strands to the previously added crosslinkers,
 until a certain crosslink conversion is reached.
@@ -487,7 +493,7 @@ until a certain crosslink conversion is reached.
   * **crosslinker_conversion** – Target conversion of crosslinkers (0: no connections to crosslinks; 1: all crosslinkers fully connected).
   * **c_infinity** – As needed for the end-to-end distribution, given by $\langle R^2\rangle_0 = C_{\infty} N b^2$.
 
-#### link_strands_to_soluble_fraction(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), soluble_fraction: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), c_infinity: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### link_strands_to_soluble_fraction(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), soluble_fraction: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), c_infinity: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Actually link the previously added strands to the previously added crosslinkers,
 until a certain soluble fraction is reached.
@@ -496,7 +502,7 @@ until a certain soluble fraction is reached.
   * **soluble_fraction** – Target soluble fraction (0: all material is soluble; 1: no material is soluble).
   * **c_infinity** – As needed for the end-to-end distribution, given by $\langle R^2\rangle_0 = C_{\infty} N b^2$ (default: 1.0).
 
-#### link_strands_to_strands_to_conversion(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), target_strand_conversion: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), c_infinity: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### link_strands_to_strands_to_conversion(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), target_strand_conversion: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), c_infinity: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Link free strand ends to each other until target conversion is reached.
 This method repeatedly calls [`link_strand_to_strand()`](#pylimer_tools_cpp.MCUniverseGenerator.link_strand_to_strand)
@@ -527,9 +533,9 @@ Remove soluble fraction (as determined by phantom force relaxation) of the stran
 * **Parameters:**
   **rescale_box** – Whether to rescale the box dimensions to maintain constant density (default: true).
 
-#### sample_entanglements(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_entanglements_to_sample: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), upper_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), lower_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.0, minimum_nr_of_entanglements: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 0, same_strand_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 3.0, seed: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '', filter_dangling_and_soluble: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [pylimer_tools_cpp.StrandPairEntanglements](pylimer_tools_cpp.StrandPairEntanglements.html.md#pylimer_tools_cpp.StrandPairEntanglements)
+#### sample_entanglements(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_entanglements_to_sample: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), upper_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), lower_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.0, minimum_nr_of_entanglements: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0, same_strand_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 3.0, seed: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '', filtering_mode: [pylimer_tools_cpp.EntanglementFilteringMode](pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode) = EntanglementFilteringMode.OMIT_INACTIVE, method: [pylimer_tools_cpp.EntanglementSamplingMethod](pylimer_tools_cpp.EntanglementSamplingMethod.html.md#pylimer_tools_cpp.EntanglementSamplingMethod) = EntanglementSamplingMethod.ANALYTICAL) → [pylimer_tools_cpp.StrandPairEntanglements](pylimer_tools_cpp.StrandPairEntanglements.html.md#pylimer_tools_cpp.StrandPairEntanglements)
 
-Sample entanglements analytically and topologically directly from the generator’s CrosslinkerUniverse
+Sample entanglements directly from the generator’s CrosslinkerUniverse
 without generating all strand beads or constructing a Universe.
 
 * **Parameters:**
@@ -539,11 +545,45 @@ without generating all strand beads or constructing a Universe.
   * **minimum_nr_of_entanglements** – Minimum number of entanglements required (default: 0).
   * **same_strand_cutoff** – Minimum contour separation on the same strand (default: 3.0).
   * **seed** – Optional random seed (uses generator RNG if empty).
-  * **filter_dangling_and_soluble** – Filter out dangling and soluble strands (default: True).
+  * **filtering_mode** – Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
+  * **method** – Sampling method (default: EntanglementSamplingMethod.ANALYTICAL).
 * **Returns:**
   Sampled StrandPairEntanglements.
 
-#### set_bead_distance(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), distance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), update_mean_squared: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### sample_entanglements_analytical(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_entanglements_to_sample: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), upper_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), lower_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.0, minimum_nr_of_entanglements: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0, same_strand_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 3.0, seed: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '', filtering_mode: [pylimer_tools_cpp.EntanglementFilteringMode](pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode) = EntanglementFilteringMode.OMIT_INACTIVE) → [pylimer_tools_cpp.StrandPairEntanglements](pylimer_tools_cpp.StrandPairEntanglements.html.md#pylimer_tools_cpp.StrandPairEntanglements)
+
+Sample entanglements analytically and probabilistically from the generator’s CrosslinkerUniverse
+using Brownian bridge conditional Gaussian distributions.
+
+* **Parameters:**
+  * **nr_of_entanglements_to_sample** – Target number of entanglements to sample.
+  * **upper_cutoff** – Upper cutoff distance between entangled beads.
+  * **lower_cutoff** – Lower cutoff distance between entangled beads (default: 0.0).
+  * **minimum_nr_of_entanglements** – Minimum number of entanglements required (default: 0).
+  * **same_strand_cutoff** – Minimum contour separation on the same strand (default: 3.0).
+  * **seed** – Optional random seed (uses generator RNG if empty).
+  * **filtering_mode** – Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
+* **Returns:**
+  Sampled StrandPairEntanglements.
+
+#### sample_entanglements_on_demand(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), nr_of_entanglements_to_sample: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), upper_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), lower_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.0, minimum_nr_of_entanglements: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0, same_strand_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 3.0, seed: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '', filtering_mode: [pylimer_tools_cpp.EntanglementFilteringMode](pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode) = EntanglementFilteringMode.OMIT_INACTIVE) → [pylimer_tools_cpp.StrandPairEntanglements](pylimer_tools_cpp.StrandPairEntanglements.html.md#pylimer_tools_cpp.StrandPairEntanglements)
+
+Sample entanglements from the generator’s CrosslinkerUniverse using per-strand bounding
+boxes and on-demand Brownian bridge bead resampling. Memory is O(N_strands) like analytical
+sampling, while results physically match discrete multi-bead chain conformations.
+
+* **Parameters:**
+  * **nr_of_entanglements_to_sample** – Target number of entanglements to sample.
+  * **upper_cutoff** – Upper cutoff distance between entangled beads.
+  * **lower_cutoff** – Lower cutoff distance between entangled beads (default: 0.0).
+  * **minimum_nr_of_entanglements** – Minimum number of entanglements required (default: 0).
+  * **same_strand_cutoff** – Minimum contour separation on the same strand (default: 3.0).
+  * **seed** – Optional random seed (uses generator RNG if empty).
+  * **filtering_mode** – Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
+* **Returns:**
+  Sampled StrandPairEntanglements.
+
+#### set_bead_distance(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), distance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), update_mean_squared: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set the mean distance between beads when doing MC stepping.
 Also used for the target crosslinker partner sampling.
@@ -554,7 +594,7 @@ NOTE: Mainly the mean squared bead distance is effectively used in the Monte-Car
   * **distance** – Mean distance between beads.
   * **update_mean_squared** – Whether to update the mean squared distance as well, deduced from the assumed gaussian distribution in 3D (default: true).
 
-#### set_mean_squared_bead_distance(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), mean_squared_distance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), update_mean: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### set_mean_squared_bead_distance(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), mean_squared_distance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), update_mean: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set the mean squared distance between beads.
 
@@ -562,14 +602,14 @@ Set the mean squared distance between beads.
   * **mean_squared_distance** – Mean squared distance between beads
   * **update_mean** – Whether to update the mean bead distance as well, deduced from the assumed gaussian distribution in 3D (default: true)
 
-#### set_seed(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), seed: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### set_seed(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), seed: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set the seed for the random generator.
 
 * **Parameters:**
   **seed** – Random seed value for reproducible results.
 
-#### use_linear_max_distance(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), multiplier: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### use_linear_max_distance(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), multiplier: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Converts the $N$ to a maximum distance within which to sample.
 The distance will be calculated as $N \times \text{multiplier}$.
@@ -578,7 +618,7 @@ in which case the multiplier is $<b>$.
 
 Useful only for performance improvements in large systems.
 
-#### use_zscore_max_distance(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), std_multiplier: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), in_sqrt_multiplier: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### use_zscore_max_distance(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), std_multiplier: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), in_sqrt_multiplier: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Converts the $N$ to a maximum distance within which to sample.
 The distance will be calculated as $\text{std_multiplier} \times \sqrt{N \times \text{in_sqrt_multiplier}}$.

@@ -1,6 +1,6 @@
 # Molecule
 
-### *class* pylimer_tools_cpp.Molecule(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), arg0: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box), arg1: igraph_t, arg2: [pylimer_tools_cpp.MoleculeType](pylimer_tools_cpp.MoleculeType.md#pylimer_tools_cpp.MoleculeType), arg3: [collections.abc.Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)])
+### *class* pylimer_tools_cpp.Molecule(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), arg0: [pylimer_tools_cpp.Box](pylimer_tools_cpp.Box.md#pylimer_tools_cpp.Box), arg1: igraph_t, arg2: [pylimer_tools_cpp.MoleculeType](pylimer_tools_cpp.MoleculeType.md#pylimer_tools_cpp.MoleculeType), arg3: [collections.abc.Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)])
 
 Bases: `pybind11_object`
 
@@ -152,7 +152,7 @@ Compute the total mass of this molecule.
 * **Returns:**
   The total mass of all atoms in this molecule
 
-#### compute_total_vector(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, close_loop: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### compute_total_vector(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, close_loop: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Compute the sum of all bond vectors.
 
@@ -162,7 +162,7 @@ Compute the sum of all bond vectors.
 * **Returns:**
   The vector sum of all bonds
 
-#### compute_vector_from_to(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), atom_id_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), atom_id_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, require_order: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### compute_vector_from_to(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), atom_id_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), atom_id_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, require_order: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Compute the sum of all bond vectors between two specified atoms.
 
@@ -174,7 +174,7 @@ Compute the sum of all bond vectors between two specified atoms.
 * **Returns:**
   The vector sum from start to end atom
 
-#### get_atom_by_id(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)
+#### get_atom_by_id(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)
 
 Get an atom by its id.
 
@@ -183,7 +183,7 @@ Get an atom by its id.
 * **Returns:**
   The atom with the specified ID
 
-#### get_atom_by_vertex_idx(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), vertex_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)
+#### get_atom_by_vertex_idx(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), vertex_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)
 
 Get an atom for a specific vertex.
 
@@ -192,7 +192,7 @@ Get an atom for a specific vertex.
 * **Returns:**
   The atom at the specified vertex
 
-#### get_atom_id_by_vertex_idx(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), vertex_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_atom_id_by_vertex_idx(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), vertex_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the ID of the atom by the vertex ID of the underlying graph.
 
@@ -215,7 +215,7 @@ Return all atom objects enclosed in this molecule, ordered by vertex id.
 * **Returns:**
   List of atoms in vertex order
 
-#### get_atoms_by_degree(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), degree: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)]
+#### get_atoms_by_degree(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), degree: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)]
 
 Get the atoms that have the specified number of bonds.
 
@@ -224,7 +224,7 @@ Get the atoms that have the specified number of bonds.
 * **Returns:**
   List of atoms with the specified degree
 
-#### get_atoms_by_type(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)]
+#### get_atoms_by_type(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)]
 
 Get the atoms with the specified type.
 
@@ -244,7 +244,7 @@ Internally uses [`get_atoms_connected_to()`](#pylimer_tools_cpp.Molecule.get_ato
 * **Returns:**
   List of connected atoms
 
-#### get_atoms_connected_to_vertex(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), vertex_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)]
+#### get_atoms_connected_to_vertex(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), vertex_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)]
 
 Get the atoms connected to a specified vertex id.
 
@@ -253,7 +253,7 @@ Get the atoms connected to a specified vertex id.
 * **Returns:**
   List of connected atoms
 
-#### get_atoms_lined_up(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, assumed_coordinates: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, close_loop: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)]
+#### get_atoms_lined_up(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, assumed_coordinates: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, close_loop: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)]
 
 Return all atom objects enclosed in this molecule based on the connectivity.
 
@@ -278,7 +278,7 @@ Get all bonds. Returns a dict with three properties: ‘bond_from’, ‘bond_to
 * **Returns:**
   Dictionary with bond information
 
-#### get_edge_ids_from(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), vertex_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
+#### get_edge_ids_from(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), vertex_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Get the edge IDs incident to a specific vertex.
 
@@ -287,7 +287,7 @@ Get the edge IDs incident to a specific vertex.
 * **Returns:**
   A vector of edge IDs connected to the vertex
 
-#### get_edge_ids_from_to(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), vertex_id_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), vertex_id_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
+#### get_edge_ids_from_to(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), vertex_id_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), vertex_id_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Get the edge IDs of the edges between two specific vertices.
 
@@ -331,7 +331,7 @@ Count and return the number of bonds associated with this molecule.
 * **Returns:**
   The number of bonds in this molecule
 
-#### get_nr_of_edges_from_to(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), vertex_id_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), vertex_id_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), max_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_edges_from_to(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), vertex_id_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), vertex_id_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), max_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the number of edges in the shortest path between two specific vertices.
 
@@ -344,7 +344,7 @@ If max_length is provided and positive, it will only consider paths up to that l
 * **Returns:**
   Number of edges in the shortest path, or -1 if no path exists
 
-#### get_strand_ends(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, close_loop: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)]
+#### get_strand_ends(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, close_loop: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.md#pylimer_tools_cpp.Atom)]
 
 Get the ends of the given strand (= molecule).
 In case of a primary loop, the crosslink is returned, if there is one.
@@ -367,7 +367,7 @@ Get the type of this molecule (see [`MoleculeType`](pylimer_tools_cpp.MoleculeTy
 This type might be unset; currently, only
 [`get_chains_with_crosslinker()`](pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe.get_chains_with_crosslinker) assigns them automatically.
 
-#### get_vertex_idx_by_atom_id(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_vertex_idx_by_atom_id(self: [pylimer_tools_cpp.Molecule](#pylimer_tools_cpp.Molecule), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the vertex ID of the underlying graph for an atom with a specified ID.
 

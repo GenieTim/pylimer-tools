@@ -44,7 +44,7 @@ ensemble results are cached into a committed `.npz` archive and loaded transpare
 The full multi-seed simulation can be recomputed at any time by passing `--recompute`
 or setting `PYLIMER_RECOMPUTE_CACHE=1`.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 38-275 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 38-268 -->
 ```Python
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import math
@@ -64,15 +64,20 @@ if "__file__" in globals():
 
 from _example_cache import (  # noqa: E402
     compute_ensemble_statistics,
+    configure_process_threading,
     get_example_cache_path,
     load_or_compute_cache,
     resolve_max_workers,
+    worker_process_initializer,
 )
 from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
     ParameterType,
     get_parameters_for_polymer,
 )
-from pylimer_tools_cpp import MCUniverseGenerator, MEHPForceBalance2  # noqa: E402
+from pylimer_tools_cpp import (  # noqa: E402
+    EntanglementSamplingMethod,
+    MCUniverseGenerator,
+)
 
 
 def _simulate_polydispersity_single_repeat(
@@ -123,38 +128,23 @@ def _simulate_polydispersity_single_repeat(
         gen.add_crosslinkers(int(0.5 * n_strands), 4)
         gen.link_strands_to_conversion(crosslinker_conversion=conversion)
 
-        universe = gen.get_universe()
-
         # 1. Total Entangled Shear Modulus (with static entanglement links)
-        fb_ent = MEHPForceBalance2(
-            universe,
-            nr_of_entanglements_to_sample=int(
-                ent_density * universe.get_volume()),
-            upper_sampling_cutoff=cutoff,
+        fb_ent = gen.get_force_balance2(
+            nr_of_entanglements_to_sample=int(ent_density * vol),
+            upper_cutoff=cutoff,
             entanglements_as_springs=False,
             seed=str(seed + 31 * i),
+            method=EntanglementSamplingMethod.ON_DEMAND,
         )
         fb_ent.run_force_relaxation()
-        g_total[i] = (
-            gamma_conv * np.sum(fb_ent.get_gamma_factors(r02)
-                                ) / universe.get_volume()
-        )
+        g_total[i] = gamma_conv * np.sum(fb_ent.get_gamma_factors(r02)) / vol
         w_active[i] = fb_ent.get_active_weight_fraction()
         w_dangling[i] = fb_ent.get_dangling_weight_fraction()
 
         # 2. Phantom Shear Modulus (unentangled network baseline)
-        fb_ph = MEHPForceBalance2(
-            universe,
-            nr_of_entanglements_to_sample=0,
-            upper_sampling_cutoff=cutoff,
-            entanglements_as_springs=False,
-            seed=str(seed + 31 * i),
-        )
+        fb_ph = gen.get_force_balance2()
         fb_ph.run_force_relaxation()
-        g_phantom[i] = (
-            gamma_conv * np.sum(fb_ph.get_gamma_factors(r02)
-                                ) / universe.get_volume()
-        )
+        g_phantom[i] = gamma_conv * np.sum(fb_ph.get_gamma_factors(r02)) / vol
 
     return r, g_total, g_phantom, w_active, w_dangling
 
@@ -204,13 +194,16 @@ def run_polydispersity_simulation(
     ]
 
     workers = min(resolve_max_workers(max_workers), n_repeats)
+    configure_process_threading(workers)
 
     if workers > 1 and n_repeats > 1:
         print(
             f"Executing {n_repeats} polydispersity repeats in parallel across {workers} workers..."
         )
         completed = 0
-        with ProcessPoolExecutor(max_workers=workers) as executor:
+        with ProcessPoolExecutor(
+            max_workers=workers, initializer=worker_process_initializer
+        ) as executor:
             futures = [
                 executor.submit(_simulate_polydispersity_single_repeat, *task)
                 for task in tasks
@@ -282,14 +275,14 @@ def run_polydispersity_simulation(
     }
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 276-280 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 269-273 -->
 
 ## Loading Cached Ensemble Data or Running Live Simulations
 
 Loads precomputed dataset from cache or executes live simulation if
 requested:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 280-420 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 273-413 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     cache_path = get_example_cache_path(
@@ -435,7 +428,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 Loading cached example data from polydispersity_study_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 421-432 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 414-425 -->
 
 ## Physical Discussion & Conclusions
 
@@ -449,7 +442,7 @@ Loading cached example data from polydispersity_study_cache.npz...
    tendency to form primary self-loops, the overall active strand weight fraction
    $w_{\mathrm{active}} \approx 84.5\%$ remains robust at high crosslinker conversions ($p = 92.5\%$).
 
-**Total running time of the script:** (0 minutes 0.327 seconds)
+**Total running time of the script:** (0 minutes 0.173 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-polydispersity-study-py"></a>
 

@@ -74,7 +74,7 @@ and 95% confidence intervals, cached for fast CI execution.
 
 ## Simulation Setup & Multi-Seed Ensemble Runner
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 69-468 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 69-471 -->
 ```Python
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
@@ -93,9 +93,11 @@ if "__file__" in globals():
 
 from _example_cache import (  # noqa: E402
     compute_ensemble_statistics,
+    configure_process_threading,
     get_example_cache_path,
     load_or_compute_cache,
     resolve_max_workers,
+    worker_process_initializer,
 )
 from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
     ParameterType,
@@ -133,7 +135,6 @@ def _simulate_sampling_cutoff_single_repeat(
     gen_std.add_strands(n_strands, [N_std] * n_strands)
     gen_std.add_crosslinkers(int(0.5 * n_strands), 4)
     gen_std.link_strands_to_conversion(0.95)
-    u_std = gen_std.get_universe()
 
     g_links = np.zeros(n_cutoffs)
     g_springs = np.zeros(n_cutoffs)
@@ -144,12 +145,12 @@ def _simulate_sampling_cutoff_single_repeat(
 
     for i, c in enumerate(cutoffs):
         # Rigid Entanglement Links
-        fb_l = pt.MEHPForceBalance2(
-            u_std,
-            n_ent_std,
-            upper_sampling_cutoff=c,
+        fb_l = gen_std.get_force_balance2(
+            nr_of_entanglements_to_sample=n_ent_std,
+            upper_cutoff=c,
             entanglements_as_springs=False,
             seed=f"link_{seed}_{c}",
+            method=pt.EntanglementSamplingMethod.ON_DEMAND,
         )
         assert fb_l.validate_network()
         res_links[i] = fb_l.get_displacement_residual_norm()
@@ -159,12 +160,12 @@ def _simulate_sampling_cutoff_single_repeat(
         iter_links[i] = fb_l.get_nr_of_iterations()
 
         # Compliant Entanglement Springs
-        fb_s = pt.MEHPForceBalance2(
-            u_std,
-            n_ent_std,
-            upper_sampling_cutoff=c,
+        fb_s = gen_std.get_force_balance2(
+            nr_of_entanglements_to_sample=n_ent_std,
+            upper_cutoff=c,
             entanglements_as_springs=True,
             seed=f"spring_{seed}_{c}",
+            method=pt.EntanglementSamplingMethod.ON_DEMAND,
         )
         assert fb_s.validate_network()
         res_springs[i] = fb_s.get_displacement_residual_norm()
@@ -187,16 +188,15 @@ def _simulate_sampling_cutoff_single_repeat(
     gen_n30.add_strands(n_strands, [30] * n_strands)
     gen_n30.add_crosslinkers(int(0.5 * n_strands), 4)
     gen_n30.link_strands_to_conversion(0.95)
-    u_n30 = gen_n30.get_universe()
 
     g_n30 = np.zeros(n_cutoffs)
     for i, c in enumerate(cutoffs):
-        fb = pt.MEHPForceBalance2(
-            u_n30,
-            n_ent_n30,
-            upper_sampling_cutoff=c,
+        fb = gen_n30.get_force_balance2(
+            nr_of_entanglements_to_sample=n_ent_n30,
+            upper_cutoff=c,
             entanglements_as_springs=False,
             seed=f"n30_{seed}_{c}",
+            method=pt.EntanglementSamplingMethod.ON_DEMAND,
         )
         fb.run_force_relaxation()
         g_n30[i] = gamma_conv * np.sum(fb.get_gamma_factors(r02_mag)) / vol_n30
@@ -212,16 +212,15 @@ def _simulate_sampling_cutoff_single_repeat(
     gen_n70.add_strands(n_strands, [70] * n_strands)
     gen_n70.add_crosslinkers(int(0.5 * n_strands), 4)
     gen_n70.link_strands_to_conversion(0.95)
-    u_n70 = gen_n70.get_universe()
 
     g_n70 = np.zeros(n_cutoffs)
     for i, c in enumerate(cutoffs):
-        fb = pt.MEHPForceBalance2(
-            u_n70,
-            n_ent_n70,
-            upper_sampling_cutoff=c,
+        fb = gen_n70.get_force_balance2(
+            nr_of_entanglements_to_sample=n_ent_n70,
+            upper_cutoff=c,
             entanglements_as_springs=False,
             seed=f"n70_{seed}_{c}",
+            method=pt.EntanglementSamplingMethod.ON_DEMAND,
         )
         fb.run_force_relaxation()
         g_n70[i] = gamma_conv * np.sum(fb.get_gamma_factors(r02_mag)) / vol_n70
@@ -237,16 +236,15 @@ def _simulate_sampling_cutoff_single_repeat(
     gen_p82.add_strands(n_strands, [N_std] * n_strands)
     gen_p82.add_crosslinkers(int(0.5 * n_strands), 4)
     gen_p82.link_strands_to_conversion(0.82)
-    u_p82 = gen_p82.get_universe()
 
     g_p82 = np.zeros(n_cutoffs)
     for i, c in enumerate(cutoffs):
-        fb = pt.MEHPForceBalance2(
-            u_p82,
-            n_ent_std,
-            upper_sampling_cutoff=c,
+        fb = gen_p82.get_force_balance2(
+            nr_of_entanglements_to_sample=n_ent_std,
+            upper_cutoff=c,
             entanglements_as_springs=False,
             seed=f"p82_{seed}_{c}",
+            method=pt.EntanglementSamplingMethod.ON_DEMAND,
         )
         fb.run_force_relaxation()
         g_p82[i] = gamma_conv * np.sum(fb.get_gamma_factors(r02_mag)) / vol_std
@@ -264,16 +262,15 @@ def _simulate_sampling_cutoff_single_repeat(
     gen_r75.add_strands(n_strands, [N_std] * n_strands)
     gen_r75.add_crosslinkers(n_xlinks_r75, 4)
     gen_r75.link_strands_to_conversion(0.90)
-    u_r75 = gen_r75.get_universe()
 
     g_r75 = np.zeros(n_cutoffs)
     for i, c in enumerate(cutoffs):
-        fb = pt.MEHPForceBalance2(
-            u_r75,
-            n_ent_r75,
-            upper_sampling_cutoff=c,
+        fb = gen_r75.get_force_balance2(
+            nr_of_entanglements_to_sample=n_ent_r75,
+            upper_cutoff=c,
             entanglements_as_springs=False,
             seed=f"r75_{seed}_{c}",
+            method=pt.EntanglementSamplingMethod.ON_DEMAND,
         )
         fb.run_force_relaxation()
         g_r75[i] = gamma_conv * np.sum(fb.get_gamma_factors(r02_mag)) / vol_r75
@@ -282,15 +279,18 @@ def _simulate_sampling_cutoff_single_repeat(
     # 4. Pair Separation Distances for c = 1.2, 2.0, 3.0
     # -------------------------------------------------------------
     sampled_dists = {}
-    box = u_std.get_box()
     for c_dist in [1.2, 2.0, 3.0]:
-        ent = pt.randomly_sample_entanglements(
-            u_std, n_ent_std, c_dist, seed=f"dist_{seed}_{c_dist}"
+        ent = gen_std.sample_entanglements(
+            nr_of_entanglements_to_sample=n_ent_std,
+            upper_cutoff=c_dist,
+            seed=f"dist_{seed}_{c_dist}",
+            method=pt.EntanglementSamplingMethod.ON_DEMAND,
         )
-        dists = [
-            u_std.get_atom(a1).distance_to(u_std.get_atom(a2), box)
-            for a1, a2 in ent.pairs_of_atoms
-        ]
+        pos1 = np.array(ent.position_1).reshape(-1, 3)
+        pos2 = np.array(ent.position_2).reshape(-1, 3)
+        diff = pos2 - pos1
+        diff = diff - np.round(diff / box_l_std) * box_l_std
+        dists = np.linalg.norm(diff, axis=1)
         sampled_dists[f"dists_{c_dist:.1f}"] = np.array(dists, dtype=float)
 
     return {
@@ -360,11 +360,14 @@ def run_sampling_cutoff_simulation(
     collected_dists = {"1.2": [], "2.0": [], "3.0": []}
 
     workers = min(resolve_max_workers(max_workers), n_repeats)
+    configure_process_threading(workers)
     print(
         f"Executing {n_repeats} repeats in parallel across {workers} workers...")
 
     if workers > 1 and n_repeats > 1:
-        with ProcessPoolExecutor(max_workers=workers) as executor:
+        with ProcessPoolExecutor(
+            max_workers=workers, initializer=worker_process_initializer
+        ) as executor:
             futures = [
                 executor.submit(_simulate_sampling_cutoff_single_repeat, *task)
                 for task in tasks
@@ -474,13 +477,13 @@ def run_sampling_cutoff_simulation(
     }
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 469-472 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 472-475 -->
 
 ## Loading Cached Data or Recomputing
 
 Resolves the committed cache file or recomputes when requested:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 472-527 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 475-530 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     cache_path = get_example_cache_path(
@@ -541,7 +544,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 Loading cached example data from sampling_cutoff_effect_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 528-552 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 531-555 -->
 
 ## Visualizing Cutoff Sensitivity & Parameter Interactions
 
@@ -568,7 +571,7 @@ The 6 panels below illustrate the physical effects of varying the slip-link samp
 6. **(f) Solver Convergence (CG Iterations)**:
    Relaxation steps to reach force balance equilibrium across cutoffs.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 552-828 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 555-831 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, axes = plt.subplots(2, 3, figsize=(16, 9.5))
@@ -846,7 +849,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 829-870 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 832-873 -->
 
 ## Physical Discussion & Practical Recommendations
 
@@ -877,7 +880,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 | **Calibrated Polymer Database**  | [`get_sampling_cutoff()`](../../pylimer_tools.io.html.md#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_sampling_cutoff) | Pre-calibrated empirical formula matched to experimental plateau modulus $G_e$. |
 | **High-Density Entangled Melts** | Use `entanglements_as_springs=True`                                                                                                                   | Series compliance buffers against large cutoff distortions.                     |
 
-**Total running time of the script:** (0 minutes 0.751 seconds)
+**Total running time of the script:** (0 minutes 0.412 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-sampling-cutoff-effect-py"></a>
 

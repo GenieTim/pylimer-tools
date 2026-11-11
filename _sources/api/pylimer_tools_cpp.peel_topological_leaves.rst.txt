@@ -1,0 +1,6 @@
+peel_topological_leaves
+=======================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autofunction:: peel_topological_leaves

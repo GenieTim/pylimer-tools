@@ -242,8 +242,8 @@
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_sampling_cutoff_effect.html">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. Analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_inactive_removal_and_sampling.html">Inactive Strand &amp; Entanglement Removal in Force Balance 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="auto_examples/network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -310,8 +310,11 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.do_random_walk_chain_from_to.html">do_random_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">do_random_walk_chain_from_to_mc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.peel_topological_leaves.html">peel_topological_leaves</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">randomly_sample_entanglements_on_demand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_v2.html">randomly_sample_entanglements_v2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -327,6 +330,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementSamplingMethod.html">EntanglementSamplingMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html">LazyUniverseSequenceIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.LinearMaxDistanceProvider.html">LinearMaxDistanceProvider</a></li>
@@ -340,7 +345,6 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Molecule.html">Molecule</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MoleculeIterator.html">MoleculeIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MoleculeType.html">MoleculeType</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NeighbourList.html">NeighbourList</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
@@ -601,12 +605,24 @@
 <li class="toctree-l5"><a class="reference internal" href="api/pylimer_tools_cpp.inverse_langevin.html#pylimer_tools_cpp.inverse_langevin"><code class="docutils literal notranslate"><span class="pre">inverse_langevin()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l4"><a class="reference internal" href="api/pylimer_tools_cpp.peel_topological_leaves.html">peel_topological_leaves</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/pylimer_tools_cpp.peel_topological_leaves.html#pylimer_tools_cpp.peel_topological_leaves"><code class="docutils literal notranslate"><span class="pre">peel_topological_leaves()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements.html#pylimer_tools_cpp.randomly_sample_entanglements"><code class="docutils literal notranslate"><span class="pre">randomly_sample_entanglements()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html#pylimer_tools_cpp.randomly_sample_entanglements_analytical"><code class="docutils literal notranslate"><span class="pre">randomly_sample_entanglements_analytical()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">randomly_sample_entanglements_on_demand</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html#pylimer_tools_cpp.randomly_sample_entanglements_on_demand"><code class="docutils literal notranslate"><span class="pre">randomly_sample_entanglements_on_demand()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_v2.html">randomly_sample_entanglements_v2</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_v2.html#pylimer_tools_cpp.randomly_sample_entanglements_v2"><code class="docutils literal notranslate"><span class="pre">randomly_sample_entanglements_v2()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="api/pylimer_tools_cpp.split_csv.html">split_csv</a><ul>
@@ -672,6 +688,14 @@
 <li class="toctree-l5"><a class="reference internal" href="api/pylimer_tools_cpp.DumpFileReader.html#pylimer_tools_cpp.DumpFileReader"><code class="docutils literal notranslate"><span class="pre">DumpFileReader</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l4"><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementFilteringMode.html#pylimer_tools_cpp.EntanglementFilteringMode"><code class="docutils literal notranslate"><span class="pre">EntanglementFilteringMode</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementSamplingMethod.html">EntanglementSamplingMethod</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementSamplingMethod.html#pylimer_tools_cpp.EntanglementSamplingMethod"><code class="docutils literal notranslate"><span class="pre">EntanglementSamplingMethod</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="api/pylimer_tools_cpp.ExitReason.html">ExitReason</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="api/pylimer_tools_cpp.ExitReason.html#pylimer_tools_cpp.ExitReason"><code class="docutils literal notranslate"><span class="pre">ExitReason</span></code></a></li>
 </ul>
@@ -722,10 +746,6 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="api/pylimer_tools_cpp.MoleculeType.html">MoleculeType</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="api/pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType"><code class="docutils literal notranslate"><span class="pre">MoleculeType</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="api/pylimer_tools_cpp.NeighbourList.html">NeighbourList</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="api/pylimer_tools_cpp.NeighbourList.html#pylimer_tools_cpp.NeighbourList"><code class="docutils literal notranslate"><span class="pre">NeighbourList</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="api/pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a><ul>

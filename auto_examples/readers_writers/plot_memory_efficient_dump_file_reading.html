@@ -242,8 +242,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_slipping_vs_fixed_links.html">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_sampling_cutoff_effect.html">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. Analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_inactive_removal_and_sampling.html">Inactive Strand &amp; Entanglement Removal in Force Balance 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -310,8 +310,11 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.do_random_walk_chain_from_to.html">do_random_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">do_random_walk_chain_from_to_mc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.peel_topological_leaves.html">peel_topological_leaves</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">randomly_sample_entanglements_on_demand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.randomly_sample_entanglements_v2.html">randomly_sample_entanglements_v2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -327,6 +330,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.EntanglementSamplingMethod.html">EntanglementSamplingMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html">LazyUniverseSequenceIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.LinearMaxDistanceProvider.html">LinearMaxDistanceProvider</a></li>
@@ -340,7 +345,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.Molecule.html">Molecule</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.MoleculeIterator.html">MoleculeIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.MoleculeType.html">MoleculeType</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.NeighbourList.html">NeighbourList</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
@@ -7909,8 +7913,8 @@ Processing frame 74310 with 32 atoms
 Processing frame 74320 with 32 atoms
 
 --- Memory Usage Report ---
-Memory before processing: 246.65 MB
-Memory after processing:  246.65 MB
+Memory before processing: 307.44 MB
+Memory after processing:  307.44 MB
 Memory used by script:    0.00 MB
 </pre></div>
 </div>
@@ -7933,7 +7937,7 @@ a flat memory profile:</p>
 <img src="../../_images/sphx_glr_plot_memory_efficient_dump_file_reading_001.png" srcset="../../_images/sphx_glr_plot_memory_efficient_dump_file_reading_001.png" alt="Memory Footprint with On-Demand Frame Loading" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Dump file size:           83.32 MB
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 21.983 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 11.002 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e8e7cde83a45dee65a92c740f5821d24/plot_memory_efficient_dump_file_reading.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_memory_efficient_dump_file_reading.ipynb</span></code></a></p>

@@ -13,13 +13,39 @@ RouseSolverType
       ~RouseSolverType.CONJUGATE_GRADIENT
       ~RouseSolverType.DIRECT_LDLT
       ~RouseSolverType.DIRECT_LLT
-      ~RouseSolverType.name
-      ~RouseSolverType.value
+      ~RouseSolverType.denominator
+      ~RouseSolverType.imag
+      ~RouseSolverType.numerator
+      ~RouseSolverType.real
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~RouseSolverType.as_integer_ratio
+      ~RouseSolverType.bit_count
+      ~RouseSolverType.bit_length
+      ~RouseSolverType.conjugate
+      ~RouseSolverType.from_bytes
+      ~RouseSolverType.is_integer
+      ~RouseSolverType.to_bytes
 
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: CONJUGATE_GRADIENT
    .. autoattribute:: DIRECT_LDLT
    .. autoattribute:: DIRECT_LLT
-   .. autoattribute:: name
-   .. autoattribute:: value
+   .. autoattribute:: denominator
+   .. autoattribute:: imag
+   .. autoattribute:: numerator
+   .. autoattribute:: real
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: as_integer_ratio
+   .. automethod:: bit_count
+   .. automethod:: bit_length
+   .. automethod:: conjugate
+   .. automethod:: from_bytes
+   .. automethod:: is_integer
+   .. automethod:: to_bytes

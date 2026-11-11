@@ -84,9 +84,11 @@ if "__file__" in globals():
 
 from _example_cache import (  # noqa: E402
     compute_ensemble_statistics,
+    configure_process_threading,
     get_example_cache_path,
     load_or_compute_cache,
     resolve_max_workers,
+    worker_process_initializer,
 )
 from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
     ParameterType,
@@ -231,13 +233,16 @@ def run_entanglement_link_vs_spring_simulation(
     ]
 
     workers = min(resolve_max_workers(max_workers), n_repeats)
+    configure_process_threading(workers)
 
     if workers > 1 and n_repeats > 1:
         print(
             f"Executing {n_repeats} repeats in parallel across {workers} worker processes..."
         )
         completed = 0
-        with ProcessPoolExecutor(max_workers=workers) as executor:
+        with ProcessPoolExecutor(
+            max_workers=workers, initializer=worker_process_initializer
+        ) as executor:
             futures = [
                 executor.submit(_simulate_link_vs_spring_single_repeat, *task)
                 for task in tasks

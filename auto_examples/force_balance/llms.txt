@@ -202,9 +202,9 @@
 - [NOTE](plot_slipping_vs_fixed_links.html.md): Go to the end
 - [NOTE](plot_polydispersity_study.html.md): Go to the end
 - [NOTE](plot_sampling_cutoff_effect.html.md): Go to the end
-- [NOTE](plot_entanglement_sampling_comparison.html.md): Go to the end
 - [NOTE](plot_inactive_removal_and_sampling.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;00:09.962&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [NOTE](plot_entanglement_sampling_comparison.html.md): Go to the end
+- [Computation times](sg_execution_times.html.md): &#42;&#42;00:05.443&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 
 ## Optional
 

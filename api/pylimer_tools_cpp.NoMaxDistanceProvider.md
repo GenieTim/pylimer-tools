@@ -13,7 +13,7 @@ For MC generation, to disable the neighbour list usage.
 
 ### Methods Documentation
 
-#### get_max_distance(self: [pylimer_tools_cpp.NoMaxDistanceProvider](#pylimer_tools_cpp.NoMaxDistanceProvider), N: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_max_distance(self: [pylimer_tools_cpp.NoMaxDistanceProvider](#pylimer_tools_cpp.NoMaxDistanceProvider), N: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Get the maximum distance for a given N (always returns -1 to disable).
 

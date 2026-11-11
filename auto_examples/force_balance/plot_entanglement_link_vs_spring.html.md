@@ -75,7 +75,7 @@ contour positions $\alpha_1$ and $\alpha_2$:
   The entanglement spring acts in series with the strand segments, adding compliance and
   reducing the effective stiffness of the entanglement constraint.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 70-98 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 70-100 -->
 ```Python
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
@@ -93,9 +93,11 @@ if "__file__" in globals():
 
 from _example_cache import (  # noqa: E402
     compute_ensemble_statistics,
+    configure_process_threading,
     get_example_cache_path,
     load_or_compute_cache,
     resolve_max_workers,
+    worker_process_initializer,
 )
 from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
     ParameterType,
@@ -104,7 +106,7 @@ from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
 from pylimer_tools_cpp import MCUniverseGenerator  # noqa: E402
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 99-109 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 101-111 -->
 
 ## Multi-Seed Simulation Procedure
 
@@ -117,7 +119,7 @@ sampling (multiple seeds and complex systems), the results are cached into a com
 at any time by passing `--recompute` or setting
 `PYLIMER_RECOMPUTE_CACHE=1`.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 109-297 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 111-302 -->
 ```Python
 def _simulate_link_vs_spring_single_repeat(
     r: int,
@@ -242,13 +244,16 @@ def run_entanglement_link_vs_spring_simulation(
     ]
 
     workers = min(resolve_max_workers(max_workers), n_repeats)
+    configure_process_threading(workers)
 
     if workers > 1 and n_repeats > 1:
         print(
             f"Executing {n_repeats} repeats in parallel across {workers} worker processes..."
         )
         completed = 0
-        with ProcessPoolExecutor(max_workers=workers) as executor:
+        with ProcessPoolExecutor(
+            max_workers=workers, initializer=worker_process_initializer
+        ) as executor:
             futures = [
                 executor.submit(_simulate_link_vs_spring_single_repeat, *task)
                 for task in tasks
@@ -305,13 +310,13 @@ def run_entanglement_link_vs_spring_simulation(
     }
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 298-301 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 303-306 -->
 
 ## Loading Cached Data or Recomputing
 
 Resolves the committed cache file or recomputes when requested:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 301-321 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 306-326 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     cache_path = get_example_cache_path(
@@ -337,7 +342,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 Loading cached example data from entanglement_link_vs_spring_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 322-335 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 327-340 -->
 
 ## Visualizing Mechanical & Structural Differences
 
@@ -353,7 +358,7 @@ The plots below compare:
    Entanglement springs introduce exactly twice as many extra node coordinates into the linear
    system of equations as entanglement links.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 335-432 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 340-437 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax_mod, ax_dof) = plt.subplots(1, 2, figsize=(11, 4.5))
@@ -452,7 +457,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 433-455 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 438-460 -->
 
 ## Practical Recommendations
 
@@ -463,7 +468,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 | **System Size (SLE)** | Smaller ($+ N_{\text{ent}}$ nodes, $0$ extra bonds).                                                                                                                    | Larger ($+ 2 N_{\text{ent}}$ nodes, $+ N_{\text{ent}}$ extra springs).                     |
 | **Recommended Use**   | Standard affine/phantom homogenization where entanglements act as effective crosslinks (Bernhard and Gusev [[BG25](../../acknowledgements.html.md#id12)]). | Studies exploring inter-chain interaction compliance or finite-range topological coupling. |
 
-**Total running time of the script:** (0 minutes 0.392 seconds)
+**Total running time of the script:** (0 minutes 0.191 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-link-vs-spring-py"></a>
 

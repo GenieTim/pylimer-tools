@@ -20,7 +20,7 @@ Entanglements can be sampled in two distinct ways:
 
 See:
 
-- [Comparing Entanglement Sampling Methods: Discrete vs. Analytical](plot_entanglement_sampling_comparison.html.md) for a detailed benchmark and comparison of discrete vs. analytical sampling methods,
+- [Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical](plot_entanglement_sampling_comparison.html.md) for a detailed benchmark and comparison of discrete vs. analytical sampling methods,
 - [Modeling Entanglements: Entanglement Links vs. Entanglement Springs](plot_entanglement_link_vs_spring.html.md) for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,
 - [Entanglement Mobility: Dynamic Slipping vs. Fixed Links](plot_slipping_vs_fixed_links.html.md) for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
 - [Inactive Strand & Entanglement Removal in Force Balance 2](plot_inactive_removal_and_sampling.html.md) for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling,
@@ -68,15 +68,15 @@ See:
 [Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2](plot_sampling_cutoff_effect.html.md)
 
   <div class="sphx-glr-thumbnail-title">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as localized topological constraints (entanglement links or springs).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_sampling_comparison_thumb.png)
-
-[Comparing Entanglement Sampling Methods: Discrete vs. Analytical](plot_entanglement_sampling_comparison.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Comparing Entanglement Sampling Methods: Discrete vs. Analytical</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network modeling via the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), networks generated below or near full conversion contain significant fractions of dangling chains, sol fractions, and topological loops.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_inactive_removal_and_sampling_thumb.png)
 
 [Inactive Strand & Entanglement Removal in Force Balance 2](plot_inactive_removal_and_sampling.html.md)
 
   <div class="sphx-glr-thumbnail-title">Inactive Strand & Entanglement Removal in Force Balance 2</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as localized topological constraints (entanglement links or springs).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_sampling_comparison_thumb.png)
+
+[Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical](plot_entanglement_sampling_comparison.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>

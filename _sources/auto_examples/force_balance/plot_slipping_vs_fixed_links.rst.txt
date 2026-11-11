@@ -83,7 +83,7 @@ sampling, results are cached into a committed ``.npz`` archive and loaded automa
 You can rerun the live multi-seed computation at any time by passing ``--recompute`` or
 setting ``PYLIMER_RECOMPUTE_CACHE=1``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-285
+.. GENERATED FROM PYTHON SOURCE LINES 66-290
 
 .. code-block:: Python
 
@@ -104,9 +104,11 @@ setting ``PYLIMER_RECOMPUTE_CACHE=1``.
 
     from _example_cache import (  # noqa: E402
         compute_ensemble_statistics,
+        configure_process_threading,
         get_example_cache_path,
         load_or_compute_cache,
         resolve_max_workers,
+        worker_process_initializer,
     )
     from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
         ParameterType,
@@ -238,13 +240,16 @@ setting ``PYLIMER_RECOMPUTE_CACHE=1``.
         ]
 
         workers = min(resolve_max_workers(max_workers), n_repeats)
+        configure_process_threading(workers)
 
         if workers > 1 and n_repeats > 1:
             print(
                 f"Executing {n_repeats} repeats in parallel across {workers} worker processes..."
             )
             completed = 0
-            with ProcessPoolExecutor(max_workers=workers) as executor:
+            with ProcessPoolExecutor(
+                max_workers=workers, initializer=worker_process_initializer
+            ) as executor:
                 futures = [
                     executor.submit(
                         _simulate_slipping_vs_fixed_single_repeat, *task)
@@ -313,13 +318,13 @@ setting ``PYLIMER_RECOMPUTE_CACHE=1``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 286-289
+.. GENERATED FROM PYTHON SOURCE LINES 291-294
 
 Loading Cached Data or Recomputing
 ----------------------------------
 Resolves the committed cache file or recomputes when requested:
 
-.. GENERATED FROM PYTHON SOURCE LINES 289-310
+.. GENERATED FROM PYTHON SOURCE LINES 294-315
 
 .. code-block:: Python
 
@@ -357,7 +362,7 @@ Resolves the committed cache file or recomputes when requested:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 311-323
+.. GENERATED FROM PYTHON SOURCE LINES 316-328
 
 Visualizing Modulus Reduction & Computational Cost
 --------------------------------------------------
@@ -372,7 +377,7 @@ The two subplots below highlight the key conclusions of :cite:t:`bernhard_phanto
    Slipping requires solving coupled non-linear partition updates, causing a 2-3× increase in
    iterations required to reach the force tolerance threshold.
 
-.. GENERATED FROM PYTHON SOURCE LINES 323-435
+.. GENERATED FROM PYTHON SOURCE LINES 328-440
 
 .. code-block:: Python
 
@@ -500,7 +505,7 @@ The two subplots below highlight the key conclusions of :cite:t:`bernhard_phanto
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 436-458
+.. GENERATED FROM PYTHON SOURCE LINES 441-463
 
 Summary & Method Selection
 --------------------------
@@ -528,7 +533,7 @@ Summary & Method Selection
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.332 seconds)
+   **Total running time of the script:** (0 minutes 0.160 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_slipping_vs_fixed_links.py:

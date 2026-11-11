@@ -20,7 +20,7 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 
 <link rel="alternate" type="text/markdown" href="pylimer_tools_cpp.randomly_sample_entanglements_analytical.html.md">
-<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="split_csv" href="pylimer_tools_cpp.split_csv.html"><link rel="prev" title="randomly_sample_entanglements" href="pylimer_tools_cpp.randomly_sample_entanglements.html">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="randomly_sample_entanglements_on_demand" href="pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html"><link rel="prev" title="randomly_sample_entanglements" href="pylimer_tools_cpp.randomly_sample_entanglements.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>randomly_sample_entanglements_analytical - pylimer-tools</title>
@@ -240,8 +240,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_sampling_cutoff_effect.html">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. Analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_inactive_removal_and_sampling.html">Inactive Strand &amp; Entanglement Removal in Force Balance 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../auto_examples/network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -308,8 +308,11 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.do_random_walk_chain_from_to.html">do_random_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">do_random_walk_chain_from_to_mc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.peel_topological_leaves.html">peel_topological_leaves</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">randomly_sample_entanglements_analytical</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">randomly_sample_entanglements_on_demand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements_v2.html">randomly_sample_entanglements_v2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -325,6 +328,8 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.EntanglementSamplingMethod.html">EntanglementSamplingMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LazyUniverseSequenceIterator.html">LazyUniverseSequenceIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LinearMaxDistanceProvider.html">LinearMaxDistanceProvider</a></li>
@@ -338,7 +343,6 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Molecule.html">Molecule</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MoleculeIterator.html">MoleculeIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MoleculeType.html">MoleculeType</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NeighbourList.html">NeighbourList</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
@@ -417,7 +421,7 @@
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">randomly_sample_entanglements_analytical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.randomly_sample_entanglements_analytical" title="Link to this definition">¶</a></dt>
 <dd><p>Overloaded function.</p>
 <ol class="arabic">
-<li><p>randomly_sample_entanglements_analytical(box: pylimer_tools_cpp.Box, crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, nr_of_samples: typing.SupportsInt, upper_cutoff: typing.SupportsFloat, lower_cutoff: typing.SupportsFloat = 0.0, minimum_nr_of_samples: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 3.0, seed: str = ‘’, filter_dangling_and_soluble: bool = True) -&gt; pylimer_tools_cpp.StrandPairEntanglements</p>
+<li><p>randomly_sample_entanglements_analytical(box: pylimer_tools_cpp.Box, crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = ‘’, filtering_mode: pylimer_tools_cpp.EntanglementFilteringMode = EntanglementFilteringMode.OMIT_INACTIVE) -&gt; pylimer_tools_cpp.StrandPairEntanglements</p>
 <blockquote>
 <div><p>Analytically and probabilistically sample pairs of strand beads that could form entanglements
 using exact 3D Brownian bridge / random walk statistics and topological strand filtering,
@@ -447,13 +451,13 @@ without requiring all strand beads or a Universe to be instantiated.</p>
 <dt class="field-even">param seed<span class="colon">:</span></dt>
 <dd class="field-even"><p>A seed for the random number generator.</p>
 </dd>
-<dt class="field-odd">param filter_dangling_and_soluble<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Whether to filter out soluble and dangling strands (via iterative leaf peeling).</p>
+<dt class="field-odd">param filtering_mode<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).</p>
 </dd>
 </dl>
 </div></blockquote>
 </li>
-<li><p>randomly_sample_entanglements_analytical(crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, box: pylimer_tools_cpp.Box, nr_of_samples: typing.SupportsInt, upper_cutoff: typing.SupportsFloat, lower_cutoff: typing.SupportsFloat = 0.0, minimum_nr_of_samples: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 3.0, seed: str = ‘’, filter_dangling_and_soluble: bool = True) -&gt; pylimer_tools_cpp.StrandPairEntanglements</p></li>
+<li><p>randomly_sample_entanglements_analytical(crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, box: pylimer_tools_cpp.Box, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = ‘’, filtering_mode: pylimer_tools_cpp.EntanglementFilteringMode = EntanglementFilteringMode.OMIT_INACTIVE) -&gt; pylimer_tools_cpp.StrandPairEntanglements</p></li>
 </ol>
 </dd></dl>
 
@@ -464,12 +468,12 @@ without requiring all strand beads or a Universe to be instantiated.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.split_csv.html">
+          <a class="next-page" href="pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">split_csv</div>
+                <div class="title">randomly_sample_entanglements_on_demand</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

@@ -205,8 +205,8 @@
 - [NOTE](force_balance/plot_slipping_vs_fixed_links.html.md): Go to the end
 - [NOTE](force_balance/plot_polydispersity_study.html.md): Go to the end
 - [NOTE](force_balance/plot_sampling_cutoff_effect.html.md): Go to the end
-- [NOTE](force_balance/plot_entanglement_sampling_comparison.html.md): Go to the end
 - [NOTE](force_balance/plot_inactive_removal_and_sampling.html.md): Go to the end
+- [NOTE](force_balance/plot_entanglement_sampling_comparison.html.md): Go to the end
 - [Network Generation](network_generator/index.html.md): pylimer-tools includes a powerful Monte Carlo-based network generator for creating realistic polymer...
 - [NOTE](network_generator/plot_save_network.html.md): Go to the end
 - [NOTE](network_generator/plot_polydisperse_system.html.md): Go to the end
@@ -240,11 +240,11 @@
 - [NOTE](structure_analysis/plot_structure_analysis.html.md): Go to the end
 - [Trajectory Analysis](trajectory_analysis/index.html.md): pylimer-tools provides advanced tools for analyzing molecular dynamics trajectories, particularly fo...
 - [NOTE](trajectory_analysis/plot_trajectory_analysis.html.md): Go to the end
-- [Computation times](dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:06.037&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
-- [Computation times](force_balance/sg_execution_times.html.md): &#42;&#42;00:09.962&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
-- [Computation times](network_generator/sg_execution_times.html.md): &#42;&#42;02:20.307&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
-- [Computation times](normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:22.892&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
-- [Computation times](readers_writers/sg_execution_times.html.md): &#42;&#42;00:23.942&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
+- [Computation times](dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:03.094&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
+- [Computation times](force_balance/sg_execution_times.html.md): &#42;&#42;00:05.443&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](network_generator/sg_execution_times.html.md): &#42;&#42;02:19.419&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
+- [Computation times](normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:10.988&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
+- [Computation times](readers_writers/sg_execution_times.html.md): &#42;&#42;00:12.196&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
 - [Computation times](sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
 - [Computation times](structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.384&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
 - [Computation times](trajectory_analysis/sg_execution_times.html.md): &#42;&#42;07:30.427&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:

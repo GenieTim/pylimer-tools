@@ -242,8 +242,8 @@
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_slipping_vs_fixed_links.html">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_sampling_cutoff_effect.html">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. Analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_inactive_removal_and_sampling.html">Inactive Strand &amp; Entanglement Removal in Force Balance 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/force_balance/plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="auto_examples/network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -310,8 +310,11 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.do_random_walk_chain_from_to.html">do_random_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">do_random_walk_chain_from_to_mc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.peel_topological_leaves.html">peel_topological_leaves</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">randomly_sample_entanglements_on_demand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_v2.html">randomly_sample_entanglements_v2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -327,6 +330,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementSamplingMethod.html">EntanglementSamplingMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html">LazyUniverseSequenceIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.LinearMaxDistanceProvider.html">LinearMaxDistanceProvider</a></li>
@@ -340,7 +345,6 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Molecule.html">Molecule</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MoleculeIterator.html">MoleculeIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MoleculeType.html">MoleculeType</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NeighbourList.html">NeighbourList</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
@@ -449,16 +453,25 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.inverse_langevin.html#pylimer_tools_cpp.inverse_langevin" title="pylimer_tools_cpp.inverse_langevin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inverse_langevin</span></code></a>(x)</p></td>
 <td><p>A somewhat accurate (for <span class="math notranslate nohighlight">\(x \in (-1, 1)\)</span>) implementation of the inverse Langevin function.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements.html#pylimer_tools_cpp.randomly_sample_entanglements" title="pylimer_tools_cpp.randomly_sample_entanglements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randomly_sample_entanglements</span></code></a>(universe, ...)</p></td>
-<td><p>Randomly find pairs of atoms that are close together and could be entanglements</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.peel_topological_leaves.html#pylimer_tools_cpp.peel_topological_leaves" title="pylimer_tools_cpp.peel_topological_leaves"><code class="xref py py-obj docutils literal notranslate"><span class="pre">peel_topological_leaves</span></code></a>(crosslinker_universe)</p></td>
+<td><p>Peel 1-core dangling trees and subgraphs iteratively from the CrosslinkerUniverse topology.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html#pylimer_tools_cpp.randomly_sample_entanglements_analytical" title="pylimer_tools_cpp.randomly_sample_entanglements_analytical"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randomly_sample_entanglements_analytical</span></code></a>(...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements.html#pylimer_tools_cpp.randomly_sample_entanglements" title="pylimer_tools_cpp.randomly_sample_entanglements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randomly_sample_entanglements</span></code></a>(universe, ...)</p></td>
+<td><p>Randomly find pairs of atoms that are close together and could be entanglements.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html#pylimer_tools_cpp.randomly_sample_entanglements_analytical" title="pylimer_tools_cpp.randomly_sample_entanglements_analytical"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randomly_sample_entanglements_analytical</span></code></a>(...)</p></td>
 <td><p>Overloaded function.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.split_csv.html#pylimer_tools_cpp.split_csv" title="pylimer_tools_cpp.split_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_csv</span></code></a>(file_path[, delimiter])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html#pylimer_tools_cpp.randomly_sample_entanglements_on_demand" title="pylimer_tools_cpp.randomly_sample_entanglements_on_demand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randomly_sample_entanglements_on_demand</span></code></a>(...)</p></td>
+<td><p>Overloaded function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.randomly_sample_entanglements_v2.html#pylimer_tools_cpp.randomly_sample_entanglements_v2" title="pylimer_tools_cpp.randomly_sample_entanglements_v2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randomly_sample_entanglements_v2</span></code></a>(universe, ...)</p></td>
+<td><p>Alias for randomly_sample_entanglements (v2 has been unified into standard method).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.split_csv.html#pylimer_tools_cpp.split_csv" title="pylimer_tools_cpp.split_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_csv</span></code></a>(file_path[, delimiter])</p></td>
 <td><p>Read a file containing a number of CSVs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.version_information.html#pylimer_tools_cpp.version_information" title="pylimer_tools_cpp.version_information"><code class="xref py py-obj docutils literal notranslate"><span class="pre">version_information</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.version_information.html#pylimer_tools_cpp.version_information" title="pylimer_tools_cpp.version_information"><code class="xref py py-obj docutils literal notranslate"><span class="pre">version_information</span></code></a>()</p></td>
 <td><p>Returns  a string of the the current version, incl.</p></td>
 </tr>
 </tbody>
@@ -509,6 +522,12 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.DumpFileReader.html#pylimer_tools_cpp.DumpFileReader" title="pylimer_tools_cpp.DumpFileReader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DumpFileReader</span></code></a>(self, path_of_file_to_read)</p></td>
 <td><p>A reader for LAMMPS's <cite>dump</cite> files.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementFilteringMode.html#pylimer_tools_cpp.EntanglementFilteringMode" title="pylimer_tools_cpp.EntanglementFilteringMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EntanglementFilteringMode</span></code></a>(*values)</p></td>
+<td><p>Enum representing the filtering mode for entanglement sampling.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.EntanglementSamplingMethod.html#pylimer_tools_cpp.EntanglementSamplingMethod" title="pylimer_tools_cpp.EntanglementSamplingMethod"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EntanglementSamplingMethod</span></code></a>(*values)</p></td>
+<td><p>Enum representing the method for sampling entanglements in polymer networks.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ExitReason.html#pylimer_tools_cpp.ExitReason" title="pylimer_tools_cpp.ExitReason"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExitReason</span></code></a>(*values)</p></td>
 <td><p>An enum representing the reason for exiting the simulation or optimization procedure.</p></td>
 </tr>
@@ -548,64 +567,61 @@
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.MoleculeType" title="pylimer_tools_cpp.MoleculeType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoleculeType</span></code></a>(*values)</p></td>
 <td><p>An enum representing the type of molecule/chain/strand.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NeighbourList.html#pylimer_tools_cpp.NeighbourList" title="pylimer_tools_cpp.NeighbourList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NeighbourList</span></code></a>(self, atoms, box, cutoff)</p></td>
-<td><p>Gives access to somewhat fast queries on the neighbourhood of atoms.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NoMaxDistanceProvider.html#pylimer_tools_cpp.NoMaxDistanceProvider" title="pylimer_tools_cpp.NoMaxDistanceProvider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NoMaxDistanceProvider</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NoMaxDistanceProvider.html#pylimer_tools_cpp.NoMaxDistanceProvider" title="pylimer_tools_cpp.NoMaxDistanceProvider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NoMaxDistanceProvider</span></code></a>(self)</p></td>
 <td><p>For MC generation, to disable the neighbour list usage.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html#pylimer_tools_cpp.NonGaussianSpringForceEvaluator" title="pylimer_tools_cpp.NonGaussianSpringForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator</span></code></a>(self[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html#pylimer_tools_cpp.NonGaussianSpringForceEvaluator" title="pylimer_tools_cpp.NonGaussianSpringForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator</span></code></a>(self[, ...])</p></td>
 <td><p>This is equal to a spring evaluator for Langevin chains.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NormalModeAnalyzer</span></code></a>(self, spring_from, spring_to)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeAnalyzer.html#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NormalModeAnalyzer</span></code></a>(self, spring_from, spring_to)</p></td>
 <td><p>Compute the normal modes and predict the loss/storage moduli.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeSolver.html#pylimer_tools_cpp.NormalModeSolver" title="pylimer_tools_cpp.NormalModeSolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NormalModeSolver</span></code></a>(*values)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.NormalModeSolver.html#pylimer_tools_cpp.NormalModeSolver" title="pylimer_tools_cpp.NormalModeSolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NormalModeSolver</span></code></a>(*values)</p></td>
 <td><p>Solver algorithms for normal mode analysis</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.OutputConfiguration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OutputConfiguration</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.OutputConfiguration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OutputConfiguration</span></code></a>(self)</p></td>
 <td><p>A configuration object to configure the output values and frequency for simulation classes in this package.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ResistanceDistanceAnalysis</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ResistanceDistanceAnalysis.html#pylimer_tools_cpp.ResistanceDistanceAnalysis" title="pylimer_tools_cpp.ResistanceDistanceAnalysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ResistanceDistanceAnalysis</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Overloaded function.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator" title="pylimer_tools_cpp.RouseBrownianSimulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RouseBrownianSimulator</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.RouseBrownianSimulator.html#pylimer_tools_cpp.RouseBrownianSimulator" title="pylimer_tools_cpp.RouseBrownianSimulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RouseBrownianSimulator</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Overloaded function.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.RouseSimulationResult.html#pylimer_tools_cpp.RouseSimulationResult" title="pylimer_tools_cpp.RouseSimulationResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RouseSimulationResult</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.RouseSimulationResult.html#pylimer_tools_cpp.RouseSimulationResult" title="pylimer_tools_cpp.RouseSimulationResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RouseSimulationResult</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType" title="pylimer_tools_cpp.RouseSolverType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RouseSolverType</span></code></a>(self, value)</p></td>
-<td><p>Members:</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.RouseSolverType.html#pylimer_tools_cpp.RouseSolverType" title="pylimer_tools_cpp.RouseSolverType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RouseSolverType</span></code></a>(*values)</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SLESolver.html#pylimer_tools_cpp.SLESolver" title="pylimer_tools_cpp.SLESolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SLESolver</span></code></a>(*values)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SLESolver.html#pylimer_tools_cpp.SLESolver" title="pylimer_tools_cpp.SLESolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SLESolver</span></code></a>(*values)</p></td>
 <td><p>Solver for sparse linear equation systems</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator" title="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleSpringMEHPForceEvaluator</span></code></a>(self[, kappa])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator" title="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleSpringMEHPForceEvaluator</span></code></a>(self[, kappa])</p></td>
 <td><p>This is equal to a spring evaluator for Gaussian chains.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html#pylimer_tools_cpp.SimplifiedBalance2Network" title="pylimer_tools_cpp.SimplifiedBalance2Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedBalance2Network</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalance2Network.html#pylimer_tools_cpp.SimplifiedBalance2Network" title="pylimer_tools_cpp.SimplifiedBalance2Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedBalance2Network</span></code></a></p></td>
 <td><p>A more efficient structure of the network for use in <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceBalance2</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork" title="pylimer_tools_cpp.SimplifiedBalanceNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedBalanceNetwork.html#pylimer_tools_cpp.SimplifiedBalanceNetwork" title="pylimer_tools_cpp.SimplifiedBalanceNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork</span></code></a></p></td>
 <td><p>A more efficient structure of the network for use in MEHP force balance, namely <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance.html#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceBalance</span></code></a>, though also passable to namely <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceBalance2</span></code></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedNetwork.html#pylimer_tools_cpp.SimplifiedNetwork" title="pylimer_tools_cpp.SimplifiedNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedNetwork</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.SimplifiedNetwork.html#pylimer_tools_cpp.SimplifiedNetwork" title="pylimer_tools_cpp.SimplifiedNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedNetwork</span></code></a></p></td>
 <td><p>A more efficient structure of the network for use in MEHP, namely <a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceRelaxation.html#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEHPForceRelaxation</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.StrandPairEntanglements.html#pylimer_tools_cpp.StrandPairEntanglements" title="pylimer_tools_cpp.StrandPairEntanglements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StrandPairEntanglements</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.StrandPairEntanglements.html#pylimer_tools_cpp.StrandPairEntanglements" title="pylimer_tools_cpp.StrandPairEntanglements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StrandPairEntanglements</span></code></a>(self)</p></td>
 <td><p>A struct to store analytically sampled entanglements on strands (without requiring an explicit Universe of all beads).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.StructureSimplificationMode.html#pylimer_tools_cpp.StructureSimplificationMode" title="pylimer_tools_cpp.StructureSimplificationMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StructureSimplificationMode</span></code></a>(*values)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.StructureSimplificationMode.html#pylimer_tools_cpp.StructureSimplificationMode" title="pylimer_tools_cpp.StructureSimplificationMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StructureSimplificationMode</span></code></a>(*values)</p></td>
 <td><p>How the structure shall be simplified during the optimization in order to remove non-trapped entanglement links.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Universe</span></code></a>(self, Lx, Ly, Lz)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Universe</span></code></a>(self, Lx, Ly, Lz)</p></td>
 <td><p>Represents a full Polymer Network structure, a collection of molecules.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniverseSequence</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.UniverseSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniverseSequence</span></code></a>(self)</p></td>
 <td><p>This class represents a sequence of Universes, with the Universe's data only being read on request.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html#pylimer_tools_cpp.ZScoreMaxDistanceProvider" title="pylimer_tools_cpp.ZScoreMaxDistanceProvider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZScoreMaxDistanceProvider</span></code></a>(self, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.ZScoreMaxDistanceProvider.html#pylimer_tools_cpp.ZScoreMaxDistanceProvider" title="pylimer_tools_cpp.ZScoreMaxDistanceProvider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZScoreMaxDistanceProvider</span></code></a>(self, ...)</p></td>
 <td><p>For MC generation, converts the <span class="math notranslate nohighlight">\(N\)</span> to a maximum distance within which to sample.</p></td>
 </tr>
 </tbody>
@@ -618,13 +634,13 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.CONJUGATE_GRADIENT.html#pylimer_tools_cpp.CONJUGATE_GRADIENT" title="pylimer_tools_cpp.CONJUGATE_GRADIENT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CONJUGATE_GRADIENT</span></code></a></p></td>
-<td><p>Members:</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.DIRECT_LDLT.html#pylimer_tools_cpp.DIRECT_LDLT" title="pylimer_tools_cpp.DIRECT_LDLT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DIRECT_LDLT</span></code></a></p></td>
-<td><p>Members:</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.DIRECT_LLT.html#pylimer_tools_cpp.DIRECT_LLT" title="pylimer_tools_cpp.DIRECT_LLT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DIRECT_LLT</span></code></a></p></td>
-<td><p>Members:</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pylimer_tools_cpp.STOP.html#pylimer_tools_cpp.STOP" title="pylimer_tools_cpp.STOP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STOP</span></code></a></p></td>
 <td><p>Stop the linking process</p></td>

@@ -1,6 +1,6 @@
 # ZScoreMaxDistanceProvider
 
-### *class* pylimer_tools_cpp.ZScoreMaxDistanceProvider(self: [pylimer_tools_cpp.ZScoreMaxDistanceProvider](#pylimer_tools_cpp.ZScoreMaxDistanceProvider), std_multiplier: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), in_sqrt_multiplier: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat))
+### *class* pylimer_tools_cpp.ZScoreMaxDistanceProvider(self: [pylimer_tools_cpp.ZScoreMaxDistanceProvider](#pylimer_tools_cpp.ZScoreMaxDistanceProvider), std_multiplier: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), in_sqrt_multiplier: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex))
 
 Bases: [`MaxDistanceProvider`](pylimer_tools_cpp.MaxDistanceProvider.md#pylimer_tools_cpp.MaxDistanceProvider)
 
@@ -20,7 +20,7 @@ Useful only for performance improvements in large systems.
 
 ### Methods Documentation
 
-#### get_max_distance(self: [pylimer_tools_cpp.ZScoreMaxDistanceProvider](#pylimer_tools_cpp.ZScoreMaxDistanceProvider), N: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_max_distance(self: [pylimer_tools_cpp.ZScoreMaxDistanceProvider](#pylimer_tools_cpp.ZScoreMaxDistanceProvider), N: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Get the maximum distance for a given N.
 

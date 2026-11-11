@@ -1,0 +1,51 @@
+EntanglementFilteringMode
+=========================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: EntanglementFilteringMode
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~EntanglementFilteringMode.NONE
+      ~EntanglementFilteringMode.OMIT_INACTIVE
+      ~EntanglementFilteringMode.PRUNE_UPFRONT
+      ~EntanglementFilteringMode.denominator
+      ~EntanglementFilteringMode.imag
+      ~EntanglementFilteringMode.numerator
+      ~EntanglementFilteringMode.real
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~EntanglementFilteringMode.as_integer_ratio
+      ~EntanglementFilteringMode.bit_count
+      ~EntanglementFilteringMode.bit_length
+      ~EntanglementFilteringMode.conjugate
+      ~EntanglementFilteringMode.from_bytes
+      ~EntanglementFilteringMode.is_integer
+      ~EntanglementFilteringMode.to_bytes
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: NONE
+   .. autoattribute:: OMIT_INACTIVE
+   .. autoattribute:: PRUNE_UPFRONT
+   .. autoattribute:: denominator
+   .. autoattribute:: imag
+   .. autoattribute:: numerator
+   .. autoattribute:: real
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: as_integer_ratio
+   .. automethod:: bit_count
+   .. automethod:: bit_length
+   .. automethod:: conjugate
+   .. automethod:: from_bytes
+   .. automethod:: is_integer
+   .. automethod:: to_bytes

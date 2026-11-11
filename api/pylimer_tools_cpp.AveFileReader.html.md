@@ -28,7 +28,7 @@ Initialize the AveFileReader with a file path.
 
 ### Methods Documentation
 
-#### autocorrelate_column(self: [pylimer_tools_cpp.AveFileReader](#pylimer_tools_cpp.AveFileReader), column_index: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), delta_indices: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)]) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
+#### autocorrelate_column(self: [pylimer_tools_cpp.AveFileReader](#pylimer_tools_cpp.AveFileReader), column_index: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), delta_indices: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
 
 Do autocorrelation on one particular column for a specified set of delta indices.
 
@@ -40,7 +40,7 @@ Assumes the data is equally spaced.
 * **Returns:**
   Autocorrelation values for the specified deltas
 
-#### autocorrelate_column_difference(self: [pylimer_tools_cpp.AveFileReader](#pylimer_tools_cpp.AveFileReader), column_index1: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), column_index2: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), delta_indices: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)]) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
+#### autocorrelate_column_difference(self: [pylimer_tools_cpp.AveFileReader](#pylimer_tools_cpp.AveFileReader), column_index1: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), column_index2: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), delta_indices: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
 
 Do autocorrelation on the difference between two particular columns for a specified set of delta indices.
 

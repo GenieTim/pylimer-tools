@@ -72,7 +72,7 @@ sampling, results are cached into a committed `.npz` archive and loaded automati
 You can rerun the live multi-seed computation at any time by passing `--recompute` or
 setting `PYLIMER_RECOMPUTE_CACHE=1`.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 66-285 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 66-290 -->
 ```Python
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
@@ -90,9 +90,11 @@ if "__file__" in globals():
 
 from _example_cache import (  # noqa: E402
     compute_ensemble_statistics,
+    configure_process_threading,
     get_example_cache_path,
     load_or_compute_cache,
     resolve_max_workers,
+    worker_process_initializer,
 )
 from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
     ParameterType,
@@ -224,13 +226,16 @@ def run_slipping_vs_fixed_simulation(
     ]
 
     workers = min(resolve_max_workers(max_workers), n_repeats)
+    configure_process_threading(workers)
 
     if workers > 1 and n_repeats > 1:
         print(
             f"Executing {n_repeats} repeats in parallel across {workers} worker processes..."
         )
         completed = 0
-        with ProcessPoolExecutor(max_workers=workers) as executor:
+        with ProcessPoolExecutor(
+            max_workers=workers, initializer=worker_process_initializer
+        ) as executor:
             futures = [
                 executor.submit(
                     _simulate_slipping_vs_fixed_single_repeat, *task)
@@ -292,13 +297,13 @@ def run_slipping_vs_fixed_simulation(
     }
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 286-289 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 291-294 -->
 
 ## Loading Cached Data or Recomputing
 
 Resolves the committed cache file or recomputes when requested:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 289-310 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 294-315 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     cache_path = get_example_cache_path(
@@ -325,7 +330,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 Loading cached example data from slipping_vs_fixed_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 311-323 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 316-328 -->
 
 ## Visualizing Modulus Reduction & Computational Cost
 
@@ -340,7 +345,7 @@ The two subplots below highlight the key conclusions of Bernhard and Gusev [[BG2
    Slipping requires solving coupled non-linear partition updates, causing a 2-3× increase in
    iterations required to reach the force tolerance threshold.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 323-435 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 328-440 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax_mod, ax_iter) = plt.subplots(1, 2, figsize=(11, 4.5))
@@ -454,7 +459,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 436-458 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 441-463 -->
 
 ## Summary & Method Selection
 
@@ -465,7 +470,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 | **Convergence Speed**          | Fast; 2-3× fewer iterations.                                                                                                            | Slower; non-linear coupled partition optimization.                                                                            |
 | **Recommended Implementation** | Use [`MEHPForceBalance2`](../../api/pylimer_tools_cpp.MEHPForceBalance2.md#pylimer_tools_cpp.MEHPForceBalance2) (links are fixed by design). | Historical curiosity in [`MEHPForceBalance`](../../api/pylimer_tools_cpp.MEHPForceBalance.md#pylimer_tools_cpp.MEHPForceBalance). |
 
-**Total running time of the script:** (0 minutes 0.332 seconds)
+**Total running time of the script:** (0 minutes 0.160 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-slipping-vs-fixed-links-py"></a>
 

@@ -1,6 +1,6 @@
 # MEHPForceRelaxation
 
-### *class* pylimer_tools_cpp.MEHPForceRelaxation(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), universe: [pylimer_tools_cpp.Universe](pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, force_evaluator: [pylimer_tools_cpp.MEHPForceEvaluator](pylimer_tools_cpp.MEHPForceEvaluator.md#pylimer_tools_cpp.MEHPForceEvaluator) = None, kappa: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0, remove_2functional_crosslinkers: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, remove_dangling_chains: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False)
+### *class* pylimer_tools_cpp.MEHPForceRelaxation(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), universe: [pylimer_tools_cpp.Universe](pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, force_evaluator: [pylimer_tools_cpp.MEHPForceEvaluator](pylimer_tools_cpp.MEHPForceEvaluator.md#pylimer_tools_cpp.MEHPForceEvaluator) = None, kappa: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0, remove_2functional_crosslinkers: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, remove_dangling_chains: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False)
 
 Bases: `pybind11_object`
 
@@ -89,7 +89,7 @@ Configure whether to run PBC on the bonds or not.
   If your bonds could get larger than half the box length,
   this must be kept False (default).
 
-#### config_rerun_epsilon(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), epsilon: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_rerun_epsilon(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), epsilon: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the offset from the lower and upper bounds for the simulation to suggest another run.
 
@@ -112,7 +112,7 @@ Overloaded function.
    >   An OutputConfiguration struct or list of OutputConfiguration structs
    >   specifying what values to log and how often
 
-#### count_active_clustered_atoms(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### count_active_clustered_atoms(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Counts the active clustered atoms in the system.
 
@@ -121,7 +121,7 @@ Counts the active clustered atoms in the system.
 * **Returns:**
   The number of active clustered atoms
 
-#### get_active_chains(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Molecule](pylimer_tools_cpp.Molecule.md#pylimer_tools_cpp.Molecule)]
+#### get_active_chains(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Molecule](pylimer_tools_cpp.Molecule.md#pylimer_tools_cpp.Molecule)]
 
 Get the crosslinker chains that are active.
 
@@ -159,7 +159,7 @@ Get the current spring distances.
 * **Returns:**
   A vector containing the current spring distance vectors
 
-#### get_dangling_weight_fraction(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_dangling_weight_fraction(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the weight fraction of non-active springs.
 
@@ -177,7 +177,7 @@ Returns the value effectively used in [`get_gamma_factor()`](#pylimer_tools_cpp.
 * **Returns:**
   The default R0 squared value used in gamma factor calculations
 
-#### get_effective_functionality_of_atoms(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
+#### get_effective_functionality_of_atoms(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Returns the number of active springs connected to each atom, atomId used as index.
 
@@ -200,7 +200,7 @@ Returns the force at the current state of the simulation.
 * **Returns:**
   The current force value
 
-#### get_gamma_factor(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), b0_squared: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = -1.0, nr_of_chains: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_gamma_factor(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), b0_squared: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1.0, nr_of_chains: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
 
@@ -221,7 +221,7 @@ $k_B$ Boltzmann’s constant.
     on the melt system, with subsequent division by the nr of bonds in the chain.
   * **nr_of_chains** – The value to normalize the sum of square distances by. Usually (and default if $< 0$) the nr of chains.
 
-#### get_gamma_factors(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), b0_squared: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = -1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### get_gamma_factors(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), b0_squared: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Computes the gamma factor for each spring as part of the ANT/MEHP formulism.
 
@@ -238,7 +238,7 @@ it’s the slope you obtain.
 
 See also [`get_gamma_factor()`](#pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor) for the mean of these.
 
-#### get_ids_of_active_nodes(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001, minimum_nr_of_active_connections: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, maximum_nr_of_active_connections: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
+#### get_ids_of_active_nodes(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001, minimum_nr_of_active_connections: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, maximum_nr_of_active_connections: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Get the atom ids of the nodes that are considered active.
 
@@ -249,7 +249,7 @@ Get the atom ids of the nodes that are considered active.
 * **Returns:**
   List of atom IDs for active nodes
 
-#### get_nr_of_active_nodes(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001, minimumNrOfActiveConnections: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, maximumNrOfActiveConnections: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_active_nodes(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001, minimumNrOfActiveConnections: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, maximumNrOfActiveConnections: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the number of active nodes remaining after running the simulation.
 
@@ -261,7 +261,7 @@ Get the number of active nodes remaining after running the simulation.
 * **Returns:**
   The number of active nodes
 
-#### get_nr_of_active_springs(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_active_springs(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the number of active springs remaining after running the simulation.
 
@@ -270,7 +270,7 @@ Get the number of active springs remaining after running the simulation.
 * **Returns:**
   The number of active springs
 
-#### get_nr_of_active_springs_connected(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.05) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.int32], '[m, 1]']
+#### get_nr_of_active_springs_connected(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.05) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.int32], '[m, 1]']
 
 Returns the number of active springs connected to each node.
 
@@ -323,7 +323,7 @@ Returns the residuals at the current state of the simulation.
 * **Returns:**
   The current residual vector
 
-#### get_soluble_weight_fraction(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_soluble_weight_fraction(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the weight fraction of springs connected to active
 springs (any depth).
@@ -377,7 +377,7 @@ this method would return true.
 * **Returns:**
   True if another run is suggested, False otherwise
 
-#### run_force_relaxation(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), algorithm: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = 'LD_MMA', max_nr_of_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 250000, x_tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-12, f_tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-09) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### run_force_relaxation(self: [pylimer_tools_cpp.MEHPForceRelaxation](#pylimer_tools_cpp.MEHPForceRelaxation), algorithm: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = 'LD_MMA', max_nr_of_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 250000, x_tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1e-12, f_tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1e-09) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Run the simulation.
 Note that the final state of the minimization is persisted and reused if you use this method again.

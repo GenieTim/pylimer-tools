@@ -1,6 +1,6 @@
 # Universe
 
-### *class* pylimer_tools_cpp.Universe(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), Lx: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), Ly: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), Lz: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat))
+### *class* pylimer_tools_cpp.Universe(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), Lx: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), Ly: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), Lz: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex))
 
 Bases: `pybind11_object`
 
@@ -86,7 +86,9 @@ Instantiate this Universe (Collection of Molecules) providing the box lengths.
 | [`has_infinite_strand`](#pylimer_tools_cpp.Universe.has_infinite_strand)(self, arg0, arg1)             | Check whether there is a strand (with crosslinker) in the universe that loops through periodic images without coming back.                                                                                       |
 | [`hash_angle_type`](#pylimer_tools_cpp.Universe.hash_angle_type)(self, angle_from, angle_via, ...) | Convert the three integers to one long number/hash.                                                                                                                                                              |
 | [`hash_dihedral_angle_type`](#pylimer_tools_cpp.Universe.hash_dihedral_angle_type)(self, angle_from, ...)   | Convert the four integers to one long number/hash.                                                                                                                                                               |
+| [`identify_active_atoms`](#pylimer_tools_cpp.Universe.identify_active_atoms)(self[, crosslinker_type])   | Identify which atoms belong to the topologically active 2-core of the network.                                                                                                                                   |
 | [`interpolate_edges`](#pylimer_tools_cpp.Universe.interpolate_edges)(self, crosslinker_type, ...)    | Get more or less edges than currently present, interpolating between junctions.                                                                                                                                  |
+| [`peel_topological_leaves`](#pylimer_tools_cpp.Universe.peel_topological_leaves)(self[, crosslinker_type]) | Peel 1-core dangling trees and subgraphs from the network topology.                                                                                                                                              |
 | [`remove_all_angles`](#pylimer_tools_cpp.Universe.remove_all_angles)(self)                           | Remove all angles from the Universe.                                                                                                                                                                             |
 | [`remove_all_dihedral_angles`](#pylimer_tools_cpp.Universe.remove_all_dihedral_angles)(self)                  | Remove all dihedral angles from the Universe.                                                                                                                                                                    |
 | [`remove_atoms`](#pylimer_tools_cpp.Universe.remove_atoms)(self, atom_ids)                      | Remove atoms and all associated bonds by their atom IDs.                                                                                                                                                         |
@@ -102,10 +104,11 @@ Instantiate this Universe (Collection of Molecules) providing the box lengths.
 | [`set_timestep`](#pylimer_tools_cpp.Universe.set_timestep)(self, timestep)                      | Set the timestep when this Universe was captured.                                                                                                                                                                |
 | [`set_vertex_property`](#pylimer_tools_cpp.Universe.set_vertex_property)(self, vertex_id, ...)         | Set a specific property for a specific vertex.                                                                                                                                                                   |
 | [`simplify`](#pylimer_tools_cpp.Universe.simplify)(self)                                    | Remove self links and double bonds.                                                                                                                                                                              |
+| [`to_crosslinker_universe`](#pylimer_tools_cpp.Universe.to_crosslinker_universe)(self, crosslinker_type)   | Convert this Universe into a CrosslinkerUniverse representation.                                                                                                                                                 |
 
 ### Methods Documentation
 
-#### add_angles(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), angles_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], angles_via: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], angles_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], angle_types: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_angles(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), angles_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], angles_via: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], angles_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], angle_types: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add angles to the Universe. No relation to the underlying graph,
 just a method to preserve read & write capabilities.
@@ -116,7 +119,7 @@ just a method to preserve read & write capabilities.
   * **angles_to** – Vector of atom IDs for angle end points
   * **angle_types** – Vector of angle types
 
-#### add_atoms(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), ids: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], types: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], x: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)], y: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)], z: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)], nx: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], ny: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], nz: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_atoms(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), ids: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], types: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], x: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], y: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], z: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], nx: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], ny: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], nz: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add atoms to the Universe, vertices to the underlying graph.
 
@@ -134,14 +137,14 @@ Add atoms to the Universe, vertices to the underlying graph.
 
 Overloaded function.
 
-1. add_bonds(self: pylimer_tools_cpp.Universe, bonds_from: collections.abc.Sequence[typing.SupportsInt], bonds_to: collections.abc.Sequence[typing.SupportsInt]) -> None
+1. add_bonds(self: pylimer_tools_cpp.Universe, bonds_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], bonds_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None
    > Add bonds to the underlying atoms, edges to the underlying graph.
    > If the connected atoms are not found, the bonds are silently skipped.
    > * **param bonds_from:**
    >   Vector of atom IDs for bond start points
    > * **param bonds_to:**
    >   Vector of atom IDs for bond end points
-2. add_bonds(self: pylimer_tools_cpp.Universe, nr_of_bonds: typing.SupportsInt, bonds_from: collections.abc.Sequence[typing.SupportsInt], bonds_to: collections.abc.Sequence[typing.SupportsInt], bond_types: collections.abc.Sequence[typing.SupportsInt], ignore_non_existent_atoms: bool = False, simplify_universe: bool = True) -> None
+2. add_bonds(self: pylimer_tools_cpp.Universe, nr_of_bonds: typing.SupportsInt | typing.SupportsIndex, bonds_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], bonds_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], bond_types: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], ignore_non_existent_atoms: bool = False, simplify_universe: bool = True) -> None
    > Add bonds to the underlying atoms, edges to the underlying graph.
    > * **param nr_of_bonds:**
    >   Number of bonds to add
@@ -156,7 +159,7 @@ Overloaded function.
    > * **param simplify_universe:**
    >   Whether to simplify the universe after adding bonds
 
-#### add_bonds_with_types(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), bonds_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], bonds_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], bond_types: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_bonds_with_types(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), bonds_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], bonds_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], bond_types: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add bonds to the underlying atoms, edges to the underlying graph.
 If the connected atoms are not found, the bonds are silently skipped.
@@ -166,7 +169,7 @@ If the connected atoms are not found, the bonds are silently skipped.
   * **bonds_to** – Vector of atom IDs for bond end points
   * **bond_types** – Vector of bond types
 
-#### add_dihedral_angles(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), angles_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], angles_via1: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], angles_via2: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], angles_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], angle_types: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_dihedral_angles(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), angles_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], angles_via1: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], angles_via2: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], angles_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], angle_types: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add dihedral angles to the Universe. No relation to the underlying graph,
 just a method to preserve read & write capabilities.
@@ -203,7 +206,7 @@ Compute the vectors of each bond in the molecule, respecting periodic boundaries
 * **Returns:**
   A list of bond vectors
 
-#### compute_dxs(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_ids_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], atom_ids_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)]) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
+#### compute_dxs(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_ids_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], atom_ids_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
 
 Compute the dx distance for certain bonds (length in x direction).
 
@@ -213,7 +216,7 @@ Compute the dx distance for certain bonds (length in x direction).
 * **Returns:**
   Vector of x-direction distances
 
-#### compute_dys(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_ids_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], atom_ids_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)]) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
+#### compute_dys(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_ids_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], atom_ids_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
 
 Compute the dy distance for certain bonds (length in y direction).
 
@@ -223,7 +226,7 @@ Compute the dy distance for certain bonds (length in y direction).
 * **Returns:**
   Vector of y-direction distances
 
-#### compute_dzs(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_ids_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], atom_ids_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)]) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
+#### compute_dzs(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_ids_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], atom_ids_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
 
 Compute the dz distance for certain bonds (length in z direction).
 
@@ -233,7 +236,7 @@ Compute the dz distance for certain bonds (length in z direction).
 * **Returns:**
   Vector of z-direction distances
 
-#### compute_end_to_end_distances(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), derive_image_flags: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
+#### compute_end_to_end_distances(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), derive_image_flags: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
 
 Compute the end-to-end distance of each strand in the network.
 
@@ -249,7 +252,7 @@ Invalid strands (where said function returns 0.0 or -1.0) are ignored.
 * **Returns:**
   List of end-to-end distances
 
-#### compute_mean_end_to_end_distance(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), derive_image_flags: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### compute_mean_end_to_end_distance(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), derive_image_flags: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the mean of the end-to-end distances of each strand in the network.
 
@@ -265,7 +268,7 @@ Invalid strands (where said function returns 0.0 or -1.0) are ignored.
 * **Returns:**
   Mean end-to-end distance
 
-#### compute_mean_squared_end_to_end_distance(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), only_those_with_two_crosslinkers: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, derive_image_flags: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### compute_mean_squared_end_to_end_distance(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), only_those_with_two_crosslinkers: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, derive_image_flags: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the mean square of the end-to-end distances of each strand (incl. crosslinks) in the network.
 
@@ -282,7 +285,7 @@ Invalid strands (where said function returns 0.0 or -1.0) are ignored.
 * **Returns:**
   Mean squared end-to-end distance
 
-#### compute_mean_strand_length(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### compute_mean_strand_length(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the mean number of beads per strand.
 
@@ -291,7 +294,7 @@ Compute the mean number of beads per strand.
 * **Returns:**
   Mean strand length
 
-#### compute_number_average_molecular_weight(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### compute_number_average_molecular_weight(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the number average molecular weight.
 
@@ -303,12 +306,12 @@ Crosslinkers are ignored completely.
 * **Returns:**
   Number average molecular weight
 
-#### compute_polydispersity_index(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### compute_polydispersity_index(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the polydispersity index:
 the weight average molecular weight over the number average molecular weight.
 
-#### compute_temperature(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), dimensions: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 3, k_b: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### compute_temperature(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), dimensions: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 3, k_b: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Use the velocities per atom to compute the temperature from the kinetic energy of the system.
 
@@ -326,7 +329,7 @@ Compute the total mass of this network/universe in whatever mass unit was used w
 * **Returns:**
   Total mass of the universe
 
-#### compute_weight_average_molecular_weight(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### compute_weight_average_molecular_weight(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the weight average molecular weight.
 
@@ -346,7 +349,7 @@ If no masses are stored, assumes a mass of 1 for each atom.
 
 If the total mass is 0., returns the total mass per atom type.
 
-#### contract_vertices_along_bond_type(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), bond_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe)
+#### contract_vertices_along_bond_type(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), bond_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe)
 
 Merge vertices along a specific bond type.
 
@@ -362,7 +365,7 @@ Count how often each atom type is present.
 * **Returns:**
   Dictionary mapping atom types to their counts
 
-#### count_atoms_in_skin_distance(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), distances: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)], unwrapped: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
+#### count_atoms_in_skin_distance(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), distances: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], unwrapped: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
 
 This is a function that may help you to compute the radial distribution function.
 It loops through all atoms and counts neighbors within specified distance ranges.
@@ -373,7 +376,7 @@ It loops through all atoms and counts neighbors within specified distance ranges
 * **Returns:**
   Array of counts for each distance bin
 
-#### count_loop_lengths(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), max_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
+#### count_loop_lengths(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), max_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Find all loops (below a specific length) and count the number of atoms involved in them.
 Returns the count, how many loops per length are found.
@@ -420,7 +423,7 @@ Find the maximum functionality of each atom type in the network.
 * **Returns:**
   Dictionary mapping atom types to maximum functionality
 
-#### find_loops(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), max_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1, skip_self_loops: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)]]]
+#### find_loops(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), max_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1, skip_self_loops: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)]]]
 
 Decompose the Universe into loops.
 The primary index specifies the degree of the loop.
@@ -431,7 +434,7 @@ and you may run out of memory when using this function, if your Universe/Network
 You can use the max_length parameter to restrict the algorithm to only search for loops up to a certain length.
 Use a negative value to find all loops and paths.
 
-#### find_minimal_order_loop_from(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), loop_start: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), loop_step1: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), max_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1, skip_self_loops: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)]
+#### find_minimal_order_loop_from(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), loop_start: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), loop_step1: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), max_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1, skip_self_loops: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)]
 
 Find the loops in the network starting with one connection.
 
@@ -462,7 +465,7 @@ Use `get_idx_by_atom_id()` to translate them to vertex IDs.
 * **Returns:**
   Dictionary with angle information
 
-#### get_atom(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)
+#### get_atom(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)
 
 Find an atom by its ID.
 
@@ -471,7 +474,7 @@ Find an atom by its ID.
 * **Returns:**
   The atom with the specified ID
 
-#### get_atom_by_vertex_id(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)
+#### get_atom_by_vertex_id(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)
 
 Find an atom by the ID of the vertex of the underlying graph.
 
@@ -480,7 +483,7 @@ Find an atom by the ID of the vertex of the underlying graph.
 * **Returns:**
   The atom at the specified vertex
 
-#### get_atom_id_by_vertex_idx(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_atom_id_by_vertex_idx(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the ID of the atom by the vertex ID of the underlying graph.
 
@@ -503,11 +506,11 @@ Get all atoms in the universe.
 * **Returns:**
   List of all atoms
 
-#### get_atoms_by_degree(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)]
+#### get_atoms_by_degree(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), functionality: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)]
 
 Get the atoms that have the specified number of bonds.
 
-#### get_atoms_by_type(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)]
+#### get_atoms_by_type(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)]
 
 Query all atoms by their type.
 
@@ -522,7 +525,7 @@ Internally uses [`get_atoms_connected_to()`](#pylimer_tools_cpp.Universe.get_ato
 * **Returns:**
   List of connected atoms
 
-#### get_atoms_connected_to_vertex(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)]
+#### get_atoms_connected_to_vertex(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)]
 
 Get the atoms connected to a specified vertex ID.
 
@@ -546,7 +549,7 @@ Get the underlying bounding box object.
 * **Returns:**
   The simulation box
 
-#### get_chains_with_crosslinker(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Molecule](pylimer_tools_cpp.Molecule.html.md#pylimer_tools_cpp.Molecule)]
+#### get_chains_with_crosslinker(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Molecule](pylimer_tools_cpp.Molecule.html.md#pylimer_tools_cpp.Molecule)]
 
 Decompose the Universe into strands (molecules, which could be either chains, or even lonely atoms), without omitting the crosslinkers
 (as in [`get_molecules()`](#pylimer_tools_cpp.Universe.get_molecules)).
@@ -570,7 +573,7 @@ Unconnected, free atoms/beads become their own [`Universe`](#pylimer_tools_cpp.U
 * **Returns:**
   List of disconnected Universe components
 
-#### get_edge_ids_from(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
+#### get_edge_ids_from(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Get the edge IDs incident to a specific vertex.
 
@@ -579,7 +582,7 @@ Get the edge IDs incident to a specific vertex.
 * **Returns:**
   List of edge IDs connected to the vertex
 
-#### get_edge_ids_from_to(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_id_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), vertex_id_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
+#### get_edge_ids_from_to(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_id_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), vertex_id_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Get the edge IDs of all edges between two specific vertices.
 
@@ -609,7 +612,7 @@ Get the mass of one atom per type.
 * **Returns:**
   Dictionary mapping atom types to masses
 
-#### get_molecules(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_type_to_omit: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Molecule](pylimer_tools_cpp.Molecule.html.md#pylimer_tools_cpp.Molecule)]
+#### get_molecules(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_type_to_omit: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[pylimer_tools_cpp.Molecule](pylimer_tools_cpp.Molecule.html.md#pylimer_tools_cpp.Molecule)]
 
 Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms.
 
@@ -622,7 +625,7 @@ then those atoms will be omitted, and this function returns chains instead.
 * **Returns:**
   List of molecules
 
-#### get_network_of_crosslinker(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe)
+#### get_network_of_crosslinker(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe)
 
 Reduce the network to contain only crosslinkers, replacing all the strands with a single bond.
 Useful e.g. to reduce the memory usage and runtime of
@@ -651,7 +654,7 @@ Query the number of atoms in this universe.
 
 Query the number of bonds associated with this universe.
 
-#### get_nr_of_bonds_of_atom(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), arg0: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_bonds_of_atom(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), arg0: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Count the number of immediate neighbors of an atom, specified by its ID.
 
@@ -660,7 +663,7 @@ Count the number of immediate neighbors of an atom, specified by its ID.
 * **Returns:**
   Number of bonds connected to the atom
 
-#### get_nr_of_bonds_of_vertex(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), arg0: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_bonds_of_vertex(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), arg0: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Count the number of immediate neighbors of an atom, specified by its vertex ID.
 
@@ -673,7 +676,7 @@ Count the number of immediate neighbors of an atom, specified by its vertex ID.
 
 Query the number of dihedral angles that have been added to this universe.
 
-#### get_nr_of_edges_from_to(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_id_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), vertex_id_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), max_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_edges_from_to(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_id_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), vertex_id_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), max_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the number of edges in the shortest path between two specific vertices.
 
@@ -694,7 +697,7 @@ Query the timestep when this universe was captured.
 
 Get the degree (functionality) of each vertex.
 
-#### get_vertex_idx_by_atom_id(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_vertex_idx_by_atom_id(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the vertex ID of the underlying graph for an atom with a specified ID.
 
@@ -710,7 +713,7 @@ Query the volume of the underlying bounding box.
 * **Returns:**
   The volume of the simulation box
 
-#### has_atom_with_id(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
+#### has_atom_with_id(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
 
 Check whether this universe contains an atom with the specified ID.
 
@@ -719,7 +722,7 @@ Check whether this universe contains an atom with the specified ID.
 * **Returns:**
   True if the atom exists in this universe, False otherwise
 
-#### has_infinite_strand(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), arg0: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), arg1: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
+#### has_infinite_strand(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), arg0: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), arg1: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
 
 Check whether there is a strand (with crosslinker) in the universe that loops through periodic images without coming back.
 
@@ -729,7 +732,7 @@ Check whether there is a strand (with crosslinker) in the universe that loops th
 * **Returns:**
   True if infinite strands are detected, False otherwise
 
-#### hash_angle_type(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), angle_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), angle_via: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), angle_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### hash_angle_type(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), angle_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), angle_via: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), angle_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Convert the three integers to one long number/hash.
 Used internally for duplicate detection.
@@ -741,7 +744,7 @@ Used internally for duplicate detection.
 * **Returns:**
   Hash value for the angle type
 
-#### hash_dihedral_angle_type(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), angle_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), angle_via1: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), angle_via2: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), angle_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### hash_dihedral_angle_type(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), angle_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), angle_via1: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), angle_via2: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), angle_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Convert the four integers to one long number/hash.
 Used internally for duplicate detection.
@@ -754,7 +757,18 @@ Used internally for duplicate detection.
 * **Returns:**
   Hash value for the dihedral angle type
 
-#### interpolate_edges(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), interpolation_factor: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]]
+#### identify_active_atoms(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[bool](https://docs.python.org/3/builtins/functions.html#bool)]
+
+Identify which atoms belong to the topologically active 2-core of the network.
+
+Atoms on pruned leaves, dangling branches, and soluble components will have false.
+
+* **Parameters:**
+  **crosslinker_type** – Type ID of crosslinker atoms (default: 2)
+* **Returns:**
+  Boolean vector of length get_nr_of_atoms() (indexed by vertex index)
+
+#### interpolate_edges(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), interpolation_factor: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]]
 
 Get more or less edges than currently present, interpolating between junctions.
 
@@ -763,6 +777,17 @@ Get more or less edges than currently present, interpolating between junctions.
   * **interpolation_factor** – Factor for edge interpolation
 * **Returns:**
   Interpolated edge structure
+
+#### peel_topological_leaves(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[bool](https://docs.python.org/3/builtins/functions.html#bool)]
+
+Peel 1-core dangling trees and subgraphs from the network topology.
+
+Returns a boolean vector indicating for each strand whether it is ignored (pruned).
+
+* **Parameters:**
+  **crosslinker_type** – Type ID of crosslinker atoms (default: 2)
+* **Returns:**
+  Vector of booleans where true means the strand is pruned/ignored
 
 #### remove_all_angles(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
@@ -777,14 +802,14 @@ This will not remove dihedral angles, use [`remove_all_dihedral_angles()`](#pyli
 Remove all dihedral angles from the Universe.
 This will not remove the atoms or bonds, just the stored dihedral angles.
 
-#### remove_atoms(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_ids: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### remove_atoms(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_ids: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Remove atoms and all associated bonds by their atom IDs.
 
 * **Parameters:**
   **atom_ids** – Vector of atom IDs to remove
 
-#### remove_bonds(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), bonds_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], bonds_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### remove_bonds(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), bonds_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], bonds_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Remove bonds by their connected atom IDs.
 
@@ -792,14 +817,14 @@ Remove bonds by their connected atom IDs.
   * **bonds_from** – Vector of starting atom IDs
   * **bonds_to** – Vector of ending atom IDs
 
-#### remove_bonds_by_type(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), bond_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### remove_bonds_by_type(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), bond_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Remove bonds with a specific type.
 
 * **Parameters:**
   **bond_type** – The bond type to remove
 
-#### replace_atom(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), replacement_atom: [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### replace_atom(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), replacement_atom: [pylimer_tools_cpp.Atom](pylimer_tools_cpp.Atom.html.md#pylimer_tools_cpp.Atom)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Replace the properties of an atom with the properties of another given atom.
 
@@ -807,7 +832,7 @@ Replace the properties of an atom with the properties of another given atom.
   * **atom_id** – ID of the atom to replace
   * **replacement_atom** – The atom with new properties
 
-#### replace_atom_type(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), new_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### replace_atom_type(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), new_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Replace the type of an atom with another type.
 
@@ -815,7 +840,7 @@ Replace the type of an atom with another type.
   * **atom_id** – ID of the atom to modify
   * **new_type** – The new atom type
 
-#### resample_velocities(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), mean: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), variance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), seed: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '', is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### resample_velocities(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), mean: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), variance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), seed: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '', is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Resample velocities for atoms in the universe.
 
@@ -833,7 +858,7 @@ Override the currently assigned box with the one specified.
   * **box** – The new box to assign
   * **rescale_atoms** – Whether to rescale atom positions
 
-#### set_box_lengths(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), lx: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), ly: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), lz: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), rescale_atoms: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### set_box_lengths(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), lx: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), ly: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), lz: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), rescale_atoms: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Override the currently assigned box with one with the side lengths specified.
 
@@ -843,7 +868,7 @@ Override the currently assigned box with one with the side lengths specified.
   * **lz** – Length in z direction
   * **rescale_atoms** – Whether to rescale atom positions
 
-#### set_mass(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), mass: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### set_mass(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), atom_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), mass: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set the mass for a specific atom type.
 
@@ -851,21 +876,21 @@ Set the mass for a specific atom type.
   * **atom_type** – The atom type to set mass for
   * **mass** – The mass value to assign
 
-#### set_masses(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), mass_per_type: [collections.abc.Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### set_masses(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), mass_per_type: [collections.abc.Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set the mass per type of atom.
 
 * **Parameters:**
   **mass_per_type** – Map of atom types to their masses
 
-#### set_timestep(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), timestep: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### set_timestep(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), timestep: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set the timestep when this Universe was captured.
 
 * **Parameters:**
   **timestep** – The timestep value
 
-#### set_vertex_property(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), property_name: [str](https://docs.python.org/3/builtins/stdtypes.html#str), value: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### set_vertex_property(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), vertex_id: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), property_name: [str](https://docs.python.org/3/builtins/stdtypes.html#str), value: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set a specific property for a specific vertex.
 
@@ -881,3 +906,14 @@ automatically after adding bonds.
 
 This operation cleans up the graph structure by removing
 redundant connections.
+
+#### to_crosslinker_universe(self: [pylimer_tools_cpp.Universe](#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2) → pylimer_tools::sim::mehp::CrosslinkerUniverse
+
+Convert this Universe into a CrosslinkerUniverse representation.
+
+Extracts all crosslinkers and strands, lining up beads deterministically.
+
+* **Parameters:**
+  **crosslinker_type** – Type ID of crosslinker atoms (default: 2)
+* **Returns:**
+  CrosslinkerUniverse struct

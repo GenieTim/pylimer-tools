@@ -124,7 +124,7 @@ See https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace 
   df.set_index("Frequency", inplace=True)
 ```
 
-**Total running time of the script:** (0 minutes 22.892 seconds)
+**Total running time of the script:** (0 minutes 10.988 seconds)
 
 <a id="sphx-glr-download-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py"></a>
 

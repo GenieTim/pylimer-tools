@@ -8,7 +8,7 @@ A single bead or atom.
 
 Overloaded function.
 
-1. \_\_init_\_(self: pylimer_tools_cpp.Atom, id: typing.SupportsInt, type: typing.SupportsInt, x: typing.SupportsFloat, y: typing.SupportsFloat, z: typing.SupportsFloat, nx: typing.SupportsInt, ny: typing.SupportsInt, nz: typing.SupportsInt) -> None
+1. \_\_init_\_(self: pylimer_tools_cpp.Atom, id: typing.SupportsInt | typing.SupportsIndex, type: typing.SupportsInt | typing.SupportsIndex, x: typing.SupportsFloat | typing.SupportsIndex, y: typing.SupportsFloat | typing.SupportsIndex, z: typing.SupportsFloat | typing.SupportsIndex, nx: typing.SupportsInt | typing.SupportsIndex, ny: typing.SupportsInt | typing.SupportsIndex, nz: typing.SupportsInt | typing.SupportsIndex) -> None
    > Construct this atom.
    > * **param id:**
    >   Unique identifier for the atom
@@ -26,7 +26,7 @@ Overloaded function.
    >   Periodic image flag in y direction
    > * **param nz:**
    >   Periodic image flag in z direction
-2. \_\_init_\_(self: pylimer_tools_cpp.Atom, properties: collections.abc.Mapping[str, typing.SupportsFloat]) -> None
+2. \_\_init_\_(self: pylimer_tools_cpp.Atom, properties: collections.abc.Mapping[str, typing.SupportsFloat | typing.SupportsIndex]) -> None
    > Construct this atom from a properties dictionary.
 
    > The dictionary should contain at least the following keys:

@@ -48,6 +48,8 @@ MCUniverseGenerator
       ~MCUniverseGenerator.relax_crosslinks
       ~MCUniverseGenerator.remove_soluble_fraction
       ~MCUniverseGenerator.sample_entanglements
+      ~MCUniverseGenerator.sample_entanglements_analytical
+      ~MCUniverseGenerator.sample_entanglements_on_demand
       ~MCUniverseGenerator.set_bead_distance
       ~MCUniverseGenerator.set_mean_squared_bead_distance
       ~MCUniverseGenerator.set_seed
@@ -95,6 +97,8 @@ MCUniverseGenerator
    .. automethod:: relax_crosslinks
    .. automethod:: remove_soluble_fraction
    .. automethod:: sample_entanglements
+   .. automethod:: sample_entanglements_analytical
+   .. automethod:: sample_entanglements_on_demand
    .. automethod:: set_bead_distance
    .. automethod:: set_mean_squared_bead_distance
    .. automethod:: set_seed

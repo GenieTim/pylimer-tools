@@ -1,6 +1,6 @@
 # NormalModeAnalyzer
 
-### *class* pylimer_tools_cpp.NormalModeAnalyzer(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), spring_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], spring_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], nr_of_nodes: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 0)
+### *class* pylimer_tools_cpp.NormalModeAnalyzer(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), spring_from: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], spring_to: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], nr_of_nodes: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0)
 
 Bases: `pybind11_object`
 
@@ -41,7 +41,7 @@ Constructs the connectivity matrix from the given edges.
 
 ### Methods Documentation
 
-#### compute_chebyshev_moments_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 20) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### compute_chebyshev_moments_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Compute Chebyshev moments using the Kernel Polynomial Method (KPM).
 
@@ -51,7 +51,7 @@ Compute Chebyshev moments using the Kernel Polynomial Method (KPM).
 * **Returns:**
   Vector of damped Chebyshev moments
 
-#### compute_chebyshev_moments_kpm_metal(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 20, batch_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 4) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### compute_chebyshev_moments_kpm_metal(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20, batch_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 4) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Compute Chebyshev moments using the Kernel Polynomial Method (KPM)
 accelerated with Apple Silicon Metal compute kernels with multi-RHS block batching.
@@ -63,7 +63,7 @@ accelerated with Apple Silicon Metal compute kernels with multi-RHS block batchi
 * **Returns:**
   Vector of damped Chebyshev moments
 
-#### compute_density_of_states_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), lambda_grid: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 20) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### compute_density_of_states_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), lambda_grid: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Compute continuous density of states (DOS) using KPM.
 
@@ -83,7 +83,7 @@ Evaluate the loss modulus $G''(\omega)$. Yet misses the conversion factor.
 * **Returns:**
   Loss modulus values
 
-#### evaluate_loss_modulus_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 20, num_quadrature_points: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2048) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### evaluate_loss_modulus_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20, num_quadrature_points: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2048) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Evaluate loss modulus G’’ directly using KPM without computing eigenvalues.
 
@@ -104,7 +104,7 @@ Evaluate the storage modulus $G'(\omega)$. Yet misses the conversion factor.
 * **Returns:**
   Storage modulus values
 
-#### evaluate_storage_modulus_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 20, num_quadrature_points: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2048) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### evaluate_storage_modulus_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), omega: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20, num_quadrature_points: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2048) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Evaluate storage modulus G’ directly using KPM without computing eigenvalues.
 
@@ -125,7 +125,7 @@ Evaluate stress autocorrelation $C(t)$.
 * **Returns:**
   Stress autocorrelation values
 
-#### evaluate_stress_autocorrelation_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), t: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 20, num_quadrature_points: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2048) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### evaluate_stress_autocorrelation_kpm(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), t: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], num_moments: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1024, num_random_vectors: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20, num_quadrature_points: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2048) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Evaluate stress autocorrelation directly using KPM without computing eigenvalues.
 
@@ -137,16 +137,16 @@ Evaluate stress autocorrelation directly using KPM without computing eigenvalues
 * **Returns:**
   Stress autocorrelation values
 
-#### find_all_eigenvalues(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), solver: [object](https://docs.python.org/3/builtins/functions.html#object) = 'auto', compute_eigenvectors: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, decompose_components: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### find_all_eigenvalues(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), solver: [pylimer_tools_cpp.NormalModeSolver](pylimer_tools_cpp.NormalModeSolver.md#pylimer_tools_cpp.NormalModeSolver) = NormalModeSolver.AUTO, compute_eigenvectors: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, decompose_components: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Find all eigenvalues using the specified solver.
 
 * **Parameters:**
-  * **solver** – Solver method to use (NormalModeSolver enum or string: ‘auto’, ‘dense_lapack’, ‘dense_eigen’, ‘sparse_slicing’, ‘metal’; default: NormalModeSolver.AUTO)
+  * **solver** – Solver method to use (NormalModeSolver enum; default: NormalModeSolver.AUTO)
   * **compute_eigenvectors** – Whether to also compute eigenvectors (default: False)
   * **decompose_components** – Whether to decompose the graph into connected components (default: True)
 
-#### find_sparse_eigenvalues(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), nr_of_eigenvalues: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), compute_eigenvectors: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### find_sparse_eigenvalues(self: [pylimer_tools_cpp.NormalModeAnalyzer](#pylimer_tools_cpp.NormalModeAnalyzer), nr_of_eigenvalues: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), compute_eigenvectors: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Find the k smallest eigenvalues using a sparse solver.
 

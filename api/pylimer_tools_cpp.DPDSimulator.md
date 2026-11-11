@@ -1,6 +1,6 @@
 # DPDSimulator
 
-### *class* pylimer_tools_cpp.DPDSimulator(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), universe: [pylimer_tools_cpp.Universe](pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, slipspring_bond_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 9, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, seed: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '')
+### *class* pylimer_tools_cpp.DPDSimulator(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), universe: [pylimer_tools_cpp.Universe](pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, slipspring_bond_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 9, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, seed: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '')
 
 Bases: `pybind11_object`
 
@@ -69,7 +69,7 @@ Configure whether to run PBC on the bonds or not.
 If your bonds could get larger than half the box length, this must be kept false (default).
 Otherwise, you can set it to true and therewith get some securities.
 
-#### config_a(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), A: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 25.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_a(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), A: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 25.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the force-field (pair-style) parameter A.
 
@@ -82,7 +82,7 @@ Side-effect: if true, the relocations may also happen *to* a slip-spring next to
 * **Parameters:**
   **config_allow_relocation_in_network.****(****bool****)** (*allow_relocation_in_network*) – Whether to allow relocation in the network or not.
 
-#### config_auto_correlator_output(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), values: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[pylimer_tools_cpp.OutputConfiguration](pylimer_tools_cpp.OutputConfiguration.md#pylimer_tools_cpp.OutputConfiguration)], num_corr_in: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 32, p: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 16, m: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_auto_correlator_output(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), values: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[pylimer_tools_cpp.OutputConfiguration](pylimer_tools_cpp.OutputConfiguration.md#pylimer_tools_cpp.OutputConfiguration)], num_corr_in: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 32, p: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 16, m: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set which values to compute multiple-tau autocorrelation for.
 If you use this, you should cite Ramírez *et al.* [[RamirezSVL10](../acknowledgements.md#id4)].
@@ -100,7 +100,7 @@ Set which values to compute averages for.
 * **Parameters:**
   **values** – A list of OutputConfiguration structs specifying what to average
 
-#### config_bond_formation(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), num_bonds_to_form: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), max_bonds_per_atom_type: [collections.abc.Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], bond_formation_dist: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0, attempt_bond_formation_every: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 50, atom_type_form_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, atom_type_form_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_bond_formation(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), num_bonds_to_form: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), max_bonds_per_atom_type: [collections.abc.Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], bond_formation_dist: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0, attempt_bond_formation_every: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 50, atom_type_form_from: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, atom_type_form_to: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure how to do bond formation during the run.
 
@@ -116,25 +116,25 @@ Configure how to do bond formation during the run.
 
 Configure where to (incrementally) deform the box to during the next simulation run.
 
-#### config_lambda(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), l: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.65) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_lambda(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), l: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.65) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the modified velocity verlet integration parameter lambda.
 
-#### config_num_steps_dpd(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), num_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 500) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_num_steps_dpd(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), num_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 500) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the number of steps to do in one DPD sequence.
 
 * **Parameters:**
   **num_steps** – Number of DPD steps per sequence
 
-#### config_num_steps_mc(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), num_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 500) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_num_steps_mc(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), num_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 500) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the number of steps to do in one MC sequence.
 
 * **Parameters:**
   **num_steps** – Number of Monte Carlo steps per sequence
 
-#### config_restart_output(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), file: [str](https://docs.python.org/3/builtins/stdtypes.html#str), output_every: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 50000) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_restart_output(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), file: [str](https://docs.python.org/3/builtins/stdtypes.html#str), output_every: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 50000) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set when to output a restart file.
 
@@ -162,19 +162,19 @@ Configure the possibility of shifting to empty positions.
 
 This setting affects Monte Carlo moves in the simulation.
 
-#### config_sigma(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), sigma: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 3.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_sigma(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), sigma: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 3.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the force-field (pair-style) parameter sigma.
 
-#### config_slipspring_high_cutoff(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 2.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_slipspring_high_cutoff(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.
 
-#### config_slipspring_low_cutoff(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.5) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_slipspring_low_cutoff(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.5) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the lower cut-off of how far a pair may be distanced for a slip-spring to be created.
 
-#### config_spring_constant(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), k: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 2.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_spring_constant(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), k: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the force-field (bond-style) parameter k, the spring constant.
 
@@ -185,7 +185,7 @@ Set which values to log.
 * **Parameters:**
   **values** – a list of OutputConfiguration structs
 
-#### create_slip_springs(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), num: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), bond_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 9) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### create_slip_springs(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), num: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), bond_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 9) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Randomly add the specified number of slip-springs to neighbours within the specified cut-offs.
 
@@ -338,13 +338,13 @@ Read a restart file in order to continue a simulation.
 After re-configuring the force-field parameters,
 this method should be called to update the current stress tensor etc.
 
-#### run_simulation(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), n_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), dt: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.06, with_MC: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### run_simulation(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), n_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), dt: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.06, with_MC: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
-#### start_measuring_msd_for_atoms(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), atom_ids: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### start_measuring_msd_for_atoms(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), atom_ids: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set a new origin for measuing the mean square displacement for a specified set of atoms
 
-#### validate_neighbour_list(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### validate_neighbour_list(self: [pylimer_tools_cpp.DPDSimulator](#pylimer_tools_cpp.DPDSimulator), cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Validate the neighbor list consistency for debugging purposes.
 

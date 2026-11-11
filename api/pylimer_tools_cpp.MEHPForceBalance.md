@@ -1,6 +1,6 @@
 # MEHPForceBalance
 
-### *class* pylimer_tools_cpp.MEHPForceBalance(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), universe: [pylimer_tools_cpp.Universe](pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, remove_2functional_crosslinkers: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, remove_dangling_chains: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False)
+### *class* pylimer_tools_cpp.MEHPForceBalance(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), universe: [pylimer_tools_cpp.Universe](pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, remove_2functional_crosslinkers: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, remove_dangling_chains: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False)
 
 Bases: `pybind11_object`
 
@@ -106,11 +106,11 @@ Instantiate the simulator for a certain universe.
 
 ### Methods Documentation
 
-#### add_sliplinks(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), strand_idx_1: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], strand_idx_2: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)], x: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)], y: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)], z: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)], alpha_1: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)], alpha_2: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)], clamp_alpha: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### add_sliplinks(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), strand_idx_1: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], strand_idx_2: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], x: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], y: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], z: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], alpha_1: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], alpha_2: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)], clamp_alpha: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Add new slip-links
 
-#### add_sliplinks_based_on_cycles(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), maxLoopLength: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### add_sliplinks_based_on_cycles(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), maxLoopLength: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Detect and add slip-links based on detected entanglements.
 
@@ -126,7 +126,7 @@ Configure whether to run PBC on the bonds or not.
   If your bonds could get larger than half the box length,
   this must be kept False (default).
 
-#### config_entanglement_type(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_entanglement_type(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 To have certain crosslinks behave as entanglements in the removal process,
 you can specify here a type, that you have used in the universe to specify:
@@ -141,21 +141,21 @@ if they have a functionality of 2 or less while still being connected to its par
 * **Parameters:**
   **type** – The atom type to treat as entanglement.
 
-#### config_mean_bond_length(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), b: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_mean_bond_length(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), b: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the $b$ used e.g. for the topological Gamma-factor.
 
 * **Parameters:**
   **b** – The mean bond length to use.
 
-#### config_simplification_frequency(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), frequency: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 10) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_simplification_frequency(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), frequency: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 10) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure every how many steps to simplify the structure.
 
 * **Parameters:**
   **frequency** – The number of steps between simplification. Default: 10.
 
-#### config_spring_breaking_distance(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), distance_over_contour_length: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = -1) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_spring_breaking_distance(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), distance_over_contour_length: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the “force” (distance over contour length) at which the bonds break.
 Can be used to model the effect of fracture, to reduce the stiffening happening upon deformation.
@@ -166,7 +166,7 @@ Default: -1.
 * **Parameters:**
   **distance_over_contour_length** – The threshold for breaking springs.
 
-#### config_spring_constant(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), kappa: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_spring_constant(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), kappa: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the spring constant used in the simulation.
 
@@ -181,7 +181,7 @@ Set which values to log during the simulation.
   **output_configuration** – A list of OutputConfiguration structs
   specifying what values to log and how often
 
-#### *static* construct_with_random_sliplinks(universe: [pylimer_tools_cpp.Universe](pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), nr_of_sliplinks_to_sample: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), upper_sampling_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.2, lower_sampling_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.0, minimum_nr_of_sliplinks: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 0, same_strand_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 3, seed: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '', crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, skip_dangling_soluble_entanglements: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance)
+#### *static* construct_with_random_sliplinks(universe: [pylimer_tools_cpp.Universe](pylimer_tools_cpp.Universe.md#pylimer_tools_cpp.Universe), nr_of_sliplinks_to_sample: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), upper_sampling_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.2, lower_sampling_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.0, minimum_nr_of_sliplinks: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0, same_strand_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 3, seed: [str](https://docs.python.org/3/builtins/stdtypes.html#str) = '', crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, is_2d: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, skip_dangling_soluble_entanglements: [bool](https://docs.python.org/3/builtins/functions.html#bool) = True) → [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance)
 
 Instantiate this simulator with randomly chosen slip-links.
 
@@ -190,7 +190,7 @@ Instantiate this simulator with randomly chosen slip-links.
 Perform a deformation of the system box to a different box.
 All coordinates etc. will be scaled as needed.
 
-#### evaluate_spring_distance(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), network: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], spring_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### evaluate_spring_distance(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), network: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], spring_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Evaluate the distance vector for a specific spring.
 
@@ -201,7 +201,7 @@ Evaluate the distance vector for a specific spring.
 * **Returns:**
   3D distance vector for the spring
 
-#### evaluate_spring_distance_from(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), network: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], spring_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### evaluate_spring_distance_from(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), network: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], spring_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Evaluate the spring distance from a specific link.
 
@@ -213,7 +213,7 @@ Evaluate the spring distance from a specific link.
 * **Returns:**
   3D distance vector from the specified link
 
-#### evaluate_spring_distance_to(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), network: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], spring_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### evaluate_spring_distance_to(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), network: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], spring_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Evaluate the spring distance to a specific link.
 
@@ -225,7 +225,7 @@ Evaluate the spring distance to a specific link.
 * **Returns:**
   3D distance vector to the specified link
 
-#### get_active_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_active_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the weight fraction of active strands
 
@@ -254,7 +254,7 @@ Get the spring vectors.
 
 #### get_current_strand_vectors(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
-#### get_dangling_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_dangling_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the weight fraction of non-active strands
 
@@ -265,7 +265,7 @@ Caution: ignores atom masses.
 Returns the value effectively used in [`get_gamma_factor()`](#pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor) for
 $b$ in $\langle R_{0,\eta}^2 = N_{\eta} b^2\rangle$.
 
-#### get_displacement_residual_norm(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_displacement_residual_norm(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Get the current link displacement residual norm.
 
@@ -273,7 +273,7 @@ Get the current link displacement residual norm.
 
 Get the current link displacements.
 
-#### get_effective_functionality_of_atoms(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
+#### get_effective_functionality_of_atoms(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Returns the number of active strands connected to each atom, atomId used as index
 
@@ -284,15 +284,15 @@ Returns the number of active strands connected to each atom, atomId used as inde
 
 Returns the reason for termination of the simulation
 
-#### get_force_magnitude_vector(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), arg0: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### get_force_magnitude_vector(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), arg0: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Evaluate the norm of the force on each (slip- or cross-) link.
 
-#### get_force_on(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### get_force_on(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Evaluate the force on a particular (slip- or cross-) link.
 
-#### get_gamma_factor(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = -1.0, nr_of_chains: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1, one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_gamma_factor(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1.0, nr_of_chains: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1, one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
 
@@ -310,11 +310,11 @@ $k_B$ Boltzmann’s constant.
   * **b02** – The melt $<b>_0^2$: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it’s the slope in a <R_0^2> vs. N plot, also sometimes labelled $C_\infinity b^2$.
   * **nr_of_chains** – The value to normalize the sum of square distances by. Usually (and default if $< 0$) the nr of springs.
 
-#### get_gamma_factors(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### get_gamma_factors(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
 
-#### get_gamma_factors_in_dir(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), direction: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### get_gamma_factors_in_dir(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), direction: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Evaluates the gamma factor for each strand in the specified direction (i.e., the squared distance divided by the contour length multiplied by b02)
 
@@ -322,7 +322,7 @@ Evaluates the gamma factor for each strand in the specified direction (i.e., the
   * **b02** – The melt $<b>_0^2$: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it’s the slope in a <R_0^2> vs. N plot, also sometimes labelled $C_\infinity b^2$.
   * **direction** – The direction in which to compute the gamma factors (0: x, 1: y, 2: z)
 
-#### get_ids_of_active_nodes(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
+#### get_ids_of_active_nodes(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Get the atom ids of the nodes that are considered active.
 Only crosslink ids are returned (not e.g. entanglement links).
@@ -334,7 +334,7 @@ Only crosslink ids are returned (not e.g. entanglement links).
 
 Get the initial coordinates of the (remaining) crosslinkers and entanglement links.
 
-#### *static* get_neighbour_link_indices(network: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
+#### *static* get_neighbour_link_indices(network: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Get the indices of neighboring links for a given link.
 
@@ -344,7 +344,7 @@ Get the indices of neighboring links for a given link.
 * **Returns:**
   Vector of connected link indices
 
-#### get_nr_of_active_nodes(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_active_nodes(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the number of active nodes (incl. entanglement nodes [atoms with type = entanglementType, present in the universe when creating this simulator],
 excl. entanglement links [the slip-links created internally when e.g. constructing the simulator with random slip-links]).
@@ -352,19 +352,19 @@ excl. entanglement links [the slip-links created internally when e.g. constructi
 * **Parameters:**
   **tolerance** – strands under this length are considered inactive. A node is active if it has > 1 active strands.
 
-#### get_nr_of_active_springs(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_active_springs(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 > Get the number of active springs remaining after running the simulation.
 * **Parameters:**
   **tolerance** – springs under this length are considered inactive
 
-#### get_nr_of_active_strands(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_active_strands(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 > Get the number of active strands remaining after running the simulation.
 * **Parameters:**
   **tolerance** – strands under this length are considered inactive
 
-#### get_nr_of_active_strands_in_dir(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), direction: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_active_strands_in_dir(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), direction: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 > Get the number of active strands remaining after running the simulation.
 * **Parameters:**
@@ -401,14 +401,14 @@ Get the sum of the lengths of the springs of each strand.
 
 Returns the pressure at the current state of the simulation.
 
-#### get_soluble_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_soluble_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the weight fraction of strands connected to active
 strands (any depth).
 
 Caution: ignores atom masses.
 
-#### get_strand_partition_indices_of_sliplink(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), network: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
+#### get_strand_partition_indices_of_sliplink(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), network: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Get the indices of strand partitions associated with a slip-link.
 
@@ -422,11 +422,11 @@ Get the indices of strand partitions associated with a slip-link.
 
 Get the current strand partitions (the fraction of the contour length associated with each spring).
 
-#### get_stress_on(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 3]']
+#### get_stress_on(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 3]']
 
 Evaluate the stress on a particular (slip- or cross-) link.
 
-#### get_stress_tensor(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 3]']
+#### get_stress_tensor(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 3]']
 
 Returns the stress tensor at the current state of the simulation.
 
@@ -434,35 +434,35 @@ The units are in $[\text{units of }\kappa]/[\text{distance units}]$,
 where the units of $\kappa$ should be $[\text{force}]/[\text{distance units}]^2$.
 Make sure to multiply by $\kappa$ or configure it appropriately.
 
-#### get_stress_tensor_link_based(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0, xlinks_only: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 3]']
+#### get_stress_tensor_link_based(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0, xlinks_only: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 3]']
 
 Returns the stress tensor at the current state of the simulation.
 
-#### get_weighted_spring_lengths(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### get_weighted_spring_lengths(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Get the current spring lengths (norm of vector) divided by the strand partition times the contour length.
 
-#### inspect_displacement_to_mean_position_update(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### inspect_displacement_to_mean_position_update(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Helper method to debug and/or understand what happens to certain links when being displaced.
 
-#### inspect_parametrisation_optimsation_for_link(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], strand_partitions: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], max_nr_of_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 100, alpha_tol: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-09, min_nr_of_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1, one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]'], [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]'], [int](https://docs.python.org/3/builtins/functions.html#int), [float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]
+#### inspect_parametrisation_optimsation_for_link(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], strand_partitions: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], max_nr_of_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 100, alpha_tol: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1e-09, min_nr_of_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1, one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]'], [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]'], [int](https://docs.python.org/3/builtins/functions.html#int), [float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float), [float](https://docs.python.org/3/builtins/functions.html#float)]
 
 Helper method to debug and/or understand what happens to certain links
 when being displaced and their partition updated.
 
-#### inspect_strand_partition_update(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### inspect_strand_partition_update(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Helper method to debug and/or understand what happens to certain links
 when the strand partition is being updated.
 
-#### move_sliplinks_to_their_best_branch(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), arg0: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), arg1: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], arg2: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], arg3: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), arg4: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), arg5: [bool](https://docs.python.org/3/builtins/functions.html#bool), arg6: [bool](https://docs.python.org/3/builtins/functions.html#bool)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### move_sliplinks_to_their_best_branch(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), arg0: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), arg1: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], arg2: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], arg3: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), arg4: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), arg5: [bool](https://docs.python.org/3/builtins/functions.html#bool), arg6: [bool](https://docs.python.org/3/builtins/functions.html#bool)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
-#### randomly_add_sliplinks(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), nr_of_sliplinks_to_sample: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 2.0, minimum_nr_of_sliplinks: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 0, same_strand_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 2, exclude_crosslinks: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, seed: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### randomly_add_sliplinks(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), nr_of_sliplinks_to_sample: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2.0, minimum_nr_of_sliplinks: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0, same_strand_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2, exclude_crosslinks: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, seed: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Randomly sample and add slip-links based on certain criteria.
 
-#### run_force_relaxation(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), max_nr_of_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 250000, x_tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-12, initial_residual_norm: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = -1.0, simplification_mode: [pylimer_tools_cpp.StructureSimplificationMode](pylimer_tools_cpp.StructureSimplificationMode.md#pylimer_tools_cpp.StructureSimplificationMode) = StructureSimplificationMode.NO_SIMPLIFICATION, inactive_removal_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001, do_inner_iterations: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, allow_sliplinks_to_pass_each_other: [pylimer_tools_cpp.LinkSwappingMode](pylimer_tools_cpp.LinkSwappingMode.md#pylimer_tools_cpp.LinkSwappingMode) = LinkSwappingMode.NO_SWAPPING, swapping_frequency: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 10, one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0, nr_of_crosslink_swaps_allowed_per_sliplink: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1, disable_slipping: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### run_force_relaxation(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), max_nr_of_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 250000, x_tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1e-12, initial_residual_norm: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1.0, simplification_mode: [pylimer_tools_cpp.StructureSimplificationMode](pylimer_tools_cpp.StructureSimplificationMode.md#pylimer_tools_cpp.StructureSimplificationMode) = StructureSimplificationMode.NO_SIMPLIFICATION, inactive_removal_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001, do_inner_iterations: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False, allow_sliplinks_to_pass_each_other: [pylimer_tools_cpp.LinkSwappingMode](pylimer_tools_cpp.LinkSwappingMode.md#pylimer_tools_cpp.LinkSwappingMode) = LinkSwappingMode.NO_SWAPPING, swapping_frequency: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 10, one_over_strand_partition_upper_limit: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0, nr_of_crosslink_swaps_allowed_per_sliplink: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1, disable_slipping: [bool](https://docs.python.org/3/builtins/functions.html#bool) = False) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Run the simulation.
 Note that the final state of the minimization is persisted and reused if you use this method again.
@@ -494,7 +494,7 @@ Set/overwrite the contour lengths.
 
 Set the current strand partitions.
 
-#### swap_sliplinks_incl_xlinks(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), arg0: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), arg1: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], arg2: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], arg3: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), arg4: [bool](https://docs.python.org/3/builtins/functions.html#bool)) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### swap_sliplinks_incl_xlinks(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance), arg0: [pylimer_tools_cpp.SimplifiedBalanceNetwork](pylimer_tools_cpp.SimplifiedBalanceNetwork.md#pylimer_tools_cpp.SimplifiedBalanceNetwork), arg1: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], arg2: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], arg3: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), arg4: [bool](https://docs.python.org/3/builtins/functions.html#bool)) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 #### validate_network(self: [pylimer_tools_cpp.MEHPForceBalance](#pylimer_tools_cpp.MEHPForceBalance)) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
 

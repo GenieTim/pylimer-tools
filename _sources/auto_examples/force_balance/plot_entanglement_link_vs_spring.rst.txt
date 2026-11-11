@@ -87,7 +87,7 @@ contour positions :math:`\alpha_1` and :math:`\alpha_2`:
   The entanglement spring acts in series with the strand segments, adding compliance and
   reducing the effective stiffness of the entanglement constraint.
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-98
+.. GENERATED FROM PYTHON SOURCE LINES 70-100
 
 .. code-block:: Python
 
@@ -108,9 +108,11 @@ contour positions :math:`\alpha_1` and :math:`\alpha_2`:
 
     from _example_cache import (  # noqa: E402
         compute_ensemble_statistics,
+        configure_process_threading,
         get_example_cache_path,
         load_or_compute_cache,
         resolve_max_workers,
+        worker_process_initializer,
     )
     from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
         ParameterType,
@@ -126,7 +128,7 @@ contour positions :math:`\alpha_1` and :math:`\alpha_2`:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-109
+.. GENERATED FROM PYTHON SOURCE LINES 101-111
 
 Multi-Seed Simulation Procedure
 -------------------------------
@@ -139,7 +141,7 @@ sampling (multiple seeds and complex systems), the results are cached into a com
 at any time by passing ``--recompute`` or setting
 ``PYLIMER_RECOMPUTE_CACHE=1``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-297
+.. GENERATED FROM PYTHON SOURCE LINES 111-302
 
 .. code-block:: Python
 
@@ -268,13 +270,16 @@ at any time by passing ``--recompute`` or setting
         ]
 
         workers = min(resolve_max_workers(max_workers), n_repeats)
+        configure_process_threading(workers)
 
         if workers > 1 and n_repeats > 1:
             print(
                 f"Executing {n_repeats} repeats in parallel across {workers} worker processes..."
             )
             completed = 0
-            with ProcessPoolExecutor(max_workers=workers) as executor:
+            with ProcessPoolExecutor(
+                max_workers=workers, initializer=worker_process_initializer
+            ) as executor:
                 futures = [
                     executor.submit(_simulate_link_vs_spring_single_repeat, *task)
                     for task in tasks
@@ -338,13 +343,13 @@ at any time by passing ``--recompute`` or setting
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 298-301
+.. GENERATED FROM PYTHON SOURCE LINES 303-306
 
 Loading Cached Data or Recomputing
 ----------------------------------
 Resolves the committed cache file or recomputes when requested:
 
-.. GENERATED FROM PYTHON SOURCE LINES 301-321
+.. GENERATED FROM PYTHON SOURCE LINES 306-326
 
 .. code-block:: Python
 
@@ -381,7 +386,7 @@ Resolves the committed cache file or recomputes when requested:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 322-335
+.. GENERATED FROM PYTHON SOURCE LINES 327-340
 
 Visualizing Mechanical & Structural Differences
 ------------------------------------------------
@@ -397,7 +402,7 @@ The plots below compare:
    Entanglement springs introduce exactly twice as many extra node coordinates into the linear
    system of equations as entanglement links.
 
-.. GENERATED FROM PYTHON SOURCE LINES 335-432
+.. GENERATED FROM PYTHON SOURCE LINES 340-437
 
 .. code-block:: Python
 
@@ -510,7 +515,7 @@ The plots below compare:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 433-455
+.. GENERATED FROM PYTHON SOURCE LINES 438-460
 
 Practical Recommendations
 -------------------------
@@ -538,7 +543,7 @@ Practical Recommendations
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.392 seconds)
+   **Total running time of the script:** (0 minutes 0.191 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_entanglement_link_vs_spring.py:

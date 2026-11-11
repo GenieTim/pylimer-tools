@@ -80,7 +80,7 @@ For each conversion and Monte Carlo realization, we evaluate 5 distinct modeling
 Results are cached in a committed `.npz` file for instantaneous CI and
 documentation builds.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 74-538 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 74-545 -->
 ```Python
 import pylimer_tools_cpp as pt
 import numpy as np
@@ -100,9 +100,11 @@ if "__file__" in globals():
 
 from _example_cache import (  # noqa: E402
     compute_ensemble_statistics,
+    configure_process_threading,
     get_example_cache_path,
     load_or_compute_cache,
     resolve_max_workers,
+    worker_process_initializer,
 )
 from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
     ParameterType,
@@ -354,8 +356,13 @@ def run_inactive_removal_and_sampling_simulation(
         for r in range(n_repeats)
     ]
 
+    configure_process_threading(effective_workers)
+
     if effective_workers > 1:
-        with ProcessPoolExecutor(max_workers=effective_workers) as executor:
+        with ProcessPoolExecutor(
+            max_workers=effective_workers,
+            initializer=worker_process_initializer,
+        ) as executor:
             futures = [
                 executor.submit(_simulate_inactive_removal_single_repeat, *t)
                 for t in tasks
@@ -545,14 +552,14 @@ def run_inactive_removal_and_sampling_simulation(
     }
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 539-543 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 546-550 -->
 
 ## Loading Cached Data or Recomputing
 
 We load precomputed multi-seed ensemble results from the committed cache archive,
 or execute the live parallel simulation when `--recompute` is requested.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 543-582 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 550-589 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     cache_path = get_example_cache_path(
@@ -597,7 +604,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 Loading cached example data from inactive_removal_and_sampling_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 583-600 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 590-607 -->
 
 ## Figure 1: Shear Modulus & The Dangling Chain Entanglement Trap
 
@@ -617,7 +624,7 @@ $$
 demonstrating how unphysical constraints inflate stiffness by hundreds
 to thousands of percent!
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 600-744 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 607-751 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
@@ -763,7 +770,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 745-755 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 752-762 -->
 
 ## Figure 2: Network Topology & Simplification Efficiency
 
@@ -776,7 +783,7 @@ How many springs and links actually carry elastic load, and how many are redunda
   Even at high conversion ($p = 0.95$), 15–20% of springs are pruned or collapsed,
   reducing memory and solver overhead for all subsequent deformation steps.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 755-853 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 762-860 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
@@ -876,7 +883,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 854-868 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 861-875 -->
 
 ## Figure 3: Linear System Dimension & Solver Relaxation Iterations
 
@@ -894,7 +901,7 @@ $$
 modes perform iterative pruning cycles, ensuring a strictly clean
 topological structure.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 868-973 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 875-980 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
@@ -1001,7 +1008,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 974-1004 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 981-1011 -->
 
 ## Physical Interpretation & Practical Recommendations
 
@@ -1030,7 +1037,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
    > This permanently purges inactive degrees of freedom and unlinks bifunctional nodes, accelerating
    > every successive deformation step by 20–80%.
 
-**Total running time of the script:** (0 minutes 0.876 seconds)
+**Total running time of the script:** (0 minutes 0.422 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"></a>
 

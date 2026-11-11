@@ -31,7 +31,7 @@ Get the number of sections (time-steps) in the file.
 * **Returns:**
   Number of timesteps/sections in the dump file
 
-#### get_numeric_values_for_at(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), rowIndex: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), headerKey: [str](https://docs.python.org/3/builtins/stdtypes.html#str), columnIndex: [str](https://docs.python.org/3/builtins/stdtypes.html#str)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
+#### get_numeric_values_for_at(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), rowIndex: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), headerKey: [str](https://docs.python.org/3/builtins/stdtypes.html#str), columnIndex: [str](https://docs.python.org/3/builtins/stdtypes.html#str)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[float](https://docs.python.org/3/builtins/functions.html#float)]
 
 Get numeric values for the section at index, the main header headerKey and the column columnIndex.
 
@@ -42,7 +42,7 @@ Get numeric values for the section at index, the main header headerKey and the c
 * **Returns:**
   Vector of numeric values for the specified location
 
-#### get_string_values_for_at(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), rowIndex: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), headerKey: [str](https://docs.python.org/3/builtins/stdtypes.html#str), columnIndex: [str](https://docs.python.org/3/builtins/stdtypes.html#str)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]
+#### get_string_values_for_at(self: [pylimer_tools_cpp.DumpFileReader](#pylimer_tools_cpp.DumpFileReader), rowIndex: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), headerKey: [str](https://docs.python.org/3/builtins/stdtypes.html#str), columnIndex: [str](https://docs.python.org/3/builtins/stdtypes.html#str)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[str](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 Get string values for the section at index, the main header headerKey and the column columnIndex.
 

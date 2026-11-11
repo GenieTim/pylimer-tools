@@ -1,11 +1,3 @@
 # DIRECT_LDLT
 
-### pylimer_tools_cpp.DIRECT_LDLT *= <RouseSolverType.DIRECT_LDLT: 0>*
-
-Members:
-
-DIRECT_LDLT
-
-DIRECT_LLT
-
-CONJUGATE_GRADIENT
+### pylimer_tools_cpp.DIRECT_LDLT *= RouseSolverType.DIRECT_LDLT*

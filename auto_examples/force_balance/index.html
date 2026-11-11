@@ -242,8 +242,8 @@
 <li class="toctree-l3"><a class="reference internal" href="plot_slipping_vs_fixed_links.html">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_polydispersity_study.html">Polydispersity Study</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_sampling_cutoff_effect.html">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. Analytical</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_inactive_removal_and_sampling.html">Inactive Strand &amp; Entanglement Removal in Force Balance 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -310,8 +310,11 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.do_random_walk_chain_from_to.html">do_random_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html">do_random_walk_chain_from_to_mc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.peel_topological_leaves.html">peel_topological_leaves</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html">randomly_sample_entanglements_analytical</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html">randomly_sample_entanglements_on_demand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.randomly_sample_entanglements_v2.html">randomly_sample_entanglements_v2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.split_csv.html">split_csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.Atom.html">Atom</a></li>
@@ -327,6 +330,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.EntanglementFilteringMode.html">EntanglementFilteringMode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.EntanglementSamplingMethod.html">EntanglementSamplingMethod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html">LazyUniverseSequenceIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.LinearMaxDistanceProvider.html">LinearMaxDistanceProvider</a></li>
@@ -340,7 +345,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.Molecule.html">Molecule</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.MoleculeIterator.html">MoleculeIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.MoleculeType.html">MoleculeType</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.NeighbourList.html">NeighbourList</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.NoMaxDistanceProvider.html">NoMaxDistanceProvider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
@@ -431,7 +435,7 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
 </ol>
 <p>See:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="plot_entanglement_sampling_comparison.html"><span class="doc">Comparing Entanglement Sampling Methods: Discrete vs. Analytical</span></a> for a detailed benchmark and comparison of discrete vs. analytical sampling methods,</p></li>
+<li><p><a class="reference internal" href="plot_entanglement_sampling_comparison.html"><span class="doc">Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical</span></a> for a detailed benchmark and comparison of discrete vs. analytical sampling methods,</p></li>
 <li><p><a class="reference internal" href="plot_entanglement_link_vs_spring.html"><span class="doc">Modeling Entanglements: Entanglement Links vs. Entanglement Springs</span></a> for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,</p></li>
 <li><p><a class="reference internal" href="plot_slipping_vs_fixed_links.html"><span class="doc">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</span></a> for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and</p></li>
 <li><p><a class="reference internal" href="plot_inactive_removal_and_sampling.html"><span class="doc">Inactive Strand &amp; Entanglement Removal in Force Balance 2</span></a> for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling,</p></li>
@@ -462,12 +466,12 @@ This is useful for predicting the (phantom) equilibrium shear modulus of the net
 </div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements are introduced by sampling candidate pairs of chain beads that lie within a spatial proximity cut-off:"><img alt="" src="../../_images/sphx_glr_plot_sampling_cutoff_effect_thumb.png" />
 <p><a class="reference internal" href="plot_sampling_cutoff_effect.html"><span class="doc">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</span></a></p>
   <div class="sphx-glr-thumbnail-title">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as localized topological constraints (entanglement links or springs)."><img alt="" src="../../_images/sphx_glr_plot_entanglement_sampling_comparison_thumb.png" />
-<p><a class="reference internal" href="plot_entanglement_sampling_comparison.html"><span class="doc">Comparing Entanglement Sampling Methods: Discrete vs. Analytical</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Comparing Entanglement Sampling Methods: Discrete vs. Analytical</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network modeling via the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), networks generated below or near full conversion contain significant fractions of dangling chains, sol fractions, and topological loops."><img alt="" src="../../_images/sphx_glr_plot_inactive_removal_and_sampling_thumb.png" />
 <p><a class="reference internal" href="plot_inactive_removal_and_sampling.html"><span class="doc">Inactive Strand &amp; Entanglement Removal in Force Balance 2</span></a></p>
   <div class="sphx-glr-thumbnail-title">Inactive Strand & Entanglement Removal in Force Balance 2</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as localized topological constraints (entanglement links or springs)."><img alt="" src="../../_images/sphx_glr_plot_entanglement_sampling_comparison_thumb.png" />
+<p><a class="reference internal" href="plot_entanglement_sampling_comparison.html"><span class="doc">Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical</div>
 </div></div><div class="toctree-wrapper compound">
 </div>
 </section>

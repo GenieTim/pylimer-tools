@@ -11,8 +11,8 @@ Currently, only rectangular boxes are supported.
 
 Overloaded function.
 
-1. \_\_init_\_(self: pylimer_tools_cpp.Box, arg0: typing.SupportsFloat, arg1: typing.SupportsFloat, arg2: typing.SupportsFloat) -> None
-2. \_\_init_\_(self: pylimer_tools_cpp.Box, arg0: typing.SupportsFloat, arg1: typing.SupportsFloat, arg2: typing.SupportsFloat, arg3: typing.SupportsFloat, arg4: typing.SupportsFloat, arg5: typing.SupportsFloat) -> None
+1. \_\_init_\_(self: pylimer_tools_cpp.Box, arg0: typing.SupportsFloat | typing.SupportsIndex, arg1: typing.SupportsFloat | typing.SupportsIndex, arg2: typing.SupportsFloat | typing.SupportsIndex) -> None
+2. \_\_init_\_(self: pylimer_tools_cpp.Box, arg0: typing.SupportsFloat | typing.SupportsIndex, arg1: typing.SupportsFloat | typing.SupportsIndex, arg2: typing.SupportsFloat | typing.SupportsIndex, arg3: typing.SupportsFloat | typing.SupportsIndex, arg4: typing.SupportsFloat | typing.SupportsIndex, arg5: typing.SupportsFloat | typing.SupportsIndex) -> None
 
 ### Methods Summary
 
@@ -45,7 +45,7 @@ Apply periodic boundary conditions (PBC): adjust the specified distances to fit 
 * **Returns:**
   The adjusted distances
 
-#### apply_simple_shear(self: [pylimer_tools_cpp.Box](#pylimer_tools_cpp.Box), shear_magnitude: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), shear_direction: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### apply_simple_shear(self: [pylimer_tools_cpp.Box](#pylimer_tools_cpp.Box), shear_magnitude: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), shear_direction: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Apply a simple shear to the box.
 
@@ -160,7 +160,7 @@ $V = L_x \cdot L_y \cdot L_z$
 * **Returns:**
   The volume of the box
 
-#### is_valid_offset(self: [pylimer_tools_cpp.Box](#pylimer_tools_cpp.Box), potential_offset: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], abs_precision: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-05) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
+#### is_valid_offset(self: [pylimer_tools_cpp.Box](#pylimer_tools_cpp.Box), potential_offset: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], abs_precision: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1e-05) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
 
 Check whether the passed offset is a valid one in this box.
 

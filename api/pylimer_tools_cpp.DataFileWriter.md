@@ -52,7 +52,7 @@ Set whether to attempt to reset image flags so that output coordinates lie in th
 * **Parameters:**
   **attempt_image_reset** – Whether to attempt image flag reset (default: False)
 
-#### config_crosslinker_type(self: [pylimer_tools_cpp.DataFileWriter](#pylimer_tools_cpp.DataFileWriter), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 2) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_crosslinker_type(self: [pylimer_tools_cpp.DataFileWriter](#pylimer_tools_cpp.DataFileWriter), crosslinker_type: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set which atom type represents crosslinkers.
 Needed in case the moleculeIdx in the output file should have any meaning.

@@ -16,7 +16,7 @@ Please cite Bernhard and Gusev [[BG25](../acknowledgements.md#id12)] if you use 
 
 Overloaded function.
 
-1. \_\_init_\_(self: pylimer_tools_cpp.MEHPForceBalance2, universe: pylimer_tools_cpp.Universe, crosslinker_type: typing.SupportsInt = 2, is_2d: bool = False) -> None
+1. \_\_init_\_(self: pylimer_tools_cpp.MEHPForceBalance2, universe: pylimer_tools_cpp.Universe, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False) -> None
    > Instantiate the simulator for a certain universe.
    > * **param universe:**
    >   The universe giving the basic connectivity to compute with
@@ -30,7 +30,7 @@ Overloaded function.
    >   whether to keep or remove the 2-functional crosslinkers when setting up the network
    > * **param remove_dangling_chains:**
    >   whether to keep or remove obviously dangling chains when setting up the network
-2. \_\_init_\_(self: pylimer_tools_cpp.MEHPForceBalance2, universe: pylimer_tools_cpp.Universe, entanglements: pylimer_tools_cpp.AtomPairEntanglements, crosslinker_type: typing.SupportsInt = 2, is_2d: bool = False, entanglements_as_springs: bool = False) -> None
+2. \_\_init_\_(self: pylimer_tools_cpp.MEHPForceBalance2, universe: pylimer_tools_cpp.Universe, entanglements: pylimer_tools_cpp.AtomPairEntanglements, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, entanglements_as_springs: bool = False) -> None
    > Instantiate the simulator for a certain universe with the given entanglements.
    > * **param universe:**
    >   The universe giving the basic connectivity to compute with
@@ -42,7 +42,7 @@ Overloaded function.
    >   Whether to ignore the z direction.
    > * **param entanglements_as_springs:**
    >   whether to use the entanglements as springs instead of links
-3. \_\_init_\_(self: pylimer_tools_cpp.MEHPForceBalance2, universe: pylimer_tools_cpp.Universe, nr_of_entanglements_to_sample: typing.SupportsInt, upper_sampling_cutoff: typing.SupportsFloat = 1.2, lower_sampling_cutoff: typing.SupportsFloat = 0.0, minimum_nr_of_sliplinks: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 3, seed: str = ‘’, crosslinker_type: typing.SupportsInt = 2, is_2d: bool = False, skip_dangling_soluble_entanglements: bool = True, entanglements_as_springs: bool = True) -> None
+3. \_\_init_\_(self: pylimer_tools_cpp.MEHPForceBalance2, universe: pylimer_tools_cpp.Universe, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_sampling_cutoff: typing.SupportsFloat | typing.SupportsIndex = 1.2, lower_sampling_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_sliplinks: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3, seed: str = ‘’, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, skip_dangling_soluble_entanglements: bool = True, entanglements_as_springs: bool = True) -> None
    > Instantiate this simulator with randomly chosen slip-links.
    > * **param universe:**
    >   The universe containing the basic atoms and connectivity
@@ -156,25 +156,25 @@ since the universe representation with all the in-between beads does not need to
 However, currently, the removal procedures are not loss-free.
 Therefore, use this with care.
 
-#### config_cg_fallback_max_iterations(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), max_iterations: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 20000) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_cg_fallback_max_iterations(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), max_iterations: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 20000) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the maximum iterations allowed for ConjugateGradient before
 automatically falling back to BiCGSTAB on ill-conditioned systems.
 Set to <= 0 to disable fallback. Default: 20000.
 
-#### config_in_place_rebuild_threshold(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), threshold: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.15) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_in_place_rebuild_threshold(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), threshold: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.15) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure threshold fraction of cumulative broken springs to rebuild CSR sparse pattern.
 Default: 0.15 (15%).
 
-#### config_mean_bond_length(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), b: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_mean_bond_length(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), b: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the $b$ used e.g. for the topological Gamma-factor.
 
 * **Parameters:**
   **b** – The mean bond length to use.
 
-#### config_spring_breaking_distance(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), distance_over_contour_length: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = -1) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_spring_breaking_distance(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), distance_over_contour_length: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the “force” (distance over contour length) at which the bonds break.
 Can be used to model the effect of fracture, to reduce the stiffening happening upon deformation.
@@ -185,7 +185,7 @@ Default: -1.
 * **Parameters:**
   **distance_over_contour_length** – The threshold for breaking springs.
 
-#### config_spring_constant(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), kappa: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_spring_constant(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), kappa: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Configure the spring constant used in the simulation.
 
@@ -204,7 +204,7 @@ Set which values to log.
 Perform a deformation of the system box to a different box.
 All coordinates etc. will be scaled as needed.
 
-#### evaluate_spring_vector(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), network: [pylimer_tools_cpp.SimplifiedBalance2Network](pylimer_tools_cpp.SimplifiedBalance2Network.md#pylimer_tools_cpp.SimplifiedBalance2Network), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], spring_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### evaluate_spring_vector(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), network: [pylimer_tools_cpp.SimplifiedBalance2Network](pylimer_tools_cpp.SimplifiedBalance2Network.md#pylimer_tools_cpp.SimplifiedBalance2Network), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], spring_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Evaluate the distance vector for a specific spring.
 
@@ -215,7 +215,7 @@ Evaluate the distance vector for a specific spring.
 * **Returns:**
   3D distance vector for the spring
 
-#### evaluate_spring_vector_from(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), network: [pylimer_tools_cpp.SimplifiedBalance2Network](pylimer_tools_cpp.SimplifiedBalance2Network.md#pylimer_tools_cpp.SimplifiedBalance2Network), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], spring_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### evaluate_spring_vector_from(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), network: [pylimer_tools_cpp.SimplifiedBalance2Network](pylimer_tools_cpp.SimplifiedBalance2Network.md#pylimer_tools_cpp.SimplifiedBalance2Network), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], spring_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Evaluate the spring vector in the direction from a specific link.
 
@@ -227,7 +227,7 @@ Evaluate the spring vector in the direction from a specific link.
 * **Returns:**
   3D distance vector from the specified link
 
-#### evaluate_spring_vector_to(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), network: [pylimer_tools_cpp.SimplifiedBalance2Network](pylimer_tools_cpp.SimplifiedBalance2Network.md#pylimer_tools_cpp.SimplifiedBalance2Network), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], spring_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### evaluate_spring_vector_to(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), network: [pylimer_tools_cpp.SimplifiedBalance2Network](pylimer_tools_cpp.SimplifiedBalance2Network.md#pylimer_tools_cpp.SimplifiedBalance2Network), displacements: [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.ArrayLike, numpy.float64, '[m, 1]'], spring_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Evaluate the spring vector in the direction to a specific link.
 
@@ -239,7 +239,7 @@ Evaluate the spring vector in the direction to a specific link.
 * **Returns:**
   3D distance vector to the specified link
 
-#### get_active_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_active_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the weight fraction of active springs
 
@@ -268,7 +268,7 @@ Get the spring lengths (Euclidean distances of the spring vectors).
 
 Get the spring vectors.
 
-#### get_dangling_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_dangling_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the weight fraction of non-active springs
 
@@ -287,7 +287,7 @@ Get the current link displacement residual norm.
 
 Get the current link displacements.
 
-#### get_effective_functionality_of_atoms(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
+#### get_effective_functionality_of_atoms(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[int](https://docs.python.org/3/builtins/functions.html#int), [int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Returns the number of active springs connected to each atom, atomId used as index
 
@@ -306,11 +306,11 @@ Returns the reason for termination of the simulation
 
 Evaluate the norm of the force on each (slip- or cross-) link.
 
-#### get_force_on(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
+#### get_force_on(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 1]']
 
 Evaluate the force on a particular (slip- or cross-) link.
 
-#### get_gamma_factor(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = -1.0, nr_of_chains: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = -1) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_gamma_factor(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1.0, nr_of_chains: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = -1) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
 
@@ -327,11 +327,11 @@ $k_B$ Boltzmann’s constant.
   * **b02** – The melt $<b>_0^2$: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it’s the slope in a <R_0^2> vs. N plot, also sometimes labelled $C_\infinity b^2$.
   * **nr_of_chains** – The value to normalize the sum of square distances by. Usually (and default if $< 0$) the nr of springs.
 
-#### get_gamma_factors(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### get_gamma_factors(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
 
-#### get_gamma_factors_in_dir(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat), direction: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### get_gamma_factors_in_dir(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), b02: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), direction: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Evaluates the gamma factor for each strand in the specified direction (i.e., the squared distance divided by the contour length multiplied by b02)
 
@@ -339,7 +339,7 @@ Evaluates the gamma factor for each strand in the specified direction (i.e., the
   * **b02** – The melt $<b>_0^2$: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it’s the slope in a <R_0^2> vs. N plot, also sometimes labelled $C_\infinity b^2$.
   * **direction** – The direction in which to compute the gamma factors (0: x, 1: y, 2: z)
 
-#### get_ids_of_active_nodes(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
+#### get_ids_of_active_nodes(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Get the atom ids of the nodes that are considered active.
 Only crosslink ids are returned (not e.g. entanglement links).
@@ -353,7 +353,7 @@ Only crosslink ids are returned (not e.g. entanglement links).
 
 Get the initial coordinates of the crosslinkers and entanglement links.
 
-#### *static* get_neighbour_link_indices(network: [pylimer_tools_cpp.SimplifiedBalance2Network](pylimer_tools_cpp.SimplifiedBalance2Network.md#pylimer_tools_cpp.SimplifiedBalance2Network), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
+#### *static* get_neighbour_link_indices(network: [pylimer_tools_cpp.SimplifiedBalance2Network](pylimer_tools_cpp.SimplifiedBalance2Network.md#pylimer_tools_cpp.SimplifiedBalance2Network), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]
 
 Get the indices of neighboring links for a given link.
 
@@ -363,7 +363,7 @@ Get the indices of neighboring links for a given link.
 * **Returns:**
   Vector of connected link indices
 
-#### get_nr_of_active_nodes(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_active_nodes(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the number of active nodes (incl. entanglement nodes [atoms with type = entanglementType, present in the universe when creating this simulator],
 excl. entanglement links [the slip-links created internally when e.g. constructing the simulator with random slip-links]).
@@ -371,33 +371,33 @@ excl. entanglement links [the slip-links created internally when e.g. constructi
 * **Parameters:**
   **tolerance** – springs under this length are considered inactive. A node is active if it has > 1 active springs.
 
-#### get_nr_of_active_partial_springs(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_active_partial_springs(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the number of active partial springs remaining after running the simulation.
 
 * **Parameters:**
   **tolerance** – springs under this length are considered inactive
 
-#### get_nr_of_active_spring(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_active_spring(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 > Get the number of active springs remaining after running the simulation.
 * **Parameters:**
   **tolerance** – springs under this length are considered inactive
 
-#### get_nr_of_active_springs(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_active_springs(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 > Get the number of active springs remaining after running the simulation.
 * **Parameters:**
   **tolerance** – springs under this length are considered inactive
 
-#### get_nr_of_active_springs_in_dir(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), direction: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_active_springs_in_dir(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), direction: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 > Get the number of active springs remaining after running the simulation.
 * **Parameters:**
   * **direction** – The direction in which to compute the active springs (0: x, 1: y, 2: z)
   * **tolerance** – springs under this length are considered inactive
 
-#### get_nr_of_active_strands(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
+#### get_nr_of_active_strands(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [int](https://docs.python.org/3/builtins/functions.html#int)
 
 Get the number of active strands remaining after running the simulation.
 
@@ -442,14 +442,14 @@ Get the sum of the lengths of the springs of each strand.
 
 Returns the pressure at the current state of the simulation.
 
-#### get_soluble_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### get_soluble_weight_fraction(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0.001) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 Compute the weight fraction of springs connected to active
 springs (any depth).
 
 Caution: ignores atom masses.
 
-#### get_stress_on(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 3]']
+#### get_stress_on(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[3, 3]']
 
 Evaluate the stress on a particular (slip- or cross-) link.
 
@@ -469,18 +469,18 @@ Returns the stress tensor at the current state of the simulation.
 
 Get the current spring lengths (norm of vector) divided by the spring partition times the contour length.
 
-#### inspect_displacement_to_mean_position_update(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### inspect_displacement_to_mean_position_update(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), link_idx: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 Helper method to debug and/or understand what happens to certain links when being displaced.
 
-#### run_force_relaxation(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), simplification_mode: [pylimer_tools_cpp.StructureSimplificationMode](pylimer_tools_cpp.StructureSimplificationMode.md#pylimer_tools_cpp.StructureSimplificationMode) = StructureSimplificationMode.NO_SIMPLIFICATION, inactive_removal_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-06, sle_solver: [object](https://docs.python.org/3/builtins/functions.html#object) = SLESolver.DEFAULT, tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) = 1e-12, max_iterations: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 50000) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### run_force_relaxation(self: [pylimer_tools_cpp.MEHPForceBalance2](#pylimer_tools_cpp.MEHPForceBalance2), simplification_mode: [pylimer_tools_cpp.StructureSimplificationMode](pylimer_tools_cpp.StructureSimplificationMode.md#pylimer_tools_cpp.StructureSimplificationMode) = StructureSimplificationMode.NO_SIMPLIFICATION, inactive_removal_cutoff: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1e-06, sle_solver: [pylimer_tools_cpp.SLESolver](pylimer_tools_cpp.SLESolver.md#pylimer_tools_cpp.SLESolver) = SLESolver.DEFAULT, tolerance: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1e-12, max_iterations: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 50000) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Run the simulation.
 
 * **Parameters:**
   * **simplification_mode** – How to simplify the structure during the minimization.
   * **inactive_removal_cutoff** – The tolerance in distance units of the partial spring length to count as active, relevant if simplification mode is specified to be something other than NO_SIMPLIFICATION.
-  * **sle_solver** – The solver to use for the system of linear equations (SLE) (SLESolver enum or string, default: SLESolver.DEFAULT / ‘auto’).
+  * **sle_solver** – The solver to use for the system of linear equations (SLE) (default: SLESolver.DEFAULT).
   * **tolerance** – The stopping condition/tolerance for the SLE solver if it’s an iterative one.
   * **max_iterations** – The maximum number of iterations to perform if the SLE solver is an iterative one.
 

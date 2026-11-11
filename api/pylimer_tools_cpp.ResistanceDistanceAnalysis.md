@@ -6,7 +6,7 @@ Bases: `pybind11_object`
 
 Overloaded function.
 
-1. \_\_init_\_(self: pylimer_tools_cpp.ResistanceDistanceAnalysis, spring_from: collections.abc.Sequence[typing.SupportsInt], spring_to: collections.abc.Sequence[typing.SupportsInt], weights: collections.abc.Sequence[typing.SupportsFloat] = [], num_nodes: typing.SupportsInt = 0) -> None
+1. \_\_init_\_(self: pylimer_tools_cpp.ResistanceDistanceAnalysis, spring_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], spring_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], weights: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex] = [], num_nodes: typing.SupportsInt | typing.SupportsIndex = 0) -> None
 2. \_\_init_\_(self: pylimer_tools_cpp.ResistanceDistanceAnalysis, L: scipy.sparse.csc_matrix[numpy.float64]) -> None
 
 ### Methods Summary
@@ -39,31 +39,31 @@ Overloaded function.
 
 #### compute_all_pairs_commute_time(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
 
-#### compute_all_pairs_effective_resistance(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 128) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
+#### compute_all_pairs_effective_resistance(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 128) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
 
-#### compute_commute_time(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), i: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), j: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### compute_commute_time(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), i: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), j: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
-#### compute_effective_resistance(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), i: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), j: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [float](https://docs.python.org/3/builtins/functions.html#float)
+#### compute_effective_resistance(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), i: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), j: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
-#### compute_effective_resistance_batched(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), pairs: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)]]) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
+#### compute_effective_resistance_batched(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), pairs: [collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)[[tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)]]) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 #### compute_kirchhoff_index(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
 #### compute_kirchhoff_index_spectral(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [float](https://docs.python.org/3/builtins/functions.html#float)
 
-#### compute_moore_penrose_pseudo_inverse(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 128) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
+#### compute_moore_penrose_pseudo_inverse(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 128) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
 
 #### compute_resistance_centrality(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
 #### compute_total_resistance_per_node(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, 1]']
 
-#### *static* create_complete(num_nodes: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)
+#### *static* create_complete(num_nodes: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)
 
-#### *static* create_linear_chain(num_nodes: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)
+#### *static* create_linear_chain(num_nodes: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)
 
-#### *static* create_ring(num_nodes: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt)) → [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)
+#### *static* create_ring(num_nodes: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex)) → [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)
 
-#### *static* create_star(num_arms: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt), arm_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 1) → [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)
+#### *static* create_star(num_arms: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex), arm_length: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1) → [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)
 
 #### get_connected_components(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[list](https://docs.python.org/3/builtins/stdtypes.html#list)[[int](https://docs.python.org/3/builtins/functions.html#int)]]
 
@@ -79,4 +79,4 @@ Overloaded function.
 
 #### is_connected(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis)) → [bool](https://docs.python.org/3/builtins/functions.html#bool)
 
-#### solve_identity_chunked(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) = 128) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']
+#### solve_identity_chunked(self: [pylimer_tools_cpp.ResistanceDistanceAnalysis](#pylimer_tools_cpp.ResistanceDistanceAnalysis), chunk_size: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 128) → [Annotated](https://docs.python.org/3/library/typing.html#typing.Annotated)[numpy.typing.NDArray[numpy.float64], '[m, n]']

@@ -1,0 +1,21 @@
+EntanglementSamplingMethod
+==========================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: EntanglementSamplingMethod
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~EntanglementSamplingMethod.ANALYTICAL
+      ~EntanglementSamplingMethod.DISCRETE
+      ~EntanglementSamplingMethod.ON_DEMAND
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: ANALYTICAL
+   .. autoattribute:: DISCRETE
+   .. autoattribute:: ON_DEMAND

@@ -4,7 +4,7 @@
 
 Overloaded function.
 
-1. randomly_sample_entanglements_analytical(box: pylimer_tools_cpp.Box, crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, nr_of_samples: typing.SupportsInt, upper_cutoff: typing.SupportsFloat, lower_cutoff: typing.SupportsFloat = 0.0, minimum_nr_of_samples: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 3.0, seed: str = ‘’, filter_dangling_and_soluble: bool = True) -> pylimer_tools_cpp.StrandPairEntanglements
+1. randomly_sample_entanglements_analytical(box: pylimer_tools_cpp.Box, crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = ‘’, filtering_mode: pylimer_tools_cpp.EntanglementFilteringMode = EntanglementFilteringMode.OMIT_INACTIVE) -> pylimer_tools_cpp.StrandPairEntanglements
    > Analytically and probabilistically sample pairs of strand beads that could form entanglements
    > using exact 3D Brownian bridge / random walk statistics and topological strand filtering,
    > without requiring all strand beads or a Universe to be instantiated.
@@ -24,6 +24,6 @@ Overloaded function.
    >   The minimum contour separation (in beads) between two beads on the same strand.
    > * **param seed:**
    >   A seed for the random number generator.
-   > * **param filter_dangling_and_soluble:**
-   >   Whether to filter out soluble and dangling strands (via iterative leaf peeling).
-2. randomly_sample_entanglements_analytical(crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, box: pylimer_tools_cpp.Box, nr_of_samples: typing.SupportsInt, upper_cutoff: typing.SupportsFloat, lower_cutoff: typing.SupportsFloat = 0.0, minimum_nr_of_samples: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 3.0, seed: str = ‘’, filter_dangling_and_soluble: bool = True) -> pylimer_tools_cpp.StrandPairEntanglements
+   > * **param filtering_mode:**
+   >   Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
+2. randomly_sample_entanglements_analytical(crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, box: pylimer_tools_cpp.Box, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = ‘’, filtering_mode: pylimer_tools_cpp.EntanglementFilteringMode = EntanglementFilteringMode.OMIT_INACTIVE) -> pylimer_tools_cpp.StrandPairEntanglements

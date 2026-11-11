@@ -77,7 +77,9 @@ Universe
       ~Universe.has_infinite_strand
       ~Universe.hash_angle_type
       ~Universe.hash_dihedral_angle_type
+      ~Universe.identify_active_atoms
       ~Universe.interpolate_edges
+      ~Universe.peel_topological_leaves
       ~Universe.remove_all_angles
       ~Universe.remove_all_dihedral_angles
       ~Universe.remove_atoms
@@ -93,6 +95,7 @@ Universe
       ~Universe.set_timestep
       ~Universe.set_vertex_property
       ~Universe.simplify
+      ~Universe.to_crosslinker_universe
 
    .. rubric:: Methods Documentation
 
@@ -163,7 +166,9 @@ Universe
    .. automethod:: has_infinite_strand
    .. automethod:: hash_angle_type
    .. automethod:: hash_dihedral_angle_type
+   .. automethod:: identify_active_atoms
    .. automethod:: interpolate_edges
+   .. automethod:: peel_topological_leaves
    .. automethod:: remove_all_angles
    .. automethod:: remove_all_dihedral_angles
    .. automethod:: remove_atoms
@@ -179,3 +184,4 @@ Universe
    .. automethod:: set_timestep
    .. automethod:: set_vertex_property
    .. automethod:: simplify
+   .. automethod:: to_crosslinker_universe

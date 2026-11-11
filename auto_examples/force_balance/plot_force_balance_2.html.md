@@ -136,7 +136,7 @@ mehp_phantom.run_force_relaxation()
 ```
 
 ```none
-Entangled final residual norm: 3.151e-08 (iterations: 180)
+Entangled final residual norm: 6.361e-12 (iterations: 131)
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 118-126 -->
@@ -185,10 +185,10 @@ print(f"Active weight fraction   : {mehp_fb.get_active_weight_fraction():.3f}")
 ```
 
 ```none
-Shear Modulus (Entangled): 0.1148 MPa
+Shear Modulus (Entangled): 0.0061 MPa
 Shear Modulus (Phantom)  : 0.0061 MPa
-Directional Moduli       : Gx=0.0504, Gy=0.0234, Gz=0.0410 MPa (sum=0.1148)
-Active weight fraction   : 0.566
+Directional Moduli       : Gx=0.0030, Gy=0.0014, Gz=0.0017 MPa (sum=0.0061)
+Active weight fraction   : 0.479
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 159-168 -->
@@ -272,7 +272,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.428 seconds)
+**Total running time of the script:** (0 minutes 0.266 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-2-py"></a>
 
