@@ -90,51 +90,17 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("compute_eigenvectors") = false)
     .def(
       "find_all_eigenvalues",
-      [](NormalModeAnalyzer& self,
-         const py::object& solver_obj,
-         bool compute_eigenvectors,
-         const bool decompose_components) {
-        calc::NormalModeSolver solver = calc::NormalModeSolver::AUTO;
-        if (py::isinstance<py::bool_>(solver_obj)) {
-          // Backward compatibility: legacy signature was
-          // find_all_eigenvalues(compute_eigenvectors=False)
-          compute_eigenvectors = solver_obj.cast<bool>();
-          solver = calc::NormalModeSolver::AUTO;
-        } else if (py::isinstance<py::str>(solver_obj)) {
-          std::string s = solver_obj.cast<std::string>();
-          std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-          if (s == "auto") {
-            solver = calc::NormalModeSolver::AUTO;
-          } else if (s == "dense" || s == "dense_lapack") {
-            solver = calc::NormalModeSolver::DENSE_LAPACK;
-          } else if (s == "dense_eigen") {
-            solver = calc::NormalModeSolver::DENSE_EIGEN;
-          } else if (s == "sparse" || s == "sparse_slicing" || s == "slicing") {
-            solver = calc::NormalModeSolver::SPARSE_SLICING;
-          } else if (s == "metal" || s == "gpu") {
-            solver = calc::NormalModeSolver::METAL;
-          } else {
-            throw std::invalid_argument("Unknown NormalModeSolver string: " +
-                                        s);
-          }
-        } else if (py::isinstance<calc::NormalModeSolver>(solver_obj)) {
-          solver = solver_obj.cast<calc::NormalModeSolver>();
-        } else {
-          throw py::type_error(
-            "solver must be a NormalModeSolver enum or string ('auto', "
-            "'dense_lapack', 'dense_eigen', 'sparse_slicing', 'metal')");
-        }
-        self.computeAllEigenvalues(
-          solver, compute_eigenvectors, decompose_components);
-      },
+      py::overload_cast<const calc::NormalModeSolver, const bool, const bool>(
+        &NormalModeAnalyzer::computeAllEigenvalues),
       R"pbdoc(
          Find all eigenvalues using the specified solver.
 
-         :param solver: Solver method to use (NormalModeSolver enum or string: 'auto', 'dense_lapack', 'dense_eigen', 'sparse_slicing', 'metal'; default: NormalModeSolver.AUTO)
+         :param solver: Solver method to use (NormalModeSolver enum; default: NormalModeSolver.AUTO)
          :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
          :param decompose_components: Whether to decompose the graph into connected components (default: True)
          )pbdoc",
-      py::arg("solver") = "auto",
+      py::arg_v(
+        "solver", calc::NormalModeSolver::AUTO, "NormalModeSolver.AUTO"),
       py::arg("compute_eigenvectors") = false,
       py::arg("decompose_components") = true)
 #if defined(USE_CUDA) || defined(USE_METAL)

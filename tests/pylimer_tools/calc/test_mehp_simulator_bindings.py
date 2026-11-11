@@ -131,18 +131,18 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
                 raise
 
     def test_auto_sle_solver_relaxation(self):
-        """Test that MEHPForceBalance2 with SLESolver.AUTO and string 'auto' completes."""
+        """Test that MEHPForceBalance2 with SLESolver.AUTO completes."""
         fb1 = MEHPForceBalance2(self.testUniverseSmall, 2, False)
         fb1.run_force_relaxation(sle_solver=SLESolver.AUTO)
         self.assertGreater(fb1.get_nr_of_iterations(), 0)
 
         fb2 = MEHPForceBalance2(self.testUniverseSmall, 2, False)
-        fb2.run_force_relaxation(sle_solver="auto")
-        self.assertGreater(fb2.get_nr_of_iterations(), 0)
+        with self.assertRaises(TypeError):
+            fb2.run_force_relaxation(sle_solver="auto")
 
         fb3 = MEHPForceBalance2(self.testUniverseSmall, 2, False)
-        fb3.run_force_relaxation(sle_solver="default")
-        self.assertGreater(fb3.get_nr_of_iterations(), 0)
+        with self.assertRaises(TypeError):
+            fb3.run_force_relaxation(sle_solver="default")
 
     def test_cg_fallback_solver_relaxation(self):
         """Test configurable CG fallback getters/setters and adaptive fallback behavior in Python."""
@@ -183,7 +183,7 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             minimum_nr_of_samples=10,
             same_strand_cutoff=3.0,
             seed="py_seed_42",
-            filter_dangling_and_soluble=True,
+            filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
         )
         self.assertIsInstance(es_direct, StrandPairEntanglements)
         self.assertGreaterEqual(len(es_direct), 10)
@@ -196,7 +196,7 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             minimum_nr_of_entanglements=10,
             same_strand_cutoff=3.0,
             seed="py_seed_42",
-            filter_dangling_and_soluble=True,
+            filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
         )
         self.assertEqual(len(es_gen), len(es_direct))
         self.assertEqual(es_gen.strand_idx_1, es_direct.strand_idx_1)
@@ -257,10 +257,22 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         # 1. Filtered sampling discards dangling/soluble candidate pairs
         # upfront
         es_filt = gen.sample_entanglements(
-            30, 2.5, 0.0, 0, 3.0, "seed_f", filter_dangling_and_soluble=True
+            30,
+            2.5,
+            0.0,
+            0,
+            3.0,
+            "seed_f",
+            filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
         )
         es_unfilt = gen.sample_entanglements(
-            30, 2.5, 0.0, 0, 3.0, "seed_f", filter_dangling_and_soluble=False
+            30,
+            2.5,
+            0.0,
+            0,
+            3.0,
+            "seed_f",
+            filtering_mode=EntanglementFilteringMode.NONE,
         )
         self.assertLessEqual(len(es_filt), len(es_unfilt))
 
@@ -316,7 +328,7 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             minimum_nr_of_samples=10,
             same_strand_cutoff=3.0,
             seed="od_seed_42",
-            filter_dangling_and_soluble=True,
+            filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
         )
         self.assertIsInstance(es_direct, StrandPairEntanglements)
         self.assertGreaterEqual(len(es_direct), 10)
@@ -330,7 +342,7 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             minimum_nr_of_entanglements=10,
             same_strand_cutoff=3.0,
             seed="od_seed_42",
-            filter_dangling_and_soluble=True,
+            filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
         )
         self.assertEqual(len(es_gen_direct), len(es_direct))
         self.assertEqual(es_gen_direct.strand_idx_1, es_direct.strand_idx_1)
@@ -345,25 +357,25 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             minimum_nr_of_entanglements=10,
             same_strand_cutoff=3.0,
             seed="od_seed_42",
-            filter_dangling_and_soluble=True,
+            filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
             method=EntanglementSamplingMethod.ON_DEMAND,
         )
         self.assertEqual(len(es_gen_method), len(es_direct))
         self.assertEqual(es_gen_method.strand_idx_1, es_direct.strand_idx_1)
         self.assertEqual(es_gen_method.strand_idx_2, es_direct.strand_idx_2)
 
-        # Also verify string method continues to work
-        es_gen_str = gen.sample_entanglements(
-            nr_of_entanglements_to_sample=40,
-            upper_cutoff=2.5,
-            lower_cutoff=0.2,
-            minimum_nr_of_entanglements=10,
-            same_strand_cutoff=3.0,
-            seed="od_seed_42",
-            filter_dangling_and_soluble=True,
-            method="on_demand",
-        )
-        self.assertEqual(len(es_gen_str), len(es_direct))
+        # Verify passing string method raises TypeError
+        with self.assertRaises(TypeError):
+            gen.sample_entanglements(
+                nr_of_entanglements_to_sample=40,
+                upper_cutoff=2.5,
+                lower_cutoff=0.2,
+                minimum_nr_of_entanglements=10,
+                same_strand_cutoff=3.0,
+                seed="od_seed_42",
+                filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
+                method="on_demand",
+            )
 
         # MEHPForceBalance (v1) with pre-sampled entanglements
         fb1 = gen.get_force_balance(es_gen_method)
@@ -389,7 +401,7 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             minimum_nr_of_entanglements=10,
             same_strand_cutoff=3.0,
             seed="od_seed_direct",
-            filter_dangling_and_soluble=True,
+            filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
             crosslinker_type=2,
             entanglements_as_springs=False,
             method=EntanglementSamplingMethod.ON_DEMAND,
@@ -437,7 +449,7 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         )
         self.assertIsInstance(es_prune.pairs_of_atoms, list)
 
-        # Sample with string filtering mode 'omit_inactive'
+        # Sample with EntanglementFilteringMode.OMIT_INACTIVE
         es_omit = randomly_sample_entanglements(
             u,
             nr_of_samples=2,
@@ -448,12 +460,12 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             seed="py_test_seed",
             crosslinker_type=2,
             ignore_crosslinks=True,
-            filtering_mode="omit_inactive",
+            filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
         )
         self.assertIsInstance(es_omit.pairs_of_atoms, list)
 
-        # Sample with boolean flag (backward compatibility)
-        es_bool = randomly_sample_entanglements(
+        # Sample with EntanglementFilteringMode.NONE
+        es_none = randomly_sample_entanglements(
             u,
             nr_of_samples=2,
             upper_cutoff=4.0,
@@ -463,21 +475,22 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             seed="py_test_seed",
             crosslinker_type=2,
             ignore_crosslinks=True,
-            filter_dangling_and_soluble=True,
+            filtering_mode=EntanglementFilteringMode.NONE,
         )
-        self.assertIsInstance(es_bool.pairs_of_atoms, list)
+        self.assertIsInstance(es_none.pairs_of_atoms, list)
 
-        with self.assertRaises(ValueError):
+        # Passing string to filtering_mode should raise TypeError
+        with self.assertRaises(TypeError):
             randomly_sample_entanglements(
                 u,
                 nr_of_samples=2,
                 upper_cutoff=4.0,
-                filtering_mode="invalid_mode",
+                filtering_mode="omit_inactive",
             )
         with self.assertRaises(TypeError):
             randomly_sample_entanglements(
                 u,
                 nr_of_samples=2,
                 upper_cutoff=4.0,
-                filtering_mode=123,
+                filtering_mode=True,
             )

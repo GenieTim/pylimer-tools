@@ -30,10 +30,6 @@ class TestNormalModeAnalyzer(unittest.TestCase):
             NormalModeSolver.DENSE_LAPACK,
             NormalModeSolver.DENSE_EIGEN,
             NormalModeSolver.SPARSE_SLICING,
-            "auto",
-            "dense_lapack",
-            "dense_eigen",
-            "sparse_slicing",
         ]
         for solver in solvers:
             with self.subTest(solver=solver):
@@ -46,26 +42,23 @@ class TestNormalModeAnalyzer(unittest.TestCase):
                 self.assertAlmostEqual(evals[1], 3.0, places=3)
                 self.assertAlmostEqual(evals[2], 3.0, places=3)
 
-    def test_legacy_boolean_signature(self):
-        # Old signature was find_all_eigenvalues(compute_eigenvectors: bool = False)
-        # Passing True as first positional argument should compute eigenvectors
+    def test_legacy_boolean_signature_raises(self):
         nma = NormalModeAnalyzer(self.ring_from, self.ring_to)
-        nma.find_all_eigenvalues(True)
-        evecs = nma.get_eigenvectors()
-        self.assertEqual(evecs.shape, (3, 3))
-        # Orthonormality check
-        np.testing.assert_allclose(evecs.T @ evecs, np.eye(3), atol=1e-8)
+        with self.assertRaises(TypeError):
+            nma.find_all_eigenvalues(True)
 
     def test_auto_solver_eigenvectors(self):
         nma = NormalModeAnalyzer(self.ring_from, self.ring_to)
-        nma.find_all_eigenvalues(solver="auto", compute_eigenvectors=True)
+        nma.find_all_eigenvalues(
+            solver=NormalModeSolver.AUTO, compute_eigenvectors=True
+        )
         evecs = nma.get_eigenvectors()
         self.assertEqual(evecs.shape, (3, 3))
         np.testing.assert_allclose(evecs.T @ evecs, np.eye(3), atol=1e-8)
 
     def test_invalid_solver_argument(self):
         nma = NormalModeAnalyzer(self.ring_from, self.ring_to)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             nma.find_all_eigenvalues(solver="nonexistent_solver")
         with self.assertRaises(TypeError):
             nma.find_all_eigenvalues(solver=12345)
