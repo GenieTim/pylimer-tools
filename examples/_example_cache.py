@@ -197,6 +197,69 @@ def resolve_max_workers(max_workers: Optional[int] = None) -> int:
     return max(1, os.cpu_count() or 1)
 
 
+def configure_process_threading(
+    workers: Optional[int] = None,
+    force_single_thread: bool = False,
+    verbose: bool = True,
+) -> None:
+    """Configure threading environment variables when running in parallel.
+
+    When running simulation workloads across multiple worker processes (e.g. using
+    ProcessPoolExecutor), each process running C++ extensions (Eigen, OpenMP,
+    OpenBLAS) would otherwise default to using all available CPU cores. This causes
+    massive CPU oversubscription (e.g. 12 processes x 12 OpenMP threads = 144 threads
+    competing for 12 physical cores), severely degrading performance.
+
+    If workers >= os.cpu_count() (running on all processors) or workers > 1,
+    and OMP_NUM_THREADS is not already explicitly set by the user, this function sets
+    OMP_NUM_THREADS=1 and related BLAS/LAPACK threading variables to 1.
+    """
+    if "OMP_NUM_THREADS" not in os.environ or force_single_thread:
+        effective_workers = workers if workers is not None else resolve_max_workers()
+        cpu_total = os.cpu_count() or 1
+        if (
+            effective_workers >= cpu_total
+            or effective_workers > 1
+            or force_single_thread
+        ):
+            for var in (
+                "OMP_NUM_THREADS",
+                "OPENBLAS_NUM_THREADS",
+                "MKL_NUM_THREADS",
+                "VECLIB_MAXIMUM_THREADS",
+                "NUMEXPR_NUM_THREADS",
+            ):
+                os.environ[var] = "1"
+            try:
+                import threadpoolctl
+
+                threadpoolctl.threadpool_limits(1)
+            except ImportError:
+                pass
+            if verbose:
+                print(
+                    f"Configured single-threaded OpenMP/BLAS for {effective_workers} parallel worker(s) (OMP_NUM_THREADS=1)."
+                )
+
+
+def worker_process_initializer() -> None:
+    """Initializer for ProcessPoolExecutor worker processes to enforce single-threaded OpenMP/BLAS."""
+    for var in (
+        "OMP_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "VECLIB_MAXIMUM_THREADS",
+        "NUMEXPR_NUM_THREADS",
+    ):
+        os.environ[var] = "1"
+    try:
+        import threadpoolctl
+
+        threadpoolctl.threadpool_limits(1)
+    except ImportError:
+        pass
+
+
 def should_recompute(recompute_flag: bool = False) -> bool:
     """Determine whether cached data should be recomputed.
 
@@ -255,6 +318,7 @@ def load_or_compute_cache(
 
     if verbose:
         print(f"Computing example data (will save to {path})...")
+    configure_process_threading(verbose=verbose)
     data = compute_fn(*args, **kwargs)
 
     path.parent.mkdir(parents=True, exist_ok=True)

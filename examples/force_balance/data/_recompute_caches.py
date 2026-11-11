@@ -30,9 +30,11 @@ for p in [str(src_dir), str(examples_dir), str(
         sys.path.insert(0, p)
 
 from _example_cache import (  # noqa: E402
+    configure_process_threading,
     get_example_cache_path,
     load_or_compute_cache,
     resolve_max_workers,
+    worker_process_initializer,
 )
 
 
@@ -226,6 +228,7 @@ def main():
     args = parser.parse_args()
 
     total_workers = resolve_max_workers(args.workers)
+    configure_process_threading(total_workers)
 
     tasks_to_run = []
     run_all = not (
@@ -262,7 +265,10 @@ def main():
                 workers_per_cache
             } worker(s) per cache)..."
         )
-        with ProcessPoolExecutor(max_workers=len(tasks_to_run)) as pool:
+        with ProcessPoolExecutor(
+            max_workers=len(tasks_to_run),
+            initializer=worker_process_initializer,
+        ) as pool:
             futures = [
                 pool.submit(_run_cache_task, t, workers_per_cache) for t in tasks_to_run
             ]

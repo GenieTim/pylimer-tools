@@ -90,9 +90,11 @@ if "__file__" in globals():
 
 from _example_cache import (  # noqa: E402
     compute_ensemble_statistics,
+    configure_process_threading,
     get_example_cache_path,
     load_or_compute_cache,
     resolve_max_workers,
+    worker_process_initializer,
 )
 from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
     ParameterType,
@@ -344,8 +346,13 @@ def run_inactive_removal_and_sampling_simulation(
         for r in range(n_repeats)
     ]
 
+    configure_process_threading(effective_workers)
+
     if effective_workers > 1:
-        with ProcessPoolExecutor(max_workers=effective_workers) as executor:
+        with ProcessPoolExecutor(
+            max_workers=effective_workers,
+            initializer=worker_process_initializer,
+        ) as executor:
             futures = [
                 executor.submit(_simulate_inactive_removal_single_repeat, *t)
                 for t in tasks
