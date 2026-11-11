@@ -39,6 +39,7 @@
   - Expose `Universe::clearCaches` (`clear_caches`) in Python bindings to reclaim decomposed molecule and cluster cache memory.
 - **Documentation & Benchmarks**:
   - Add comprehensive Sphinx-gallery example `examples/force_balance/plot_entanglement_sampling_comparison.py` comparing memory scaling, runtime, contour distributions, and network shear modulus across conversions between discrete, on-demand bounding-box, and analytical methods, with accompanying precomputed benchmark cache.
+  - Update `examples/force_balance/plot_polydispersity_study.py` and `examples/force_balance/plot_sampling_cutoff_effect.py` to use `MCUniverseGenerator.get_force_balance2` and `sample_entanglements` with `EntanglementSamplingMethod.ON_DEMAND`, eliminating unnecessary `Universe` instantiation.
 
 
 ### Automatic Solver Selection Optimizations
