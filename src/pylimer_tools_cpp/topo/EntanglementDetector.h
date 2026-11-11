@@ -134,6 +134,43 @@ randomlyFindEntanglementsAnalytical(
   bool filterDanglingAndSoluble = true);
 
 /**
+ * @brief Sample spatial entanglements on a CrosslinkerUniverse using
+ * per-strand bounding boxes and on-demand Brownian bridge bead resampling.
+ * Only strand seeds and bounding boxes are stored, achieving the O(N_strands)
+ * memory scaling of the analytical method while sampling from the exact
+ * discrete multi-bead chain conformations.
+ *
+ * @param box the simulation box
+ * @param crosslinkerUniverse the crosslinker & strand representation
+ * @param nrOfEntanglementsToSample the maximum number of entanglements to
+ * sample
+ * @param upperCutoff the upper distance cutoff within which two beads can
+ * entangle
+ * @param lowerCutoff the lower distance cutoff
+ * @param minimumNrOfEntanglements the minimum number of entanglements to sample
+ * @param sameStrandCutoff the minimum number of bonds between two entangled
+ * beads on the same strand
+ * @param seed the random seed
+ * @param filterDanglingAndSoluble whether to filter out entanglements involving
+ * dangling or soluble strands (including iterative topological leaf peeling)
+ * @param nMcSteps number of Monte Carlo equilibration steps for chain
+ * resampling (default: 0)
+ * @return StrandPairEntanglements
+ */
+StrandPairEntanglements
+randomlyFindEntanglementsOnDemand(
+  const pylimer_tools::entities::Box& box,
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse,
+  const size_t nrOfEntanglementsToSample,
+  const double upperCutoff,
+  const double lowerCutoff = 0.,
+  const size_t minimumNrOfEntanglements = 0,
+  const double sameStrandCutoff = 3,
+  const std::string& seed = "",
+  bool filterDanglingAndSoluble = true,
+  int nMcSteps = 0);
+
+/**
  * @brief Randomly find pairs of atoms that are close together and could be
  * entanglements
  *

@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "../utils/utilityMacros.h"
 #include <Eigen/Dense>
 #include <numeric>

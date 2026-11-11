@@ -1973,6 +1973,126 @@ TEST_CASE(
   }
 }
 
+TEST_CASE(
+  "MCUniverseGenerator on-demand entanglement sampling with bounding boxes",
+  "[generator][MCUniverseGenerator][EntanglementDetector][on_demand]")
+{
+  pu::MCUniverseGenerator generator(25.0, 25.0, 25.0);
+  generator.setSeed(424242);
+  generator.setMeanSquaredBeadDistance(1.0);
+  generator.configNrOfMCSteps(0);
+
+  generator.addCrosslinkers(80, 4, 2, true);
+  generator.addStrands(150, pu::initializeWithValue(150, 30), 1);
+  generator.addMonofunctionalStrands(15, pu::initializeWithValue(15, 20), 4);
+  generator.addStrands(
+    10, pu::initializeWithValue(10, 25), 3); // stays partially free
+  generator.linkStrandsToConversion(0.88);
+
+  const size_t expectedAtoms = generator.getCurrentNrOfAtoms();
+
+  // Test on-demand sampling directly
+  const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+    entanglements = generator.sampleEntanglementsOnDemand(
+      60, 2.5, 0.2, 20, 3.0, "od_seed_123", true);
+  REQUIRE(entanglements.size() >= 20);
+  CHECK(entanglements.size() <= 60);
+
+  // Check distances of sampled entanglements under PBC
+  const pylimer_tools::entities::Box box = generator.getBox();
+  for (size_t i = 0; i < entanglements.size(); ++i) {
+    const auto idx = static_cast<Eigen::Index>(i);
+    Eigen::Vector3d p1 = entanglements.position1.segment<3>(3 * idx);
+    Eigen::Vector3d p2 = entanglements.position2.segment<3>(3 * idx);
+    Eigen::Vector3d diff = p2 - p1;
+    box.handlePBC(diff);
+    double dist = diff.norm();
+    CHECK(dist <= 2.5 + 1e-6);
+    CHECK(dist >= 0.2 - 1e-6);
+    CHECK(entanglements.alpha1[i] > 0.0);
+    CHECK(entanglements.alpha1[i] < 1.0);
+    CHECK(entanglements.alpha2[i] > 0.0);
+    CHECK(entanglements.alpha2[i] < 1.0);
+  }
+
+  SECTION("sampleEntanglements dispatching by method parameter")
+  {
+    const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+      entEnum = generator.sampleEntanglements(
+        40,
+        2.5,
+        0.0,
+        10,
+        3.0,
+        "test_seed",
+        true,
+        pu::EntanglementSamplingMethod::ON_DEMAND);
+    CHECK(entEnum.size() >= 10);
+
+    const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+      entOnDemand = generator.sampleEntanglements(
+        40, 2.5, 0.0, 10, 3.0, "test_seed", true, "on_demand");
+    CHECK(entOnDemand.size() == entEnum.size());
+
+    const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+      entBBox = generator.sampleEntanglements(
+        40,
+        2.5,
+        0.0,
+        10,
+        3.0,
+        "test_seed",
+        true,
+        pu::EntanglementSamplingMethod::BOUNDING_BOX);
+    CHECK(entBBox.size() == entOnDemand.size());
+
+    CHECK_THROWS_AS(generator.sampleEntanglements(
+                      10, 2.0, 0.0, 0, 3.0, "", true, "nonexistent_method"),
+                    std::invalid_argument);
+  }
+
+  SECTION("MEHPForceBalance2 with on-demand entanglements")
+  {
+    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
+      generator.getForceBalance2(60,
+                                 2.5,
+                                 0.2,
+                                 20,
+                                 3.0,
+                                 "od_seed_123",
+                                 true,
+                                 false,
+                                 2,
+                                 pu::EntanglementSamplingMethod::ON_DEMAND);
+    CHECK_NOTHROW(fb2.validateNetwork());
+    CHECK(fb2.inferNrOfAtomsFromNetwork() == expectedAtoms);
+    CHECK(fb2.getNumExtraAtoms() >= 20);
+
+    fb2.runForceRelaxation(
+      pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F,
+      1e-7);
+    CHECK_NOTHROW(fb2.validateNetwork());
+    CHECK(fb2.getGammaFactor(1.0) > 0.0);
+    CHECK(fb2.getActiveWeightFraction() > 0.0);
+    CHECK(fb2.getSolubleWeightFraction() > 0.0);
+  }
+
+  SECTION("Consistency with toAtomPairEntanglements")
+  {
+    const pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
+      atomPairs = entanglements.toAtomPairEntanglements(
+        generator.getCrosslinkerUniverse());
+    CHECK(atomPairs.pairsOfAtoms.size() == entanglements.size());
+    for (const std::pair<size_t, size_t>& pair : atomPairs.pairsOfAtoms) {
+      CHECK(pair.first >= 1);
+      CHECK(pair.second >= 1);
+      CHECK(pair.first <= expectedAtoms);
+      CHECK(pair.second <= expectedAtoms);
+      CHECK(pair.first != pair.second);
+    }
+  }
+}
+
 #ifdef CEREALIZABLE
 TEST_CASE(
   "MaxDistanceProvider implementations can be serialized and deserialized",

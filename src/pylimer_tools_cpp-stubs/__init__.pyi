@@ -17,7 +17,7 @@ import numpy
 import numpy.typing
 import scipy.sparse
 import typing
-__all__: list[str] = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'BackTrackStatus', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NeighbourList', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'NormalModeSolver', 'OutputConfiguration', 'ResistanceDistanceAnalysis', 'RouseBrownianSimulator', 'RouseSimulationResult', 'RouseSolverType', 'SLESolver', 'STOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'TRACK_BACKWARD', 'TRACK_FORWARD', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'randomly_sample_entanglements', 'split_csv', 'version_information']
+__all__: list[str] = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'BackTrackStatus', 'Box', 'CONJUGATE_GRADIENT', 'ComputedDoubleValues', 'ComputedIntValues', 'CrosslinkerUniverse', 'DIRECT_LDLT', 'DIRECT_LLT', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'EntanglementSamplingMethod', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NeighbourList', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'NormalModeSolver', 'OutputConfiguration', 'ResistanceDistanceAnalysis', 'RouseBrownianSimulator', 'RouseSimulationResult', 'RouseSolverType', 'SLESolver', 'STOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StrandPairEntanglements', 'StructureSimplificationMode', 'TRACK_BACKWARD', 'TRACK_FORWARD', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'randomly_sample_entanglements', 'randomly_sample_entanglements_analytical', 'randomly_sample_entanglements_on_demand', 'split_csv', 'version_information']
 class Atom:
     """
     
@@ -27,10 +27,10 @@ class Atom:
     __hash__: typing.ClassVar[None] = None
     def __eq__(self, arg0: Atom) -> bool:
         ...
-    def __getstate__(self) -> tuple:
+    def __getstate__(self) -> tuple[int, int, float, float, float, int, int, int, dict[str, float]]:
         ...
     @typing.overload
-    def __init__(self, id: typing.SupportsInt, type: typing.SupportsInt, x: typing.SupportsFloat, y: typing.SupportsFloat, z: typing.SupportsFloat, nx: typing.SupportsInt, ny: typing.SupportsInt, nz: typing.SupportsInt) -> None:
+    def __init__(self, id: typing.SupportsInt | typing.SupportsIndex, type: typing.SupportsInt | typing.SupportsIndex, x: typing.SupportsFloat | typing.SupportsIndex, y: typing.SupportsFloat | typing.SupportsIndex, z: typing.SupportsFloat | typing.SupportsIndex, nx: typing.SupportsInt | typing.SupportsIndex, ny: typing.SupportsInt | typing.SupportsIndex, nz: typing.SupportsInt | typing.SupportsIndex) -> None:
         """
                  Construct this atom.
         
@@ -44,7 +44,7 @@ class Atom:
                  :param nz: Periodic image flag in z direction
         """
     @typing.overload
-    def __init__(self, properties: collections.abc.Mapping[str, typing.SupportsFloat]) -> None:
+    def __init__(self, properties: collections.abc.Mapping[str, typing.SupportsFloat | typing.SupportsIndex]) -> None:
         """
                  Construct this atom from a properties dictionary.
         
@@ -226,7 +226,7 @@ class AtomPairEntanglements:
               An index in the pairs_of_atoms if the atom is part of a pair, -1 else.
         """
     @pair_of_atom.setter
-    def pair_of_atom(self, arg0: collections.abc.Sequence[typing.SupportsInt]) -> None:
+    def pair_of_atom(self, arg0: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
         ...
     @property
     def pairs_of_atoms(self) -> list[tuple[int, int]]:
@@ -234,7 +234,7 @@ class AtomPairEntanglements:
               A list of pairs of atom ids that are close together and could be entanglements
         """
     @pairs_of_atoms.setter
-    def pairs_of_atoms(self, arg0: collections.abc.Sequence[tuple[typing.SupportsInt, typing.SupportsInt]]) -> None:
+    def pairs_of_atoms(self, arg0: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> None:
         ...
 class AtomStyle(enum.Enum):
     """
@@ -292,7 +292,7 @@ class AveFileReader:
                  
                  :return: String representation showing file dimensions
         """
-    def autocorrelate_column(self, column_index: typing.SupportsInt, delta_indices: collections.abc.Sequence[typing.SupportsInt]) -> list[float]:
+    def autocorrelate_column(self, column_index: typing.SupportsInt | typing.SupportsIndex, delta_indices: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> list[float]:
         """
                   Do autocorrelation on one particular column for a specified set of delta indices.
         
@@ -302,7 +302,7 @@ class AveFileReader:
                   :param delta_indices: List of delta indices for the autocorrelation
                   :return: Autocorrelation values for the specified deltas
         """
-    def autocorrelate_column_difference(self, column_index1: typing.SupportsInt, column_index2: typing.SupportsInt, delta_indices: collections.abc.Sequence[typing.SupportsInt]) -> list[float]:
+    def autocorrelate_column_difference(self, column_index1: typing.SupportsInt | typing.SupportsIndex, column_index2: typing.SupportsInt | typing.SupportsIndex, delta_indices: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> list[float]:
         """
                   Do autocorrelation on the difference between two particular columns for a specified set of delta indices.
         
@@ -355,13 +355,13 @@ class Box:
               Currently, only rectangular boxes are supported.
             
     """
-    def __getstate__(self) -> tuple:
+    def __getstate__(self) -> tuple[float, float, float, float, float, float, float, int]:
         ...
     @typing.overload
-    def __init__(self, arg0: typing.SupportsFloat, arg1: typing.SupportsFloat, arg2: typing.SupportsFloat) -> None:
+    def __init__(self, arg0: typing.SupportsFloat | typing.SupportsIndex, arg1: typing.SupportsFloat | typing.SupportsIndex, arg2: typing.SupportsFloat | typing.SupportsIndex) -> None:
         ...
     @typing.overload
-    def __init__(self, arg0: typing.SupportsFloat, arg1: typing.SupportsFloat, arg2: typing.SupportsFloat, arg3: typing.SupportsFloat, arg4: typing.SupportsFloat, arg5: typing.SupportsFloat) -> None:
+    def __init__(self, arg0: typing.SupportsFloat | typing.SupportsIndex, arg1: typing.SupportsFloat | typing.SupportsIndex, arg2: typing.SupportsFloat | typing.SupportsIndex, arg3: typing.SupportsFloat | typing.SupportsIndex, arg4: typing.SupportsFloat | typing.SupportsIndex, arg5: typing.SupportsFloat | typing.SupportsIndex) -> None:
         ...
     def __repr__(self) -> str:
         """
@@ -380,7 +380,7 @@ class Box:
               :param distances: The distances to adjust
               :return: The adjusted distances
         """
-    def apply_simple_shear(self, shear_magnitude: typing.SupportsFloat, shear_direction: typing.SupportsInt = 0) -> None:
+    def apply_simple_shear(self, shear_magnitude: typing.SupportsFloat | typing.SupportsIndex, shear_direction: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         """
                   Apply a simple shear to the box.
         
@@ -480,7 +480,7 @@ class Box:
         
                     :return: The volume of the box
         """
-    def is_valid_offset(self, potential_offset: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], abs_precision: typing.SupportsFloat = 1e-05) -> bool:
+    def is_valid_offset(self, potential_offset: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], abs_precision: typing.SupportsFloat | typing.SupportsIndex = 1e-05) -> bool:
         """
                   Check whether the passed offset is a valid one in this box.
                   
@@ -537,6 +537,89 @@ class ComputedIntValues(enum.IntEnum):
         """
         Convert to a string according to format_spec.
         """
+class CrosslinkerUniverse:
+    """
+    
+          A struct representing the topological and spatial state of crosslinkers and strands
+          without explicitly instantiating all individual strand beads.
+        
+    """
+    def __init__(self) -> None:
+        """
+        Get an instance of this struct
+        """
+    @property
+    def bead_distance_in_strand(self) -> list[float]:
+        ...
+    @bead_distance_in_strand.setter
+    def bead_distance_in_strand(self, arg0: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def beads_in_strand(self) -> list[int]:
+        ...
+    @beads_in_strand.setter
+    def beads_in_strand(self, arg0: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def mean_squared_bead_distance_in_strand(self) -> list[float]:
+        ...
+    @mean_squared_bead_distance_in_strand.setter
+    def mean_squared_bead_distance_in_strand(self, arg0: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def strand_bead_type(self) -> list[int]:
+        ...
+    @strand_bead_type.setter
+    def strand_bead_type(self, arg0: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def strand_from(self) -> list[int]:
+        ...
+    @strand_from.setter
+    def strand_from(self, arg0: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def strand_to(self) -> list[int]:
+        ...
+    @strand_to.setter
+    def strand_to(self, arg0: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def strands_of_xlink(self) -> list[list[int]]:
+        ...
+    @strands_of_xlink.setter
+    def strands_of_xlink(self, arg0: collections.abc.Sequence[collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]]) -> None:
+        ...
+    @property
+    def xlink_chain_id(self) -> list[int]:
+        ...
+    @xlink_chain_id.setter
+    def xlink_chain_id(self, arg0: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def xlink_types(self) -> list[int]:
+        ...
+    @xlink_types.setter
+    def xlink_types(self, arg0: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def xlink_x(self) -> list[float]:
+        ...
+    @xlink_x.setter
+    def xlink_x(self, arg0: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def xlink_y(self) -> list[float]:
+        ...
+    @xlink_y.setter
+    def xlink_y(self, arg0: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def xlink_z(self) -> list[float]:
+        ...
+    @xlink_z.setter
+    def xlink_z(self, arg0: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex]) -> None:
+        ...
 class DPDSimulator:
     """
     
@@ -552,7 +635,7 @@ class DPDSimulator:
         
                   :param file: The file path to the restart file to read
         """
-    def __init__(self, universe: Universe, crosslinker_type: typing.SupportsInt = 2, slipspring_bond_type: typing.SupportsInt = 9, is_2d: bool = False, seed: str = '') -> None:
+    def __init__(self, universe: Universe, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, slipspring_bond_type: typing.SupportsInt | typing.SupportsIndex = 9, is_2d: bool = False, seed: str = '') -> None:
         """
         Get an instance of this class
         """
@@ -563,7 +646,7 @@ class DPDSimulator:
                   If your bonds could get larger than half the box length, this must be kept false (default).
                   Otherwise, you can set it to true and therewith get some securities.
         """
-    def config_a(self, A: typing.SupportsFloat = 25.0) -> None:
+    def config_a(self, A: typing.SupportsFloat | typing.SupportsIndex = 25.0) -> None:
         """
                   Configure the force-field (pair-style) parameter `A`.
         """
@@ -575,7 +658,7 @@ class DPDSimulator:
         
                   :param allow_relocation_in_network (bool): Whether to allow relocation in the network or not.
         """
-    def config_auto_correlator_output(self, values: collections.abc.Sequence[OutputConfiguration], num_corr_in: typing.SupportsInt = 32, p: typing.SupportsInt = 16, m: typing.SupportsInt = 2) -> None:
+    def config_auto_correlator_output(self, values: collections.abc.Sequence[OutputConfiguration], num_corr_in: typing.SupportsInt | typing.SupportsIndex = 32, p: typing.SupportsInt | typing.SupportsIndex = 16, m: typing.SupportsInt | typing.SupportsIndex = 2) -> None:
         """
                   Set which values to compute multiple-tau autocorrelation for.
                   If you use this, you should cite :cite:t:`ramirez_efficient_2010`.
@@ -591,7 +674,7 @@ class DPDSimulator:
         
                   :param values: A list of OutputConfiguration structs specifying what to average
         """
-    def config_bond_formation(self, num_bonds_to_form: typing.SupportsInt, max_bonds_per_atom_type: collections.abc.Mapping[typing.SupportsInt, typing.SupportsInt], bond_formation_dist: typing.SupportsFloat = 1.0, attempt_bond_formation_every: typing.SupportsInt = 50, atom_type_form_from: typing.SupportsInt = 2, atom_type_form_to: typing.SupportsInt = 1) -> None:
+    def config_bond_formation(self, num_bonds_to_form: typing.SupportsInt | typing.SupportsIndex, max_bonds_per_atom_type: collections.abc.Mapping[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex], bond_formation_dist: typing.SupportsFloat | typing.SupportsIndex = 1.0, attempt_bond_formation_every: typing.SupportsInt | typing.SupportsIndex = 50, atom_type_form_from: typing.SupportsInt | typing.SupportsIndex = 2, atom_type_form_to: typing.SupportsInt | typing.SupportsIndex = 1) -> None:
         """
                   Configure how to do bond formation during the run.
         
@@ -606,23 +689,23 @@ class DPDSimulator:
         """
                   Configure where to (incrementally) deform the box to during the next simulation run.
         """
-    def config_lambda(self, l: typing.SupportsFloat = 0.65) -> None:
+    def config_lambda(self, l: typing.SupportsFloat | typing.SupportsIndex = 0.65) -> None:
         """
                   Configure the modified velocity verlet integration parameter `\\lambda`.
         """
-    def config_num_steps_dpd(self, num_steps: typing.SupportsInt = 500) -> None:
+    def config_num_steps_dpd(self, num_steps: typing.SupportsInt | typing.SupportsIndex = 500) -> None:
         """
                   Configure the number of steps to do in one DPD sequence.
         
                   :param num_steps: Number of DPD steps per sequence
         """
-    def config_num_steps_mc(self, num_steps: typing.SupportsInt = 500) -> None:
+    def config_num_steps_mc(self, num_steps: typing.SupportsInt | typing.SupportsIndex = 500) -> None:
         """
                   Configure the number of steps to do in one MC sequence.
         
                   :param num_steps: Number of Monte Carlo steps per sequence
         """
-    def config_restart_output(self, file: str, output_every: typing.SupportsInt = 50000) -> None:
+    def config_restart_output(self, file: str, output_every: typing.SupportsInt | typing.SupportsIndex = 50000) -> None:
         """
                   Set when to output a restart file.
         
@@ -649,19 +732,19 @@ class DPDSimulator:
         
                   This setting affects Monte Carlo moves in the simulation.
         """
-    def config_sigma(self, sigma: typing.SupportsFloat = 3.0) -> None:
+    def config_sigma(self, sigma: typing.SupportsFloat | typing.SupportsIndex = 3.0) -> None:
         """
                   Configure the force-field (pair-style) parameter `\\sigma`.
         """
-    def config_slipspring_high_cutoff(self, cutoff: typing.SupportsFloat = 2.0) -> None:
+    def config_slipspring_high_cutoff(self, cutoff: typing.SupportsFloat | typing.SupportsIndex = 2.0) -> None:
         """
                   Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.
         """
-    def config_slipspring_low_cutoff(self, cutoff: typing.SupportsFloat = 0.5) -> None:
+    def config_slipspring_low_cutoff(self, cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.5) -> None:
         """
                   Configure the lower cut-off of how far a pair may be distanced for a slip-spring to be created.
         """
-    def config_spring_constant(self, k: typing.SupportsFloat = 2.0) -> None:
+    def config_spring_constant(self, k: typing.SupportsFloat | typing.SupportsIndex = 2.0) -> None:
         """
                   Configure the force-field (bond-style) parameter `k`, the spring constant.
         """
@@ -671,7 +754,7 @@ class DPDSimulator:
         
                   :param values: a list of OutputConfiguration structs
         """
-    def create_slip_springs(self, num: typing.SupportsInt, bond_type: typing.SupportsInt = 9) -> int:
+    def create_slip_springs(self, num: typing.SupportsInt | typing.SupportsIndex, bond_type: typing.SupportsInt | typing.SupportsIndex = 9) -> int:
         """
                   Randomly add the specified number of slip-springs to neighbours within the specified cut-offs.
         """
@@ -798,13 +881,13 @@ class DPDSimulator:
                   After re-configuring the force-field parameters,
                   this method should be called to update the current stress tensor etc.
         """
-    def run_simulation(self, n_steps: typing.SupportsInt, dt: typing.SupportsFloat = 0.06, with_MC: bool = False) -> None:
+    def run_simulation(self, n_steps: typing.SupportsInt | typing.SupportsIndex, dt: typing.SupportsFloat | typing.SupportsIndex = 0.06, with_MC: bool = False) -> None:
         ...
-    def start_measuring_msd_for_atoms(self, atom_ids: collections.abc.Sequence[typing.SupportsInt]) -> None:
+    def start_measuring_msd_for_atoms(self, atom_ids: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
         """
                   Set a new origin for measuing the mean square displacement for a specified set of atoms
         """
-    def validate_neighbour_list(self, cutoff: typing.SupportsFloat) -> None:
+    def validate_neighbour_list(self, cutoff: typing.SupportsFloat | typing.SupportsIndex) -> None:
         """
                   Validate the neighbor list consistency for debugging purposes.
         
@@ -1040,7 +1123,7 @@ class DataFileWriter:
         
                 :param attempt_image_reset: Whether to attempt image flag reset (default: False)
         """
-    def config_crosslinker_type(self, crosslinker_type: typing.SupportsInt = 2) -> None:
+    def config_crosslinker_type(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2) -> None:
         """
                 Set which atom type represents crosslinkers.
                 Needed in case the moleculeIdx in the output file should have any meaning.
@@ -1152,7 +1235,7 @@ class DumpFileReader:
                  
                  :return: Number of timesteps/sections in the dump file
         """
-    def get_numeric_values_for_at(self, rowIndex: typing.SupportsInt, headerKey: str, columnIndex: str) -> list[float]:
+    def get_numeric_values_for_at(self, rowIndex: typing.SupportsInt | typing.SupportsIndex, headerKey: str, columnIndex: str) -> list[float]:
         """
                  Get numeric values for the section at index, the main header headerKey and the column columnIndex.
                  
@@ -1161,7 +1244,7 @@ class DumpFileReader:
                  :param columnIndex: Index of the column within the header
                  :return: Vector of numeric values for the specified location
         """
-    def get_string_values_for_at(self, rowIndex: typing.SupportsInt, headerKey: str, columnIndex: str) -> list[str]:
+    def get_string_values_for_at(self, rowIndex: typing.SupportsInt | typing.SupportsIndex, headerKey: str, columnIndex: str) -> list[str]:
         """
                  Get string values for the section at index, the main header headerKey and the column columnIndex.
                  
@@ -1198,6 +1281,13 @@ class DumpFileReader:
         """
                  Read the whole file.
         """
+class EntanglementSamplingMethod(enum.Enum):
+    """
+    Enum representing the method for sampling entanglements in polymer networks.
+    """
+    ANALYTICAL: typing.ClassVar[EntanglementSamplingMethod]  # value = <EntanglementSamplingMethod.ANALYTICAL: 1>
+    DISCRETE: typing.ClassVar[EntanglementSamplingMethod]  # value = <EntanglementSamplingMethod.DISCRETE: 0>
+    ON_DEMAND: typing.ClassVar[EntanglementSamplingMethod]  # value = <EntanglementSamplingMethod.ON_DEMAND: 2>
 class ExitReason(enum.IntEnum):
     """
     
@@ -1239,7 +1329,7 @@ class LinearMaxDistanceProvider(MaxDistanceProvider):
         :param max_distance_multiplier: Multiplier for the maximum distance.
         
     """
-    def __init__(self, max_distance_multiplier: typing.SupportsFloat) -> None:
+    def __init__(self, max_distance_multiplier: typing.SupportsFloat | typing.SupportsIndex) -> None:
         ...
     def __repr__(self) -> str:
         """
@@ -1247,7 +1337,7 @@ class LinearMaxDistanceProvider(MaxDistanceProvider):
                  
                  :return: String representation
         """
-    def get_max_distance(self, N: typing.SupportsFloat) -> float:
+    def get_max_distance(self, N: typing.SupportsFloat | typing.SupportsIndex) -> float:
         """
                  Get the maximum distance for a given N.
         
@@ -1289,9 +1379,9 @@ class MCUniverseGenerator:
     """
     def __copy__(self) -> MCUniverseGenerator:
         ...
-    def __getstate__(self) -> tuple:
+    def __getstate__(self) -> tuple[str]:
         ...
-    def __init__(self, lx: typing.SupportsFloat = 10.0, ly: typing.SupportsFloat = 10.0, lz: typing.SupportsFloat = 10.0) -> None:
+    def __init__(self, lx: typing.SupportsFloat | typing.SupportsIndex = 10.0, ly: typing.SupportsFloat | typing.SupportsIndex = 10.0, lz: typing.SupportsFloat | typing.SupportsIndex = 10.0) -> None:
         """
                  Initialize a new MCUniverseGenerator with specified box dimensions.
         
@@ -1301,7 +1391,7 @@ class MCUniverseGenerator:
         """
     def __setstate__(self, arg0: tuple) -> None:
         ...
-    def add_crosslinkers(self, nr_of_crosslinkers: typing.SupportsInt, crosslinker_functionality: typing.SupportsInt = 4, crosslinker_type: typing.SupportsInt = 2, white_noise: bool = True) -> None:
+    def add_crosslinkers(self, nr_of_crosslinkers: typing.SupportsInt | typing.SupportsIndex, crosslinker_functionality: typing.SupportsInt | typing.SupportsIndex = 4, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, white_noise: bool = True) -> None:
         """
                     Add crosslinkers at random positions.
         
@@ -1310,7 +1400,7 @@ class MCUniverseGenerator:
                     :param crosslinker_type: Atom type of the crosslinkers (default: 2).
                     :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).
         """
-    def add_crosslinkers_at(self, coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], crosslinker_functionality: typing.SupportsInt = 4, crosslinker_type: typing.SupportsInt = 2) -> None:
+    def add_crosslinkers_at(self, coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], crosslinker_functionality: typing.SupportsInt | typing.SupportsIndex = 4, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2) -> None:
         """
                   Add crosslinkers at specific coordinates.
         
@@ -1318,7 +1408,7 @@ class MCUniverseGenerator:
                   :param crosslinker_functionality: Functionality of the crosslinkers (default: 4).
                   :param crosslinker_type: Atom type of the crosslinkers (default: 2).
         """
-    def add_end_functionalized_strands(self, nr_of_strands: typing.SupportsInt, strand_length: collections.abc.Sequence[typing.SupportsInt], crosslinker_functionality: typing.SupportsInt = 4, crosslinker_type: typing.SupportsInt = 2, strand_atom_type: typing.SupportsInt = 1, white_noise: bool = True) -> None:
+    def add_end_functionalized_strands(self, nr_of_strands: typing.SupportsInt | typing.SupportsIndex, strand_length: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], crosslinker_functionality: typing.SupportsInt | typing.SupportsIndex = 4, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, strand_atom_type: typing.SupportsInt | typing.SupportsIndex = 1, white_noise: bool = True) -> None:
         """
                     Add strands with crosslinkers at the ends.
         
@@ -1329,7 +1419,7 @@ class MCUniverseGenerator:
                     :param strand_atom_type: Atom type of the beads that are not at the ends (default: 1).
                     :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).
         """
-    def add_functionalized_strands(self, nr_of_strands: typing.SupportsInt, strand_length: collections.abc.Sequence[typing.SupportsInt], crosslink_selector: collections.abc.Callable[[typing.SupportsInt, typing.SupportsInt, typing.SupportsInt], tuple[bool, int]], default_crosslinker_functionality: typing.SupportsInt, crosslinker_type: typing.SupportsInt = 2, strand_atom_type: typing.SupportsInt = 1, white_noise: bool = True) -> None:
+    def add_functionalized_strands(self, nr_of_strands: typing.SupportsInt | typing.SupportsIndex, strand_length: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], crosslink_selector: collections.abc.Callable[[int, int, int], tuple[bool, typing.SupportsInt | typing.SupportsIndex]], default_crosslinker_functionality: typing.SupportsInt | typing.SupportsIndex, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, strand_atom_type: typing.SupportsInt | typing.SupportsIndex = 1, white_noise: bool = True) -> None:
         """
                   Add strands with custom crosslink placement using a selector function.
         
@@ -1368,7 +1458,7 @@ class MCUniverseGenerator:
                   :param strand_atom_type: Atom type of the beads that stay (default: 1).
                   :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).     
         """
-    def add_monofunctional_strands(self, nr_of_monofunctional_strands: typing.SupportsInt, monofunctional_strand_length: collections.abc.Sequence[typing.SupportsInt], monofunctional_strand_atom_type: typing.SupportsInt = 4) -> None:
+    def add_monofunctional_strands(self, nr_of_monofunctional_strands: typing.SupportsInt | typing.SupportsIndex, monofunctional_strand_length: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], monofunctional_strand_atom_type: typing.SupportsInt | typing.SupportsIndex = 4) -> None:
         """
                  Add multiple monofunctional strands with specified bead types.
         
@@ -1376,7 +1466,7 @@ class MCUniverseGenerator:
                  :param monofunctional_strand_length: Vector specifying the length of each strand in beads.
                  :param monofunctional_strand_atom_type: Atom type for the strand beads (default: 4).
         """
-    def add_randomly_functionalized_strands(self, nr_of_strands: typing.SupportsInt, strand_length: collections.abc.Sequence[typing.SupportsInt], functionalization_probability: typing.SupportsFloat, crosslinker_functionality: typing.SupportsInt = 4, crosslinker_type: typing.SupportsInt = 2, strand_atom_type: typing.SupportsInt = 1, white_noise: bool = True) -> None:
+    def add_randomly_functionalized_strands(self, nr_of_strands: typing.SupportsInt | typing.SupportsIndex, strand_length: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], functionalization_probability: typing.SupportsFloat | typing.SupportsIndex, crosslinker_functionality: typing.SupportsInt | typing.SupportsIndex = 4, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, strand_atom_type: typing.SupportsInt | typing.SupportsIndex = 1, white_noise: bool = True) -> None:
         """
                   Add strands with randomly distributed crosslinkers in between.
         
@@ -1388,7 +1478,7 @@ class MCUniverseGenerator:
                   :param strand_atom_type: Atom type of the beads that stay (default: 1).
                   :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).     
         """
-    def add_regularly_spaced_functionalized_strands(self, nr_of_strands: typing.SupportsInt, strand_length: collections.abc.Sequence[typing.SupportsInt], spacing_between_crosslinks: typing.SupportsInt, offset_to_first_crosslink: typing.SupportsInt = 0, crosslinker_functionality: typing.SupportsInt = 4, crosslinker_type: typing.SupportsInt = 2, strand_atom_type: typing.SupportsInt = 1, white_noise: bool = True) -> None:
+    def add_regularly_spaced_functionalized_strands(self, nr_of_strands: typing.SupportsInt | typing.SupportsIndex, strand_length: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], spacing_between_crosslinks: typing.SupportsInt | typing.SupportsIndex, offset_to_first_crosslink: typing.SupportsInt | typing.SupportsIndex = 0, crosslinker_functionality: typing.SupportsInt | typing.SupportsIndex = 4, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, strand_atom_type: typing.SupportsInt | typing.SupportsIndex = 1, white_noise: bool = True) -> None:
         """
                   Add strands with regularly spaced crosslinkers in between.
         
@@ -1401,7 +1491,7 @@ class MCUniverseGenerator:
                   :param strand_atom_type: Atom type of the beads that stay (default: 1).
                   :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the crosslinkers (default: true).     
         """
-    def add_solvent_chains(self, nr_of_solvent_chains: typing.SupportsInt, solvent_chain_length: typing.SupportsInt, solvent_atom_type: typing.SupportsInt = 3, white_noise: bool = True) -> None:
+    def add_solvent_chains(self, nr_of_solvent_chains: typing.SupportsInt | typing.SupportsIndex, solvent_chain_length: typing.SupportsInt | typing.SupportsIndex, solvent_atom_type: typing.SupportsInt | typing.SupportsIndex = 3, white_noise: bool = True) -> None:
         """
                     Randomly distribute additional, free chains.
         
@@ -1410,7 +1500,7 @@ class MCUniverseGenerator:
                     :param solvent_atom_type: Atom type for solvent chain beads (default: 3).
                     :param white_noise: Whether to use white noise (true) or blue noise (false) for positioning (default: true).
         """
-    def add_star_crosslinkers(self, nr_of_stars: typing.SupportsInt, functionality: typing.SupportsInt, beads_per_strand: typing.SupportsInt, crosslinker_atom_type: typing.SupportsInt = 2, strand_atom_type: typing.SupportsInt = 1, white_noise: bool = True) -> None:
+    def add_star_crosslinkers(self, nr_of_stars: typing.SupportsInt | typing.SupportsIndex, functionality: typing.SupportsInt | typing.SupportsIndex, beads_per_strand: typing.SupportsInt | typing.SupportsIndex, crosslinker_atom_type: typing.SupportsInt | typing.SupportsIndex = 2, strand_atom_type: typing.SupportsInt | typing.SupportsIndex = 1, white_noise: bool = True) -> None:
         """
                  Add star-like crosslinkers with pre-connected strands (useful e.g. for tetra-PEG networks).
                  Each star crosslinker will have the specified functionality with strands already attached.
@@ -1428,7 +1518,7 @@ class MCUniverseGenerator:
                  :param strand_atom_type: Atom type for the strand beads
                  :param white_noise: Whether to use white noise positioning
         """
-    def add_strands(self, nr_of_strands: typing.SupportsInt, strand_lengths: collections.abc.Sequence[typing.SupportsInt], strand_atom_type: typing.SupportsInt = 1) -> None:
+    def add_strands(self, nr_of_strands: typing.SupportsInt | typing.SupportsIndex, strand_lengths: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], strand_atom_type: typing.SupportsInt | typing.SupportsIndex = 1) -> None:
         """
                     Add strands.
                     Adds them unconnected at first.
@@ -1438,13 +1528,13 @@ class MCUniverseGenerator:
                     :param strand_lengths: A list of integers representing the number of beads of each of the strands.
                     :param strand_atom_type: Type of atoms for the strands (default: 1).
         """
-    def config_nr_of_mc_steps(self, n_steps: typing.SupportsInt = 2000) -> None:
+    def config_nr_of_mc_steps(self, n_steps: typing.SupportsInt | typing.SupportsIndex = 2000) -> None:
         """
                Set the number of Monte-Carlo steps during bond length equilibration.
         
                :param n_steps: Number of MC steps to perform (default: 2000)
         """
-    def config_primary_loop_probability(self, probability: typing.SupportsFloat = 1.0) -> None:
+    def config_primary_loop_probability(self, probability: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """
                  Configure an additional weight reduction for the primary loop formation.
         
@@ -1453,7 +1543,7 @@ class MCUniverseGenerator:
         
                  Set to 0. to disable the formation of primary loops.
         """
-    def config_secondary_loop_probability(self, probability: typing.SupportsFloat = 1.0) -> None:
+    def config_secondary_loop_probability(self, probability: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """
                  Configure an additional weight reduction for the secondary loop formation.
         
@@ -1466,6 +1556,19 @@ class MCUniverseGenerator:
         """
                  Disable the maximum distance provider to allow unlimited distance sampling.
                  This may slow down performance for large systems but ensures complete sampling.
+        """
+    def get_box(self) -> Box:
+        """
+                    Get the simulation box of the generator.
+        
+                    :return: The Box object.
+        """
+    def get_crosslinker_universe(self) -> CrosslinkerUniverse:
+        """
+                    Get a copy of the internal CrosslinkerUniverse (crosslinker coordinates and strand topology)
+                    without instantiating individual strand beads or constructing a Universe.
+        
+                    :return: The CrosslinkerUniverse struct.
         """
     def get_current_crosslinker_conversion(self) -> float:
         """
@@ -1492,6 +1595,7 @@ class MCUniverseGenerator:
         
                  :return: Strand conversion as a fraction between 0 and 1.
         """
+    @typing.overload
     def get_force_balance(self) -> MEHPForceBalance:
         """
                  Get an instance of the force balance procedure.
@@ -1499,12 +1603,67 @@ class MCUniverseGenerator:
         
                  :return: Configured MEHPForceBalance instance.
         """
+    @typing.overload
+    def get_force_balance(self, entanglements: StrandPairEntanglements) -> MEHPForceBalance:
+        """
+                 Get an instance of the force balance procedure with pre-sampled entanglements,
+                 bypassing the creation of a Universe.
+        
+                 :param entanglements: Sampled StrandPairEntanglements.
+                 :return: Configured MEHPForceBalance instance.
+        """
+    @typing.overload
+    def get_force_balance(self, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filter_dangling_and_soluble: bool = True, method: typing.Any = ...) -> MEHPForceBalance:
+        """
+              Sample entanglements and return a configured MEHPForceBalance instance,
+              bypassing the creation of a Universe.
+        
+              :param nr_of_entanglements_to_sample: Target number of entanglements to sample.
+              :param upper_cutoff: Upper cutoff distance between entangled beads.
+              :param lower_cutoff: Lower cutoff distance between entangled beads (default: 0.0).
+              :param minimum_nr_of_entanglements: Minimum number of entanglements required (default: 0).
+              :param same_strand_cutoff: Minimum contour separation on the same strand (default: 3.0).
+              :param seed: Optional random seed (uses generator RNG if empty).
+              :param filter_dangling_and_soluble: Filter out dangling and soluble strands (default: True).
+              :param method: Entanglement sampling method (EntanglementSamplingMethod enum or string; default: EntanglementSamplingMethod.ANALYTICAL).
+              :return: Configured MEHPForceBalance instance.
+        """
+    @typing.overload
     def get_force_balance2(self) -> MEHPForceBalance2:
         """
                       Get an instance of the force balance procedure.
                       This is a useful shorthand e.g. to skip the sampling of beads within in the strands.
         
                       :return: Configured MEHPForceBalance2 instance.
+        """
+    @typing.overload
+    def get_force_balance2(self, entanglements: StrandPairEntanglements, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, entanglements_as_springs: bool = False) -> MEHPForceBalance2:
+        """
+                      Get an instance of the MEHPForceBalance2 procedure with pre-sampled entanglements,
+                      bypassing the creation of a Universe.
+        
+                      :param entanglements: Sampled StrandPairEntanglements.
+                      :param crosslinker_type: Crosslinker atom type (default: 2).
+                      :param entanglements_as_springs: Whether to represent entanglements as springs between two split nodes (default: False).
+                      :return: Configured MEHPForceBalance2 instance.
+        """
+    @typing.overload
+    def get_force_balance2(self, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filter_dangling_and_soluble: bool = True, entanglements_as_springs: bool = False, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, method: typing.Any = ...) -> MEHPForceBalance2:
+        """
+                   Sample entanglements and return a configured MEHPForceBalance2 instance,
+                   bypassing the creation of a Universe.
+        
+                   :param nr_of_entanglements_to_sample: Target number of entanglements to sample.
+                   :param upper_cutoff: Upper cutoff distance between entangled beads.
+                   :param lower_cutoff: Lower cutoff distance between entangled beads (default: 0.0).
+                   :param minimum_nr_of_entanglements: Minimum number of entanglements required (default: 0).
+                   :param same_strand_cutoff: Minimum contour separation on the same strand (default: 3.0).
+                   :param seed: Optional random seed (uses generator RNG if empty).
+                   :param filter_dangling_and_soluble: Filter out dangling and soluble strands (default: True).
+                   :param entanglements_as_springs: Whether to represent entanglements as springs between two split nodes (default: False).
+                   :param crosslinker_type: Crosslinker atom type (default: 2).
+                   :param method: Entanglement sampling method (EntanglementSamplingMethod enum or string; default: EntanglementSamplingMethod.ANALYTICAL).
+                   :return: Configured MEHPForceBalance2 instance.
         """
     def get_force_relaxation(self) -> MEHPForceRelaxation:
         """
@@ -1545,7 +1704,7 @@ class MCUniverseGenerator:
         
                     :return: The generated Universe object containing all atoms, bonds, and their coordinates.
         """
-    def link_strand(self, strand_idx: typing.SupportsInt, c_infinity: typing.SupportsFloat = 1.0) -> None:
+    def link_strand(self, strand_idx: typing.SupportsInt | typing.SupportsIndex, c_infinity: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """
                   Link one particular strand to a crosslinker.
                   This strand will have one bond made, to an appropriate crosslinker, 
@@ -1554,7 +1713,7 @@ class MCUniverseGenerator:
                   :param strand_idx: Index of the strand to be linked.
                   :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2` (default: 1.0).
         """
-    def link_strand_to(self, strand_idx: typing.SupportsInt, link_idx: typing.SupportsInt) -> None:
+    def link_strand_to(self, strand_idx: typing.SupportsInt | typing.SupportsIndex, link_idx: typing.SupportsInt | typing.SupportsIndex) -> None:
         """
                   Link a strand to a specific crosslinker.
                   This assumes that you keep track of the order in which you added the crosslinkers and strands,
@@ -1567,7 +1726,7 @@ class MCUniverseGenerator:
                   :param strand_idx: Index of the strand to be linked.
                   :param link_idx: Index of the crosslinker to be linked.
         """
-    def link_strand_to_strand(self, c_infinity: typing.SupportsFloat = 1.0) -> bool:
+    def link_strand_to_strand(self, c_infinity: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> bool:
         """
                  Link two free strand ends together directly.
                  This method finds free strand ends and combines them into a single strand based on
@@ -1582,7 +1741,7 @@ class MCUniverseGenerator:
                  :param c_infinity: Statistical parameter for end-to-end distance calculation
                  :return: True if a successful link was made, False if no suitable pair was found
         """
-    def link_strands_callback(self, linking_controller: collections.abc.Callable[[MCUniverseGenerator, typing.SupportsInt], BackTrackStatus], c_infinity: typing.SupportsFloat = 1.0) -> None:
+    def link_strands_callback(self, linking_controller: collections.abc.Callable[[MCUniverseGenerator, int], BackTrackStatus], c_infinity: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """
                     Link strands to crosslinkers using a custom callback function to control when to stop.
         
@@ -1596,7 +1755,7 @@ class MCUniverseGenerator:
                                               Function signature: (MCUniverseGenerator, int) -> BackTrackStatus
                     :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
         """
-    def link_strands_to_conversion(self, crosslinker_conversion: typing.SupportsFloat, c_infinity: typing.SupportsFloat = 1.0) -> None:
+    def link_strands_to_conversion(self, crosslinker_conversion: typing.SupportsFloat | typing.SupportsIndex, c_infinity: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """
                     Actually link the previously added strands to the previously added crosslinkers,
                     until a certain crosslink conversion is reached.
@@ -1604,7 +1763,7 @@ class MCUniverseGenerator:
                     :param crosslinker_conversion: Target conversion of crosslinkers (0: no connections to crosslinks; 1: all crosslinkers fully connected).
                     :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
         """
-    def link_strands_to_soluble_fraction(self, soluble_fraction: typing.SupportsFloat, c_infinity: typing.SupportsFloat = 1.0) -> None:
+    def link_strands_to_soluble_fraction(self, soluble_fraction: typing.SupportsFloat | typing.SupportsIndex, c_infinity: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """
                     Actually link the previously added strands to the previously added crosslinkers,
                     until a certain soluble fraction is reached.
@@ -1612,7 +1771,7 @@ class MCUniverseGenerator:
                     :param soluble_fraction: Target soluble fraction (0: all material is soluble; 1: no material is soluble).
                     :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2` (default: 1.0).
         """
-    def link_strands_to_strands_to_conversion(self, target_strand_conversion: typing.SupportsFloat, c_infinity: typing.SupportsFloat = 1.0) -> None:
+    def link_strands_to_strands_to_conversion(self, target_strand_conversion: typing.SupportsFloat | typing.SupportsIndex, c_infinity: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """
                  Link free strand ends to each other until target conversion is reached.
                  This method repeatedly calls :meth:`~pylimer_tools_cpp.MCUniverseGenerator.link_strand_to_strand` 
@@ -1643,7 +1802,51 @@ class MCUniverseGenerator:
         
                     :param rescale_box: Whether to rescale the box dimensions to maintain constant density (default: true).
         """
-    def set_bead_distance(self, distance: typing.SupportsFloat, update_mean_squared: bool = True) -> None:
+    def sample_entanglements(self, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filter_dangling_and_soluble: bool = True, method: typing.Any = ...) -> StrandPairEntanglements:
+        """
+                 Sample entanglements directly from the generator's CrosslinkerUniverse
+                 without generating all strand beads or constructing a Universe.
+        
+                 :param nr_of_entanglements_to_sample: Target number of entanglements to sample.
+                 :param upper_cutoff: Upper cutoff distance between entangled beads.
+                 :param lower_cutoff: Lower cutoff distance between entangled beads (default: 0.0).
+                 :param minimum_nr_of_entanglements: Minimum number of entanglements required (default: 0).
+                 :param same_strand_cutoff: Minimum contour separation on the same strand (default: 3.0).
+                 :param seed: Optional random seed (uses generator RNG if empty).
+                 :param filter_dangling_and_soluble: Filter out dangling and soluble strands (default: True).
+                 :param method: Sampling method (EntanglementSamplingMethod enum or string; default: EntanglementSamplingMethod.ANALYTICAL).
+                 :return: Sampled StrandPairEntanglements.
+        """
+    def sample_entanglements_analytical(self, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filter_dangling_and_soluble: bool = True) -> StrandPairEntanglements:
+        """
+                    Sample entanglements analytically and probabilistically from the generator's CrosslinkerUniverse
+                    using Brownian bridge conditional Gaussian distributions.
+        
+                    :param nr_of_entanglements_to_sample: Target number of entanglements to sample.
+                    :param upper_cutoff: Upper cutoff distance between entangled beads.
+                    :param lower_cutoff: Lower cutoff distance between entangled beads (default: 0.0).
+                    :param minimum_nr_of_entanglements: Minimum number of entanglements required (default: 0).
+                    :param same_strand_cutoff: Minimum contour separation on the same strand (default: 3.0).
+                    :param seed: Optional random seed (uses generator RNG if empty).
+                    :param filter_dangling_and_soluble: Filter out dangling and soluble strands (default: True).
+                    :return: Sampled StrandPairEntanglements.
+        """
+    def sample_entanglements_on_demand(self, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filter_dangling_and_soluble: bool = True) -> StrandPairEntanglements:
+        """
+                    Sample entanglements from the generator's CrosslinkerUniverse using per-strand bounding
+                    boxes and on-demand Brownian bridge bead resampling. Memory is O(N_strands) like analytical
+                    sampling, while results physically match discrete multi-bead chain conformations.
+        
+                    :param nr_of_entanglements_to_sample: Target number of entanglements to sample.
+                    :param upper_cutoff: Upper cutoff distance between entangled beads.
+                    :param lower_cutoff: Lower cutoff distance between entangled beads (default: 0.0).
+                    :param minimum_nr_of_entanglements: Minimum number of entanglements required (default: 0).
+                    :param same_strand_cutoff: Minimum contour separation on the same strand (default: 3.0).
+                    :param seed: Optional random seed (uses generator RNG if empty).
+                    :param filter_dangling_and_soluble: Filter out dangling and soluble strands (default: True).
+                    :return: Sampled StrandPairEntanglements.
+        """
+    def set_bead_distance(self, distance: typing.SupportsFloat | typing.SupportsIndex, update_mean_squared: bool = True) -> None:
         """
                  Set the mean distance between beads when doing MC stepping.
                  Also used for the target crosslinker partner sampling.
@@ -1653,20 +1856,20 @@ class MCUniverseGenerator:
                  :param distance: Mean distance between beads.
                  :param update_mean_squared: Whether to update the mean squared distance as well, deduced from the assumed gaussian distribution in 3D (default: true).
         """
-    def set_mean_squared_bead_distance(self, mean_squared_distance: typing.SupportsFloat, update_mean: bool = True) -> None:
+    def set_mean_squared_bead_distance(self, mean_squared_distance: typing.SupportsFloat | typing.SupportsIndex, update_mean: bool = True) -> None:
         """
                   Set the mean squared distance between beads.
         
                   :param mean_squared_distance: Mean squared distance between beads
                   :param update_mean: Whether to update the mean bead distance as well, deduced from the assumed gaussian distribution in 3D (default: true)
         """
-    def set_seed(self, seed: typing.SupportsInt) -> None:
+    def set_seed(self, seed: typing.SupportsInt | typing.SupportsIndex) -> None:
         """
                  Set the seed for the random generator.
         
                  :param seed: Random seed value for reproducible results.
         """
-    def use_linear_max_distance(self, multiplier: typing.SupportsFloat) -> None:
+    def use_linear_max_distance(self, multiplier: typing.SupportsFloat | typing.SupportsIndex) -> None:
         """
                   Converts the :math:`N` to a maximum distance within which to sample.
                   The distance will be calculated as :math:`N \\times \\text{multiplier}`.
@@ -1675,7 +1878,7 @@ class MCUniverseGenerator:
         
                   Useful only for performance improvements in large systems.
         """
-    def use_zscore_max_distance(self, std_multiplier: typing.SupportsFloat, in_sqrt_multiplier: typing.SupportsFloat = 1.0) -> None:
+    def use_zscore_max_distance(self, std_multiplier: typing.SupportsFloat | typing.SupportsIndex, in_sqrt_multiplier: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """
                  Converts the :math:`N` to a maximum distance within which to sample.
                  The distance will be calculated as :math:`\\text{std_multiplier} \\times \\sqrt{N \\times \\text{in_sqrt_multiplier}}`.
@@ -1697,21 +1900,21 @@ class MEHPForceBalance:
         A small simulation tool for quickly minimizing the force between the crosslinker beads.
     
         This is the second implementation in the group of MEHP provided by this package.
-        The distinct feature here is the slip-links: a form of entanglement,
-        represented as an entanglement link, just like a four-functional crosslink,
-        but with the ability to slip along the two associated strands, therewith
-        adjusting the fraction of the contour length on both sides of the link.
+        The distinct feature here is slip-links: entanglements represented as links
+        with the option to dynamically slip along the two associated strands (via ``disable_slipping=False``)
+        or remain fixed at their contour positions (via ``disable_slipping=True``).
     
-        Please cite :cite:t:`bernhard_phantom_2025` if you use this method.
+        See :doc:`/nomenclature` for details on entanglement terminology and the rationale
+        for fixed links, and cite :cite:t:`bernhard_phantom_2025` if you use this method.
         
     """
     @staticmethod
-    def construct_with_random_sliplinks(universe: Universe, nr_of_sliplinks_to_sample: typing.SupportsInt, upper_sampling_cutoff: typing.SupportsFloat = 1.2, lower_sampling_cutoff: typing.SupportsFloat = 0.0, minimum_nr_of_sliplinks: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 3, seed: str = '', crosslinker_type: typing.SupportsInt = 2, is_2d: bool = False, skip_dangling_soluble_entanglements: bool = True) -> MEHPForceBalance:
+    def construct_with_random_sliplinks(universe: Universe, nr_of_sliplinks_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_sampling_cutoff: typing.SupportsFloat | typing.SupportsIndex = 1.2, lower_sampling_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_sliplinks: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3, seed: str = '', crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, skip_dangling_soluble_entanglements: bool = True) -> MEHPForceBalance:
         """
                   Instantiate this simulator with randomly chosen slip-links.
         """
     @staticmethod
-    def get_neighbour_link_indices(network: SimplifiedBalanceNetwork, link_idx: typing.SupportsInt) -> list[int]:
+    def get_neighbour_link_indices(network: SimplifiedBalanceNetwork, link_idx: typing.SupportsInt | typing.SupportsIndex) -> list[int]:
         """
                          Get the indices of neighboring links for a given link.
         
@@ -1721,9 +1924,9 @@ class MEHPForceBalance:
         """
     def __copy__(self) -> MEHPForceBalance:
         ...
-    def __getstate__(self) -> tuple:
+    def __getstate__(self) -> tuple[str]:
         ...
-    def __init__(self, universe: Universe, crosslinker_type: typing.SupportsInt = 2, is_2d: bool = False, remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -> None:
+    def __init__(self, universe: Universe, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -> None:
         """
                   Instantiate the simulator for a certain universe.
         
@@ -1736,11 +1939,11 @@ class MEHPForceBalance:
         """
     def __setstate__(self, arg0: tuple) -> None:
         ...
-    def add_sliplinks(self, strand_idx_1: collections.abc.Sequence[typing.SupportsInt], strand_idx_2: collections.abc.Sequence[typing.SupportsInt], x: collections.abc.Sequence[typing.SupportsFloat], y: collections.abc.Sequence[typing.SupportsFloat], z: collections.abc.Sequence[typing.SupportsFloat], alpha_1: collections.abc.Sequence[typing.SupportsFloat], alpha_2: collections.abc.Sequence[typing.SupportsFloat], clamp_alpha: bool = False) -> None:
+    def add_sliplinks(self, strand_idx_1: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], strand_idx_2: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], x: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex], y: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex], z: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex], alpha_1: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex], alpha_2: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex], clamp_alpha: bool = False) -> None:
         """
                   Add new slip-links
         """
-    def add_sliplinks_based_on_cycles(self, maxLoopLength: typing.SupportsInt = -1) -> int:
+    def add_sliplinks_based_on_cycles(self, maxLoopLength: typing.SupportsInt | typing.SupportsIndex = -1) -> int:
         """
                   Detect and add slip-links based on detected entanglements.
         
@@ -1755,7 +1958,7 @@ class MEHPForceBalance:
                                           If your bonds could get larger than half the box length, 
                                           this must be kept False (default).
         """
-    def config_entanglement_type(self, type: typing.SupportsInt = -1) -> None:
+    def config_entanglement_type(self, type: typing.SupportsInt | typing.SupportsIndex = -1) -> None:
         """
                  To have certain crosslinks behave as entanglements in the removal process,
                  you can specify here a type, that you have used in the universe to specify:
@@ -1769,19 +1972,19 @@ class MEHPForceBalance:
         
                  :param type: The atom type to treat as entanglement.
         """
-    def config_mean_bond_length(self, b: typing.SupportsFloat = 1.0) -> None:
+    def config_mean_bond_length(self, b: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """
                   Configure the :math:`b` used e.g. for the topological Gamma-factor.
         
                   :param b: The mean bond length to use.
         """
-    def config_simplification_frequency(self, frequency: typing.SupportsInt = 10) -> None:
+    def config_simplification_frequency(self, frequency: typing.SupportsInt | typing.SupportsIndex = 10) -> None:
         """
                   Configure every how many steps to simplify the structure.
         
                   :param frequency: The number of steps between simplification. Default: 10.
         """
-    def config_spring_breaking_distance(self, distance_over_contour_length: typing.SupportsFloat = -1) -> None:
+    def config_spring_breaking_distance(self, distance_over_contour_length: typing.SupportsFloat | typing.SupportsIndex = -1) -> None:
         """
                   Configure the "force" (distance over contour length) at which the bonds break.
                   Can be used to model the effect of fracture, to reduce the stiffening happening upon deformation.
@@ -1791,7 +1994,7 @@ class MEHPForceBalance:
         
                   :param distance_over_contour_length: The threshold for breaking springs.
         """
-    def config_spring_constant(self, kappa: typing.SupportsFloat = 1.0) -> None:
+    def config_spring_constant(self, kappa: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """
                   Configure the spring constant used in the simulation.
         
@@ -1809,7 +2012,7 @@ class MEHPForceBalance:
                   Perform a deformation of the system box to a different box.
                   All coordinates etc. will be scaled as needed.
         """
-    def evaluate_spring_distance(self, network: SimplifiedBalanceNetwork, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], spring_idx: typing.SupportsInt) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+    def evaluate_spring_distance(self, network: SimplifiedBalanceNetwork, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], spring_idx: typing.SupportsInt | typing.SupportsIndex) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
         """
                Evaluate the distance vector for a specific spring.
         
@@ -1818,7 +2021,7 @@ class MEHPForceBalance:
                :param spring_idx: Index of the spring to evaluate
                :return: 3D distance vector for the spring
         """
-    def evaluate_spring_distance_from(self, network: SimplifiedBalanceNetwork, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], spring_idx: typing.SupportsInt, link_idx: typing.SupportsInt) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+    def evaluate_spring_distance_from(self, network: SimplifiedBalanceNetwork, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], spring_idx: typing.SupportsInt | typing.SupportsIndex, link_idx: typing.SupportsInt | typing.SupportsIndex) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
         """
                Evaluate the spring distance from a specific link.
         
@@ -1828,7 +2031,7 @@ class MEHPForceBalance:
                :param link_idx: Index of the starting link
                :return: 3D distance vector from the specified link
         """
-    def evaluate_spring_distance_to(self, network: SimplifiedBalanceNetwork, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], spring_idx: typing.SupportsInt, link_idx: typing.SupportsInt) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+    def evaluate_spring_distance_to(self, network: SimplifiedBalanceNetwork, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], spring_idx: typing.SupportsInt | typing.SupportsIndex, link_idx: typing.SupportsInt | typing.SupportsIndex) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
         """
                Evaluate the spring distance to a specific link.
         
@@ -1837,6 +2040,12 @@ class MEHPForceBalance:
                :param spring_idx: Index of the spring to evaluate
                :param link_idx: Index of the target link
                :return: 3D distance vector to the specified link
+        """
+    def get_active_weight_fraction(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> float:
+        """
+                  Compute the weight fraction of active strands
+        
+                  Caution: ignores atom masses.
         """
     def get_average_strand_length(self) -> float:
         """
@@ -1861,7 +2070,7 @@ class MEHPForceBalance:
         """
     def get_current_strand_vectors(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         ...
-    def get_dangling_weight_fraction(self, tolerance: typing.SupportsFloat = 0.001) -> float:
+    def get_dangling_weight_fraction(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> float:
         """
                   Compute the weight fraction of non-active strands
         
@@ -1872,7 +2081,7 @@ class MEHPForceBalance:
                    Returns the value effectively used in :meth:`~pylimer_tools_cpp.MEHPForceBalance.get_gamma_factor` for
                    :math:`b` in :math:`\\langle R_{0,\\eta}^2 = N_{\\eta} b^2\\rangle`.
         """
-    def get_displacement_residual_norm(self, one_over_strand_partition_upper_limit: typing.SupportsFloat = 1.0) -> float:
+    def get_displacement_residual_norm(self, one_over_strand_partition_upper_limit: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> float:
         """
                    Get the current link displacement residual norm.
         """
@@ -1880,7 +2089,7 @@ class MEHPForceBalance:
         """
                    Get the current link displacements.
         """
-    def get_effective_functionality_of_atoms(self, tolerance: typing.SupportsFloat = 0.001) -> dict[int, int]:
+    def get_effective_functionality_of_atoms(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> dict[int, int]:
         """
                   Returns the number of active strands connected to each atom, atomId used as index
         
@@ -1890,15 +2099,15 @@ class MEHPForceBalance:
         """
                    Returns the reason for termination of the simulation
         """
-    def get_force_magnitude_vector(self, arg0: typing.SupportsFloat) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def get_force_magnitude_vector(self, arg0: typing.SupportsFloat | typing.SupportsIndex) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                   Evaluate the norm of the force on each (slip- or cross-) link.
         """
-    def get_force_on(self, link_idx: typing.SupportsInt, one_over_strand_partition_upper_limit: typing.SupportsFloat = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+    def get_force_on(self, link_idx: typing.SupportsInt | typing.SupportsIndex, one_over_strand_partition_upper_limit: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
         """
                   Evaluate the force on a particular (slip- or cross-) link.
         """
-    def get_gamma_factor(self, b02: typing.SupportsFloat = -1.0, nr_of_chains: typing.SupportsInt = -1, one_over_strand_partition_upper_limit: typing.SupportsFloat = 1.0) -> float:
+    def get_gamma_factor(self, b02: typing.SupportsFloat | typing.SupportsIndex = -1.0, nr_of_chains: typing.SupportsInt | typing.SupportsIndex = -1, one_over_strand_partition_upper_limit: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> float:
         """
                   Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
         
@@ -1915,18 +2124,18 @@ class MEHPForceBalance:
                   :param b02: The melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
                   :param nr_of_chains: The value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs.
         """
-    def get_gamma_factors(self, b02: typing.SupportsFloat, one_over_strand_partition_upper_limit: typing.SupportsFloat = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def get_gamma_factors(self, b02: typing.SupportsFloat | typing.SupportsIndex, one_over_strand_partition_upper_limit: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                   Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
         """
-    def get_gamma_factors_in_dir(self, b02: typing.SupportsFloat, direction: typing.SupportsInt, one_over_strand_partition_upper_limit: typing.SupportsFloat = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def get_gamma_factors_in_dir(self, b02: typing.SupportsFloat | typing.SupportsIndex, direction: typing.SupportsInt | typing.SupportsIndex, one_over_strand_partition_upper_limit: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                        Evaluates the gamma factor for each strand in the specified direction (i.e., the squared distance divided by the contour length multiplied by b02)
         
                        :param b02: The melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
                        :param direction: The direction in which to compute the gamma factors (0: x, 1: y, 2: z)
         """
-    def get_ids_of_active_nodes(self, tolerance: typing.SupportsFloat = 0.001) -> list[int]:
+    def get_ids_of_active_nodes(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> list[int]:
         """
                   Get the atom ids of the nodes that are considered active.
                   Only crosslink ids are returned (not e.g. entanglement links).
@@ -1937,26 +2146,26 @@ class MEHPForceBalance:
         """
                      Get the initial coordinates of the (remaining) crosslinkers and entanglement links.
         """
-    def get_nr_of_active_nodes(self, tolerance: typing.SupportsFloat = 0.001) -> int:
+    def get_nr_of_active_nodes(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> int:
         """
                   Get the number of active nodes (incl. entanglement nodes [atoms with type = entanglementType, present in the universe when creating this simulator],
                   excl. entanglement links [the slip-links created internally when e.g. constructing the simulator with random slip-links]).
         
                   :param tolerance: strands under this length are considered inactive. A node is active if it has > 1 active strands.
         """
-    def get_nr_of_active_springs(self, tolerance: typing.SupportsFloat = 0.001) -> int:
+    def get_nr_of_active_springs(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> int:
         """
                    Get the number of active springs remaining after running the simulation.
         
                   :param tolerance: springs under this length are considered inactive
         """
-    def get_nr_of_active_strands(self, tolerance: typing.SupportsFloat = 0.001) -> int:
+    def get_nr_of_active_strands(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> int:
         """
                    Get the number of active strands remaining after running the simulation.
         
                   :param tolerance: strands under this length are considered inactive
         """
-    def get_nr_of_active_strands_in_dir(self, direction: typing.SupportsInt, tolerance: typing.SupportsFloat = 0.001) -> int:
+    def get_nr_of_active_strands_in_dir(self, direction: typing.SupportsInt | typing.SupportsIndex, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> int:
         """
                         Get the number of active strands remaining after running the simulation.
         
@@ -1993,14 +2202,14 @@ class MEHPForceBalance:
         """
                   Returns the pressure at the current state of the simulation.
         """
-    def get_soluble_weight_fraction(self, tolerance: typing.SupportsFloat = 0.001) -> float:
+    def get_soluble_weight_fraction(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> float:
         """
                   Compute the weight fraction of strands connected to active
                   strands (any depth).
         
                   Caution: ignores atom masses.
         """
-    def get_strand_partition_indices_of_sliplink(self, network: SimplifiedBalanceNetwork, link_idx: typing.SupportsInt) -> list[int]:
+    def get_strand_partition_indices_of_sliplink(self, network: SimplifiedBalanceNetwork, link_idx: typing.SupportsInt | typing.SupportsIndex) -> list[int]:
         """
                   Get the indices of strand partitions associated with a slip-link.
         
@@ -2012,11 +2221,11 @@ class MEHPForceBalance:
         """
                   Get the current strand partitions (the fraction of the contour length associated with each spring).
         """
-    def get_stress_on(self, link_idx: typing.SupportsInt, one_over_strand_partition_upper_limit: typing.SupportsFloat = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 3]"]:
+    def get_stress_on(self, link_idx: typing.SupportsInt | typing.SupportsIndex, one_over_strand_partition_upper_limit: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 3]"]:
         """
                   Evaluate the stress on a particular (slip- or cross-) link.
         """
-    def get_stress_tensor(self, one_over_strand_partition_upper_limit: typing.SupportsFloat = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 3]"]:
+    def get_stress_tensor(self, one_over_strand_partition_upper_limit: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 3]"]:
         """
                   Returns the stress tensor at the current state of the simulation.
         
@@ -2024,35 +2233,35 @@ class MEHPForceBalance:
                   where the units of :math:`\\kappa` should be :math:`[\\text{force}]/[\\text{distance units}]^2`.
                   Make sure to multiply by :math:`\\kappa` or configure it appropriately.
         """
-    def get_stress_tensor_link_based(self, one_over_strand_partition_upper_limit: typing.SupportsFloat = 1.0, xlinks_only: bool = False) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 3]"]:
+    def get_stress_tensor_link_based(self, one_over_strand_partition_upper_limit: typing.SupportsFloat | typing.SupportsIndex = 1.0, xlinks_only: bool = False) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 3]"]:
         """
                   Returns the stress tensor at the current state of the simulation.
         """
-    def get_weighted_spring_lengths(self, one_over_strand_partition_upper_limit: typing.SupportsFloat = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def get_weighted_spring_lengths(self, one_over_strand_partition_upper_limit: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                   Get the current spring lengths (norm of vector) divided by the strand partition times the contour length.
         """
-    def inspect_displacement_to_mean_position_update(self, link_idx: typing.SupportsInt, one_over_strand_partition_upper_limit: typing.SupportsFloat = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def inspect_displacement_to_mean_position_update(self, link_idx: typing.SupportsInt | typing.SupportsIndex, one_over_strand_partition_upper_limit: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                   Helper method to debug and/or understand what happens to certain links when being displaced.
         """
-    def inspect_parametrisation_optimsation_for_link(self, link_idx: typing.SupportsInt, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], strand_partitions: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], max_nr_of_steps: typing.SupportsInt = 100, alpha_tol: typing.SupportsFloat = 1e-09, min_nr_of_steps: typing.SupportsInt = 1, one_over_strand_partition_upper_limit: typing.SupportsFloat = 1.0) -> tuple[typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"], typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"], int, float, float, float, float]:
+    def inspect_parametrisation_optimsation_for_link(self, link_idx: typing.SupportsInt | typing.SupportsIndex, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], strand_partitions: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], max_nr_of_steps: typing.SupportsInt | typing.SupportsIndex = 100, alpha_tol: typing.SupportsFloat | typing.SupportsIndex = 1e-09, min_nr_of_steps: typing.SupportsInt | typing.SupportsIndex = 1, one_over_strand_partition_upper_limit: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> tuple[typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"], typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"], int, float, float, float, float]:
         """
                   Helper method to debug and/or understand what happens to certain links
                   when being displaced and their partition updated.
         """
-    def inspect_strand_partition_update(self, link_idx: typing.SupportsInt) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def inspect_strand_partition_update(self, link_idx: typing.SupportsInt | typing.SupportsIndex) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                   Helper method to debug and/or understand what happens to certain links
                   when the strand partition is being updated.
         """
-    def move_sliplinks_to_their_best_branch(self, arg0: SimplifiedBalanceNetwork, arg1: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], arg2: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], arg3: typing.SupportsFloat, arg4: typing.SupportsInt, arg5: bool, arg6: bool) -> None:
+    def move_sliplinks_to_their_best_branch(self, arg0: SimplifiedBalanceNetwork, arg1: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], arg2: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], arg3: typing.SupportsFloat | typing.SupportsIndex, arg4: typing.SupportsInt | typing.SupportsIndex, arg5: bool, arg6: bool) -> None:
         ...
-    def randomly_add_sliplinks(self, nr_of_sliplinks_to_sample: typing.SupportsInt, cutoff: typing.SupportsFloat = 2.0, minimum_nr_of_sliplinks: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 2, exclude_crosslinks: bool = False, seed: typing.SupportsInt = -1) -> int:
+    def randomly_add_sliplinks(self, nr_of_sliplinks_to_sample: typing.SupportsInt | typing.SupportsIndex, cutoff: typing.SupportsFloat | typing.SupportsIndex = 2.0, minimum_nr_of_sliplinks: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 2, exclude_crosslinks: bool = False, seed: typing.SupportsInt | typing.SupportsIndex = -1) -> int:
         """
                   Randomly sample and add slip-links based on certain criteria.
         """
-    def run_force_relaxation(self, max_nr_of_steps: typing.SupportsInt = 250000, x_tolerance: typing.SupportsFloat = 1e-12, initial_residual_norm: typing.SupportsFloat = -1.0, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: typing.SupportsFloat = 0.001, do_inner_iterations: bool = False, allow_sliplinks_to_pass_each_other: LinkSwappingMode = ..., swapping_frequency: typing.SupportsInt = 10, one_over_strand_partition_upper_limit: typing.SupportsFloat = 1.0, nr_of_crosslink_swaps_allowed_per_sliplink: typing.SupportsInt = -1, disable_slipping: bool = False) -> None:
+    def run_force_relaxation(self, max_nr_of_steps: typing.SupportsInt | typing.SupportsIndex = 250000, x_tolerance: typing.SupportsFloat | typing.SupportsIndex = 1e-12, initial_residual_norm: typing.SupportsFloat | typing.SupportsIndex = -1.0, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.001, do_inner_iterations: bool = False, allow_sliplinks_to_pass_each_other: LinkSwappingMode = ..., swapping_frequency: typing.SupportsInt | typing.SupportsIndex = 10, one_over_strand_partition_upper_limit: typing.SupportsFloat | typing.SupportsIndex = 1.0, nr_of_crosslink_swaps_allowed_per_sliplink: typing.SupportsInt | typing.SupportsIndex = -1, disable_slipping: bool = False) -> None:
         """
                   Run the simulation.
                   Note that the final state of the minimization is persisted and reused if you use this method again.
@@ -2083,7 +2292,7 @@ class MEHPForceBalance:
         """
                   Set the current strand partitions.
         """
-    def swap_sliplinks_incl_xlinks(self, arg0: SimplifiedBalanceNetwork, arg1: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], arg2: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], arg3: typing.SupportsFloat, arg4: bool) -> None:
+    def swap_sliplinks_incl_xlinks(self, arg0: SimplifiedBalanceNetwork, arg1: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], arg2: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], arg3: typing.SupportsFloat | typing.SupportsIndex, arg4: bool) -> None:
         ...
     def validate_network(self) -> bool:
         """
@@ -2107,14 +2316,14 @@ class MEHPForceBalance2:
          This is the third implementation of the MEHP. 
          It's the fastest implementation by using a simple spring model only, disabling the non-linear
          periodic boundary conditions, and instead builds a sparse linear system of equations that's readily solved.
-         However, it allows entanglements to be represented as additional links or/and springs,
-         although without slipping along the chain.
+         However, it allows entanglements to be represented as additional fixed links or/and springs,
+         without slipping along the chain contour (see :doc:`/nomenclature`).
     
          Please cite :cite:t:`bernhard_phantom_2025` if you use this method.
           
     """
     @staticmethod
-    def get_neighbour_link_indices(network: SimplifiedBalance2Network, link_idx: typing.SupportsInt) -> list[int]:
+    def get_neighbour_link_indices(network: SimplifiedBalance2Network, link_idx: typing.SupportsInt | typing.SupportsIndex) -> list[int]:
         """
                          Get the indices of neighboring links for a given link.
         
@@ -2124,10 +2333,10 @@ class MEHPForceBalance2:
         """
     def __copy__(self) -> MEHPForceBalance2:
         ...
-    def __getstate__(self) -> tuple:
+    def __getstate__(self) -> tuple[str]:
         ...
     @typing.overload
-    def __init__(self, universe: Universe, crosslinker_type: typing.SupportsInt = 2, is_2d: bool = False) -> None:
+    def __init__(self, universe: Universe, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False) -> None:
         """
                    Instantiate the simulator for a certain universe.
         
@@ -2139,7 +2348,7 @@ class MEHPForceBalance2:
                    :param remove_dangling_chains: whether to keep or remove obviously dangling chains when setting up the network
         """
     @typing.overload
-    def __init__(self, universe: Universe, entanglements: AtomPairEntanglements, crosslinker_type: typing.SupportsInt = 2, is_2d: bool = False, entanglements_as_springs: bool = False) -> None:
+    def __init__(self, universe: Universe, entanglements: AtomPairEntanglements, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, entanglements_as_springs: bool = False) -> None:
         """
                    Instantiate the simulator for a certain universe with the given entanglements.
         
@@ -2150,7 +2359,7 @@ class MEHPForceBalance2:
                    :param entanglements_as_springs: whether to use the entanglements as springs instead of links
         """
     @typing.overload
-    def __init__(self, universe: Universe, nr_of_entanglements_to_sample: typing.SupportsInt, upper_sampling_cutoff: typing.SupportsFloat = 1.2, lower_sampling_cutoff: typing.SupportsFloat = 0.0, minimum_nr_of_sliplinks: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 3, seed: str = '', crosslinker_type: typing.SupportsInt = 2, is_2d: bool = False, skip_dangling_soluble_entanglements: bool = True, entanglements_as_springs: bool = True) -> None:
+    def __init__(self, universe: Universe, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_sampling_cutoff: typing.SupportsFloat | typing.SupportsIndex = 1.2, lower_sampling_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_sliplinks: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3, seed: str = '', crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, skip_dangling_soluble_entanglements: bool = True, entanglements_as_springs: bool = True) -> None:
         """
              Instantiate this simulator with randomly chosen slip-links.
         
@@ -2182,13 +2391,24 @@ class MEHPForceBalance2:
                    However, currently, the removal procedures are not loss-free.
                    Therefore, use this with care.
         """
-    def config_mean_bond_length(self, b: typing.SupportsFloat = 1.0) -> None:
+    def config_cg_fallback_max_iterations(self, max_iterations: typing.SupportsInt | typing.SupportsIndex = 20000) -> None:
+        """
+                   Configure the maximum iterations allowed for ConjugateGradient before
+                   automatically falling back to BiCGSTAB on ill-conditioned systems.
+                   Set to <= 0 to disable fallback. Default: 20000.
+        """
+    def config_in_place_rebuild_threshold(self, threshold: typing.SupportsFloat | typing.SupportsIndex = 0.15) -> None:
+        """
+                   Configure threshold fraction of cumulative broken springs to rebuild CSR sparse pattern.
+                   Default: 0.15 (15%).
+        """
+    def config_mean_bond_length(self, b: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """
               Configure the :math:`b` used e.g. for the topological Gamma-factor.
         
               :param b: The mean bond length to use.
         """
-    def config_spring_breaking_distance(self, distance_over_contour_length: typing.SupportsFloat = -1) -> None:
+    def config_spring_breaking_distance(self, distance_over_contour_length: typing.SupportsFloat | typing.SupportsIndex = -1) -> None:
         """
                    Configure the "force" (distance over contour length) at which the bonds break.
                    Can be used to model the effect of fracture, to reduce the stiffening happening upon deformation.
@@ -2198,7 +2418,7 @@ class MEHPForceBalance2:
         
                    :param distance_over_contour_length: The threshold for breaking springs.
         """
-    def config_spring_constant(self, kappa: typing.SupportsFloat = 1.0) -> None:
+    def config_spring_constant(self, kappa: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """
                    Configure the spring constant used in the simulation.
         
@@ -2215,7 +2435,7 @@ class MEHPForceBalance2:
                    Perform a deformation of the system box to a different box.
                    All coordinates etc. will be scaled as needed.
         """
-    def evaluate_spring_vector(self, network: SimplifiedBalance2Network, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], spring_idx: typing.SupportsInt) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+    def evaluate_spring_vector(self, network: SimplifiedBalance2Network, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], spring_idx: typing.SupportsInt | typing.SupportsIndex) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
         """
                Evaluate the distance vector for a specific spring.
         
@@ -2224,7 +2444,7 @@ class MEHPForceBalance2:
                :param spring_idx: Index of the spring to evaluate
                :return: 3D distance vector for the spring
         """
-    def evaluate_spring_vector_from(self, network: SimplifiedBalance2Network, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], spring_idx: typing.SupportsInt, link_idx: typing.SupportsInt) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+    def evaluate_spring_vector_from(self, network: SimplifiedBalance2Network, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], spring_idx: typing.SupportsInt | typing.SupportsIndex, link_idx: typing.SupportsInt | typing.SupportsIndex) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
         """
                Evaluate the spring vector in the direction from a specific link.
         
@@ -2234,7 +2454,7 @@ class MEHPForceBalance2:
                :param link_idx: Index of the starting link
                :return: 3D distance vector from the specified link
         """
-    def evaluate_spring_vector_to(self, network: SimplifiedBalance2Network, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], spring_idx: typing.SupportsInt, link_idx: typing.SupportsInt) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+    def evaluate_spring_vector_to(self, network: SimplifiedBalance2Network, displacements: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], spring_idx: typing.SupportsInt | typing.SupportsIndex, link_idx: typing.SupportsInt | typing.SupportsIndex) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
         """
                Evaluate the spring vector in the direction to a specific link.
         
@@ -2244,11 +2464,19 @@ class MEHPForceBalance2:
                :param link_idx: Index of the target link
                :return: 3D distance vector to the specified link
         """
+    def get_active_weight_fraction(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> float:
+        """
+                   Compute the weight fraction of active springs
+        
+                   Caution: ignores atom masses.
+        """
     def get_average_spring_length(self) -> float:
         """
                     Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()`,
                     this value is normalized by the number of springs rather than the number of chains.
         """
+    def get_cg_fallback_max_iterations(self) -> int:
+        ...
     def get_coordinates(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                      Get the current coordinates of the crosslinkers and entanglement links.
@@ -2265,7 +2493,7 @@ class MEHPForceBalance2:
         """
                    Get the spring vectors.
         """
-    def get_dangling_weight_fraction(self, tolerance: typing.SupportsFloat = 0.001) -> float:
+    def get_dangling_weight_fraction(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> float:
         """
                    Compute the weight fraction of non-active springs
         
@@ -2284,11 +2512,15 @@ class MEHPForceBalance2:
         """
                    Get the current link displacements.
         """
-    def get_effective_functionality_of_atoms(self, tolerance: typing.SupportsFloat = 0.001) -> dict[int, int]:
+    def get_effective_functionality_of_atoms(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> dict[int, int]:
         """
                    Returns the number of active springs connected to each atom, atomId used as index
         
                    :param tolerance: springs under this length are considered inactive
+        """
+    def get_effective_solver_choice(self) -> SLESolver:
+        """
+                   Get the effective solver choice resolved or switched to during relaxation.
         """
     def get_exit_reason(self) -> ExitReason:
         """
@@ -2298,11 +2530,11 @@ class MEHPForceBalance2:
         """
                    Evaluate the norm of the force on each (slip- or cross-) link.
         """
-    def get_force_on(self, link_idx: typing.SupportsInt) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+    def get_force_on(self, link_idx: typing.SupportsInt | typing.SupportsIndex) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
         """
                    Evaluate the force on a particular (slip- or cross-) link.
         """
-    def get_gamma_factor(self, b02: typing.SupportsFloat = -1.0, nr_of_chains: typing.SupportsInt = -1) -> float:
+    def get_gamma_factor(self, b02: typing.SupportsFloat | typing.SupportsIndex = -1.0, nr_of_chains: typing.SupportsInt | typing.SupportsIndex = -1) -> float:
         """
                    Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
         
@@ -2318,53 +2550,67 @@ class MEHPForceBalance2:
                    :param b02: The melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
                    :param nr_of_chains: The value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs.
         """
-    def get_gamma_factors(self, b02: typing.SupportsFloat) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def get_gamma_factors(self, b02: typing.SupportsFloat | typing.SupportsIndex) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                    Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
         """
-    def get_gamma_factors_in_dir(self, b02: typing.SupportsFloat, direction: typing.SupportsInt) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def get_gamma_factors_in_dir(self, b02: typing.SupportsFloat | typing.SupportsIndex, direction: typing.SupportsInt | typing.SupportsIndex) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                         Evaluates the gamma factor for each strand in the specified direction (i.e., the squared distance divided by the contour length multiplied by b02)
         
                         :param b02: The melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
                         :param direction: The direction in which to compute the gamma factors (0: x, 1: y, 2: z)
         """
-    def get_ids_of_active_nodes(self, tolerance: typing.SupportsFloat = 0.001) -> list[int]:
+    def get_ids_of_active_nodes(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> list[int]:
         """
                    Get the atom ids of the nodes that are considered active.
                    Only crosslink ids are returned (not e.g. entanglement links).
         
                    :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
         """
+    def get_in_place_rebuild_threshold(self) -> float:
+        ...
     def get_initial_coordinates(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                      Get the initial coordinates of the crosslinkers and entanglement links.
         """
-    def get_nr_of_active_nodes(self, tolerance: typing.SupportsFloat = 0.001) -> int:
+    def get_nr_of_active_nodes(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> int:
         """
                    Get the number of active nodes (incl. entanglement nodes [atoms with type = entanglementType, present in the universe when creating this simulator],
                    excl. entanglement links [the slip-links created internally when e.g. constructing the simulator with random slip-links]).
         
                    :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
         """
-    def get_nr_of_active_spring(self, tolerance: typing.SupportsFloat = 0.001) -> int:
+    def get_nr_of_active_partial_springs(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> int:
+        """
+                   Get the number of active partial springs remaining after running the simulation.
+        
+                   :param tolerance: springs under this length are considered inactive
+        """
+    def get_nr_of_active_spring(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> int:
         """
                    Get the number of active springs remaining after running the simulation.
         
                   :param tolerance: springs under this length are considered inactive
         """
-    def get_nr_of_active_springs(self, tolerance: typing.SupportsFloat = 0.001) -> int:
+    def get_nr_of_active_springs(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> int:
         """
                    Get the number of active springs remaining after running the simulation.
         
                   :param tolerance: springs under this length are considered inactive
         """
-    def get_nr_of_active_springs_in_dir(self, direction: typing.SupportsInt, tolerance: typing.SupportsFloat = 0.001) -> int:
+    def get_nr_of_active_springs_in_dir(self, direction: typing.SupportsInt | typing.SupportsIndex, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> int:
         """
                          Get the number of active springs remaining after running the simulation.
         
                         :param direction: The direction in which to compute the active springs (0: x, 1: y, 2: z)
                         :param tolerance: springs under this length are considered inactive
+        """
+    def get_nr_of_active_strands(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> int:
+        """
+                   Get the number of active strands remaining after running the simulation.
+        
+                   :param tolerance: strands under this length are considered inactive
         """
     def get_nr_of_atoms(self) -> int:
         ...
@@ -2384,11 +2630,17 @@ class MEHPForceBalance2:
         """
                     Get the number of nodes (crosslinkers) considered in this simulation.
         """
+    def get_nr_of_partial_springs(self) -> int:
+        """
+                   Get the number of partial springs considered in this simulation.
+        """
     def get_nr_of_springs(self) -> int:
         """
-                   Get the number of springs considered in this simulation.
-        
-                   :param tolerance: springs under this length are considered inactive
+                   Get the number of springs (strands) considered in this simulation. Alias for get_nr_of_strands.
+        """
+    def get_nr_of_strands(self) -> int:
+        """
+                   Get the number of strands considered in this simulation.
         """
     def get_overall_strand_lengths(self) -> list[float]:
         """
@@ -2398,14 +2650,14 @@ class MEHPForceBalance2:
         """
                    Returns the pressure at the current state of the simulation.
         """
-    def get_soluble_weight_fraction(self, tolerance: typing.SupportsFloat = 0.001) -> float:
+    def get_soluble_weight_fraction(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> float:
         """
                    Compute the weight fraction of springs connected to active
                    springs (any depth).
         
                    Caution: ignores atom masses.
         """
-    def get_stress_on(self, link_idx: typing.SupportsInt) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 3]"]:
+    def get_stress_on(self, link_idx: typing.SupportsInt | typing.SupportsIndex) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 3]"]:
         """
                    Evaluate the stress on a particular (slip- or cross-) link.
         """
@@ -2425,17 +2677,17 @@ class MEHPForceBalance2:
         """
                    Get the current spring lengths (norm of vector) divided by the spring partition times the contour length.
         """
-    def inspect_displacement_to_mean_position_update(self, link_idx: typing.SupportsInt) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def inspect_displacement_to_mean_position_update(self, link_idx: typing.SupportsInt | typing.SupportsIndex) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                    Helper method to debug and/or understand what happens to certain links when being displaced.
         """
-    def run_force_relaxation(self, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: typing.SupportsFloat = 1e-06, sle_solver: SLESolver | str = ..., tolerance: typing.SupportsFloat = 1e-15, max_iterations: typing.SupportsInt = 10000) -> None:
+    def run_force_relaxation(self, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: typing.SupportsFloat | typing.SupportsIndex = 1e-06, sle_solver: typing.Any = ..., tolerance: typing.SupportsFloat | typing.SupportsIndex = 1e-12, max_iterations: typing.SupportsInt | typing.SupportsIndex = 50000) -> None:
         """
                    Run the simulation.
         
                    :param simplification_mode: How to simplify the structure during the minimization.
                    :param inactive_removal_cutoff: The tolerance in distance units of the partial spring length to count as active, relevant if simplification mode is specified to be something other than NO_SIMPLIFICATION.
-                   :param sle_solver: The solver to use for the system of linear equations (SLE).
+                   :param sle_solver: The solver to use for the system of linear equations (SLE) (SLESolver enum or string, default: SLESolver.DEFAULT / 'auto').
                    :param tolerance: The stopping condition/tolerance for the SLE solver if it's an iterative one.
                    :param max_iterations: The maximum number of iterations to perform if the SLE solver is an iterative one.
         """
@@ -2458,6 +2710,10 @@ class MEHPForceBalance2:
         
                    :return: True if validation passes, raises exception otherwise
         """
+    def was_cg_fallback_triggered(self) -> bool:
+        """
+                   Check whether the adaptive CG-to-BiCGSTAB fallback was triggered in the last relaxation.
+        """
     @property
     def network(self) -> SimplifiedBalance2Network:
         ...
@@ -2476,7 +2732,7 @@ class MEHPForceEvaluator:
     is_2d: bool
     def __init__(self) -> None:
         ...
-    def evaluate_force_set_gradient(self, n: typing.SupportsInt, spring_distances: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], compute_gradient: bool = False) -> tuple:
+    def evaluate_force_set_gradient(self, n: typing.SupportsInt | typing.SupportsIndex, spring_distances: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], compute_gradient: bool = False) -> tuple:
         """
                   Evaluate the force and optionally compute its gradient.
         
@@ -2504,7 +2760,7 @@ class MEHPForceEvaluator:
                           
                           return (force, gradient)
         """
-    def evaluate_stress_contribution(self, spring_distances: typing.SupportsFloat, i: typing.SupportsInt, j: typing.SupportsInt, spring_index: typing.SupportsInt) -> float:
+    def evaluate_stress_contribution(self, spring_distances: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex], i: typing.SupportsInt | typing.SupportsIndex, j: typing.SupportsInt | typing.SupportsIndex, spring_index: typing.SupportsInt | typing.SupportsIndex) -> float:
         """
                   Evaluate the stress-contribution for a single spring.
         
@@ -2535,9 +2791,9 @@ class MEHPForceRelaxation:
         Please cite :cite:t:`gusev_numerical_2019` if you use this method in your work.
         
     """
-    def __getstate__(self) -> tuple:
+    def __getstate__(self) -> tuple[str]:
         ...
-    def __init__(self, universe: Universe, crosslinker_type: typing.SupportsInt = 2, is_2d: bool = False, force_evaluator: MEHPForceEvaluator = None, kappa: typing.SupportsFloat = 1.0, remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -> None:
+    def __init__(self, universe: Universe, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, force_evaluator: MEHPForceEvaluator = None, kappa: typing.SupportsFloat | typing.SupportsIndex = 1.0, remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -> None:
         """
                   Instantiate the simulator for a certain universe.
         
@@ -2562,7 +2818,7 @@ class MEHPForceRelaxation:
                                           If your bonds could get larger than half the box length, 
                                           this must be kept False (default).
         """
-    def config_rerun_epsilon(self, epsilon: typing.SupportsFloat = 0.001) -> None:
+    def config_rerun_epsilon(self, epsilon: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> None:
         """
                   Configure the offset from the lower and upper bounds for the simulation to suggest another run.
                   
@@ -2585,14 +2841,14 @@ class MEHPForceRelaxation:
                   :param output_configuration: An OutputConfiguration struct or list of OutputConfiguration structs
                                               specifying what values to log and how often
         """
-    def count_active_clustered_atoms(self, tolerance: typing.SupportsFloat = 0.001) -> float:
+    def count_active_clustered_atoms(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> float:
         """
                   Counts the active clustered atoms in the system.
         
                   :param tolerance: Springs under this length are considered inactive
                   :return: The number of active clustered atoms
         """
-    def get_active_chains(self, tolerance: typing.SupportsFloat = 0.001) -> list[Molecule]:
+    def get_active_chains(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> list[Molecule]:
         """
                   Get the crosslinker chains that are active.
         
@@ -2624,7 +2880,7 @@ class MEHPForceRelaxation:
         
                   :return: A vector containing the current spring distance vectors
         """
-    def get_dangling_weight_fraction(self, tolerance: typing.SupportsFloat = 0.001) -> float:
+    def get_dangling_weight_fraction(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> float:
         """
                   Compute the weight fraction of non-active springs.
         
@@ -2639,7 +2895,7 @@ class MEHPForceRelaxation:
         
                   :return: The default R0 squared value used in gamma factor calculations
         """
-    def get_effective_functionality_of_atoms(self, tolerance: typing.SupportsFloat = 0.001) -> dict[int, int]:
+    def get_effective_functionality_of_atoms(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> dict[int, int]:
         """
                   Returns the number of active springs connected to each atom, atomId used as index.
         
@@ -2658,7 +2914,7 @@ class MEHPForceRelaxation:
                   
                   :return: The current force value
         """
-    def get_gamma_factor(self, b0_squared: typing.SupportsFloat = -1.0, nr_of_chains: typing.SupportsInt = -1) -> float:
+    def get_gamma_factor(self, b0_squared: typing.SupportsFloat | typing.SupportsIndex = -1.0, nr_of_chains: typing.SupportsInt | typing.SupportsIndex = -1) -> float:
         """
                   Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
         
@@ -2678,7 +2934,7 @@ class MEHPForceRelaxation:
                        on the melt system, with subsequent division by the nr of bonds in the chain.
                   :param nr_of_chains: The value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains.
         """
-    def get_gamma_factors(self, b0_squared: typing.SupportsFloat = -1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def get_gamma_factors(self, b0_squared: typing.SupportsFloat | typing.SupportsIndex = -1.0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                   Computes the gamma factor for each spring as part of the ANT/MEHP formulism.
         
@@ -2694,7 +2950,7 @@ class MEHPForceRelaxation:
         
                   See also :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor` for the mean of these.
         """
-    def get_ids_of_active_nodes(self, tolerance: typing.SupportsFloat = 0.001, minimum_nr_of_active_connections: typing.SupportsInt = 2, maximum_nr_of_active_connections: typing.SupportsInt = -1) -> list[int]:
+    def get_ids_of_active_nodes(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001, minimum_nr_of_active_connections: typing.SupportsInt | typing.SupportsIndex = 2, maximum_nr_of_active_connections: typing.SupportsInt | typing.SupportsIndex = -1) -> list[int]:
         """
                   Get the atom ids of the nodes that are considered active.
         
@@ -2703,7 +2959,7 @@ class MEHPForceRelaxation:
                   :param maximum_nr_of_active_connections: Maximum number of active connections allowed for a node to be considered active
                   :return: List of atom IDs for active nodes
         """
-    def get_nr_of_active_nodes(self, tolerance: typing.SupportsFloat = 0.001, minimumNrOfActiveConnections: typing.SupportsInt = 2, maximumNrOfActiveConnections: typing.SupportsInt = -1) -> int:
+    def get_nr_of_active_nodes(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001, minimumNrOfActiveConnections: typing.SupportsInt | typing.SupportsIndex = 2, maximumNrOfActiveConnections: typing.SupportsInt | typing.SupportsIndex = -1) -> int:
         """
                   Get the number of active nodes remaining after running the simulation.
         
@@ -2713,14 +2969,14 @@ class MEHPForceRelaxation:
                        Use a value < 0 to indicate that there is no maximum number of active connections
                   :return: The number of active nodes
         """
-    def get_nr_of_active_springs(self, tolerance: typing.SupportsFloat = 0.001) -> int:
+    def get_nr_of_active_springs(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> int:
         """
                   Get the number of active springs remaining after running the simulation.
         
                   :param tolerance: Springs under this length are considered inactive
                   :return: The number of active springs
         """
-    def get_nr_of_active_springs_connected(self, tolerance: typing.SupportsFloat = 0.05) -> typing.Annotated[numpy.typing.NDArray[numpy.int32], "[m, 1]"]:
+    def get_nr_of_active_springs_connected(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.05) -> typing.Annotated[numpy.typing.NDArray[numpy.int32], "[m, 1]"]:
         """
                   Returns the number of active springs connected to each node.
         
@@ -2764,7 +3020,7 @@ class MEHPForceRelaxation:
         
                   :return: The current residual vector
         """
-    def get_soluble_weight_fraction(self, tolerance: typing.SupportsFloat = 0.001) -> float:
+    def get_soluble_weight_fraction(self, tolerance: typing.SupportsFloat | typing.SupportsIndex = 0.001) -> float:
         """
                   Compute the weight fraction of springs connected to active
                   springs (any depth).
@@ -2811,7 +3067,7 @@ class MEHPForceRelaxation:
         
                   :return: True if another run is suggested, False otherwise
         """
-    def run_force_relaxation(self, algorithm: str = 'LD_MMA', max_nr_of_steps: typing.SupportsInt = 250000, x_tolerance: typing.SupportsFloat = 1e-12, f_tolerance: typing.SupportsFloat = 1e-09) -> None:
+    def run_force_relaxation(self, algorithm: str = 'LD_MMA', max_nr_of_steps: typing.SupportsInt | typing.SupportsIndex = 250000, x_tolerance: typing.SupportsFloat | typing.SupportsIndex = 1e-12, f_tolerance: typing.SupportsFloat | typing.SupportsIndex = 1e-09) -> None:
         """
                   Run the simulation.
                   Note that the final state of the minimization is persisted and reused if you use this method again.
@@ -2843,7 +3099,7 @@ class MaxDistanceProvider:
          A generic implementation of a class, that shall provide a maximum distance for the MC sampling.
          
     """
-    def get_max_distance(self, N: typing.SupportsFloat) -> float:
+    def get_max_distance(self, N: typing.SupportsFloat | typing.SupportsIndex) -> float:
         """
                  Get the maximum distance for a given N.
         
@@ -2869,11 +3125,11 @@ class Molecule:
         """
     def __eq__(self, arg0: Molecule) -> bool:
         ...
-    def __getitem__(self, arg0: typing.SupportsInt) -> Atom:
+    def __getitem__(self, arg0: typing.SupportsInt | typing.SupportsIndex) -> Atom:
         """
                Access an atom by its vertex index.
         """
-    def __init__(self, arg0: Box, arg1: igraph_t, arg2: MoleculeType, arg3: collections.abc.Mapping[typing.SupportsInt, typing.SupportsFloat]) -> None:
+    def __init__(self, arg0: Box, arg1: igraph_t, arg2: MoleculeType, arg3: collections.abc.Mapping[typing.SupportsInt | typing.SupportsIndex, typing.SupportsFloat | typing.SupportsIndex]) -> None:
         """
                  Construct a molecule from a graph structure.
                  
@@ -2982,7 +3238,7 @@ class Molecule:
                     
                     :return: The total mass of all atoms in this molecule
         """
-    def compute_total_vector(self, crosslinker_type: typing.SupportsInt = 2, close_loop: bool = True) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+    def compute_total_vector(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, close_loop: bool = True) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
         """
                        Compute the sum of all bond vectors.
                        
@@ -2990,7 +3246,7 @@ class Molecule:
                        :param close_loop: Whether to close the loop for calculations
                        :return: The vector sum of all bonds
         """
-    def compute_vector_from_to(self, atom_id_from: typing.SupportsInt, atom_id_to: typing.SupportsInt, crosslinker_type: typing.SupportsInt = 2, require_order: bool = True) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+    def compute_vector_from_to(self, atom_id_from: typing.SupportsInt | typing.SupportsIndex, atom_id_to: typing.SupportsInt | typing.SupportsIndex, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, require_order: bool = True) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
         """
                        Compute the sum of all bond vectors between two specified atoms.
                        
@@ -3000,21 +3256,21 @@ class Molecule:
                        :param require_order: Whether to require specific ordering
                        :return: The vector sum from start to end atom
         """
-    def get_atom_by_id(self, atom_id: typing.SupportsInt) -> Atom:
+    def get_atom_by_id(self, atom_id: typing.SupportsInt | typing.SupportsIndex) -> Atom:
         """
                     Get an atom by its id.
                     
                     :param atom_id: The atom ID to search for
                     :return: The atom with the specified ID
         """
-    def get_atom_by_vertex_idx(self, vertex_idx: typing.SupportsInt) -> Atom:
+    def get_atom_by_vertex_idx(self, vertex_idx: typing.SupportsInt | typing.SupportsIndex) -> Atom:
         """
                     Get an atom for a specific vertex.
                     
                     :param vertex_idx: The vertex index to query
                     :return: The atom at the specified vertex
         """
-    def get_atom_id_by_vertex_idx(self, vertex_id: typing.SupportsInt) -> int:
+    def get_atom_id_by_vertex_idx(self, vertex_id: typing.SupportsInt | typing.SupportsIndex) -> int:
         """
                  Get the ID of the atom by the vertex ID of the underlying graph.
                  
@@ -3033,14 +3289,14 @@ class Molecule:
                     
                     :return: List of atoms in vertex order
         """
-    def get_atoms_by_degree(self, degree: typing.SupportsInt) -> list[Atom]:
+    def get_atoms_by_degree(self, degree: typing.SupportsInt | typing.SupportsIndex) -> list[Atom]:
         """
                     Get the atoms that have the specified number of bonds.
                     
                     :param degree: The number of bonds (degree/functionality)
                     :return: List of atoms with the specified degree
         """
-    def get_atoms_by_type(self, type: typing.SupportsInt) -> list[Atom]:
+    def get_atoms_by_type(self, type: typing.SupportsInt | typing.SupportsIndex) -> list[Atom]:
         """
                     Get the atoms with the specified type.
                     
@@ -3056,14 +3312,14 @@ class Molecule:
                     :param atom: The atom to query connections for
                     :return: List of connected atoms
         """
-    def get_atoms_connected_to_vertex(self, vertex_idx: typing.SupportsInt) -> list[Atom]:
+    def get_atoms_connected_to_vertex(self, vertex_idx: typing.SupportsInt | typing.SupportsIndex) -> list[Atom]:
         """
                     Get the atoms connected to a specified vertex id.
                     
                     :param vertex_idx: The vertex index to query
                     :return: List of connected atoms
         """
-    def get_atoms_lined_up(self, crosslinker_type: typing.SupportsInt = 2, assumed_coordinates: bool = False, close_loop: bool = False) -> list[Atom]:
+    def get_atoms_lined_up(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, assumed_coordinates: bool = False, close_loop: bool = False) -> list[Atom]:
         """
                     Return all atom objects enclosed in this molecule based on the connectivity.
         
@@ -3085,14 +3341,14 @@ class Molecule:
                     
                     :return: Dictionary with bond information
         """
-    def get_edge_ids_from(self, vertex_id: typing.SupportsInt) -> list[int]:
+    def get_edge_ids_from(self, vertex_id: typing.SupportsInt | typing.SupportsIndex) -> list[int]:
         """
                  Get the edge IDs incident to a specific vertex.
                  
                  :param vertex_id: The vertex to query
                  :return: A vector of edge IDs connected to the vertex
         """
-    def get_edge_ids_from_to(self, vertex_id_from: typing.SupportsInt, vertex_id_to: typing.SupportsInt) -> list[int]:
+    def get_edge_ids_from_to(self, vertex_id_from: typing.SupportsInt | typing.SupportsIndex, vertex_id_to: typing.SupportsInt | typing.SupportsIndex) -> list[int]:
         """
                  Get the edge IDs of the edges between two specific vertices.
                  
@@ -3130,7 +3386,7 @@ class Molecule:
                  
                  :return: The number of bonds in this molecule
         """
-    def get_nr_of_edges_from_to(self, vertex_id_from: typing.SupportsInt, vertex_id_to: typing.SupportsInt, max_length: typing.SupportsInt = -1) -> int:
+    def get_nr_of_edges_from_to(self, vertex_id_from: typing.SupportsInt | typing.SupportsIndex, vertex_id_to: typing.SupportsInt | typing.SupportsIndex, max_length: typing.SupportsInt | typing.SupportsIndex = -1) -> int:
         """
                  Get the number of edges in the shortest path between two specific vertices.
         
@@ -3141,7 +3397,7 @@ class Molecule:
                  :param max_length: Maximum path length to consider (-1 for no limit)
                  :return: Number of edges in the shortest path, or -1 if no path exists
         """
-    def get_strand_ends(self, crosslinker_type: typing.SupportsInt = 2, close_loop: bool = False) -> list[Atom]:
+    def get_strand_ends(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, close_loop: bool = False) -> list[Atom]:
         """
                   Get the ends of the given strand (= molecule).
                   In case of a primary loop, the crosslink is returned, if there is one.
@@ -3162,7 +3418,7 @@ class Molecule:
                       This type might be unset; currently, only 
                       :meth:`~pylimer_tools_cpp.Universe.get_chains_with_crosslinker` assigns them automatically.
         """
-    def get_vertex_idx_by_atom_id(self, atom_id: typing.SupportsInt) -> int:
+    def get_vertex_idx_by_atom_id(self, atom_id: typing.SupportsInt | typing.SupportsIndex) -> int:
         """
                  Get the vertex ID of the underlying graph for an atom with a specified ID.
                  
@@ -3197,7 +3453,7 @@ class NeighbourList:
         a specified distance of each other.
         
     """
-    def __init__(self, atoms: collections.abc.Sequence[Atom], box: Box, cutoff: typing.SupportsFloat) -> None:
+    def __init__(self, atoms: collections.abc.Sequence[Atom], box: Box, cutoff: typing.SupportsFloat | typing.SupportsIndex) -> None:
         """
                  Instantiate a new neighbour list.
                  
@@ -3205,7 +3461,7 @@ class NeighbourList:
                  :param box: The simulation box
                  :param cutoff: Maximum distance for neighbour searches
         """
-    def get_atoms_close_to(self, atom: Atom, upper_cutoff: typing.SupportsFloat = 1.0, lower_cutoff: typing.SupportsFloat = 0.0, unwrapped: bool = False, expect_self: bool = False) -> list[Atom]:
+    def get_atoms_close_to(self, atom: Atom, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex = 1.0, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, unwrapped: bool = False, expect_self: bool = False) -> list[Atom]:
         """
                   List all atoms that are close to a given one. 
         
@@ -3247,7 +3503,7 @@ class NoMaxDistanceProvider(MaxDistanceProvider):
                  
                  :return: String representation
         """
-    def get_max_distance(self, N: typing.SupportsFloat) -> float:
+    def get_max_distance(self, N: typing.SupportsFloat | typing.SupportsIndex) -> float:
         """
                  Get the maximum distance for a given N (always returns -1 to disable).
         
@@ -3273,7 +3529,7 @@ class NonGaussianSpringForceEvaluator(MEHPForceEvaluator):
          :param l: The  the length of a spring in the chain
         
     """
-    def __init__(self, kappa: typing.SupportsFloat = 1.0, N: typing.SupportsFloat = 1.0, l: typing.SupportsFloat = 1.0) -> None:
+    def __init__(self, kappa: typing.SupportsFloat | typing.SupportsIndex = 1.0, N: typing.SupportsFloat | typing.SupportsIndex = 1.0, l: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """
         Initialize this ForceEvaluator
         """
@@ -3285,9 +3541,9 @@ class NormalModeAnalyzer:
         Please cite :cite:t:`gusev_molecular_2024` if you use this method in your work.
         
     """
-    def __getstate__(self) -> tuple:
+    def __getstate__(self) -> tuple[bytes]:
         ...
-    def __init__(self, spring_from: collections.abc.Sequence[typing.SupportsInt], spring_to: collections.abc.Sequence[typing.SupportsInt]) -> None:
+    def __init__(self, spring_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], spring_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], nr_of_nodes: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         """
                  Initialize the NormalModeAnalyzer with the bonds (edges).
         
@@ -3295,14 +3551,52 @@ class NormalModeAnalyzer:
                  
                  :param spring_from: Vector of starting node indices for springs/bonds
                  :param spring_to: Vector of ending node indices for springs/bonds
+                 :param nr_of_nodes: Optional total number of nodes (to include isolated vertices with index > max)
         """
     def __setstate__(self, arg0: tuple) -> None:
         ...
+    def compute_chebyshev_moments_kpm(self, num_moments: typing.SupportsInt | typing.SupportsIndex = 1024, num_random_vectors: typing.SupportsInt | typing.SupportsIndex = 20) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+                 Compute Chebyshev moments using the Kernel Polynomial Method (KPM).
+        
+                 :param num_moments: Number of moments to compute (default: 1024)
+                 :param num_random_vectors: Number of random Rademacher vectors for trace estimation (default: 20)
+                 :return: Vector of damped Chebyshev moments
+        """
+    def compute_chebyshev_moments_kpm_metal(self, num_moments: typing.SupportsInt | typing.SupportsIndex = 1024, num_random_vectors: typing.SupportsInt | typing.SupportsIndex = 20, batch_size: typing.SupportsInt | typing.SupportsIndex = 4) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+                 Compute Chebyshev moments using the Kernel Polynomial Method (KPM)
+                 accelerated with Apple Silicon Metal compute kernels with multi-RHS block batching.
+        
+                 :param num_moments: Number of moments to compute (default: 1024)
+                 :param num_random_vectors: Number of random Rademacher vectors for trace estimation (default: 20)
+                 :param batch_size: Number of RHS vectors batched into each Block-SpMM (default: 4)
+                 :return: Vector of damped Chebyshev moments
+        """
+    def compute_density_of_states_kpm(self, lambda_grid: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], num_moments: typing.SupportsInt | typing.SupportsIndex = 1024, num_random_vectors: typing.SupportsInt | typing.SupportsIndex = 20) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+                 Compute continuous density of states (DOS) using KPM.
+        
+                 :param lambda_grid: Eigenvalue points at which to evaluate DOS
+                 :param num_moments: Number of Chebyshev moments (default: 1024)
+                 :param num_random_vectors: Number of random vectors (default: 20)
+                 :return: Density of states values on the grid
+        """
     def evaluate_loss_modulus(self, omega: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                  Evaluate the loss modulus :math:`G''(\\omega)`. Yet misses the conversion factor.
                  
                  :param omega: Angular frequencies
+                 :return: Loss modulus values
+        """
+    def evaluate_loss_modulus_kpm(self, omega: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], num_moments: typing.SupportsInt | typing.SupportsIndex = 1024, num_random_vectors: typing.SupportsInt | typing.SupportsIndex = 20, num_quadrature_points: typing.SupportsInt | typing.SupportsIndex = 2048) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+                 Evaluate loss modulus G'' directly using KPM without computing eigenvalues.
+        
+                 :param omega: Angular frequencies to evaluate
+                 :param num_moments: Number of Chebyshev moments (default: 1024)
+                 :param num_random_vectors: Number of random vectors (default: 20)
+                 :param num_quadrature_points: Number of Gauss-Chebyshev quadrature points (default: 2048)
                  :return: Loss modulus values
         """
     def evaluate_storage_modulus(self, omega: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
@@ -3312,6 +3606,16 @@ class NormalModeAnalyzer:
                  :param omega: Angular frequencies
                  :return: Storage modulus values
         """
+    def evaluate_storage_modulus_kpm(self, omega: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], num_moments: typing.SupportsInt | typing.SupportsIndex = 1024, num_random_vectors: typing.SupportsInt | typing.SupportsIndex = 20, num_quadrature_points: typing.SupportsInt | typing.SupportsIndex = 2048) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+                 Evaluate storage modulus G' directly using KPM without computing eigenvalues.
+        
+                 :param omega: Angular frequencies to evaluate
+                 :param num_moments: Number of Chebyshev moments (default: 1024)
+                 :param num_random_vectors: Number of random vectors (default: 20)
+                 :param num_quadrature_points: Number of Gauss-Chebyshev quadrature points (default: 2048)
+                 :return: Storage modulus values
+        """
     def evaluate_stress_autocorrelation(self, t: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
                  Evaluate stress autocorrelation :math:`C(t)`.
@@ -3319,20 +3623,38 @@ class NormalModeAnalyzer:
                  :param t: The time at which to evaluate the stress autocorrelation
                  :return: Stress autocorrelation values
         """
-    def find_all_eigenvalues(self, solver: NormalModeSolver | str = NormalModeSolver.AUTO, compute_eigenvectors: bool = False, decompose_components: bool = True) -> None:
+    def evaluate_stress_autocorrelation_kpm(self, t: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], num_moments: typing.SupportsInt | typing.SupportsIndex = 1024, num_random_vectors: typing.SupportsInt | typing.SupportsIndex = 20, num_quadrature_points: typing.SupportsInt | typing.SupportsIndex = 2048) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+                 Evaluate stress autocorrelation directly using KPM without computing eigenvalues.
+        
+                 :param t: Time points to evaluate
+                 :param num_moments: Number of Chebyshev moments (default: 1024)
+                 :param num_random_vectors: Number of random vectors (default: 20)
+                 :param num_quadrature_points: Number of Gauss-Chebyshev quadrature points (default: 2048)
+                 :return: Stress autocorrelation values
+        """
+    def find_all_eigenvalues(self, solver: typing.Any = 'auto', compute_eigenvectors: bool = False, decompose_components: bool = True) -> None:
         """
                  Find all eigenvalues using the specified solver.
-                 
-                 :param solver: Solver method to use (NormalModeSolver enum or string, default: NormalModeSolver.AUTO)
+        
+                 :param solver: Solver method to use (NormalModeSolver enum or string: 'auto', 'dense_lapack', 'dense_eigen', 'sparse_slicing', 'metal'; default: NormalModeSolver.AUTO)
                  :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
                  :param decompose_components: Whether to decompose the graph into connected components (default: True)
         """
-    def find_sparse_eigenvalues(self, nr_of_eigenvalues: typing.SupportsInt, compute_eigenvectors: bool = False) -> None:
+    def find_all_eigenvalues_gpu(self, compute_eigenvectors: bool = False) -> None:
+        """
+                 Find all eigenvalues using a GPU solver (cuSOLVER on CUDA or Metal on Apple Silicon).
+                 
+                 :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
+                 :return: True if computation was successful
+        """
+    def find_sparse_eigenvalues(self, nr_of_eigenvalues: typing.SupportsInt | typing.SupportsIndex, compute_eigenvectors: bool = False) -> None:
         """
                  Find the k smallest eigenvalues using a sparse solver.
                  
                  :param nr_of_eigenvalues: Number of smallest eigenvalues to find
                  :param compute_eigenvectors: Whether to also compute eigenvectors (default: False)
+                 :return: True if computation was successful
         """
     def get_eigenvalues(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         """
@@ -3376,72 +3698,15 @@ class NormalModeAnalyzer:
                  
                  :param eigenvectors: Matrix of eigenvectors to set
         """
-    def compute_chebyshev_moments_kpm(self, num_moments: int = 1024, num_random_vectors: int = 20) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
-        """
-        Compute Chebyshev moments using the Kernel Polynomial Method (KPM).
-
-        :param num_moments: Number of moments to compute (default: 1024)
-        :param num_random_vectors: Number of random Rademacher vectors for trace estimation (default: 20)
-        :return: Vector of damped Chebyshev moments
-        """
-    def compute_chebyshev_moments_kpm_metal(self, num_moments: int = 1024, num_random_vectors: int = 20, batch_size: int = 4) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
-        """
-        Compute Chebyshev moments using the Kernel Polynomial Method (KPM) on Apple Silicon GPU via Metal.
-
-        :param num_moments: Number of moments to compute (default: 1024)
-        :param num_random_vectors: Number of random Rademacher vectors for trace estimation (default: 20)
-        :param batch_size: Number of RHS vectors batched into each Block-SpMM (default: 4)
-        :return: Vector of damped Chebyshev moments
-        """
-    def compute_density_of_states_kpm(self, lambda_grid: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], num_moments: int = 1024, num_random_vectors: int = 20) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
-        """
-        Compute continuous density of states (DOS) using KPM.
-
-        :param lambda_grid: Eigenvalue points at which to evaluate DOS
-        :param num_moments: Number of Chebyshev moments (default: 1024)
-        :param num_random_vectors: Number of random vectors (default: 20)
-        :return: Density of states values on the grid
-        """
-    def evaluate_stress_autocorrelation_kpm(self, t: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], num_moments: int = 1024, num_random_vectors: int = 20, num_quadrature_points: int = 2048) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
-        """
-        Evaluate stress autocorrelation directly using KPM without computing eigenvalues.
-
-        :param t: Time points to evaluate
-        :param num_moments: Number of Chebyshev moments (default: 1024)
-        :param num_random_vectors: Number of random vectors (default: 20)
-        :param num_quadrature_points: Number of Gauss-Chebyshev quadrature points (default: 2048)
-        :return: Stress autocorrelation values
-        """
-    def evaluate_storage_modulus_kpm(self, omega: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], num_moments: int = 1024, num_random_vectors: int = 20, num_quadrature_points: int = 2048) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
-        """
-        Evaluate storage modulus G' directly using KPM without computing eigenvalues.
-
-        :param omega: Angular frequencies to evaluate
-        :param num_moments: Number of Chebyshev moments (default: 1024)
-        :param num_random_vectors: Number of random vectors (default: 20)
-        :param num_quadrature_points: Number of Gauss-Chebyshev quadrature points (default: 2048)
-        :return: Storage modulus values
-        """
-    def evaluate_loss_modulus_kpm(self, omega: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"], num_moments: int = 1024, num_random_vectors: int = 20, num_quadrature_points: int = 2048) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
-        """
-        Evaluate loss modulus G'' directly using KPM without computing eigenvalues.
-
-        :param omega: Angular frequencies to evaluate
-        :param num_moments: Number of Chebyshev moments (default: 1024)
-        :param num_random_vectors: Number of random vectors (default: 20)
-        :param num_quadrature_points: Number of Gauss-Chebyshev quadrature points (default: 2048)
-        :return: Loss modulus values
-        """
 class NormalModeSolver(enum.Enum):
     """
-    Solver algorithms for normal mode analysis.
+    Solver algorithms for normal mode analysis
     """
-    AUTO = ...
-    DENSE_LAPACK = ...
-    DENSE_EIGEN = ...
-    SPARSE_SLICING = ...
-    METAL = ...
-
+    AUTO: typing.ClassVar[NormalModeSolver]  # value = <NormalModeSolver.AUTO: 0>
+    DENSE_EIGEN: typing.ClassVar[NormalModeSolver]  # value = <NormalModeSolver.DENSE_EIGEN: 2>
+    DENSE_LAPACK: typing.ClassVar[NormalModeSolver]  # value = <NormalModeSolver.DENSE_LAPACK: 1>
+    METAL: typing.ClassVar[NormalModeSolver]  # value = <NormalModeSolver.METAL: 4>
+    SPARSE_SLICING: typing.ClassVar[NormalModeSolver]  # value = <NormalModeSolver.SPARSE_SLICING: 3>
 class OutputConfiguration:
     """
     
@@ -3504,7 +3769,7 @@ class OutputConfiguration:
              For averages, this value also says how many values will be averaged.
         """
     @output_every.setter
-    def output_every(self, arg0: typing.SupportsInt) -> None:
+    def output_every(self, arg0: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
     @property
     def use_every(self) -> int:
@@ -3515,68 +3780,144 @@ class OutputConfiguration:
              all values encountered during the simulation or optimization procedure.
         """
     @use_every.setter
-    def use_every(self, arg0: typing.SupportsInt) -> None:
+    def use_every(self, arg0: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
 class ResistanceDistanceAnalysis:
+    @staticmethod
+    def create_complete(num_nodes: typing.SupportsInt | typing.SupportsIndex) -> ResistanceDistanceAnalysis:
+        ...
+    @staticmethod
+    def create_linear_chain(num_nodes: typing.SupportsInt | typing.SupportsIndex) -> ResistanceDistanceAnalysis:
+        ...
+    @staticmethod
+    def create_ring(num_nodes: typing.SupportsInt | typing.SupportsIndex) -> ResistanceDistanceAnalysis:
+        ...
+    @staticmethod
+    def create_star(num_arms: typing.SupportsInt | typing.SupportsIndex, arm_length: typing.SupportsInt | typing.SupportsIndex = 1) -> ResistanceDistanceAnalysis:
+        ...
     @typing.overload
-    def __init__(self, spring_from: collections.abc.Sequence[typing.SupportsInt], spring_to: collections.abc.Sequence[typing.SupportsInt], weights: collections.abc.Sequence[typing.SupportsFloat] = [], num_nodes: typing.SupportsInt = 0) -> None:
+    def __init__(self, spring_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], spring_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], weights: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex] = [], num_nodes: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         ...
     @typing.overload
-    def __init__(self, L: scipy.sparse.csc_matrix[numpy.float64]) -> None:
+    def __init__(self, L: scipy.sparse.csc_matrix) -> None:
         ...
-    @staticmethod
-    def create_linear_chain(num_nodes: typing.SupportsInt) -> ResistanceDistanceAnalysis:
+    def compute_all_pairs_commute_time(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, n]"]:
         ...
-    @staticmethod
-    def create_ring(num_nodes: typing.SupportsInt) -> ResistanceDistanceAnalysis:
+    def compute_all_pairs_effective_resistance(self, chunk_size: typing.SupportsInt | typing.SupportsIndex = 128) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, n]"]:
         ...
-    @staticmethod
-    def create_complete(num_nodes: typing.SupportsInt) -> ResistanceDistanceAnalysis:
+    def compute_commute_time(self, i: typing.SupportsInt | typing.SupportsIndex, j: typing.SupportsInt | typing.SupportsIndex) -> float:
         ...
-    @staticmethod
-    def create_star(num_arms: typing.SupportsInt, arm_length: typing.SupportsInt = 1) -> ResistanceDistanceAnalysis:
+    def compute_effective_resistance(self, i: typing.SupportsInt | typing.SupportsIndex, j: typing.SupportsInt | typing.SupportsIndex) -> float:
         ...
-    def get_nr_of_nodes(self) -> int:
-        ...
-    def get_nr_of_edges(self) -> int:
-        ...
-    def get_total_edge_weight(self) -> float:
-        ...
-    def is_connected(self) -> bool:
-        ...
-    def get_nr_of_connected_components(self) -> int:
-        ...
-    def get_connected_components(self) -> list[list[int]]:
-        ...
-    def get_laplacian(self) -> scipy.sparse.csc_matrix[numpy.float64]:
-        ...
-    def compute_effective_resistance(self, i: typing.SupportsInt, j: typing.SupportsInt) -> float:
-        ...
-    def compute_effective_resistance_batched(self, pairs: collections.abc.Sequence[tuple[typing.SupportsInt, typing.SupportsInt]]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
-        ...
-    def compute_all_pairs_effective_resistance(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, n]"]:
+    def compute_effective_resistance_batched(self, pairs: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         ...
     def compute_kirchhoff_index(self) -> float:
         ...
     def compute_kirchhoff_index_spectral(self) -> float:
         ...
-    def compute_total_resistance_per_node(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def compute_moore_penrose_pseudo_inverse(self, chunk_size: typing.SupportsInt | typing.SupportsIndex = 128) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, n]"]:
         ...
     def compute_resistance_centrality(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         ...
-    def compute_commute_time(self, i: typing.SupportsInt, j: typing.SupportsInt) -> float:
+    def compute_total_resistance_per_node(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         ...
-    def compute_all_pairs_commute_time(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, n]"]:
+    def get_connected_components(self) -> list[list[int]]:
         ...
-
-class RouseSolverType(enum.Enum):
-    DIRECT_LDLT: typing.ClassVar[RouseSolverType]
-    DIRECT_LLT: typing.ClassVar[RouseSolverType]
-    CONJUGATE_GRADIENT: typing.ClassVar[RouseSolverType]
-
+    def get_laplacian(self) -> scipy.sparse.csc_matrix:
+        ...
+    def get_nr_of_connected_components(self) -> int:
+        ...
+    def get_nr_of_edges(self) -> int:
+        ...
+    def get_nr_of_nodes(self) -> int:
+        ...
+    def get_total_edge_weight(self) -> float:
+        ...
+    def is_connected(self) -> bool:
+        ...
+    def solve_identity_chunked(self, chunk_size: typing.SupportsInt | typing.SupportsIndex = 128) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, n]"]:
+        ...
+class RouseBrownianSimulator:
+    @staticmethod
+    def compute_center_of_mass_msd(trajectory: collections.abc.Sequence[typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, n]"]], time_averaged: bool = False) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        ...
+    @staticmethod
+    def compute_msd(trajectory: collections.abc.Sequence[typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, n]"]], time_averaged: bool = False) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        ...
+    @staticmethod
+    def create_linear_chain(num_nodes: typing.SupportsInt | typing.SupportsIndex, gamma: typing.SupportsFloat | typing.SupportsIndex = 1.0, k: typing.SupportsFloat | typing.SupportsIndex = 1.0, T: typing.SupportsFloat | typing.SupportsIndex = 1.0, dt: typing.SupportsFloat | typing.SupportsIndex = 0.01) -> RouseBrownianSimulator:
+        ...
+    @staticmethod
+    def create_ring(num_nodes: typing.SupportsInt | typing.SupportsIndex, gamma: typing.SupportsFloat | typing.SupportsIndex = 1.0, k: typing.SupportsFloat | typing.SupportsIndex = 1.0, T: typing.SupportsFloat | typing.SupportsIndex = 1.0, dt: typing.SupportsFloat | typing.SupportsIndex = 0.01) -> RouseBrownianSimulator:
+        ...
+    @staticmethod
+    def create_star(num_arms: typing.SupportsInt | typing.SupportsIndex, arm_length: typing.SupportsInt | typing.SupportsIndex = 1, gamma: typing.SupportsFloat | typing.SupportsIndex = 1.0, k: typing.SupportsFloat | typing.SupportsIndex = 1.0, T: typing.SupportsFloat | typing.SupportsIndex = 1.0, dt: typing.SupportsFloat | typing.SupportsIndex = 0.01) -> RouseBrownianSimulator:
+        ...
+    @typing.overload
+    def __init__(self, spring_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], spring_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], gamma: typing.SupportsFloat | typing.SupportsIndex = 1.0, k: typing.SupportsFloat | typing.SupportsIndex = 1.0, T: typing.SupportsFloat | typing.SupportsIndex = 1.0, dt: typing.SupportsFloat | typing.SupportsIndex = 0.01, num_nodes: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
+        ...
+    @typing.overload
+    def __init__(self, L: scipy.sparse.csc_matrix, gamma: typing.SupportsFloat | typing.SupportsIndex = 1.0, k: typing.SupportsFloat | typing.SupportsIndex = 1.0, T: typing.SupportsFloat | typing.SupportsIndex = 1.0, dt: typing.SupportsFloat | typing.SupportsIndex = 0.01) -> None:
+        ...
+    def get_center_of_mass(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+        ...
+    def get_diffusion_coefficient(self) -> float:
+        ...
+    def get_dt(self) -> float:
+        ...
+    def get_end_to_end_distance(self, node_a: typing.SupportsInt | typing.SupportsIndex = 0, node_b: typing.SupportsInt | typing.SupportsIndex = 18446744073709551615) -> float:
+        ...
+    def get_end_to_end_vector(self, node_a: typing.SupportsInt | typing.SupportsIndex = 0, node_b: typing.SupportsInt | typing.SupportsIndex = 18446744073709551615) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+        ...
+    def get_gamma(self) -> float:
+        ...
+    def get_k(self) -> float:
+        ...
+    def get_laplacian(self) -> scipy.sparse.csc_matrix:
+        ...
+    def get_nr_of_nodes(self) -> int:
+        ...
+    def get_positions(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, n]"]:
+        ...
+    def get_potential_energy(self) -> float:
+        ...
+    def get_radius_of_gyration(self) -> float:
+        ...
+    def get_shifted_matrix(self) -> scipy.sparse.csc_matrix:
+        ...
+    def get_temperature(self) -> float:
+        ...
+    def initialize_linear_positions(self, bond_length: typing.SupportsFloat | typing.SupportsIndex = 1.0, axis: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
+        ...
+    def initialize_random_walk(self, bond_length: typing.SupportsFloat | typing.SupportsIndex = 1.0, seed: typing.SupportsInt | typing.SupportsIndex = 42) -> None:
+        ...
+    def run(self, total_steps: typing.SupportsInt | typing.SupportsIndex, sample_interval: typing.SupportsInt | typing.SupportsIndex = 1, save_trajectory: bool = False, end_to_end_node_a: typing.SupportsInt | typing.SupportsIndex = 0, end_to_end_node_b: typing.SupportsInt | typing.SupportsIndex = 18446744073709551615) -> RouseSimulationResult:
+        ...
+    def set_dt(self, arg0: typing.SupportsFloat | typing.SupportsIndex) -> None:
+        ...
+    def set_gamma(self, arg0: typing.SupportsFloat | typing.SupportsIndex) -> None:
+        ...
+    def set_k(self, arg0: typing.SupportsFloat | typing.SupportsIndex) -> None:
+        ...
+    def set_parameters(self, arg0: typing.SupportsFloat | typing.SupportsIndex, arg1: typing.SupportsFloat | typing.SupportsIndex, arg2: typing.SupportsFloat | typing.SupportsIndex, arg3: typing.SupportsFloat | typing.SupportsIndex) -> None:
+        ...
+    def set_positions(self, arg0: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, n]"]) -> None:
+        ...
+    def set_seed(self, arg0: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def set_solver_type(self, arg0: RouseSolverType) -> None:
+        ...
+    def set_temperature(self, arg0: typing.SupportsFloat | typing.SupportsIndex) -> None:
+        ...
+    def step(self, num_steps: typing.SupportsInt | typing.SupportsIndex = 1) -> None:
+        ...
+    def step_deterministic(self, num_steps: typing.SupportsInt | typing.SupportsIndex = 1) -> None:
+        ...
+    def step_with_external_forces(self, forces: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, n]"], num_steps: typing.SupportsInt | typing.SupportsIndex = 1) -> None:
+        ...
 class RouseSimulationResult:
     @property
-    def times(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def end_to_end_correlation(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         ...
     @property
     def msd(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
@@ -3585,118 +3926,86 @@ class RouseSimulationResult:
     def msd_center_of_mass(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         ...
     @property
-    def end_to_end_correlation(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    def times(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
         ...
     @property
     def trajectory(self) -> list[typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, n]"]]:
         ...
-
-class RouseBrownianSimulator:
+class RouseSolverType:
+    """
+    Members:
+    
+      DIRECT_LDLT
+    
+      DIRECT_LLT
+    
+      CONJUGATE_GRADIENT
+    """
+    CONJUGATE_GRADIENT: typing.ClassVar[RouseSolverType]  # value = <RouseSolverType.CONJUGATE_GRADIENT: 2>
+    DIRECT_LDLT: typing.ClassVar[RouseSolverType]  # value = <RouseSolverType.DIRECT_LDLT: 0>
+    DIRECT_LLT: typing.ClassVar[RouseSolverType]  # value = <RouseSolverType.DIRECT_LLT: 1>
+    __members__: typing.ClassVar[dict[str, RouseSolverType]]  # value = {'DIRECT_LDLT': <RouseSolverType.DIRECT_LDLT: 0>, 'DIRECT_LLT': <RouseSolverType.DIRECT_LLT: 1>, 'CONJUGATE_GRADIENT': <RouseSolverType.CONJUGATE_GRADIENT: 2>}
     @typing.overload
-    def __init__(self, spring_from: collections.abc.Sequence[typing.SupportsInt], spring_to: collections.abc.Sequence[typing.SupportsInt], gamma: typing.SupportsFloat = 1.0, k: typing.SupportsFloat = 1.0, T: typing.SupportsFloat = 1.0, dt: typing.SupportsFloat = 0.01, num_nodes: typing.SupportsInt = 0) -> None:
+    def __eq__(self, other: RouseSolverType) -> bool:
         ...
     @typing.overload
-    def __init__(self, L: scipy.sparse.csc_matrix[numpy.float64], gamma: typing.SupportsFloat = 1.0, k: typing.SupportsFloat = 1.0, T: typing.SupportsFloat = 1.0, dt: typing.SupportsFloat = 0.01) -> None:
+    def __eq__(self, other: typing.Any) -> bool:
         ...
-    @staticmethod
-    def create_linear_chain(num_nodes: typing.SupportsInt, gamma: typing.SupportsFloat = 1.0, k: typing.SupportsFloat = 1.0, T: typing.SupportsFloat = 1.0, dt: typing.SupportsFloat = 0.01) -> RouseBrownianSimulator:
+    def __getstate__(self) -> int:
         ...
-    @staticmethod
-    def create_ring(num_nodes: typing.SupportsInt, gamma: typing.SupportsFloat = 1.0, k: typing.SupportsFloat = 1.0, T: typing.SupportsFloat = 1.0, dt: typing.SupportsFloat = 0.01) -> RouseBrownianSimulator:
+    def __hash__(self) -> int:
         ...
-    @staticmethod
-    def create_star(num_arms: typing.SupportsInt, arm_length: typing.SupportsInt = 1, gamma: typing.SupportsFloat = 1.0, k: typing.SupportsFloat = 1.0, T: typing.SupportsFloat = 1.0, dt: typing.SupportsFloat = 0.01) -> RouseBrownianSimulator:
+    def __index__(self) -> int:
         ...
-    def get_nr_of_nodes(self) -> int:
+    def __init__(self, value: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
-    def get_gamma(self) -> float:
+    def __int__(self) -> int:
         ...
-    def get_k(self) -> float:
+    @typing.overload
+    def __ne__(self, other: RouseSolverType) -> bool:
         ...
-    def get_temperature(self) -> float:
+    @typing.overload
+    def __ne__(self, other: typing.Any) -> bool:
         ...
-    def get_dt(self) -> float:
+    def __repr__(self) -> str:
         ...
-    def get_diffusion_coefficient(self) -> float:
+    def __setstate__(self, state: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
-    def set_parameters(self, gamma: typing.SupportsFloat, k: typing.SupportsFloat, T: typing.SupportsFloat, dt: typing.SupportsFloat) -> None:
+    def __str__(self) -> str:
         ...
-    def set_gamma(self, gamma: typing.SupportsFloat) -> None:
+    @property
+    def name(self) -> str:
         ...
-    def set_k(self, k: typing.SupportsFloat) -> None:
+    @property
+    def value(self) -> int:
         ...
-    def set_temperature(self, T: typing.SupportsFloat) -> None:
-        ...
-    def set_dt(self, dt: typing.SupportsFloat) -> None:
-        ...
-    def set_solver_type(self, type: RouseSolverType) -> None:
-        ...
-    def set_seed(self, seed: typing.SupportsInt) -> None:
-        ...
-    def set_positions(self, positions: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, n]"]) -> None:
-        ...
-    def get_positions(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, n]"]:
-        ...
-    def initialize_linear_positions(self, bond_length: typing.SupportsFloat = 1.0, axis: typing.SupportsInt = 0) -> None:
-        ...
-    def initialize_random_walk(self, bond_length: typing.SupportsFloat = 1.0, seed: typing.SupportsInt = 42) -> None:
-        ...
-    def get_laplacian(self) -> scipy.sparse.csc_matrix[numpy.float64]:
-        ...
-    def get_shifted_matrix(self) -> scipy.sparse.csc_matrix[numpy.float64]:
-        ...
-    def step(self, num_steps: typing.SupportsInt = 1) -> None:
-        ...
-    def step_with_external_forces(self, forces: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, n]"], num_steps: typing.SupportsInt = 1) -> None:
-        ...
-    def step_deterministic(self, num_steps: typing.SupportsInt = 1) -> None:
-        ...
-    def get_center_of_mass(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
-        ...
-    def get_end_to_end_vector(self, node_a: typing.SupportsInt = 0, node_b: typing.SupportsInt = ...) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
-        ...
-    def get_end_to_end_distance(self, node_a: typing.SupportsInt = 0, node_b: typing.SupportsInt = ...) -> float:
-        ...
-    def get_radius_of_gyration(self) -> float:
-        ...
-    def get_potential_energy(self) -> float:
-        ...
-    def run(self, total_steps: typing.SupportsInt, sample_interval: typing.SupportsInt = 1, save_trajectory: bool = False, end_to_end_node_a: typing.SupportsInt = 0, end_to_end_node_b: typing.SupportsInt = ...) -> RouseSimulationResult:
-        ...
-    @staticmethod
-    def compute_msd(trajectory: collections.abc.Sequence[typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, n]"]], time_averaged: bool = False) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
-        ...
-    @staticmethod
-    def compute_center_of_mass_msd(trajectory: collections.abc.Sequence[typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, n]"]], time_averaged: bool = False) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
-        ...
-
 class SLESolver(enum.Enum):
     """
     Solver for sparse linear equation systems
     """
-    BICGSTAB: typing.ClassVar[SLESolver]  # value = <SLESolver.BICGSTAB: 12>
-    BICGSTAB_DIAGONALIZED: typing.ClassVar[SLESolver]  # value = <SLESolver.BICGSTAB_DIAGONALIZED: 13>
-    BICGSTAB_IDENTITY: typing.ClassVar[SLESolver]  # value = <SLESolver.BICGSTAB_IDENTITY: 14>
-    BICGSTAB_INCOMPLETE_LU: typing.ClassVar[SLESolver]  # value = <SLESolver.BICGSTAB_INCOMPLETE_LU: 15>
-    CONJUGATE_GRADIENT: typing.ClassVar[SLESolver]  # value = <SLESolver.CONJUGATE_GRADIENT: 5>
-    CONJUGATE_GRADIENT_DIAGONALIZED: typing.ClassVar[SLESolver]  # value = <SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED: 6>
-    CONJUGATE_GRADIENT_IDENTITY: typing.ClassVar[SLESolver]  # value = <SLESolver.CONJUGATE_GRADIENT_IDENTITY: 7>
-    CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY: typing.ClassVar[SLESolver]  # value = <SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY: 8>
-    AUTO: typing.ClassVar[SLESolver]
+    AUTO: typing.ClassVar[SLESolver]  # value = <SLESolver.AUTO: 1>
+    BICGSTAB: typing.ClassVar[SLESolver]  # value = <SLESolver.BICGSTAB: 13>
+    BICGSTAB_DIAGONALIZED: typing.ClassVar[SLESolver]  # value = <SLESolver.BICGSTAB_DIAGONALIZED: 14>
+    BICGSTAB_IDENTITY: typing.ClassVar[SLESolver]  # value = <SLESolver.BICGSTAB_IDENTITY: 15>
+    BICGSTAB_INCOMPLETE_LU: typing.ClassVar[SLESolver]  # value = <SLESolver.BICGSTAB_INCOMPLETE_LU: 16>
+    CONJUGATE_GRADIENT: typing.ClassVar[SLESolver]  # value = <SLESolver.CONJUGATE_GRADIENT: 6>
+    CONJUGATE_GRADIENT_DIAGONALIZED: typing.ClassVar[SLESolver]  # value = <SLESolver.CONJUGATE_GRADIENT_DIAGONALIZED: 7>
+    CONJUGATE_GRADIENT_IDENTITY: typing.ClassVar[SLESolver]  # value = <SLESolver.CONJUGATE_GRADIENT_IDENTITY: 8>
+    CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY: typing.ClassVar[SLESolver]  # value = <SLESolver.CONJUGATE_GRADIENT_INCOMPLETE_CHOLESKY: 9>
     DEFAULT: typing.ClassVar[SLESolver]  # value = <SLESolver.DEFAULT: 0>
-    GRADIENT_DESCENT: typing.ClassVar[SLESolver]  # value = <SLESolver.GRADIENT_DESCENT: 16>
-    GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG: typing.ClassVar[SLESolver]  # value = <SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG: 18>
-    GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM: typing.ClassVar[SLESolver]  # value = <SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM: 19>
-    GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT: typing.ClassVar[SLESolver]  # value = <SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT: 17>
-    LEAST_SQUARES_CONJUGATE_GRADIENT: typing.ClassVar[SLESolver]  # value = <SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT: 9>
-    LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED: typing.ClassVar[SLESolver]  # value = <SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED: 10>
-    LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY: typing.ClassVar[SLESolver]  # value = <SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY: 11>
-    SIMPLICIAL_LDLT: typing.ClassVar[SLESolver]  # value = <SLESolver.SIMPLICIAL_LDLT: 2>
-    SIMPLICIAL_LLT: typing.ClassVar[SLESolver]  # value = <SLESolver.SIMPLICIAL_LLT: 1>
-    SPARSE_LU: typing.ClassVar[SLESolver]  # value = <SLESolver.SPARSE_LU: 3>
-    SPARSE_QR: typing.ClassVar[SLESolver]  # value = <SLESolver.SPARSE_QR: 4>
-    METAL_CG: typing.ClassVar[SLESolver]  # value = <SLESolver.METAL_CG: 20>
-    METAL_BARZILAI_BORWEIN: typing.ClassVar[SLESolver]  # value = <SLESolver.METAL_BARZILAI_BORWEIN: 21>
+    GRADIENT_DESCENT: typing.ClassVar[SLESolver]  # value = <SLESolver.GRADIENT_DESCENT: 17>
+    GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG: typing.ClassVar[SLESolver]  # value = <SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_LONG: 19>
+    GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM: typing.ClassVar[SLESolver]  # value = <SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_MOMENTUM: 20>
+    GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT: typing.ClassVar[SLESolver]  # value = <SLESolver.GRADIENT_DESCENT_BARZILAI_BORWEIN_SHORT: 18>
+    LEAST_SQUARES_CONJUGATE_GRADIENT: typing.ClassVar[SLESolver]  # value = <SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT: 10>
+    LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED: typing.ClassVar[SLESolver]  # value = <SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_DIAGONALIZED: 11>
+    LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY: typing.ClassVar[SLESolver]  # value = <SLESolver.LEAST_SQUARES_CONJUGATE_GRADIENT_IDENTITY: 12>
+    METAL_BARZILAI_BORWEIN: typing.ClassVar[SLESolver]  # value = <SLESolver.METAL_BARZILAI_BORWEIN: 22>
+    METAL_CG: typing.ClassVar[SLESolver]  # value = <SLESolver.METAL_CG: 21>
+    SIMPLICIAL_LDLT: typing.ClassVar[SLESolver]  # value = <SLESolver.SIMPLICIAL_LDLT: 3>
+    SIMPLICIAL_LLT: typing.ClassVar[SLESolver]  # value = <SLESolver.SIMPLICIAL_LLT: 2>
+    SPARSE_LU: typing.ClassVar[SLESolver]  # value = <SLESolver.SPARSE_LU: 4>
+    SPARSE_QR: typing.ClassVar[SLESolver]  # value = <SLESolver.SPARSE_QR: 5>
 class SimpleSpringMEHPForceEvaluator(MEHPForceEvaluator):
     """
     
@@ -3711,7 +4020,7 @@ class SimpleSpringMEHPForceEvaluator(MEHPForceEvaluator):
          :param kappa: The spring constant :math:`\\kappa`
         
     """
-    def __init__(self, kappa: typing.SupportsFloat = 1.0) -> None:
+    def __init__(self, kappa: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         ...
 class SimplifiedBalance2Network:
     """
@@ -3795,8 +4104,12 @@ class SimplifiedBalanceNetwork:
          i.e., no "normal strand beads" in between, in order to reduce the degrees of freedom
          and therewith improve performance of the solver.
     
-         A note on the terminology: a spring is the connection between two links (crosslink, entanglement-link/slip-link).
-         A strand is a chain of connected links between two crosslinks.
+         A note on terminology:
+         - A **spring** (or partial spring) is the Hookean connection between two adjacent links
+           (which may be a chemical crosslink or an entanglement link / slip-link).
+         - A **strand** is the full chain of connected links and springs between two chemical crosslinks.
+         - For the distinction between chemical crosslinks, non-slipping entanglement links,
+           entanglement springs, and dynamic slip-links, see :doc:`/nomenclature`.
      
     """
     @property
@@ -3921,6 +4234,112 @@ class SimplifiedNetwork:
     @property
     def volume(self) -> float:
         ...
+class StrandPairEntanglements:
+    """
+    
+          A struct to store analytically sampled entanglements on strands (without requiring an explicit Universe of all beads).
+        
+    """
+    def __init__(self) -> None:
+        """
+        Get an instance of this struct
+        """
+    def __len__(self) -> int:
+        ...
+    def size(self) -> int:
+        ...
+    def to_atom_pair_entanglements(self, crosslinker_universe: CrosslinkerUniverse) -> AtomPairEntanglements:
+        """
+              Convert the strand pair entanglements to AtomPairEntanglements using the deterministic atom indexing of CrosslinkerUniverse.
+        """
+    @property
+    def alpha_1(self) -> list[float]:
+        """
+              Contour fraction along the first strand in (0, 1).
+        """
+    @alpha_1.setter
+    def alpha_1(self, arg0: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def alpha_2(self) -> list[float]:
+        """
+              Contour fraction along the second strand in (0, 1).
+        """
+    @alpha_2.setter
+    def alpha_2(self, arg0: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def bead_idx_1(self) -> list[int]:
+        """
+              Bead index along the first strand in [0, beads_in_strand - 1].
+        """
+    @bead_idx_1.setter
+    def bead_idx_1(self, arg0: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def bead_idx_2(self) -> list[int]:
+        """
+              Bead index along the second strand in [0, beads_in_strand - 1].
+        """
+    @bead_idx_2.setter
+    def bead_idx_2(self, arg0: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def position_1(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+              Sampled 3D positions of the first entangled beads.
+        """
+    @position_1.setter
+    def position_1(self, arg0: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> None:
+        ...
+    @property
+    def position_2(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+              Sampled 3D positions of the second entangled beads.
+        """
+    @position_2.setter
+    def position_2(self, arg0: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> None:
+        ...
+    @property
+    def strand_idx_1(self) -> list[int]:
+        """
+              First strand index of each entanglement pair.
+        """
+    @strand_idx_1.setter
+    def strand_idx_1(self, arg0: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def strand_idx_2(self) -> list[int]:
+        """
+              Second strand index of each entanglement pair.
+        """
+    @strand_idx_2.setter
+    def strand_idx_2(self, arg0: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def x(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+              X-coordinates of the sampled entanglement midpoints.
+        """
+    @x.setter
+    def x(self, arg0: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> None:
+        ...
+    @property
+    def y(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+              Y-coordinates of the sampled entanglement midpoints.
+        """
+    @y.setter
+    def y(self, arg0: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> None:
+        ...
+    @property
+    def z(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+        """
+              Z-coordinates of the sampled entanglement midpoints.
+        """
+    @z.setter
+    def z(self, arg0: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[m, 1]"]) -> None:
+        ...
 class StructureSimplificationMode(enum.Enum):
     """
     How the structure shall be simplified during the optimization in order to remove non-trapped entanglement links.
@@ -3949,13 +4368,13 @@ class Universe:
                  
                  :return: A new Universe instance that is a copy of this one
         """
-    def __getitem__(self, arg0: typing.SupportsInt) -> Atom:
+    def __getitem__(self, arg0: typing.SupportsInt | typing.SupportsIndex) -> Atom:
         """
                Access an atom by its vertex index.
         """
-    def __getstate__(self) -> tuple:
+    def __getstate__(self) -> tuple[str]:
         ...
-    def __init__(self, Lx: typing.SupportsFloat, Ly: typing.SupportsFloat, Lz: typing.SupportsFloat) -> None:
+    def __init__(self, Lx: typing.SupportsFloat | typing.SupportsIndex, Ly: typing.SupportsFloat | typing.SupportsIndex, Lz: typing.SupportsFloat | typing.SupportsIndex) -> None:
         """
                  Instantiate this Universe (Collection of Molecules) providing the box lengths.
                  
@@ -3969,7 +4388,7 @@ class Universe:
         """
     def __setstate__(self, arg0: tuple) -> None:
         ...
-    def add_angles(self, angles_from: collections.abc.Sequence[typing.SupportsInt], angles_via: collections.abc.Sequence[typing.SupportsInt], angles_to: collections.abc.Sequence[typing.SupportsInt], angle_types: collections.abc.Sequence[typing.SupportsInt]) -> None:
+    def add_angles(self, angles_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], angles_via: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], angles_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], angle_types: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
         """
                  Add angles to the Universe. No relation to the underlying graph, 
                  just a method to preserve read & write capabilities.
@@ -3979,7 +4398,7 @@ class Universe:
                  :param angles_to: Vector of atom IDs for angle end points
                  :param angle_types: Vector of angle types
         """
-    def add_atoms(self, ids: collections.abc.Sequence[typing.SupportsInt], types: collections.abc.Sequence[typing.SupportsInt], x: collections.abc.Sequence[typing.SupportsFloat], y: collections.abc.Sequence[typing.SupportsFloat], z: collections.abc.Sequence[typing.SupportsFloat], nx: collections.abc.Sequence[typing.SupportsInt], ny: collections.abc.Sequence[typing.SupportsInt], nz: collections.abc.Sequence[typing.SupportsInt]) -> None:
+    def add_atoms(self, ids: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], types: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], x: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex], y: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex], z: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex], nx: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], ny: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], nz: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
         """
                  Add atoms to the Universe, vertices to the underlying graph.
                  
@@ -3993,7 +4412,7 @@ class Universe:
                  :param nz: Vector of periodic image flags in z direction
         """
     @typing.overload
-    def add_bonds(self, bonds_from: collections.abc.Sequence[typing.SupportsInt], bonds_to: collections.abc.Sequence[typing.SupportsInt]) -> None:
+    def add_bonds(self, bonds_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], bonds_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
         """
                  Add bonds to the underlying atoms, edges to the underlying graph. 
                  If the connected atoms are not found, the bonds are silently skipped.
@@ -4002,7 +4421,7 @@ class Universe:
                  :param bonds_to: Vector of atom IDs for bond end points
         """
     @typing.overload
-    def add_bonds(self, nr_of_bonds: typing.SupportsInt, bonds_from: collections.abc.Sequence[typing.SupportsInt], bonds_to: collections.abc.Sequence[typing.SupportsInt], bond_types: collections.abc.Sequence[typing.SupportsInt], ignore_non_existent_atoms: bool = False, simplify_universe: bool = True) -> None:
+    def add_bonds(self, nr_of_bonds: typing.SupportsInt | typing.SupportsIndex, bonds_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], bonds_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], bond_types: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], ignore_non_existent_atoms: bool = False, simplify_universe: bool = True) -> None:
         """
                  Add bonds to the underlying atoms, edges to the underlying graph.
                  
@@ -4013,7 +4432,7 @@ class Universe:
                  :param ignore_non_existent_atoms: Whether to skip bonds to non-existent atoms
                  :param simplify_universe: Whether to simplify the universe after adding bonds
         """
-    def add_bonds_with_types(self, bonds_from: collections.abc.Sequence[typing.SupportsInt], bonds_to: collections.abc.Sequence[typing.SupportsInt], bond_types: collections.abc.Sequence[typing.SupportsInt]) -> None:
+    def add_bonds_with_types(self, bonds_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], bonds_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], bond_types: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
         """
                  Add bonds to the underlying atoms, edges to the underlying graph. 
                  If the connected atoms are not found, the bonds are silently skipped.
@@ -4022,7 +4441,7 @@ class Universe:
                  :param bonds_to: Vector of atom IDs for bond end points
                  :param bond_types: Vector of bond types
         """
-    def add_dihedral_angles(self, angles_from: collections.abc.Sequence[typing.SupportsInt], angles_via1: collections.abc.Sequence[typing.SupportsInt], angles_via2: collections.abc.Sequence[typing.SupportsInt], angles_to: collections.abc.Sequence[typing.SupportsInt], angle_types: collections.abc.Sequence[typing.SupportsInt]) -> None:
+    def add_dihedral_angles(self, angles_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], angles_via1: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], angles_via2: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], angles_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], angle_types: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
         """
                  Add dihedral angles to the Universe. No relation to the underlying graph, 
                  just a method to preserve read & write capabilities.
@@ -4032,6 +4451,10 @@ class Universe:
                  :param angles_via2: Vector of atom IDs for second middle points
                  :param angles_to: Vector of atom IDs for dihedral end points
                  :param angle_types: Vector of dihedral angle types
+        """
+    def clear_caches(self) -> None:
+        """
+                 Clear internal caches of decomposed molecules and chains with crosslinkers to reclaim memory.
         """
     def compute_angles(self) -> list[float]:
         """
@@ -4051,7 +4474,7 @@ class Universe:
                  
                  :return: A list of bond vectors
         """
-    def compute_dxs(self, atom_ids_to: collections.abc.Sequence[typing.SupportsInt], atom_ids_from: collections.abc.Sequence[typing.SupportsInt]) -> list[float]:
+    def compute_dxs(self, atom_ids_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], atom_ids_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> list[float]:
         """
                  Compute the dx distance for certain bonds (length in x direction).
                  
@@ -4059,7 +4482,7 @@ class Universe:
                  :param atom_ids_from: Vector of source atom IDs
                  :return: Vector of x-direction distances
         """
-    def compute_dys(self, atom_ids_to: collections.abc.Sequence[typing.SupportsInt], atom_ids_from: collections.abc.Sequence[typing.SupportsInt]) -> list[float]:
+    def compute_dys(self, atom_ids_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], atom_ids_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> list[float]:
         """
                  Compute the dy distance for certain bonds (length in y direction).
                  
@@ -4067,7 +4490,7 @@ class Universe:
                  :param atom_ids_from: Vector of source atom IDs
                  :return: Vector of y-direction distances
         """
-    def compute_dzs(self, atom_ids_to: collections.abc.Sequence[typing.SupportsInt], atom_ids_from: collections.abc.Sequence[typing.SupportsInt]) -> list[float]:
+    def compute_dzs(self, atom_ids_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], atom_ids_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> list[float]:
         """
                  Compute the dz distance for certain bonds (length in z direction).
                  
@@ -4075,7 +4498,7 @@ class Universe:
                  :param atom_ids_from: Vector of source atom IDs
                  :return: Vector of z-direction distances
         """
-    def compute_end_to_end_distances(self, crosslinker_type: typing.SupportsInt, derive_image_flags: bool = False) -> list[float]:
+    def compute_end_to_end_distances(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex, derive_image_flags: bool = False) -> list[float]:
         """
                   Compute the end-to-end distance of each strand in the network.
         
@@ -4089,7 +4512,7 @@ class Universe:
                   :param derive_image_flags: Whether to derive image flags from connectivity
                   :return: List of end-to-end distances
         """
-    def compute_mean_end_to_end_distance(self, crosslinker_type: typing.SupportsInt, derive_image_flags: bool = False) -> float:
+    def compute_mean_end_to_end_distance(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex, derive_image_flags: bool = False) -> float:
         """
                   Compute the mean of the end-to-end distances of each strand in the network.
         
@@ -4103,7 +4526,7 @@ class Universe:
                   :param derive_image_flags: Whether to derive image flags from connectivity
                   :return: Mean end-to-end distance
         """
-    def compute_mean_squared_end_to_end_distance(self, crosslinker_type: typing.SupportsInt, only_those_with_two_crosslinkers: bool = False, derive_image_flags: bool = False) -> float:
+    def compute_mean_squared_end_to_end_distance(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex, only_those_with_two_crosslinkers: bool = False, derive_image_flags: bool = False) -> float:
         """
                   Compute the mean square of the end-to-end distances of each strand (incl. crosslinks) in the network.
         
@@ -4118,14 +4541,14 @@ class Universe:
                   :param derive_image_flags: Whether to derive image flags from connectivity
                   :return: Mean squared end-to-end distance
         """
-    def compute_mean_strand_length(self, crosslinker_type: typing.SupportsInt) -> float:
+    def compute_mean_strand_length(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex) -> float:
         """
                       Compute the mean number of beads per strand.
                       
                       :param crosslinker_type: The type of crosslinker atoms
                       :return: Mean strand length
         """
-    def compute_number_average_molecular_weight(self, crosslinker_type: typing.SupportsInt) -> float:
+    def compute_number_average_molecular_weight(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex) -> float:
         """
                       Compute the number average molecular weight.
         
@@ -4135,12 +4558,12 @@ class Universe:
                       :param crosslinker_type: The type of crosslinker atoms
                       :return: Number average molecular weight
         """
-    def compute_polydispersity_index(self, crosslinker_type: typing.SupportsInt) -> float:
+    def compute_polydispersity_index(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex) -> float:
         """
                       Compute the polydispersity index: 
                       the weight average molecular weight over the number average molecular weight.
         """
-    def compute_temperature(self, dimensions: typing.SupportsInt = 3, k_b: typing.SupportsFloat = 1.0) -> float:
+    def compute_temperature(self, dimensions: typing.SupportsInt | typing.SupportsIndex = 3, k_b: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> float:
         """
               Use the velocities per atom to compute the temperature from the kinetic energy of the system.
               
@@ -4155,7 +4578,7 @@ class Universe:
                   
                   :return: Total mass of the universe
         """
-    def compute_weight_average_molecular_weight(self, crosslinker_type: typing.SupportsInt) -> float:
+    def compute_weight_average_molecular_weight(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex) -> float:
         """
                       Compute the weight average molecular weight.
         
@@ -4173,7 +4596,7 @@ class Universe:
         
                     If the total mass is 0., returns the total mass per atom type.
         """
-    def contract_vertices_along_bond_type(self, bond_type: typing.SupportsInt) -> Universe:
+    def contract_vertices_along_bond_type(self, bond_type: typing.SupportsInt | typing.SupportsIndex) -> Universe:
         """
                   Merge vertices along a specific bond type.
         
@@ -4187,7 +4610,7 @@ class Universe:
                   
                   :return: Dictionary mapping atom types to their counts
         """
-    def count_atoms_in_skin_distance(self, distances: collections.abc.Sequence[typing.SupportsFloat], unwrapped: bool = False) -> list[int]:
+    def count_atoms_in_skin_distance(self, distances: collections.abc.Sequence[typing.SupportsFloat | typing.SupportsIndex], unwrapped: bool = False) -> list[int]:
         """
                   This is a function that may help you to compute the radial distribution function.
                   It loops through all atoms and counts neighbors within specified distance ranges.
@@ -4196,7 +4619,7 @@ class Universe:
                   :param unwrapped: Whether to measure the distance in unwrapped coordinates or as PBC-corrected distance
                   :return: Array of counts for each distance bin
         """
-    def count_loop_lengths(self, max_length: typing.SupportsInt = -1) -> dict[int, int]:
+    def count_loop_lengths(self, max_length: typing.SupportsInt | typing.SupportsIndex = -1) -> dict[int, int]:
         """
                   Find all loops (below a specific length) and count the number of atoms involved in them.
                   Returns the count, how many loops per length are found.
@@ -4239,7 +4662,7 @@ class Universe:
                     
                     :return: Dictionary mapping atom types to maximum functionality
         """
-    def find_loops(self, crosslinker_type: typing.SupportsInt, max_length: typing.SupportsInt = -1, skip_self_loops: bool = False) -> dict[int, list[list[Atom]]]:
+    def find_loops(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex, max_length: typing.SupportsInt | typing.SupportsIndex = -1, skip_self_loops: bool = False) -> dict[int, list[list[Atom]]]:
         """
                     Decompose the Universe into loops.
                     The primary index specifies the degree of the loop.
@@ -4250,7 +4673,7 @@ class Universe:
                        You can use the `max_length` parameter to restrict the algorithm to only search for loops up to a certain length.
                        Use a negative value to find all loops and paths.
         """
-    def find_minimal_order_loop_from(self, loop_start: typing.SupportsInt, loop_step1: typing.SupportsInt, max_length: typing.SupportsInt = -1, skip_self_loops: bool = False) -> list[Atom]:
+    def find_minimal_order_loop_from(self, loop_start: typing.SupportsInt | typing.SupportsIndex, loop_step1: typing.SupportsInt | typing.SupportsIndex, max_length: typing.SupportsInt | typing.SupportsIndex = -1, skip_self_loops: bool = False) -> list[Atom]:
         """
                     Find the loops in the network starting with one connection.
         
@@ -4278,21 +4701,21 @@ class Universe:
                        
                    :return: Dictionary with angle information
         """
-    def get_atom(self, atom_id: typing.SupportsInt) -> Atom:
+    def get_atom(self, atom_id: typing.SupportsInt | typing.SupportsIndex) -> Atom:
         """
                  Find an atom by its ID.
                  
                  :param atom_id: The ID of the atom to find
                  :return: The atom with the specified ID
         """
-    def get_atom_by_vertex_id(self, vertex_id: typing.SupportsInt) -> Atom:
+    def get_atom_by_vertex_id(self, vertex_id: typing.SupportsInt | typing.SupportsIndex) -> Atom:
         """
               Find an atom by the ID of the vertex of the underlying graph.
               
               :param vertex_id: The vertex ID to query
               :return: The atom at the specified vertex
         """
-    def get_atom_id_by_vertex_idx(self, vertex_id: typing.SupportsInt) -> int:
+    def get_atom_id_by_vertex_idx(self, vertex_id: typing.SupportsInt | typing.SupportsIndex) -> int:
         """
                  Get the ID of the atom by the vertex ID of the underlying graph.
                  
@@ -4311,11 +4734,11 @@ class Universe:
                     
                     :return: List of all atoms
         """
-    def get_atoms_by_degree(self, functionality: typing.SupportsInt) -> list[Atom]:
+    def get_atoms_by_degree(self, functionality: typing.SupportsInt | typing.SupportsIndex) -> list[Atom]:
         """
                     Get the atoms that have the specified number of bonds.
         """
-    def get_atoms_by_type(self, atom_type: typing.SupportsInt) -> list[Atom]:
+    def get_atoms_by_type(self, atom_type: typing.SupportsInt | typing.SupportsIndex) -> list[Atom]:
         """
                     Query all atoms by their type.
         """
@@ -4328,7 +4751,7 @@ class Universe:
                     :param atom: The atom to query connections for
                     :return: List of connected atoms
         """
-    def get_atoms_connected_to_vertex(self, vertex_idx: typing.SupportsInt) -> list[Atom]:
+    def get_atoms_connected_to_vertex(self, vertex_idx: typing.SupportsInt | typing.SupportsIndex) -> list[Atom]:
         """
                     Get the atoms connected to a specified vertex ID.
                     
@@ -4348,7 +4771,7 @@ class Universe:
                     
                     :return: The simulation box
         """
-    def get_chains_with_crosslinker(self, crosslinker_type: typing.SupportsInt) -> list[Molecule]:
+    def get_chains_with_crosslinker(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex) -> list[Molecule]:
         """
                     Decompose the Universe into strands (molecules, which could be either chains, or even lonely atoms), without omitting the crosslinkers
                     (as in :meth:`~pylimer_tools_cpp.Universe.get_molecules`).
@@ -4369,14 +4792,14 @@ class Universe:
                   
                   :return: List of disconnected Universe components
         """
-    def get_edge_ids_from(self, vertex_id: typing.SupportsInt) -> list[int]:
+    def get_edge_ids_from(self, vertex_id: typing.SupportsInt | typing.SupportsIndex) -> list[int]:
         """
                   Get the edge IDs incident to a specific vertex.
         
                   :param vertex_id: The ID of the vertex to query
                   :return: List of edge IDs connected to the vertex
         """
-    def get_edge_ids_from_to(self, vertex_id_from: typing.SupportsInt, vertex_id_to: typing.SupportsInt) -> list[int]:
+    def get_edge_ids_from_to(self, vertex_id_from: typing.SupportsInt | typing.SupportsIndex, vertex_id_to: typing.SupportsInt | typing.SupportsIndex) -> list[int]:
         """
                   Get the edge IDs of all edges between two specific vertices.
         
@@ -4402,7 +4825,7 @@ class Universe:
                     
                     :return: Dictionary mapping atom types to masses
         """
-    def get_molecules(self, atom_type_to_omit: typing.SupportsInt) -> list[Molecule]:
+    def get_molecules(self, atom_type_to_omit: typing.SupportsInt | typing.SupportsIndex) -> list[Molecule]:
         """
                   Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms.
                   
@@ -4413,7 +4836,7 @@ class Universe:
                   :param atom_type_to_omit: The type of atom to omit from the universe to end up with the desired molecules (e.g., the type of the crosslinkers).
                   :return: List of molecules
         """
-    def get_network_of_crosslinker(self, crosslinker_type: typing.SupportsInt) -> Universe:
+    def get_network_of_crosslinker(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex) -> Universe:
         """
                     Reduce the network to contain only crosslinkers, replacing all the strands with a single bond.
                     Useful e.g. to reduce the memory usage and runtime of 
@@ -4439,14 +4862,14 @@ class Universe:
         """
                     Query the number of bonds associated with this universe.
         """
-    def get_nr_of_bonds_of_atom(self, arg0: typing.SupportsInt) -> int:
+    def get_nr_of_bonds_of_atom(self, arg0: typing.SupportsInt | typing.SupportsIndex) -> int:
         """
                Count the number of immediate neighbors of an atom, specified by its ID.
         
                :param atom_id: The ID of the atom to query
                :return: Number of bonds connected to the atom
         """
-    def get_nr_of_bonds_of_vertex(self, arg0: typing.SupportsInt) -> int:
+    def get_nr_of_bonds_of_vertex(self, arg0: typing.SupportsInt | typing.SupportsIndex) -> int:
         """
                Count the number of immediate neighbors of an atom, specified by its vertex ID.
         
@@ -4457,7 +4880,7 @@ class Universe:
         """
                     Query the number of dihedral angles that have been added to this universe.
         """
-    def get_nr_of_edges_from_to(self, vertex_id_from: typing.SupportsInt, vertex_id_to: typing.SupportsInt, max_length: typing.SupportsInt = -1) -> int:
+    def get_nr_of_edges_from_to(self, vertex_id_from: typing.SupportsInt | typing.SupportsIndex, vertex_id_to: typing.SupportsInt | typing.SupportsIndex, max_length: typing.SupportsInt | typing.SupportsIndex = -1) -> int:
         """
                   Get the number of edges in the shortest path between two specific vertices.
         
@@ -4476,7 +4899,7 @@ class Universe:
         """
                   Get the degree (functionality) of each vertex.
         """
-    def get_vertex_idx_by_atom_id(self, atom_id: typing.SupportsInt) -> int:
+    def get_vertex_idx_by_atom_id(self, atom_id: typing.SupportsInt | typing.SupportsIndex) -> int:
         """
                  Get the vertex ID of the underlying graph for an atom with a specified ID.
                  
@@ -4489,14 +4912,14 @@ class Universe:
                     
                     :return: The volume of the simulation box
         """
-    def has_atom_with_id(self, atom_id: typing.SupportsInt) -> bool:
+    def has_atom_with_id(self, atom_id: typing.SupportsInt | typing.SupportsIndex) -> bool:
         """
                  Check whether this universe contains an atom with the specified ID.
         
                  :param atom_id: The atom ID to check
                  :return: True if the atom exists in this universe, False otherwise
         """
-    def has_infinite_strand(self, arg0: typing.SupportsInt, arg1: typing.SupportsInt) -> bool:
+    def has_infinite_strand(self, arg0: typing.SupportsInt | typing.SupportsIndex, arg1: typing.SupportsInt | typing.SupportsIndex) -> bool:
         """
                    Check whether there is a strand (with crosslinker) in the universe that loops through periodic images without coming back.
                    
@@ -4506,7 +4929,7 @@ class Universe:
                        
                    :return: True if infinite strands are detected, False otherwise
         """
-    def hash_angle_type(self, angle_from: typing.SupportsInt, angle_via: typing.SupportsInt, angle_to: typing.SupportsInt) -> int:
+    def hash_angle_type(self, angle_from: typing.SupportsInt | typing.SupportsIndex, angle_via: typing.SupportsInt | typing.SupportsIndex, angle_to: typing.SupportsInt | typing.SupportsIndex) -> int:
         """
                   Convert the three integers to one long number/hash.
                   Used internally for duplicate detection.
@@ -4516,7 +4939,7 @@ class Universe:
                   :param angle_to: Last atom ID in the angle
                   :return: Hash value for the angle type
         """
-    def hash_dihedral_angle_type(self, angle_from: typing.SupportsInt, angle_via1: typing.SupportsInt, angle_via2: typing.SupportsInt, angle_to: typing.SupportsInt) -> int:
+    def hash_dihedral_angle_type(self, angle_from: typing.SupportsInt | typing.SupportsIndex, angle_via1: typing.SupportsInt | typing.SupportsIndex, angle_via2: typing.SupportsInt | typing.SupportsIndex, angle_to: typing.SupportsInt | typing.SupportsIndex) -> int:
         """
                   Convert the four integers to one long number/hash.
                   Used internally for duplicate detection.
@@ -4527,7 +4950,7 @@ class Universe:
                   :param angle_to: Fourth atom ID in the dihedral
                   :return: Hash value for the dihedral angle type
         """
-    def interpolate_edges(self, crosslinker_type: typing.SupportsInt, interpolation_factor: typing.SupportsFloat) -> list[tuple[int, int]]:
+    def interpolate_edges(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex, interpolation_factor: typing.SupportsFloat | typing.SupportsIndex) -> list[tuple[int, int]]:
         """
                   Get more or less edges than currently present, interpolating between junctions.
                   
@@ -4548,40 +4971,40 @@ class Universe:
                   Remove all dihedral angles from the Universe. 
                   This will not remove the atoms or bonds, just the stored dihedral angles.
         """
-    def remove_atoms(self, atom_ids: collections.abc.Sequence[typing.SupportsInt]) -> None:
+    def remove_atoms(self, atom_ids: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
         """
                   Remove atoms and all associated bonds by their atom IDs. 
                   
                   :param atom_ids: Vector of atom IDs to remove
         """
-    def remove_bonds(self, bonds_from: collections.abc.Sequence[typing.SupportsInt], bonds_to: collections.abc.Sequence[typing.SupportsInt]) -> None:
+    def remove_bonds(self, bonds_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], bonds_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
         """
                   Remove bonds by their connected atom IDs. 
                   
                   :param bonds_from: Vector of starting atom IDs
                   :param bonds_to: Vector of ending atom IDs
         """
-    def remove_bonds_by_type(self, bond_type: typing.SupportsInt) -> None:
+    def remove_bonds_by_type(self, bond_type: typing.SupportsInt | typing.SupportsIndex) -> None:
         """
                   Remove bonds with a specific type. 
                   
                   :param bond_type: The bond type to remove
         """
-    def replace_atom(self, atom_id: typing.SupportsInt, replacement_atom: Atom) -> None:
+    def replace_atom(self, atom_id: typing.SupportsInt | typing.SupportsIndex, replacement_atom: Atom) -> None:
         """
                   Replace the properties of an atom with the properties of another given atom.
                   
                   :param atom_id: ID of the atom to replace
                   :param replacement_atom: The atom with new properties
         """
-    def replace_atom_type(self, atom_id: typing.SupportsInt, new_type: typing.SupportsInt) -> None:
+    def replace_atom_type(self, atom_id: typing.SupportsInt | typing.SupportsIndex, new_type: typing.SupportsInt | typing.SupportsIndex) -> None:
         """
                   Replace the type of an atom with another type.
                   
                   :param atom_id: ID of the atom to modify
                   :param new_type: The new atom type
         """
-    def resample_velocities(self, mean: typing.SupportsFloat, variance: typing.SupportsFloat, seed: str = '', is_2d: bool = False) -> None:
+    def resample_velocities(self, mean: typing.SupportsFloat | typing.SupportsIndex, variance: typing.SupportsFloat | typing.SupportsIndex, seed: str = '', is_2d: bool = False) -> None:
         """
                  Resample velocities for atoms in the universe.
                  
@@ -4597,7 +5020,7 @@ class Universe:
                   :param box: The new box to assign
                   :param rescale_atoms: Whether to rescale atom positions
         """
-    def set_box_lengths(self, lx: typing.SupportsFloat, ly: typing.SupportsFloat, lz: typing.SupportsFloat, rescale_atoms: bool = False) -> None:
+    def set_box_lengths(self, lx: typing.SupportsFloat | typing.SupportsIndex, ly: typing.SupportsFloat | typing.SupportsIndex, lz: typing.SupportsFloat | typing.SupportsIndex, rescale_atoms: bool = False) -> None:
         """
                   Override the currently assigned box with one with the side lengths specified.
                   
@@ -4606,26 +5029,26 @@ class Universe:
                   :param lz: Length in z direction
                   :param rescale_atoms: Whether to rescale atom positions
         """
-    def set_mass(self, atom_type: typing.SupportsInt, mass: typing.SupportsFloat) -> None:
+    def set_mass(self, atom_type: typing.SupportsInt | typing.SupportsIndex, mass: typing.SupportsFloat | typing.SupportsIndex) -> None:
         """
                  Set the mass for a specific atom type.
                  
                  :param atom_type: The atom type to set mass for
                  :param mass: The mass value to assign
         """
-    def set_masses(self, mass_per_type: collections.abc.Mapping[typing.SupportsInt, typing.SupportsFloat]) -> None:
+    def set_masses(self, mass_per_type: collections.abc.Mapping[typing.SupportsInt | typing.SupportsIndex, typing.SupportsFloat | typing.SupportsIndex]) -> None:
         """
                  Set the mass per type of atom.
                  
                  :param mass_per_type: Map of atom types to their masses
         """
-    def set_timestep(self, timestep: typing.SupportsInt) -> None:
+    def set_timestep(self, timestep: typing.SupportsInt | typing.SupportsIndex) -> None:
         """
                  Set the timestep when this Universe was captured.
                  
                  :param timestep: The timestep value
         """
-    def set_vertex_property(self, vertex_id: typing.SupportsInt, property_name: str, value: typing.SupportsFloat) -> None:
+    def set_vertex_property(self, vertex_id: typing.SupportsInt | typing.SupportsIndex, property_name: str, value: typing.SupportsFloat | typing.SupportsIndex) -> None:
         """
                   Set a specific property for a specific vertex.
                   
@@ -4655,7 +5078,7 @@ class UniverseSequence:
          to have the UniverseSequence forget about already read universes.
          
     """
-    def __getitem__(self, arg0: typing.SupportsInt) -> Universe:
+    def __getitem__(self, arg0: typing.SupportsInt | typing.SupportsIndex) -> Universe:
         """
               Get a universe by its index.
               
@@ -4693,7 +5116,7 @@ class UniverseSequence:
                  
                  :return: The total number of universes available
         """
-    def at_index(self, index: typing.SupportsInt) -> Universe:
+    def at_index(self, index: typing.SupportsInt | typing.SupportsIndex) -> Universe:
         """
                  Get the Universe at the given index (as of in the sequence given 
                  by the dump file).
@@ -4701,20 +5124,20 @@ class UniverseSequence:
                  :param index: The index of the universe to retrieve
                  :return: The Universe at the specified index
         """
-    def compute_distance_autocorrelation_from_to(self, atom_ids_from: collections.abc.Sequence[typing.SupportsInt], atom_ids_to: collections.abc.Sequence[typing.SupportsInt], nr_of_origins: typing.SupportsInt = 25, reduce_memory: bool = False) -> dict[int, float]:
+    def compute_distance_autocorrelation_from_to(self, atom_ids_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], atom_ids_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], nr_of_origins: typing.SupportsInt | typing.SupportsIndex = 25, reduce_memory: bool = False) -> dict[int, float]:
         """
                   Compute the autocorrelation of the dot product of the distance vector from certain to other atoms.
         
                   For example, this can be used to compute Eq. 4.51 from Masao Doi, Introduction to Polymer Physics, p. 74.
         """
-    def compute_distance_from_to_atoms(self, atom_ids_from: collections.abc.Sequence[typing.SupportsInt], atom_ids_to: collections.abc.Sequence[typing.SupportsInt], reduce_memory: bool = False) -> list[float]:
+    def compute_distance_from_to_atoms(self, atom_ids_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], atom_ids_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], reduce_memory: bool = False) -> list[float]:
         """
                   Compute the root square norm of all the (unwrapped!) distances for the given pair of atoms.
                   
                   Can be used to somewhat faster compute e.g. all the end-to-end or bond distances.
                   Pay attention that the image flags are correct, otherwise, this data may not be useable.
         """
-    def compute_msd_for_atom_properties(self, atom_ids: collections.abc.Sequence[typing.SupportsInt], x_property: str, y_property: str, z_property: str, nr_of_origins: typing.SupportsInt = 25, reduce_memory: bool = False, max_tau: typing.SupportsInt = -1) -> dict[int, float]:
+    def compute_msd_for_atom_properties(self, atom_ids: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], x_property: str, y_property: str, z_property: str, nr_of_origins: typing.SupportsInt | typing.SupportsIndex = 25, reduce_memory: bool = False, max_tau: typing.SupportsInt | typing.SupportsIndex = -1) -> dict[int, float]:
         """
                   Compute the mean square displacement for atoms using specified property names.
                   
@@ -4727,7 +5150,7 @@ class UniverseSequence:
                   :param max_tau: Maximum time lag (tau) to compute. If -1, computes for all possible tau values. For better statistics, consider setting this to approximately half the sequence length (default: -1)
                   :return: Dictionary mapping time lag (tau) to mean square displacement values
         """
-    def compute_msd_for_atoms(self, atom_ids: collections.abc.Sequence[typing.SupportsInt], nr_of_origins: typing.SupportsInt = 25, reduce_memory: bool = False, max_tau: typing.SupportsInt = -1) -> dict[int, float]:
+    def compute_msd_for_atoms(self, atom_ids: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], nr_of_origins: typing.SupportsInt | typing.SupportsIndex = 25, reduce_memory: bool = False, max_tau: typing.SupportsInt | typing.SupportsIndex = -1) -> dict[int, float]:
         """
                   Compute the mean square displacement for atoms with the specified IDs.
                   
@@ -4737,14 +5160,14 @@ class UniverseSequence:
                   :param max_tau: Maximum time lag (tau) to compute. If -1, computes for all possible tau values. For better statistics, consider setting this to approximately half the sequence length (default: -1)
                   :return: Dictionary mapping time lag (tau) to mean square displacement values
         """
-    def compute_vector_from_to_atoms(self, atom_ids_from: collections.abc.Sequence[typing.SupportsInt], atom_ids_to: collections.abc.Sequence[typing.SupportsInt], reduce_memory: bool = False) -> list[typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]]:
+    def compute_vector_from_to_atoms(self, atom_ids_from: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], atom_ids_to: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex], reduce_memory: bool = False) -> list[typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]]:
         """
                   Compute the (unwrapped!) distances for the given pair of atoms.
                   
                   Can be used to somewhat faster compute e.g. all the end-to-end or bond vectors.
                   Pay attention that the image flags are correct, otherwise, this data may not be useable.
         """
-    def forget_at_index(self, index: typing.SupportsInt) -> None:
+    def forget_at_index(self, index: typing.SupportsInt | typing.SupportsIndex) -> None:
         """
               Clear the memory of the Universe at the given index (as of in the
               sequence given by the dump file).
@@ -4804,7 +5227,7 @@ class ZScoreMaxDistanceProvider(MaxDistanceProvider):
          :param in_sqrt_multiplier: The multiplier with the :math:`N` in the square root. Probably :math:`<b^2>`.
         
     """
-    def __init__(self, std_multiplier: typing.SupportsFloat, in_sqrt_multiplier: typing.SupportsFloat) -> None:
+    def __init__(self, std_multiplier: typing.SupportsFloat | typing.SupportsIndex, in_sqrt_multiplier: typing.SupportsFloat | typing.SupportsIndex) -> None:
         ...
     def __repr__(self) -> str:
         """
@@ -4812,13 +5235,13 @@ class ZScoreMaxDistanceProvider(MaxDistanceProvider):
                  
                  :return: String representation
         """
-    def get_max_distance(self, N: typing.SupportsFloat) -> float:
+    def get_max_distance(self, N: typing.SupportsFloat | typing.SupportsIndex) -> float:
         """
                  Get the maximum distance for a given N.
         
                  :param N: Number of segments.
         """
-def do_linear_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], to_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], chain_len: typing.SupportsInt, include_ends: bool = False) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+def do_linear_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], to_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], chain_len: typing.SupportsInt | typing.SupportsIndex, include_ends: bool = False) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
     """
                 Get coordinates linearly interpolated from one point to another (both exclusive).
     
@@ -4830,7 +5253,7 @@ def do_linear_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[nu
                    If yes, chain_len + 2 coordinates will be returned, 
                    where the first will be from_coordinates and the last will be to_coordinates.
     """
-def do_random_walk(chain_len: typing.SupportsInt, bead_distance: typing.SupportsFloat = 1.0, mean_squared_bead_distance: typing.SupportsFloat = 1.0, seed: str = '') -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+def do_random_walk(chain_len: typing.SupportsInt | typing.SupportsIndex, bead_distance: typing.SupportsFloat | typing.SupportsIndex = 1.0, mean_squared_bead_distance: typing.SupportsFloat | typing.SupportsIndex = 1.0, seed: str = '') -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
     """
                 Do a random walk, return the coordinates of each point visited.
     
@@ -4840,7 +5263,7 @@ def do_random_walk(chain_len: typing.SupportsInt, bead_distance: typing.Supports
                 :param seed: Random seed for reproducibility (default: empty string for random seed).
                 :return: Coordinates of each point as a flat array (i.e., [x1, y1, z1, x2, y2, z2, ...]).
     """
-def do_random_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], to_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], chain_len: typing.SupportsInt, bead_distance: typing.SupportsFloat = 1.0, mean_squared_bead_distance: typing.SupportsFloat = 1.0, seed: str = '') -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+def do_random_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], to_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], chain_len: typing.SupportsInt | typing.SupportsIndex, bead_distance: typing.SupportsFloat | typing.SupportsIndex = 1.0, mean_squared_bead_distance: typing.SupportsFloat | typing.SupportsIndex = 1.0, seed: str = '') -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
     """
                 Do a random walk from one point to another.
     
@@ -4853,7 +5276,7 @@ def do_random_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[nu
                 :param seed: Random seed for reproducibility (default: empty string for no seed).
                 :return: Coordinates of the chain as a flat array (i.e., [x1, y1, z1, x2, y2, z2, ...]).
     """
-def do_random_walk_chain_from_to_mc(box: Box, from_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], to_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], chain_len: typing.SupportsInt, bead_distance: typing.SupportsFloat = 1.0, mean_squared_bead_distance: typing.SupportsFloat = 1.0, seed: str = '', n_iterations: typing.SupportsInt = 10000) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+def do_random_walk_chain_from_to_mc(box: Box, from_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], to_coordinates: typing.Annotated[numpy.typing.ArrayLike, numpy.float64, "[3, 1]"], chain_len: typing.SupportsInt | typing.SupportsIndex, bead_distance: typing.SupportsFloat | typing.SupportsIndex = 1.0, mean_squared_bead_distance: typing.SupportsFloat | typing.SupportsIndex = 1.0, seed: str = '', n_iterations: typing.SupportsInt | typing.SupportsIndex = 10000) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
     """
                 Do a random walk from one point to another.
                 Then, relax the points in between using a Metropolis-Monte Carlo simulation.
@@ -4868,7 +5291,7 @@ def do_random_walk_chain_from_to_mc(box: Box, from_coordinates: typing.Annotated
                 :param n_iterations: Number of Monte Carlo iterations for relaxation (default: 10000).
                 :return: Coordinates of the relaxed chain as a flat array (i.e., [x1, y1, z1, x2, y2, z2, ...]).
     """
-def inverse_langevin(x: typing.SupportsFloat) -> float:
+def inverse_langevin(x: typing.SupportsFloat | typing.SupportsIndex) -> float:
     """
          A somewhat accurate (for :math:`x \\in (-1, 1)`) implementation of the inverse Langevin function.
     
@@ -4877,7 +5300,7 @@ def inverse_langevin(x: typing.SupportsFloat) -> float:
          :param x: Input value in the range (-1, 1)
          :return: Inverse Langevin function value
     """
-def randomly_sample_entanglements(universe: Universe, nr_of_samples: typing.SupportsInt, upper_cutoff: typing.SupportsFloat, lower_cutoff: typing.SupportsFloat = 0, minimum_nr_of_samples: typing.SupportsInt = 0, same_strand_cutoff: typing.SupportsFloat = 3.0, seed: str = '', crosslinker_type: typing.SupportsInt = 2, ignore_crosslinks: bool = True, filter_dangling_and_soluble: bool = False) -> AtomPairEntanglements:
+def randomly_sample_entanglements(universe: Universe, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, ignore_crosslinks: bool = True, filter_dangling_and_soluble: bool = False) -> AtomPairEntanglements:
     """
         Randomly find pairs of atoms that are close together and could be
         entanglements
@@ -4894,6 +5317,48 @@ def randomly_sample_entanglements(universe: Universe, nr_of_samples: typing.Supp
         :param filter_dangling_and_soluble: Whether to filter out dangling chains and soluble crosslinks when finding entanglements.
           This means, entanglements involving an obviously (1st order) dangling or soluble chain are 
     """
+@typing.overload
+def randomly_sample_entanglements_analytical(box: Box, crosslinker_universe: CrosslinkerUniverse, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filter_dangling_and_soluble: bool = True) -> StrandPairEntanglements:
+    """
+        Analytically and probabilistically sample pairs of strand beads that could form entanglements
+        using exact 3D Brownian bridge / random walk statistics and topological strand filtering,
+        without requiring all strand beads or a Universe to be instantiated.
+    
+        :param box: The simulation box for periodic boundary conditions.
+        :param crosslinker_universe: The CrosslinkerUniverse of crosslinkers and strands.
+        :param nr_of_samples: The number of entanglement pairs to randomly sample.
+        :param upper_cutoff: The maximum distance between two beads to be considered an entanglement.
+        :param lower_cutoff: The minimum distance between two beads to be considered an entanglement.
+        :param minimum_nr_of_samples: The minimum number of entanglements to be found.
+        :param same_strand_cutoff: The minimum contour separation (in beads) between two beads on the same strand.
+        :param seed: A seed for the random number generator.
+        :param filter_dangling_and_soluble: Whether to filter out soluble and dangling strands (via iterative leaf peeling).
+    """
+@typing.overload
+def randomly_sample_entanglements_analytical(crosslinker_universe: CrosslinkerUniverse, box: Box, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filter_dangling_and_soluble: bool = True) -> StrandPairEntanglements:
+    ...
+@typing.overload
+def randomly_sample_entanglements_on_demand(box: Box, crosslinker_universe: CrosslinkerUniverse, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filter_dangling_and_soluble: bool = True, n_mc_steps: typing.SupportsInt | typing.SupportsIndex = 0) -> StrandPairEntanglements:
+    """
+        Sample pairs of strand beads that could form entanglements on demand from a CrosslinkerUniverse
+        using per-strand bounding boxes and on-demand Brownian bridge bead resampling.
+        Only strand seeds and bounding boxes are stored, achieving the O(N_strands) memory scaling
+        of the analytical method while sampling from the exact discrete multi-bead chain conformations.
+    
+        :param box: The simulation box for periodic boundary conditions.
+        :param crosslinker_universe: The CrosslinkerUniverse of crosslinkers and strands.
+        :param nr_of_samples: The number of entanglement pairs to randomly sample.
+        :param upper_cutoff: The maximum distance between two beads to be considered an entanglement.
+        :param lower_cutoff: The minimum distance between two beads to be considered an entanglement.
+        :param minimum_nr_of_samples: The minimum number of entanglements to be found.
+        :param same_strand_cutoff: The minimum contour separation (in beads) between two beads on the same strand.
+        :param seed: A seed for the random number generator.
+        :param filter_dangling_and_soluble: Whether to filter out soluble and dangling strands (via iterative leaf peeling).
+        :param n_mc_steps: Number of MC equilibration steps per chain (default: 0).
+    """
+@typing.overload
+def randomly_sample_entanglements_on_demand(crosslinker_universe: CrosslinkerUniverse, box: Box, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filter_dangling_and_soluble: bool = True, n_mc_steps: typing.SupportsInt | typing.SupportsIndex = 0) -> StrandPairEntanglements:
+    ...
 def split_csv(file_path: str, delimiter: str = ',') -> list[str]:
     """
             Read a file containing a number of CSVs. Returns them split up.
@@ -4906,7 +5371,10 @@ def version_information() -> str:
     """
         Returns  a string of the the current version, incl. git hash and date of compilation.
     """
+CONJUGATE_GRADIENT: RouseSolverType  # value = <RouseSolverType.CONJUGATE_GRADIENT: 2>
+DIRECT_LDLT: RouseSolverType  # value = <RouseSolverType.DIRECT_LDLT: 0>
+DIRECT_LLT: RouseSolverType  # value = <RouseSolverType.DIRECT_LLT: 1>
 STOP: BackTrackStatus  # value = <BackTrackStatus.STOP: 0>
 TRACK_BACKWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_BACKWARD: 2>
 TRACK_FORWARD: BackTrackStatus  # value = <BackTrackStatus.TRACK_FORWARD: 1>
-__version__: str = '0.3.14'
+__version__: str = '0.4.1'

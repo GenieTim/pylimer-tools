@@ -48,6 +48,50 @@ enum BackTrackStatus
   TRACK_BACKWARD,
 };
 
+/**
+ * @brief Methods for sampling entanglements in polymer networks.
+ */
+enum class EntanglementSamplingMethod
+{
+  DISCRETE,   ///< Full bead-spring Universe discrete sampling
+  ANALYTICAL, ///< Universe-free analytical Gaussian Brownian-bridge sampling
+  ON_DEMAND,  ///< On-demand Brownian-bridge sampling with bounding-box culling
+  BOUNDING_BOX = ON_DEMAND ///< Alias for ON_DEMAND
+};
+
+inline EntanglementSamplingMethod
+parseEntanglementSamplingMethod(const std::string& str)
+{
+  std::string s = str;
+  std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+  if (s == "analytical" || s == "bridge") {
+    return EntanglementSamplingMethod::ANALYTICAL;
+  } else if (s == "on_demand" || s == "bounding_box" || s == "ondemand") {
+    return EntanglementSamplingMethod::ON_DEMAND;
+  } else if (s == "discrete" || s == "universe") {
+    return EntanglementSamplingMethod::DISCRETE;
+  }
+  INVALIDARG_EXP_IFN(false,
+                     "Unknown entanglement sampling method: '" + str +
+                       "'. Expected 'analytical', 'on_demand', or 'discrete'.");
+  return EntanglementSamplingMethod::ANALYTICAL;
+}
+
+inline std::string
+to_string(EntanglementSamplingMethod method)
+{
+  switch (method) {
+    case EntanglementSamplingMethod::DISCRETE:
+      return "discrete";
+    case EntanglementSamplingMethod::ANALYTICAL:
+      return "analytical";
+    case EntanglementSamplingMethod::ON_DEMAND:
+      return "on_demand";
+    default:
+      return "analytical";
+  }
+}
+
 using CrosslinkerUniverse = pylimer_tools::sim::mehp::CrosslinkerUniverse;
 
 class MaxDistanceProvider
@@ -484,8 +528,8 @@ public:
   const pylimer_tools::entities::Box& getBox() const { return this->box; }
 
   /**
-   * @brief Analytically and probabilistically sample entanglements directly on
-   * the internal CrosslinkerUniverse without constructing a Universe.
+   * @brief Sample entanglements directly on the internal CrosslinkerUniverse
+   * without constructing a Universe.
    *
    * @param nrOfEntanglementsToSample
    * @param upperCutoff
@@ -494,6 +538,8 @@ public:
    * @param sameStrandCutoff
    * @param seed
    * @param filterDanglingAndSoluble
+   * @param method Entanglement sampling method (EntanglementSamplingMethod
+   * enum)
    * @return
    * pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
    */
@@ -504,7 +550,58 @@ public:
                       size_t minimumNrOfEntanglements = 0,
                       double sameStrandCutoff = 3.,
                       const std::string& seed = "",
-                      bool filterDanglingAndSoluble = true) const;
+                      bool filterDanglingAndSoluble = true,
+                      EntanglementSamplingMethod method =
+                        EntanglementSamplingMethod::ANALYTICAL) const;
+
+  pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+  sampleEntanglements(size_t nrOfEntanglementsToSample,
+                      double upperCutoff,
+                      double lowerCutoff,
+                      size_t minimumNrOfEntanglements,
+                      double sameStrandCutoff,
+                      const std::string& seed,
+                      bool filterDanglingAndSoluble,
+                      const std::string& method) const
+  {
+    return sampleEntanglements(nrOfEntanglementsToSample,
+                               upperCutoff,
+                               lowerCutoff,
+                               minimumNrOfEntanglements,
+                               sameStrandCutoff,
+                               seed,
+                               filterDanglingAndSoluble,
+                               parseEntanglementSamplingMethod(method));
+  }
+
+  /**
+   * @brief Sample entanglements analytically and probabilistically from the
+   * generator's CrosslinkerUniverse using Brownian bridge conditional
+   * Gaussians.
+   */
+  pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+  sampleEntanglementsAnalytical(size_t nrOfEntanglementsToSample,
+                                double upperCutoff,
+                                double lowerCutoff = 0.,
+                                size_t minimumNrOfEntanglements = 0,
+                                double sameStrandCutoff = 3.,
+                                const std::string& seed = "",
+                                bool filterDanglingAndSoluble = true) const;
+
+  /**
+   * @brief Sample entanglements on demand from the generator's
+   * CrosslinkerUniverse using per-strand bounding boxes and on-demand Brownian
+   * bridge bead resampling. Memory is O(N_strands) like analytical sampling,
+   * while results physically match discrete multi-bead realizations.
+   */
+  pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+  sampleEntanglementsOnDemand(size_t nrOfEntanglementsToSample,
+                              double upperCutoff,
+                              double lowerCutoff = 0.,
+                              size_t minimumNrOfEntanglements = 0,
+                              double sameStrandCutoff = 3.,
+                              const std::string& seed = "",
+                              bool filterDanglingAndSoluble = true) const;
 
   /**
    * @brief Convert the current simplified universe into a force relaxation
@@ -564,7 +661,29 @@ public:
     size_t minimumNrOfEntanglements = 0,
     double sameStrandCutoff = 3.,
     const std::string& seed = "",
-    bool filterDanglingAndSoluble = true) const;
+    bool filterDanglingAndSoluble = true,
+    EntanglementSamplingMethod method =
+      EntanglementSamplingMethod::ANALYTICAL) const;
+
+  pylimer_tools::sim::mehp::MEHPForceBalance getForceBalance(
+    size_t nrOfEntanglementsToSample,
+    double upperCutoff,
+    double lowerCutoff,
+    size_t minimumNrOfEntanglements,
+    double sameStrandCutoff,
+    const std::string& seed,
+    bool filterDanglingAndSoluble,
+    const std::string& method) const
+  {
+    return getForceBalance(nrOfEntanglementsToSample,
+                           upperCutoff,
+                           lowerCutoff,
+                           minimumNrOfEntanglements,
+                           sameStrandCutoff,
+                           seed,
+                           filterDanglingAndSoluble,
+                           parseEntanglementSamplingMethod(method));
+  }
 
   pylimer_tools::sim::mehp::MEHPForceBalance2 getForceBalance2() const;
 
@@ -583,7 +702,33 @@ public:
     const std::string& seed = "",
     bool filterDanglingAndSoluble = true,
     bool entanglementsAsSprings = false,
-    int crossLinkerType = 2) const;
+    int crossLinkerType = 2,
+    EntanglementSamplingMethod method =
+      EntanglementSamplingMethod::ANALYTICAL) const;
+
+  pylimer_tools::sim::mehp::MEHPForceBalance2 getForceBalance2(
+    size_t nrOfEntanglementsToSample,
+    double upperCutoff,
+    double lowerCutoff,
+    size_t minimumNrOfEntanglements,
+    double sameStrandCutoff,
+    const std::string& seed,
+    bool filterDanglingAndSoluble,
+    bool entanglementsAsSprings,
+    int crossLinkerType,
+    const std::string& method) const
+  {
+    return getForceBalance2(nrOfEntanglementsToSample,
+                            upperCutoff,
+                            lowerCutoff,
+                            minimumNrOfEntanglements,
+                            sameStrandCutoff,
+                            seed,
+                            filterDanglingAndSoluble,
+                            entanglementsAsSprings,
+                            crossLinkerType,
+                            parseEntanglementSamplingMethod(method));
+  }
 
   /**
    * @brief Run force relaxation to improve the statistics of the crosslinked

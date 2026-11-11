@@ -20,14 +20,16 @@
   - Propagate `EIGEN3_INCLUDE_DIRS` from `Eigen3::Eigen` target properties in `vendor/eigen.CMakeLists.cmake` and link `Eigen3::Eigen` directly in `tests/CMakeLists.txt`.
   - Optimize GitHub Actions workflows with path triggers, `ccache`, Ninja build generator, and conditional C++ test execution (`RUN_CPP_TESTS`) when only Python files are modified.
 
-### Analytical Brownian-Bridge Entanglement Sampling & Universe-Free Force Balance
-- **Analytical Entanglement Detection (`EntanglementDetector`)**:
+### Analytical & On-Demand Brownian-Bridge Entanglement Sampling & Universe-Free Force Balance
+- **Analytical & On-Demand Entanglement Detection (`EntanglementDetector`)**:
   - Implement `randomlyFindEntanglementsAnalytical` (`randomly_sample_entanglements_analytical`) to probabilistically sample spatial slip-links directly on a `CrosslinkerUniverse` using conditional Brownian-bridge and random-walk Gaussian distributions between crosslinker anchors without instantiating explicit 3D bead coordinates or constructing an intermediate `Universe`.
-  - Add topological leaf peeling to `randomlyFindEntanglementsAnalytical` (`filter_dangling_and_soluble=True`) to iteratively prune dangling chain ends, soluble components, and degree-$\le 1$ dead ends, ensuring slip-links are placed exclusively on load-bearing strands.
+  - Implement `randomlyFindEntanglementsOnDemand` (`randomly_sample_entanglements_on_demand`) using per-strand 3D bounding boxes (AABB) with periodic `EigenNeighbourList` culling and on-demand deterministic Brownian-bridge bead resampling (backed by a lightweight LRU `StrandCache`), matching discrete multi-bead chain conformations at $O(N_{\text{strands}})$ memory footprint.
+  - Add `EntanglementSamplingMethod` enum (`ANALYTICAL`, `ON_DEMAND`, `BOUNDING_BOX`, `DISCRETE`) and string parsing (`"analytical"`, `"on_demand"`, `"bounding_box"`, `"discrete"`) for unified sampling dispatch.
+  - Add shared topological leaf peeling (`peelTopologicalLeaves`, `filter_dangling_and_soluble=True`) to both analytical and on-demand samplers to iteratively prune dangling chain ends, soluble components, and degree-$\le 1$ dead ends, ensuring slip-links are placed exclusively on load-bearing strands.
   - Introduce `StrandPairEntanglements` structure to store sampled strand indices, contour fractions ($\alpha_1, \alpha_2$), bead indices, and 3D coordinates, with `toAtomPairEntanglements` mapping directly to discrete atom pairs.
 - **Universe-Free Network Mapping (`MCUniverseGenerator`)**:
-  - Add `MCUniverseGenerator::sampleEntanglements` to sample entanglements directly from the generator's internal `simplifiedUniverse` (`CrosslinkerUniverse`).
-  - Add `MCUniverseGenerator::getForceBalance` and `MCUniverseGenerator::getForceBalance2` overloads taking `StrandPairEntanglements` or sampling parameters directly, bypassing full bead generation and reducing peak resident memory (RSS) by 80% to over 90% on large networks.
+  - Add `MCUniverseGenerator::sampleEntanglements` (with `method` dispatch), `sampleEntanglementsAnalytical`, and `sampleEntanglementsOnDemand` to sample entanglements directly from the generator's internal `simplifiedUniverse` (`CrosslinkerUniverse`).
+  - Add `MCUniverseGenerator::getForceBalance` and `MCUniverseGenerator::getForceBalance2` overloads taking `StrandPairEntanglements` or sampling parameters (including `method`) directly, bypassing full bead generation and reducing peak resident memory (RSS) by 80% to over 90% on large networks.
   - Add `MCUniverseGenerator::convertToForceBalanceNetwork` and `MCUniverseGenerator::convertToForceBalance2Network` supporting both merged static entanglement links and split entanglement springs.
   - Expose `MCUniverseGenerator::getCrosslinkerUniverse` and `MCUniverseGenerator::getBox` in Python bindings.
 - **Universe-Independent Force Balance Solvers (`MEHPForceBalance` & `MEHPForceBalance2`)**:
@@ -36,7 +38,7 @@
   - Expose `get_active_weight_fraction` in Python bindings for both `MEHPForceBalance` and `MEHPForceBalance2`.
   - Expose `Universe::clearCaches` (`clear_caches`) in Python bindings to reclaim decomposed molecule and cluster cache memory.
 - **Documentation & Benchmarks**:
-  - Add comprehensive Sphinx-gallery example `examples/force_balance/plot_entanglement_sampling_comparison.py` comparing memory scaling, runtime, contour distributions, and network shear modulus across conversions between discrete and analytical methods, with accompanying precomputed benchmark cache and generator script.
+  - Add comprehensive Sphinx-gallery example `examples/force_balance/plot_entanglement_sampling_comparison.py` comparing memory scaling, runtime, contour distributions, and network shear modulus across conversions between discrete, on-demand bounding-box, and analytical methods, with accompanying precomputed benchmark cache.
 
 
 ### Automatic Solver Selection Optimizations
