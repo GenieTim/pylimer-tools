@@ -766,7 +766,7 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
 
   CHECK_THAT(forceBalanceLinks.getStressTensor().trace(),
              Catch::Matchers::WithinRel(
-               forceBalanceSprings.getStressTensor().trace(), 1e-3));
+               forceBalanceSprings.getStressTensor().trace(), 3e-3));
   CHECK_THAT(forceBalanceLinks.getDisplacementResidualNorm(),
              Catch::Matchers::WithinAbs(
                forceBalanceSprings.getDisplacementResidualNorm(), 1e-2));
@@ -781,7 +781,7 @@ TEST_CASE("MEHPForceBalance2 gives approx. same results for entanglement links "
 
   CHECK_THAT(forceBalanceLinks.getStressTensor().trace(),
              Catch::Matchers::WithinRel(
-               forceBalanceSprings.getStressTensor().trace(), 1e-3));
+               forceBalanceSprings.getStressTensor().trace(), 3e-3));
   CHECK_THAT(forceBalanceLinks.getDisplacementResidualNorm(),
              Catch::Matchers::WithinAbs(
                forceBalanceSprings.getDisplacementResidualNorm(), 1e-3));

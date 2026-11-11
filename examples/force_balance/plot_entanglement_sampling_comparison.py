@@ -331,7 +331,8 @@ def run_distribution_comparison(
         False,
         method=pt.EntanglementSamplingMethod.ON_DEMAND,
     )
-    alpha_od = np.concatenate([np.array(es_od.alpha_1), np.array(es_od.alpha_2)])
+    alpha_od = np.concatenate(
+        [np.array(es_od.alpha_1), np.array(es_od.alpha_2)])
 
     pos1_od = np.array(es_od.position_1).reshape(-1, 3)
     pos2_od = np.array(es_od.position_2).reshape(-1, 3)
@@ -373,7 +374,9 @@ def run_distribution_comparison(
         dist_disc.append(atom1.distance_to(atom2, box))
 
     print(
-        f"Sampled {len(dist_ana)} analytical pairs, {len(dist_od)} on-demand pairs, {len(dist_disc)} discrete pairs."
+        f"Sampled {len(dist_ana)} analytical pairs, {len(dist_od)} on-demand pairs, {
+            len(dist_disc)
+        } discrete pairs."
     )
     return {
         "alpha_analytical": np.array(alpha_ana),

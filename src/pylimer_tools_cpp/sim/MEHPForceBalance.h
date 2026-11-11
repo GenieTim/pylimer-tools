@@ -383,7 +383,7 @@ public:
     const std::string seed = "",
     const int crossLinkerType = 2,
     const bool is2D = false,
-    const bool filterEntanglements = true)
+    const bool filterEntanglements = false)
   {
     // sample the "entanglements"
     const pylimer_tools::topo::entanglement_detection::AtomPairEntanglements

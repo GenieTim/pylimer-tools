@@ -1,7 +1,6 @@
 #include "../../src/pylimer_tools_cpp/entities/Atom.h"
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
 #include "../../src/pylimer_tools_cpp/entities/EigenNeighbourList.h"
-#include "../../src/pylimer_tools_cpp/entities/NeighbourList.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include <catch2/catch_approx.hpp>
@@ -16,82 +15,6 @@ extern "C"
 }
 
 namespace pe = pylimer_tools::entities;
-
-TEST_CASE("NeighbourList works as intended", "[entity][NeighbourList]")
-{
-  std::cout << "Running test \"NeighbourList works as intended\"" << std::endl;
-  pe::UniverseSequence universeSeq = pe::UniverseSequence();
-  CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = PYLIMER_TEST_FIXTURES_DIR;
-  REQUIRE(std::filesystem::exists(suspectedPath));
-
-  universeSeq.initializeFromDataSequence(
-    { { suspectedPath + "/lammps_data_file_small.out" } });
-  REQUIRE(universeSeq.getLength() == 1);
-  CHECK(universeSeq.atIndex(0).getNrOfAtoms() == 12);
-  CHECK(universeSeq.atIndex(0).getNrOfBonds() == 5);
-
-  pe::Universe universe = universeSeq.atIndex(0);
-
-  pe::NeighbourList neighbourList =
-    pe::NeighbourList(universe.getAtoms(), universe.getBox(), 3.0);
-
-  pe::Atom testAtom10000 = universe.getAtom(10000);
-  std::vector<pe::Atom> neighbours =
-    neighbourList.getAtomsCloseTo(testAtom10000, 0.000001);
-  CHECK(neighbours.size() == 0);
-
-  neighbours = neighbourList.getAtomsCloseTo(testAtom10000, 1.0, 0.9999);
-  CHECK(neighbours.size() == 0);
-
-  pe::Atom testAtom20000 = universe.getAtom(20000);
-  neighbours = neighbourList.getAtomsCloseTo(testAtom20000);
-  CHECK(neighbours.size() > 0);
-
-  CHECK_THROWS(neighbourList.getAtomsCloseTo(testAtom10000, 2.0, 3.0, true));
-
-  // remove
-  neighbourList.removeAtom(testAtom10000);
-  // make sure we cannot query the remove atom
-  CHECK_THROWS(
-    neighbourList.getAtomsCloseTo(testAtom10000, 3.0, 0.0, false, true));
-  // nor find it in other neighbour lists
-  std::vector<pe::Atom> neighbours2 =
-    neighbourList.getAtomsCloseTo(testAtom20000);
-  CHECK(neighbours2.size() == neighbours.size() - 1);
-}
-
-TEST_CASE("Manually accurate NeighbourList", "[entity][NeighbourList]")
-{
-  std::cout << "Running test \"Manually accurate NeighbourList\"" << std::endl;
-  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
-  const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
-  universe.setBox(box);
-  universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
-                    { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
-                    { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x
-                    { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // y
-                    { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // z
-                    { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // nx
-                    { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // ny
-                    { { 0, 0, 0, 0, 1, 2, 2, 2 } }      // nz
-  );
-
-  pe::NeighbourList neighbourList =
-    pe::NeighbourList(universe.getAtoms(), universe.getBox(), 3.0);
-
-  pe::Atom atom2 = universe.getAtom(2);
-  std::vector<pe::Atom> neighbours = neighbourList.getAtomsCloseTo(atom2, 1.0);
-  CHECK(neighbours.size() == 0);
-  neighbours = neighbourList.getAtomsCloseTo(atom2, 2.0);
-  CHECK(neighbours.size() == 2);
-  neighbours = neighbourList.getAtomsCloseTo(atom2, 2.0, 1.8);
-  CHECK(neighbours.size() == 0);
-  pe::Atom atom3 = universe.getAtom(3);
-  neighbourList.removeAtom(atom3);
-  neighbours = neighbourList.getAtomsCloseTo(atom2, 2.0);
-  CHECK(neighbours.size() == 1);
-}
 
 TEST_CASE("Random coordinates EigenNeighbourList",
           "[entity][EigenNeighbourList][long]")

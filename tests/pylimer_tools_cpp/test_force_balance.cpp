@@ -2206,7 +2206,7 @@ TEST_CASE(
 
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 1000, 2.0, 0.0, 100, 5, "my_seed_fb12");
+        universe, 1000, 2.0, 0.0, 100, 5, "my_seed_fb12", 2, false, false);
     forceBalancer.configAssumeBoxLargeEnough(false);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
     double initialResidual = forceBalancer.getDisplacementResidualNorm();

@@ -22,6 +22,10 @@ extern "C"
 #include <unordered_map>
 #include <vector>
 
+namespace pylimer_tools::sim::mehp {
+struct CrosslinkerUniverse;
+}
+
 namespace pylimer_tools::entities {
 
 struct LoopIntersectionInfo
@@ -157,6 +161,12 @@ public:
     int atomTypeToOmit = -1) const;
   [[nodiscard]] std::vector<Molecule> getChainsWithCrosslinker(
     int crossLinkerType) const;
+  [[nodiscard]] pylimer_tools::sim::mehp::CrosslinkerUniverse
+  toCrosslinkerUniverse(int crosslinkerType = 2) const;
+  [[nodiscard]] std::vector<bool> peelTopologicalLeaves(
+    int crosslinkerType = 2) const;
+  [[nodiscard]] std::vector<bool> identifyActiveAtoms(
+    int crosslinkerType = 2) const;
   [[nodiscard]] std::vector<pylimer_tools::entities::MoleculeType>
   identifyObviouslyDanglingAtoms(bool distinguishFree = false) const;
   [[nodiscard]] Universe getNetworkOfCrosslinker(int crossLinkerType) const;

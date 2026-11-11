@@ -4,11 +4,93 @@
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
 #include "../sim/MEHPUtilityStructures.h"
+#include "../utils/utilityMacros.h"
 #include <Eigen/Dense>
+#include <algorithm>
 #include <string>
 #include <vector>
 
 namespace pylimer_tools::topo::entanglement_detection {
+
+/**
+ * @brief Filtering mode for entanglement sampling.
+ */
+enum class EntanglementFilteringMode
+{
+  NONE = 0,          ///< No filtering: all entanglements retained
+  OMIT_INACTIVE = 1, ///< Melt density mode: sample from all strands, omit from
+                     ///< output if touching dangling/sol
+  PRUNE_UPFRONT = 2  ///< Active-only mode: topologically peel leaves upfront,
+                     ///< sample strictly between active strands
+};
+
+/**
+ * @brief Convert string to EntanglementFilteringMode
+ */
+inline EntanglementFilteringMode
+parseEntanglementFilteringMode(const std::string& str)
+{
+  std::string s = str;
+  std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+  if (s == "prune_upfront" || s == "prune" || s == "active_only") {
+    return EntanglementFilteringMode::PRUNE_UPFRONT;
+  }
+  if (s == "none" || s == "unfiltered") {
+    return EntanglementFilteringMode::NONE;
+  }
+  if (s == "omit_inactive" || s == "omit" || s == "filtered") {
+    return EntanglementFilteringMode::OMIT_INACTIVE;
+  }
+  INVALIDARG_EXP_IFN(
+    false,
+    "Unknown entanglement filtering mode: '" + str +
+      "'. Expected 'none', 'omit_inactive', or 'prune_upfront'.");
+  return EntanglementFilteringMode::OMIT_INACTIVE;
+}
+
+inline std::string
+to_string(const EntanglementFilteringMode mode)
+{
+  switch (mode) {
+    case EntanglementFilteringMode::NONE:
+      return "none";
+    case EntanglementFilteringMode::PRUNE_UPFRONT:
+      return "prune_upfront";
+    case EntanglementFilteringMode::OMIT_INACTIVE:
+    default:
+      return "omit_inactive";
+  }
+}
+
+struct TopologicalLeafPeelingResult
+{
+  std::vector<bool> strandIsIgnored;
+  std::vector<bool> crosslinkerIsIgnored;
+};
+
+/**
+ * @brief Perform iterative 2-core topological leaf peeling on a
+ * CrosslinkerUniverse.
+ *
+ * @param crosslinkerUniverse The crosslinker & strand representation
+ * @return TopologicalLeafPeelingResult containing boolean flags for both
+ * strands and crosslinkers
+ */
+TopologicalLeafPeelingResult
+peelTopologicalLeavesDetailed(
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse);
+
+/**
+ * @brief Perform iterative 2-core topological leaf peeling on a
+ * CrosslinkerUniverse.
+ *
+ * @param crosslinkerUniverse The crosslinker & strand representation
+ * @return std::vector<bool> Boolean vector indicating which strands are peeled
+ * (ignored)
+ */
+std::vector<bool>
+peelTopologicalLeaves(
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse);
 
 struct AtomPairEntanglements
 {
@@ -117,8 +199,7 @@ struct StrandPairEntanglements
  * @param sameStrandCutoff the minimum number of bonds between two entangled
  * beads on the same strand
  * @param seed the random seed
- * @param filterDanglingAndSoluble whether to filter out entanglements involving
- * dangling or soluble strands (including iterative topological leaf peeling)
+ * @param filteringMode filtering mode (NONE, OMIT_INACTIVE, or PRUNE_UPFRONT)
  * @return StrandPairEntanglements
  */
 StrandPairEntanglements
@@ -131,7 +212,33 @@ randomlyFindEntanglementsAnalytical(
   const size_t minimumNrOfEntanglements = 0,
   const double sameStrandCutoff = 3,
   const std::string& seed = "",
-  bool filterDanglingAndSoluble = true);
+  EntanglementFilteringMode filteringMode =
+    EntanglementFilteringMode::OMIT_INACTIVE);
+
+inline StrandPairEntanglements
+randomlyFindEntanglementsAnalytical(
+  const pylimer_tools::entities::Box& box,
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse,
+  const size_t nrOfEntanglementsToSample,
+  const double upperCutoff,
+  const double lowerCutoff,
+  const size_t minimumNrOfEntanglements,
+  const double sameStrandCutoff,
+  const std::string& seed,
+  const bool filterDanglingAndSoluble)
+{
+  return randomlyFindEntanglementsAnalytical(
+    box,
+    crosslinkerUniverse,
+    nrOfEntanglementsToSample,
+    upperCutoff,
+    lowerCutoff,
+    minimumNrOfEntanglements,
+    sameStrandCutoff,
+    seed,
+    filterDanglingAndSoluble ? EntanglementFilteringMode::OMIT_INACTIVE
+                             : EntanglementFilteringMode::NONE);
+}
 
 /**
  * @brief Sample spatial entanglements on a CrosslinkerUniverse using
@@ -151,8 +258,7 @@ randomlyFindEntanglementsAnalytical(
  * @param sameStrandCutoff the minimum number of bonds between two entangled
  * beads on the same strand
  * @param seed the random seed
- * @param filterDanglingAndSoluble whether to filter out entanglements involving
- * dangling or soluble strands (including iterative topological leaf peeling)
+ * @param filteringMode filtering mode (NONE, OMIT_INACTIVE, or PRUNE_UPFRONT)
  * @param nMcSteps number of Monte Carlo equilibration steps for chain
  * resampling (default: 0)
  * @return StrandPairEntanglements
@@ -167,8 +273,36 @@ randomlyFindEntanglementsOnDemand(
   const size_t minimumNrOfEntanglements = 0,
   const double sameStrandCutoff = 3,
   const std::string& seed = "",
-  bool filterDanglingAndSoluble = true,
+  EntanglementFilteringMode filteringMode =
+    EntanglementFilteringMode::OMIT_INACTIVE,
   int nMcSteps = 0);
+
+inline StrandPairEntanglements
+randomlyFindEntanglementsOnDemand(
+  const pylimer_tools::entities::Box& box,
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse,
+  const size_t nrOfEntanglementsToSample,
+  const double upperCutoff,
+  const double lowerCutoff,
+  const size_t minimumNrOfEntanglements,
+  const double sameStrandCutoff,
+  const std::string& seed,
+  const bool filterDanglingAndSoluble,
+  const int nMcSteps = 0)
+{
+  return randomlyFindEntanglementsOnDemand(
+    box,
+    crosslinkerUniverse,
+    nrOfEntanglementsToSample,
+    upperCutoff,
+    lowerCutoff,
+    minimumNrOfEntanglements,
+    sameStrandCutoff,
+    seed,
+    filterDanglingAndSoluble ? EntanglementFilteringMode::OMIT_INACTIVE
+                             : EntanglementFilteringMode::NONE,
+    nMcSteps);
+}
 
 /**
  * @brief Randomly find pairs of atoms that are close together and could be
@@ -186,7 +320,7 @@ randomlyFindEntanglementsOnDemand(
  * @param seed the random seed
  * @param crossLinkerType the type of the crosslink atoms
  * @param ignoreCrosslinks
- * @param filterDanglingAndSoluble
+ * @param filteringMode filtering mode (NONE, OMIT_INACTIVE, or PRUNE_UPFRONT)
  * @return AtomPairEntanglements
  */
 AtomPairEntanglements
@@ -199,28 +333,40 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
                           const std::string& seed = "",
                           int crossLinkerType = 2,
                           bool ignoreCrosslinks = true,
-                          bool filterDanglingAndSoluble = false);
+                          EntanglementFilteringMode filteringMode =
+                            EntanglementFilteringMode::OMIT_INACTIVE);
+
+inline AtomPairEntanglements
+randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
+                          const size_t nrOfEntanglementsToSample,
+                          const double upperCutoff,
+                          const double lowerCutoff,
+                          const size_t minimumNrOfEntanglements,
+                          const double sameStrandCutoff,
+                          const std::string& seed,
+                          const int crossLinkerType,
+                          const bool ignoreCrosslinks,
+                          const bool filterDanglingAndSoluble)
+{
+  return randomlyFindEntanglements(universe,
+                                   nrOfEntanglementsToSample,
+                                   upperCutoff,
+                                   lowerCutoff,
+                                   minimumNrOfEntanglements,
+                                   sameStrandCutoff,
+                                   seed,
+                                   crossLinkerType,
+                                   ignoreCrosslinks,
+                                   filterDanglingAndSoluble
+                                     ? EntanglementFilteringMode::OMIT_INACTIVE
+                                     : EntanglementFilteringMode::NONE);
+}
 
 /**
- * @brief Randomly find pairs of atoms that are close together and could be
- * entanglements
- *
- * @param universe the universe with all the atoms etc.
- * @param nrOfEntanglementsToSample the nr of entanglements to find
- * @param upperCutoff the cut-off distance within which two atoms are
- * considered close enough
- * @param lowerCutoff
- * @param minimumNrOfEntanglements the minimum number of entanglements to
- * find
- * @param sameStrandCutoff the number of beads required between two atoms of
- * the same strand
- * @param seed the random seed
- * @param crossLinkerType the type of the crosslink atoms
- * @param ignoreCrosslinks
- * @param filterDanglingAndSoluble
- * @return AtomPairEntanglements
+ * @brief Legacy alias for randomlyFindEntanglements using modern Eigen cell
+ * lists and topological leaf peeling.
  */
-AtomPairEntanglements
+inline AtomPairEntanglements
 randomlyFindEntanglementsV2(const pylimer_tools::entities::Universe& universe,
                             const size_t nrOfEntanglementsToSample,
                             const double upperCutoff,
@@ -230,7 +376,46 @@ randomlyFindEntanglementsV2(const pylimer_tools::entities::Universe& universe,
                             const std::string& seed = "",
                             int crossLinkerType = 2,
                             bool ignoreCrosslinks = true,
-                            bool filterDanglingAndSoluble = true);
+                            EntanglementFilteringMode filteringMode =
+                              EntanglementFilteringMode::OMIT_INACTIVE)
+{
+  return randomlyFindEntanglements(universe,
+                                   nrOfEntanglementsToSample,
+                                   upperCutoff,
+                                   lowerCutoff,
+                                   minimumNrOfEntanglements,
+                                   sameStrandCutoff,
+                                   seed,
+                                   crossLinkerType,
+                                   ignoreCrosslinks,
+                                   filteringMode);
+}
+
+inline AtomPairEntanglements
+randomlyFindEntanglementsV2(const pylimer_tools::entities::Universe& universe,
+                            const size_t nrOfEntanglementsToSample,
+                            const double upperCutoff,
+                            const double lowerCutoff,
+                            const size_t minimumNrOfEntanglements,
+                            const double sameStrandCutoff,
+                            const std::string& seed,
+                            const int crossLinkerType,
+                            const bool ignoreCrosslinks,
+                            const bool filterDanglingAndSoluble)
+{
+  return randomlyFindEntanglements(universe,
+                                   nrOfEntanglementsToSample,
+                                   upperCutoff,
+                                   lowerCutoff,
+                                   minimumNrOfEntanglements,
+                                   sameStrandCutoff,
+                                   seed,
+                                   crossLinkerType,
+                                   ignoreCrosslinks,
+                                   filterDanglingAndSoluble
+                                     ? EntanglementFilteringMode::OMIT_INACTIVE
+                                     : EntanglementFilteringMode::NONE);
+}
 
 }
 

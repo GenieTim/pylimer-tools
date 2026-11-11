@@ -555,6 +555,19 @@ public:
                         EntanglementSamplingMethod::ANALYTICAL) const;
 
   pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+  sampleEntanglements(
+    size_t nrOfEntanglementsToSample,
+    double upperCutoff,
+    double lowerCutoff,
+    size_t minimumNrOfEntanglements,
+    double sameStrandCutoff,
+    const std::string& seed,
+    pylimer_tools::topo::entanglement_detection::EntanglementFilteringMode
+      filteringMode,
+    EntanglementSamplingMethod method =
+      EntanglementSamplingMethod::ANALYTICAL) const;
+
+  pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
   sampleEntanglements(size_t nrOfEntanglementsToSample,
                       double upperCutoff,
                       double lowerCutoff,
@@ -574,6 +587,28 @@ public:
                                parseEntanglementSamplingMethod(method));
   }
 
+  pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+  sampleEntanglements(
+    size_t nrOfEntanglementsToSample,
+    double upperCutoff,
+    double lowerCutoff,
+    size_t minimumNrOfEntanglements,
+    double sameStrandCutoff,
+    const std::string& seed,
+    pylimer_tools::topo::entanglement_detection::EntanglementFilteringMode
+      filteringMode,
+    const std::string& method) const
+  {
+    return sampleEntanglements(nrOfEntanglementsToSample,
+                               upperCutoff,
+                               lowerCutoff,
+                               minimumNrOfEntanglements,
+                               sameStrandCutoff,
+                               seed,
+                               filteringMode,
+                               parseEntanglementSamplingMethod(method));
+  }
+
   /**
    * @brief Sample entanglements analytically and probabilistically from the
    * generator's CrosslinkerUniverse using Brownian bridge conditional
@@ -587,6 +622,17 @@ public:
                                 double sameStrandCutoff = 3.,
                                 const std::string& seed = "",
                                 bool filterDanglingAndSoluble = true) const;
+
+  pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+  sampleEntanglementsAnalytical(
+    size_t nrOfEntanglementsToSample,
+    double upperCutoff,
+    double lowerCutoff,
+    size_t minimumNrOfEntanglements,
+    double sameStrandCutoff,
+    const std::string& seed,
+    pylimer_tools::topo::entanglement_detection::EntanglementFilteringMode
+      filteringMode) const;
 
   /**
    * @brief Sample entanglements on demand from the generator's
@@ -602,6 +648,17 @@ public:
                               double sameStrandCutoff = 3.,
                               const std::string& seed = "",
                               bool filterDanglingAndSoluble = true) const;
+
+  pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+  sampleEntanglementsOnDemand(
+    size_t nrOfEntanglementsToSample,
+    double upperCutoff,
+    double lowerCutoff,
+    size_t minimumNrOfEntanglements,
+    double sameStrandCutoff,
+    const std::string& seed,
+    pylimer_tools::topo::entanglement_detection::EntanglementFilteringMode
+      filteringMode) const;
 
   /**
    * @brief Convert the current simplified universe into a force relaxation

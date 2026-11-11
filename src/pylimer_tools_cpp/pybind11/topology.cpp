@@ -5,6 +5,7 @@
 #include "../topo/ResistanceDistanceAnalysis.h"
 
 #include <pybind11/eigen.h>
+#include <pybind11/native_enum.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -12,10 +13,64 @@ namespace py = pybind11;
 namespace pe = pylimer_tools::entities;
 
 using namespace pylimer_tools::topo::entanglement_detection;
+
+namespace {
+EntanglementFilteringMode
+extractFilteringMode(const py::object& obj,
+                     const EntanglementFilteringMode defaultMode)
+{
+  if (obj.is_none()) {
+    return defaultMode;
+  }
+  if (py::isinstance<py::bool_>(obj)) {
+    return obj.cast<bool>() ? EntanglementFilteringMode::OMIT_INACTIVE
+                            : EntanglementFilteringMode::NONE;
+  }
+  if (py::isinstance<EntanglementFilteringMode>(obj)) {
+    return obj.cast<EntanglementFilteringMode>();
+  }
+  if (py::isinstance<py::str>(obj)) {
+    return parseEntanglementFilteringMode(obj.cast<std::string>());
+  }
+  throw py::type_error(
+    "filtering_mode must be an EntanglementFilteringMode enum, bool, or string "
+    "('none', 'omit_inactive', 'prune_upfront')");
+}
+
+EntanglementFilteringMode
+resolveFilteringMode(const py::object& filterDanglingAndSoluble,
+                     const py::object& filteringMode,
+                     const EntanglementFilteringMode defaultMode)
+{
+  if (!filteringMode.is_none()) {
+    return extractFilteringMode(filteringMode, defaultMode);
+  }
+  return extractFilteringMode(filterDanglingAndSoluble, defaultMode);
+}
+} // namespace
+
 // namespace pylimer_tools::calc {
 void
 init_pylimer_bound_topo(py::module_& m)
 {
+  py::native_enum<EntanglementFilteringMode>(
+    m,
+    "EntanglementFilteringMode",
+    "enum.IntEnum",
+    "Enum representing the filtering mode for entanglement sampling.")
+    .value("NONE",
+           EntanglementFilteringMode::NONE,
+           "No filtering: all entanglements retained")
+    .value("OMIT_INACTIVE",
+           EntanglementFilteringMode::OMIT_INACTIVE,
+           "Melt density mode: sample from all strands, omit from output if "
+           "touching dangling/soluble strands")
+    .value("PRUNE_UPFRONT",
+           EntanglementFilteringMode::PRUNE_UPFRONT,
+           "Active-only mode: topologically peel leaves upfront, sample "
+           "strictly between active strands")
+    .finalize();
+
   py::class_<pylimer_tools::sim::mehp::CrosslinkerUniverse, py::smart_holder>(
     m, "CrosslinkerUniverse", py::module_local(), R"pbdoc(
       A struct representing the topological and spatial state of crosslinkers and strands
@@ -51,6 +106,17 @@ init_pylimer_bound_topo(py::module_& m)
     .def_readwrite("mean_squared_bead_distance_in_strand",
                    &pylimer_tools::sim::mehp::CrosslinkerUniverse::
                      meanSquaredBeadDistanceInStrand);
+
+  m.def("peel_topological_leaves",
+        &peelTopologicalLeaves,
+        R"pbdoc(
+    Peel 1-core dangling trees and subgraphs iteratively from the CrosslinkerUniverse topology.
+    Returns a boolean vector indicating for each strand whether it is ignored (pruned).
+
+    :param crosslinker_universe: The CrosslinkerUniverse representation.
+    :return: Boolean vector of ignored/pruned strands.
+  )pbdoc",
+        py::arg("crosslinker_universe"));
 
   py::class_<AtomPairEntanglements, py::smart_holder>(
     m, "AtomPairEntanglements", py::module_local(), R"pbdoc(
@@ -116,9 +182,33 @@ init_pylimer_bound_topo(py::module_& m)
       Convert the strand pair entanglements to AtomPairEntanglements using the deterministic atom indexing of CrosslinkerUniverse.
     )pbdoc");
 
-  m.def("randomly_sample_entanglements_analytical",
-        &randomlyFindEntanglementsAnalytical,
-        R"pbdoc(
+  m.def(
+    "randomly_sample_entanglements_analytical",
+    [](const pe::Box& box,
+       const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse,
+       const size_t nrOfSamples,
+       const double upperCutoff,
+       const double lowerCutoff,
+       const size_t minimumNrOfSamples,
+       const double sameStrandCutoff,
+       const std::string& seed,
+       const py::object& filterDanglingAndSoluble,
+       const py::object& filteringMode) {
+      const EntanglementFilteringMode mode =
+        resolveFilteringMode(filterDanglingAndSoluble,
+                             filteringMode,
+                             EntanglementFilteringMode::OMIT_INACTIVE);
+      return randomlyFindEntanglementsAnalytical(box,
+                                                 crosslinkerUniverse,
+                                                 nrOfSamples,
+                                                 upperCutoff,
+                                                 lowerCutoff,
+                                                 minimumNrOfSamples,
+                                                 sameStrandCutoff,
+                                                 seed,
+                                                 mode);
+    },
+    R"pbdoc(
     Analytically and probabilistically sample pairs of strand beads that could form entanglements
     using exact 3D Brownian bridge / random walk statistics and topological strand filtering,
     without requiring all strand beads or a Universe to be instantiated.
@@ -131,17 +221,19 @@ init_pylimer_bound_topo(py::module_& m)
     :param minimum_nr_of_samples: The minimum number of entanglements to be found.
     :param same_strand_cutoff: The minimum contour separation (in beads) between two beads on the same strand.
     :param seed: A seed for the random number generator.
-    :param filter_dangling_and_soluble: Whether to filter out soluble and dangling strands (via iterative leaf peeling).
+    :param filter_dangling_and_soluble: EntanglementFilteringMode enum, str ("none", "omit_inactive", "prune_upfront"), or bool.
+    :param filtering_mode: Alias for filter_dangling_and_soluble.
   )pbdoc",
-        py::arg("box"),
-        py::arg("crosslinker_universe"),
-        py::arg("nr_of_samples"),
-        py::arg("upper_cutoff"),
-        py::arg("lower_cutoff") = 0.,
-        py::arg("minimum_nr_of_samples") = 0,
-        py::arg("same_strand_cutoff") = 3.,
-        py::arg("seed") = "",
-        py::arg("filter_dangling_and_soluble") = true);
+    py::arg("box"),
+    py::arg("crosslinker_universe"),
+    py::arg("nr_of_samples"),
+    py::arg("upper_cutoff"),
+    py::arg("lower_cutoff") = 0.,
+    py::arg("minimum_nr_of_samples") = 0,
+    py::arg("same_strand_cutoff") = 3.,
+    py::arg("seed") = "",
+    py::arg("filter_dangling_and_soluble") = py::none(),
+    py::arg("filtering_mode") = py::none());
 
   m.def(
     "randomly_sample_entanglements_analytical",
@@ -153,7 +245,12 @@ init_pylimer_bound_topo(py::module_& m)
        const size_t minimumNrOfSamples,
        const double sameStrandCutoff,
        const std::string& seed,
-       const bool filterDanglingAndSoluble) {
+       const py::object& filterDanglingAndSoluble,
+       const py::object& filteringMode) {
+      const EntanglementFilteringMode mode =
+        resolveFilteringMode(filterDanglingAndSoluble,
+                             filteringMode,
+                             EntanglementFilteringMode::OMIT_INACTIVE);
       return randomlyFindEntanglementsAnalytical(box,
                                                  crosslinkerUniverse,
                                                  nrOfSamples,
@@ -162,7 +259,7 @@ init_pylimer_bound_topo(py::module_& m)
                                                  minimumNrOfSamples,
                                                  sameStrandCutoff,
                                                  seed,
-                                                 filterDanglingAndSoluble);
+                                                 mode);
     },
     py::arg("crosslinker_universe"),
     py::arg("box"),
@@ -172,11 +269,38 @@ init_pylimer_bound_topo(py::module_& m)
     py::arg("minimum_nr_of_samples") = 0,
     py::arg("same_strand_cutoff") = 3.,
     py::arg("seed") = "",
-    py::arg("filter_dangling_and_soluble") = true);
+    py::arg("filter_dangling_and_soluble") = py::none(),
+    py::arg("filtering_mode") = py::none());
 
-  m.def("randomly_sample_entanglements_on_demand",
-        &randomlyFindEntanglementsOnDemand,
-        R"pbdoc(
+  m.def(
+    "randomly_sample_entanglements_on_demand",
+    [](const pe::Box& box,
+       const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse,
+       const size_t nrOfSamples,
+       const double upperCutoff,
+       const double lowerCutoff,
+       const size_t minimumNrOfSamples,
+       const double sameStrandCutoff,
+       const std::string& seed,
+       const py::object& filterDanglingAndSoluble,
+       const int nMcSteps,
+       const py::object& filteringMode) {
+      const EntanglementFilteringMode mode =
+        resolveFilteringMode(filterDanglingAndSoluble,
+                             filteringMode,
+                             EntanglementFilteringMode::OMIT_INACTIVE);
+      return randomlyFindEntanglementsOnDemand(box,
+                                               crosslinkerUniverse,
+                                               nrOfSamples,
+                                               upperCutoff,
+                                               lowerCutoff,
+                                               minimumNrOfSamples,
+                                               sameStrandCutoff,
+                                               seed,
+                                               mode,
+                                               nMcSteps);
+    },
+    R"pbdoc(
     Sample pairs of strand beads that could form entanglements on demand from a CrosslinkerUniverse
     using per-strand bounding boxes and on-demand Brownian bridge bead resampling.
     Only strand seeds and bounding boxes are stored, achieving the O(N_strands) memory scaling
@@ -190,19 +314,21 @@ init_pylimer_bound_topo(py::module_& m)
     :param minimum_nr_of_samples: The minimum number of entanglements to be found.
     :param same_strand_cutoff: The minimum contour separation (in beads) between two beads on the same strand.
     :param seed: A seed for the random number generator.
-    :param filter_dangling_and_soluble: Whether to filter out soluble and dangling strands (via iterative leaf peeling).
+    :param filter_dangling_and_soluble: EntanglementFilteringMode enum, str ("none", "omit_inactive", "prune_upfront"), or bool.
     :param n_mc_steps: Number of MC equilibration steps per chain (default: 0).
+    :param filtering_mode: Alias for filter_dangling_and_soluble.
   )pbdoc",
-        py::arg("box"),
-        py::arg("crosslinker_universe"),
-        py::arg("nr_of_samples"),
-        py::arg("upper_cutoff"),
-        py::arg("lower_cutoff") = 0.,
-        py::arg("minimum_nr_of_samples") = 0,
-        py::arg("same_strand_cutoff") = 3.,
-        py::arg("seed") = "",
-        py::arg("filter_dangling_and_soluble") = true,
-        py::arg("n_mc_steps") = 0);
+    py::arg("box"),
+    py::arg("crosslinker_universe"),
+    py::arg("nr_of_samples"),
+    py::arg("upper_cutoff"),
+    py::arg("lower_cutoff") = 0.,
+    py::arg("minimum_nr_of_samples") = 0,
+    py::arg("same_strand_cutoff") = 3.,
+    py::arg("seed") = "",
+    py::arg("filter_dangling_and_soluble") = py::none(),
+    py::arg("n_mc_steps") = 0,
+    py::arg("filtering_mode") = py::none());
 
   m.def(
     "randomly_sample_entanglements_on_demand",
@@ -214,8 +340,13 @@ init_pylimer_bound_topo(py::module_& m)
        const size_t minimumNrOfSamples,
        const double sameStrandCutoff,
        const std::string& seed,
-       const bool filterDanglingAndSoluble,
-       const int nMcSteps) {
+       const py::object& filterDanglingAndSoluble,
+       const int nMcSteps,
+       const py::object& filteringMode) {
+      const EntanglementFilteringMode mode =
+        resolveFilteringMode(filterDanglingAndSoluble,
+                             filteringMode,
+                             EntanglementFilteringMode::OMIT_INACTIVE);
       return randomlyFindEntanglementsOnDemand(box,
                                                crosslinkerUniverse,
                                                nrOfSamples,
@@ -224,7 +355,7 @@ init_pylimer_bound_topo(py::module_& m)
                                                minimumNrOfSamples,
                                                sameStrandCutoff,
                                                seed,
-                                               filterDanglingAndSoluble,
+                                               mode,
                                                nMcSteps);
     },
     py::arg("crosslinker_universe"),
@@ -235,37 +366,106 @@ init_pylimer_bound_topo(py::module_& m)
     py::arg("minimum_nr_of_samples") = 0,
     py::arg("same_strand_cutoff") = 3.,
     py::arg("seed") = "",
-    py::arg("filter_dangling_and_soluble") = true,
-    py::arg("n_mc_steps") = 0);
+    py::arg("filter_dangling_and_soluble") = py::none(),
+    py::arg("n_mc_steps") = 0,
+    py::arg("filtering_mode") = py::none());
 
-  m.def("randomly_sample_entanglements",
-        &randomlyFindEntanglements,
-        R"pbdoc(
-    Randomly find pairs of atoms that are close together and could be
-    entanglements
+  m.def(
+    "randomly_sample_entanglements",
+    [](const pylimer_tools::entities::Universe& universe,
+       const size_t nrOfSamples,
+       const double upperCutoff,
+       const double lowerCutoff,
+       const size_t minimumNrOfSamples,
+       const double sameStrandCutoff,
+       const std::string& seed,
+       const int crosslinkerType,
+       const bool ignoreCrosslinks,
+       const py::object& filterDanglingAndSoluble,
+       const py::object& filteringMode) {
+      const EntanglementFilteringMode mode =
+        resolveFilteringMode(filterDanglingAndSoluble,
+                             filteringMode,
+                             EntanglementFilteringMode::NONE);
+      return randomlyFindEntanglements(universe,
+                                       nrOfSamples,
+                                       upperCutoff,
+                                       lowerCutoff,
+                                       minimumNrOfSamples,
+                                       sameStrandCutoff,
+                                       seed,
+                                       crosslinkerType,
+                                       ignoreCrosslinks,
+                                       mode);
+    },
+    R"pbdoc(
+    Randomly find pairs of atoms that are close together and could be entanglements.
 
     :param universe: The universe of atoms from which to sample entanglements from.
     :param nr_of_samples: The number of pairs of atoms to randomly sample.
     :param upper_cutoff: The maximum distance between atoms for a pair to be considered a potential entanglement.
     :param lower_cutoff: The minimum distance between atoms for a pair to be considered a potential entanglement.
     :param minimum_nr_of_samples: The minimum number of entanglements to be found.
-    :param same_strand_cutoff: The maximum distance between atoms on the same strand for a pair to be considered a potential entanglement.
+    :param same_strand_cutoff: The minimum shortest path distance on the graph between atoms for an entanglement.
     :param seed: A seed for the random number generator.
-    :param crosslinker_type: The type of crosslinker to consider when finding entanglements. Used for the splitting into strands.
-    :param ignore_crosslinks: Whether to ignore crosslinks when finding entanglements. Careful: if you don't ignore them, the same-strand policy might not work correctly, since each crosslink should actually be associated with more than one strand.
-    :param filter_dangling_and_soluble: Whether to filter out dangling chains and soluble crosslinks when finding entanglements.
-      This means, entanglements involving an obviously (1st order) dangling or soluble chain are 
+    :param crosslinker_type: Atom type ID representing crosslinkers.
+    :param ignore_crosslinks: Whether to exclude crosslink atoms from forming entanglements.
+    :param filter_dangling_and_soluble: EntanglementFilteringMode enum, str ("none", "omit_inactive", "prune_upfront"), or bool.
+    :param filtering_mode: Alias for filter_dangling_and_soluble.
   )pbdoc",
-        py::arg("universe"),
-        py::arg("nr_of_samples"),
-        py::arg("upper_cutoff"),
-        py::arg("lower_cutoff") = 0,
-        py::arg("minimum_nr_of_samples") = 0,
-        py::arg("same_strand_cutoff") = 3.,
-        py::arg("seed") = "",
-        py::arg("crosslinker_type") = 2,
-        py::arg("ignore_crosslinks") = true,
-        py::arg("filter_dangling_and_soluble") = false);
+    py::arg("universe"),
+    py::arg("nr_of_samples"),
+    py::arg("upper_cutoff"),
+    py::arg("lower_cutoff") = 0.0,
+    py::arg("minimum_nr_of_samples") = 0,
+    py::arg("same_strand_cutoff") = 3.0,
+    py::arg("seed") = "",
+    py::arg("crosslinker_type") = 2,
+    py::arg("ignore_crosslinks") = true,
+    py::arg("filter_dangling_and_soluble") = py::none(),
+    py::arg("filtering_mode") = py::none());
+
+  m.def(
+    "randomly_sample_entanglements_v2",
+    [](const pylimer_tools::entities::Universe& universe,
+       const size_t nrOfSamples,
+       const double upperCutoff,
+       const double lowerCutoff,
+       const size_t minimumNrOfSamples,
+       const double sameStrandCutoff,
+       const std::string& seed,
+       const int crosslinkerType,
+       const bool ignoreCrosslinks,
+       const py::object& filterDanglingAndSoluble,
+       const py::object& filteringMode) {
+      const EntanglementFilteringMode mode =
+        resolveFilteringMode(filterDanglingAndSoluble,
+                             filteringMode,
+                             EntanglementFilteringMode::NONE);
+      return randomlyFindEntanglements(universe,
+                                       nrOfSamples,
+                                       upperCutoff,
+                                       lowerCutoff,
+                                       minimumNrOfSamples,
+                                       sameStrandCutoff,
+                                       seed,
+                                       crosslinkerType,
+                                       ignoreCrosslinks,
+                                       mode);
+    },
+    "Alias for randomly_sample_entanglements (v2 has been unified into "
+    "standard method).",
+    py::arg("universe"),
+    py::arg("nr_of_samples"),
+    py::arg("upper_cutoff"),
+    py::arg("lower_cutoff") = 0.0,
+    py::arg("minimum_nr_of_samples") = 0,
+    py::arg("same_strand_cutoff") = 3.0,
+    py::arg("seed") = "",
+    py::arg("crosslinker_type") = 2,
+    py::arg("ignore_crosslinks") = true,
+    py::arg("filter_dangling_and_soluble") = py::none(),
+    py::arg("filtering_mode") = py::none());
 
   py::class_<pylimer_tools::topo::ResistanceDistanceAnalysis, py::smart_holder>(
     m, "ResistanceDistanceAnalysis")

@@ -8,6 +8,7 @@ import numpy as np
 from pylimer_tools_cpp import (
     Box,
     CrosslinkerUniverse,
+    EntanglementFilteringMode,
     EntanglementSamplingMethod,
     MCUniverseGenerator,
     MEHPForceRelaxation,
@@ -18,6 +19,8 @@ from pylimer_tools_cpp import (
     NonGaussianSpringForceEvaluator,
     SimpleSpringMEHPForceEvaluator,
     inverse_langevin,
+    peel_topological_leaves,
+    randomly_sample_entanglements,
     randomly_sample_entanglements_analytical,
     randomly_sample_entanglements_on_demand,
 )
@@ -333,7 +336,8 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         self.assertEqual(es_gen_direct.strand_idx_1, es_direct.strand_idx_1)
         self.assertEqual(es_gen_direct.strand_idx_2, es_direct.strand_idx_2)
 
-        # Via MCUniverseGenerator.sample_entanglements(..., method=EntanglementSamplingMethod.ON_DEMAND)
+        # Via MCUniverseGenerator.sample_entanglements(...,
+        # method=EntanglementSamplingMethod.ON_DEMAND)
         es_gen_method = gen.sample_entanglements(
             nr_of_entanglements_to_sample=40,
             upper_cutoff=2.5,
@@ -376,7 +380,8 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         self.assertGreater(fb2.get_active_weight_fraction(), 0.0)
         self.assertGreater(fb2.get_gamma_factor(1.0), 0.0)
 
-        # Sampling and building directly via get_force_balance2(..., method=EntanglementSamplingMethod.ON_DEMAND)
+        # Sampling and building directly via get_force_balance2(...,
+        # method=EntanglementSamplingMethod.ON_DEMAND)
         fb2_direct = gen.get_force_balance2(
             nr_of_entanglements_to_sample=40,
             upper_cutoff=2.5,
@@ -392,3 +397,87 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         fb2_direct.validate_network()
         self.assertGreater(fb2_direct.get_nr_of_extra_atoms(), 0)
 
+    def test_universe_to_crosslinker_universe_and_leaf_peeling(self):
+        """Test Universe.to_crosslinker_universe, peel_topological_leaves, identify_active_atoms."""
+        u = self.testUniverse
+        cu = u.to_crosslinker_universe(2)
+        self.assertIsInstance(cu, CrosslinkerUniverse)
+        self.assertGreater(len(cu.xlink_types), 0)
+        self.assertGreater(len(cu.beads_in_strand), 0)
+
+        ignored_strands = u.peel_topological_leaves(2)
+        self.assertEqual(len(ignored_strands), len(cu.beads_in_strand))
+
+        active_atoms = u.identify_active_atoms(2)
+        self.assertEqual(len(active_atoms), u.get_nr_of_atoms())
+
+        # Test peel_topological_leaves free function
+        ignored_free = peel_topological_leaves(cu)
+        self.assertEqual(list(ignored_free), list(ignored_strands))
+
+    def test_entanglement_filtering_modes(self):
+        """Test EntanglementFilteringMode enum and discrete sampling with filtering modes."""
+        self.assertEqual(int(EntanglementFilteringMode.NONE), 0)
+        self.assertEqual(int(EntanglementFilteringMode.OMIT_INACTIVE), 1)
+        self.assertEqual(int(EntanglementFilteringMode.PRUNE_UPFRONT), 2)
+
+        u = self.testUniverse
+        # Sample with EntanglementFilteringMode.PRUNE_UPFRONT
+        es_prune = randomly_sample_entanglements(
+            u,
+            nr_of_samples=2,
+            upper_cutoff=4.0,
+            lower_cutoff=0.0,
+            minimum_nr_of_samples=0,
+            same_strand_cutoff=2.0,
+            seed="py_test_seed",
+            crosslinker_type=2,
+            ignore_crosslinks=True,
+            filtering_mode=EntanglementFilteringMode.PRUNE_UPFRONT,
+        )
+        self.assertIsInstance(es_prune.pairs_of_atoms, list)
+
+        # Sample with string filtering mode 'omit_inactive'
+        es_omit = randomly_sample_entanglements(
+            u,
+            nr_of_samples=2,
+            upper_cutoff=4.0,
+            lower_cutoff=0.0,
+            minimum_nr_of_samples=0,
+            same_strand_cutoff=2.0,
+            seed="py_test_seed",
+            crosslinker_type=2,
+            ignore_crosslinks=True,
+            filtering_mode="omit_inactive",
+        )
+        self.assertIsInstance(es_omit.pairs_of_atoms, list)
+
+        # Sample with boolean flag (backward compatibility)
+        es_bool = randomly_sample_entanglements(
+            u,
+            nr_of_samples=2,
+            upper_cutoff=4.0,
+            lower_cutoff=0.0,
+            minimum_nr_of_samples=0,
+            same_strand_cutoff=2.0,
+            seed="py_test_seed",
+            crosslinker_type=2,
+            ignore_crosslinks=True,
+            filter_dangling_and_soluble=True,
+        )
+        self.assertIsInstance(es_bool.pairs_of_atoms, list)
+
+        with self.assertRaises(ValueError):
+            randomly_sample_entanglements(
+                u,
+                nr_of_samples=2,
+                upper_cutoff=4.0,
+                filtering_mode="invalid_mode",
+            )
+        with self.assertRaises(TypeError):
+            randomly_sample_entanglements(
+                u,
+                nr_of_samples=2,
+                upper_cutoff=4.0,
+                filtering_mode=123,
+            )

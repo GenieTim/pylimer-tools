@@ -1,4 +1,6 @@
 #include "Universe.h"
+#include "../sim/MEHPUtilityStructures.h"
+#include "../topo/EntanglementDetector.h"
 #include "../topo/TopologyCalc.h"
 #include "../utils/BoolUtils.h"
 #include "../utils/Counter.h"
@@ -6,7 +8,7 @@
 #include "../utils/StringUtils.h"
 #include "../utils/VectorUtils.h"
 #include "Box.h"
-#include "NeighbourList.h"
+#include "EigenNeighbourList.h"
 
 #include <Eigen/Dense>
 
@@ -787,22 +789,61 @@ Universe::countAtomsInSkinDistance(const std::vector<double>& distances,
     }
   }
 
-  // then, start processing using a neighbour list
-  const std::vector<Atom> atoms = this->getAtoms();
-  NeighbourList neighbourList = NeighbourList(
-    atoms, this->getBox(), pylimer_tools::utils::last<double>(distances));
+  const Box box = this->getBox();
+  const Eigen::VectorXd coordinates =
+    unwrapped ? this->getUnwrappedVertexCoordinates(box)
+              : this->getAssumedVertexCoordinates(box);
+  const double maxCutoff = pylimer_tools::utils::last<double>(distances);
+  const double listCutoff = std::max(maxCutoff, 1e-2);
+  const EigenNeighbourList neighbourList(coordinates, box, listCutoff);
+
+  const size_t nBins = distances.size() - 1;
+  std::vector<double> distSquared(distances.size());
+  for (size_t i = 0; i < distances.size(); ++i) {
+    distSquared[i] = distances[i] * distances[i];
+  }
+
+  const size_t nAtoms = this->getNrOfAtoms();
+#ifdef OPENMP_FOUND
+#pragma omp parallel if (nAtoms > 64)
+#endif
+  {
+    std::vector<size_t> localResult(nBins, 0);
+    Eigen::ArrayXi neighbours = Eigen::ArrayXi::Zero(32);
 
 #ifdef OPENMP_FOUND
-#pragma omp parallel for schedule(dynamic) if (distances.size() > 4)
+#pragma omp for schedule(static)
 #endif
-  for (size_t i = 1; i < distances.size(); ++i) {
-    size_t countForBin = 0;
-    for (const Atom& a : atoms) {
-      std::vector<Atom> closeAtoms = neighbourList.getAtomsCloseTo(
-        a, distances[i], distances[i - 1], unwrapped, true);
-      countForBin += closeAtoms.size();
+    for (size_t a = 0; a < nAtoms; ++a) {
+      const size_t nFound = neighbourList.getIndicesCloseToCoordinates(
+        neighbours, coordinates.segment<3>(3 * a), listCutoff, true);
+      for (size_t k = 0; k < nFound; ++k) {
+        const size_t b = static_cast<size_t>(neighbours[k]);
+        if (a == b) {
+          continue;
+        }
+        Eigen::Vector3d d =
+          coordinates.segment<3>(3 * b) - coordinates.segment<3>(3 * a);
+        if (!unwrapped) {
+          box.handlePBC(d);
+        }
+        const double d2 = d.squaredNorm();
+        for (size_t i = 0; i < nBins; ++i) {
+          if (d2 >= distSquared[i] && d2 <= distSquared[i + 1]) {
+            localResult[i] += 1;
+          }
+        }
+      }
     }
-    result[i - 1] = countForBin;
+
+#ifdef OPENMP_FOUND
+#pragma omp critical
+#endif
+    {
+      for (size_t i = 0; i < nBins; ++i) {
+        result[i] += localResult[i];
+      }
+    }
   }
 
   return result;
@@ -1349,6 +1390,185 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
   this->cachedChainsWithCrosslinker_[crossLinkerType] = molecules;
   return molecules;
 };
+
+pylimer_tools::sim::mehp::CrosslinkerUniverse
+Universe::toCrosslinkerUniverse(const int crossLinkerType) const
+{
+  pylimer_tools::sim::mehp::CrosslinkerUniverse cu;
+  if (this->getNrOfAtoms() == 0) {
+    return cu;
+  }
+
+  const std::vector<int> vertexDegrees = this->getVertexDegrees();
+  const std::vector<int> vertexTypes = this->getPropertyValues<int>("type");
+  const size_t nAtoms = this->getNrOfAtoms();
+
+  std::vector<long int> vertexToXlinkIdx(nAtoms, -1);
+  size_t nXlinks = 0;
+  for (size_t v = 0; v < nAtoms; ++v) {
+    if (vertexTypes[v] == crossLinkerType || vertexDegrees[v] > 2) {
+      vertexToXlinkIdx[v] = static_cast<long int>(nXlinks++);
+    }
+  }
+
+  cu.xlinkX.resize(nXlinks);
+  cu.xlinkY.resize(nXlinks);
+  cu.xlinkZ.resize(nXlinks);
+  cu.xlinkTypes.resize(nXlinks);
+  cu.xlinkChainId.resize(nXlinks);
+  cu.strandsOfXlink.resize(nXlinks);
+
+  std::vector<int> moleculeIds;
+  const bool hasMoleculeProp = this->vertexPropertyExists("molecule");
+  if (hasMoleculeProp) {
+    moleculeIds = this->getPropertyValues<int>("molecule");
+  }
+
+  for (size_t v = 0; v < nAtoms; ++v) {
+    const long int xl = vertexToXlinkIdx[v];
+    if (xl >= 0) {
+      const Atom atom = this->getAtomByVertexIdx(v);
+      cu.xlinkX[xl] = atom.getX();
+      cu.xlinkY[xl] = atom.getY();
+      cu.xlinkZ[xl] = atom.getZ();
+      cu.xlinkTypes[xl] = vertexTypes[v];
+      cu.xlinkChainId[xl] =
+        hasMoleculeProp ? moleculeIds[v] : static_cast<int>(xl);
+    }
+  }
+
+  const std::vector<Molecule> chains =
+    this->getChainsWithCrosslinker(crossLinkerType);
+  for (size_t c = 0; c < chains.size(); ++c) {
+    const Molecule& chain = chains[c];
+    if (chain.getNrOfBonds() == 0 && chain.getLength() <= 1) {
+      continue;
+    }
+
+    std::vector<Atom> chainEnds = chain.getChainEnds(crossLinkerType, true);
+    long int fromXlink = -1;
+    long int toXlink = -1;
+
+    std::vector<Atom> atoms =
+      chain.getAtomsLinedUp(crossLinkerType, true, true);
+    const int totalAtomsInStrand = static_cast<int>(atoms.size());
+
+    if (chainEnds.size() >= 2) {
+      const size_t v0 = this->getIdxByAtomId(chainEnds[0].getId());
+      const size_t v1 = this->getIdxByAtomId(chainEnds[1].getId());
+      fromXlink = vertexToXlinkIdx[v0];
+      toXlink = vertexToXlinkIdx[v1];
+    } else if (chainEnds.size() == 1) {
+      const size_t v0 = this->getIdxByAtomId(chainEnds[0].getId());
+      fromXlink = vertexToXlinkIdx[v0];
+    }
+
+    const int nCrosslinksInChain =
+      (fromXlink >= 0 ? 1 : 0) + (toXlink >= 0 ? 1 : 0);
+    const int internalBeads =
+      std::max(0, totalAtomsInStrand - nCrosslinksInChain);
+
+    double b2 = 1.0;
+    if (chain.getNrOfBonds() > 0) {
+      double bondDistSum = 0.0;
+      int nBonds = 0;
+      for (size_t b = 0; b + 1 < atoms.size(); ++b) {
+        const double d = atoms[b].distanceTo(atoms[b + 1], this->getBox());
+        bondDistSum += d * d;
+        nBonds += 1;
+      }
+      if (nBonds > 0) {
+        b2 = bondDistSum / static_cast<double>(nBonds);
+      }
+    }
+
+    const size_t strandIdx = cu.strandFrom.size();
+    cu.strandFrom.push_back(fromXlink);
+    cu.strandTo.push_back(toXlink);
+    cu.beadsInStrand.push_back(internalBeads);
+    cu.meanSquaredBeadDistanceInStrand.push_back(b2);
+    cu.beadDistanceInStrand.push_back(std::sqrt(b2));
+
+    int beadType = 1;
+    for (const Atom& a : atoms) {
+      if (a.getType() != crossLinkerType) {
+        beadType = a.getType();
+        break;
+      }
+    }
+    cu.strandBeadType.push_back(beadType);
+
+    if (fromXlink >= 0) {
+      cu.strandsOfXlink[fromXlink].push_back(static_cast<long int>(strandIdx));
+    }
+    if (toXlink >= 0 && toXlink != fromXlink) {
+      cu.strandsOfXlink[toXlink].push_back(static_cast<long int>(strandIdx));
+    }
+  }
+
+  return cu;
+}
+
+std::vector<bool>
+Universe::peelTopologicalLeaves(const int crossLinkerType) const
+{
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse cu =
+    this->toCrosslinkerUniverse(crossLinkerType);
+  return pylimer_tools::topo::entanglement_detection::peelTopologicalLeaves(cu);
+}
+
+std::vector<bool>
+Universe::identifyActiveAtoms(const int crossLinkerType) const
+{
+  const size_t nAtoms = this->getNrOfAtoms();
+  std::vector<bool> isActive(nAtoms, false);
+  if (nAtoms == 0) {
+    return isActive;
+  }
+
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse cu =
+    this->toCrosslinkerUniverse(crossLinkerType);
+  const pylimer_tools::topo::entanglement_detection::
+    TopologicalLeafPeelingResult peelResult = pylimer_tools::topo::
+      entanglement_detection::peelTopologicalLeavesDetailed(cu);
+
+  const std::vector<int> vertexDegrees = this->getVertexDegrees();
+  const std::vector<int> vertexTypes = this->getPropertyValues<int>("type");
+
+  size_t xlIdx = 0;
+  for (size_t v = 0; v < nAtoms; ++v) {
+    if (vertexTypes[v] == crossLinkerType || vertexDegrees[v] > 2) {
+      if (xlIdx < peelResult.crosslinkerIsIgnored.size()) {
+        isActive[v] = !peelResult.crosslinkerIsIgnored[xlIdx];
+      }
+      xlIdx++;
+    }
+  }
+
+  const std::vector<Molecule> chains =
+    this->getChainsWithCrosslinker(crossLinkerType);
+  size_t strandIdx = 0;
+  for (size_t c = 0; c < chains.size(); ++c) {
+    const Molecule& chain = chains[c];
+    if (chain.getNrOfBonds() == 0 && chain.getLength() <= 1) {
+      continue;
+    }
+    if (strandIdx < peelResult.strandIsIgnored.size()) {
+      const bool strandActive = !peelResult.strandIsIgnored[strandIdx];
+      const std::vector<long int> atomIds =
+        chain.getPropertyValues<long int>("id");
+      for (const long int atomId : atomIds) {
+        const size_t v = this->getIdxByAtomId(atomId);
+        if (vertexTypes[v] != crossLinkerType && vertexDegrees[v] <= 2) {
+          isActive[v] = strandActive;
+        }
+      }
+    }
+    strandIdx++;
+  }
+
+  return isActive;
+}
 
 /**
  * Identify vertices associated with dangling and free chains.

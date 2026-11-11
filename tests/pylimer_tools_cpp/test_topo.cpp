@@ -244,6 +244,168 @@ TEST_CASE("Analytical Entanglement Detector samples valid entanglements on "
   }
 }
 
+TEST_CASE("Universe toCrosslinkerUniverse and topological leaf peeling",
+          "[analysis][Universe][CrosslinkerUniverse][leaf_peeling]")
+{
+  pe::Universe universe(30.0, 30.0, 30.0);
+  std::vector<double> xPos;
+  std::vector<double> yPos;
+  std::vector<double> zPos;
+  std::vector<long int> atomIds;
+  std::vector<int> atomTypes;
+  std::vector<int> zeroInts;
+  std::vector<long int> bondFrom;
+  std::vector<long int> bondTo;
+
+  auto addAtom = [&](double x, double y, double z, int type) -> long int {
+    long int id = static_cast<long int>(atomIds.size() + 1);
+    atomIds.push_back(id);
+    atomTypes.push_back(type);
+    xPos.push_back(x);
+    yPos.push_back(y);
+    zPos.push_back(z);
+    zeroInts.push_back(0);
+    return id;
+  };
+
+  auto addStrand = [&](long int idFrom,
+                       long int idTo,
+                       int nBeads,
+                       const Eigen::Vector3d& pFrom,
+                       const Eigen::Vector3d& pTo) {
+    long int prevId = idFrom;
+    for (int b = 1; b <= nBeads; ++b) {
+      const double frac =
+        static_cast<double>(b) / static_cast<double>(nBeads + 1);
+      Eigen::Vector3d p = pFrom + frac * (pTo - pFrom);
+      long int bId = addAtom(p.x(), p.y(), p.z(), 1);
+      if (prevId > 0) {
+        bondFrom.push_back(prevId);
+        bondTo.push_back(bId);
+      }
+      prevId = bId;
+    }
+    if (idTo > 0 && prevId > 0) {
+      bondFrom.push_back(prevId);
+      bondTo.push_back(idTo);
+    }
+  };
+
+  // 4 active crosslinkers (c0..c3) forming a tetrahedron (degree 3 each)
+  Eigen::Vector3d p0(5., 5., 5.);
+  Eigen::Vector3d p1(15., 5., 5.);
+  Eigen::Vector3d p2(5., 15., 5.);
+  Eigen::Vector3d p3(5., 5., 15.);
+
+  long int c0 = addAtom(p0.x(), p0.y(), p0.z(), 2);
+  long int c1 = addAtom(p1.x(), p1.y(), p1.z(), 2);
+  long int c2 = addAtom(p2.x(), p2.y(), p2.z(), 2);
+  long int c3 = addAtom(p3.x(), p3.y(), p3.z(), 2);
+
+  // 6 active strands connecting c0..c3 (each with 3 intermediate beads)
+  addStrand(c0, c1, 3, p0, p1);
+  addStrand(c0, c2, 3, p0, p2);
+  addStrand(c0, c3, 3, p0, p3);
+  addStrand(c1, c2, 3, p1, p2);
+  addStrand(c1, c3, 3, p1, p3);
+  addStrand(c2, c3, 3, p2, p3);
+
+  // 1 leaf crosslinker c4 (degree 1) connected only to c1
+  Eigen::Vector3d p4(25., 5., 5.);
+  long int c4 = addAtom(p4.x(), p4.y(), p4.z(), 2);
+  addStrand(c1, c4, 3, p1, p4);
+
+  // 1 dangling strand connected to c2 (free end)
+  Eigen::Vector3d pDangEnd(5., 25., 5.);
+  addStrand(c2, -1, 3, p2, pDangEnd);
+
+  // 1 soluble chain (both ends free)
+  Eigen::Vector3d pSolStart(20., 20., 20.);
+  Eigen::Vector3d pSolEnd(25., 25., 25.);
+  addStrand(-1, -1, 4, pSolStart, pSolEnd);
+
+  universe.addAtoms(
+    atomIds, atomTypes, xPos, yPos, zPos, zeroInts, zeroInts, zeroInts);
+  universe.addBonds(bondFrom, bondTo);
+
+  SECTION("toCrosslinkerUniverse converts accurately")
+  {
+    pylimer_tools::sim::mehp::CrosslinkerUniverse cu =
+      universe.toCrosslinkerUniverse(2);
+    CHECK(cu.xlinkTypes.size() == 5); // c0, c1, c2, c3, c4
+    CHECK(cu.strandFrom.size() >=
+          8); // 6 core + 1 leaf + 1 dangling (+ soluble)
+  }
+
+  SECTION(
+    "peelTopologicalLeaves and identifyActiveAtoms correctly identify 2-core")
+  {
+    std::vector<bool> activeAtoms = universe.identifyActiveAtoms(2);
+    REQUIRE(activeAtoms.size() == universe.getNrOfAtoms());
+
+    // c0..c3 are active
+    CHECK(activeAtoms[universe.getIdxByAtomId(c0)] == true);
+    CHECK(activeAtoms[universe.getIdxByAtomId(c1)] == true);
+    CHECK(activeAtoms[universe.getIdxByAtomId(c2)] == true);
+    CHECK(activeAtoms[universe.getIdxByAtomId(c3)] == true);
+
+    // c4 is a leaf crosslinker (degree 1) -> must be inactive
+    CHECK(activeAtoms[universe.getIdxByAtomId(c4)] == false);
+
+    // Soluble chain atoms must be inactive
+    long int solEndId = atomIds.back();
+    CHECK(activeAtoms[universe.getIdxByAtomId(solEndId)] == false);
+  }
+
+  SECTION("EntanglementFilteringMode behavior in randomlyFindEntanglements")
+  {
+    std::vector<bool> activeAtoms = universe.identifyActiveAtoms(2);
+
+    // PRUNE_UPFRONT: all sampled atoms must be active
+    pt::AtomPairEntanglements upfront = pt::randomlyFindEntanglements(
+      universe,
+      10,
+      8.0,
+      0.0,
+      0,
+      1.0,
+      "seed_upfront",
+      2,
+      true,
+      pt::EntanglementFilteringMode::PRUNE_UPFRONT);
+
+    for (const std::pair<size_t, size_t>& pair : upfront.pairsOfAtoms) {
+      size_t v1 = universe.getIdxByAtomId(pair.first);
+      size_t v2 = universe.getIdxByAtomId(pair.second);
+      CHECK(activeAtoms[v1] == true);
+      CHECK(activeAtoms[v2] == true);
+    }
+
+    CHECK(pt::parseEntanglementFilteringMode("NONE") ==
+          pt::EntanglementFilteringMode::NONE);
+    CHECK(pt::parseEntanglementFilteringMode("Omit_Inactive") ==
+          pt::EntanglementFilteringMode::OMIT_INACTIVE);
+    CHECK(pt::parseEntanglementFilteringMode("PRUNE_UPFRONT") ==
+          pt::EntanglementFilteringMode::PRUNE_UPFRONT);
+    CHECK_THROWS_AS(pt::parseEntanglementFilteringMode("invalid_mode"),
+                    std::invalid_argument);
+
+    // NONE: allows inactive/dangling atoms to be sampled
+    pt::AtomPairEntanglements none =
+      pt::randomlyFindEntanglements(universe,
+                                    15,
+                                    8.0,
+                                    0.0,
+                                    0,
+                                    1.0,
+                                    "seed_none",
+                                    2,
+                                    true,
+                                    pt::EntanglementFilteringMode::NONE);
+    CHECK(none.pairsOfAtoms.size() > 0);
+  }
+}
+
 TEST_CASE("Entanglement Detector respects distance cut-off",
           "[analysis][EntanglementDetector][long]")
 {

@@ -2,7 +2,6 @@
 
 #include "../entities/EigenNeighbourList.h"
 #include "../entities/Molecule.h"
-#include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
 #include "../utils/LazyDistanceMatrix.h"
 #include "../utils/RandomWalker.h"
@@ -17,26 +16,52 @@
 #include <vector>
 
 namespace pylimer_tools::topo::entanglement_detection {
-/**
- * @brief Randomly find pairs of atoms that are close together and could be
- * entanglements
- *
- * @param universe the universe with all the atoms etc.
- * @param nrOfEntanglementsToSample the nr of entanglements to find
- * @param cutoff the cut-off distance within which two atoms are considered
- * close enough
- * @param minimumNrOfEntanglements the minimum number of entanglements to
- * find
- * @param sameStrandCutoff the number of beads required between two atoms of
- * the same strand
- * @param seed the random seed
- * @param crossLinkerType the type of the crosslink atoms
- * @param ignoreCrosslinks whether to ignore crosslink atoms when sampling.
- * Careful: if you don't ignore them, the same-strand policy might not work
- * correctly.
- * @param filterDanglingAndSoluble
- * @return AtomPairEntanglements
- */
+
+namespace {
+
+  void validateEntanglementParameters(const size_t totalAtoms,
+                                      const size_t nrOfEntanglementsToSample,
+                                      const size_t minimumNrOfEntanglements,
+                                      const double upperCutoff,
+                                      const double lowerCutoff)
+  {
+    INVALIDARG_EXP_IFN(minimumNrOfEntanglements < totalAtoms / 2 ||
+                         (minimumNrOfEntanglements == 0 && totalAtoms == 0),
+                       "Minimum number of slip-links must be less than the "
+                       "possible number of slip-links to place.");
+    INVALIDARG_EXP_IFN(nrOfEntanglementsToSample < totalAtoms / 2 ||
+                         (nrOfEntanglementsToSample == 0 && totalAtoms == 0),
+                       "Number of slip-links to place must be less than "
+                       "the possible number of slip-links to place.");
+    INVALIDARG_EXP_IFN(nrOfEntanglementsToSample >= minimumNrOfEntanglements,
+                       "Maximum nr. should be larger than minimum, got " +
+                         std::to_string(nrOfEntanglementsToSample) + " and " +
+                         std::to_string(minimumNrOfEntanglements) + ".");
+    INVALIDARG_EXP_IFN(upperCutoff > 0.0,
+                       "Expected a cutoff > 0.0, got " +
+                         std::to_string(upperCutoff) + ".");
+    INVALIDARG_EXP_IFN(lowerCutoff >= 0.0,
+                       "Expected lower cut-off >= 0.0, got " +
+                         std::to_string(lowerCutoff) + ".");
+    INVALIDARG_EXP_IFN(
+      lowerCutoff < upperCutoff,
+      "Expected lower cut-off to be smaller than upper cut-off, got " +
+        std::to_string(lowerCutoff) + " >= " + std::to_string(upperCutoff) +
+        ".");
+  }
+
+  std::mt19937 initializeRng(const std::string& seed)
+  {
+    if (seed.empty()) {
+      std::random_device rd{};
+      return std::mt19937(rd());
+    }
+    std::seed_seq seedSeq(seed.begin(), seed.end());
+    return std::mt19937(seedSeq);
+  }
+
+} // anonymous namespace
+
 AtomPairEntanglements
 randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
                           const size_t nrOfEntanglementsToSample,
@@ -45,353 +70,100 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
                           const size_t minimumNrOfEntanglements,
                           const double sameStrandCutoff,
                           const std::string& seed,
-                          int crossLinkerType,
-                          bool ignoreCrosslinks,
-                          bool filterDanglingAndSoluble)
+                          const int crossLinkerType,
+                          const bool ignoreCrosslinks,
+                          const EntanglementFilteringMode filteringMode)
 {
-  INVALIDARG_EXP_IFN(minimumNrOfEntanglements < universe.getNrOfAtoms() / 2,
-                     "Minimum number of slip-links must be less than the "
-                     "possible number of slip-links to place.");
-  INVALIDARG_EXP_IFN(nrOfEntanglementsToSample < universe.getNrOfAtoms() / 2,
-                     "Number of slip-links to place must be less than "
-                     "the possible number of slip-links to place.");
-  INVALIDARG_EXP_IFN(nrOfEntanglementsToSample >= minimumNrOfEntanglements,
-                     "Maximum nr. should be larger than minimum, got " +
-                       std::to_string(nrOfEntanglementsToSample) + " and " +
-                       std::to_string(minimumNrOfEntanglements) + ".");
-  INVALIDARG_EXP_IFN(upperCutoff > 0.0,
-                     "Expected a cutoff > 0.0, got " +
-                       std::to_string(upperCutoff) + ".");
-  INVALIDARG_EXP_IFN(
-    lowerCutoff < upperCutoff,
-    "Expected lower cut-off to be smaller than upper cut-off, got " +
-      std::to_string(lowerCutoff) + " ≥ " + std::to_string(upperCutoff) + ".");
+  validateEntanglementParameters(universe.getNrOfAtoms(),
+                                 nrOfEntanglementsToSample,
+                                 minimumNrOfEntanglements,
+                                 upperCutoff,
+                                 lowerCutoff);
 
-  // std::cout << "Randomly finding " << nrOfEntanglementsToSample
-  //           << " entanglements within cutoff " << cutoff
-  //           << " and same strand cutoff " << sameStrandCutoff << "."
-  //           << std::endl;
-
-  // initialise some stuff
   std::vector<std::pair<size_t, size_t>> pairsOfAtoms;
   pairsOfAtoms.reserve(nrOfEntanglementsToSample);
-  std::vector<long int> pairOfAtom =
-    std::vector<long int>(universe.getNrOfAtoms(), -1);
+  std::vector<long int> pairOfAtom(universe.getNrOfAtoms(), -1);
 
-  if (nrOfEntanglementsToSample == 0) {
-    return AtomPairEntanglements(pairsOfAtoms, pairOfAtom);
-  }
-
-  // assemble some minor performance benefits
-  std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
-    universe.getChainsWithCrosslinker(crossLinkerType);
-  std::vector<bool> ignoreMolecule =
-    std::vector<bool>(crossLinkerChains.size(), filterDanglingAndSoluble);
-  if (filterDanglingAndSoluble) {
-    std::transform(
-      crossLinkerChains.begin(),
-      crossLinkerChains.end(),
-      ignoreMolecule.begin(),
-      [](const pylimer_tools::entities::Molecule& m) {
-        return m.getType() ==
-                 pylimer_tools::entities::MoleculeType::DANGLING_CHAIN ||
-               m.getType() == pylimer_tools::entities::MoleculeType::FREE_CHAIN;
-      });
-  }
-
-  std::vector<long int> atomToStrand =
-    std::vector<long int>(universe.getNrOfAtoms(), -1);
-  // use long int here to make unproblematic subtractions
-  std::vector<long int> atomIdxInStrand =
-    std::vector<long int>(universe.getNrOfAtoms(), -1);
-  // start by setting distribution to sample from
-  std::vector<pylimer_tools::entities::Atom> atomsForNeighbourList;
-  atomsForNeighbourList.reserve(universe.getNrOfAtoms());
-  for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
-    std::vector<pylimer_tools::entities::Atom> atoms =
-      crossLinkerChains[i].getAtomsLinedUp(crossLinkerType, true, true);
-    for (size_t atomIdx = 0; atomIdx < atoms.size(); ++atomIdx) {
-      pylimer_tools::entities::Atom atom = atoms[atomIdx];
-      if (((atom.getType() != crossLinkerType) && (atomIdx != 0) &&
-           (atomIdx != (atoms.size() - 1))) ||
-          !ignoreCrosslinks) {
-        igraph_integer_t vertexIdx = universe.getIdxByAtomId(atom.getId());
-        atomsForNeighbourList.push_back(atom);
-        atomToStrand[vertexIdx] = i;
-        atomIdxInStrand[vertexIdx] = atomIdx;
-      }
-    }
-  }
-
-  // some randomness for placement
-  std::mt19937 rng;
-  if (seed == "") {
-    std::random_device rd{};
-    rng = std::mt19937(rd());
-  } else {
-    std::seed_seq seed2(seed.begin(), seed.end());
-    rng = std::mt19937(seed2);
-  }
-  // std::cout << "Initial sampling rng seed: " << rng << std::endl;
-  pylimer_tools::entities::NeighbourList neighbourList =
-    pylimer_tools::entities::NeighbourList(
-      atomsForNeighbourList, universe.getBox(), upperCutoff);
-  size_t numLinksFoundInIteration = 1;
-
-  // start iteration to sample "entanglements"
-  size_t numEntanglementsSampled = 0;
-  do {
-    numLinksFoundInIteration = 0;
-    std::shuffle(
-      atomsForNeighbourList.begin(), atomsForNeighbourList.end(), rng);
-    for (const pylimer_tools::entities::Atom& a1 : atomsForNeighbourList) {
-      size_t atomVertexIdx1 = universe.getIdxByAtomId(a1.getId());
-      // make sure this atom does not yet have a pair
-      if (pairOfAtom[atomVertexIdx1] != -1) {
-        continue;
-      }
-      // then, find neighbouring atoms (but not from the same strand?!)
-      std::vector<pylimer_tools::entities::Atom> neighbours =
-        neighbourList.getAtomsCloseTo(a1, upperCutoff, lowerCutoff);
-      neighbourList.removeAtom(a1, "After querying neighbours.");
-      // filter the neighbours to include only those from other strands
-      // NOTE: this skews the whole thing a bit
-      std::erase_if(
-        neighbours, [&](const pylimer_tools::entities::Atom& a) -> bool {
-          return (((atomToStrand[universe.getIdxByAtomId(a.getId())] ==
-                    atomToStrand[atomVertexIdx1]) &&
-                   (std::abs(static_cast<double>(
-                      atomIdxInStrand[universe.getIdxByAtomId(a.getId())] -
-                      atomIdxInStrand[atomVertexIdx1])) < sameStrandCutoff)));
-        });
-      if (neighbours.size() == 0) {
-        // std::cerr << "Not enough close neighbours found." << std::endl;
-        continue;
-      }
-      // then, randomly select one of them
-      pylimer_tools::entities::Atom a2 = neighbours[0];
-      if (neighbours.size() > 1) {
-        size_t randomA2Idx =
-          std::uniform_int_distribution<size_t>{ 0,
-                                                 neighbours.size() - 1 }(rng);
-        a2 = neighbours[randomA2Idx];
-      }
-
-      size_t atomVertexIdx2 = universe.getIdxByAtomId(a2.getId());
-      RUNTIME_EXP_IFN(
-        pairOfAtom[atomVertexIdx2] == -1,
-        "Expected not to be able to sample the same atom "
-        "twice. Sampled atom with vertex " +
-          std::to_string(atomVertexIdx2) + " and id " +
-          std::to_string(a2.getId()) + " again, already present in " +
-          std::to_string(pairOfAtom[atomVertexIdx2]) + " being " +
-          std::to_string(pairsOfAtoms[pairOfAtom[atomVertexIdx2]]) +
-          ". This time sampled with atom " + std::to_string(a1.getId()) + ".");
-      RUNTIME_EXP_IFN(
-        (atomToStrand[atomVertexIdx2] != atomToStrand[atomVertexIdx1]) ||
-          ((std::abs(static_cast<double>(atomIdxInStrand[atomVertexIdx2] -
-                                         atomIdxInStrand[atomVertexIdx1])) >=
-            sameStrandCutoff)),
-        "Expected neighbours to have been deleted if too far apart.");
-
-      if (!filterDanglingAndSoluble ||
-          (!ignoreMolecule[atomToStrand[atomVertexIdx2]] &&
-           !ignoreMolecule[atomToStrand[atomVertexIdx1]])) {
-        pairOfAtom[atomVertexIdx2] = pairsOfAtoms.size();
-        pairOfAtom[atomVertexIdx1] = pairsOfAtoms.size();
-        pairsOfAtoms.emplace_back(a1.getId(), a2.getId());
-      } else {
-        pairOfAtom[atomVertexIdx2] = -2;
-        pairOfAtom[atomVertexIdx1] = -2;
-      }
-      numEntanglementsSampled += 1;
-      numLinksFoundInIteration += 1;
-      neighbourList.removeAtom(a2, "After marking atom as second pair part.");
-      // std::cout << "Merging atoms " << a1.getId() << " ("
-      //           << atomIdxInStrand[a1.getId()] << "th in "
-      //           << atomToStrand[atomVertexIdx1] << ") and " << a2.getId()
-      //           << " (" << atomIdxInStrand[a2.getId()] << "th in "
-      //           << atomToStrand[atomVertexIdx2] << ") "
-      //           << " with distance " << a1.distanceTo(a2,
-      //           universe.getBox())
-      //           << std::endl;
-      // if (atomToStrand[atomVertexIdx2] == atomToStrand[atomVertexIdx1]) {
-      //   std::cout << "Same strand detected: distance is "
-      //             << std::abs(
-      //                  static_cast<double>(atomIdxInStrand[a2.getId()] -
-      //                                      atomIdxInStrand[a1.getId()]))
-      //             << std::endl;
-      // }
-      if (numEntanglementsSampled >= nrOfEntanglementsToSample) {
-        break;
-      }
-    }
-    if (numEntanglementsSampled >= nrOfEntanglementsToSample) {
-      break;
-    }
-  } while (numEntanglementsSampled < minimumNrOfEntanglements &&
-           numLinksFoundInIteration > 0);
-
-  // reset internal thing
-  for (long& i : pairOfAtom) {
-    if (i == -2) {
-      i = -1;
-    }
-  }
-
-  AtomPairEntanglements result;
-  result.pairsOfAtoms = pairsOfAtoms;
-  result.pairOfAtom = pairOfAtom;
-  return result;
-}
-
-/**
- * @brief Randomly find pairs of atoms that are close together and could be
- * entanglements
- *
- * @param universe the universe with all the atoms etc.
- * @param nrOfEntanglementsToSample the nr of entanglements to find
- * @param upperCutoff the cut-off distance within which two atoms are
- * considered close enough
- * @param lowerCutoff
- * @param minimumNrOfEntanglements the minimum number of entanglements to
- * find
- * @param sameStrandCutoff the number of beads required between two atoms of
- * the same strand
- * @param seed the random seed
- * @param crossLinkerType the type of the crosslink atoms
- * @param ignoreCrosslinks whether to ignore crosslink atoms when sampling.
- * Careful: if you don't ignore them, the same-strand policy might not work
- * correctly.
- * @param filterDanglingAndSoluble
- * @return AtomPairEntanglements
- */
-AtomPairEntanglements
-randomlyFindEntanglementsV2(const pylimer_tools::entities::Universe& universe,
-                            const size_t nrOfEntanglementsToSample,
-                            const double upperCutoff,
-                            const double lowerCutoff,
-                            const size_t minimumNrOfEntanglements,
-                            const double sameStrandCutoff,
-                            const std::string& seed,
-                            const int crossLinkerType,
-                            const bool ignoreCrosslinks,
-                            bool filterDanglingAndSoluble)
-{
-  INVALIDARG_EXP_IFN(minimumNrOfEntanglements < universe.getNrOfAtoms() / 2,
-                     "Minimum number of slip-links must be less than the "
-                     "possible number of slip-links to place.");
-  INVALIDARG_EXP_IFN(nrOfEntanglementsToSample < universe.getNrOfAtoms() / 2,
-                     "Number of slip-links to place must be less than "
-                     "the possible number of slip-links to place.");
-  INVALIDARG_EXP_IFN(nrOfEntanglementsToSample >= minimumNrOfEntanglements,
-                     "Maximum nr. should be larger than minimum, got " +
-                       std::to_string(nrOfEntanglementsToSample) + " and " +
-                       std::to_string(minimumNrOfEntanglements) + ".");
-  INVALIDARG_EXP_IFN(upperCutoff > 0.0,
-                     "Expected a cutoff > 0.0, got " +
-                       std::to_string(upperCutoff) + ".");
-  INVALIDARG_EXP_IFN(
-    lowerCutoff < upperCutoff,
-    "Expected lower cut-off to be smaller than upper cut-off, got " +
-      std::to_string(lowerCutoff) + " ≥ " + std::to_string(upperCutoff) + ".");
-
-  // std::cout << "Randomly finding " << nrOfEntanglementsToSample
-  //           << " entanglements within cutoff " << cutoff
-  //           << " and same strand cutoff " << sameStrandCutoff << "."
-  //           << std::endl;
-
-  // initialise some stuff
-  std::vector<std::pair<size_t, size_t>> pairsOfAtoms;
-  pairsOfAtoms.reserve(nrOfEntanglementsToSample);
-  std::vector<long int> pairOfAtom =
-    std::vector<long int>(universe.getNrOfAtoms(), -1);
-
-  if (nrOfEntanglementsToSample == 0) {
+  if (nrOfEntanglementsToSample == 0 || universe.getNrOfAtoms() < 2) {
     return AtomPairEntanglements(pairsOfAtoms, pairOfAtom);
   }
 
   igraph_lazy_distance_matrix_state_t distance_matrix_computer;
   igraph_t graph = universe.getCopyOfGraph();
   igraph_lazy_distance_matrix_state_init(
-    &distance_matrix_computer, &graph, IGRAPH_ALL, sameStrandCutoff);
+    &distance_matrix_computer,
+    &graph,
+    IGRAPH_ALL,
+    sameStrandCutoff > 0 ? static_cast<igraph_integer_t>(sameStrandCutoff) : 0);
 
-  // some randomness for placement
-  std::mt19937 rng;
-  if (seed == "") {
-    std::random_device rd{};
-    rng = std::mt19937(rd());
-  } else {
-    std::seed_seq seed2(seed.begin(), seed.end());
-    rng = std::mt19937(seed2);
-  }
-  // std::cout << "Initial sampling rng seed: " << rng << std::endl;
-  pylimer_tools::entities::Box box = universe.getBox();
-  Eigen::VectorXd coordinates = universe.getUnwrappedVertexCoordinates(box);
-  const pylimer_tools::entities::EigenNeighbourList neighbourList =
-    pylimer_tools::entities::EigenNeighbourList(coordinates, box, upperCutoff);
+  std::mt19937 rng = initializeRng(seed);
+
+  const pylimer_tools::entities::Box box = universe.getBox();
+  const Eigen::VectorXd coordinates =
+    universe.getUnwrappedVertexCoordinates(box);
+  const pylimer_tools::entities::EigenNeighbourList neighbourList(
+    coordinates, box, upperCutoff);
   std::vector<bool> vertexIsEligible(universe.getNrOfAtoms(), true);
   const std::vector<int> vertexTypes = universe.getPropertyValues<int>("type");
   const std::vector<int> vertexDegrees = universe.getVertexDegrees();
 
+  const std::vector<bool> activeAtoms =
+    (filteringMode != EntanglementFilteringMode::NONE)
+      ? universe.identifyActiveAtoms(crossLinkerType)
+      : std::vector<bool>();
+
   std::vector<long int> vertexIdsToSample;
   vertexIdsToSample.reserve(universe.getNrOfAtoms());
 
-  const std::vector<pylimer_tools::entities::MoleculeType>
-    moleculeTypePerVertex =
-      filterDanglingAndSoluble
-        ? universe.identifyObviouslyDanglingAtoms()
-        : std::vector({ pylimer_tools::entities::MoleculeType::UNDEFINED });
-
-  // filter out crosslink atoms and soluble atoms
-
   for (size_t i = 0; i < universe.getNrOfAtoms(); ++i) {
+    if (vertexDegrees[i] != 2) {
+      vertexIsEligible[i] = false;
+    }
     if (ignoreCrosslinks && vertexTypes[i] == crossLinkerType) {
       vertexIsEligible[i] = false;
     }
-    if (ignoreCrosslinks && vertexDegrees[i] > 2) {
+    if (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT &&
+        !activeAtoms.empty() && !activeAtoms[i]) {
       vertexIsEligible[i] = false;
     }
     if (vertexIsEligible[i]) {
-      vertexIdsToSample.push_back(i);
+      vertexIdsToSample.push_back(static_cast<long int>(i));
     }
   }
 
   size_t numLinksFoundInIteration = 1;
   Eigen::ArrayXi neighbourIndices = Eigen::ArrayXi::Zero(12);
-
-  // start iteration to sample "entanglements"
   size_t numEntanglementsSampled = 0;
+
   do {
     numLinksFoundInIteration = 0;
     std::ranges::shuffle(vertexIdsToSample, rng);
     for (const long int atomVertexIdx1 : vertexIdsToSample) {
-      // make sure this atom does not yet have a pair
       if (pairOfAtom[atomVertexIdx1] != -1) {
         continue;
       }
       vertexIsEligible[atomVertexIdx1] = false;
-      // then, find neighbouring atoms
+
       const size_t nNeighbours = neighbourList.getIndicesCloseToCoordinates(
         neighbourIndices,
-        coordinates.segment(3 * atomVertexIdx1, 3),
-        upperCutoff,
-        true);
+        coordinates.segment<3>(3 * atomVertexIdx1),
+        upperCutoff);
       long int atomVertexIdx2 = -1;
 
       std::shuffle(
         neighbourIndices.data(), neighbourIndices.data() + nNeighbours, rng);
 
-      for (Eigen::Index idxInNeighbours = 0; idxInNeighbours < nNeighbours;
+      for (Eigen::Index idxInNeighbours = 0;
+           idxInNeighbours < static_cast<Eigen::Index>(nNeighbours);
            ++idxInNeighbours) {
-        // filter these neighbours
-        if (!vertexIsEligible[neighbourIndices[idxInNeighbours]]) {
+        const long int candidateVertex = neighbourIndices[idxInNeighbours];
+        if (!vertexIsEligible[candidateVertex] ||
+            pairOfAtom[candidateVertex] != -1) {
           continue;
         }
 
-        Eigen::Vector3d distance =
-          coordinates.segment(3 * neighbourIndices[idxInNeighbours], 3) -
-          coordinates.segment(3 * atomVertexIdx1, 3);
+        Eigen::Vector3d distance = coordinates.segment<3>(3 * candidateVertex) -
+                                   coordinates.segment<3>(3 * atomVertexIdx1);
         box.handlePBC(distance);
 
         const double dist2 = distance.squaredNorm();
@@ -401,15 +173,15 @@ randomlyFindEntanglementsV2(const pylimer_tools::entities::Universe& universe,
         }
 
         igraph_integer_t pathLength =
-          sameStrandCutoff <= 0 ? IGRAPH_INFINITY
-                                : igraph_lazy_distance_matrix_path_length(
-                                    &distance_matrix_computer,
-                                    atomVertexIdx1,
-                                    neighbourIndices[idxInNeighbours],
-                                    false);
-        if (sameStrandCutoff <= 0 || pathLength < sameStrandCutoff) {
-          // found the second part of the pair
-          atomVertexIdx2 = neighbourIndices[idxInNeighbours];
+          sameStrandCutoff <= 0
+            ? IGRAPH_INFINITY
+            : igraph_lazy_distance_matrix_path_length(&distance_matrix_computer,
+                                                      atomVertexIdx1,
+                                                      candidateVertex,
+                                                      false);
+        if (sameStrandCutoff <= 0 || pathLength >= sameStrandCutoff ||
+            pathLength == IGRAPH_INFINITY) {
+          atomVertexIdx2 = candidateVertex;
           break;
         }
       }
@@ -417,59 +189,68 @@ randomlyFindEntanglementsV2(const pylimer_tools::entities::Universe& universe,
                                                 atomVertexIdx1);
 
       if (atomVertexIdx2 < 0) {
-        // did not find eligible neighbour, continue to next starting atom
         continue;
       }
 
-      RUNTIME_EXP_IFN(
-        pairOfAtom[atomVertexIdx2] == -1,
-        "Expected not to be able to sample the same atom "
-        "twice. Sampled atom with vertex " +
-          std::to_string(atomVertexIdx2) + " again, already present in " +
-          std::to_string(pairOfAtom[atomVertexIdx2]) + " being " +
-          std::to_string(pairsOfAtoms[pairOfAtom[atomVertexIdx2]]) +
-          ". This time sampled with vertex " + std::to_string(atomVertexIdx1) +
-          ".");
+      RUNTIME_EXP_IFN(pairOfAtom[atomVertexIdx2] == -1,
+                      "Expected not to be able to sample the same atom twice.");
 
-      if (!filterDanglingAndSoluble ||
-          !((moleculeTypePerVertex[atomVertexIdx1] ==
-               pylimer_tools::entities::MoleculeType::FREE_CHAIN ||
-             moleculeTypePerVertex[atomVertexIdx1] ==
-               pylimer_tools::entities::MoleculeType::DANGLING_CHAIN) ||
-            (moleculeTypePerVertex[atomVertexIdx2] ==
-               pylimer_tools::entities::MoleculeType::FREE_CHAIN ||
-             moleculeTypePerVertex[atomVertexIdx2] ==
-               pylimer_tools::entities::MoleculeType::DANGLING_CHAIN))) {
-        pairOfAtom[atomVertexIdx2] = pairsOfAtoms.size();
-        pairOfAtom[atomVertexIdx1] = pairsOfAtoms.size();
+      if (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT) {
+        pairOfAtom[atomVertexIdx2] = static_cast<long int>(pairsOfAtoms.size());
+        pairOfAtom[atomVertexIdx1] = static_cast<long int>(pairsOfAtoms.size());
         pairsOfAtoms.emplace_back(universe.getAtomIdByIdx(atomVertexIdx1),
                                   universe.getAtomIdByIdx(atomVertexIdx2));
-      } else {
-        // dangling atoms, entangled but we don't store it
-        pairOfAtom[atomVertexIdx2] = -2;
-        pairOfAtom[atomVertexIdx1] = -2;
+      } else if (filteringMode == EntanglementFilteringMode::OMIT_INACTIVE) {
+        if (activeAtoms.empty() ||
+            (activeAtoms[atomVertexIdx1] && activeAtoms[atomVertexIdx2])) {
+          pairOfAtom[atomVertexIdx2] =
+            static_cast<long int>(pairsOfAtoms.size());
+          pairOfAtom[atomVertexIdx1] =
+            static_cast<long int>(pairsOfAtoms.size());
+          pairsOfAtoms.emplace_back(universe.getAtomIdByIdx(atomVertexIdx1),
+                                    universe.getAtomIdByIdx(atomVertexIdx2));
+        } else {
+          pairOfAtom[atomVertexIdx2] = -2;
+          pairOfAtom[atomVertexIdx1] = -2;
+        }
+      } else { // NONE
+        pairOfAtom[atomVertexIdx2] = static_cast<long int>(pairsOfAtoms.size());
+        pairOfAtom[atomVertexIdx1] = static_cast<long int>(pairsOfAtoms.size());
+        pairsOfAtoms.emplace_back(universe.getAtomIdByIdx(atomVertexIdx1),
+                                  universe.getAtomIdByIdx(atomVertexIdx2));
       }
-      vertexIsEligible[atomVertexIdx2] = false;
 
+      vertexIsEligible[atomVertexIdx2] = false;
       numEntanglementsSampled += 1;
       numLinksFoundInIteration += 1;
 
-      if (numEntanglementsSampled >= nrOfEntanglementsToSample) {
+      const size_t targetCount =
+        (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT)
+          ? pairsOfAtoms.size()
+          : numEntanglementsSampled;
+      if (targetCount >= nrOfEntanglementsToSample) {
         break;
       }
     }
-    if (numEntanglementsSampled >= nrOfEntanglementsToSample) {
+
+    const size_t targetCount =
+      (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT)
+        ? pairsOfAtoms.size()
+        : numEntanglementsSampled;
+    if (targetCount >= nrOfEntanglementsToSample) {
       break;
     }
-  } while (numEntanglementsSampled < minimumNrOfEntanglements &&
+  } while (((filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT)
+              ? pairsOfAtoms.size() < minimumNrOfEntanglements
+              : numEntanglementsSampled < minimumNrOfEntanglements) &&
            numLinksFoundInIteration > 0);
 
-  // reset internal thing
-  for (long& i : pairOfAtom) {
+  for (long int& i : pairOfAtom) {
     if (i == -2) {
       i = -1;
     }
   }
+
   igraph_lazy_distance_matrix_state_destroy(&distance_matrix_computer);
   igraph_destroy(&graph);
 
@@ -525,71 +306,84 @@ StrandPairEntanglements::toAtomPairEntanglements(
   return result;
 }
 
-namespace {
+TopologicalLeafPeelingResult
+peelTopologicalLeavesDetailed(
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse)
+{
+  const size_t nCrosslinks = crosslinkerUniverse.xlinkX.size();
+  const size_t nStrands = crosslinkerUniverse.beadsInStrand.size();
+  TopologicalLeafPeelingResult result;
+  result.strandIsIgnored.assign(nStrands, false);
+  result.crosslinkerIsIgnored.assign(nCrosslinks, false);
+  std::vector<std::vector<size_t>> incidentStrands(nCrosslinks);
+  std::vector<size_t> activeNonLoopDegree(nCrosslinks, 0);
+  std::vector<size_t> primaryLoopCount(nCrosslinks, 0);
 
-  std::vector<bool> peelTopologicalLeaves(
-    const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse)
-  {
-    const size_t nCrosslinks = crosslinkerUniverse.xlinkX.size();
-    const size_t nStrands = crosslinkerUniverse.beadsInStrand.size();
-    std::vector<bool> strandIsIgnored(nStrands, false);
-    std::vector<std::vector<size_t>> incidentStrands(nCrosslinks);
-    std::vector<size_t> activeNonLoopDegree(nCrosslinks, 0);
-    std::vector<size_t> primaryLoopCount(nCrosslinks, 0);
-
-    for (size_t s = 0; s < nStrands; ++s) {
-      const long int u = crosslinkerUniverse.strandFrom[s];
-      const long int v = crosslinkerUniverse.strandTo[s];
-      if (u < 0 || v < 0) {
-        strandIsIgnored[s] = true;
+  for (size_t s = 0; s < nStrands; ++s) {
+    const long int u = crosslinkerUniverse.strandFrom[s];
+    const long int v = crosslinkerUniverse.strandTo[s];
+    if (u < 0 || v < 0) {
+      result.strandIsIgnored[s] = true;
+    } else {
+      INVALIDARG_EXP_IFN(
+        static_cast<size_t>(u) < nCrosslinks &&
+          static_cast<size_t>(v) < nCrosslinks,
+        "Crosslinker index out of bounds in strandFrom / strandTo.");
+      if (u == v) {
+        primaryLoopCount[u] += 1;
       } else {
-        INVALIDARG_EXP_IFN(
-          static_cast<size_t>(u) < nCrosslinks &&
-            static_cast<size_t>(v) < nCrosslinks,
-          "Crosslinker index out of bounds in strandFrom / strandTo.");
-        if (u == v) {
-          primaryLoopCount[u] += 1;
-        } else {
-          incidentStrands[u].push_back(s);
-          incidentStrands[v].push_back(s);
-          activeNonLoopDegree[u] += 1;
-          activeNonLoopDegree[v] += 1;
-        }
+        incidentStrands[u].push_back(s);
+        incidentStrands[v].push_back(s);
+        activeNonLoopDegree[u] += 1;
+        activeNonLoopDegree[v] += 1;
       }
     }
-
-    std::vector<size_t> peelQueue;
-    peelQueue.reserve(nCrosslinks);
-    for (size_t xl = 0; xl < nCrosslinks; ++xl) {
-      if (activeNonLoopDegree[xl] <= 1 && primaryLoopCount[xl] == 0) {
-        peelQueue.push_back(xl);
-      }
-    }
-
-    size_t qHead = 0;
-    while (qHead < peelQueue.size()) {
-      const size_t xl = peelQueue[qHead++];
-      for (const size_t s : incidentStrands[xl]) {
-        if (strandIsIgnored[s]) {
-          continue;
-        }
-        strandIsIgnored[s] = true;
-        const size_t u = static_cast<size_t>(crosslinkerUniverse.strandFrom[s]);
-        const size_t v = static_cast<size_t>(crosslinkerUniverse.strandTo[s]);
-        const size_t other = (u == xl) ? v : u;
-        if (activeNonLoopDegree[xl] > 0) {
-          activeNonLoopDegree[xl] -= 1;
-        }
-        if (activeNonLoopDegree[other] > 0) {
-          activeNonLoopDegree[other] -= 1;
-          if (activeNonLoopDegree[other] <= 1 && primaryLoopCount[other] == 0) {
-            peelQueue.push_back(other);
-          }
-        }
-      }
-    }
-    return strandIsIgnored;
   }
+
+  std::vector<size_t> peelQueue;
+  peelQueue.reserve(nCrosslinks);
+  for (size_t xl = 0; xl < nCrosslinks; ++xl) {
+    if (activeNonLoopDegree[xl] <= 1 && primaryLoopCount[xl] == 0) {
+      peelQueue.push_back(xl);
+      result.crosslinkerIsIgnored[xl] = true;
+    }
+  }
+
+  size_t qHead = 0;
+  while (qHead < peelQueue.size()) {
+    const size_t xl = peelQueue[qHead++];
+    for (const size_t s : incidentStrands[xl]) {
+      if (result.strandIsIgnored[s]) {
+        continue;
+      }
+      result.strandIsIgnored[s] = true;
+      const size_t u = static_cast<size_t>(crosslinkerUniverse.strandFrom[s]);
+      const size_t v = static_cast<size_t>(crosslinkerUniverse.strandTo[s]);
+      const size_t other = (u == xl) ? v : u;
+      if (activeNonLoopDegree[xl] > 0) {
+        activeNonLoopDegree[xl] -= 1;
+      }
+      if (activeNonLoopDegree[other] > 0) {
+        activeNonLoopDegree[other] -= 1;
+        if (activeNonLoopDegree[other] <= 1 && primaryLoopCount[other] == 0 &&
+            !result.crosslinkerIsIgnored[other]) {
+          peelQueue.push_back(other);
+          result.crosslinkerIsIgnored[other] = true;
+        }
+      }
+    }
+  }
+  return result;
+}
+
+std::vector<bool>
+peelTopologicalLeaves(
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse)
+{
+  return peelTopologicalLeavesDetailed(crosslinkerUniverse).strandIsIgnored;
+}
+
+namespace {
 
   struct StrandBoundingBox
   {
@@ -976,7 +770,7 @@ randomlyFindEntanglementsAnalytical(
   const size_t minimumNrOfEntanglements,
   const double sameStrandCutoff,
   const std::string& seed,
-  const bool filterDanglingAndSoluble)
+  const EntanglementFilteringMode filteringMode)
 {
   const size_t nCrosslinks = crosslinkerUniverse.xlinkX.size();
   const size_t nStrands = crosslinkerUniverse.beadsInStrand.size();
@@ -1000,46 +794,22 @@ randomlyFindEntanglementsAnalytical(
       std::max<int>(0, crosslinkerUniverse.beadsInStrand[s]));
   }
 
-  INVALIDARG_EXP_IFN(minimumNrOfEntanglements < totalAtoms / 2 ||
-                       (minimumNrOfEntanglements == 0 && totalAtoms == 0),
-                     "Minimum number of slip-links must be less than the "
-                     "possible number of slip-links to place.");
-  INVALIDARG_EXP_IFN(nrOfEntanglementsToSample < totalAtoms / 2 ||
-                       (nrOfEntanglementsToSample == 0 && totalAtoms == 0),
-                     "Number of slip-links to place must be less than "
-                     "the possible number of slip-links to place.");
-  INVALIDARG_EXP_IFN(nrOfEntanglementsToSample >= minimumNrOfEntanglements,
-                     "Maximum nr. should be larger than minimum, got " +
-                       std::to_string(nrOfEntanglementsToSample) + " and " +
-                       std::to_string(minimumNrOfEntanglements) + ".");
-  INVALIDARG_EXP_IFN(upperCutoff > 0.0,
-                     "Expected a cutoff > 0.0, got " +
-                       std::to_string(upperCutoff) + ".");
-  INVALIDARG_EXP_IFN(lowerCutoff >= 0.0,
-                     "Expected lower cut-off >= 0.0, got " +
-                       std::to_string(lowerCutoff) + ".");
-  INVALIDARG_EXP_IFN(
-    lowerCutoff < upperCutoff,
-    "Expected lower cut-off to be smaller than upper cut-off, got " +
-      std::to_string(lowerCutoff) + " >= " + std::to_string(upperCutoff) + ".");
+  validateEntanglementParameters(totalAtoms,
+                                 nrOfEntanglementsToSample,
+                                 minimumNrOfEntanglements,
+                                 upperCutoff,
+                                 lowerCutoff);
 
   StrandPairEntanglements result;
   if (nrOfEntanglementsToSample == 0 || nStrands == 0) {
     return result;
   }
 
-  std::mt19937 rng;
-  if (seed.empty()) {
-    std::random_device rd{};
-    rng = std::mt19937(rd());
-  } else {
-    std::seed_seq seedSeq(seed.begin(), seed.end());
-    rng = std::mt19937(seedSeq);
-  }
+  std::mt19937 rng = initializeRng(seed);
 
-  // Topological leaf peeling on CrosslinkerUniverse if filterDanglingAndSoluble
+  // Topological leaf peeling on CrosslinkerUniverse if filtering is enabled
   std::vector<bool> strandIsIgnored(nStrands, false);
-  if (filterDanglingAndSoluble) {
+  if (filteringMode != EntanglementFilteringMode::NONE) {
     strandIsIgnored = peelTopologicalLeaves(crosslinkerUniverse);
   }
 
@@ -1148,6 +918,10 @@ randomlyFindEntanglementsAnalytical(
   std::vector<BeadRef> candidateBeads;
   candidateBeads.reserve(totalInternalBeads);
   for (size_t s = 0; s < nStrands; ++s) {
+    if (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT &&
+        strandIsIgnored[s]) {
+      continue;
+    }
     const size_t nInt = static_cast<size_t>(strands[s].nInternalBeads);
     for (size_t m = 0; m < nInt; ++m) {
       candidateBeads.push_back(
@@ -1155,8 +929,13 @@ randomlyFindEntanglementsAnalytical(
     }
   }
 
+  const size_t nActiveCandidates = candidateBeads.size();
+  if (nActiveCandidates < 2) {
+    return result;
+  }
+
   std::vector<uint8_t> beadIsPaired(totalInternalBeads, 0);
-  std::vector<size_t> candidateOrder(totalInternalBeads);
+  std::vector<size_t> candidateOrder(nActiveCandidates);
   std::iota(candidateOrder.begin(), candidateOrder.end(), 0);
 
   // Cached mean positions and standard deviations for all internal beads
@@ -1214,13 +993,14 @@ randomlyFindEntanglementsAnalytical(
     numLinksFoundInIteration = 0;
     std::ranges::shuffle(candidateOrder, rng);
 
-    for (const size_t globalIdx1 : candidateOrder) {
+    for (const size_t candIdx1 : candidateOrder) {
+      const size_t s1 = candidateBeads[candIdx1].strandIdx;
+      const size_t m1 = candidateBeads[candIdx1].internalIdx;
+      const size_t globalIdx1 = strandInternalOffset[s1] + m1;
       if (beadIsPaired[globalIdx1]) {
         continue;
       }
 
-      const size_t s1 = candidateBeads[globalIdx1].strandIdx;
-      const size_t m1 = candidateBeads[globalIdx1].internalIdx;
       StrandModel& sm1 = strands[s1];
       const double alpha1 = sm1.internalIdxToAlpha(m1);
 
@@ -1250,6 +1030,10 @@ randomlyFindEntanglementsAnalytical(
       for (size_t nsIdx = 0; nsIdx < nNearbyStrands; ++nsIdx) {
         const size_t s2 = static_cast<size_t>(nearbyStrands[nsIdx]);
         const StrandModel& sm2 = strands[s2];
+        if (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT &&
+            sm2.isIgnored) {
+          continue;
+        }
         const size_t nInt2 = static_cast<size_t>(sm2.nInternalBeads);
         if (nInt2 == 0) {
           continue;
@@ -1382,7 +1166,9 @@ randomlyFindEntanglementsAnalytical(
         updateStrandBeadCache(s2);
       }
 
-      if (!filterDanglingAndSoluble || (!sm1.isIgnored && !sm2.isIgnored)) {
+      if (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT ||
+          filteringMode == EntanglementFilteringMode::NONE ||
+          (!sm1.isIgnored && !sm2.isIgnored)) {
         result.strandIdx1.push_back(s1);
         result.strandIdx2.push_back(s2);
         result.alpha1.push_back(alpha1);
@@ -1401,15 +1187,26 @@ randomlyFindEntanglementsAnalytical(
 
       numEntanglementsSampled += 1;
       numLinksFoundInIteration += 1;
-      if (numEntanglementsSampled >= nrOfEntanglementsToSample) {
+
+      const size_t targetCount =
+        (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT)
+          ? result.size()
+          : numEntanglementsSampled;
+      if (targetCount >= nrOfEntanglementsToSample) {
         break;
       }
     }
 
-    if (numEntanglementsSampled >= nrOfEntanglementsToSample) {
+    const size_t targetCount =
+      (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT)
+        ? result.size()
+        : numEntanglementsSampled;
+    if (targetCount >= nrOfEntanglementsToSample) {
       break;
     }
-  } while (numEntanglementsSampled < minimumNrOfEntanglements &&
+  } while (((filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT)
+              ? result.size() < minimumNrOfEntanglements
+              : numEntanglementsSampled < minimumNrOfEntanglements) &&
            numLinksFoundInIteration > 0);
 
   const size_t nRecorded = result.strandIdx1.size();
@@ -1439,7 +1236,7 @@ randomlyFindEntanglementsOnDemand(
   const size_t minimumNrOfEntanglements,
   const double sameStrandCutoff,
   const std::string& seed,
-  const bool filterDanglingAndSoluble,
+  const EntanglementFilteringMode filteringMode,
   const int nMcSteps)
 {
   const size_t nCrosslinks = crosslinkerUniverse.xlinkX.size();
@@ -1464,28 +1261,11 @@ randomlyFindEntanglementsOnDemand(
       std::max<int>(0, crosslinkerUniverse.beadsInStrand[s]));
   }
 
-  INVALIDARG_EXP_IFN(minimumNrOfEntanglements < totalAtoms / 2 ||
-                       (minimumNrOfEntanglements == 0 && totalAtoms == 0),
-                     "Minimum number of slip-links must be less than the "
-                     "possible number of slip-links to place.");
-  INVALIDARG_EXP_IFN(nrOfEntanglementsToSample < totalAtoms / 2 ||
-                       (nrOfEntanglementsToSample == 0 && totalAtoms == 0),
-                     "Number of slip-links to place must be less than "
-                     "the possible number of slip-links to place.");
-  INVALIDARG_EXP_IFN(nrOfEntanglementsToSample >= minimumNrOfEntanglements,
-                     "Maximum nr. should be larger than minimum, got " +
-                       std::to_string(nrOfEntanglementsToSample) + " and " +
-                       std::to_string(minimumNrOfEntanglements) + ".");
-  INVALIDARG_EXP_IFN(upperCutoff > 0.0,
-                     "Expected a cutoff > 0.0, got " +
-                       std::to_string(upperCutoff) + ".");
-  INVALIDARG_EXP_IFN(lowerCutoff >= 0.0,
-                     "Expected lower cut-off >= 0.0, got " +
-                       std::to_string(lowerCutoff) + ".");
-  INVALIDARG_EXP_IFN(
-    lowerCutoff < upperCutoff,
-    "Expected lower cut-off to be smaller than upper cut-off, got " +
-      std::to_string(lowerCutoff) + " >= " + std::to_string(upperCutoff) + ".");
+  validateEntanglementParameters(totalAtoms,
+                                 nrOfEntanglementsToSample,
+                                 minimumNrOfEntanglements,
+                                 upperCutoff,
+                                 lowerCutoff);
 
   StrandPairEntanglements result;
   if (nrOfEntanglementsToSample == 0 || nStrands == 0) {
@@ -1493,18 +1273,11 @@ randomlyFindEntanglementsOnDemand(
   }
 
   std::vector<bool> strandIsIgnored(nStrands, false);
-  if (filterDanglingAndSoluble) {
+  if (filteringMode != EntanglementFilteringMode::NONE) {
     strandIsIgnored = peelTopologicalLeaves(crosslinkerUniverse);
   }
 
-  std::mt19937 masterRng;
-  if (seed.empty()) {
-    std::random_device rd;
-    masterRng = std::mt19937(rd());
-  } else {
-    std::seed_seq seedSeq(seed.begin(), seed.end());
-    masterRng = std::mt19937(seedSeq);
-  }
+  std::mt19937 masterRng = initializeRng(seed);
 
   std::vector<uint64_t> strandSeeds(nStrands);
   std::uniform_int_distribution<uint64_t> seedDist(
@@ -1523,11 +1296,17 @@ randomlyFindEntanglementsOnDemand(
     bboxes[s].nBeads = std::max(0, nBeads);
     bboxes[s].isIgnored = strandIsIgnored[s];
 
+    const bool ignoreInOffset =
+      (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT &&
+       strandIsIgnored[s]) ||
+      nBeads <= 0;
     strandInternalOffset[s + 1] =
       strandInternalOffset[s] +
-      (strandIsIgnored[s] || nBeads <= 0 ? 0 : static_cast<size_t>(nBeads));
+      (ignoreInOffset ? 0 : static_cast<size_t>(nBeads));
 
-    if (nBeads <= 0) {
+    if (nBeads <= 0 ||
+        (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT &&
+         strandIsIgnored[s])) {
       continue;
     }
 
@@ -1663,7 +1442,10 @@ randomlyFindEntanglementsOnDemand(
 
       for (size_t nsIdx = 0; nsIdx < nNearby; ++nsIdx) {
         const size_t s2 = static_cast<size_t>(nearbyStrands[nsIdx]);
-        if (s2 == s1 || bboxes[s2].isIgnored || bboxes[s2].nBeads == 0) {
+        if (s2 == s1 ||
+            (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT &&
+             bboxes[s2].isIgnored) ||
+            bboxes[s2].nBeads == 0) {
           continue;
         }
         if (!isAABBWithinCutoff(r1Wrapped,
@@ -1709,37 +1491,52 @@ randomlyFindEntanglementsOnDemand(
       beadIsPaired[g1] = 1;
       beadIsPaired[chosen.globalIdx] = 1;
 
-      result.strandIdx1.push_back(s1);
-      result.strandIdx2.push_back(chosen.strandIdx);
-      result.alpha1.push_back(
-        static_cast<double>(m1 + 1) /
-        static_cast<double>(crosslinkerUniverse.beadsInStrand[s1] + 1));
-      result.alpha2.push_back(
-        static_cast<double>(chosen.beadIdx + 1) /
-        static_cast<double>(
-          crosslinkerUniverse.beadsInStrand[chosen.strandIdx] + 1));
-      result.beadIdx1.push_back(m1);
-      result.beadIdx2.push_back(chosen.beadIdx);
+      if (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT ||
+          filteringMode == EntanglementFilteringMode::NONE ||
+          (!strandIsIgnored[s1] && !strandIsIgnored[chosen.strandIdx])) {
+        result.strandIdx1.push_back(s1);
+        result.strandIdx2.push_back(chosen.strandIdx);
+        result.alpha1.push_back(
+          static_cast<double>(m1 + 1) /
+          static_cast<double>(crosslinkerUniverse.beadsInStrand[s1] + 1));
+        result.alpha2.push_back(
+          static_cast<double>(chosen.beadIdx + 1) /
+          static_cast<double>(
+            crosslinkerUniverse.beadsInStrand[chosen.strandIdx] + 1));
+        result.beadIdx1.push_back(m1);
+        result.beadIdx2.push_back(chosen.beadIdx);
 
-      const Eigen::Vector3d pos1 = r1;
-      const Eigen::Vector3d pos2 = r1 + chosen.delta;
-      Eigen::Vector3d mid = r1 + 0.5 * chosen.delta;
-      box.handlePBC(mid);
-      sampledPos1.push_back(pos1);
-      sampledPos2.push_back(pos2);
-      sampledMidpoints.push_back(mid);
+        const Eigen::Vector3d pos1 = r1;
+        const Eigen::Vector3d pos2 = r1 + chosen.delta;
+        Eigen::Vector3d mid = r1 + 0.5 * chosen.delta;
+        box.handlePBC(mid);
+        sampledPos1.push_back(pos1);
+        sampledPos2.push_back(pos2);
+        sampledMidpoints.push_back(mid);
+      }
 
       numEntanglementsSampled += 1;
       numLinksFoundInIteration += 1;
-      if (numEntanglementsSampled >= nrOfEntanglementsToSample) {
+
+      const size_t targetCount =
+        (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT)
+          ? result.size()
+          : numEntanglementsSampled;
+      if (targetCount >= nrOfEntanglementsToSample) {
         break;
       }
     }
 
-    if (numEntanglementsSampled >= nrOfEntanglementsToSample) {
+    const size_t targetCount =
+      (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT)
+        ? result.size()
+        : numEntanglementsSampled;
+    if (targetCount >= nrOfEntanglementsToSample) {
       break;
     }
-  } while (numEntanglementsSampled < minimumNrOfEntanglements &&
+  } while (((filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT)
+              ? result.size() < minimumNrOfEntanglements
+              : numEntanglementsSampled < minimumNrOfEntanglements) &&
            numLinksFoundInIteration > 0);
 
   const size_t nRecorded = result.strandIdx1.size();

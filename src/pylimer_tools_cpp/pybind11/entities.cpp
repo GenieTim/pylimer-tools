@@ -4,9 +4,9 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Molecule.h"
-#include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
 #include "../entities/UniverseSequence.h"
+#include "../sim/MEHPUtilityStructures.h"
 
 #include "../utils/CerealUtils.h"
 
@@ -937,67 +937,6 @@ init_pylimer_bound_entities(py::module_& m)
          :return: A new Molecule instance that is a copy of this one
          )pbdoc");
 
-  py::class_<NeighbourList, py::smart_holder>(m,
-                                              "NeighbourList",
-                                              R"pbdoc(
-    Gives access to somewhat fast queries on the neighbourhood of atoms.
-    
-    This class provides efficient spatial queries for finding atoms within
-    a specified distance of each other.
-    )pbdoc",
-                                              py::module_local())
-    .def(py::init<const std::vector<pylimer_tools::entities::Atom>&,
-                  const pylimer_tools::entities::Box&,
-                  double>(),
-         R"pbdoc(
-         Instantiate a new neighbour list.
-         
-         :param atoms: Vector of atoms to include in the neighbour list
-         :param box: The simulation box
-         :param cutoff: Maximum distance for neighbour searches
-         )pbdoc",
-         py::arg("atoms"),
-         py::arg("box"),
-         py::arg("cutoff"))
-    .def("get_atoms_close_to",
-         py::overload_cast<const Atom&, double, double, bool, bool>(
-           &NeighbourList::getAtomsCloseTo),
-         R"pbdoc(
-          List all atoms that are close to a given one. 
-
-          It is possible to request it within a new cutoff, 
-          though the underlying neighbour list will not be regenerated.
-          For performance reasons, it is recommended to initialize a 
-          new NeighbourList if you require a different cutoff, depending on your use case.
-
-          You can use a negative value for the upper_cutoff to use the cutoff used for 
-          filling the neighbour list buckets.
-          
-          :param atom: The reference atom
-          :param upper_cutoff: Maximum distance for neighbours
-          :param lower_cutoff: Minimum distance for neighbours
-          :param unwrapped: Whether to use unwrapped coordinates
-          :param expect_self: Whether to expect the atom itself in results
-          :return: List of neighbouring atoms
-         )pbdoc",
-         py::arg("atom"),
-         py::arg("upper_cutoff") = 1.0,
-         py::arg("lower_cutoff") = 0.0,
-         py::arg("unwrapped") = false,
-         py::arg("expect_self") = false)
-    .def("remove_atom",
-         &NeighbourList::removeAtom,
-         R"pbdoc(
-         Remove an atom from this neighbour list.
-         It will not show up when querying for neighbours, 
-         but its neighbours cannot be queried either.
-         
-         :param atom: The atom to remove
-         :param debug_hint: Optional debug information
-         )pbdoc",
-         py::arg("atom"),
-         py::arg("debug_hint") = "");
-
   py::class_<Universe, py::smart_holder>(m,
                                          "Universe",
                                          R"pbdoc(
@@ -1440,6 +1379,39 @@ init_pylimer_bound_entities(py::module_& m)
             :return: Reduced network containing only crosslinkers
           )pbdoc",
          py::arg("crosslinker_type"))
+    .def("to_crosslinker_universe",
+         &Universe::toCrosslinkerUniverse,
+         R"pbdoc(
+            Convert this Universe into a CrosslinkerUniverse representation.
+
+            Extracts all crosslinkers and strands, lining up beads deterministically.
+
+            :param crosslinker_type: Type ID of crosslinker atoms (default: 2)
+            :return: CrosslinkerUniverse struct
+         )pbdoc",
+         py::arg("crosslinker_type") = 2)
+    .def("peel_topological_leaves",
+         &Universe::peelTopologicalLeaves,
+         R"pbdoc(
+            Peel 1-core dangling trees and subgraphs from the network topology.
+
+            Returns a boolean vector indicating for each strand whether it is ignored (pruned).
+
+            :param crosslinker_type: Type ID of crosslinker atoms (default: 2)
+            :return: Vector of booleans where true means the strand is pruned/ignored
+         )pbdoc",
+         py::arg("crosslinker_type") = 2)
+    .def("identify_active_atoms",
+         &Universe::identifyActiveAtoms,
+         R"pbdoc(
+            Identify which atoms belong to the topologically active 2-core of the network.
+
+            Atoms on pruned leaves, dangling branches, and soluble components will have false.
+
+            :param crosslinker_type: Type ID of crosslinker atoms (default: 2)
+            :return: Boolean vector of length get_nr_of_atoms() (indexed by vertex index)
+         )pbdoc",
+         py::arg("crosslinker_type") = 2)
     .def("contract_vertices_along_bond_type",
          &Universe::contractVerticesAlongBondType,
          R"pbdoc(

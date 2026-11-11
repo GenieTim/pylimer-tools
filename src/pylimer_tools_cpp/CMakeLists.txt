@@ -18,7 +18,6 @@ add_library(pylimer_tools
     entities/Molecule.cpp
     entities/Universe.cpp
     entities/UniverseSequence.cpp
-    entities/NeighbourList.cpp
     entities/EigenNeighbourList.cpp
     io/AveFileReader.cpp
     io/DataFileParser.cpp

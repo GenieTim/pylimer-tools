@@ -1529,6 +1529,32 @@ MCUniverseGenerator::sampleEntanglements(
   const bool filterDanglingAndSoluble,
   const EntanglementSamplingMethod method) const
 {
+  return this->sampleEntanglements(
+    nrOfEntanglementsToSample,
+    upperCutoff,
+    lowerCutoff,
+    minimumNrOfEntanglements,
+    sameStrandCutoff,
+    seed,
+    filterDanglingAndSoluble ? pylimer_tools::topo::entanglement_detection::
+                                 EntanglementFilteringMode::OMIT_INACTIVE
+                             : pylimer_tools::topo::entanglement_detection::
+                                 EntanglementFilteringMode::NONE,
+    method);
+}
+
+pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+MCUniverseGenerator::sampleEntanglements(
+  const size_t nrOfEntanglementsToSample,
+  const double upperCutoff,
+  const double lowerCutoff,
+  const size_t minimumNrOfEntanglements,
+  const double sameStrandCutoff,
+  const std::string& seed,
+  const pylimer_tools::topo::entanglement_detection::EntanglementFilteringMode
+    filteringMode,
+  const EntanglementSamplingMethod method) const
+{
   switch (method) {
     case EntanglementSamplingMethod::ANALYTICAL:
       return this->sampleEntanglementsAnalytical(nrOfEntanglementsToSample,
@@ -1537,23 +1563,16 @@ MCUniverseGenerator::sampleEntanglements(
                                                  minimumNrOfEntanglements,
                                                  sameStrandCutoff,
                                                  seed,
-                                                 filterDanglingAndSoluble);
+                                                 filteringMode);
     case EntanglementSamplingMethod::ON_DEMAND:
+    case EntanglementSamplingMethod::DISCRETE:
       return this->sampleEntanglementsOnDemand(nrOfEntanglementsToSample,
                                                upperCutoff,
                                                lowerCutoff,
                                                minimumNrOfEntanglements,
                                                sameStrandCutoff,
                                                seed,
-                                               filterDanglingAndSoluble);
-    case EntanglementSamplingMethod::DISCRETE:
-      INVALIDARG_EXP_IFN(
-        false,
-        "Discrete entanglement sampling requires generating the full Universe "
-        "via get_universe() and using randomly_sample_entanglements. Use "
-        "EntanglementSamplingMethod::ANALYTICAL or ON_DEMAND for "
-        "generator-level "
-        "sampling.");
+                                               filteringMode);
   }
   return this->sampleEntanglementsAnalytical(nrOfEntanglementsToSample,
                                              upperCutoff,
@@ -1561,7 +1580,7 @@ MCUniverseGenerator::sampleEntanglements(
                                              minimumNrOfEntanglements,
                                              sameStrandCutoff,
                                              seed,
-                                             filterDanglingAndSoluble);
+                                             filteringMode);
 }
 
 pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
@@ -1574,6 +1593,30 @@ MCUniverseGenerator::sampleEntanglementsAnalytical(
   const std::string& seed,
   const bool filterDanglingAndSoluble) const
 {
+  return this->sampleEntanglementsAnalytical(
+    nrOfEntanglementsToSample,
+    upperCutoff,
+    lowerCutoff,
+    minimumNrOfEntanglements,
+    sameStrandCutoff,
+    seed,
+    filterDanglingAndSoluble ? pylimer_tools::topo::entanglement_detection::
+                                 EntanglementFilteringMode::OMIT_INACTIVE
+                             : pylimer_tools::topo::entanglement_detection::
+                                 EntanglementFilteringMode::NONE);
+}
+
+pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+MCUniverseGenerator::sampleEntanglementsAnalytical(
+  const size_t nrOfEntanglementsToSample,
+  const double upperCutoff,
+  const double lowerCutoff,
+  const size_t minimumNrOfEntanglements,
+  const double sameStrandCutoff,
+  const std::string& seed,
+  const pylimer_tools::topo::entanglement_detection::EntanglementFilteringMode
+    filteringMode) const
+{
   const std::string effectiveSeed =
     seed.empty() ? this->getCurrentSeed() : seed;
   return pylimer_tools::topo::entanglement_detection::
@@ -1585,7 +1628,7 @@ MCUniverseGenerator::sampleEntanglementsAnalytical(
                                         minimumNrOfEntanglements,
                                         sameStrandCutoff,
                                         effectiveSeed,
-                                        filterDanglingAndSoluble);
+                                        filteringMode);
 }
 
 pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
@@ -1598,6 +1641,30 @@ MCUniverseGenerator::sampleEntanglementsOnDemand(
   const std::string& seed,
   const bool filterDanglingAndSoluble) const
 {
+  return this->sampleEntanglementsOnDemand(
+    nrOfEntanglementsToSample,
+    upperCutoff,
+    lowerCutoff,
+    minimumNrOfEntanglements,
+    sameStrandCutoff,
+    seed,
+    filterDanglingAndSoluble ? pylimer_tools::topo::entanglement_detection::
+                                 EntanglementFilteringMode::OMIT_INACTIVE
+                             : pylimer_tools::topo::entanglement_detection::
+                                 EntanglementFilteringMode::NONE);
+}
+
+pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+MCUniverseGenerator::sampleEntanglementsOnDemand(
+  const size_t nrOfEntanglementsToSample,
+  const double upperCutoff,
+  const double lowerCutoff,
+  const size_t minimumNrOfEntanglements,
+  const double sameStrandCutoff,
+  const std::string& seed,
+  const pylimer_tools::topo::entanglement_detection::EntanglementFilteringMode
+    filteringMode) const
+{
   const std::string effectiveSeed =
     seed.empty() ? this->getCurrentSeed() : seed;
   return pylimer_tools::topo::entanglement_detection::
@@ -1609,7 +1676,7 @@ MCUniverseGenerator::sampleEntanglementsOnDemand(
                                       minimumNrOfEntanglements,
                                       sameStrandCutoff,
                                       effectiveSeed,
-                                      filterDanglingAndSoluble,
+                                      filteringMode,
                                       this->nMcSteps);
 }
 
