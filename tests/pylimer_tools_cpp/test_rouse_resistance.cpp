@@ -643,31 +643,54 @@ TEST_CASE("ResistanceDistanceAnalysis Level-3 BLAS Chunking for All-Pairs & "
     double pDiff = (P_chunk1 - P_chunk128).cwiseAbs().maxCoeff();
     CHECK(pDiff < 1e-12);
   }
+}
 
-  SECTION("Benchmark Level-3 BLAS Chunking (B=1 vs B=128)")
-  {
-    auto start1 = std::chrono::high_resolution_clock::now();
-    Eigen::MatrixXd R1 = rda.computeAllPairsEffectiveResistance(1);
-    auto end1 = std::chrono::high_resolution_clock::now();
-    double time1_ms =
-      std::chrono::duration<double, std::milli>(end1 - start1).count();
-
-    auto start128 = std::chrono::high_resolution_clock::now();
-    Eigen::MatrixXd R128 = rda.computeAllPairsEffectiveResistance(128);
-    auto end128 = std::chrono::high_resolution_clock::now();
-    double time128_ms =
-      std::chrono::duration<double, std::milli>(end128 - start128).count();
-
-    double speedup = time1_ms / time128_ms;
-    std::cout << "\n=== All-Pairs Resistance Distance Level-3 BLAS Chunking "
-                 "Benchmark (N="
-              << N << ") ===\n"
-              << "Level-2 BLAS (chunk=1, dtrsv):   " << time1_ms << " ms\n"
-              << "Level-3 BLAS (chunk=128, dtrsm): " << time128_ms << " ms\n"
-              << "Speedup:                         " << speedup << "x\n"
-              << "============================================================="
-                 "============\n";
-
-    CHECK(speedup >= 1.0);
+TEST_CASE(
+  "ResistanceDistanceAnalysis Level-3 BLAS Chunking Benchmark (B=1 vs B=128)",
+  "[ResistanceDistanceAnalysis][topo][benchmark][long]")
+{
+  const size_t N = 300;
+  std::vector<size_t> from, to;
+  std::vector<double> weights;
+  for (size_t i = 0; i < N - 1; ++i) {
+    from.push_back(i);
+    to.push_back(i + 1);
+    weights.push_back(1.0);
   }
+  from.push_back(N - 1);
+  to.push_back(0);
+  weights.push_back(1.0);
+
+  // Cross-links
+  for (size_t i = 0; i < N / 4; ++i) {
+    from.push_back(i * 3);
+    to.push_back((i * 3 + N / 2) % N);
+    weights.push_back(0.5);
+  }
+
+  pt::ResistanceDistanceAnalysis rda(from, to, weights, N);
+
+  auto start1 = std::chrono::high_resolution_clock::now();
+  Eigen::MatrixXd R1 = rda.computeAllPairsEffectiveResistance(1);
+  auto end1 = std::chrono::high_resolution_clock::now();
+  double time1_ms =
+    std::chrono::duration<double, std::milli>(end1 - start1).count();
+
+  auto start128 = std::chrono::high_resolution_clock::now();
+  Eigen::MatrixXd R128 = rda.computeAllPairsEffectiveResistance(128);
+  auto end128 = std::chrono::high_resolution_clock::now();
+  double time128_ms =
+    std::chrono::duration<double, std::milli>(end128 - start128).count();
+
+  double speedup = time1_ms / time128_ms;
+  std::cout << "\n=== All-Pairs Resistance Distance Level-3 BLAS Chunking "
+               "Benchmark (N="
+            << N << ") ===\n"
+            << "Level-2 BLAS (chunk=1, dtrsv):   " << time1_ms << " ms\n"
+            << "Level-3 BLAS (chunk=128, dtrsm): " << time128_ms << " ms\n"
+            << "Speedup:                         " << speedup << "x\n"
+            << "============================================================="
+               "============\n";
+
+  CHECK(speedup >= 1.0);
 }

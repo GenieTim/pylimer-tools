@@ -5,6 +5,10 @@ extern "C"
 #include <igraph/igraph.h>
 }
 #include <cassert>
+#include <limits>
+
+constexpr igraph_integer_t LAZY_DISTANCE_INFINITY =
+  std::numeric_limits<igraph_integer_t>::max();
 
 typedef struct igraph_lazy_distance_matrix_state_t
 {
@@ -59,7 +63,7 @@ igraph_lazy_distance_matrix_forget_source(
  * @param target The target vertex ID
  * @param store_path Whether to store all path lengths (default: false)
  * @return The length of the shortest path between source and target,
- * or IGRAPH_INFINITY if no path exists
+ * or LAZY_DISTANCE_INFINITY if no path exists
  */
 static igraph_integer_t
 igraph_lazy_distance_matrix_path_length(
@@ -88,7 +92,7 @@ igraph_lazy_distance_matrix_path_length(
   // otherwise, compute it by bfs
   igraph_dqueue_int_push(&state->to_visit_queue, source);
   igraph_dqueue_int_push(&state->depth_queue, 0);
-  igraph_integer_t result = IGRAPH_INFINITY;
+  igraph_integer_t result = LAZY_DISTANCE_INFINITY;
   // remember having visited the start
   igraph_vector_int_push_back(&state->visiting_hosts_in_current_iteration,
                               source);
@@ -136,7 +140,7 @@ igraph_lazy_distance_matrix_path_length(
            igraph_dqueue_int_size(&state->depth_queue));
     // C does not have a `break 2`, nor should one use a `goto` statement,
     // so we break again here if we found the target vertex
-    if (result != IGRAPH_INFINITY) {
+    if (result != LAZY_DISTANCE_INFINITY) {
       break;
     }
   }

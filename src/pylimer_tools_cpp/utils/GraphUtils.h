@@ -33,14 +33,15 @@ graphHasVertexWithProperty(igraph_t* graph,
 {
   INVALIDARG_EXP_IFN(propertyValue != 0,
                      "Check for default property value not supported.");
-  igraph_vector_t results;
-  igraph_vector_init(&results, 1);
   if (!igraph_cattribute_has_attr(
         graph, IGRAPH_ATTRIBUTE_VERTEX, propertyName.c_str())) {
     return false;
   }
+  igraph_vector_t results;
+  igraph_vector_init(&results, 1);
   if (igraph_cattribute_VANV(
         graph, propertyName.c_str(), igraph_vss_all(), &results)) {
+    igraph_vector_destroy(&results);
     throw std::runtime_error("Failed to query property " + propertyName);
   };
   std::vector<IN> resultsV;

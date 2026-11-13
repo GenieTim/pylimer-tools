@@ -176,13 +176,13 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
 
         igraph_integer_t pathLength =
           sameStrandCutoff <= 0
-            ? IGRAPH_INFINITY
+            ? LAZY_DISTANCE_INFINITY
             : igraph_lazy_distance_matrix_path_length(&distance_matrix_computer,
                                                       atomVertexIdx1,
                                                       candidateVertex,
                                                       false);
         if (sameStrandCutoff <= 0 || pathLength >= sameStrandCutoff ||
-            pathLength == IGRAPH_INFINITY) {
+            pathLength == LAZY_DISTANCE_INFINITY) {
           atomVertexIdx2 = candidateVertex;
           break;
         }
