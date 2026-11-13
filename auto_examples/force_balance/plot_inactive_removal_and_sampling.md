@@ -1052,7 +1052,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
    > This permanently purges inactive degrees of freedom and unlinks bifunctional nodes, accelerating
    > every successive deformation step by 20–80%.
 
-**Total running time of the script:** (0 minutes 0.875 seconds)
+**Total running time of the script:** (0 minutes 0.609 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"></a>
 

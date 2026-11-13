@@ -203,7 +203,7 @@
 - [NOTE](plot_multi_component_system.html.md): Go to the end
 - [NOTE](plot_custom_crosslinking_callback.html.md): Go to the end
 - [NOTE](plot_tetra_peg_network.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;01:03.115&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;01:00.121&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
 
 ## Optional
 

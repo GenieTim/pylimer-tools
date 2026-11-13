@@ -897,7 +897,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 | **Calibrated Polymer Database**  | [`get_sampling_cutoff()`](../../pylimer_tools.io.html.md#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_sampling_cutoff) | Pre-calibrated empirical formula matched to experimental plateau modulus $G_e$. |
 | **High-Density Entangled Melts** | Use `entanglements_as_springs=True`                                                                                                                   | Series compliance buffers against large cutoff distortions.                     |
 
-**Total running time of the script:** (0 minutes 0.921 seconds)
+**Total running time of the script:** (0 minutes 0.642 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-sampling-cutoff-effect-py"></a>
 

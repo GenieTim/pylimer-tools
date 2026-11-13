@@ -129,7 +129,7 @@ plt.title("Distribution of Strand Lengths in Vulcanized Network")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 22.139 seconds)
+**Total running time of the script:** (0 minutes 19.388 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-vulcanized-network-py"></a>
 

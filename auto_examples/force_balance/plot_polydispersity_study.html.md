@@ -444,7 +444,7 @@ Loading cached example data from polydispersity_study_cache.npz...
    tendency to form primary self-loops, the overall active strand weight fraction
    $w_{\mathrm{active}} \approx 84.5\%$ remains robust at high crosslinker conversions ($p = 92.5\%$).
 
-**Total running time of the script:** (0 minutes 0.372 seconds)
+**Total running time of the script:** (0 minutes 0.258 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-polydispersity-study-py"></a>
 

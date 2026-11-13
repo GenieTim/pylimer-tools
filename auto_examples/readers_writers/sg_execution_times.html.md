@@ -2,7 +2,7 @@
 
 # Computation times
 
-**00:23.641** total execution time for 13 files **from auto_examples/readers_writers**:
+**00:17.316** total execution time for 13 files **from auto_examples/readers_writers**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -19,10 +19,10 @@ $(document).ready( function () {
 
 | Example                                                                                                                                                                                                    | Time      |   Mem (MB) |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
-| [Streaming Dump File Reader](plot_memory_efficient_dump_file_reading.html.md#sphx-glr-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py) (`plot_memory_efficient_dump_file_reading.py`) | 00:22.347 |          0 |
+| [Streaming Dump File Reader](plot_memory_efficient_dump_file_reading.html.md#sphx-glr-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py) (`plot_memory_efficient_dump_file_reading.py`) | 00:16.068 |          0 |
 | [Data File Reader](plot_data_file_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-reader-py) (`plot_data_file_reader.py`)                                               | 00:00.262 |          0 |
 | [Unit Conversion](plot_unit_conversion.html.md#sphx-glr-auto-examples-readers-writers-plot-unit-conversion-py) (`plot_unit_conversion.py`)                                                  | 00:00.238 |          0 |
-| [Extract Trajectory Frame](plot_convert_trajectory_to_frame.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py) (`plot_convert_trajectory_to_frame.py`)                 | 00:00.225 |          0 |
+| [Extract Trajectory Frame](plot_convert_trajectory_to_frame.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py) (`plot_convert_trajectory_to_frame.py`)                 | 00:00.180 |          0 |
 | [Data File Writer](plot_data_file_writer.html.md#sphx-glr-auto-examples-readers-writers-plot-data-file-writer-py) (`plot_data_file_writer.py`)                                               | 00:00.088 |          0 |
 | [Convert for Bond Swapping](plot_convert_for_bond_swapping.html.md#sphx-glr-auto-examples-readers-writers-plot-convert-for-bond-swapping-py) (`plot_convert_for_bond_swapping.py`)                    | 00:00.080 |          0 |
 | [Histogram Reader](plot_histogram_reader.html.md#sphx-glr-auto-examples-readers-writers-plot-histogram-reader-py) (`plot_histogram_reader.py`)                                               | 00:00.074 |          0 |

@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**01:03.115** total execution time for 9 files **from auto_examples/network_generator**:
+**01:00.121** total execution time for 9 files **from auto_examples/network_generator**:
 
 .. container::
 
@@ -36,10 +36,7 @@ Computation times
      - 00:38.560
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_vulcanized_network.py` (``plot_vulcanized_network.py``)
-     - 00:22.139
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_network_generator_plot_custom_crosslinking_callback.py` (``plot_custom_crosslinking_callback.py``)
-     - 00:00.454
+     - 00:19.388
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_simple_crosslinked_network.py` (``plot_simple_crosslinked_network.py``)
      - 00:00.438
@@ -47,11 +44,14 @@ Computation times
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_add_angles.py` (``plot_add_angles.py``)
      - 00:00.436
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py` (``plot_polydisperse_system.py``)
-     - 00:00.407
-     - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_multi_component_system.py` (``plot_multi_component_system.py``)
      - 00:00.359
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_network_generator_plot_custom_crosslinking_callback.py` (``plot_custom_crosslinking_callback.py``)
+     - 00:00.336
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_network_generator_plot_polydisperse_system.py` (``plot_polydisperse_system.py``)
+     - 00:00.282
      - 0.0
    * - :ref:`sphx_glr_auto_examples_network_generator_plot_save_network.py` (``plot_save_network.py``)
      - 00:00.231

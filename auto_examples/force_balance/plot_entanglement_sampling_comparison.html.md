@@ -35,12 +35,14 @@ three complementary sampling methods:
    storing only 6 floats + seed per strand ($O(N_{\text{strands}})$ memory). During entanglement
    detection, periodic neighbor lists on bounding-box centroids cull non-overlapping strands with >99%
    efficiency; candidate strands regenerate explicit beads on demand into a small LRU cache.
-   This achieves physical bead-level fidelity identical to discrete sampling at the memory footprint
-   of analytical sampling.
+   This achieves physical bead-level fidelity identical to discrete sampling with a memory footprint
+   close to that of analytical sampling, and is typically also the fastest of the three for large systems.
 3. **Analytical Method** ([`sample_entanglements()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements) with
    `method=EntanglementSamplingMethod.ANALYTICAL` or [`randomly_sample_entanglements_analytical()`](../../api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html.md#pylimer_tools_cpp.randomly_sample_entanglements_analytical)):
    Bypasses bead coordinates entirely by evaluating pairwise conditional Gaussian Brownian-bridge
-   distributions directly on [`CrosslinkerUniverse`](../../api/pylimer_tools_cpp.CrosslinkerUniverse.html.md#pylimer_tools_cpp.CrosslinkerUniverse). Minimal memory and fast.
+   distributions directly on [`CrosslinkerUniverse`](../../api/pylimer_tools_cpp.CrosslinkerUniverse.html.md#pylimer_tools_cpp.CrosslinkerUniverse). Minimal memory; runtime is
+   competitive for small and medium systems, but for large systems it is typically *slower* than the
+   on-demand method, because every candidate pair requires evaluating conditional distributions.
 
 This example illustrates:
 
@@ -59,7 +61,7 @@ This example illustrates:
      (simultaneous frozen multi-chain bead realization with intra-chain correlations vs. independent pairwise conditional bridge sampling).
 5. **Practical Decision Guide**: When to choose which method, key trade-offs, and physical assumptions.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 54-83 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 56-85 -->
 
 ## Background: The Memory Wall in Entanglement Sampling
 
@@ -91,7 +93,7 @@ from their conditional Gaussian distributions. Furthermore, all three sampling m
 `EntanglementFilteringMode.PRUNE_UPFRONT`), discarding candidate links that involve
 dangling chains or soluble molecules.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 83-119 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 85-121 -->
 ```Python
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import json
@@ -128,7 +130,7 @@ from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
 import pylimer_tools_cpp as pt  # noqa: E402
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 120-126 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 122-128 -->
 
 ## Benchmark 1: Scaling Benchmark (Peak Memory & Runtime)
 
@@ -137,14 +139,20 @@ ranging from 200 to 10,000 strands (up to 200,000+ beads).
 Subprocesses isolate memory measurements per condition to prevent
 accumulation.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 126-268 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 128-281 -->
 ```Python
 def run_scaling_benchmark(
     sizes: Sequence[int] = (200, 500, 1000, 2000, 4000, 7000, 10000),
     strand_len: int = 50,
     seed: int = 42,
+    n_repeats: int = 5,
 ) -> Dict[str, np.ndarray]:
-    """Measure peak memory and runtime for discrete, on-demand, and analytical methods across system sizes."""
+    """Measure peak memory and runtime (median of ``n_repeats``) for discrete, on-demand, and analytical methods across system sizes.
+
+    All methods use the same filtering mode and sampling target; the network definition
+    (identical for all) is excluded from the timings. Sampling and force balance
+    construction are timed separately.
+    """
     print("Running Scaling Benchmark across system sizes...")
     params = get_parameters_for_polymer(
         "PDMS", parameter_type=ParameterType.GAUSSIAN)
@@ -169,6 +177,9 @@ vol = n_atoms / bead_density
 L = vol ** (1.0 / 3.0)
 n_ent = int(ent_density * vol)
 
+filt = pt.EntanglementFilteringMode.OMIT_INACTIVE
+
+# Phase 0: network definition (identical for all methods)
 t0 = time.perf_counter()
 gen = pt.MCUniverseGenerator(L, L, L)
 gen.config_nr_of_mc_steps(0)
@@ -177,116 +188,118 @@ gen.set_mean_squared_bead_distance(1.0)
 gen.add_strands(n_strands, [strand_len] * n_strands)
 gen.add_crosslinkers(int(0.5 * n_strands), 4)
 gen.link_strands_to_conversion(0.92)
+t_setup = time.perf_counter()
 
+# Phase 1: bead realization (discrete only) and entanglement sampling,
+# all with the same filtering (OMIT_INACTIVE) and target count.
 if mode == "discrete":
     u = gen.get_universe()
-    fb = pt.MEHPForceBalance2(
-        u,
-        nr_of_entanglements_to_sample=n_ent,
-        upper_sampling_cutoff=cutoff,
-        entanglements_as_springs=False,
+    ents = pt.randomly_sample_entanglements(
+        u, n_ent, cutoff, 0.0, 0, 3.0, "seed", filtering_mode=filt
     )
-    fb.validate_network()
-elif mode == "on_demand":
+    n_sampled = len(ents.pairs_of_atoms)
+    t_sample = time.perf_counter()
+    fb = pt.MEHPForceBalance2(u, ents, 2, False, False)
+else:
+    method = (
+        pt.EntanglementSamplingMethod.ON_DEMAND
+        if mode == "on_demand"
+        else pt.EntanglementSamplingMethod.ANALYTICAL
+    )
     es = gen.sample_entanglements(
-        n_ent, cutoff, 0.0, 0, 3.0, "seed", pt.EntanglementFilteringMode.OMIT_INACTIVE,
-        method=pt.EntanglementSamplingMethod.ON_DEMAND,
+        n_ent, cutoff, 0.0, 0, 3.0, "seed", filt, method=method
     )
+    n_sampled = len(es.alpha_1)
+    t_sample = time.perf_counter()
+    # Phase 2: force balance construction
     fb = gen.get_force_balance2(es, 2, False)
-    fb.validate_network()
-elif mode == "analytical":
-    es = gen.sample_entanglements(
-        n_ent, cutoff, 0.0, 0, 3.0, "seed", pt.EntanglementFilteringMode.OMIT_INACTIVE,
-        method=pt.EntanglementSamplingMethod.ANALYTICAL,
-    )
-    fb = gen.get_force_balance2(es, 2, False)
-    fb.validate_network()
-
+fb.validate_network()
 t1 = time.perf_counter()
+
 maxrss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 if sys.platform == "darwin":
     rss_mb = maxrss / (1024.0 * 1024.0)
 else:
     rss_mb = maxrss / 1024.0
 
-print(json.dumps({"mode": mode, "n_strands": n_strands, "n_atoms": n_atoms, "time": t1 - t0, "rss_mb": rss_mb}))
+# "time" excludes the common network definition; it covers sampling + FB build.
+print(json.dumps({
+    "mode": mode, "n_strands": n_strands, "n_atoms": n_atoms,
+    "time": t1 - t_setup, "t_setup": t_setup - t0,
+    "t_sample": t_sample - t_setup, "t_build": t1 - t_sample,
+    "n_sampled": n_sampled, "rss_mb": rss_mb,
+}))
 """
 
-    disc_atoms: List[int] = []
-    disc_time: List[float] = []
-    disc_rss: List[float] = []
-
-    od_atoms: List[int] = []
-    od_time: List[float] = []
-    od_rss: List[float] = []
-
-    ana_atoms: List[int] = []
-    ana_time: List[float] = []
-    ana_rss: List[float] = []
+    modes = ["analytical", "on_demand", "discrete"]
+    records: Dict[str, List[Dict[str, Any]]] = {m: [] for m in modes}
+    atoms: List[int] = []
 
     for n in sizes:
-        for mode in ["analytical", "on_demand", "discrete"]:
-            cmd = [
-                sys.executable,
-                "-c",
-                worker_code,
-                mode,
-                str(n),
-                str(strand_len),
-                str(seed),
-                str(bead_density),
-                str(cutoff),
-                str(ent_density),
-            ]
-            res = subprocess.run(
-                cmd, capture_output=True, text=True, check=True)
-            lines = [l for l in res.stdout.strip().split("\n")
-                     if l.startswith("{")]
-            record = json.loads(lines[-1])
-            if mode == "discrete":
-                disc_atoms.append(record["n_atoms"])
-                disc_time.append(record["time"])
-                disc_rss.append(record["rss_mb"])
-                print(
-                    f"Discrete:   N_atoms={record['n_atoms']:6d} | Time={
-                        record['time']:6.2f}s | RSS={record['rss_mb']:6.1f} MB"
-                )
-            elif mode == "on_demand":
-                od_atoms.append(record["n_atoms"])
-                od_time.append(record["time"])
-                od_rss.append(record["rss_mb"])
-                print(
-                    f"On-Demand:  N_atoms={record['n_atoms']:6d} | Time={
-                        record['time']:6.2f}s | RSS={record['rss_mb']:6.1f} MB"
-                )
-            else:
-                ana_atoms.append(record["n_atoms"])
-                ana_time.append(record["time"])
-                ana_rss.append(record["rss_mb"])
-                print(
-                    f"Analytical: N_atoms={record['n_atoms']:6d} | Time={
-                        record['time']:6.2f}s | RSS={record['rss_mb']:6.1f} MB"
-                )
+        runs: Dict[str, List[Dict[str, Any]]] = {m: [] for m in modes}
+        # Interleave modes across repeats so that transient machine load
+        # affects all methods alike; report the median.
+        for _ in range(n_repeats):
+            for mode in modes:
+                cmd = [
+                    sys.executable,
+                    "-c",
+                    worker_code,
+                    mode,
+                    str(n),
+                    str(strand_len),
+                    str(seed),
+                    str(bead_density),
+                    str(cutoff),
+                    str(ent_density),
+                ]
+                res = subprocess.run(
+                    cmd, capture_output=True, text=True, check=True)
+                lines = [l for l in res.stdout.strip().split("\n")
+                         if l.startswith("{")]
+                runs[mode].append(json.loads(lines[-1]))
+        atoms.append(int(runs[modes[0]][0]["n_atoms"]))
+        for mode in modes:
+            med: Dict[str, Any] = {
+                k: float(np.median([r[k] for r in runs[mode]]))
+                for k in ("time", "t_sample", "t_build", "rss_mb", "n_sampled")
+            }
+            records[mode].append(med)
+            print(
+                f"{mode:10s} N_atoms={atoms[-1]:7d} | Time={med['time']:6.2f}s "
+                f"(sample={
+                    med['t_sample']:5.2f}s, build={
+                    med['t_build']:5.2f}s) | "
+                f"RSS={
+                    med['rss_mb']:6.1f} MB | n_sampled={
+                    med['n_sampled']:.0f}"
+            )
 
-    return {
-        "scaling_atoms": np.array(ana_atoms),
-        "scaling_time_discrete": np.array(disc_time),
-        "scaling_rss_discrete": np.array(disc_rss),
-        "scaling_time_on_demand": np.array(od_time),
-        "scaling_rss_on_demand": np.array(od_rss),
-        "scaling_time_analytical": np.array(ana_time),
-        "scaling_rss_analytical": np.array(ana_rss),
-    }
+    def col(mode: str, key: str) -> np.ndarray:
+        return np.array([r[key] for r in records[mode]])
+
+    out: Dict[str, np.ndarray] = {"scaling_atoms": np.array(atoms)}
+    for mode, tag in (
+        ("discrete", "discrete"),
+        ("on_demand", "on_demand"),
+        ("analytical", "analytical"),
+    ):
+        out[f"scaling_time_{tag}"] = col(mode, "time")
+        out[f"scaling_rss_{tag}"] = col(mode, "rss_mb")
+        out[f"scaling_time_sample_{tag}"] = col(mode, "t_sample")
+        out[f"scaling_time_build_{tag}"] = col(mode, "t_build")
+        out[f"scaling_n_sampled_{tag}"] = col(mode, "n_sampled")
+    return out
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 269-273 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 282-286 -->
 
 ## Benchmark 2: Conformational Statistics Comparison
 
 We sample entanglements and compare the distribution of continuous contour positions
 $\alpha$ and spatial Euclidean distances $r$ against explicit discrete bead sampling.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 273-392 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 286-405 -->
 ```Python
 def run_distribution_comparison(
     n_strands: int = 10000,
@@ -405,7 +418,7 @@ def run_distribution_comparison(
     }
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 393-398 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 406-411 -->
 
 ## Benchmark 3: Crosslinker Conversion Sweep & Multi-Seed Ensembles
 
@@ -413,7 +426,7 @@ We evaluate how defective networks behave across crosslinker conversion $p \in [
 Multi-seed repetitions provide empirical variance and Student’s t 95%
 confidence intervals.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 398-818 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 411-831 -->
 ```Python
 def _count_active_entanglements(fb: pt.MEHPForceBalance2) -> int:
     """Count the number of active load-bearing entanglements in the network."""
@@ -833,7 +846,7 @@ def run_all_benchmarks(max_workers: Optional[int] = None) -> Dict[str, Any]:
     return combined
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 819-827 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 832-840 -->
 
 ## Loading Benchmark & Statistical Data
 
@@ -844,7 +857,7 @@ benchmark data is loaded from the committed cache.
 The dataset can be recomputed from scratch at any time by passing `--recompute`
 to this script or setting `PYLIMER_RECOMPUTE_CACHE=1`.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 827-885 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 840-906 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     cache_path = get_example_cache_path(
@@ -859,6 +872,14 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     scaling_rss_od = data.get("scaling_rss_on_demand")
     scaling_time_ana = data["scaling_time_analytical"]
     scaling_rss_ana = data["scaling_rss_analytical"]
+    # Optional per-phase timings (sampling vs. force-balance construction)
+    scaling_phase = {
+        m: (
+            data.get(f"scaling_time_sample_{m}"),
+            data.get(f"scaling_time_build_{m}"),
+        )
+        for m in ("discrete", "on_demand", "analytical")
+    }
 
     alpha_ana = data["alpha_analytical"]
     dist_ana = data["dist_analytical"]
@@ -908,17 +929,26 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 Loading cached example data from entanglement_sampling_comparison_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 886-893 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 907-923 -->
 
 ## Comparison 1: Memory Footprint & Runtime Scaling
 
 As the network size increases, explicit bead generation rapidly inflates peak resident
 memory (RSS) due to bead coordinate arrays, neighbor search structures, and igraph graphs.
-In contrast, analytical sampling bypasses intermediate bead allocation, keeping memory
-footprint virtually flat and reducing peak RAM by 80% to over 90% on
-large networks.
+In contrast, on-demand and analytical sampling bypass the full bead allocation, keeping the
+memory footprint nearly flat and substantially reducing peak RAM on large networks.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 893-1006 -->
+For a fair runtime comparison, all methods sample the same number of entanglements with the
+same filtering mode (`OMIT_INACTIVE`), MC equilibration is disabled for all
+(`config_nr_of_mc_steps(0)`), the identical network-definition step is excluded from the
+timings, and every point is the median over several runs in fresh subprocesses.
+Runtime is split into sampling (for the discrete method including bead realization) and
+force-balance construction. Note that the discrete method must realize and neighbor-search
+*all* beads, whereas the on-demand method only regenerates beads of candidate strands that
+survive the bounding-box culling, so the on-demand method can
+legitimately be faster.
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 923-1064 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 
@@ -1024,16 +1054,44 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_time.set_yscale("log")
     ax_time.xaxis.set_major_formatter(k_formatter)
     ax_time.set_xlabel(r"Total Atoms in Network ($N_{\mathrm{atoms}}$)")
-    ax_time.set_ylabel("Setup & Sampling Time [s]")
-    ax_time.set_title("Setup & Sampling Execution Time")
+    ax_time.set_ylabel("Sampling & Force-Balance Setup Time [s]")
+    ax_time.set_title("Sampling & Force-Balance Setup Time (median)")
     ax_time.grid(True, which="both", linestyle="--", alpha=0.5)
     ax_time.legend(frameon=True)
 
     plt.tight_layout()
     plt.show()
+
+    # Figure 3: Phase breakdown at the largest system size
+    if all(v[0] is not None for v in scaling_phase.values()):
+        labels = {
+            "discrete": "Discrete\n(bead realization\n+ sampling)",
+            "on_demand": "On-Demand",
+            "analytical": "Analytical",
+        }
+        fig, ax_ph = plt.subplots(figsize=(7, 4.5))
+        names = list(labels)
+        samp = [float(scaling_phase[m][0][-1]) for m in names]
+        build = [float(scaling_phase[m][1][-1]) for m in names]
+        ax_ph.bar([labels[m] for m in names], samp,
+                  color="#7570b3", label="Sampling")
+        ax_ph.bar(
+            [labels[m] for m in names],
+            build,
+            bottom=samp,
+            color="#e7298a",
+            label="Force-balance construction",
+        )
+        ax_ph.set_ylabel("Time [s]")
+        ax_ph.set_title(
+            f"Phase Breakdown at $N_{{\\mathrm{{atoms}}}}$ = {int(scaling_atoms[-1])}"
+        )
+        ax_ph.legend(frameon=True)
+        plt.tight_layout()
+        plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1007-1021 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1065-1079 -->
 
 ## Comparison 2: Conformational Statistics (Contour & Spatial Distributions)
 
@@ -1050,7 +1108,7 @@ Below, we compare:
    sampling cutoff $r_{\text{cut}}$, producing identical Euclidean
    distance distributions.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1021-1111 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1079-1169 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax_alpha, ax_dist) = plt.subplots(1, 2, figsize=(11, 4.5))
@@ -1147,7 +1205,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
   return n / db / n.sum(), bin_edges
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1112-1162 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1170-1220 -->
 
 ## Comparison 3: Crosslinker Conversion, Topological Filtering & Network Simplification
 
@@ -1199,7 +1257,7 @@ When comparing discrete and analytical sampling across conversions, two distinct
 When multi-seed ensembles are enabled, shaded confidence bands and error bars show the
 **95% Student’s t confidence interval** across independent realizations.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1162-1578 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1220-1636 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax_mod, ax_ent, ax_frac) = plt.subplots(1, 3, figsize=(15, 4.6))
@@ -1617,7 +1675,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1579-1667 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1637-1729 -->
 
 ## Method Comparison & Practical Guidance
 
@@ -1625,11 +1683,11 @@ The table below summarizes key trade-offs between discrete, on-demand, and analy
 
 | Criterion                 | Discrete (Full Universe)                                                                                                                                                                                                                                                                                                                                                                           | On-Demand (Bounding Box)                                                                                                                                                                                                                          | Analytical (Universe-Free)                                                                                                                                                                                                                        |
 |---------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Memory Footprint**      | High: $O(N_{\text{atoms}})$, reaches gigabytes for large networks.                                                                                                                                                                                                                                                                                                                                 | Minimal: $O(N_{\text{strands}})$, ~80–95% lower (stores only 6 floats + seed per strand).                                                                                                                                                         | Minimal: $O(N_{\text{xlinks}} + N_{\text{strands}})$, ~80–95% lower.                                                                                                                                                                              |
-| **Execution Speed**       | Slower: requires placing every bead and building 3D neighbor cell lists.                                                                                                                                                                                                                                                                                                                           | Fast: periodic bounding-box culling (>99% pairs culled), beads regenerated on demand.                                                                                                                                                             | Fastest: samples conditional Gaussian distributions between crosslinkers directly.                                                                                                                                                                |
+| **Memory Footprint**      | High: $O(N_{\text{atoms}})$, reaches gigabytes for large networks.                                                                                                                                                                                                                                                                                                                                 | Low: $O(N_{\text{strands}})$ (stores only 6 floats + seed per strand).                                                                                                                                                                            | Low: $O(N_{\text{xlinks}} + N_{\text{strands}})$.                                                                                                                                                                                                 |
+| **Execution Speed**       | Moderate: requires placing every bead and building 3D neighbor cell lists; cost grows with<br/>$N_{\text{atoms}}$.                                                                                                                                                                                                                                                                                 | Fastest for large systems: periodic bounding-box culling (>99% pairs culled), beads regenerated on demand.                                                                                                                                        | Fast for small systems, but can become the slowest option for large systems, as each candidate<br/>pair requires evaluating conditional distributions. See the runtime plot above.                                                                |
 | **Strand Physics**        | Exact bead coordinates as generated by the Monte Carlo universe generator.                                                                                                                                                                                                                                                                                                                         | Exact bead coordinates generated on demand using per-strand deterministic seeds.                                                                                                                                                                  | Assumes conditional Gaussian random walks (Brownian bridge) between anchors.                                                                                                                                                                      |
 | **Topological Filtering** | Recursive topological leaf peeling via [`OMIT_INACTIVE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.OMIT_INACTIVE)<br/>(or `PRUNE_UPFRONT`). Paired with<br/>[`INACTIVE_THEN_X2F`](../../api/pylimer_tools_cpp.StructureSimplificationMode.html.md#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_THEN_X2F), any remaining<br/>zero-strain links are also pruned. | Recursive topological leaf peeling via [`OMIT_INACTIVE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.OMIT_INACTIVE)<br/>(or `PRUNE_UPFRONT`) places links strictly on elastically active gel strands. | Recursive topological leaf peeling via [`OMIT_INACTIVE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.OMIT_INACTIVE)<br/>(or `PRUNE_UPFRONT`) places links strictly on elastically active gel strands. |
-| **Ideal Use Case**        | Downstream MD/DPD simulations requiring full 3D atom configurations.                                                                                                                                                                                                                                                                                                                               | MEHP Force Balance runs demanding exact bead-level fidelity without the RAM bottleneck.                                                                                                                                                           | Large networks, high-throughput conversion/parameter sweeps, and affine/phantom calculations.                                                                                                                                                     |
+| **Ideal Use Case**        | Downstream MD/DPD simulations requiring full 3D atom configurations.                                                                                                                                                                                                                                                                                                                               | Default choice for MEHP Force Balance runs: exact bead-level fidelity without the RAM bottleneck,<br/>also for large networks and high-throughput conversion/parameter sweeps.                                                                    | Quick studies on small to medium networks, and when the Gaussian-chain assumption is acceptable.<br/>For large networks, prefer on-demand sampling.                                                                                               |
 
 ### Physical Understanding & Limitations
 
@@ -1676,7 +1734,7 @@ The table below summarizes key trade-offs between discrete, on-demand, and analy
      [`NONE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.NONE) (paired with simplification) or scale
      target $N_{\text{ent}}$ by $1 / w_{\text{active}}^2$.
 
-**Total running time of the script:** (0 minutes 2.142 seconds)
+**Total running time of the script:** (0 minutes 1.813 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 
