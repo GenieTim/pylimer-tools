@@ -3417,7 +3417,6 @@ MEHPForceBalance2::computeActiveWeightFraction(ForceBalance2Network& net,
     }
   }
 
-  const double nActiveSprings = activeSprings.count();
   // as of now, the springsContourLength is equal to the number of bonds
   // from link to link. therefore, the number of atoms of each
   // of these springs is one less
@@ -3627,7 +3626,7 @@ MEHPForceBalance2::countActiveClusteredAtoms(ForceBalance2Network& net,
   const std::vector<int> activeNodeIndices =
     this->getIndicesOfActiveNodes(net, u, tolerance);
 
-  for (const long int& nodeIdx : activeNodeIndices) {
+  for (const int nodeIdx : activeNodeIndices) {
     const long int atomId = net.oldAtomIds[nodeIdx];
     auto it = this->atomIdToClusterIdx.find(atomId);
     if (it != this->atomIdToClusterIdx.end()) {

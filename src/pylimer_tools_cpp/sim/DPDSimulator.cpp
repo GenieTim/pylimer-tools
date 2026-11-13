@@ -554,7 +554,6 @@ DPDSimulator::addBond(const long int fromIdx,
 void
 DPDSimulator::deformBoxImmediately(const pylimer_tools::entities::Box& newBox)
 {
-  bool isDifferent = newBox == this->box;
   const pylimer_tools::entities::Box previousBox = this->box;
   // rescale box offsets
   this->box = newBox;
@@ -1510,21 +1509,18 @@ DPDSimulator::replaceSlipSpringPartner(const size_t springIdx,
   INVALIDARG_EXP_IFN((this->atomTypes[partnerAfter] != this->crossLinkerType ||
                       this->idxFunctionalities[partnerAfter] <= 2),
                      "Cannot form slip-springs with crosslinkers.");
-  size_t otherPartner;
   if (this->bondPartnersA[springIdx] == partnerBefore) {
     this->bondPartnersA[springIdx] = partnerAfter;
     for (int dir = 0; dir < 3; ++dir) {
       this->bondPartnerCoordinatesA[3 * springIdx + dir] =
         3 * partnerAfter + dir;
     }
-    otherPartner = this->bondPartnersB[springIdx];
   } else {
     this->bondPartnersB[springIdx] = partnerAfter;
     for (int dir = 0; dir < 3; ++dir) {
       this->bondPartnerCoordinatesB[3 * springIdx + dir] =
         3 * partnerAfter + dir;
     }
-    otherPartner = this->bondPartnersA[springIdx];
   }
   this->resetBondOffset(springIdx);
   // add to the bonds of the new bond partner

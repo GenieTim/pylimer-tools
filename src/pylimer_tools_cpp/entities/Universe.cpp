@@ -90,8 +90,8 @@ Universe::Universe(Universe&& other) noexcept
   , NAtoms(other.NAtoms)
   , NBonds(other.NBonds)
   , angleFrom(std::move(other.angleFrom))
-  , angleVia(std::move(other.angleVia))
   , angleTo(std::move(other.angleTo))
+  , angleVia(std::move(other.angleVia))
   , angleType(std::move(other.angleType))
   , dihedralAngleFrom(std::move(other.dihedralAngleFrom))
   , dihedralAngleVia1(std::move(other.dihedralAngleVia1))
@@ -789,13 +789,13 @@ Universe::countAtomsInSkinDistance(const std::vector<double>& distances,
     }
   }
 
-  const Box box = this->getBox();
+  const Box currentBox = this->getBox();
   const Eigen::VectorXd coordinates =
-    unwrapped ? this->getUnwrappedVertexCoordinates(box)
-              : this->getAssumedVertexCoordinates(box);
+    unwrapped ? this->getUnwrappedVertexCoordinates(currentBox)
+              : this->getAssumedVertexCoordinates(currentBox);
   const double maxCutoff = pylimer_tools::utils::last<double>(distances);
   const double listCutoff = std::max(maxCutoff, 1e-2);
-  const EigenNeighbourList neighbourList(coordinates, box, listCutoff);
+  const EigenNeighbourList neighbourList(coordinates, currentBox, listCutoff);
 
   const size_t nBins = distances.size() - 1;
   std::vector<double> distSquared(distances.size());
@@ -825,7 +825,7 @@ Universe::countAtomsInSkinDistance(const std::vector<double>& distances,
         Eigen::Vector3d d =
           coordinates.segment<3>(3 * b) - coordinates.segment<3>(3 * a);
         if (!unwrapped) {
-          box.handlePBC(d);
+          currentBox.handlePBC(d);
         }
         const double d2 = d.squaredNorm();
         for (size_t i = 0; i < nBins; ++i) {
@@ -1184,7 +1184,8 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
       std::vector<std::vector<long int>> bondsToAdd;
       // loop end nodes
       while (!IGRAPH_VIT_END(endNodeVit)) {
-        long int newEndNodeVertexId = (long int)IGRAPH_VIT_GET(endNodeVit);
+        long int newEndNodeVertexId =
+          static_cast<long int>(IGRAPH_VIT_GET(endNodeVit));
         long int oldEndNodeId =
           igraphRealToInt<long int>(VAN(chain, "id", newEndNodeVertexId));
         long int originalEndNodeVertexId =
@@ -1209,8 +1210,6 @@ Universe::getChainsWithCrosslinker(const int crossLinkerType) const
 
           if (vertexIsJunction[neighbourOriginalId]) {
             // found a crosslinker neighbour
-            long int originalNeighbourAtomId = igraph_cattribute_VAN(
-              &this->getGraph(), "id", neighbourOriginalId);
             atomsToAdd.push_back(neighbourOriginalId);
             bondsToAdd.push_back({ {
               originalEndNodeVertexId,
@@ -1993,7 +1992,6 @@ Universe::findMinimalOrderLoopFrom(const long int loopStart,
   }
 
   // translate the paths we found
-  long int currentPathKey = 0;
   igraph_integer_t n_paths = igraph_vector_int_list_size(&paths);
   for (igraph_integer_t pathIdx = 0; pathIdx < n_paths; ++pathIdx) {
     igraph_vector_int_t* path = igraph_vector_int_list_get_ptr(&paths, pathIdx);
@@ -2017,7 +2015,6 @@ Universe::findMinimalOrderLoopFrom(const long int loopStart,
         }
       }
     }
-    currentPathKey = 0;
   }
 
   igraph_vector_int_list_destroy(&paths);
@@ -2969,7 +2966,6 @@ Universe::findLoopEntanglements(
     this->box.handlePBC(distance);
     helperNode += ((distance).array() * sizeDenominator).matrix();
   }
-  int intersections = 0;
   // now that we have the helper node, we can check all edges of loop2, how
   // often they intersect the triangles
   for (long int i = 0; i < vertexIndicesLoop1.size(); ++i) {
@@ -3015,7 +3011,6 @@ Universe::findLoopEntanglements(
                   << "; " << vertex1[0] << ", " << vertex1[1] << ", "
                   << vertex1[2] << "; " << helperNode[0] << ", "
                   << helperNode[1] << ", " << helperNode[2] << "." << std::endl;
-        intersections += 1;
         // TODO: maybe do something with the intersection point?
         LoopIntersectionInfo result;
         std::vector<Atom> involvedAtoms;
@@ -3192,8 +3187,8 @@ Universe::computeDs(const std::vector<long int>& bondFrom,
   results.reserve(nBonds);
 
   for (int i = 0; i < nBonds; ++i) {
-    double currentD = (double)igraph_vector_get(&dValuesTo, i) -
-                      (double)igraph_vector_get(&dValuesFrom, i);
+    double currentD = static_cast<double>(igraph_vector_get(&dValuesTo, i)) -
+                      static_cast<double>(igraph_vector_get(&dValuesFrom, i));
     while (std::fabs(currentD) > 0.5 * boxLimit) {
       if (currentD < 0.0) {
         currentD += boxLimit;

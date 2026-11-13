@@ -152,6 +152,8 @@ RouseBrownianSimulator::ensureFactorized() const
         RUNTIME_EXP_IFN(cgSolver_.info() == Eigen::Success,
                         "ConjugateGradient setup of A failed");
         break;
+      default:
+        throw std::invalid_argument("Unknown RouseSolverType");
     }
     solverFactorized_ = true;
   }
@@ -178,6 +180,8 @@ RouseBrownianSimulator::solveShiftedRHS(const Eigen::MatrixXd& rhs,
       result = nextPos;
       break;
     }
+    default:
+      throw std::invalid_argument("Unknown RouseSolverType");
   }
 }
 
@@ -311,7 +315,7 @@ RouseBrownianSimulator::initializeLinearPositions(double bondLength, int axis)
 {
   INVALIDARG_EXP_IFN(axis >= 0 && axis < 3,
                      "axis must be 0 (x), 1 (y), or 2 (z)");
-  positions_ = Eigen::MatrixXd::Zero(numNodes_, 3);
+  positions_ = Eigen::MatrixXd::Zero(static_cast<Eigen::Index>(numNodes_), 3);
   for (size_t i = 0; i < numNodes_; ++i) {
     positions_(static_cast<Eigen::Index>(i), axis) =
       static_cast<double>(i) * bondLength;
@@ -324,7 +328,7 @@ RouseBrownianSimulator::initializeRandomWalk(double bondLength, uint64_t seed)
   std::mt19937_64 gen(seed);
   std::normal_distribution<double> dist(0.0, 1.0);
 
-  positions_ = Eigen::MatrixXd::Zero(numNodes_, 3);
+  positions_ = Eigen::MatrixXd::Zero(static_cast<Eigen::Index>(numNodes_), 3);
   for (size_t i = 1; i < numNodes_; ++i) {
     Eigen::Vector3d step(dist(gen), dist(gen), dist(gen));
     step.normalize();

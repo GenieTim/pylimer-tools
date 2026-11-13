@@ -111,7 +111,7 @@ testGradient(pcm::MEHPForceEvaluator* forceEvaluator)
   for (size_t i = 0; i < 12; ++i) {
     // std::cout << "MEHP Gradient Test coordinate " << i << std::endl;
     // evaluate gradient
-    double f = forceEvaluator->evaluateForceSetGradient(12, x, grad, nullptr);
+    forceEvaluator->evaluateForceSetGradient(12, x, grad, nullptr);
     if (i % 3 != 0) {
       // in x and y direction, we expect no spring distance -> 0 gradient
       CHECK(grad[i] == Catch::Approx(0.0));

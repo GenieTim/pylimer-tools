@@ -20,9 +20,9 @@ protected:
 
 public:
   virtual ~MEHPForceEvaluator() = default;
-  void setNetwork(Network& net) { this->net = net; }
+  void setNetwork(Network& newNet) { this->net = newNet; }
   Network getNetwork() const { return this->net; }
-  void setIs2D(const bool is2D) { this->is2D = is2D; }
+  void setIs2D(const bool newIs2D) { this->is2D = newIs2D; }
   bool getIs2D() const { return this->is2D; };
   double evaluateForceSetGradient(const size_t n,
                                   const double* x,

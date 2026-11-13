@@ -334,7 +334,7 @@ namespace dpd {
      *
      * @param dt Time step size (default: 0.06)
      */
-    void configTimeStep(const double dt = 0.06) { this->dt = dt; }
+    void configTimeStep(const double newDt = 0.06) { this->dt = newDt; }
 
     /**
      * @brief Configure the lambda parameter for modified velocity Verlet
@@ -535,7 +535,7 @@ namespace dpd {
       bool withSlipsprings = true) const;
 
     double getTimestep() override { return this->dt; }
-    double getCurrentTime(double currentStep) override
+    double getCurrentTime(double /* currentStep */) override
     {
       return this->currentTime;
     }

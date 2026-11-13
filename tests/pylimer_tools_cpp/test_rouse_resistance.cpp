@@ -450,7 +450,8 @@ TEST_CASE("RouseBrownianSimulator center-of-mass diffusion",
   size_t sampleInterval = 10;
   auto result = sim.run(totalSteps, sampleInterval, true);
 
-  REQUIRE(result.times.size() == (totalSteps / sampleInterval + 1));
+  REQUIRE(result.times.size() ==
+          static_cast<Eigen::Index>(totalSteps / sampleInterval + 1));
   REQUIRE(result.msdCenterOfMass.size() == result.times.size());
 
   SECTION("Center of mass MSD increases with time")

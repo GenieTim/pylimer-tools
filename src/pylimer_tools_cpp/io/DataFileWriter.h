@@ -53,10 +53,10 @@ namespace utils {
     {
       this->attemptImageReset = doImageReset;
     }
-    void configAtomStyle(pylimer_tools::utils::AtomStyle atomStyle =
+    void configAtomStyle(pylimer_tools::utils::AtomStyle newAtomStyle =
                            pylimer_tools::utils::AtomStyle::ANGLE)
     {
-      this->atomStyle = atomStyle;
+      this->atomStyle = newAtomStyle;
     }
     void setCustomAtomFormat(const std::string atomFormat)
     {
@@ -84,9 +84,9 @@ namespace utils {
     {
       this->moleculeIdxSwappable = includeSwap;
     }
-    void configCrosslinkerType(const int crossLinkerType)
+    void configCrosslinkerType(const int newCrossLinkerType)
     {
-      this->crossLinkerType = crossLinkerType;
+      this->crossLinkerType = newCrossLinkerType;
     }
     void configReindexAtoms(const bool reindex = true)
     {

@@ -993,7 +993,6 @@ TEST_CASE(
   CHECK(numRemoved > 0);
   // numRemoved = forceBalancer.removeInactiveCrosslinks(net, displacements,
   // partitions, 1e-20); CHECK(numRemoved == 204); // TODO: analyze these
-  size_t nrOfSpringsBefore = net.nrOfSprings;
   CHECK_NOTHROW(forceBalancer.validateNetwork(net, displacements, partitions));
   // remove all springs...
   numRemoved =

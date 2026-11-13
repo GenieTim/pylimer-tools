@@ -598,7 +598,10 @@ public:
    *
    * @param kappa the spring constant value
    */
-  void configSpringConstant(const double kappa = 1.0) { this->kappa = kappa; }
+  void configSpringConstant(const double newKappa = 1.0)
+  {
+    this->kappa = newKappa;
+  }
 
   /**
    * @brief Configure the spring breaking distance
@@ -618,10 +621,11 @@ public:
    *
    * @param assumeNetworkIsComplete whether to assume the network is complete
    */
-  void configAssumeNetworkIsComplete(const bool assumeNetworkIsComplete = false)
+  void configAssumeNetworkIsComplete(
+    const bool newAssumeNetworkIsComplete = false)
   {
-    this->assumeNetworkIsComplete = assumeNetworkIsComplete;
-    if (assumeNetworkIsComplete && this->universeNrOfAtoms == 0) {
+    this->assumeNetworkIsComplete = newAssumeNetworkIsComplete;
+    if (this->assumeNetworkIsComplete && this->universeNrOfAtoms == 0) {
       this->extractNetworkMetadata(this->initialConfig);
     }
   }

@@ -136,7 +136,8 @@ DumpFileParser::getValuesForAt(const size_t index,
       throw std::invalid_argument("Column '" + column +
                                   "' not found for header '" + headerKey + "'");
     }
-    colIdx = colItIdx - this->headerColMap.at(headerKey).begin();
+    colIdx =
+      static_cast<size_t>(colItIdx - this->headerColMap.at(headerKey).begin());
   }
   return this->getValuesForAt<OUT>(index, headerKey, colIdx);
 }

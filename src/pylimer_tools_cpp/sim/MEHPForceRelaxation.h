@@ -305,9 +305,9 @@ public:
    *
    * @param forceEvaluator pointer to the force evaluator to use
    */
-  void setForceEvaluator(MEHPForceEvaluator* forceEvaluator)
+  void setForceEvaluator(MEHPForceEvaluator* newForceEvaluator)
   {
-    this->forceEvaluator = forceEvaluator;
+    this->forceEvaluator = newForceEvaluator;
     this->forceEvaluator->setNetwork(this->forceRelaxationNetwork);
     this->forceEvaluator->setIs2D(this->is2D);
     this->forceEvaluator->prepareForEvaluations();
@@ -728,7 +728,6 @@ protected:
                       const int crossLinkerType = 2,
                       bool remove2functionalCrosslinkers = false,
                       bool removeDanglingChains = false);
-  ;
 
   /**
    * @brief Compute the gamma factor from certain spring distances

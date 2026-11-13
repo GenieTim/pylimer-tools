@@ -79,33 +79,33 @@ UniverseSequence::setDataFileAtomStyle(
 }
 
 Universe
-UniverseSequence::readDataFileAtIndex(const size_t index) const
+UniverseSequence::readDataFileAtIndex(const size_t universeIndex) const
 {
-  return this->readDataFile(this->dataFiles[index]);
+  return this->readDataFile(this->dataFiles[universeIndex]);
 }
 
 Universe
-UniverseSequence::readDumpFileAtIndex(size_t index)
+UniverseSequence::readDumpFileAtIndex(size_t universeIndex)
 {
-  // std::cout << "Reading dump file at idx " << index << std::endl;
-  this->dumpFileParser.readGroupByIdx(index);
+  // std::cout << "Reading dump file at idx " << universeIndex << std::endl;
+  this->dumpFileParser.readGroupByIdx(universeIndex);
   Universe newUniverse = Universe(1.0, 1.0, 1.0);
   std::vector<long int> timeStepData =
-    this->dumpFileParser.getValuesForAt<long int>(index, "TIMESTEP", 0);
+    this->dumpFileParser.getValuesForAt<long int>(universeIndex, "TIMESTEP", 0);
   if (timeStepData.size() == 0) {
     throw std::runtime_error(
-      "Universe with index " + std::to_string(index) +
+      "Universe with index " + std::to_string(universeIndex) +
       " does not have enough data on its timestep. Is the file defect?");
   }
   newUniverse.setTimestep(timeStepData[0]);
   if (this->dumpFileParser.hasKey("BOX BOUNDS")) {
-    std::vector<double> lo =
-      this->dumpFileParser.getValuesForAt<double>(index, "BOX BOUNDS", 0);
-    std::vector<double> hi =
-      this->dumpFileParser.getValuesForAt<double>(index, "BOX BOUNDS", 1);
+    std::vector<double> lo = this->dumpFileParser.getValuesForAt<double>(
+      universeIndex, "BOX BOUNDS", 0);
+    std::vector<double> hi = this->dumpFileParser.getValuesForAt<double>(
+      universeIndex, "BOX BOUNDS", 1);
     if (lo.size() < 3 || hi.size() < 3) {
       throw std::runtime_error(
-        "Universe with index " + std::to_string(index) +
+        "Universe with index " + std::to_string(universeIndex) +
         " does not have enough data on its box size, " +
         std::to_string(lo.size()) + " and " + std::to_string(hi.size()) +
         " instead of at least 3 each. Is the file defect?");
@@ -145,17 +145,18 @@ UniverseSequence::readDumpFileAtIndex(size_t index)
   // Pre-allocate vectors to avoid stack issues
   std::vector<double> positionsX, positionsY, positionsZ;
   positionsX = this->dumpFileParser.getValuesForAt<double>(
-    index, "ATOMS", "x" + positionSuffix);
+    universeIndex, "ATOMS", "x" + positionSuffix);
   positionsY = this->dumpFileParser.getValuesForAt<double>(
-    index, "ATOMS", "y" + positionSuffix);
+    universeIndex, "ATOMS", "y" + positionSuffix);
   positionsZ = this->dumpFileParser.getValuesForAt<double>(
-    index, "ATOMS", "z" + positionSuffix);
+    universeIndex, "ATOMS", "z" + positionSuffix);
   if (positionsZ.size() != positionsY.size() ||
       positionsY.size() != positionsX.size()) {
     throw std::runtime_error(
-      "Atom coordinates for universe with index " + std::to_string(index) +
-      " do not have the same size (" + std::to_string(positionsX.size()) +
-      ", " + std::to_string(positionsY.size()) + ", " +
+      "Atom coordinates for universe with index " +
+      std::to_string(universeIndex) + " do not have the same size (" +
+      std::to_string(positionsX.size()) + ", " +
+      std::to_string(positionsY.size()) + ", " +
       std::to_string(positionsZ.size()) + "). Is the file defect?");
   };
   if (isScaled) {
@@ -170,8 +171,8 @@ UniverseSequence::readDumpFileAtIndex(size_t index)
 
   int nAtoms = 0;
   if (this->dumpFileParser.hasKey("NUMBER OF ATOMS")) {
-    std::vector<int> nAtomVec =
-      this->dumpFileParser.getValuesForAt<int>(index, "NUMBER OF ATOMS", 0);
+    std::vector<int> nAtomVec = this->dumpFileParser.getValuesForAt<int>(
+      universeIndex, "NUMBER OF ATOMS", 0);
     if (nAtomVec.size() > 0) {
       nAtoms = nAtomVec[0];
     }
@@ -182,9 +183,9 @@ UniverseSequence::readDumpFileAtIndex(size_t index)
 
   if (this->dumpFileParser.keyHasDirectionalColumn("ATOMS", "i", "") &&
       !isUnwrapped) {
-    nx = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "ix");
-    ny = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "iy");
-    nz = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "iz");
+    nx = this->dumpFileParser.getValuesForAt<int>(universeIndex, "ATOMS", "ix");
+    ny = this->dumpFileParser.getValuesForAt<int>(universeIndex, "ATOMS", "iy");
+    nz = this->dumpFileParser.getValuesForAt<int>(universeIndex, "ATOMS", "iz");
   } else {
     nx = pylimer_tools::utils::initializeWithValue(nAtoms, 0);
     ny = pylimer_tools::utils::initializeWithValue(nAtoms, 0);
@@ -195,8 +196,8 @@ UniverseSequence::readDumpFileAtIndex(size_t index)
   std::vector<long int> atomIds;
   bool hasAtomIds = false;
   if (this->dumpFileParser.keyHasColumn("ATOMS", "id")) {
-    atomIds =
-      this->dumpFileParser.getValuesForAt<long int>(index, "ATOMS", "id");
+    atomIds = this->dumpFileParser.getValuesForAt<long int>(
+      universeIndex, "ATOMS", "id");
     hasAtomIds = true;
   } else {
     atomIds.reserve(nAtoms);
@@ -210,7 +211,7 @@ UniverseSequence::readDumpFileAtIndex(size_t index)
   atomTypes.reserve(nAtoms);
   if (this->dumpFileParser.keyHasColumn("ATOMS", "type")) {
     atomTypes =
-      this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "type");
+      this->dumpFileParser.getValuesForAt<int>(universeIndex, "ATOMS", "type");
   } else {
     if (hasAtomIds) {
       // infer from data file

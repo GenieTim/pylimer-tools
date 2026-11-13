@@ -458,7 +458,6 @@ MEHPForceRelaxation::ConvertNetwork(Network* net,
   // check whether spring contour lengths are what we want them to be
   size_t numCrosslinkers = springEndAtoms.size();
   // this->universe.countPropertyValue<int>("type", crossLinkerType);
-  size_t contourSum = net->springsContourLength.sum();
   assert(net->springsContourLength.size() == net->nrOfSprings);
   assert(numCrosslinkers == net->nrOfNodes);
 
@@ -602,7 +601,7 @@ MEHPForceRelaxation::countActiveClusteredAtoms(Network* net,
   const std::vector<int> activeNodeIndices =
     this->getIndicesOfActiveNodes(net, tolerance);
 
-  for (const long int& nodeIdx : activeNodeIndices) {
+  for (const int nodeIdx : activeNodeIndices) {
     const long int universeAtomIdx =
       this->universe.getIdxByAtomId(net->oldAtomIds[nodeIdx]);
     clusterIsActive[vertexIdxToClusterIdx[universeAtomIdx]] = true;

@@ -3298,7 +3298,7 @@ TEST_CASE("MEHPForceBalance2 Metal Center-of-Mass Zero-Mode Projection",
   std::vector<Eigen::Triplet<double>> triplets;
   triplets.reserve(N * 7);
 
-  auto idx = [S](int x, int y, int z) {
+  auto idx = [](int x, int y, int z) {
     return (x % S) * S * S + (y % S) * S + (z % S);
   };
 

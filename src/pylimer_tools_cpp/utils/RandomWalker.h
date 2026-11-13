@@ -22,7 +22,7 @@ namespace utils {
    * @param meanSquaredBeadDistance
    * @param rng
    */
-  static Eigen::VectorXd doRandomWalkChain(const int chainLen,
+  inline Eigen::VectorXd doRandomWalkChain(const int chainLen,
                                            const double beadDistance,
                                            const double meanSquaredBeadDistance,
                                            std::mt19937& rng)
@@ -66,7 +66,7 @@ namespace utils {
     return coordinates;
   }
 
-  static Eigen::VectorXd doRandomWalkChain(
+  inline Eigen::VectorXd doRandomWalkChain(
     const int chainLen,
     const double beadDistance = 1.0,
     const double meanSquaredBeadDistance = 1.0,
@@ -99,7 +99,7 @@ namespace utils {
    * @param rng the random number generator
    * @param includeEnds whether to include the first and the last positions
    */
-  static Eigen::VectorXd doRandomWalkChainFromTo(
+  inline Eigen::VectorXd doRandomWalkChainFromTo(
     const pylimer_tools::entities::Box& box,
     const Eigen::Vector3d& from,
     const Eigen::Vector3d& to,
@@ -127,7 +127,6 @@ namespace utils {
     // note that the bond size gets a bit destroyed
     // inspiration:
     // https://medium.com/@christopher.tabori/bridging-the-gap-an-introduction-to-brownian-bridge-simulations-10655b0baf02
-    double bondLen = 0.;
     for (size_t i = 1; i < chainLen + 2; ++i) {
       double pathFraction =
         static_cast<double>(i) / static_cast<double>(chainLen + 1);
@@ -144,7 +143,7 @@ namespace utils {
     return coordinates.segment(3, coordinates.size() - 6);
   }
 
-  static Eigen::VectorXd doRandomWalkChainFromTo(
+  inline Eigen::VectorXd doRandomWalkChainFromTo(
     const pylimer_tools::entities::Box& box,
     const Eigen::Vector3d& from,
     const Eigen::Vector3d& to,
@@ -179,7 +178,7 @@ namespace utils {
    * @param rng the random number generator
    * @param numIterations
    */
-  static Eigen::VectorXd doRandomWalkChainFromToMC(
+  inline Eigen::VectorXd doRandomWalkChainFromToMC(
     const pylimer_tools::entities::Box& box,
     const Eigen::Vector3d& from,
     const Eigen::Vector3d& to,
@@ -208,7 +207,7 @@ namespace utils {
     return coordinates.segment(3, coordinates.size() - 6);
   }
 
-  static Eigen::VectorXd doRandomWalkChainFromToMC(
+  inline Eigen::VectorXd doRandomWalkChainFromToMC(
     const pylimer_tools::entities::Box& box,
     const Eigen::Vector3d& from,
     const Eigen::Vector3d& to,
@@ -247,7 +246,7 @@ namespace utils {
    * @param chainLen the number of atoms to add in between from and to
    * @param includeEnds
    */
-  static Eigen::VectorXd doLinearWalkChainFromTo(
+  inline Eigen::VectorXd doLinearWalkChainFromTo(
     const pylimer_tools::entities::Box& box,
     const Eigen::Vector3d& from,
     const Eigen::Vector3d& to,

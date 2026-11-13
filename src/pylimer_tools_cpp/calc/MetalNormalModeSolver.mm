@@ -464,7 +464,7 @@ computeAllEigenvaluesMetal(const Eigen::SparseMatrix<double>& mat,
     id<MTLBuffer> bufA =
       [device newBufferWithLength:sizeof(float) * N * N
                           options:MTLResourceStorageModeShared];
-    float* A = (float*)[bufA contents];
+    float* A = static_cast<float*>([bufA contents]);
     for (uint32_t i = 0; i < N; ++i) {
       for (uint32_t j = 0; j < N; ++j) {
         A[i * N + j] = static_cast<float>(denseMat(i, j));
@@ -474,7 +474,7 @@ computeAllEigenvaluesMetal(const Eigen::SparseMatrix<double>& mat,
     id<MTLBuffer> bufV =
       [device newBufferWithLength:sizeof(float) * N * N
                           options:MTLResourceStorageModeShared];
-    float* V = (float*)[bufV contents];
+    float* V = static_cast<float*>([bufV contents]);
     std::memset(V, 0, sizeof(float) * N * N);
     for (uint32_t i = 0; i < N; ++i) {
       V[i * N + i] = 1.0f;
@@ -786,7 +786,7 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
         [cmd commit];
         [cmd waitUntilCompleted];
 
-        float* parts = (float*)[bufPartialsB8 contents];
+        float* parts = static_cast<float*>([bufPartialsB8 contents]);
         for (size_t m = 0; m < numMoments; ++m) {
           float sum = 0.0f;
           for (uint32_t tg = 0; tg < num_tgs; ++tg) {
@@ -886,7 +886,7 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
         [cmd commit];
         [cmd waitUntilCompleted];
 
-        float* parts = (float*)[bufPartialsB4 contents];
+        float* parts = static_cast<float*>([bufPartialsB4 contents]);
         for (size_t m = 0; m < numMoments; ++m) {
           float sum = 0.0f;
           for (uint32_t tg = 0; tg < num_tgs; ++tg) {
@@ -985,7 +985,7 @@ computeChebyshevMomentsKPMMetal(const Eigen::SparseMatrix<double>& mat,
         [cmd commit];
         [cmd waitUntilCompleted];
 
-        float* parts = (float*)[bufPartials contents];
+        float* parts = static_cast<float*>([bufPartials contents]);
         for (size_t m = 0; m < numMoments; ++m) {
           float sum = 0.0f;
           for (uint32_t tg = 0; tg < num_tgs; ++tg) {

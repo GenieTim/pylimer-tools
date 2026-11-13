@@ -1017,7 +1017,6 @@ private:
   void linkStrandToCrosslink(size_t strandIdx,
                              size_t crosslinkIdx,
                              bool ignoreInexistent = false);
-  ;
 
   /**
    * @brief Add atoms (incl. type, id etc.) with given positions to the

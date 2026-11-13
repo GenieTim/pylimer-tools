@@ -541,8 +541,6 @@ namespace entities {
     const double newCutoff,
     const bool sort) const
   {
-    Eigen::Array3li indexBasis =
-      this->getBucketTripletForCoordinates(coordinates);
     Eigen::Array3li maxIndices = this->getBucketTripletForCoordinates(
       coordinates + Eigen::Vector3d::Constant(newCutoff));
     Eigen::Array3li minIndices = this->getBucketTripletForCoordinates(

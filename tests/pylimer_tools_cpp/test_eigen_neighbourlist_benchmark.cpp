@@ -71,7 +71,6 @@ runBenchmarkWithConfig(const double neighbourBinSize = 1.0,
                   cutoff,
                   density,
                   scatter);
-  bool expectDefaultCutoff = APPROX_EQUAL(cutoff, neighbourBinSize, 1e-15);
   BENCHMARK(benchmarkName.c_str())
   {
     // std::cout << "Setting up Neighlist" << std::endl;

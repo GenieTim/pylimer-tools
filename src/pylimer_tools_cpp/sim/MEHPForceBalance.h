@@ -2564,7 +2564,6 @@ protected:
   {
     Eigen::ArrayXb activePartialSprings =
       this->findActivePartialSprings(net, u, springPartitions, tolerance);
-    const double nActivePartialSprings = activePartialSprings.count();
     Eigen::ArrayXb result = Eigen::ArrayXb::Constant(net->nrOfSprings, false);
 
     for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
@@ -2572,7 +2571,6 @@ protected:
         result[net->partialToFullSpringIndex[i]] || activePartialSprings[i];
     }
 
-    const double nActiveSprings = result.count();
     return result;
   }
 

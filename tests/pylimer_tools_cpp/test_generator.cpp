@@ -59,9 +59,6 @@ andersonDarlingNormalDistributionTest(Eigen::VectorXd observations,
 {
   std::ranges::sort(observations);
   const double sampleMean = observations.mean();
-  const double sampleVariance =
-    (observations.array() - sampleMean).square().sum() /
-    (observations.size() - 1);
   const double n = observations.size();
 
   // if (std::abs(sampleMean) < 1e-4 || std::abs(expectedMean) < 1e-4) {
@@ -801,7 +798,7 @@ TEST_CASE("MCUniverseGenerator can generate with monofunctional chains",
             << std::endl;
 
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
-  generator.setSeed(457564875e2);
+  generator.setSeed(457564875U);
   generator.setBeadDistance(0.75);
   generator.configNrOfMCSteps(0);
 
@@ -839,7 +836,7 @@ TEST_CASE("Randomly functionalized chains collapse",
             << std::endl;
 
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
-  generator.setSeed(457564875e2);
+  generator.setSeed(457564875U);
   generator.setBeadDistance(0.75);
   generator.configNrOfMCSteps(0);
 
@@ -1576,7 +1573,6 @@ TEST_CASE("doRandomWalkChain generates very long chains",
   constexpr double beadDistance = 1.0;
   constexpr double meanSquaredBeadDistance = (3. * M_PI / 8.) * beadDistance;
   const std::string seed = "some_other_seed";
-  int numIterations = 500;
 
   // Generate the chain
   Eigen::VectorXd coordinates = pylimer_tools::utils::doRandomWalkChain(
@@ -1695,7 +1691,7 @@ TEST_CASE(
     size_t bondsBefore = universeBefore.getNrOfBonds();
 
     // Link strand ends - should create some new bonds
-    bool linkMade = generator.linkStrandToStrand();
+    generator.linkStrandToStrand();
 
     pe::Universe universeAfter = generator.getUniverse();
     size_t bondsAfter = universeAfter.getNrOfBonds();
@@ -1712,8 +1708,7 @@ TEST_CASE(
     generator.addStarCrosslinkers(15, 6, 12, 2, 1);
 
     size_t bondsBefore = generator.getUniverse().getNrOfBonds();
-    bool linkMade =
-      generator.linkStrandToStrand(2.0); // custom cInfinity parameter
+    generator.linkStrandToStrand(2.0); // custom cInfinity parameter
     size_t bondsAfter = generator.getUniverse().getNrOfBonds();
 
     CHECK(bondsAfter == bondsBefore + 1);

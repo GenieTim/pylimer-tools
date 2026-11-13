@@ -91,7 +91,6 @@ MEHPForceBalance::runForceRelaxation(
       : this->getDisplacementResidualNormFor(this->initialConfig,
                                              this->currentDisplacements,
                                              oneOverSpringPartitions);
-  const double minN = this->initialConfig.springsContourLength.minCoeff();
   std::cout << "Starting force balance procedure "
             << "with " << initialResidual
             << " as initial residual, got requested "
@@ -106,7 +105,6 @@ MEHPForceBalance::runForceRelaxation(
   std::cout << "Using oneOverSpringPartitionUpperLimit = "
             << oneOverSpringPartitionUpperLimit << std::endl;
   double currentResidual = initialResidual;
-  double previousResidual = initialResidual;
   size_t iterationsDone = 0;
 
   std::vector<std::vector<size_t>> partialSpringIndicesOfLinks(
@@ -191,14 +189,13 @@ MEHPForceBalance::runForceRelaxation(
         //           << " / " << net.nrOfLinks << std::endl;
         int innerIterationsDone = 0;
         do {
-          double r2 =
-            this->updateSpringPartition(this->initialConfig,
-                                        this->currentDisplacements,
-                                        this->currentSpringPartitionsVec,
-                                        oneOverSpringPartitions,
-                                        link_idx,
-                                        oneOverSpringPartitionUpperLimit,
-                                        allowSlipLinksToPassEachOther);
+          this->updateSpringPartition(this->initialConfig,
+                                      this->currentDisplacements,
+                                      this->currentSpringPartitionsVec,
+                                      oneOverSpringPartitions,
+                                      link_idx,
+                                      oneOverSpringPartitionUpperLimit,
+                                      allowSlipLinksToPassEachOther);
 
           double displacementDone =
             this->displaceToMeanPosition(this->initialConfig,
@@ -260,7 +257,6 @@ MEHPForceBalance::runForceRelaxation(
     //     "sense and hints at a mistake.");
     // }
 
-    previousResidual = currentResidual;
     iterationsDone += 1;
     if (iterationsDone % this->simplificationFrequency == 0) {
       const size_t numBroken =
@@ -344,8 +340,6 @@ MEHPForceBalance::runForceRelaxation(
       // -> reset previous and current to prevent change to iterative
       // displacement
       if (nRemoved > 0) {
-        previousResidual = initialResidual;
-
         oneOverSpringPartitions = this->assembleOneOverSpringPartition(
           this->initialConfig,
           this->currentSpringPartitionsVec,
@@ -2479,7 +2473,6 @@ MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
   }
 
   // handle contour lengths
-  double contourLengthBefore = net.springsContourLength[keptSpringIdx];
   net.springsContourLength[keptSpringIdx] +=
     net.springsContourLength[removedSpringIdx];
   pylimer_tools::utils::removeRow(net.springsContourLength, removedSpringIdx);
@@ -4116,7 +4109,6 @@ MEHPForceBalance::rotateSlipLinkAroundCrosslink(
         // (b) the one the second, currently non-slipping part is
         // associated with only the cases of (a) are allowed as possible
         // target springs
-        bool allLoopsWithSpringIdxToCheckIncludespringIdx = false;
         for (const size_t loopIdx : net.loopsOfSliplink[involvedSlipLink]) {
           bool loopContainsCheck = false;
           bool loopContainsOriginal = false;
@@ -4222,9 +4214,6 @@ MEHPForceBalance::swapSlipLinks(ForceBalanceNetwork& net,
   const long int otherPartialOfLinkIdx2 =
     net.localToGlobalSpringIndex[springIdx][firstPositionInSpring + 1];
   assert(otherPartialOfLinkIdx1 != otherPartialOfLinkIdx2);
-
-  const size_t unaffectedEnd1 = net.springPartIndexA[otherPartialOfLinkIdx1];
-  const size_t unaffectedEnd2 = net.springPartIndexB[otherPartialOfLinkIdx2];
 
   // std::cout << "Swapping link " << linkIdx1 << " and " << linkIdx2
   //           << " on partial spring " << partialSpringIdx
@@ -4440,7 +4429,6 @@ MEHPForceBalance::displaceToMeanPosition(
   Eigen::Vector3d objectiveDisplacement =
     Eigen::Vector3d::Zero(); // = remainingDisplacement.array();
   double objectiveDisplacementContributors = 0.0;
-  bool cautionPrimaryLoop = false;
 
   for (const size_t globalSpringIndex : partialSpringIndices) {
     assert(net.springPartIndexA[globalSpringIndex] == linkIdx ||

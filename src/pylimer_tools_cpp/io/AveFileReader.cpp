@@ -139,8 +139,8 @@ AveFileReader::getData()
     return this->data;
   }
 
-  int nRows = this->getNrOfRows();
-  int nCols = this->getNrOfColumns();
+  const size_t nRows = static_cast<size_t>(std::max(0, this->getNrOfRows()));
+  const size_t nCols = static_cast<size_t>(std::max(0, this->getNrOfColumns()));
   std::vector<std::vector<double>> results =
     pylimer_tools::utils::initializeWithValue(nCols, std::vector<double>());
   for (size_t i = 0; i < nCols; ++i) {
@@ -153,7 +153,9 @@ AveFileReader::getData()
   }
 
   std::string line;
-  for (size_t i = 0; i < this->getNrOfHeaderRows(); ++i) {
+  const size_t nHeaderRows =
+    static_cast<size_t>(std::max(0, this->getNrOfHeaderRows()));
+  for (size_t i = 0; i < nHeaderRows; ++i) {
     RUNTIME_EXP_IFN(std::getline(file, line),
                     "File ended before data was even reached");
   }

@@ -156,10 +156,10 @@ Correlator::evaluate(const bool norm)
   }
 
   // Subsequent correlators
-  for (int k = 1; k < kmax; ++k) {
-    for (int i = dmin; i < p; ++i) {
+  for (unsigned int k = 1; k < kmax; ++k) {
+    for (unsigned int i = dmin; i < p; ++i) {
       if (ncorrelation(k, i) > 0) {
-        t[im] = i * pow(static_cast<double>(m), k);
+        t[im] = i * pow(static_cast<double>(m), static_cast<int>(k));
         f[im] = correlation(k, i) / ncorrelation(k, i) - aux;
         ++im;
       }

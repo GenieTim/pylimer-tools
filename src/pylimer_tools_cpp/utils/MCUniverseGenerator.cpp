@@ -719,13 +719,6 @@ MCUniverseGenerator::linkStrandsCallback(
 
   // prepare sampling of partners
   const long int nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
-  int nrOfStrandsAdded = 0;
-
-  double currentCrosslinkerConversion =
-    1. - (static_cast<double>(this->nrOfAvailableCrosslinkSites) /
-          static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
-  double conversionPerBond =
-    1. / (static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
 
   const size_t nrOfStrands = this->simplifiedUniverse.strandFrom.size();
   std::vector<size_t> availableStrandEnds;
@@ -942,19 +935,14 @@ MCUniverseGenerator::linkStrandsToSolubleFraction(double targetSolubleFraction,
   long int currentStep = 0;
 
   this->linkStrandsCallback(
-    [targetSolubleFraction,
-     nAtomsTotal,
-     &status,
-     &nSteps,
-     &lastStep,
-     &currentStep](const MCUniverseGenerator& gen,
-                   const long int nStrandsRemaining) {
+    [targetSolubleFraction, &status, &nSteps, &lastStep, &currentStep](
+      const MCUniverseGenerator& gen, const long int nStrandsRemaining) {
       if (currentStep == 0) {
         // go all in, we want to jump to end to know when to stop
         nSteps = nStrandsRemaining;
       }
       currentStep += 1;
-      nSteps = std::max<long int>(nSteps, (long int)1);
+      nSteps = std::max<long int>(nSteps, 1L);
       // make large step without force relaxation
       if ((currentStep < lastStep + nSteps) &&
           // but only if the last strand will not be reached with this large
@@ -1573,6 +1561,8 @@ MCUniverseGenerator::sampleEntanglements(
                                                sameStrandCutoff,
                                                seed,
                                                filteringMode);
+    default:
+      throw std::invalid_argument("Unknown EntanglementSamplingMethod");
   }
   return this->sampleEntanglementsAnalytical(nrOfEntanglementsToSample,
                                              upperCutoff,
@@ -2488,9 +2478,8 @@ MCUniverseGenerator::generateRandomBluePositions(const int nSamples)
   // inspiration:
   // https://github.com/Atrix256/RandomCode/blob/master/Mitchell/Source.cpp
   for (size_t i = 0; i < nSamples; ++i) {
-    const size_t numCandidates =
-      std::min((size_t)(i * 1 + 1),
-               (size_t)500); // decrease the multiplier to speed things up
+    const size_t numCandidates = std::min<size_t>(
+      i + 1, 500); // decrease the multiplier to speed things up
     double bestDistance = 0.0;
     double bestCandidateX = 0.0;
     double bestCandidateY = 0.0;
@@ -2541,7 +2530,6 @@ MCUniverseGenerator::findAppropriateLink(const size_t from,
                   "Invalid internal state, number of and remaining "
                   "crosslink functionalities mismatch");
 
-  double sumOfWeights = 0.0;
   const double normalisationFactorInExponential = -3. / (2. * desiredR02);
 
   std::vector<size_t> suitableMatches;
@@ -2558,7 +2546,6 @@ MCUniverseGenerator::findAppropriateLink(const size_t from,
       }
       suitableMatches.push_back(i);
       matchWeights.push_back(thisWeight);
-      sumOfWeights += thisWeight;
     }
   } else {
     // else: use a neighbour list instead, to improve performance
@@ -2581,7 +2568,6 @@ MCUniverseGenerator::findAppropriateLink(const size_t from,
       }
       suitableMatches.push_back(crosslinkIdx);
       matchWeights.push_back(thisWeight);
-      sumOfWeights += thisWeight;
     }
   }
 
@@ -2944,8 +2930,6 @@ MCUniverseGenerator::combineStrands(const size_t strandIdx1,
                        UNCONNECTED,
                      "Expect at least one end of strand 2 to be unconnected.");
 
-  bool strand1IsFrom =
-    this->simplifiedUniverse.strandFrom[strandIdx1] == UNCONNECTED;
   bool strand2IsFrom =
     this->simplifiedUniverse.strandFrom[strandIdx2] == UNCONNECTED;
 
