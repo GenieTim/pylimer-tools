@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:05.443** total execution time for 10 files **from auto_examples/force_balance**:
+**00:10.458** total execution time for 10 files **from auto_examples/force_balance**:
 
 .. container::
 
@@ -33,32 +33,32 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_relaxation.py` (``plot_force_relaxation.py``)
-     - 00:02.109
+     - 00:03.915
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_sampling_comparison.py` (``plot_entanglement_sampling_comparison.py``)
-     - 00:01.039
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_inactive_removal_and_sampling.py` (``plot_inactive_removal_and_sampling.py``)
-     - 00:00.422
+     - 00:02.142
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_sampling_cutoff_effect.py` (``plot_sampling_cutoff_effect.py``)
-     - 00:00.412
+     - 00:00.921
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_inactive_removal_and_sampling.py` (``plot_inactive_removal_and_sampling.py``)
+     - 00:00.875
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance.py` (``plot_force_balance.py``)
-     - 00:00.376
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py` (``plot_fb_deformation_exp.py``)
-     - 00:00.296
+     - 00:00.548
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_force_balance_2.py` (``plot_force_balance_2.py``)
-     - 00:00.266
+     - 00:00.489
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_force_balance_plot_fb_deformation_exp.py` (``plot_fb_deformation_exp.py``)
+     - 00:00.482
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_link_vs_spring.py` (``plot_entanglement_link_vs_spring.py``)
-     - 00:00.191
+     - 00:00.376
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_polydispersity_study.py` (``plot_polydispersity_study.py``)
-     - 00:00.173
+     - 00:00.372
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_slipping_vs_fixed_links.py` (``plot_slipping_vs_fixed_links.py``)
-     - 00:00.160
+     - 00:00.340
      - 0.0

@@ -100,8 +100,8 @@ gz = (
 ```
 
 ```none
-Final residual (should be close to 0): 4.714943631774275e-12
-Shear Modulus [MPa]: 0.0061
+Final residual (should be close to 0): 7.414386286534764e-07
+Shear Modulus [MPa]: 0.0256
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 92-97 -->
@@ -112,13 +112,12 @@ We plot the distribution of strand elastic factors $\Gamma$ and the directional
 shear moduli $G_x, G_y, G_z$ compared to the total shear modulus
 $G$.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 97-163 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 97-165 -->
 ```Python
 active_gammas = gamma_factors[gamma_factors > 1e-4]
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
-
-# Panel 1: Gamma distribution
+# Figure 1: Gamma distribution
+fig, ax1 = plt.subplots(figsize=(7, 4.5))
 ax1.hist(
     active_gammas,
     bins=30,
@@ -147,8 +146,11 @@ ax1.set_ylabel("Probability Density", fontsize=11)
 ax1.set_title("Distribution of Strand Elastic Factors", fontsize=12)
 ax1.grid(True, linestyle=":", alpha=0.5)
 ax1.legend(loc="upper right", framealpha=0.9)
+plt.tight_layout()
+plt.show()
 
-# Panel 2: Directional Moduli
+# Figure 2: Directional Moduli
+fig, ax2 = plt.subplots(figsize=(7, 4.5))
 labels = ["Total ($G$)", r"$G_x$", r"$G_y$", r"$G_z$"]
 values = [shear_modulus, gx, gy, gz]
 colors = ["#1F77B4", "#4C72B0", "#55A868", "#DD8452"]
@@ -181,7 +183,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.376 seconds)
+**Total running time of the script:** (0 minutes 0.548 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-balance-py"></a>
 

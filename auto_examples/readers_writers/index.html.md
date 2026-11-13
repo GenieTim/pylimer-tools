@@ -54,9 +54,9 @@ The library supports four main file I/O operations:
   <div class="sphx-glr-thumbnail-title">Dump File Reader</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Take a later entry from a LAMMPS trajectory and save it as a data file.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_trajectory_to_frame_thumb.png)
 
-[Extract Trajectory Frame to Data File](plot_convert_trajectory_to_frame.html.md)
+[Extract Trajectory Frame](plot_convert_trajectory_to_frame.html.md)
 
-  <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame to Data File</div>
+  <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="LAMMPS bond swapping can significantly speed up equilibration for polymer networks. However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly. Here&#x27;s how you could re-set the molecule indices for bond swapping with constant chain lengths.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_for_bond_swapping_thumb.png)
 
 [Convert for Bond Swapping](plot_convert_for_bond_swapping.html.md)
@@ -64,9 +64,9 @@ The library supports four main file I/O operations:
   <div class="sphx-glr-thumbnail-title">Convert for Bond Swapping</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="The UniverseSequence class provides automatic memory management.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_memory_efficient_dump_file_reading_thumb.png)
 
-[Memory-Efficient Dump File Reading](plot_memory_efficient_dump_file_reading.html.md)
+[Streaming Dump File Reader](plot_memory_efficient_dump_file_reading.html.md)
 
-  <div class="sphx-glr-thumbnail-title">Memory-Efficient Dump File Reading</div>
+  <div class="sphx-glr-thumbnail-title">Streaming Dump File Reader</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_data_file_reader_thumb.png)
 
 [Data File Reader](plot_data_file_reader.html.md)

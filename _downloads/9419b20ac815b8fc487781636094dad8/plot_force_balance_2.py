@@ -160,15 +160,16 @@ print(f"Active weight fraction   : {mehp_fb.get_active_weight_fraction():.3f}")
 # -------------------------------------------------
 # We visualize:
 #
-# - **Left panel**: The distribution of strand :math:`\Gamma` factors for active network strands.
+# - **First figure**: The distribution of strand :math:`\Gamma` factors for active network strands.
 #   Phantom network theory predicts :math:`\Gamma_{\text{phantom}} = 1 - 2/f = 0.5` for
 #   4-functional crosslinks; topological entanglements substantially enhance individual strand tension.
-# - **Right panel**: Modulus comparison between phantom and entangled states, alongside
+# - **Second figure**: Modulus comparison between phantom and entangled states, alongside
 #   Cartesian components :math:`G_x, G_y, G_z`, showing mechanical isotropy.
 
 active_gammas = gamma_factors[gamma_factors > 1e-4]
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+# Figure 1: Distribution of Gamma factors
+fig, ax1 = plt.subplots(figsize=(7, 4.5))
 
 # Panel 1: Distribution of Gamma factors
 ax1.hist(
@@ -199,8 +200,11 @@ ax1.set_ylabel("Probability Density", fontsize=11)
 ax1.set_title("Distribution of Strand Elastic Factors", fontsize=12)
 ax1.grid(True, linestyle=":", alpha=0.5)
 ax1.legend(loc="upper right", framealpha=0.9)
+plt.tight_layout()
+plt.show()
 
-# Panel 2: Modulus Comparison & Directional Components
+# Figure 2: Modulus Comparison & Directional Components
+fig, ax2 = plt.subplots(figsize=(7, 4.5))
 labels = ["Phantom", "Entangled\n(Total)", r"$G_x$", r"$G_y$", r"$G_z$"]
 values = [phantom_modulus, shear_modulus, gx, gy, gz]
 colors = ["#797979", "#1F77B4", "#4C72B0", "#55A868", "#DD8452"]

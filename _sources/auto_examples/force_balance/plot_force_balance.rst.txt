@@ -118,8 +118,8 @@ its equilibrium shear modulus.
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 4.714943631774275e-12
-    Shear Modulus [MPa]: 0.0061
+    Final residual (should be close to 0): 7.414386286534764e-07
+    Shear Modulus [MPa]: 0.0256
 
 
 
@@ -132,16 +132,15 @@ We plot the distribution of strand elastic factors :math:`\Gamma` and the direct
 shear moduli :math:`G_x, G_y, G_z` compared to the total shear modulus
 :math:`G`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-163
+.. GENERATED FROM PYTHON SOURCE LINES 97-165
 
 .. code-block:: Python
 
 
     active_gammas = gamma_factors[gamma_factors > 1e-4]
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
-
-    # Panel 1: Gamma distribution
+    # Figure 1: Gamma distribution
+    fig, ax1 = plt.subplots(figsize=(7, 4.5))
     ax1.hist(
         active_gammas,
         bins=30,
@@ -170,8 +169,11 @@ shear moduli :math:`G_x, G_y, G_z` compared to the total shear modulus
     ax1.set_title("Distribution of Strand Elastic Factors", fontsize=12)
     ax1.grid(True, linestyle=":", alpha=0.5)
     ax1.legend(loc="upper right", framealpha=0.9)
+    plt.tight_layout()
+    plt.show()
 
-    # Panel 2: Directional Moduli
+    # Figure 2: Directional Moduli
+    fig, ax2 = plt.subplots(figsize=(7, 4.5))
     labels = ["Total ($G$)", r"$G_x$", r"$G_y$", r"$G_z$"]
     values = [shear_modulus, gx, gy, gz]
     colors = ["#1F77B4", "#4C72B0", "#55A868", "#DD8452"]
@@ -205,10 +207,22 @@ shear moduli :math:`G_x, G_y, G_z` compared to the total shear modulus
 
 
 
-.. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_force_balance_001.png
-   :alt: Distribution of Strand Elastic Factors, Shear Modulus & Directional Decomposition
-   :srcset: /auto_examples/force_balance/images/sphx_glr_plot_force_balance_001.png
-   :class: sphx-glr-single-img
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_force_balance_001.png
+         :alt: Distribution of Strand Elastic Factors
+         :srcset: /auto_examples/force_balance/images/sphx_glr_plot_force_balance_001.png
+         :class: sphx-glr-multi-img
+
+    *
+
+      .. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_force_balance_002.png
+         :alt: Shear Modulus & Directional Decomposition
+         :srcset: /auto_examples/force_balance/images/sphx_glr_plot_force_balance_002.png
+         :class: sphx-glr-multi-img
 
 
 
@@ -217,7 +231,7 @@ shear moduli :math:`G_x, G_y, G_z` compared to the total shear modulus
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.376 seconds)
+   **Total running time of the script:** (0 minutes 0.548 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_force_balance.py:

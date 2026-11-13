@@ -10,7 +10,7 @@ to download the full example code.
 
 <a id="sphx-glr-auto-examples-network-generator-plot-custom-crosslinking-callback-py"></a>
 
-# Custom Crosslinking with Callback Functions
+# Custom Crosslinking Callbacks
 
 This example demonstrates how to use the [`link_strands_callback()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.md#pylimer_tools_cpp.MCUniverseGenerator.link_strands_callback)
 method to create custom crosslinking procedures
@@ -164,7 +164,7 @@ ax.legend()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.456 seconds)
+**Total running time of the script:** (0 minutes 0.454 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-custom-crosslinking-callback-py"></a>
 

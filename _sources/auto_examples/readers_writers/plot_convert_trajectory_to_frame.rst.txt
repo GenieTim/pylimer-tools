@@ -18,8 +18,8 @@
 .. _sphx_glr_auto_examples_readers_writers_plot_convert_trajectory_to_frame.py:
 
 
-Extract Trajectory Frame to Data File
-=====================================
+Extract Trajectory Frame
+========================
 
 Take a later entry from a LAMMPS trajectory and save it as a data file.
 
@@ -132,7 +132,7 @@ frame:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.126 seconds)
+   **Total running time of the script:** (0 minutes 0.225 seconds)
 
 
 .. _sphx_glr_download_auto_examples_readers_writers_plot_convert_trajectory_to_frame.py:

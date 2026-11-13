@@ -1,6 +1,6 @@
 r"""
-Inactive Strand & Entanglement Removal in Force Balance 2
-=========================================================
+Inactive Removal & Sampling
+===========================
 
 In polymer network modeling via the Maximum Entropy Homogenization Procedure (MEHP)
 and Force Balance (:cite:t:`gusev_numerical_2019`, :cite:t:`bernhard_phantom_2025`),
@@ -13,7 +13,7 @@ slipping. This introduces two interrelated and critical modeling questions:
 
 1. **The Sampling Trap (Pre-Filter vs. Unfiltered Sampling)**:
    If entanglements are sampled without filtering (:meth:`~pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements`
-   with ``filter_dangling_and_soluble=False``), entanglements are placed indiscriminately
+   with ``filtering_mode=EntanglementFilteringMode.NONE``), entanglements are placed indiscriminately
    along all chains, including dangling ends and unattached sol molecules.
    Because links cannot slip off open chain ends in Force Balance 2, an entanglement linking
    a dangling chain to the gel effectively pins the dangling arm in space, artificially
@@ -181,10 +181,22 @@ def _simulate_inactive_removal_single_repeat(
 
         # Entanglement sampling: filtered vs. unfiltered
         es_filt = gen.sample_entanglements(
-            n_ent, cutoff, 0.0, 0, 3.0, f"s_filt_{seed}_{conv}", True
+            n_ent,
+            cutoff,
+            0.0,
+            0,
+            3.0,
+            f"s_filt_{seed}_{conv}",
+            filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
         )
         es_unf = gen.sample_entanglements(
-            n_ent, cutoff, 0.0, 0, 3.0, f"s_unf_{seed}_{conv}", False
+            n_ent,
+            cutoff,
+            0.0,
+            0,
+            3.0,
+            f"s_unf_{seed}_{conv}",
+            filtering_mode=pt.EntanglementFilteringMode.NONE,
         )
 
         # 1. Unfiltered + No Simplification
@@ -606,8 +618,6 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 # to thousands of percent!
 
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
-
     # Palette
     c_naive = "#d62728"  # Red: Unfiltered NO_SIMPLIFICATION
     c_filt_raw = "#1f77b4"  # Blue: Filtered NO_SIMPLIFICATION
@@ -615,7 +625,8 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     c_truth = "#2ca02c"  # Green: Filtered INACTIVE_THEN_X2F
     c_unf_x2f = "#9467bd"  # Purple: Unfiltered INACTIVE_THEN_X2F
 
-    # Panel 1: Modulus vs Conversion
+    # Figure 1: Modulus vs Conversion
+    fig, ax1 = plt.subplots(figsize=(7, 5))
     ax1.plot(
         convs,
         g_unf_nosimp_m,
@@ -701,8 +712,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     )
     ax1.grid(True, linestyle=":", alpha=0.6)
     ax1.legend(loc="upper left", frameon=True, fontsize=9.5)
+    plt.tight_layout()
+    plt.show()
 
-    # Panel 2: Artificial Inflation Factor (%)
+    # Figure 2: Artificial Inflation Factor (%)
+    fig, ax2 = plt.subplots(figsize=(7, 5))
     g_truth = g_filt_x2f_m
     # Avoid division by near-zero at lowest conversion if unpercolated
     inflation_unf = np.where(
@@ -990,11 +1004,12 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 #    zero-modulus sol/dangling material into load-bearing network strands.
 #    At :math:`p \le 0.85`, this artifact inflates :math:`G` by hundreds to thousands of percent!
 #
-# 2. **Analytical Brownian-Bridge Leaf Peeling is the First Line of Defense**:
-#    Passing ``filter_dangling_and_soluble=True`` (the default in :meth:`~pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements`
-#    and :meth:`~pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2`) uses graph-theoretic leaf peeling
-#    to eliminate dangling and sol strands before entanglement pairs are sampled. This completely prevents
-#    artificial dangling entanglements.
+# 2. **Topological Leaf Peeling is the First Line of Defense**:
+#    Passing ``filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE`` (the default in
+#    :meth:`~pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements` and
+#    :meth:`~pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2`, or ``PRUNE_UPFRONT`` for active-only sampling)
+#    uses graph-theoretic leaf peeling to eliminate dangling and sol strands before entanglement pairs are sampled.
+#    This completely prevents artificial dangling entanglements.
 #
 # 3. **The Solver Pruning Rescues Corrupted Networks**:
 #    Even if entanglements were sampled on an unfiltered network, running :class:`~pylimer_tools_cpp.MEHPForceBalance2`
@@ -1003,7 +1018,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 #    (:math:`G_{\text{unfiltered+X2F}} \equiv G_{\text{filtered+X2F}}`).
 #
 # 4. **Recommended Best Practice**:
-#    - Always enable ``filter_dangling_and_soluble=True`` during entanglement sampling.
+#    - Always keep filtering enabled (``filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE`` or ``PRUNE_UPFRONT``) during entanglement sampling.
 #    - For subsequent large-scale deformation studies (e.g. uniaxial, biaxial, or shear strain sweeps),
 #      perform an initial relaxation with ``simplification_mode=StructureSimplificationMode.INACTIVE_THEN_X2F``.
 #      This permanently purges inactive degrees of freedom and unlinks bifunctional nodes, accelerating

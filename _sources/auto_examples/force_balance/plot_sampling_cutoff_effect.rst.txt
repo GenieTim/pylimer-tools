@@ -18,8 +18,8 @@
 .. _sphx_glr_auto_examples_force_balance_plot_sampling_cutoff_effect.py:
 
 
-Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2
-========================================================================
+Sampling Cut-Off Effect
+=======================
 
 In polymer network simulations using the Maximum Entropy Homogenization Procedure (MEHP)
 and Force Balance (:cite:t:`gusev_numerical_2019`, :cite:t:`bernhard_phantom_2025`),
@@ -73,7 +73,7 @@ Interactions with Network Parameters (:math:`N, p, r`)
   (:math:`G_c \propto 1/N`). For long strands (:math:`N = 70`), entanglements dominate (:math:`G_e > G_c`),
   greatly amplifying the relative sensitivity of :math:`G` to the sampling cutoff.
 - **Conversion :math:`p`**: Incomplete conversion (:math:`p = 0.82`) generates sol fractions and
-  dangling arms. Leaf peeling (``skip_dangling_soluble_entanglements=True``) ensures entanglements
+  dangling arms. Topological leaf peeling (``filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE``, default) ensures entanglements
   are only placed on active network strands.
 - **Stoichiometric Imbalance :math:`r`**: Off-stoichiometric formulations (:math:`r = [B]/[A] = 0.75`)
   exhibit lower crosslinking efficiency, reducing both phantom modulus and entanglement pinning.
@@ -86,7 +86,7 @@ and 95% confidence intervals, cached for fast CI execution.
 Simulation Setup & Multi-Seed Ensemble Runner
 ----------------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-471
+.. GENERATED FROM PYTHON SOURCE LINES 69-476
 
 .. code-block:: Python
 
@@ -145,6 +145,7 @@ Simulation Setup & Multi-Seed Ensemble Runner
 
         gen_std = pt.MCUniverseGenerator(box_l_std, box_l_std, box_l_std)
         gen_std.set_seed(seed)
+        gen_std.config_nr_of_mc_steps(0)
         gen_std.set_bead_distance(b)
         gen_std.set_mean_squared_bead_distance(b**2)
         gen_std.add_strands(n_strands, [N_std] * n_strands)
@@ -198,6 +199,7 @@ Simulation Setup & Multi-Seed Ensemble Runner
         n_ent_n30 = int(ent_density * vol_n30)
         gen_n30 = pt.MCUniverseGenerator(box_l_n30, box_l_n30, box_l_n30)
         gen_n30.set_seed(seed + 100)
+        gen_n30.config_nr_of_mc_steps(0)
         gen_n30.set_bead_distance(b)
         gen_n30.set_mean_squared_bead_distance(b**2)
         gen_n30.add_strands(n_strands, [30] * n_strands)
@@ -222,6 +224,7 @@ Simulation Setup & Multi-Seed Ensemble Runner
         n_ent_n70 = int(ent_density * vol_n70)
         gen_n70 = pt.MCUniverseGenerator(box_l_n70, box_l_n70, box_l_n70)
         gen_n70.set_seed(seed + 200)
+        gen_n70.config_nr_of_mc_steps(0)
         gen_n70.set_bead_distance(b)
         gen_n70.set_mean_squared_bead_distance(b**2)
         gen_n70.add_strands(n_strands, [70] * n_strands)
@@ -246,6 +249,7 @@ Simulation Setup & Multi-Seed Ensemble Runner
         # Incomplete Conversion: p = 0.82 (r = 1.0, N = 50)
         gen_p82 = pt.MCUniverseGenerator(box_l_std, box_l_std, box_l_std)
         gen_p82.set_seed(seed + 300)
+        gen_p82.config_nr_of_mc_steps(0)
         gen_p82.set_bead_distance(b)
         gen_p82.set_mean_squared_bead_distance(b**2)
         gen_p82.add_strands(n_strands, [N_std] * n_strands)
@@ -272,6 +276,7 @@ Simulation Setup & Multi-Seed Ensemble Runner
         n_ent_r75 = int(ent_density * vol_r75)
         gen_r75 = pt.MCUniverseGenerator(box_l_r75, box_l_r75, box_l_r75)
         gen_r75.set_seed(seed + 400)
+        gen_r75.config_nr_of_mc_steps(0)
         gen_r75.set_bead_distance(b)
         gen_r75.set_mean_squared_bead_distance(b**2)
         gen_r75.add_strands(n_strands, [N_std] * n_strands)
@@ -499,13 +504,13 @@ Simulation Setup & Multi-Seed Ensemble Runner
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 472-475
+.. GENERATED FROM PYTHON SOURCE LINES 477-480
 
 Loading Cached Data or Recomputing
 ----------------------------------
 Resolves the committed cache file or recomputes when requested:
 
-.. GENERATED FROM PYTHON SOURCE LINES 475-530
+.. GENERATED FROM PYTHON SOURCE LINES 480-535
 
 .. code-block:: Python
 
@@ -577,7 +582,7 @@ Resolves the committed cache file or recomputes when requested:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 531-555
+.. GENERATED FROM PYTHON SOURCE LINES 536-560
 
 Visualizing Cutoff Sensitivity & Parameter Interactions
 --------------------------------------------------------
@@ -604,17 +609,14 @@ The 6 panels below illustrate the physical effects of varying the slip-link samp
 6. **(f) Solver Convergence (CG Iterations)**:
    Relaxation steps to reach force balance equilibrium across cutoffs.
 
-.. GENERATED FROM PYTHON SOURCE LINES 555-831
+.. GENERATED FROM PYTHON SOURCE LINES 560-848
 
 .. code-block:: Python
 
 
     if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
-        fig, axes = plt.subplots(2, 3, figsize=(16, 9.5))
-        ax_mod, ax_res, ax_len = axes[0]
-        ax_net, ax_dist, ax_iter = axes[1]
-
-        # Panel 1: Modulus Links vs Springs
+        # Figure 1: Modulus Links vs Springs
+        fig, ax_mod = plt.subplots(figsize=(7, 4.5))
         ax_mod.plot(
             cutoffs,
             g_l_mean,
@@ -665,8 +667,11 @@ The 6 panels below illustrate the physical effects of varying the slip-link samp
         )
         ax_mod.grid(True, linestyle="--", alpha=0.5)
         ax_mod.legend(fontsize=9, frameon=True)
+        plt.tight_layout()
+        plt.show()
 
-        # Panel 2: Initial Residual (Pre-Strain)
+        # Figure 2: Initial Residual (Pre-Strain)
+        fig, ax_res = plt.subplots(figsize=(7, 4.5))
         ax_res.plot(
             cutoffs,
             res_l_mean,
@@ -707,8 +712,11 @@ The 6 panels below illustrate the physical effects of varying the slip-link samp
             fontweight="bold")
         ax_res.grid(True, linestyle="--", alpha=0.5)
         ax_res.legend(fontsize=9, frameon=True)
+        plt.tight_layout()
+        plt.show()
 
-        # Panel 3: Relative Inflation vs Strand Length
+        # Figure 3: Relative Inflation vs Strand Length
+        fig, ax_len = plt.subplots(figsize=(7, 4.5))
         # Normalize to value at cutoff = 1.2 (contact plateau)
         c12_idx = np.argmin(np.abs(cutoffs - 1.2))
         norm_n30 = g_n30_mean / g_n30_mean[c12_idx]
@@ -748,8 +756,11 @@ The 6 panels below illustrate the physical effects of varying the slip-link samp
             fontweight="bold")
         ax_len.grid(True, linestyle="--", alpha=0.5)
         ax_len.legend(fontsize=9, frameon=True)
+        plt.tight_layout()
+        plt.show()
 
-        # Panel 4: Conversion & Stoichiometry
+        # Figure 4: Conversion & Stoichiometry
+        fig, ax_net = plt.subplots(figsize=(7, 4.5))
         ax_net.plot(
             cutoffs,
             g_l_mean,
@@ -802,8 +813,11 @@ The 6 panels below illustrate the physical effects of varying the slip-link samp
         )
         ax_net.grid(True, linestyle="--", alpha=0.5)
         ax_net.legend(fontsize=9, frameon=True)
+        plt.tight_layout()
+        plt.show()
 
-        # Panel 5: Pair Distance Distributions
+        # Figure 5: Pair Distance Distributions
+        fig, ax_dist = plt.subplots(figsize=(7, 4.5))
         ax_dist.plot(
             bin_centers,
             hist_12,
@@ -843,8 +857,11 @@ The 6 panels below illustrate the physical effects of varying the slip-link samp
         ax_dist.set_xlim(0, 3.5)
         ax_dist.grid(True, linestyle="--", alpha=0.5)
         ax_dist.legend(fontsize=9, frameon=True)
+        plt.tight_layout()
+        plt.show()
 
-        # Panel 6: Solver Convergence (Iterations)
+        # Figure 6: Solver Convergence (Iterations)
+        fig, ax_iter = plt.subplots(figsize=(7, 4.5))
         ax_iter.plot(
             cutoffs,
             iter_l_mean,
@@ -887,16 +904,56 @@ The 6 panels below illustrate the physical effects of varying the slip-link samp
 
 
 
-.. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_001.png
-   :alt: (a) Modulus $G(r_{\mathrm{cut}})$: Links vs. Springs, (b) Topological Pre-Strain Distortion, (c) Relative Inflation vs. Strand Length $N$, (d) Conversion $p$ & Stoichiometric Imbalance $r$, (e) Sampled Pair Separation $P(r)$, (f) Relaxation Solver Convergence
-   :srcset: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_001.png
-   :class: sphx-glr-single-img
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_001.png
+         :alt: (a) Modulus $G(r_{\mathrm{cut}})$: Links vs. Springs
+         :srcset: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_001.png
+         :class: sphx-glr-multi-img
+
+    *
+
+      .. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_002.png
+         :alt: (b) Topological Pre-Strain Distortion
+         :srcset: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_002.png
+         :class: sphx-glr-multi-img
+
+    *
+
+      .. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_003.png
+         :alt: (c) Relative Inflation vs. Strand Length $N$
+         :srcset: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_003.png
+         :class: sphx-glr-multi-img
+
+    *
+
+      .. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_004.png
+         :alt: (d) Conversion $p$ & Stoichiometric Imbalance $r$
+         :srcset: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_004.png
+         :class: sphx-glr-multi-img
+
+    *
+
+      .. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_005.png
+         :alt: (e) Sampled Pair Separation $P(r)$
+         :srcset: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_005.png
+         :class: sphx-glr-multi-img
+
+    *
+
+      .. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_006.png
+         :alt: (f) Relaxation Solver Convergence
+         :srcset: /auto_examples/force_balance/images/sphx_glr_plot_sampling_cutoff_effect_006.png
+         :class: sphx-glr-multi-img
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 832-873
+.. GENERATED FROM PYTHON SOURCE LINES 849-890
 
 Physical Discussion & Practical Recommendations
 -----------------------------------------------
@@ -917,7 +974,7 @@ Key Insights:
    dominate the elasticity of long-chain networks.
 4. **Defect Tolerance**:
    Under incomplete conversion (:math:`p = 0.82`) or stoichiometric imbalance (:math:`r = 0.75`),
-   topological leaf peeling (``skip_dangling_soluble_entanglements=True``) prevents entanglements
+   topological leaf peeling (``filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE``) prevents entanglements
    from being placed on inactive dangling arms.
 
 Recommended Best Practices:
@@ -943,7 +1000,7 @@ Recommended Best Practices:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.412 seconds)
+   **Total running time of the script:** (0 minutes 0.921 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_sampling_cutoff_effect.py:

@@ -1,6 +1,6 @@
 """
-Maximum Entropy Homogenization Procedure (MEHP)
-===============================================
+MEHP Force Relaxation
+=====================
 
 This example demonstrates how to use
 the "original" MEHP implementation (see :cite:t:`gusev_numerical_2019`)

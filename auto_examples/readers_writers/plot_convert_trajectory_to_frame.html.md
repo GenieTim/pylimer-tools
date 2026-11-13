@@ -10,7 +10,7 @@ to download the full example code.
 
 <a id="sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"></a>
 
-# Extract Trajectory Frame to Data File
+# Extract Trajectory Frame
 
 Take a later entry from a LAMMPS trajectory and save it as a data file.
 
@@ -89,7 +89,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 0.126 seconds)
+**Total running time of the script:** (0 minutes 0.225 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"></a>
 

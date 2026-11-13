@@ -3,14 +3,14 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta property="og:title" content="Extract Trajectory Frame to Data File" />
+<meta property="og:title" content="Extract Trajectory Frame" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/readers_writers/plot_convert_trajectory_to_frame.html" />
 <meta property="og:site_name" content="pylimer-tools" />
 <meta property="og:description" content="Take a later entry from a LAMMPS trajectory and save it as a data file. import os from pathlib import Path from pylimer_tools_cpp import DataFileWriter, UniverseSequence if not os. path. exists(&qu..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
-<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_readers_writers_plot_convert_trajectory_to_frame_6329910c.png" />
+<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_readers_writers_plot_convert_trajectory_to_frame_6fa2eaef.png" />
 <meta property="og:image:alt" content="Take a later entry from a LAMMPS trajectory and save it as a data file. import os from pathlib import Path from pylimer_tools_cpp import DataFileWriter, UniverseSequence if not os. path. exists(&qu..." />
 <meta name="description" content="Take a later entry from a LAMMPS trajectory and save it as a data file. import os from pathlib import Path from pylimer_tools_cpp import DataFileWriter, UniverseSequence if not os. path. exists(&qu..." />
 <meta name="twitter:card" content="summary_large_image" />
@@ -25,7 +25,7 @@
 <link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Convert for Bond Swapping" href="plot_convert_for_bond_swapping.html"><link rel="prev" title="Dump File Reader" href="plot_dump_file_reader.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
-        <title>Extract Trajectory Frame to Data File - pylimer-tools</title>
+        <title>Extract Trajectory Frame - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -230,31 +230,31 @@
 <li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Interface</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Examples</a><input aria-label="Toggle navigation of Examples" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../dpd_simulations/index.html">Dissipative Particle Dynamics (DPD) Simulations</a><input aria-label="Toggle navigation of Dissipative Particle Dynamics (DPD) Simulations" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../dpd_simulations/plot_dpd_simulation.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dpd_simulations/plot_dpd_simulation.html">DPD Simulations</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../force_balance/index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_fb_deformation_exp.html">Deformation Experiment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_balance_2.html">Force Balance 2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_entanglement_link_vs_spring.html">Modeling Entanglements: Entanglement Links vs. Entanglement Springs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_slipping_vs_fixed_links.html">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_force_relaxation.html">MEHP Force Relaxation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_entanglement_link_vs_spring.html">Entanglement Links vs. Springs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_polydispersity_study.html">Polydispersity Study</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_sampling_cutoff_effect.html">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_inactive_removal_and_sampling.html">Inactive Strand &amp; Entanglement Removal in Force Balance 2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_sampling_cutoff_effect.html">Sampling Cut-Off Effect</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_inactive_removal_and_sampling.html">Inactive Removal &amp; Sampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../force_balance/plot_entanglement_sampling_comparison.html">Entanglement Sampling Methods</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_save_network.html">Save Generated Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_polydisperse_system.html">Polydisperse Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_custom_crosslinking_callback.html">Custom Crosslinking with Callback Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_custom_crosslinking_callback.html">Custom Crosslinking Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_tetra_peg_network.html">Tetra-PEG Network Generation</a></li>
 </ul>
 </li>
@@ -271,9 +271,9 @@
 <li class="toctree-l3"><a class="reference internal" href="plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_dump_file_reader.html">Dump File Reader</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Extract Trajectory Frame</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_memory_efficient_dump_file_reading.html">Memory-Efficient Dump File Reading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_memory_efficient_dump_file_reading.html">Streaming Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_data_file_reader.html">Data File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_data_file_writer.html">Data File Writer</a></li>
 </ul>
@@ -421,8 +421,8 @@
 <p><a class="reference internal" href="#sphx-glr-download-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code.</p>
 </div>
-<section class="sphx-glr-example-title" id="extract-trajectory-frame-to-data-file">
-<span id="sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"></span><h1>Extract Trajectory Frame to Data File<a class="headerlink" href="#extract-trajectory-frame-to-data-file" title="Link to this heading">¶</a></h1>
+<section class="sphx-glr-example-title" id="extract-trajectory-frame">
+<span id="sphx-glr-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py"></span><h1>Extract Trajectory Frame<a class="headerlink" href="#extract-trajectory-frame" title="Link to this heading">¶</a></h1>
 <p>Take a later entry from a LAMMPS trajectory and save it as a data file.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="w">
 </span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a><span class="w">
@@ -484,7 +484,7 @@ frame:</p>
 </span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tight_layout.html#matplotlib.pyplot.tight_layout" title="matplotlib.pyplot.tight_layout"><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<img src="../../_images/sphx_glr_plot_convert_trajectory_to_frame_001.png" srcset="../../_images/sphx_glr_plot_convert_trajectory_to_frame_001.png" alt="Bond Length Distribution in Extracted Frame (Step 1461920000)" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.126 seconds)</p>
+<img src="../../_images/sphx_glr_plot_convert_trajectory_to_frame_001.png" srcset="../../_images/sphx_glr_plot_convert_trajectory_to_frame_001.png" alt="Bond Length Distribution in Extracted Frame (Step 1461920000)" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.225 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-readers-writers-plot-convert-trajectory-to-frame-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7fd95444cda60585d08d3023ce3b33c4/plot_convert_trajectory_to_frame.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_convert_trajectory_to_frame.ipynb</span></code></a></p>
@@ -555,7 +555,7 @@ frame:</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Extract Trajectory Frame to Data File</a><ul>
+<li><a class="reference internal" href="#">Extract Trajectory Frame</a><ul>
 <li><a class="reference internal" href="#visualizing-extracted-frame-structure">Visualizing Extracted Frame Structure</a></li>
 </ul>
 </li>

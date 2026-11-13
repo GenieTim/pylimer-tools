@@ -18,8 +18,8 @@
 .. _sphx_glr_auto_examples_force_balance_plot_slipping_vs_fixed_links.py:
 
 
-Entanglement Mobility: Dynamic Slipping vs. Fixed Links
-======================================================
+Slipping vs. Fixed Links
+========================
 
 In the first-generation Maximum Entropy Homogenization Procedure (MEHP) Force Balance
 (:class:`~pylimer_tools_cpp.MEHPForceBalance`, :cite:t:`bernhard_phantom_2025`), topological
@@ -83,7 +83,7 @@ sampling, results are cached into a committed ``.npz`` archive and loaded automa
 You can rerun the live multi-seed computation at any time by passing ``--recompute`` or
 setting ``PYLIMER_RECOMPUTE_CACHE=1``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-290
+.. GENERATED FROM PYTHON SOURCE LINES 66-299
 
 .. code-block:: Python
 
@@ -114,7 +114,10 @@ setting ``PYLIMER_RECOMPUTE_CACHE=1``.
         ParameterType,
         get_parameters_for_polymer,
     )
-    from pylimer_tools_cpp import MCUniverseGenerator  # noqa: E402
+    from pylimer_tools_cpp import (  # noqa: E402
+        EntanglementFilteringMode,
+        MCUniverseGenerator,
+    )
 
 
     def _simulate_slipping_vs_fixed_single_repeat(
@@ -165,7 +168,13 @@ setting ``PYLIMER_RECOMPUTE_CACHE=1``.
             else:
                 # Sample entanglements analytically
                 es = gen.sample_entanglements(
-                    n_target, cutoff, 0.0, 0, 3.0, f"ent_{seed}_{factor}", True
+                    n_target,
+                    cutoff,
+                    0.0,
+                    0,
+                    3.0,
+                    f"ent_{seed}_{factor}",
+                    filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
                 )
 
                 # 1. Fixed Entanglement Links (disable_slipping=True)
@@ -318,13 +327,13 @@ setting ``PYLIMER_RECOMPUTE_CACHE=1``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 291-294
+.. GENERATED FROM PYTHON SOURCE LINES 300-303
 
 Loading Cached Data or Recomputing
 ----------------------------------
 Resolves the committed cache file or recomputes when requested:
 
-.. GENERATED FROM PYTHON SOURCE LINES 294-315
+.. GENERATED FROM PYTHON SOURCE LINES 303-324
 
 .. code-block:: Python
 
@@ -362,7 +371,7 @@ Resolves the committed cache file or recomputes when requested:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 316-328
+.. GENERATED FROM PYTHON SOURCE LINES 325-337
 
 Visualizing Modulus Reduction & Computational Cost
 --------------------------------------------------
@@ -377,15 +386,14 @@ The two subplots below highlight the key conclusions of :cite:t:`bernhard_phanto
    Slipping requires solving coupled non-linear partition updates, causing a 2-3× increase in
    iterations required to reach the force tolerance threshold.
 
-.. GENERATED FROM PYTHON SOURCE LINES 328-440
+.. GENERATED FROM PYTHON SOURCE LINES 337-451
 
 .. code-block:: Python
 
 
     if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
-        fig, (ax_mod, ax_iter) = plt.subplots(1, 2, figsize=(11, 4.5))
-
-        # Modulus comparison
+        # Figure 1: Modulus comparison
+        fig, ax_mod = plt.subplots(figsize=(7, 4.5))
         ax_mod.plot(
             density_factors,
             g_fixed_mean,
@@ -446,8 +454,11 @@ The two subplots below highlight the key conclusions of :cite:t:`bernhard_phanto
         ax_mod.set_title("Equilibrium Shear Modulus vs. Entanglement Density")
         ax_mod.grid(True, linestyle="--", alpha=0.5)
         ax_mod.legend(frameon=True)
+        plt.tight_layout()
+        plt.show()
 
-        # Iteration count comparison
+        # Figure 2: Iteration count comparison
+        fig, ax_iter = plt.subplots(figsize=(7, 4.5))
         ax_iter.plot(
             density_factors,
             iter_fixed_mean,
@@ -496,16 +507,28 @@ The two subplots below highlight the key conclusions of :cite:t:`bernhard_phanto
 
 
 
-.. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_slipping_vs_fixed_links_001.png
-   :alt: Equilibrium Shear Modulus vs. Entanglement Density, Convergence Iterations vs. Entanglement Density
-   :srcset: /auto_examples/force_balance/images/sphx_glr_plot_slipping_vs_fixed_links_001.png
-   :class: sphx-glr-single-img
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_slipping_vs_fixed_links_001.png
+         :alt: Equilibrium Shear Modulus vs. Entanglement Density
+         :srcset: /auto_examples/force_balance/images/sphx_glr_plot_slipping_vs_fixed_links_001.png
+         :class: sphx-glr-multi-img
+
+    *
+
+      .. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_slipping_vs_fixed_links_002.png
+         :alt: Convergence Iterations vs. Entanglement Density
+         :srcset: /auto_examples/force_balance/images/sphx_glr_plot_slipping_vs_fixed_links_002.png
+         :class: sphx-glr-multi-img
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 441-463
+.. GENERATED FROM PYTHON SOURCE LINES 452-474
 
 Summary & Method Selection
 --------------------------
@@ -533,7 +556,7 @@ Summary & Method Selection
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.160 seconds)
+   **Total running time of the script:** (0 minutes 0.340 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_slipping_vs_fixed_links.py:

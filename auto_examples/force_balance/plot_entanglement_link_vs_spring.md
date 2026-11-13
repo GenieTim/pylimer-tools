@@ -10,7 +10,7 @@ to download the full example code.
 
 <a id="sphx-glr-auto-examples-force-balance-plot-entanglement-link-vs-spring-py"></a>
 
-# Modeling Entanglements: Entanglement Links vs. Entanglement Springs
+# Entanglement Links vs. Springs
 
 In polymer network elasticity simulations using the Maximum Entropy Homogenization
 Procedure (MEHP) (Gusev [[Gus19](../../acknowledgements.md#id8)], Bernhard and Gusev [[BG25](../../acknowledgements.md#id12)]),
@@ -40,7 +40,7 @@ polymer chains. In Bernhard and Gusev [[BG25](../../acknowledgements.md#id12)], 
 The first-generation [`MEHPForceBalance`](../../api/pylimer_tools_cpp.MEHPForceBalance.md#pylimer_tools_cpp.MEHPForceBalance) did provide an option for
 links to slide dynamically along the contour (`disable_slipping=False`), but slipping was
 found to artificially soften the network modulus and add unnecessary numerical complexity.
-For a detailed comparison of actual slipping vs. fixed links, see [Entanglement Mobility: Dynamic Slipping vs. Fixed Links](plot_slipping_vs_fixed_links.md).
+For a detailed comparison of actual slipping vs. fixed links, see [Slipping vs. Fixed Links](plot_slipping_vs_fixed_links.md).
 
 This example illustrates:
 
@@ -75,7 +75,7 @@ contour positions $\alpha_1$ and $\alpha_2$:
   The entanglement spring acts in series with the strand segments, adding compliance and
   reducing the effective stiffness of the entanglement constraint.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 70-100 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 70-103 -->
 ```Python
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
@@ -103,10 +103,13 @@ from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
     ParameterType,
     get_parameters_for_polymer,
 )
-from pylimer_tools_cpp import MCUniverseGenerator  # noqa: E402
+from pylimer_tools_cpp import (  # noqa: E402
+    EntanglementFilteringMode,
+    MCUniverseGenerator,
+)
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 101-111 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 104-114 -->
 
 ## Multi-Seed Simulation Procedure
 
@@ -119,7 +122,7 @@ sampling (multiple seeds and complex systems), the results are cached into a com
 at any time by passing `--recompute` or setting
 `PYLIMER_RECOMPUTE_CACHE=1`.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 111-302 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 114-311 -->
 ```Python
 def _simulate_link_vs_spring_single_repeat(
     r: int,
@@ -166,7 +169,13 @@ def _simulate_link_vs_spring_single_repeat(
         else:
             # Sample entanglements using seeded Brownian bridge
             es = gen.sample_entanglements(
-                n_target, cutoff, 0.0, 0, 3.0, f"ent_{seed}_{factor}", True
+                n_target,
+                cutoff,
+                0.0,
+                0,
+                3.0,
+                f"ent_{seed}_{factor}",
+                filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
             )
 
             # 1. Entanglement Links (merged junction nodes)
@@ -310,13 +319,13 @@ def run_entanglement_link_vs_spring_simulation(
     }
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 303-306 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 312-315 -->
 
 ## Loading Cached Data or Recomputing
 
 Resolves the committed cache file or recomputes when requested:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 306-326 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 315-335 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     cache_path = get_example_cache_path(
@@ -342,7 +351,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 Loading cached example data from entanglement_link_vs_spring_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 327-340 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 336-349 -->
 
 ## Visualizing Mechanical & Structural Differences
 
@@ -358,12 +367,12 @@ The plots below compare:
    Entanglement springs introduce exactly twice as many extra node coordinates into the linear
    system of equations as entanglement links.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 340-437 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 349-449 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
-    fig, (ax_mod, ax_dof) = plt.subplots(1, 2, figsize=(11, 4.5))
-
-    # Modulus comparison with shaded 95% confidence intervals and error bars
+    # Figure 1: Modulus comparison with shaded 95% confidence intervals and
+    # error bars
+    fig, ax_mod = plt.subplots(figsize=(7, 4.5))
     ax_mod.plot(
         density_factors,
         g_links_mean,
@@ -424,8 +433,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_mod.set_title("Equilibrium Shear Modulus vs. Entanglement Density")
     ax_mod.grid(True, linestyle="--", alpha=0.5)
     ax_mod.legend(frameon=True)
+    plt.tight_layout()
+    plt.show()
 
-    # System size comparison
+    # Figure 2: System size comparison
+    fig, ax_dof = plt.subplots(figsize=(7, 4.5))
     ax_dof.plot(
         density_factors,
         extra_links_mean,
@@ -457,7 +469,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 438-460 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 450-472 -->
 
 ## Practical Recommendations
 
@@ -468,7 +480,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 | **System Size (SLE)** | Smaller ($+ N_{\text{ent}}$ nodes, $0$ extra bonds).                                                                                                                    | Larger ($+ 2 N_{\text{ent}}$ nodes, $+ N_{\text{ent}}$ extra springs).                     |
 | **Recommended Use**   | Standard affine/phantom homogenization where entanglements act as effective crosslinks (Bernhard and Gusev [[BG25](../../acknowledgements.md#id12)]). | Studies exploring inter-chain interaction compliance or finite-range topological coupling. |
 
-**Total running time of the script:** (0 minutes 0.191 seconds)
+**Total running time of the script:** (0 minutes 0.376 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-link-vs-spring-py"></a>
 

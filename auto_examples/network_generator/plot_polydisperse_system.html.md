@@ -10,7 +10,7 @@ to download the full example code.
 
 <a id="sphx-glr-auto-examples-network-generator-plot-polydisperse-system-py"></a>
 
-# Generate a Polydisperse Polymer Network
+# Polydisperse Network
 
 This example demonstrates how to use the [`MCUniverseGenerator`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator)
 to create a polydisperse end-linked polymer network with varying strand lengths.
@@ -103,7 +103,7 @@ plt.title("Distribution of Strand Lengths in Polydisperse Network")
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 7.293 seconds)
+**Total running time of the script:** (0 minutes 0.407 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-polydisperse-system-py"></a>
 

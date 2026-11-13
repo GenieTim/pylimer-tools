@@ -3,14 +3,14 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta property="og:title" content="Inactive Strand & Entanglement Removal in Force Balance 2" />
+<meta property="og:title" content="Inactive Removal & Sampling" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://genietim.github.io/auto_examples/force_balance/plot_inactive_removal_and_sampling.html" />
 <meta property="og:site_name" content="pylimer-tools" />
 <meta property="og:description" content="In polymer network modeling via the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance ( Gusev [ Gus19], Bernhard and Gusev [ BG25]), networks generated below or near full conversion..." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
-<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_force_balance_plot_inactive_removal_and_sampling_d40a71dd.png" />
+<meta property="og:image" content="https://genietim.github.io/pylimer-tools/_images/social_previews/summary_auto_examples_force_balance_plot_inactive_removal_and_sampling_df772f78.png" />
 <meta property="og:image:alt" content="In polymer network modeling via the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance ( Gusev [ Gus19], Bernhard and Gusev [ BG25]), networks generated below or near full conversion..." />
 <meta name="description" content="In polymer network modeling via the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance ( Gusev [ Gus19], Bernhard and Gusev [ BG25]), networks generated below or near full conversion..." />
 <meta name="twitter:card" content="summary_large_image" />
@@ -22,10 +22,10 @@
 <link rel="manifest" href="/_static/favicon/site.webmanifest" />
 
 <link rel="alternate" type="text/markdown" href="plot_inactive_removal_and_sampling.html.md">
-<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical" href="plot_entanglement_sampling_comparison.html"><link rel="prev" title="Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2" href="plot_sampling_cutoff_effect.html">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Entanglement Sampling Methods" href="plot_entanglement_sampling_comparison.html"><link rel="prev" title="Sampling Cut-Off Effect" href="plot_sampling_cutoff_effect.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
-        <title>Inactive Strand &amp; Entanglement Removal in Force Balance 2 - pylimer-tools</title>
+        <title>Inactive Removal &amp; Sampling - pylimer-tools</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=30c0293a" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -230,31 +230,31 @@
 <li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Interface</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Examples</a><input aria-label="Toggle navigation of Examples" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../dpd_simulations/index.html">Dissipative Particle Dynamics (DPD) Simulations</a><input aria-label="Toggle navigation of Dissipative Particle Dynamics (DPD) Simulations" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../dpd_simulations/plot_dpd_simulation.html">Dissipative Particle Dynamics (DPD) Simulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dpd_simulations/plot_dpd_simulation.html">DPD Simulations</a></li>
 </ul>
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Force Balance, Maximum Entropy Homogenization Procedures</a><input aria-label="Toggle navigation of Force Balance, Maximum Entropy Homogenization Procedures" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="plot_fb_deformation_exp.html">Deformation Experiment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_force_balance.html">Force Balance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_force_balance_2.html">Force Balance 2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_force_relaxation.html">Maximum Entropy Homogenization Procedure (MEHP)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_entanglement_link_vs_spring.html">Modeling Entanglements: Entanglement Links vs. Entanglement Springs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_slipping_vs_fixed_links.html">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_force_relaxation.html">MEHP Force Relaxation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_entanglement_link_vs_spring.html">Entanglement Links vs. Springs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_slipping_vs_fixed_links.html">Slipping vs. Fixed Links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_polydispersity_study.html">Polydispersity Study</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_sampling_cutoff_effect.html">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Inactive Strand &amp; Entanglement Removal in Force Balance 2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_entanglement_sampling_comparison.html">Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_sampling_cutoff_effect.html">Sampling Cut-Off Effect</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Inactive Removal &amp; Sampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_entanglement_sampling_comparison.html">Entanglement Sampling Methods</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../network_generator/index.html">Network Generation</a><input aria-label="Toggle navigation of Network Generation" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_save_network.html">Save Generated Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_polydisperse_system.html">Generate a Polydisperse Polymer Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_polydisperse_system.html">Polydisperse Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_simple_crosslinked_network.html">Simple Crosslinked Network</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_monte_carlo_configuration.html">Monte Carlo Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_add_angles.html">Adding Topology Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_vulcanized_network.html">Generate Vulcanized Networks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_multi_component_system.html">Multi-Component System</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_custom_crosslinking_callback.html">Custom Crosslinking with Callback Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_custom_crosslinking_callback.html">Custom Crosslinking Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../network_generator/plot_tetra_peg_network.html">Tetra-PEG Network Generation</a></li>
 </ul>
 </li>
@@ -271,9 +271,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_time_averaged_data_reader.html">Time-Averaged Data Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_unit_conversion.html">Unit Conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_dump_file_reader.html">Dump File Reader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame to Data File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_trajectory_to_frame.html">Extract Trajectory Frame</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_convert_for_bond_swapping.html">Convert for Bond Swapping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_memory_efficient_dump_file_reading.html">Memory-Efficient Dump File Reading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_memory_efficient_dump_file_reading.html">Streaming Dump File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_data_file_reader.html">Data File Reader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readers_writers/plot_data_file_writer.html">Data File Writer</a></li>
 </ul>
@@ -421,8 +421,8 @@
 <p><a class="reference internal" href="#sphx-glr-download-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code.</p>
 </div>
-<section class="sphx-glr-example-title" id="inactive-strand-entanglement-removal-in-force-balance-2">
-<span id="sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"></span><h1>Inactive Strand &amp; Entanglement Removal in Force Balance 2<a class="headerlink" href="#inactive-strand-entanglement-removal-in-force-balance-2" title="Link to this heading">¶</a></h1>
+<section class="sphx-glr-example-title" id="inactive-removal-sampling">
+<span id="sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"></span><h1>Inactive Removal &amp; Sampling<a class="headerlink" href="#inactive-removal-sampling" title="Link to this heading">¶</a></h1>
 <p>In polymer network modeling via the Maximum Entropy Homogenization Procedure (MEHP)
 and Force Balance (<span class="bibtex-citation" id="id1">Gusev [<a class="reference internal" href="../../acknowledgements.html#id8" title="Andrei A. Gusev. Numerical Estimates of the Topological Effects in the Elasticity of Gaussian Polymer Networks and Their Exact Theoretical Description. Macromolecules, 52(9):3244–3251, May 2019. doi:10.1021/acs.macromol.9b00262.">Gus19</a>]</span>, <span class="bibtex-citation" id="id2">Bernhard and Gusev [<a class="reference internal" href="../../acknowledgements.html#id12" title="Tim Bernhard and Andrei A. Gusev. Phantom force balance procedure for predicting the modulus of entangled polymer networks. ACS Polymers Au, 2025. doi:10.1021/acspolymersau.5c00036.">BG25</a>]</span>),
 networks generated below or near full conversion contain significant fractions of
@@ -433,7 +433,7 @@ slipping. This introduces two interrelated and critical modeling questions:</p>
 <ol class="arabic simple">
 <li><p><strong>The Sampling Trap (Pre-Filter vs. Unfiltered Sampling)</strong>:
 If entanglements are sampled without filtering (<a class="reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements" title="pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sample_entanglements()</span></code></a>
-with <code class="docutils literal notranslate"><span class="pre">filter_dangling_and_soluble=False</span></code>), entanglements are placed indiscriminately
+with <code class="docutils literal notranslate"><span class="pre">filtering_mode=EntanglementFilteringMode.NONE</span></code>), entanglements are placed indiscriminately
 along all chains, including dangling ends and unattached sol molecules.
 Because links cannot slip off open chain ends in Force Balance 2, an entanglement linking
 a dangling chain to the gel effectively pins the dangling arm in space, artificially
@@ -599,10 +599,22 @@ documentation builds.</p>
 </span><span class="w">
 </span>        <span class="c1"># Entanglement sampling: filtered vs. unfiltered</span><span class="w">
 </span>        <span class="n">es_filt</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">sample_entanglements</span><span class="p">(</span><span class="w">
-</span>            <span class="n">n_ent</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="s2">s_filt_</span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">conv</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="w">
+</span>            <span class="n">n_ent</span><span class="p">,</span><span class="w">
+</span>            <span class="n">cutoff</span><span class="p">,</span><span class="w">
+</span>            <span class="mf">0.0</span><span class="p">,</span><span class="w">
+</span>            <span class="mi">0</span><span class="p">,</span><span class="w">
+</span>            <span class="mf">3.0</span><span class="p">,</span><span class="w">
+</span>            <span class="sa">f</span><span class="s2">&quot;</span><span class="s2">s_filt_</span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">conv</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>            <span class="n">filtering_mode</span><span class="o">=</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/pylimer_tools_cpp.EntanglementFilteringMode.html#pylimer_tools_cpp.EntanglementFilteringMode" title="pylimer_tools_cpp.EntanglementFilteringMode"><span class="n">pt</span><span class="o">.</span><span class="n">EntanglementFilteringMode</span><span class="o">.</span><span class="n">OMIT_INACTIVE</span></a><span class="p">,</span><span class="w">
 </span>        <span class="p">)</span><span class="w">
 </span>        <span class="n">es_unf</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">sample_entanglements</span><span class="p">(</span><span class="w">
-</span>            <span class="n">n_ent</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="s2">s_unf_</span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">conv</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="w">
+</span>            <span class="n">n_ent</span><span class="p">,</span><span class="w">
+</span>            <span class="n">cutoff</span><span class="p">,</span><span class="w">
+</span>            <span class="mf">0.0</span><span class="p">,</span><span class="w">
+</span>            <span class="mi">0</span><span class="p">,</span><span class="w">
+</span>            <span class="mf">3.0</span><span class="p">,</span><span class="w">
+</span>            <span class="sa">f</span><span class="s2">&quot;</span><span class="s2">s_unf_</span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">conv</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>            <span class="n">filtering_mode</span><span class="o">=</span><a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/pylimer_tools_cpp.EntanglementFilteringMode.html#pylimer_tools_cpp.EntanglementFilteringMode" title="pylimer_tools_cpp.EntanglementFilteringMode"><span class="n">pt</span><span class="o">.</span><span class="n">EntanglementFilteringMode</span><span class="o">.</span><span class="n">NONE</span></a><span class="p">,</span><span class="w">
 </span>        <span class="p">)</span><span class="w">
 </span><span class="w">
 </span>        <span class="c1"># 1. Unfiltered + No Simplification</span><span class="w">
@@ -1021,8 +1033,6 @@ collapse cleanly onto the true physical phantom percolation curve.</p>
 <p>demonstrating how unphysical constraints inflate stiffness by hundreds
 to thousands of percent!</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span class="k">if</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">&quot;</span><span class="s2">__main__</span><span class="s2">&quot;</span> <span class="ow">or</span> <span class="s2">&quot;</span><span class="s2">sphinx_gallery</span><span class="s2">&quot;</span> <span class="ow">in</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">sys</span><span class="o">.</span><span class="n">modules</span></a><span class="p">:</span><span class="w">
-</span>    <a class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure"><span class="n">fig</span></a><span class="p">,</span> <span class="p">(</span><a class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes"><span class="n">ax1</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes"><span class="n">ax2</span></a><span class="p">)</span> <span class="o">=</span> <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">)</span><span class="p">)</span><span class="w">
-</span><span class="w">
 </span>    <span class="c1"># Palette</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">c_naive</span></a> <span class="o">=</span> <span class="s2">&quot;</span><span class="s2">#d62728</span><span class="s2">&quot;</span>  <span class="c1"># Red: Unfiltered NO_SIMPLIFICATION</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">c_filt_raw</span></a> <span class="o">=</span> <span class="s2">&quot;</span><span class="s2">#1f77b4</span><span class="s2">&quot;</span>  <span class="c1"># Blue: Filtered NO_SIMPLIFICATION</span><span class="w">
@@ -1030,7 +1040,8 @@ to thousands of percent!</p>
 </span>    <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">c_truth</span></a> <span class="o">=</span> <span class="s2">&quot;</span><span class="s2">#2ca02c</span><span class="s2">&quot;</span>  <span class="c1"># Green: Filtered INACTIVE_THEN_X2F</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">c_unf_x2f</span></a> <span class="o">=</span> <span class="s2">&quot;</span><span class="s2">#9467bd</span><span class="s2">&quot;</span>  <span class="c1"># Purple: Unfiltered INACTIVE_THEN_X2F</span><span class="w">
 </span><span class="w">
-</span>    <span class="c1"># Panel 1: Modulus vs Conversion</span><span class="w">
+</span>    <span class="c1"># Figure 1: Modulus vs Conversion</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure"><span class="n">fig</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes"><span class="n">ax1</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="p">)</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot" title="matplotlib.axes.Axes.plot"><span class="n">ax1</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><span class="w">
 </span>        <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">convs</span></a><span class="p">,</span><span class="w">
 </span>        <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">g_unf_nosimp_m</span></a><span class="p">,</span><span class="w">
@@ -1116,8 +1127,11 @@ to thousands of percent!</p>
 </span>    <span class="p">)</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.grid.html#matplotlib.axes.Axes.grid" title="matplotlib.axes.Axes.grid"><span class="n">ax1</span><span class="o">.</span><span class="n">grid</span></a><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">:</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.legend.html#matplotlib.axes.Axes.legend" title="matplotlib.axes.Axes.legend"><span class="n">ax1</span><span class="o">.</span><span class="n">legend</span></a><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">upper left</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mf">9.5</span><span class="p">)</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tight_layout.html#matplotlib.pyplot.tight_layout" title="matplotlib.pyplot.tight_layout"><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span><span class="w">
-</span>    <span class="c1"># Panel 2: Artificial Inflation Factor (%)</span><span class="w">
+</span>    <span class="c1"># Figure 2: Artificial Inflation Factor (%)</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure"><span class="n">fig</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes"><span class="n">ax2</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="p">)</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">g_truth</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">g_filt_x2f_m</span></a><span class="w">
 </span>    <span class="c1"># Avoid division by near-zero at lowest conversion if unpercolated</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">inflation_unf</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.where.html#numpy.where" title="numpy.where"><span class="n">np</span><span class="o">.</span><span class="n">where</span></a><span class="p">(</span><span class="w">
@@ -1163,7 +1177,11 @@ to thousands of percent!</p>
 </span>    <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tight_layout.html#matplotlib.pyplot.tight_layout" title="matplotlib.pyplot.tight_layout"><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<img src="../../_images/sphx_glr_plot_inactive_removal_and_sampling_001.png" srcset="../../_images/sphx_glr_plot_inactive_removal_and_sampling_001.png" alt="Shear Modulus across Network Conversion, Artificial Stiffening from Trapped Dangling Chains" class = "sphx-glr-single-img"/></section>
+<ul class="sphx-glr-horizontal">
+<li><img src="../../_images/sphx_glr_plot_inactive_removal_and_sampling_001.png" srcset="../../_images/sphx_glr_plot_inactive_removal_and_sampling_001.png" alt="Shear Modulus across Network Conversion" class = "sphx-glr-multi-img"/></li>
+<li><img src="../../_images/sphx_glr_plot_inactive_removal_and_sampling_002.png" srcset="../../_images/sphx_glr_plot_inactive_removal_and_sampling_002.png" alt="Artificial Stiffening from Trapped Dangling Chains" class = "sphx-glr-multi-img"/></li>
+</ul>
+</section>
 <section id="figure-2-network-topology-simplification-efficiency">
 <h2>Figure 2: Network Topology &amp; Simplification Efficiency<a class="headerlink" href="#figure-2-network-topology-simplification-efficiency" title="Link to this heading">¶</a></h2>
 <p>How many springs and links actually carry elastic load, and how many are redundant dead ends?</p>
@@ -1272,7 +1290,7 @@ reducing memory and solver overhead for all subsequent deformation steps.</p></l
 </span>    <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tight_layout.html#matplotlib.pyplot.tight_layout" title="matplotlib.pyplot.tight_layout"><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<img src="../../_images/sphx_glr_plot_inactive_removal_and_sampling_002.png" srcset="../../_images/sphx_glr_plot_inactive_removal_and_sampling_002.png" alt="Remaining Springs after Topological Pruning, Network Simplification Fraction vs. Conversion" class = "sphx-glr-single-img"/></section>
+<img src="../../_images/sphx_glr_plot_inactive_removal_and_sampling_003.png" srcset="../../_images/sphx_glr_plot_inactive_removal_and_sampling_003.png" alt="Remaining Springs after Topological Pruning, Network Simplification Fraction vs. Conversion" class = "sphx-glr-single-img"/></section>
 <section id="figure-3-linear-system-dimension-solver-relaxation-iterations">
 <h2>Figure 3: Linear System Dimension &amp; Solver Relaxation Iterations<a class="headerlink" href="#figure-3-linear-system-dimension-solver-relaxation-iterations" title="Link to this heading">¶</a></h2>
 <p>Simplification directly reduces the dimension of the linear system solved during force balance:</p>
@@ -1392,7 +1410,7 @@ topological structure.</p>
 </span>    <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tight_layout.html#matplotlib.pyplot.tight_layout" title="matplotlib.pyplot.tight_layout"><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<img src="../../_images/sphx_glr_plot_inactive_removal_and_sampling_003.png" srcset="../../_images/sphx_glr_plot_inactive_removal_and_sampling_003.png" alt="Degrees of Freedom in Sparse Force Balance, Solver Convergence & Pruning Iterations" class = "sphx-glr-single-img"/></section>
+<img src="../../_images/sphx_glr_plot_inactive_removal_and_sampling_004.png" srcset="../../_images/sphx_glr_plot_inactive_removal_and_sampling_004.png" alt="Degrees of Freedom in Sparse Force Balance, Solver Convergence & Pruning Iterations" class = "sphx-glr-single-img"/></section>
 <section id="physical-interpretation-practical-recommendations">
 <h2>Physical Interpretation &amp; Practical Recommendations<a class="headerlink" href="#physical-interpretation-practical-recommendations" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
@@ -1404,18 +1422,19 @@ static junctions. Without topological filtering, an entanglement between a dangl
 the gel artificially anchors the dangling chain, preventing it from relaxing and converting
 zero-modulus sol/dangling material into load-bearing network strands.
 At <span class="math notranslate nohighlight">\(p \le 0.85\)</span>, this artifact inflates <span class="math notranslate nohighlight">\(G\)</span> by hundreds to thousands of percent!</p></li>
-<li><p><strong>Analytical Brownian-Bridge Leaf Peeling is the First Line of Defense</strong>:
-Passing <code class="docutils literal notranslate"><span class="pre">filter_dangling_and_soluble=True</span></code> (the default in <a class="reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements" title="pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sample_entanglements()</span></code></a>
-and <a class="reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2" title="pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_force_balance2()</span></code></a>) uses graph-theoretic leaf peeling
-to eliminate dangling and sol strands before entanglement pairs are sampled. This completely prevents
-artificial dangling entanglements.</p></li>
+<li><p><strong>Topological Leaf Peeling is the First Line of Defense</strong>:
+Passing <code class="docutils literal notranslate"><span class="pre">filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE</span></code> (the default in
+<a class="reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements" title="pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sample_entanglements()</span></code></a> and
+<a class="reference internal" href="../../api/pylimer_tools_cpp.MCUniverseGenerator.html#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2" title="pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_force_balance2()</span></code></a>, or <code class="docutils literal notranslate"><span class="pre">PRUNE_UPFRONT</span></code> for active-only sampling)
+uses graph-theoretic leaf peeling to eliminate dangling and sol strands before entanglement pairs are sampled.
+This completely prevents artificial dangling entanglements.</p></li>
 <li><p><strong>The Solver Pruning Rescues Corrupted Networks</strong>:
 Even if entanglements were sampled on an unfiltered network, running <a class="reference internal" href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><code class="xref py py-class docutils literal notranslate"><span class="pre">MEHPForceBalance2</span></code></a>
 with <code class="docutils literal notranslate"><span class="pre">simplification_mode=StructureSimplificationMode.INACTIVE_THEN_X2F</span></code> automatically detects
 all zero-tension dangling arms and prunes them, recovering the identical physical modulus
 (<span class="math notranslate nohighlight">\(G_{\text{unfiltered+X2F}} \equiv G_{\text{filtered+X2F}}\)</span>).</p></li>
 <li><p><strong>Recommended Best Practice</strong>:
-- Always enable <code class="docutils literal notranslate"><span class="pre">filter_dangling_and_soluble=True</span></code> during entanglement sampling.
+- Always keep filtering enabled (<code class="docutils literal notranslate"><span class="pre">filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE</span></code> or <code class="docutils literal notranslate"><span class="pre">PRUNE_UPFRONT</span></code>) during entanglement sampling.
 - For subsequent large-scale deformation studies (e.g. uniaxial, biaxial, or shear strain sweeps),</p>
 <blockquote>
 <div><p>perform an initial relaxation with <code class="docutils literal notranslate"><span class="pre">simplification_mode=StructureSimplificationMode.INACTIVE_THEN_X2F</span></code>.
@@ -1424,7 +1443,7 @@ every successive deformation step by 20–80%.</p>
 </div></blockquote>
 </li>
 </ol>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.422 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.875 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-force-balance-plot-inactive-removal-and-sampling-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/0029a2e85275b4f296c01701f1120891/plot_inactive_removal_and_sampling.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_inactive_removal_and_sampling.ipynb</span></code></a></p>
@@ -1450,7 +1469,7 @@ every successive deformation step by 20–80%.</p>
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical</div>
+                <div class="title">Entanglement Sampling Methods</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -1461,7 +1480,7 @@ every successive deformation step by 20–80%.</p>
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</div>
+                <div class="title">Sampling Cut-Off Effect</div>
                 
               </div>
             </a>
@@ -1495,7 +1514,7 @@ every successive deformation step by 20–80%.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Inactive Strand &amp; Entanglement Removal in Force Balance 2</a><ul>
+<li><a class="reference internal" href="#">Inactive Removal &amp; Sampling</a><ul>
 <li><a class="reference internal" href="#multi-seed-ensemble-simulation-procedure">Multi-Seed Ensemble Simulation Procedure</a></li>
 <li><a class="reference internal" href="#loading-cached-data-or-recomputing">Loading Cached Data or Recomputing</a></li>
 <li><a class="reference internal" href="#figure-1-shear-modulus-the-dangling-chain-entanglement-trap">Figure 1: Shear Modulus &amp; The Dangling Chain Entanglement Trap</a></li>

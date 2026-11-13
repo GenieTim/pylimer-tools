@@ -63,50 +63,48 @@ for universe in sequence:
     )
     timesteps.append(universe.get_timestep())
 
-# Create a two-panel plot: MSD and Rg
-fig, axs = plt.subplots(2, 1, figsize=(10, 10), sharex=False)
-
-# Panel 1: MSD
-axs[0].plot(
-    list(
-        msd.keys()), list(
-            msd.values()), label="Mean Square Displacement")
-axs[0].axhline(
-    np.mean(
-        list(
-            msd.values())),
+# Plot 1: Mean Square Displacement (primary single-panel figure)
+fig, ax = plt.subplots(figsize=(7, 4.5))
+ax.plot(
+    list(msd.keys()),
+    list(msd.values()),
+    label="Mean Square Displacement",
+)
+ax.axhline(
+    np.mean(list(msd.values())),
     color="black",
     linestyle="--",
-    label="Mean")
-# add cumulative mean
-axs[0].plot(
+    label="Mean",
+)
+ax.plot(
     list(msd.keys()),
     [np.mean(list(msd.values())[: i + 1]) for i in range(len(msd))],
     label="Cumulative Mean",
     color="red",
 )
-axs[0].set_xlabel("$\\tau$")
-axs[0].set_ylabel("MSD")
-axs[0].set_title("Mean Square Displacement")
-axs[0].set(xscale="log", yscale="log")
-axs[0].legend()
+ax.set_xlabel(r"$\tau$")
+ax.set_ylabel("MSD")
+ax.set_title("Mean Square Displacement")
+ax.set(xscale="log", yscale="log")
+ax.legend()
+plt.tight_layout()
+plt.show()
 
-# Panel 2: Radius of Gyration
-axs[1].plot(timesteps, rgs, label="Radius of Gyration", color="orange")
-axs[1].axhline(np.mean(rgs), color="black", linestyle="--", label="Mean")
-# add cumulative mean
-axs[1].plot(
+# Plot 2: Radius of Gyration
+fig, ax = plt.subplots(figsize=(7, 4.5))
+ax.plot(timesteps, rgs, label="Radius of Gyration", color="orange")
+ax.axhline(np.mean(rgs), color="black", linestyle="--", label="Mean")
+ax.plot(
     timesteps,
     [np.mean(rgs[: i + 1]) for i in range(len(rgs))],
     label="Cumulative Mean",
     color="red",
 )
-axs[1].set_xlabel("Timestep")
-axs[1].set_ylabel("Radius of Gyration")
-axs[1].set_title("Radius of Gyration Over Time")
-axs[1].set(xscale="log", yscale="log")
-axs[1].legend()
-
+ax.set_xlabel("Timestep")
+ax.set_ylabel("Radius of Gyration")
+ax.set_title("Radius of Gyration Over Time")
+ax.set(xscale="log", yscale="log")
+ax.legend()
 plt.tight_layout()
 plt.show()
 

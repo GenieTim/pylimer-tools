@@ -1,6 +1,6 @@
 """
-Dissipative Particle Dynamics (DPD) Simulations
-===============================================
+DPD Simulations
+===============
 
 This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools.
 
@@ -85,7 +85,7 @@ avg_output_config.double_values = [
     ComputedDoubleValues.PRESSURE,  # Output the pressure
 ]
 avg_output_config.output_every = 10
-step_output_config.use_every = 1
+avg_output_config.use_every = 1
 avg_output_config.filename = "dpd_simulation_avg_output.txt"
 dpd_simulator.config_average_output([avg_output_config])
 
@@ -98,20 +98,32 @@ dpd_simulator.run_simulation(
 print("DPD simulation completed.")
 
 # %%
-# read the output file and actually plot something
+# read the output file and plot the diagonal stress components and
+# thermodynamic observables
 df = pd.read_csv("dpd_simulation_output.txt", sep="\\s+")
-_ = df.plot(
-    x="Step",
-    y=[
-        "Temperature",
-        "Pressure",
-        "Stress[0,0]",
-        "Stress[1,1]",
-        "Stress[2,2]",
-    ],
-    subplots=True,
-    layout=(3, 2),
-    figsize=(10, 10),
-)
+
+fig, ax = plt.subplots(figsize=(7, 4.5))
+for col, label in [
+    ("Stress[0,0]", r"$\sigma_{xx}$"),
+    ("Stress[1,1]", r"$\sigma_{yy}$"),
+    ("Stress[2,2]", r"$\sigma_{zz}$"),
+]:
+    ax.plot(df["Step"], df[col], label=label)
+ax.set_xlabel("Step")
+ax.set_ylabel("Stress [DPD units]")
+ax.set_title("Diagonal Stress Tensor Components")
+ax.grid(True, linestyle="--", alpha=0.5)
+ax.legend()
+plt.tight_layout()
+plt.show()
+
+fig, ax = plt.subplots(figsize=(7, 4.5))
+ax.plot(df["Step"], df["Temperature"], label="Temperature", color="#1f77b4")
+ax.plot(df["Step"], df["Pressure"], label="Pressure", color="#d95f02")
+ax.set_xlabel("Step")
+ax.set_ylabel("Value [DPD units]")
+ax.set_title("Temperature and Pressure")
+ax.grid(True, linestyle="--", alpha=0.5)
+ax.legend()
 plt.tight_layout()
 plt.show()

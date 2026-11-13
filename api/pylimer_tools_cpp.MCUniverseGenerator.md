@@ -227,12 +227,12 @@ To link them to crosslinkers, use some of the `link_strand_` methods.
   * **strand_lengths** – A list of integers representing the number of beads of each of the strands.
   * **strand_atom_type** – Type of atoms for the strands (default: 1).
 
-#### config_nr_of_mc_steps(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), n_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 2000) → [None](https://docs.python.org/3/builtins/constants.html#None)
+#### config_nr_of_mc_steps(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), n_steps: [SupportsInt](https://docs.python.org/3/library/typing.html#typing.SupportsInt) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 
 Set the number of Monte-Carlo steps during bond length equilibration.
 
 * **Parameters:**
-  **n_steps** – Number of MC steps to perform (default: 2000)
+  **n_steps** – Number of MC steps to perform (default: 0)
 
 #### config_primary_loop_probability(self: [pylimer_tools_cpp.MCUniverseGenerator](#pylimer_tools_cpp.MCUniverseGenerator), probability: [SupportsFloat](https://docs.python.org/3/library/typing.html#typing.SupportsFloat) | [SupportsIndex](https://docs.python.org/3/library/typing.html#typing.SupportsIndex) = 1.0) → [None](https://docs.python.org/3/builtins/constants.html#None)
 

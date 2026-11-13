@@ -112,7 +112,7 @@ def _simulate_polydispersity_single_repeat(
             vol ** (1.0 / 3.0),
         )
         gen.set_seed(seed + 31 * i)
-        gen.config_nr_of_mc_steps(100)
+        gen.config_nr_of_mc_steps(0)
         gen.set_bead_distance(b)
         gen.add_strands(nr_of_strands=n_strands, strand_lengths=strand_lengths)
         gen.add_crosslinkers(int(0.5 * n_strands), 4)
@@ -301,9 +301,8 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     # 95% confidence intervals from :math:`N_{\text{repeats}} = 8` independent
     # realizations.
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
-
-    # Panel 1: Modulus vs Polydispersity
+    # Figure 1: Modulus vs Polydispersity
+    fig, ax1 = plt.subplots(figsize=(7, 4.5))
     ax1.plot(
         pdi_values,
         g_total_mean,
@@ -364,8 +363,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     )
     ax1.grid(True, linestyle=":", alpha=0.6)
     ax1.legend(loc="best", framealpha=0.9)
+    plt.tight_layout()
+    plt.show()
 
-    # Panel 2: Network Topological Fractions vs Polydispersity
+    # Figure 2: Network Topological Fractions vs Polydispersity
+    fig, ax2 = plt.subplots(figsize=(7, 4.5))
     ax2.plot(
         pdi_values,
         w_active_mean,

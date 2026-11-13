@@ -175,7 +175,7 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame to Data File</div>
+      <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame</div>
     </div>
 
 
@@ -209,7 +209,7 @@ The library supports four main file I/O operations:
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Memory-Efficient Dump File Reading</div>
+      <div class="sphx-glr-thumbnail-title">Streaming Dump File Reader</div>
     </div>
 
 

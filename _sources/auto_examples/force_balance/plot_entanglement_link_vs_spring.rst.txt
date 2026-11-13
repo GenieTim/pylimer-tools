@@ -18,8 +18,8 @@
 .. _sphx_glr_auto_examples_force_balance_plot_entanglement_link_vs_spring.py:
 
 
-Modeling Entanglements: Entanglement Links vs. Entanglement Springs
-===================================================================
+Entanglement Links vs. Springs
+==============================
 
 In polymer network elasticity simulations using the Maximum Entropy Homogenization
 Procedure (MEHP) (:cite:t:`gusev_numerical_2019`, :cite:t:`bernhard_phantom_2025`),
@@ -87,7 +87,7 @@ contour positions :math:`\alpha_1` and :math:`\alpha_2`:
   The entanglement spring acts in series with the strand segments, adding compliance and
   reducing the effective stiffness of the entanglement constraint.
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-100
+.. GENERATED FROM PYTHON SOURCE LINES 70-103
 
 .. code-block:: Python
 
@@ -118,7 +118,10 @@ contour positions :math:`\alpha_1` and :math:`\alpha_2`:
         ParameterType,
         get_parameters_for_polymer,
     )
-    from pylimer_tools_cpp import MCUniverseGenerator  # noqa: E402
+    from pylimer_tools_cpp import (  # noqa: E402
+        EntanglementFilteringMode,
+        MCUniverseGenerator,
+    )
 
 
 
@@ -128,7 +131,7 @@ contour positions :math:`\alpha_1` and :math:`\alpha_2`:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-111
+.. GENERATED FROM PYTHON SOURCE LINES 104-114
 
 Multi-Seed Simulation Procedure
 -------------------------------
@@ -141,7 +144,7 @@ sampling (multiple seeds and complex systems), the results are cached into a com
 at any time by passing ``--recompute`` or setting
 ``PYLIMER_RECOMPUTE_CACHE=1``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-302
+.. GENERATED FROM PYTHON SOURCE LINES 114-311
 
 .. code-block:: Python
 
@@ -192,7 +195,13 @@ at any time by passing ``--recompute`` or setting
             else:
                 # Sample entanglements using seeded Brownian bridge
                 es = gen.sample_entanglements(
-                    n_target, cutoff, 0.0, 0, 3.0, f"ent_{seed}_{factor}", True
+                    n_target,
+                    cutoff,
+                    0.0,
+                    0,
+                    3.0,
+                    f"ent_{seed}_{factor}",
+                    filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
                 )
 
                 # 1. Entanglement Links (merged junction nodes)
@@ -343,13 +352,13 @@ at any time by passing ``--recompute`` or setting
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 303-306
+.. GENERATED FROM PYTHON SOURCE LINES 312-315
 
 Loading Cached Data or Recomputing
 ----------------------------------
 Resolves the committed cache file or recomputes when requested:
 
-.. GENERATED FROM PYTHON SOURCE LINES 306-326
+.. GENERATED FROM PYTHON SOURCE LINES 315-335
 
 .. code-block:: Python
 
@@ -386,7 +395,7 @@ Resolves the committed cache file or recomputes when requested:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 327-340
+.. GENERATED FROM PYTHON SOURCE LINES 336-349
 
 Visualizing Mechanical & Structural Differences
 ------------------------------------------------
@@ -402,15 +411,15 @@ The plots below compare:
    Entanglement springs introduce exactly twice as many extra node coordinates into the linear
    system of equations as entanglement links.
 
-.. GENERATED FROM PYTHON SOURCE LINES 340-437
+.. GENERATED FROM PYTHON SOURCE LINES 349-449
 
 .. code-block:: Python
 
 
     if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
-        fig, (ax_mod, ax_dof) = plt.subplots(1, 2, figsize=(11, 4.5))
-
-        # Modulus comparison with shaded 95% confidence intervals and error bars
+        # Figure 1: Modulus comparison with shaded 95% confidence intervals and
+        # error bars
+        fig, ax_mod = plt.subplots(figsize=(7, 4.5))
         ax_mod.plot(
             density_factors,
             g_links_mean,
@@ -471,8 +480,11 @@ The plots below compare:
         ax_mod.set_title("Equilibrium Shear Modulus vs. Entanglement Density")
         ax_mod.grid(True, linestyle="--", alpha=0.5)
         ax_mod.legend(frameon=True)
+        plt.tight_layout()
+        plt.show()
 
-        # System size comparison
+        # Figure 2: System size comparison
+        fig, ax_dof = plt.subplots(figsize=(7, 4.5))
         ax_dof.plot(
             density_factors,
             extra_links_mean,
@@ -506,16 +518,28 @@ The plots below compare:
 
 
 
-.. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_entanglement_link_vs_spring_001.png
-   :alt: Equilibrium Shear Modulus vs. Entanglement Density, System Size / Extra Degrees of Freedom
-   :srcset: /auto_examples/force_balance/images/sphx_glr_plot_entanglement_link_vs_spring_001.png
-   :class: sphx-glr-single-img
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_entanglement_link_vs_spring_001.png
+         :alt: Equilibrium Shear Modulus vs. Entanglement Density
+         :srcset: /auto_examples/force_balance/images/sphx_glr_plot_entanglement_link_vs_spring_001.png
+         :class: sphx-glr-multi-img
+
+    *
+
+      .. image-sg:: /auto_examples/force_balance/images/sphx_glr_plot_entanglement_link_vs_spring_002.png
+         :alt: System Size / Extra Degrees of Freedom
+         :srcset: /auto_examples/force_balance/images/sphx_glr_plot_entanglement_link_vs_spring_002.png
+         :class: sphx-glr-multi-img
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 438-460
+.. GENERATED FROM PYTHON SOURCE LINES 450-472
 
 Practical Recommendations
 -------------------------
@@ -543,7 +567,7 @@ Practical Recommendations
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.191 seconds)
+   **Total running time of the script:** (0 minutes 0.376 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_entanglement_link_vs_spring.py:

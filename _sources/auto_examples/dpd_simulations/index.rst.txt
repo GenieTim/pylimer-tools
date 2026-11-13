@@ -36,7 +36,7 @@ Refer to the full documentation of the DPD simulator in the :class:`~pylimer_too
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Dissipative Particle Dynamics (DPD) Simulations</div>
+      <div class="sphx-glr-thumbnail-title">DPD Simulations</div>
     </div>
 
 

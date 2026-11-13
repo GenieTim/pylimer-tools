@@ -58,7 +58,7 @@ universe = read_data_file(
 )
 assert isinstance(universe, Universe)
 
-# 2. MEHPForceBalance: Hookean springs, allows slip-links
+# 2. MEHPForceBalance2: Hookean springs with fixed entanglement links
 mehp_fb = MEHPForceBalance2(
     universe,
     nr_of_entanglements_to_sample=int(
@@ -152,8 +152,8 @@ plt.show()
 ```
 
 ```none
-Final residual (should be close to 0): 3.900759442857275e-08
-Shear Modulus from Equilibrium [MPa]:  0.10774945332686552
+Final residual (should be close to 0): 2.7442194798334923e-08
+Shear Modulus from Equilibrium [MPa]:  0.05262639679756671
 ```
 
 <!-- GENERATED FROM PYTHON SOURCE LINES 143-146 -->
@@ -162,7 +162,7 @@ Rather than using the nominal stress, you can also use the
 stress tensor directly to compute the shear modulus.
 Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
 
-**Total running time of the script:** (0 minutes 0.296 seconds)
+**Total running time of the script:** (0 minutes 0.482 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-fb-deformation-exp-py"></a>
 

@@ -10,7 +10,7 @@ to download the full example code.
 
 <a id="sphx-glr-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py"></a>
 
-# Memory-Efficient Dump File Reading
+# Streaming Dump File Reader
 
 The [`UniverseSequence`](../../api/pylimer_tools_cpp.UniverseSequence.md#pylimer_tools_cpp.UniverseSequence) class provides automatic memory management.
 
@@ -7513,8 +7513,8 @@ Processing frame 74310 with 32 atoms
 Processing frame 74320 with 32 atoms
 
 --- Memory Usage Report ---
-Memory before processing: 307.44 MB
-Memory after processing:  307.44 MB
+Memory before processing: 943.93 MB
+Memory after processing:  943.93 MB
 Memory used by script:    0.00 MB
 ```
 
@@ -7544,7 +7544,7 @@ print(f"Dump file size:           {dump_file_size / (1024 * 1024):.2f} MB")
 Dump file size:           83.32 MB
 ```
 
-**Total running time of the script:** (0 minutes 11.002 seconds)
+**Total running time of the script:** (0 minutes 22.347 seconds)
 
 <a id="sphx-glr-download-auto-examples-readers-writers-plot-memory-efficient-dump-file-reading-py"></a>
 

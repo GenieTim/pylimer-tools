@@ -10,7 +10,7 @@ to download the full example code.
 
 <a id="sphx-glr-auto-examples-force-balance-plot-sampling-cutoff-effect-py"></a>
 
-# Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2
+# Sampling Cut-Off Effect
 
 In polymer network simulations using the Maximum Entropy Homogenization Procedure (MEHP)
 and Force Balance (Gusev [[Gus19](../../acknowledgements.md#id8)], Bernhard and Gusev [[BG25](../../acknowledgements.md#id12)]),
@@ -62,7 +62,7 @@ Why does the choice of $r_{\text{cut}}$ matter?
   ($G_c \propto 1/N$). For long strands ($N = 70$), entanglements dominate ($G_e > G_c$),
   greatly amplifying the relative sensitivity of $G$ to the sampling cutoff.
 - **Conversion :math:\`p\`**: Incomplete conversion ($p = 0.82$) generates sol fractions and
-  dangling arms. Leaf peeling (`skip_dangling_soluble_entanglements=True`) ensures entanglements
+  dangling arms. Topological leaf peeling (`filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE`, default) ensures entanglements
   are only placed on active network strands.
 - **Stoichiometric Imbalance :math:\`r\`**: Off-stoichiometric formulations ($r = [B]/[A] = 0.75$)
   exhibit lower crosslinking efficiency, reducing both phantom modulus and entanglement pinning.
@@ -74,7 +74,7 @@ and 95% confidence intervals, cached for fast CI execution.
 
 ## Simulation Setup & Multi-Seed Ensemble Runner
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 69-471 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 69-476 -->
 ```Python
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
@@ -130,6 +130,7 @@ def _simulate_sampling_cutoff_single_repeat(
 
     gen_std = pt.MCUniverseGenerator(box_l_std, box_l_std, box_l_std)
     gen_std.set_seed(seed)
+    gen_std.config_nr_of_mc_steps(0)
     gen_std.set_bead_distance(b)
     gen_std.set_mean_squared_bead_distance(b**2)
     gen_std.add_strands(n_strands, [N_std] * n_strands)
@@ -183,6 +184,7 @@ def _simulate_sampling_cutoff_single_repeat(
     n_ent_n30 = int(ent_density * vol_n30)
     gen_n30 = pt.MCUniverseGenerator(box_l_n30, box_l_n30, box_l_n30)
     gen_n30.set_seed(seed + 100)
+    gen_n30.config_nr_of_mc_steps(0)
     gen_n30.set_bead_distance(b)
     gen_n30.set_mean_squared_bead_distance(b**2)
     gen_n30.add_strands(n_strands, [30] * n_strands)
@@ -207,6 +209,7 @@ def _simulate_sampling_cutoff_single_repeat(
     n_ent_n70 = int(ent_density * vol_n70)
     gen_n70 = pt.MCUniverseGenerator(box_l_n70, box_l_n70, box_l_n70)
     gen_n70.set_seed(seed + 200)
+    gen_n70.config_nr_of_mc_steps(0)
     gen_n70.set_bead_distance(b)
     gen_n70.set_mean_squared_bead_distance(b**2)
     gen_n70.add_strands(n_strands, [70] * n_strands)
@@ -231,6 +234,7 @@ def _simulate_sampling_cutoff_single_repeat(
     # Incomplete Conversion: p = 0.82 (r = 1.0, N = 50)
     gen_p82 = pt.MCUniverseGenerator(box_l_std, box_l_std, box_l_std)
     gen_p82.set_seed(seed + 300)
+    gen_p82.config_nr_of_mc_steps(0)
     gen_p82.set_bead_distance(b)
     gen_p82.set_mean_squared_bead_distance(b**2)
     gen_p82.add_strands(n_strands, [N_std] * n_strands)
@@ -257,6 +261,7 @@ def _simulate_sampling_cutoff_single_repeat(
     n_ent_r75 = int(ent_density * vol_r75)
     gen_r75 = pt.MCUniverseGenerator(box_l_r75, box_l_r75, box_l_r75)
     gen_r75.set_seed(seed + 400)
+    gen_r75.config_nr_of_mc_steps(0)
     gen_r75.set_bead_distance(b)
     gen_r75.set_mean_squared_bead_distance(b**2)
     gen_r75.add_strands(n_strands, [N_std] * n_strands)
@@ -477,13 +482,13 @@ def run_sampling_cutoff_simulation(
     }
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 472-475 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 477-480 -->
 
 ## Loading Cached Data or Recomputing
 
 Resolves the committed cache file or recomputes when requested:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 475-530 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 480-535 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     cache_path = get_example_cache_path(
@@ -544,7 +549,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 Loading cached example data from sampling_cutoff_effect_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 531-555 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 536-560 -->
 
 ## Visualizing Cutoff Sensitivity & Parameter Interactions
 
@@ -571,14 +576,11 @@ The 6 panels below illustrate the physical effects of varying the slip-link samp
 6. **(f) Solver Convergence (CG Iterations)**:
    Relaxation steps to reach force balance equilibrium across cutoffs.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 555-831 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 560-848 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
-    fig, axes = plt.subplots(2, 3, figsize=(16, 9.5))
-    ax_mod, ax_res, ax_len = axes[0]
-    ax_net, ax_dist, ax_iter = axes[1]
-
-    # Panel 1: Modulus Links vs Springs
+    # Figure 1: Modulus Links vs Springs
+    fig, ax_mod = plt.subplots(figsize=(7, 4.5))
     ax_mod.plot(
         cutoffs,
         g_l_mean,
@@ -629,8 +631,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     )
     ax_mod.grid(True, linestyle="--", alpha=0.5)
     ax_mod.legend(fontsize=9, frameon=True)
+    plt.tight_layout()
+    plt.show()
 
-    # Panel 2: Initial Residual (Pre-Strain)
+    # Figure 2: Initial Residual (Pre-Strain)
+    fig, ax_res = plt.subplots(figsize=(7, 4.5))
     ax_res.plot(
         cutoffs,
         res_l_mean,
@@ -671,8 +676,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
         fontweight="bold")
     ax_res.grid(True, linestyle="--", alpha=0.5)
     ax_res.legend(fontsize=9, frameon=True)
+    plt.tight_layout()
+    plt.show()
 
-    # Panel 3: Relative Inflation vs Strand Length
+    # Figure 3: Relative Inflation vs Strand Length
+    fig, ax_len = plt.subplots(figsize=(7, 4.5))
     # Normalize to value at cutoff = 1.2 (contact plateau)
     c12_idx = np.argmin(np.abs(cutoffs - 1.2))
     norm_n30 = g_n30_mean / g_n30_mean[c12_idx]
@@ -712,8 +720,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
         fontweight="bold")
     ax_len.grid(True, linestyle="--", alpha=0.5)
     ax_len.legend(fontsize=9, frameon=True)
+    plt.tight_layout()
+    plt.show()
 
-    # Panel 4: Conversion & Stoichiometry
+    # Figure 4: Conversion & Stoichiometry
+    fig, ax_net = plt.subplots(figsize=(7, 4.5))
     ax_net.plot(
         cutoffs,
         g_l_mean,
@@ -766,8 +777,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     )
     ax_net.grid(True, linestyle="--", alpha=0.5)
     ax_net.legend(fontsize=9, frameon=True)
+    plt.tight_layout()
+    plt.show()
 
-    # Panel 5: Pair Distance Distributions
+    # Figure 5: Pair Distance Distributions
+    fig, ax_dist = plt.subplots(figsize=(7, 4.5))
     ax_dist.plot(
         bin_centers,
         hist_12,
@@ -807,8 +821,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_dist.set_xlim(0, 3.5)
     ax_dist.grid(True, linestyle="--", alpha=0.5)
     ax_dist.legend(fontsize=9, frameon=True)
+    plt.tight_layout()
+    plt.show()
 
-    # Panel 6: Solver Convergence (Iterations)
+    # Figure 6: Solver Convergence (Iterations)
+    fig, ax_iter = plt.subplots(figsize=(7, 4.5))
     ax_iter.plot(
         cutoffs,
         iter_l_mean,
@@ -849,7 +866,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 832-873 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 849-890 -->
 
 ## Physical Discussion & Practical Recommendations
 
@@ -869,7 +886,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
    dominate the elasticity of long-chain networks.
 4. **Defect Tolerance**:
    Under incomplete conversion ($p = 0.82$) or stoichiometric imbalance ($r = 0.75$),
-   topological leaf peeling (`skip_dangling_soluble_entanglements=True`) prevents entanglements
+   topological leaf peeling (`filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE`) prevents entanglements
    from being placed on inactive dangling arms.
 
 ### Recommended Best Practices:
@@ -880,7 +897,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 | **Calibrated Polymer Database**  | [`get_sampling_cutoff()`](../../pylimer_tools.io.md#pylimer_tools.io.bead_spring_parameter_provider.Parameters.get_sampling_cutoff) | Pre-calibrated empirical formula matched to experimental plateau modulus $G_e$. |
 | **High-Density Entangled Melts** | Use `entanglements_as_springs=True`                                                                                                                   | Series compliance buffers against large cutoff distortions.                     |
 
-**Total running time of the script:** (0 minutes 0.412 seconds)
+**Total running time of the script:** (0 minutes 0.921 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-sampling-cutoff-effect-py"></a>
 

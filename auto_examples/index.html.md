@@ -13,7 +13,7 @@ Make sure you have pylimer-tools installed and the necessary dependencies are me
 Some examples require specific input files, such as LAMMPS data or output files.
 All these files are part of the pylimer-tools test suite.
 You can either download them from the [GitHub repository](https://github.com/GenieTim/pylimer-tools),
-where you find them in in the folder tests/pylimer_tools/fixtures,
+where you find them in the folder tests/pylimer_tools/fixtures,
 in which case you will have to adjust the file paths in the examples accordingly,
 or you can clone the entire repository and switch to the directory of the example script you want to run.
 Then, run the script directly from there.
@@ -33,15 +33,15 @@ Refer to the full documentation of the DPD simulator in the [`DPDSimulator`](../
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
 <!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to set up and run a DPD simulation with slip-springs using pylimer-tools.">![](auto_examples/dpd_simulations/images/thumb/sphx_glr_plot_dpd_simulation_thumb.png)
 
-[Dissipative Particle Dynamics (DPD) Simulations](dpd_simulations/plot_dpd_simulation.html.md)
+[DPD Simulations](dpd_simulations/plot_dpd_simulation.html.md)
 
-  <div class="sphx-glr-thumbnail-title">Dissipative Particle Dynamics (DPD) Simulations</div>
+  <div class="sphx-glr-thumbnail-title">DPD Simulations</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>
 
 ## Force Balance, Maximum Entropy Homogenization Procedures
 
-pylimer-tools provides three implementations of the Force Balance:cite:p:bernhard_phantom_2025, Maximum Entropy Homogenization Procedure (MEHP):cite:p:gusev_numerical_2019 to reduce polymer networks to their minimum energy, maximum entropy homogenized state.
+pylimer-tools provides three implementations of the Force Balance [[BG25](../acknowledgements.html.md#id12)], Maximum Entropy Homogenization Procedure (MEHP) [[Gus19](../acknowledgements.html.md#id8)] to reduce polymer networks to their minimum energy, maximum entropy homogenized state.
 This is useful for predicting the (phantom) equilibrium shear modulus of the network.
 
 Here, we distinguish the following three different implementations:
@@ -52,10 +52,13 @@ Here, we distinguish the following three different implementations:
 
 ### Sampling Entanglements
 
-Entanglements can be sampled in two distinct ways:
+Entanglements can be sampled in three ways:
 
 1. **Discrete full-universe sampling**: Directly on explicit bead coordinates in a [`Universe`](../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe).
-2. **Analytical Brownian-bridge sampling**: Directly on the crosslinkers and strand connectivity of a [`CrosslinkerUniverse`](../api/pylimer_tools_cpp.CrosslinkerUniverse.html.md#pylimer_tools_cpp.CrosslinkerUniverse) without instantiating intermediate strand beads, reducing peak memory by up to 90%+ and supporting topological leaf peeling of dangling and soluble fractions.
+2. **On-demand bounding-box sampling**: Computes per-strand bounding boxes and regenerates candidate strand beads on demand, matching discrete bead-level fidelity with ~80–95% lower peak memory.
+3. **Analytical Brownian-bridge sampling**: Directly on the crosslinkers and strand connectivity of a [`CrosslinkerUniverse`](../api/pylimer_tools_cpp.CrosslinkerUniverse.html.md#pylimer_tools_cpp.CrosslinkerUniverse) without instantiating intermediate strand beads, reducing peak memory by ~80–95%.
+
+All three methods support [`EntanglementFilteringMode`](../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode) for topological leaf peeling of dangling and soluble fractions.
 
 See:
 
@@ -84,19 +87,19 @@ See:
   <div class="sphx-glr-thumbnail-title">Force Balance 2</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the &quot;original&quot; MEHP implementation (see gusev_numerical_2019) without slip-links or entanglements.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_force_relaxation_thumb.png)
 
-[Maximum Entropy Homogenization Procedure (MEHP)](force_balance/plot_force_relaxation.html.md)
+[MEHP Force Relaxation](force_balance/plot_force_relaxation.html.md)
 
-  <div class="sphx-glr-thumbnail-title">Maximum Entropy Homogenization Procedure (MEHP)</div>
+  <div class="sphx-glr-thumbnail-title">MEHP Force Relaxation</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements impose constraints on polymer chain fluctuations.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_link_vs_spring_thumb.png)
 
-[Modeling Entanglements: Entanglement Links vs. Entanglement Springs](force_balance/plot_entanglement_link_vs_spring.html.md)
+[Entanglement Links vs. Springs](force_balance/plot_entanglement_link_vs_spring.html.md)
 
-  <div class="sphx-glr-thumbnail-title">Modeling Entanglements: Entanglement Links vs. Entanglement Springs</div>
+  <div class="sphx-glr-thumbnail-title">Entanglement Links vs. Springs</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In the first-generation Maximum Entropy Homogenization Procedure (MEHP) Force Balance (~pylimer_tools_cpp.MEHPForceBalance, bernhard_phantom_2025), topological entanglements can be modeled with dynamic mobility along the polymer chain contour.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png)
 
-[Entanglement Mobility: Dynamic Slipping vs. Fixed Links](force_balance/plot_slipping_vs_fixed_links.html.md)
+[Slipping vs. Fixed Links](force_balance/plot_slipping_vs_fixed_links.html.md)
 
-  <div class="sphx-glr-thumbnail-title">Entanglement Mobility: Dynamic Slipping vs. Fixed Links</div>
+  <div class="sphx-glr-thumbnail-title">Slipping vs. Fixed Links</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of polymer strand length polydispersity on the equilibrium shear modulus and topological network structure of end-linked polymer networks.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png)
 
 [Polydispersity Study](force_balance/plot_polydispersity_study.html.md)
@@ -104,28 +107,28 @@ See:
   <div class="sphx-glr-thumbnail-title">Polydispersity Study</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements are introduced by sampling candidate pairs of chain beads that lie within a spatial proximity cut-off:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_sampling_cutoff_effect_thumb.png)
 
-[Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2](force_balance/plot_sampling_cutoff_effect.html.md)
+[Sampling Cut-Off Effect](force_balance/plot_sampling_cutoff_effect.html.md)
 
-  <div class="sphx-glr-thumbnail-title">Effect of Slip-Link Sampling Cut-Off on Shear Modulus in Force Balance 2</div>
+  <div class="sphx-glr-thumbnail-title">Sampling Cut-Off Effect</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network modeling via the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), networks generated below or near full conversion contain significant fractions of dangling chains, sol fractions, and topological loops.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_inactive_removal_and_sampling_thumb.png)
 
-[Inactive Strand & Entanglement Removal in Force Balance 2](force_balance/plot_inactive_removal_and_sampling.html.md)
+[Inactive Removal & Sampling](force_balance/plot_inactive_removal_and_sampling.html.md)
 
-  <div class="sphx-glr-thumbnail-title">Inactive Strand & Entanglement Removal in Force Balance 2</div>
+  <div class="sphx-glr-thumbnail-title">Inactive Removal & Sampling</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as localized topological constraints (entanglement links or springs).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_sampling_comparison_thumb.png)
 
-[Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical](force_balance/plot_entanglement_sampling_comparison.html.md)
+[Entanglement Sampling Methods](force_balance/plot_entanglement_sampling_comparison.html.md)
 
-  <div class="sphx-glr-thumbnail-title">Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical</div>
+  <div class="sphx-glr-thumbnail-title">Entanglement Sampling Methods</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>
 
 ## Network Generation
 
 pylimer-tools includes a powerful Monte Carlo-based network generator for creating realistic polymer systems.
-This tools is particularly useful for generating quick initial configurations for molecular dynamics simulations,
+This tool is particularly useful for generating quick initial configurations for molecular dynamics simulations,
 or for doing fast predictions of the viscoelasticity using the [`NormalModeAnalyzer`](../api/pylimer_tools_cpp.NormalModeAnalyzer.html.md#pylimer_tools_cpp.NormalModeAnalyzer) or the
-[`pylimer_tools_cpp.MEHPForceBalance`](../api/pylimer_tools_cpp.MEHPForceBalance.html.md#pylimer_tools_cpp.MEHPForceBalance) and its variants.
+[`MEHPForceBalance`](../api/pylimer_tools_cpp.MEHPForceBalance.html.md#pylimer_tools_cpp.MEHPForceBalance) and its variants.
 
 For more options, examples and advanced usage, see the [test suite](https://github.com/GenieTim/pylimer-tools/tree/main/tests)
 and the modules API reference, particularly of the [`MCUniverseGenerator`](../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator) class.
@@ -149,9 +152,9 @@ the current implementation is more powerful, as needed for Bernhard and Gusev [[
   <div class="sphx-glr-thumbnail-title">Save Generated Network</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MCUniverseGenerator to create a polydisperse end-linked polymer network with varying strand lengths.">![](auto_examples/network_generator/images/thumb/sphx_glr_plot_polydisperse_system_thumb.png)
 
-[Generate a Polydisperse Polymer Network](network_generator/plot_polydisperse_system.html.md)
+[Polydisperse Network](network_generator/plot_polydisperse_system.html.md)
 
-  <div class="sphx-glr-thumbnail-title">Generate a Polydisperse Polymer Network</div>
+  <div class="sphx-glr-thumbnail-title">Polydisperse Network</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Here&#x27;s a minimal example of creating a crosslinked polymer network:">![](auto_examples/network_generator/images/thumb/sphx_glr_plot_simple_crosslinked_network_thumb.png)
 
 [Simple Crosslinked Network](network_generator/plot_simple_crosslinked_network.html.md)
@@ -179,9 +182,9 @@ the current implementation is more powerful, as needed for Bernhard and Gusev [[
   <div class="sphx-glr-thumbnail-title">Multi-Component System</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the link_strands_callback method to create custom crosslinking procedures as an alternative to the built-in linking methods, link_strands_to_conversion and link_strands_to_soluble_fraction. The callback function allows users to control when the crosslinking process should stop based on any criteria they can implement.">![](auto_examples/network_generator/images/thumb/sphx_glr_plot_custom_crosslinking_callback_thumb.png)
 
-[Custom Crosslinking with Callback Functions](network_generator/plot_custom_crosslinking_callback.html.md)
+[Custom Crosslinking Callbacks](network_generator/plot_custom_crosslinking_callback.html.md)
 
-  <div class="sphx-glr-thumbnail-title">Custom Crosslinking with Callback Functions</div>
+  <div class="sphx-glr-thumbnail-title">Custom Crosslinking Callbacks</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to create a tetra-PEG (tetra-functional polyethylene glycol) network using the add_star_crosslinkers and link_strands_to_strands_to_conversion methods.">![](auto_examples/network_generator/images/thumb/sphx_glr_plot_tetra_peg_network_thumb.png)
 
 [Tetra-PEG Network Generation](network_generator/plot_tetra_peg_network.html.md)
@@ -260,9 +263,9 @@ The library supports four main file I/O operations:
   <div class="sphx-glr-thumbnail-title">Dump File Reader</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Take a later entry from a LAMMPS trajectory and save it as a data file.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_trajectory_to_frame_thumb.png)
 
-[Extract Trajectory Frame to Data File](readers_writers/plot_convert_trajectory_to_frame.html.md)
+[Extract Trajectory Frame](readers_writers/plot_convert_trajectory_to_frame.html.md)
 
-  <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame to Data File</div>
+  <div class="sphx-glr-thumbnail-title">Extract Trajectory Frame</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="LAMMPS bond swapping can significantly speed up equilibration for polymer networks. However, to preserve the strand lengths, you need to ensure that the molecule indices are set correctly. Here&#x27;s how you could re-set the molecule indices for bond swapping with constant chain lengths.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_convert_for_bond_swapping_thumb.png)
 
 [Convert for Bond Swapping](readers_writers/plot_convert_for_bond_swapping.html.md)
@@ -270,9 +273,9 @@ The library supports four main file I/O operations:
   <div class="sphx-glr-thumbnail-title">Convert for Bond Swapping</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="The UniverseSequence class provides automatic memory management.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_memory_efficient_dump_file_reading_thumb.png)
 
-[Memory-Efficient Dump File Reading](readers_writers/plot_memory_efficient_dump_file_reading.html.md)
+[Streaming Dump File Reader](readers_writers/plot_memory_efficient_dump_file_reading.html.md)
 
-  <div class="sphx-glr-thumbnail-title">Memory-Efficient Dump File Reading</div>
+  <div class="sphx-glr-thumbnail-title">Streaming Dump File Reader</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="The DataFileParser handles LAMMPS data files containing complete system definitions. The UniverseSequence provides a convenient way to have these data files read into the Universe objects.">![](auto_examples/readers_writers/images/thumb/sphx_glr_plot_data_file_reader_thumb.png)
 
 [Data File Reader](readers_writers/plot_data_file_reader.html.md)
@@ -302,7 +305,7 @@ To find the chains, there are two main approaches:
 - Removing the crosslinkers and analysing the remaining polymer strands using [`get_molecules()`](../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe.get_molecules)
 - Decomposing the network to chains, but keeping the crosslinkers in place, possibly being repeated in all the chains it is associated with. This decomposition can be done using the [`get_chains_with_crosslinker()`](../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe.get_chains_with_crosslinker) method.
 
-pylimer-tools provides two more advanced methods for decomposing networks:
+pylimer-tools also provides a more advanced method for decomposing networks:
 - If you removed the junctions yourself, you can use [`get_clusters()`](../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe.get_clusters)
 
 If you want even more control, you could assemble your own decomposition algorithm using the [`Universe`](../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe) class and its methods, such as [`get_atoms_connected_to()`](../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe.get_atoms_connected_to).

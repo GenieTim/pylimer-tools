@@ -10,7 +10,7 @@ to download the full example code.
 
 <a id="sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 
-# Comparing Entanglement Sampling Methods: Discrete vs. On-Demand vs. Analytical
+# Entanglement Sampling Methods
 
 In polymer network elasticity simulations using the Maximum Entropy Homogenization
 Procedure (MEHP) and Force Balance (Gusev [[Gus19](../../acknowledgements.html.md#id8)], Bernhard and Gusev [[BG25](../../acknowledgements.html.md#id12)]),
@@ -30,7 +30,7 @@ three complementary sampling methods:
    for all beads in the system upfront. High physical accuracy, but large $O(N_{\text{atoms}})$
    memory footprint.
 2. **On-Demand Bounding-Box Method** ([`sample_entanglements()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements) with
-   `method="on_demand"` or [`randomly_sample_entanglements_on_demand()`](../../api/pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html.md#pylimer_tools_cpp.randomly_sample_entanglements_on_demand)):
+   `method=EntanglementSamplingMethod.ON_DEMAND` or [`randomly_sample_entanglements_on_demand()`](../../api/pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html.md#pylimer_tools_cpp.randomly_sample_entanglements_on_demand)):
    Samples each strand once upfront using deterministic seeds to compute its 3D bounding box (AABB),
    storing only 6 floats + seed per strand ($O(N_{\text{strands}})$ memory). During entanglement
    detection, periodic neighbor lists on bounding-box centroids cull non-overlapping strands with >99%
@@ -38,7 +38,7 @@ three complementary sampling methods:
    This achieves physical bead-level fidelity identical to discrete sampling at the memory footprint
    of analytical sampling.
 3. **Analytical Method** ([`sample_entanglements()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements) with
-   `method="analytical"` or [`randomly_sample_entanglements_analytical()`](../../api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html.md#pylimer_tools_cpp.randomly_sample_entanglements_analytical)):
+   `method=EntanglementSamplingMethod.ANALYTICAL` or [`randomly_sample_entanglements_analytical()`](../../api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html.md#pylimer_tools_cpp.randomly_sample_entanglements_analytical)):
    Bypasses bead coordinates entirely by evaluating pairwise conditional Gaussian Brownian-bridge
    distributions directly on [`CrosslinkerUniverse`](../../api/pylimer_tools_cpp.CrosslinkerUniverse.html.md#pylimer_tools_cpp.CrosslinkerUniverse). Minimal memory and fast.
 
@@ -59,7 +59,7 @@ This example illustrates:
      (simultaneous frozen multi-chain bead realization with intra-chain correlations vs. independent pairwise conditional bridge sampling).
 5. **Practical Decision Guide**: When to choose which method, key trade-offs, and physical assumptions.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 54-82 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 54-83 -->
 
 ## Background: The Memory Wall in Entanglement Sampling
 
@@ -83,14 +83,15 @@ Where:
 The traditional **Discrete Method** explicitly generates all $N_{\text{atoms}}$ beads in
 3D space and constructs spatial cell lists to find pairs within cutoff $r_{\text{cut}}$.
 
-The new **Analytical Method** skips bead coordinates entirely. It works directly on
+The **Analytical Method** skips bead coordinates entirely. It works directly on
 [`CrosslinkerUniverse`](../../api/pylimer_tools_cpp.CrosslinkerUniverse.html.md#pylimer_tools_cpp.CrosslinkerUniverse) ($N_{\text{xlinks}} \ll N_{\text{atoms}}$),
 selecting pairs of strands and sampling continuous contour positions $\alpha_1, \alpha_2$
-from their conditional Gaussian distributions. Furthermore, it incorporates **topological leaf
-peeling** (`filter_dangling_and_soluble=True`), discarding candidate links that involve
+from their conditional Gaussian distributions. Furthermore, all three sampling methods support
+**topological leaf peeling** (`filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE` or
+`EntanglementFilteringMode.PRUNE_UPFRONT`), discarding candidate links that involve
 dangling chains or soluble molecules.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 82-118 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 83-119 -->
 ```Python
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import json
@@ -127,7 +128,7 @@ from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
 import pylimer_tools_cpp as pt  # noqa: E402
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 119-125 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 120-126 -->
 
 ## Benchmark 1: Scaling Benchmark (Peak Memory & Runtime)
 
@@ -136,14 +137,14 @@ ranging from 200 to 10,000 strands (up to 200,000+ beads).
 Subprocesses isolate memory measurements per condition to prevent
 accumulation.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 125-267 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 126-268 -->
 ```Python
 def run_scaling_benchmark(
     sizes: Sequence[int] = (200, 500, 1000, 2000, 4000, 7000, 10000),
     strand_len: int = 50,
     seed: int = 42,
 ) -> Dict[str, np.ndarray]:
-    """Measure peak memory and runtime for discrete and analytical methods across system sizes."""
+    """Measure peak memory and runtime for discrete, on-demand, and analytical methods across system sizes."""
     print("Running Scaling Benchmark across system sizes...")
     params = get_parameters_for_polymer(
         "PDMS", parameter_type=ParameterType.GAUSSIAN)
@@ -188,14 +189,14 @@ if mode == "discrete":
     fb.validate_network()
 elif mode == "on_demand":
     es = gen.sample_entanglements(
-        n_ent, cutoff, 0.0, 0, 3.0, "seed", True,
+        n_ent, cutoff, 0.0, 0, 3.0, "seed", pt.EntanglementFilteringMode.OMIT_INACTIVE,
         method=pt.EntanglementSamplingMethod.ON_DEMAND,
     )
     fb = gen.get_force_balance2(es, 2, False)
     fb.validate_network()
 elif mode == "analytical":
     es = gen.sample_entanglements(
-        n_ent, cutoff, 0.0, 0, 3.0, "seed", True,
+        n_ent, cutoff, 0.0, 0, 3.0, "seed", pt.EntanglementFilteringMode.OMIT_INACTIVE,
         method=pt.EntanglementSamplingMethod.ANALYTICAL,
     )
     fb = gen.get_force_balance2(es, 2, False)
@@ -278,14 +279,14 @@ print(json.dumps({"mode": mode, "n_strands": n_strands, "n_atoms": n_atoms, "tim
     }
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 268-272 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 269-273 -->
 
 ## Benchmark 2: Conformational Statistics Comparison
 
 We sample entanglements and compare the distribution of continuous contour positions
 $\alpha$ and spatial Euclidean distances $r$ against explicit discrete bead sampling.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 272-391 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 273-392 -->
 ```Python
 def run_distribution_comparison(
     n_strands: int = 10000,
@@ -324,7 +325,7 @@ def run_distribution_comparison(
         0,
         3.0,
         "ana_seed",
-        False,
+        pt.EntanglementFilteringMode.NONE,
         method=pt.EntanglementSamplingMethod.ANALYTICAL,
     )
     alpha_ana = np.concatenate([np.array(es.alpha_1), np.array(es.alpha_2)])
@@ -344,7 +345,7 @@ def run_distribution_comparison(
         0,
         3.0,
         "od_seed",
-        False,
+        pt.EntanglementFilteringMode.NONE,
         method=pt.EntanglementSamplingMethod.ON_DEMAND,
     )
     alpha_od = np.concatenate(
@@ -404,7 +405,7 @@ def run_distribution_comparison(
     }
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 392-397 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 393-398 -->
 
 ## Benchmark 3: Crosslinker Conversion Sweep & Multi-Seed Ensembles
 
@@ -412,7 +413,7 @@ We evaluate how defective networks behave across crosslinker conversion $p \in [
 Multi-seed repetitions provide empirical variance and Student’s t 95%
 confidence intervals.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 397-665 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 398-818 -->
 ```Python
 def _count_active_entanglements(fb: pt.MEHPForceBalance2) -> int:
     """Count the number of active load-bearing entanglements in the network."""
@@ -450,12 +451,25 @@ def _simulate_conversion_sweep_single_repeat(
     np.ndarray,
     np.ndarray,
     np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
 ]:
     """Execute a single Monte Carlo repeat for the conversion sweep benchmark."""
     n_p = len(conversions)
     g_d = np.zeros(n_p)
     w_d = np.zeros(n_p)
     n_d = np.zeros(n_p)
+    g_odf = np.zeros(n_p)
+    w_odf = np.zeros(n_p)
+    n_odf = np.zeros(n_p)
+    g_odu = np.zeros(n_p)
+    w_odu = np.zeros(n_p)
+    n_odu = np.zeros(n_p)
     g_af = np.zeros(n_p)
     w_af = np.zeros(n_p)
     n_af = np.zeros(n_p)
@@ -488,10 +502,56 @@ def _simulate_conversion_sweep_single_repeat(
         w_d[i] = fb_disc.get_active_weight_fraction()
         n_d[i] = _count_active_entanglements(fb_disc)
 
-        # 2. Analytical Filtered (Default) with INACTIVE_THEN_X2F
+        # 2. On-Demand Filtered with INACTIVE_THEN_X2F simplification
+        es_od_filt = gen.sample_entanglements(
+            n_ent,
+            cutoff,
+            0.0,
+            0,
+            3.0,
+            f"seed_od_f_{seed}",
+            pt.EntanglementFilteringMode.OMIT_INACTIVE,
+            method=pt.EntanglementSamplingMethod.ON_DEMAND,
+        )
+        fb_od_filt = gen.get_force_balance2(es_od_filt, 2, False)
+        fb_od_filt.run_force_relaxation(
+            pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+        )
+        g_odf[i] = gamma_conv * np.sum(fb_od_filt.get_gamma_factors(r02)) / vol
+        w_odf[i] = fb_od_filt.get_active_weight_fraction()
+        n_odf[i] = _count_active_entanglements(fb_od_filt)
+
+        # 3. On-Demand Unfiltered with INACTIVE_THEN_X2F simplification
+        es_od_unfilt = gen.sample_entanglements(
+            n_ent,
+            cutoff,
+            0.0,
+            0,
+            3.0,
+            f"seed_od_u_{seed}",
+            pt.EntanglementFilteringMode.NONE,
+            method=pt.EntanglementSamplingMethod.ON_DEMAND,
+        )
+        fb_od_unfilt = gen.get_force_balance2(es_od_unfilt, 2, False)
+        fb_od_unfilt.run_force_relaxation(
+            pt.StructureSimplificationMode.INACTIVE_THEN_X2F
+        )
+        g_odu[i] = gamma_conv * \
+            np.sum(fb_od_unfilt.get_gamma_factors(r02)) / vol
+        w_odu[i] = fb_od_unfilt.get_active_weight_fraction()
+        n_odu[i] = _count_active_entanglements(fb_od_unfilt)
+
+        # 4. Analytical Filtered (Default) with INACTIVE_THEN_X2F
         # simplification
         es_filt = gen.sample_entanglements(
-            n_ent, cutoff, 0.0, 0, 3.0, f"seed_f_{seed}", True
+            n_ent,
+            cutoff,
+            0.0,
+            0,
+            3.0,
+            f"seed_f_{seed}",
+            pt.EntanglementFilteringMode.OMIT_INACTIVE,
+            method=pt.EntanglementSamplingMethod.ANALYTICAL,
         )
         fb_filt = gen.get_force_balance2(es_filt, 2, False)
         fb_filt.run_force_relaxation(
@@ -500,9 +560,16 @@ def _simulate_conversion_sweep_single_repeat(
         w_af[i] = fb_filt.get_active_weight_fraction()
         n_af[i] = _count_active_entanglements(fb_filt)
 
-        # 3. Analytical Unfiltered with INACTIVE_THEN_X2F simplification
+        # 5. Analytical Unfiltered with INACTIVE_THEN_X2F simplification
         es_unfilt = gen.sample_entanglements(
-            n_ent, cutoff, 0.0, 0, 3.0, f"seed_u_{seed}", False
+            n_ent,
+            cutoff,
+            0.0,
+            0,
+            3.0,
+            f"seed_u_{seed}",
+            pt.EntanglementFilteringMode.NONE,
+            method=pt.EntanglementSamplingMethod.ANALYTICAL,
         )
         fb_unfilt = gen.get_force_balance2(es_unfilt, 2, False)
         fb_unfilt.run_force_relaxation(
@@ -511,7 +578,7 @@ def _simulate_conversion_sweep_single_repeat(
         w_au[i] = fb_unfilt.get_active_weight_fraction()
         n_au[i] = _count_active_entanglements(fb_unfilt)
 
-        # 4. Analytical with Hookean Springs with INACTIVE_THEN_X2F
+        # 6. Analytical with Hookean Springs with INACTIVE_THEN_X2F
         # simplification
         fb_springs = gen.get_force_balance2(es_filt, 2, True)
         fb_springs.run_force_relaxation(
@@ -519,7 +586,25 @@ def _simulate_conversion_sweep_single_repeat(
         )
         g_as[i] = gamma_conv * np.sum(fb_springs.get_gamma_factors(r02)) / vol
 
-    return r, g_d, w_d, n_d, g_af, w_af, n_af, g_au, w_au, n_au, g_as
+    return (
+        r,
+        g_d,
+        w_d,
+        n_d,
+        g_odf,
+        w_odf,
+        n_odf,
+        g_odu,
+        w_odu,
+        n_odu,
+        g_af,
+        w_af,
+        n_af,
+        g_au,
+        w_au,
+        n_au,
+        g_as,
+    )
 
 
 def run_conversion_sweep(
@@ -552,6 +637,12 @@ def run_conversion_sweep(
     g_d_all = np.zeros((n_p, n_repeats))
     w_d_all = np.zeros((n_p, n_repeats))
     n_d_all = np.zeros((n_p, n_repeats))
+    g_odf_all = np.zeros((n_p, n_repeats))
+    w_odf_all = np.zeros((n_p, n_repeats))
+    n_odf_all = np.zeros((n_p, n_repeats))
+    g_odu_all = np.zeros((n_p, n_repeats))
+    w_odu_all = np.zeros((n_p, n_repeats))
+    n_odu_all = np.zeros((n_p, n_repeats))
     g_af_all = np.zeros((n_p, n_repeats))
     w_af_all = np.zeros((n_p, n_repeats))
     n_af_all = np.zeros((n_p, n_repeats))
@@ -595,12 +686,34 @@ def run_conversion_sweep(
                 for task in tasks
             ]
             for fut in as_completed(futures):
-                r, g_d, w_d, n_d, g_af, w_af, n_af, g_au, w_au, n_au, g_as = (
-                    fut.result()
-                )
+                (
+                    r,
+                    g_d,
+                    w_d,
+                    n_d,
+                    g_odf,
+                    w_odf,
+                    n_odf,
+                    g_odu,
+                    w_odu,
+                    n_odu,
+                    g_af,
+                    w_af,
+                    n_af,
+                    g_au,
+                    w_au,
+                    n_au,
+                    g_as,
+                ) = fut.result()
                 g_d_all[:, r] = g_d
                 w_d_all[:, r] = w_d
                 n_d_all[:, r] = n_d
+                g_odf_all[:, r] = g_odf
+                w_odf_all[:, r] = w_odf
+                n_odf_all[:, r] = n_odf
+                g_odu_all[:, r] = g_odu
+                w_odu_all[:, r] = w_odu
+                n_odu_all[:, r] = n_odu
                 g_af_all[:, r] = g_af
                 w_af_all[:, r] = w_af
                 n_af_all[:, r] = n_af
@@ -616,12 +729,34 @@ def run_conversion_sweep(
                 )
     else:
         for task in tasks:
-            r, g_d, w_d, n_d, g_af, w_af, n_af, g_au, w_au, n_au, g_as = (
-                _simulate_conversion_sweep_single_repeat(*task)
-            )
+            (
+                r,
+                g_d,
+                w_d,
+                n_d,
+                g_odf,
+                w_odf,
+                n_odf,
+                g_odu,
+                w_odu,
+                n_odu,
+                g_af,
+                w_af,
+                n_af,
+                g_au,
+                w_au,
+                n_au,
+                g_as,
+            ) = _simulate_conversion_sweep_single_repeat(*task)
             g_d_all[:, r] = g_d
             w_d_all[:, r] = w_d
             n_d_all[:, r] = n_d
+            g_odf_all[:, r] = g_odf
+            w_odf_all[:, r] = w_odf
+            n_odf_all[:, r] = n_odf
+            g_odu_all[:, r] = g_odu
+            w_odu_all[:, r] = w_odu
+            n_odu_all[:, r] = n_odu
             g_af_all[:, r] = g_af
             w_af_all[:, r] = w_af
             n_af_all[:, r] = n_af
@@ -636,6 +771,12 @@ def run_conversion_sweep(
     stat_gd = compute_ensemble_statistics(g_d_all, axis=1)
     stat_wd = compute_ensemble_statistics(w_d_all, axis=1)
     stat_nd = compute_ensemble_statistics(n_d_all, axis=1)
+    stat_godf = compute_ensemble_statistics(g_odf_all, axis=1)
+    stat_wodf = compute_ensemble_statistics(w_odf_all, axis=1)
+    stat_nodf = compute_ensemble_statistics(n_odf_all, axis=1)
+    stat_godu = compute_ensemble_statistics(g_odu_all, axis=1)
+    stat_wodu = compute_ensemble_statistics(w_odu_all, axis=1)
+    stat_nodu = compute_ensemble_statistics(n_odu_all, axis=1)
     stat_gaf = compute_ensemble_statistics(g_af_all, axis=1)
     stat_waf = compute_ensemble_statistics(w_af_all, axis=1)
     stat_naf = compute_ensemble_statistics(n_af_all, axis=1)
@@ -654,6 +795,18 @@ def run_conversion_sweep(
         "w_active_discrete_ci": stat_wd["ci"],
         "n_ent_discrete": stat_nd["mean"],
         "n_ent_discrete_ci": stat_nd["ci"],
+        "g_od_filtered": stat_godf["mean"],
+        "g_od_filtered_ci": stat_godf["ci"],
+        "w_active_od_filtered": stat_wodf["mean"],
+        "w_active_od_filtered_ci": stat_wodf["ci"],
+        "n_ent_od_filtered": stat_nodf["mean"],
+        "n_ent_od_filtered_ci": stat_nodf["ci"],
+        "g_od_unfiltered": stat_godu["mean"],
+        "g_od_unfiltered_ci": stat_godu["ci"],
+        "w_active_od_unfiltered": stat_wodu["mean"],
+        "w_active_od_unfiltered_ci": stat_wodu["ci"],
+        "n_ent_od_unfiltered": stat_nodu["mean"],
+        "n_ent_od_unfiltered_ci": stat_nodu["ci"],
         "g_ana_filtered": stat_gaf["mean"],
         "g_ana_filtered_ci": stat_gaf["ci"],
         "w_active_ana_filtered": stat_waf["mean"],
@@ -680,7 +833,7 @@ def run_all_benchmarks(max_workers: Optional[int] = None) -> Dict[str, Any]:
     return combined
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 666-674 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 819-827 -->
 
 ## Loading Benchmark & Statistical Data
 
@@ -691,7 +844,7 @@ benchmark data is loaded from the committed cache.
 The dataset can be recomputed from scratch at any time by passing `--recompute`
 to this script or setting `PYLIMER_RECOMPUTE_CACHE=1`.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 674-720 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 827-885 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     cache_path = get_example_cache_path(
@@ -718,6 +871,12 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     g_disc = data["g_discrete"]
     w_act_disc = data["w_active_discrete"]
     n_ent_disc = data.get("n_ent_discrete")
+    g_od_filt = data.get("g_od_filtered")
+    w_act_od_filt = data.get("w_active_od_filtered")
+    n_ent_od_filt = data.get("n_ent_od_filtered")
+    g_od_unfilt = data.get("g_od_unfiltered")
+    w_act_od_unfilt = data.get("w_active_od_unfiltered")
+    n_ent_od_unfilt = data.get("n_ent_od_unfiltered")
     g_ana_filt = data["g_ana_filtered"]
     w_act_ana_filt = data["w_active_ana_filtered"]
     n_ent_ana_filt = data["n_ent_ana_filtered"]
@@ -730,6 +889,12 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     g_disc_ci = data.get("g_discrete_ci")
     w_act_disc_ci = data.get("w_active_discrete_ci")
     n_ent_disc_ci = data.get("n_ent_discrete_ci")
+    g_od_filt_ci = data.get("g_od_filtered_ci")
+    w_act_od_filt_ci = data.get("w_active_od_filtered_ci")
+    n_ent_od_filt_ci = data.get("n_ent_od_filtered_ci")
+    g_od_unfilt_ci = data.get("g_od_unfiltered_ci")
+    w_act_od_unfilt_ci = data.get("w_active_od_unfiltered_ci")
+    n_ent_od_unfilt_ci = data.get("n_ent_od_unfiltered_ci")
     g_ana_filt_ci = data.get("g_ana_filtered_ci")
     w_act_ana_filt_ci = data.get("w_active_ana_filtered_ci")
     n_ent_ana_filt_ci = data.get("n_ent_ana_filtered_ci")
@@ -743,7 +908,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 Loading cached example data from entanglement_sampling_comparison_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 721-728 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 886-893 -->
 
 ## Comparison 1: Memory Footprint & Runtime Scaling
 
@@ -753,10 +918,9 @@ In contrast, analytical sampling bypasses intermediate bead allocation, keeping 
 footprint virtually flat and reducing peak RAM by 80% to over 90% on
 large networks.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 728-838 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 893-1006 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
-    fig, (ax_mem, ax_time) = plt.subplots(1, 2, figsize=(11, 4.5))
 
     def format_k(x, pos):
         if x >= 1e6:
@@ -767,7 +931,8 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 
     k_formatter = ticker.FuncFormatter(format_k)
 
-    # Peak Memory
+    # Figure 1: Peak Memory
+    fig, ax_mem = plt.subplots(figsize=(7, 4.5))
     ax_mem.plot(
         scaling_atoms,
         scaling_rss_disc,
@@ -821,8 +986,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_mem.set_title("Peak Memory Consumption")
     ax_mem.grid(True, which="both", linestyle="--", alpha=0.5)
     ax_mem.legend(frameon=True)
+    plt.tight_layout()
+    plt.show()
 
-    # Runtime
+    # Figure 2: Runtime
+    fig, ax_time = plt.subplots(figsize=(7, 4.5))
     ax_time.plot(
         scaling_atoms,
         scaling_time_disc,
@@ -865,7 +1033,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 839-853 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1007-1021 -->
 
 ## Comparison 2: Conformational Statistics (Contour & Spatial Distributions)
 
@@ -882,7 +1050,7 @@ Below, we compare:
    sampling cutoff $r_{\text{cut}}$, producing identical Euclidean
    distance distributions.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 853-935 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1021-1111 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax_alpha, ax_dist) = plt.subplots(1, 2, figsize=(11, 4.5))
@@ -925,7 +1093,15 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_alpha.legend(frameon=True)
 
     # Pair distance distribution
-    bins_dist = np.linspace(0.0, float(np.max(dist_disc)) * 1.02, 35)
+    # The discrete sampler may yield no pairs (e.g. small systems in CI),
+    # so derive the range from all non-empty distance sets.
+    max_dists: list[float] = [
+        float(np.max(d))
+        for d in (dist_disc, dist_od, dist_ana)
+        if d is not None and len(d) > 0
+    ]
+    max_dist: float = max(max_dists) if len(max_dists) > 0 else 1.0
+    bins_dist = np.linspace(0.0, max_dist * 1.02, 35)
     ax_dist.hist(
         dist_disc,
         bins=bins_dist,
@@ -966,7 +1142,12 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 936-987 -->
+```none
+/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/numpy/lib/_histograms_impl.py:897: RuntimeWarning: invalid value encountered in divide
+  return n / db / n.sum(), bin_edges
+```
+
+<!-- GENERATED FROM PYTHON SOURCE LINES 1112-1162 -->
 
 ## Comparison 3: Crosslinker Conversion, Topological Filtering & Network Simplification
 
@@ -976,21 +1157,20 @@ higher-order branched dead ends, and **soluble fractions** (unconnected clusters
 
 When comparing discrete and analytical sampling across conversions, two distinct phenomena arise:
 
-1. **The Major Factor at** $p < 1.0$: **1st-Order Dangling vs. Recursive Leaf Peeling**
-   - At sampling time, the discrete bead sampler in [`MEHPForceBalance2`](../../api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2)
-   > only filters out 1st-order dangling chains and free sol (`MoleculeType::DANGLING_CHAIN`).
-   > Higher-order tree-like dangling branches can still receive entanglement links.
-   - In contrast, analytical sampling with `filter_dangling_and_soluble=True` performs
-     **recursive topological leaf peeling** on the [`CrosslinkerUniverse`](../../api/pylimer_tools_cpp.CrosslinkerUniverse.html.md#pylimer_tools_cpp.CrosslinkerUniverse),
-     ensuring that candidate links are placed exclusively on elastically active backbone strands.
-   - If force relaxation is run without structure simplification, entanglements pinned onto
-     dangling branches in discrete networks cannot relax freely to infinity because their initial
-     3D positions remain fixed, artificially stiffening the network and inflating $G$.
-   - **The Solution**: Enabling structural simplification
+1. **The Major Factor at** $p < 1.0$: **Unfiltered Sampling vs. Topological Leaf Peeling**
+   - Without filtering ([`NONE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.NONE)), entanglements can
+   > be placed on dangling branches and sol molecules. If force relaxation is run without structure
+   > simplification, entanglements pinned onto dangling branches cannot relax freely because their
+   > initial 3D positions remain fixed, artificially stiffening the network and inflating $G$.
+   - With [`OMIT_INACTIVE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.OMIT_INACTIVE) (default) or
+     [`PRUNE_UPFRONT`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.PRUNE_UPFRONT), **recursive topological leaf peeling**
+     identifies all dangling branches and soluble molecules so that candidate links are placed
+     exclusively on elastically active backbone strands.
+   - **Solver-Level Simplification**: Enabling structural simplification
      ([`INACTIVE_THEN_X2F`](../../api/pylimer_tools_cpp.StructureSimplificationMode.html.md#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_THEN_X2F)) during force balance
-     detects and removes zero-strain inactive springs/links and collapses unconstrained degree-2 nodes.
+     also detects and removes zero-strain inactive springs/links and collapses unconstrained degree-2 nodes.
      As shown below, when simplified networks are relaxed, the final number of active load-bearing
-     entanglements $N_{\text{active}}$ and the shear modulus $G$ of discrete and
+     entanglements $N_{\text{active}}$ and the shear modulus $G$ of discrete, on-demand, and
      analytical sampling match closely across all conversions down to near the gel point!
 2. **The Subtle Factor at** $p = 1.0$: **Physical vs. Methodological Origins**
    Even at 100% conversion without topological defects, a modest difference (~3–5%) in shear
@@ -1019,7 +1199,7 @@ When comparing discrete and analytical sampling across conversions, two distinct
 When multi-seed ensembles are enabled, shaded confidence bands and error bars show the
 **95% Student’s t confidence interval** across independent realizations.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 987-1266 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1162-1578 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax_mod, ax_ent, ax_frac) = plt.subplots(1, 3, figsize=(15, 4.6))
@@ -1028,6 +1208,8 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     g_disc_kpa = g_disc * 1e3
     g_ana_filt_kpa = g_ana_filt * 1e3
     g_ana_unfilt_kpa = g_ana_unfilt * 1e3
+    g_od_filt_kpa = g_od_filt * 1e3 if g_od_filt is not None else None
+    g_od_unfilt_kpa = g_od_unfilt * 1e3 if g_od_unfilt is not None else None
 
     # -------------------------------------------------------------
     # Subplot 1: Equilibrium Shear Modulus G vs. Conversion
@@ -1035,11 +1217,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_mod.plot(
         conversions,
         g_disc_kpa,
-        "o--",
+        "o-",
         color="#d95f02",
-        linewidth=1.8,
+        linewidth=2.0,
         markersize=6,
-        label="Discrete (Filtered & Simplified)",
+        label="Discrete (Full Universe)",
     )
     if g_disc_ci is not None:
         g_d_ci_kpa = g_disc_ci * 1e3
@@ -1060,14 +1242,63 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
             elinewidth=1.0,
         )
 
+    if g_od_filt_kpa is not None:
+        ax_mod.plot(
+            conversions,
+            g_od_filt_kpa,
+            "^--",
+            color="#7570b3",
+            linewidth=2.0,
+            markersize=6,
+            label="On-Demand (Filtered)",
+        )
+        if g_od_filt_ci is not None:
+            g_odf_ci_kpa = g_od_filt_ci * 1e3
+            ax_mod.fill_between(
+                conversions,
+                g_od_filt_kpa - g_odf_ci_kpa,
+                g_od_filt_kpa + g_odf_ci_kpa,
+                color="#7570b3",
+                alpha=0.15,
+            )
+            ax_mod.errorbar(
+                conversions,
+                g_od_filt_kpa,
+                yerr=g_odf_ci_kpa,
+                fmt="none",
+                ecolor="#7570b3",
+                capsize=3,
+                elinewidth=1.0,
+            )
+
+    if g_od_unfilt_kpa is not None:
+        ax_mod.plot(
+            conversions,
+            g_od_unfilt_kpa,
+            "v:",
+            color="#984ea3",
+            linewidth=1.6,
+            markersize=5,
+            label="On-Demand (Unfiltered)",
+        )
+        if g_od_unfilt_ci is not None:
+            g_odu_ci_kpa = g_od_unfilt_ci * 1e3
+            ax_mod.fill_between(
+                conversions,
+                g_od_unfilt_kpa - g_odu_ci_kpa,
+                g_od_unfilt_kpa + g_odu_ci_kpa,
+                color="#984ea3",
+                alpha=0.12,
+            )
+
     ax_mod.plot(
         conversions,
         g_ana_filt_kpa,
         "s-",
         color="#1b9e77",
-        linewidth=2.2,
+        linewidth=2.0,
         markersize=6,
-        label="Analytical (Filtered, Default)",
+        label="Analytical (Filtered)",
     )
     if g_ana_filt_ci is not None:
         g_af_ci_kpa = g_ana_filt_ci * 1e3
@@ -1076,7 +1307,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
             g_ana_filt_kpa - g_af_ci_kpa,
             g_ana_filt_kpa + g_af_ci_kpa,
             color="#1b9e77",
-            alpha=0.2,
+            alpha=0.18,
         )
         ax_mod.errorbar(
             conversions,
@@ -1091,10 +1322,10 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_mod.plot(
         conversions,
         g_ana_unfilt_kpa,
-        "^:",
-        color="#7570b3",
-        linewidth=1.8,
-        markersize=6,
+        "d:",
+        color="#66a61e",
+        linewidth=1.6,
+        markersize=5,
         label="Analytical (Unfiltered)",
     )
     if g_ana_unfilt_ci is not None:
@@ -1103,15 +1334,15 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
             conversions,
             g_ana_unfilt_kpa - g_au_ci_kpa,
             g_ana_unfilt_kpa + g_au_ci_kpa,
-            color="#7570b3",
-            alpha=0.15,
+            color="#66a61e",
+            alpha=0.12,
         )
         ax_mod.errorbar(
             conversions,
             g_ana_unfilt_kpa,
             yerr=g_au_ci_kpa,
             fmt="none",
-            ecolor="#7570b3",
+            ecolor="#66a61e",
             capsize=3,
             elinewidth=1.0,
         )
@@ -1120,7 +1351,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_mod.set_ylabel(r"Shear Modulus $G$ [kPa]")
     ax_mod.set_title(r"Equilibrium Shear Modulus $G$")
     ax_mod.grid(True, linestyle="--", alpha=0.5)
-    ax_mod.legend(frameon=True, fontsize=8.5)
+    ax_mod.legend(frameon=True, fontsize=8)
 
     # -------------------------------------------------------------
     # Subplot 2: Active Load-Bearing Entanglements N_active vs. Conversion
@@ -1137,9 +1368,9 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
         ax_ent.plot(
             conversions,
             n_ent_disc,
-            "o--",
+            "o-",
             color="#d95f02",
-            linewidth=1.8,
+            linewidth=2.0,
             markersize=6,
             label=r"Discrete ($N_{\mathrm{active}}$)",
         )
@@ -1161,12 +1392,59 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
                 elinewidth=1.0,
             )
 
+    if n_ent_od_filt is not None:
+        ax_ent.plot(
+            conversions,
+            n_ent_od_filt,
+            "^--",
+            color="#7570b3",
+            linewidth=2.0,
+            markersize=6,
+            label=r"On-Demand Filtered ($N_{\mathrm{active}}$)",
+        )
+        if n_ent_od_filt_ci is not None:
+            ax_ent.fill_between(
+                conversions,
+                n_ent_od_filt - n_ent_od_filt_ci,
+                n_ent_od_filt + n_ent_od_filt_ci,
+                color="#7570b3",
+                alpha=0.15,
+            )
+            ax_ent.errorbar(
+                conversions,
+                n_ent_od_filt,
+                yerr=n_ent_od_filt_ci,
+                fmt="none",
+                ecolor="#7570b3",
+                capsize=3,
+                elinewidth=1.0,
+            )
+
+    if n_ent_od_unfilt is not None:
+        ax_ent.plot(
+            conversions,
+            n_ent_od_unfilt,
+            "v:",
+            color="#984ea3",
+            linewidth=1.6,
+            markersize=5,
+            label=r"On-Demand Unfiltered ($N_{\mathrm{active}}$)",
+        )
+        if n_ent_od_unfilt_ci is not None:
+            ax_ent.fill_between(
+                conversions,
+                n_ent_od_unfilt - n_ent_od_unfilt_ci,
+                n_ent_od_unfilt + n_ent_od_unfilt_ci,
+                color="#984ea3",
+                alpha=0.12,
+            )
+
     ax_ent.plot(
         conversions,
         n_ent_ana_filt,
         "s-",
         color="#1b9e77",
-        linewidth=2.2,
+        linewidth=2.0,
         markersize=6,
         label=r"Analytical Filtered ($N_{\mathrm{active}}$)",
     )
@@ -1176,7 +1454,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
             n_ent_ana_filt - n_ent_ana_filt_ci,
             n_ent_ana_filt + n_ent_ana_filt_ci,
             color="#1b9e77",
-            alpha=0.2,
+            alpha=0.18,
         )
         ax_ent.errorbar(
             conversions,
@@ -1191,10 +1469,10 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_ent.plot(
         conversions,
         n_ent_ana_unfilt,
-        "^:",
-        color="#7570b3",
-        linewidth=1.8,
-        markersize=6,
+        "d:",
+        color="#66a61e",
+        linewidth=1.6,
+        markersize=5,
         label=r"Analytical Unfiltered ($N_{\mathrm{active}}$)",
     )
     if n_ent_ana_unfilt_ci is not None:
@@ -1202,15 +1480,15 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
             conversions,
             n_ent_ana_unfilt - n_ent_ana_unfilt_ci,
             n_ent_ana_unfilt + n_ent_ana_unfilt_ci,
-            color="#7570b3",
-            alpha=0.15,
+            color="#66a61e",
+            alpha=0.12,
         )
         ax_ent.errorbar(
             conversions,
             n_ent_ana_unfilt,
             yerr=n_ent_ana_unfilt_ci,
             fmt="none",
-            ecolor="#7570b3",
+            ecolor="#66a61e",
             capsize=3,
             elinewidth=1.0,
         )
@@ -1220,7 +1498,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_ent.set_title(r"Active Load-Bearing Entanglements")
     ax_ent.yaxis.set_major_formatter(ticker.FuncFormatter(format_k))
     ax_ent.grid(True, linestyle="--", alpha=0.5)
-    ax_ent.legend(frameon=True, fontsize=8.5)
+    ax_ent.legend(frameon=True, fontsize=8)
 
     # -------------------------------------------------------------
     # Subplot 3: Active Gel Weight Fraction w_active vs. Conversion
@@ -1228,9 +1506,9 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_frac.plot(
         conversions,
         w_act_disc,
-        "o--",
+        "o-",
         color="#d95f02",
-        linewidth=1.8,
+        linewidth=2.0,
         markersize=6,
         label=r"Discrete $w_{\mathrm{active}}$",
     )
@@ -1251,12 +1529,39 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
             capsize=3,
         )
 
+    if w_act_od_filt is not None:
+        ax_frac.plot(
+            conversions,
+            w_act_od_filt,
+            "^--",
+            color="#7570b3",
+            linewidth=2.0,
+            markersize=6,
+            label=r"On-Demand $w_{\mathrm{active}}$",
+        )
+        if w_act_od_filt_ci is not None:
+            ax_frac.fill_between(
+                conversions,
+                w_act_od_filt - w_act_od_filt_ci,
+                w_act_od_filt + w_act_od_filt_ci,
+                color="#7570b3",
+                alpha=0.15,
+            )
+            ax_frac.errorbar(
+                conversions,
+                w_act_od_filt,
+                yerr=w_act_od_filt_ci,
+                fmt="none",
+                ecolor="#7570b3",
+                capsize=3,
+            )
+
     ax_frac.plot(
         conversions,
         w_act_ana_filt,
         "s-",
         color="#1b9e77",
-        linewidth=2.2,
+        linewidth=2.0,
         markersize=6,
         label=r"Analytical Filtered $w_{\mathrm{active}}$",
     )
@@ -1266,7 +1571,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
             w_act_ana_filt - w_act_ana_filt_ci,
             w_act_ana_filt + w_act_ana_filt_ci,
             color="#1b9e77",
-            alpha=0.2,
+            alpha=0.18,
         )
         ax_frac.errorbar(
             conversions,
@@ -1275,6 +1580,18 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
             fmt="none",
             ecolor="#1b9e77",
             capsize=3,
+        )
+
+    if n_ent_od_filt is not None:
+        frac_active_od = n_ent_od_filt / float(target_n_ent)
+        ax_frac.plot(
+            conversions,
+            frac_active_od,
+            "v--",
+            color="#984ea3",
+            linewidth=1.5,
+            markersize=5,
+            label=r"On-Demand $N_{\mathrm{active}} / N_{\mathrm{target}}$",
         )
 
     # Filtered active entanglement retention fraction (N_active / N_target)
@@ -1286,7 +1603,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
         color="#2b83ba",
         linewidth=1.5,
         markersize=5,
-        label=r"Retention $N_{\mathrm{active}} / N_{\mathrm{target}}$",
+        label=r"Analytical $N_{\mathrm{active}} / N_{\mathrm{target}}$",
     )
 
     ax_frac.set_xlabel(r"Crosslinker Conversion $p$")
@@ -1294,25 +1611,25 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_frac.set_title(r"Network Activity & Entanglement Retention")
     ax_frac.set_ylim(-0.05, 1.05)
     ax_frac.grid(True, linestyle="--", alpha=0.5)
-    ax_frac.legend(frameon=True, fontsize=8.5)
+    ax_frac.legend(frameon=True, fontsize=8)
 
     plt.tight_layout()
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1267-1346 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1579-1667 -->
 
 ## Method Comparison & Practical Guidance
 
 The table below summarizes key trade-offs between discrete, on-demand, and analytical sampling:
 
-| Criterion                 | Discrete (Full Universe)                                                                                                                                                                                                                                                              | On-Demand (Bounding Box)                                                                                                               | Analytical (Universe-Free)                                                                                                             |
-|---------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| **Memory Footprint**      | High: $O(N_{\text{atoms}})$, reaches gigabytes for large networks.                                                                                                                                                                                                                    | Minimal: $O(N_{\text{strands}})$, ~80–95% lower (stores only 6 floats + seed per strand).                                              | Minimal: $O(N_{\text{xlinks}} + N_{\text{strands}})$, ~80–95% lower.                                                                   |
-| **Execution Speed**       | Slower: requires placing every bead and building 3D neighbor cell lists.                                                                                                                                                                                                              | Fast: periodic bounding-box culling (>99% pairs culled), beads regenerated on demand.                                                  | Fastest: samples conditional Gaussian distributions between crosslinkers directly.                                                     |
-| **Strand Physics**        | Exact bead coordinates as generated by the Monte Carlo universe generator.                                                                                                                                                                                                            | Exact bead coordinates generated on demand using per-strand deterministic seeds.                                                       | Assumes conditional Gaussian random walks (Brownian bridge) between anchors.                                                           |
-| **Topological Filtering** | Filters 1st-order dangling ends at sampling time. When paired with<br/>[`INACTIVE_THEN_X2F`](../../api/pylimer_tools_cpp.StructureSimplificationMode.html.md#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_THEN_X2F), higher-order<br/>dangling branches and zero-strain links are fully pruned. | Recursive topological leaf peeling via `filter_dangling_and_soluble=True`<br/>places links strictly on elastically active gel strands. | Recursive topological leaf peeling via `filter_dangling_and_soluble=True`<br/>places links strictly on elastically active gel strands. |
-| **Ideal Use Case**        | Downstream MD/DPD simulations requiring full 3D atom configurations.                                                                                                                                                                                                                  | MEHP Force Balance runs demanding exact bead-level fidelity without the RAM bottleneck.                                                | Large networks, high-throughput conversion/parameter sweeps, and affine/phantom calculations.                                          |
+| Criterion                 | Discrete (Full Universe)                                                                                                                                                                                                                                                                                                                                                                           | On-Demand (Bounding Box)                                                                                                                                                                                                                          | Analytical (Universe-Free)                                                                                                                                                                                                                        |
+|---------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Memory Footprint**      | High: $O(N_{\text{atoms}})$, reaches gigabytes for large networks.                                                                                                                                                                                                                                                                                                                                 | Minimal: $O(N_{\text{strands}})$, ~80–95% lower (stores only 6 floats + seed per strand).                                                                                                                                                         | Minimal: $O(N_{\text{xlinks}} + N_{\text{strands}})$, ~80–95% lower.                                                                                                                                                                              |
+| **Execution Speed**       | Slower: requires placing every bead and building 3D neighbor cell lists.                                                                                                                                                                                                                                                                                                                           | Fast: periodic bounding-box culling (>99% pairs culled), beads regenerated on demand.                                                                                                                                                             | Fastest: samples conditional Gaussian distributions between crosslinkers directly.                                                                                                                                                                |
+| **Strand Physics**        | Exact bead coordinates as generated by the Monte Carlo universe generator.                                                                                                                                                                                                                                                                                                                         | Exact bead coordinates generated on demand using per-strand deterministic seeds.                                                                                                                                                                  | Assumes conditional Gaussian random walks (Brownian bridge) between anchors.                                                                                                                                                                      |
+| **Topological Filtering** | Recursive topological leaf peeling via [`OMIT_INACTIVE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.OMIT_INACTIVE)<br/>(or `PRUNE_UPFRONT`). Paired with<br/>[`INACTIVE_THEN_X2F`](../../api/pylimer_tools_cpp.StructureSimplificationMode.html.md#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_THEN_X2F), any remaining<br/>zero-strain links are also pruned. | Recursive topological leaf peeling via [`OMIT_INACTIVE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.OMIT_INACTIVE)<br/>(or `PRUNE_UPFRONT`) places links strictly on elastically active gel strands. | Recursive topological leaf peeling via [`OMIT_INACTIVE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.OMIT_INACTIVE)<br/>(or `PRUNE_UPFRONT`) places links strictly on elastically active gel strands. |
+| **Ideal Use Case**        | Downstream MD/DPD simulations requiring full 3D atom configurations.                                                                                                                                                                                                                                                                                                                               | MEHP Force Balance runs demanding exact bead-level fidelity without the RAM bottleneck.                                                                                                                                                           | Large networks, high-throughput conversion/parameter sweeps, and affine/phantom calculations.                                                                                                                                                     |
 
 ### Physical Understanding & Limitations
 
@@ -1322,11 +1639,16 @@ The table below summarizes key trade-offs between discrete, on-demand, and analy
    Without simplification, dead-end entanglement links on dangling chains remain pinned in space,
    artificially stiffening the network. Simplification prunes inactive zero-force links and collapses
    2-functional nodes into straight strands, bringing discrete and analytical networks into close agreement.
-2. **Inherent Differences at Full Conversion**:
-   At $p = 1.00$, discrete and analytical sampling exhibit a small, unavoidable ~3% difference
-   in shear modulus:
-   - In discrete sampling, all beads along every chain are simultaneously instantiated with
-     Markovian intra-chain correlations ($\mathbf{r}_{k+1} = \mathbf{r}_k + \mathbf{\Delta}_k$),
+2. **Inherent Differences at Full Conversion and On-Demand Equivalence**:
+   At $p = 1.00$, on-demand sampling achieves near-exact fidelity with discrete sampling
+   ($G_{\text{discrete}} \approx 316$ kPa vs. $G_{\text{on-demand}} \approx 318$ kPa,
+   matching within < 0.5%) because on-demand sampling reconstructs the exact discrete bead positions
+   using deterministic per-strand random seeds inside candidate bounding boxes.
+
+   In contrast, discrete/on-demand and analytical sampling exhibit a small, unavoidable ~3–5%
+   difference in shear modulus ($G_{\text{analytical}} \approx 301$ kPa):
+   - In discrete and on-demand sampling, all beads along each chain possess exact Markovian
+     intra-chain correlations ($\mathbf{r}_{k+1} = \mathbf{r}_k + \mathbf{\Delta}_k$),
      capturing multi-bead collective spatial correlations between adjacent strands.
    - In analytical sampling, each entanglement pair is conditionally sampled from the marginal
      single-strand Gaussian Brownian bridge.
@@ -1339,19 +1661,22 @@ The table below summarizes key trade-offs between discrete, on-demand, and analy
    with high persistence lengths, actual bead paths may deviate from ideal Brownian bridges.
 4. **Effective Entanglement Density in Defective Networks**:
    When setting a target number of entanglements $N_{\text{ent}}$:
-   - With `filter_dangling_and_soluble=True` (default), candidate links involving
-     dangling chains or sol are discarded, reducing the placed entanglements to
+   - With [`OMIT_INACTIVE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.OMIT_INACTIVE) (default), candidate
+     links involving dangling chains or sol are discarded, reducing the placed entanglements to
      roughly $w_{\text{active}}^2 N_{\text{ent}}$.
-   - With `filter_dangling_and_soluble=False`, all $N_{\text{ent}}$ links are
+   - With [`PRUNE_UPFRONT`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.PRUNE_UPFRONT), dangling and soluble
+     strands are peeled before sampling, placing all $N_{\text{ent}}$ links strictly on
+     elastically active strands.
+   - With [`NONE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.NONE), all $N_{\text{ent}}$ links are
      instantiated across the entire volume. Inactive dead-end links carry zero stress
      and are eliminated if [`INACTIVE_THEN_X2F`](../../api/pylimer_tools_cpp.StructureSimplificationMode.html.md#pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_THEN_X2F)
      is used.
    - If matching physical experiments where nominal entanglement density is defined relative
      to total volume rather than the gel fraction, users can pass
-     `filter_dangling_and_soluble=False` or scale target $N_{\text{ent}}$ by
-     $1 / w_{\text{active}}^2$.
+     [`NONE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode.NONE) (paired with simplification) or scale
+     target $N_{\text{ent}}$ by $1 / w_{\text{active}}^2$.
 
-**Total running time of the script:** (0 minutes 1.039 seconds)
+**Total running time of the script:** (0 minutes 2.142 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 

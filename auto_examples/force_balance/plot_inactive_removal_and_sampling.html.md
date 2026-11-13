@@ -10,7 +10,7 @@ to download the full example code.
 
 <a id="sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"></a>
 
-# Inactive Strand & Entanglement Removal in Force Balance 2
+# Inactive Removal & Sampling
 
 In polymer network modeling via the Maximum Entropy Homogenization Procedure (MEHP)
 and Force Balance (Gusev [[Gus19](../../acknowledgements.html.md#id8)], Bernhard and Gusev [[BG25](../../acknowledgements.html.md#id12)]),
@@ -23,7 +23,7 @@ slipping. This introduces two interrelated and critical modeling questions:
 
 1. **The Sampling Trap (Pre-Filter vs. Unfiltered Sampling)**:
    If entanglements are sampled without filtering ([`sample_entanglements()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements)
-   with `filter_dangling_and_soluble=False`), entanglements are placed indiscriminately
+   with `filtering_mode=EntanglementFilteringMode.NONE`), entanglements are placed indiscriminately
    along all chains, including dangling ends and unattached sol molecules.
    Because links cannot slip off open chain ends in Force Balance 2, an entanglement linking
    a dangling chain to the gel effectively pins the dangling arm in space, artificially
@@ -80,7 +80,7 @@ For each conversion and Monte Carlo realization, we evaluate 5 distinct modeling
 Results are cached in a committed `.npz` file for instantaneous CI and
 documentation builds.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 74-545 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 74-557 -->
 ```Python
 import pylimer_tools_cpp as pt
 import numpy as np
@@ -191,10 +191,22 @@ def _simulate_inactive_removal_single_repeat(
 
         # Entanglement sampling: filtered vs. unfiltered
         es_filt = gen.sample_entanglements(
-            n_ent, cutoff, 0.0, 0, 3.0, f"s_filt_{seed}_{conv}", True
+            n_ent,
+            cutoff,
+            0.0,
+            0,
+            3.0,
+            f"s_filt_{seed}_{conv}",
+            filtering_mode=pt.EntanglementFilteringMode.OMIT_INACTIVE,
         )
         es_unf = gen.sample_entanglements(
-            n_ent, cutoff, 0.0, 0, 3.0, f"s_unf_{seed}_{conv}", False
+            n_ent,
+            cutoff,
+            0.0,
+            0,
+            3.0,
+            f"s_unf_{seed}_{conv}",
+            filtering_mode=pt.EntanglementFilteringMode.NONE,
         )
 
         # 1. Unfiltered + No Simplification
@@ -552,14 +564,14 @@ def run_inactive_removal_and_sampling_simulation(
     }
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 546-550 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 558-562 -->
 
 ## Loading Cached Data or Recomputing
 
 We load precomputed multi-seed ensemble results from the committed cache archive,
 or execute the live parallel simulation when `--recompute` is requested.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 550-589 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 562-601 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     cache_path = get_example_cache_path(
@@ -604,7 +616,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 Loading cached example data from inactive_removal_and_sampling_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 590-607 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 602-619 -->
 
 ## Figure 1: Shear Modulus & The Dangling Chain Entanglement Trap
 
@@ -624,11 +636,9 @@ $$
 demonstrating how unphysical constraints inflate stiffness by hundreds
 to thousands of percent!
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 607-751 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 619-765 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
-
     # Palette
     c_naive = "#d62728"  # Red: Unfiltered NO_SIMPLIFICATION
     c_filt_raw = "#1f77b4"  # Blue: Filtered NO_SIMPLIFICATION
@@ -636,7 +646,8 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     c_truth = "#2ca02c"  # Green: Filtered INACTIVE_THEN_X2F
     c_unf_x2f = "#9467bd"  # Purple: Unfiltered INACTIVE_THEN_X2F
 
-    # Panel 1: Modulus vs Conversion
+    # Figure 1: Modulus vs Conversion
+    fig, ax1 = plt.subplots(figsize=(7, 5))
     ax1.plot(
         convs,
         g_unf_nosimp_m,
@@ -722,8 +733,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     )
     ax1.grid(True, linestyle=":", alpha=0.6)
     ax1.legend(loc="upper left", frameon=True, fontsize=9.5)
+    plt.tight_layout()
+    plt.show()
 
-    # Panel 2: Artificial Inflation Factor (%)
+    # Figure 2: Artificial Inflation Factor (%)
+    fig, ax2 = plt.subplots(figsize=(7, 5))
     g_truth = g_filt_x2f_m
     # Avoid division by near-zero at lowest conversion if unpercolated
     inflation_unf = np.where(
@@ -770,7 +784,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 752-762 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 766-776 -->
 
 ## Figure 2: Network Topology & Simplification Efficiency
 
@@ -783,7 +797,7 @@ How many springs and links actually carry elastic load, and how many are redunda
   Even at high conversion ($p = 0.95$), 15–20% of springs are pruned or collapsed,
   reducing memory and solver overhead for all subsequent deformation steps.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 762-860 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 776-874 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
@@ -883,7 +897,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 861-875 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 875-889 -->
 
 ## Figure 3: Linear System Dimension & Solver Relaxation Iterations
 
@@ -901,7 +915,7 @@ $$
 modes perform iterative pruning cycles, ensuring a strictly clean
 topological structure.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 875-980 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 889-994 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
@@ -1008,7 +1022,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 981-1011 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 995-1026 -->
 
 ## Physical Interpretation & Practical Recommendations
 
@@ -1020,24 +1034,25 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
    the gel artificially anchors the dangling chain, preventing it from relaxing and converting
    zero-modulus sol/dangling material into load-bearing network strands.
    At $p \le 0.85$, this artifact inflates $G$ by hundreds to thousands of percent!
-2. **Analytical Brownian-Bridge Leaf Peeling is the First Line of Defense**:
-   Passing `filter_dangling_and_soluble=True` (the default in [`sample_entanglements()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements)
-   and [`get_force_balance2()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2)) uses graph-theoretic leaf peeling
-   to eliminate dangling and sol strands before entanglement pairs are sampled. This completely prevents
-   artificial dangling entanglements.
+2. **Topological Leaf Peeling is the First Line of Defense**:
+   Passing `filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE` (the default in
+   [`sample_entanglements()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements) and
+   [`get_force_balance2()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.html.md#pylimer_tools_cpp.MCUniverseGenerator.get_force_balance2), or `PRUNE_UPFRONT` for active-only sampling)
+   uses graph-theoretic leaf peeling to eliminate dangling and sol strands before entanglement pairs are sampled.
+   This completely prevents artificial dangling entanglements.
 3. **The Solver Pruning Rescues Corrupted Networks**:
    Even if entanglements were sampled on an unfiltered network, running [`MEHPForceBalance2`](../../api/pylimer_tools_cpp.MEHPForceBalance2.html.md#pylimer_tools_cpp.MEHPForceBalance2)
    with `simplification_mode=StructureSimplificationMode.INACTIVE_THEN_X2F` automatically detects
    all zero-tension dangling arms and prunes them, recovering the identical physical modulus
    ($G_{\text{unfiltered+X2F}} \equiv G_{\text{filtered+X2F}}$).
 4. **Recommended Best Practice**:
-   - Always enable `filter_dangling_and_soluble=True` during entanglement sampling.
+   - Always keep filtering enabled (`filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE` or `PRUNE_UPFRONT`) during entanglement sampling.
    - For subsequent large-scale deformation studies (e.g. uniaxial, biaxial, or shear strain sweeps),
    > perform an initial relaxation with `simplification_mode=StructureSimplificationMode.INACTIVE_THEN_X2F`.
    > This permanently purges inactive degrees of freedom and unlinks bifunctional nodes, accelerating
    > every successive deformation step by 20–80%.
 
-**Total running time of the script:** (0 minutes 0.422 seconds)
+**Total running time of the script:** (0 minutes 0.875 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-inactive-removal-and-sampling-py"></a>
 

@@ -10,7 +10,7 @@ to download the full example code.
 
 <a id="sphx-glr-auto-examples-force-balance-plot-force-relaxation-py"></a>
 
-# Maximum Entropy Homogenization Procedure (MEHP)
+# MEHP Force Relaxation
 
 This example demonstrates how to use
 the “original” MEHP implementation (see Gusev [[Gus19](../../acknowledgements.md#id8)])
@@ -203,7 +203,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Total running time of the script:** (0 minutes 2.109 seconds)
+**Total running time of the script:** (0 minutes 3.915 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-force-relaxation-py"></a>
 

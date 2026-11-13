@@ -70,7 +70,7 @@ It also shows, that deformation is an equivalent method to the :math:`\Gamma` fa
     )
     assert isinstance(universe, Universe)
 
-    # 2. MEHPForceBalance: Hookean springs, allows slip-links
+    # 2. MEHPForceBalance2: Hookean springs with fixed entanglement links
     mehp_fb = MEHPForceBalance2(
         universe,
         nr_of_entanglements_to_sample=int(
@@ -175,8 +175,8 @@ It also shows, that deformation is an equivalent method to the :math:`\Gamma` fa
 
  .. code-block:: none
 
-    Final residual (should be close to 0): 3.900759442857275e-08
-    Shear Modulus from Equilibrium [MPa]:  0.10774945332686552
+    Final residual (should be close to 0): 2.7442194798334923e-08
+    Shear Modulus from Equilibrium [MPa]:  0.05262639679756671
 
 
 
@@ -190,7 +190,7 @@ Therewith, you could try to investigate e.g. the Mooney-Rivlin behaviour.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.296 seconds)
+   **Total running time of the script:** (0 minutes 0.482 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_fb_deformation_exp.py:

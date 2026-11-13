@@ -47,7 +47,7 @@ universe = read_data_file(
 )
 assert isinstance(universe, Universe)
 
-# 2. MEHPForceBalance: Hookean springs, allows slip-links
+# 2. MEHPForceBalance2: Hookean springs with fixed entanglement links
 mehp_fb = MEHPForceBalance2(
     universe,
     nr_of_entanglements_to_sample=int(

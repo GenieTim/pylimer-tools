@@ -14,12 +14,11 @@ to download the full example code.
 
 In this example, we create a vulcanized network using the pylimer-tools library.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 8-98 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 8-96 -->
 ```Python
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.stats import chisquare, kstest
 
 from pylimer_tools.io.bead_spring_parameter_provider import (
     ParameterType,
@@ -60,9 +59,8 @@ generator.set_mean_squared_bead_distance(
 # Add strands
 generator.add_strands(
     nr_of_strands=n_strands,  # 10000 polymer chains
-    strand_lengths=[
-        n_atoms_per_strand for _ in range(n_strands)
-    ],  # 100 beads per chain
+    strand_lengths=[n_atoms_per_strand for _ in range(n_strands)],
+    # 50 beads per chain
 )
 
 # At this point, the universe is still a melt
@@ -110,14 +108,14 @@ writer.write_to_file("generated_structures/vulcanized_network.data")
 Generated vulcanized network with 7500 crosslinks
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 99-103 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 97-101 -->
 
 Refer to [File I/O: Readers & Writers](../readers_writers/index.html.md#sphx-glr-auto-examples-readers-writers) for more details on how you can save the universe to a file.
 
 For now, we will show that this produces a variety of different strand
 lengths:
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 103-114 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 101-112 -->
 ```Python
 strand_lengths = [m.get_nr_of_atoms()
                   for m in universe.get_chains_with_crosslinker(2)]
@@ -131,7 +129,7 @@ plt.title("Distribution of Strand Lengths in Vulcanized Network")
 plt.show()
 ```
 
-**Total running time of the script:** (1 minutes 31.556 seconds)
+**Total running time of the script:** (0 minutes 22.139 seconds)
 
 <a id="sphx-glr-download-auto-examples-network-generator-plot-vulcanized-network-py"></a>
 
