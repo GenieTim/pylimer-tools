@@ -1060,7 +1060,15 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_alpha.legend(frameon=True)
 
     # Pair distance distribution
-    bins_dist = np.linspace(0.0, float(np.max(dist_disc)) * 1.02, 35)
+    # The discrete sampler may yield no pairs (e.g. small systems in CI),
+    # so derive the range from all non-empty distance sets.
+    max_dists: list[float] = [
+        float(np.max(d))
+        for d in (dist_disc, dist_od, dist_ana)
+        if d is not None and len(d) > 0
+    ]
+    max_dist: float = max(max_dists) if len(max_dists) > 0 else 1.0
+    bins_dist = np.linspace(0.0, max_dist * 1.02, 35)
     ax_dist.hist(
         dist_disc,
         bins=bins_dist,
