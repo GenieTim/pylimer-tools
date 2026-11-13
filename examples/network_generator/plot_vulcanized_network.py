@@ -49,8 +49,7 @@ generator.set_mean_squared_bead_distance(
 # Add strands
 generator.add_strands(
     nr_of_strands=n_strands,  # 10000 polymer chains
-    strand_lengths=[
-        n_atoms_per_strand for _ in range(n_strands)],
+    strand_lengths=[n_atoms_per_strand for _ in range(n_strands)],
     # 50 beads per chain
 )
 
