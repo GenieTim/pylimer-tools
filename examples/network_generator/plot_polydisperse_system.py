@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Generate a Polydisperse Polymer Network
-=======================================
+Polydisperse Network
+====================
 
 This example demonstrates how to use the :class:`~pylimer_tools_cpp.MCUniverseGenerator`
 to create a polydisperse end-linked polymer network with varying strand lengths.

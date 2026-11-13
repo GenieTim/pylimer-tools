@@ -10,9 +10,11 @@
 #include <cmath>
 #include <cstdint>
 #include <iostream>
+#include <list>
 #include <numeric>
 #include <random>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace pylimer_tools::topo::entanglement_detection {
@@ -481,30 +483,30 @@ namespace {
   class StrandCache
   {
   public:
-    explicit StrandCache(size_t capacity = 16)
-      : capacity_(capacity)
+    explicit StrandCache(size_t capacity = 4096)
+      : capacity_(std::max<size_t>(1, capacity))
     {
-      entries_.reserve(capacity);
+      indexMap_.reserve(capacity_);
     }
 
     template<typename Generator>
     const Eigen::VectorXd& get(size_t strandIdx, Generator&& gen)
     {
-      for (size_t i = 0; i < entries_.size(); ++i) {
-        if (entries_[i].strandIdx == strandIdx) {
-          if (i > 0) {
-            std::rotate(
-              entries_.begin(), entries_.begin() + i, entries_.begin() + i + 1);
-          }
-          return entries_[0].coords;
+      const auto it = indexMap_.find(strandIdx);
+      if (it != indexMap_.end()) {
+        if (it->second != entries_.begin()) {
+          entries_.splice(entries_.begin(), entries_, it->second);
         }
+        return entries_.front().coords;
       }
       Eigen::VectorXd coords = gen();
       if (entries_.size() >= capacity_) {
+        indexMap_.erase(entries_.back().strandIdx);
         entries_.pop_back();
       }
-      entries_.insert(entries_.begin(), Entry{ strandIdx, std::move(coords) });
-      return entries_[0].coords;
+      entries_.push_front(Entry{ strandIdx, std::move(coords) });
+      indexMap_[strandIdx] = entries_.begin();
+      return entries_.front().coords;
     }
 
   private:
@@ -514,7 +516,8 @@ namespace {
       Eigen::VectorXd coords;
     };
     size_t capacity_;
-    std::vector<Entry> entries_;
+    std::list<Entry> entries_;
+    std::unordered_map<size_t, std::list<Entry>::iterator> indexMap_;
   };
 
   struct PinnedPoint
@@ -1351,7 +1354,7 @@ randomlyFindEntanglementsOnDemand(
   std::vector<size_t> candidateOrder(totalInternalBeads);
   std::iota(candidateOrder.begin(), candidateOrder.end(), 0);
 
-  StrandCache cache(16);
+  StrandCache cache(4096);
 
   std::vector<Eigen::Vector3d> sampledPos1;
   std::vector<Eigen::Vector3d> sampledPos2;

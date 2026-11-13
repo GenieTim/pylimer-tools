@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Memory-Efficient Dump File Reading
-==================================
+Streaming Dump File Reader
+==========================
 
 The :class:`~pylimer_tools_cpp.UniverseSequence` class provides automatic memory management.
 """

@@ -9,7 +9,6 @@ In this example, we create a vulcanized network using the `pylimer-tools` librar
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.stats import chisquare, kstest
 
 from pylimer_tools.io.bead_spring_parameter_provider import (
     ParameterType,
@@ -51,8 +50,8 @@ generator.set_mean_squared_bead_distance(
 generator.add_strands(
     nr_of_strands=n_strands,  # 10000 polymer chains
     strand_lengths=[
-        n_atoms_per_strand for _ in range(n_strands)
-    ],  # 100 beads per chain
+        n_atoms_per_strand for _ in range(n_strands)],
+    # 50 beads per chain
 )
 
 # At this point, the universe is still a melt

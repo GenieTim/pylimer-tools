@@ -1,6 +1,6 @@
 r"""
-Entanglement Mobility: Dynamic Slipping vs. Fixed Links
-======================================================
+Slipping vs. Fixed Links
+========================
 
 In the first-generation Maximum Entropy Homogenization Procedure (MEHP) Force Balance
 (:class:`~pylimer_tools_cpp.MEHPForceBalance`, :cite:t:`bernhard_phantom_2025`), topological
@@ -90,7 +90,10 @@ from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
     ParameterType,
     get_parameters_for_polymer,
 )
-from pylimer_tools_cpp import MCUniverseGenerator  # noqa: E402
+from pylimer_tools_cpp import (  # noqa: E402
+    EntanglementFilteringMode,
+    MCUniverseGenerator,
+)
 
 
 def _simulate_slipping_vs_fixed_single_repeat(
@@ -141,7 +144,13 @@ def _simulate_slipping_vs_fixed_single_repeat(
         else:
             # Sample entanglements analytically
             es = gen.sample_entanglements(
-                n_target, cutoff, 0.0, 0, 3.0, f"ent_{seed}_{factor}", True
+                n_target,
+                cutoff,
+                0.0,
+                0,
+                3.0,
+                f"ent_{seed}_{factor}",
+                filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
             )
 
             # 1. Fixed Entanglement Links (disable_slipping=True)
@@ -327,9 +336,8 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 #    iterations required to reach the force tolerance threshold.
 
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
-    fig, (ax_mod, ax_iter) = plt.subplots(1, 2, figsize=(11, 4.5))
-
-    # Modulus comparison
+    # Figure 1: Modulus comparison
+    fig, ax_mod = plt.subplots(figsize=(7, 4.5))
     ax_mod.plot(
         density_factors,
         g_fixed_mean,
@@ -390,8 +398,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_mod.set_title("Equilibrium Shear Modulus vs. Entanglement Density")
     ax_mod.grid(True, linestyle="--", alpha=0.5)
     ax_mod.legend(frameon=True)
+    plt.tight_layout()
+    plt.show()
 
-    # Iteration count comparison
+    # Figure 2: Iteration count comparison
+    fig, ax_iter = plt.subplots(figsize=(7, 4.5))
     ax_iter.plot(
         density_factors,
         iter_fixed_mean,

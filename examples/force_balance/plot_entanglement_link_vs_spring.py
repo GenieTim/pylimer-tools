@@ -1,6 +1,6 @@
 r"""
-Modeling Entanglements: Entanglement Links vs. Entanglement Springs
-===================================================================
+Entanglement Links vs. Springs
+==============================
 
 In polymer network elasticity simulations using the Maximum Entropy Homogenization
 Procedure (MEHP) (:cite:t:`gusev_numerical_2019`, :cite:t:`bernhard_phantom_2025`),
@@ -94,7 +94,10 @@ from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
     ParameterType,
     get_parameters_for_polymer,
 )
-from pylimer_tools_cpp import MCUniverseGenerator  # noqa: E402
+from pylimer_tools_cpp import (  # noqa: E402
+    EntanglementFilteringMode,
+    MCUniverseGenerator,
+)
 
 
 # %%
@@ -155,7 +158,13 @@ def _simulate_link_vs_spring_single_repeat(
         else:
             # Sample entanglements using seeded Brownian bridge
             es = gen.sample_entanglements(
-                n_target, cutoff, 0.0, 0, 3.0, f"ent_{seed}_{factor}", True
+                n_target,
+                cutoff,
+                0.0,
+                0,
+                3.0,
+                f"ent_{seed}_{factor}",
+                filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
             )
 
             # 1. Entanglement Links (merged junction nodes)
@@ -339,9 +348,9 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 #    system of equations as entanglement links.
 
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
-    fig, (ax_mod, ax_dof) = plt.subplots(1, 2, figsize=(11, 4.5))
-
-    # Modulus comparison with shaded 95% confidence intervals and error bars
+    # Figure 1: Modulus comparison with shaded 95% confidence intervals and
+    # error bars
+    fig, ax_mod = plt.subplots(figsize=(7, 4.5))
     ax_mod.plot(
         density_factors,
         g_links_mean,
@@ -402,8 +411,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_mod.set_title("Equilibrium Shear Modulus vs. Entanglement Density")
     ax_mod.grid(True, linestyle="--", alpha=0.5)
     ax_mod.legend(frameon=True)
+    plt.tight_layout()
+    plt.show()
 
-    # System size comparison
+    # Figure 2: System size comparison
+    fig, ax_dof = plt.subplots(figsize=(7, 4.5))
     ax_dof.plot(
         density_factors,
         extra_links_mean,

@@ -15,7 +15,7 @@ Make sure you have `pylimer-tools` installed and the necessary dependencies are 
 Some examples require specific input files, such as LAMMPS data or output files.
 All these files are part of the `pylimer-tools` test suite.
 You can either download them from the `GitHub repository <https://github.com/GenieTim/pylimer-tools>`_, 
-where you find them in in the folder `tests/pylimer_tools/fixtures`,
+where you find them in the folder `tests/pylimer_tools/fixtures`,
 in which case you will have to adjust the file paths in the examples accordingly,
 or you can clone the entire repository and switch to the directory of the example script you want to run.
 Then, run the script directly from there.

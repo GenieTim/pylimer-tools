@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Extract Trajectory Frame to Data File
-=====================================
+Extract Trajectory Frame
+========================
 
 Take a later entry from a LAMMPS trajectory and save it as a data file.
 """

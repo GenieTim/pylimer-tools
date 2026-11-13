@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Custom Crosslinking with Callback Functions
-============================================
+Custom Crosslinking Callbacks
+==============================
 
 This example demonstrates how to use the :meth:`~pylimer_tools_cpp.MCUniverseGenerator.link_strands_callback`
 method to create custom crosslinking procedures

@@ -952,7 +952,7 @@ private:
   double primaryLoopProbability = 1.0;
   double secondaryLoopProbability = 1.0;
   std::unique_ptr<MaxDistanceProvider> maxDistanceProvider;
-  size_t nMcSteps = 2000;
+  size_t nMcSteps = 0;
   /// random distributions
   std::mt19937 rng;
   std::uniform_real_distribution<double> distX;

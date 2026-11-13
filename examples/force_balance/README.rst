@@ -1,7 +1,7 @@
 Force Balance, Maximum Entropy Homogenization Procedures
 --------------------------------------------------------
 
-pylimer-tools provides three implementations of the Force Balance:cite:p:`bernhard_phantom_2025`, Maximum Entropy Homogenization Procedure (MEHP):cite:p:`gusev_numerical_2019` to reduce polymer networks to their minimum energy, maximum entropy homogenized state. 
+pylimer-tools provides three implementations of the Force Balance :cite:p:`bernhard_phantom_2025`, Maximum Entropy Homogenization Procedure (MEHP) :cite:p:`gusev_numerical_2019` to reduce polymer networks to their minimum energy, maximum entropy homogenized state. 
 This is useful for predicting the (phantom) equilibrium shear modulus of the network.
 
 Here, we distinguish the following three different implementations:
@@ -13,10 +13,13 @@ Here, we distinguish the following three different implementations:
 Sampling Entanglements
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Entanglements can be sampled in two distinct ways:
+Entanglements can be sampled in three ways:
 
 1. **Discrete full-universe sampling**: Directly on explicit bead coordinates in a :class:`~pylimer_tools_cpp.Universe`.
-2. **Analytical Brownian-bridge sampling**: Directly on the crosslinkers and strand connectivity of a :class:`~pylimer_tools_cpp.CrosslinkerUniverse` without instantiating intermediate strand beads, reducing peak memory by up to 90%+ and supporting topological leaf peeling of dangling and soluble fractions.
+2. **On-demand bounding-box sampling**: Computes per-strand bounding boxes and regenerates candidate strand beads on demand, matching discrete bead-level fidelity with ~80–95% lower peak memory.
+3. **Analytical Brownian-bridge sampling**: Directly on the crosslinkers and strand connectivity of a :class:`~pylimer_tools_cpp.CrosslinkerUniverse` without instantiating intermediate strand beads, reducing peak memory by ~80–95%.
+
+All three methods support :class:`~pylimer_tools_cpp.EntanglementFilteringMode` for topological leaf peeling of dangling and soluble fractions.
 
 See:
 

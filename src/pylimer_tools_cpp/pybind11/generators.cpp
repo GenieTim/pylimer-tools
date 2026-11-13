@@ -256,9 +256,9 @@ init_pylimer_bound_generators(py::module_& m)
          R"pbdoc(
        Set the number of Monte-Carlo steps during bond length equilibration.
 
-       :param n_steps: Number of MC steps to perform (default: 2000)
+       :param n_steps: Number of MC steps to perform (default: 0)
       )pbdoc",
-         py::arg("n_steps") = 2000)
+         py::arg("n_steps") = 0)
     .def("config_primary_loop_probability",
          &MCUniverseGenerator::configPrimaryLoopProbability,
          R"pbdoc(

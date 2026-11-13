@@ -30,71 +30,83 @@ namespace sim {
     std::uniform_real_distribution<double> displacementSamplingDist =
       std::uniform_real_distribution<double>(-0.5, 0.5);
 
-    size_t nBeads = coordinates.size() / 3;
-    size_t nBeadsToMove = nBeads - (fixFirst ? 1 : 0) - (fixLast ? 1 : 0);
+    const size_t nBeads = static_cast<size_t>(coordinates.size() / 3);
+    const size_t nBeadsToMove = nBeads - (fixFirst ? 1 : 0) - (fixLast ? 1 : 0);
+    if (nBeads <= 1 || nBeadsToMove == 0 || nSteps == 0) {
+      return;
+    }
 
-    double normalisationFactor =
-      std::pow(3. / (2. * M_PI * meanSquaredBeadDistance), 3. / 2.);
-    double normalisationFactorInExponential =
+    const double normalisationFactorInExponential =
       -3. / (2. * meanSquaredBeadDistance);
     double stepSize = std::cbrt(meanSquaredBeadDistance) * 0.5;
+    double* const coords = coordinates.data();
+
+    auto tryAccept = [&](double* const bead,
+                         const double dx,
+                         const double dy,
+                         const double dz,
+                         const double deltaBondLen2) -> void {
+      // Metropolis acceptance criterion:
+      // P_new / P_old = exp(normalisationFactorInExponential * deltaBondLen2).
+      // Since normalisationFactorInExponential < 0, if deltaBondLen2 <= 0 the
+      // move is accepted unconditionally without evaluating exp() or RNG.
+      if (deltaBondLen2 <= 0.0 ||
+          std::exp(normalisationFactorInExponential * deltaBondLen2) >
+            probabilitySamplingDist(rng)) {
+        bead[0] += dx;
+        bead[1] += dy;
+        bead[2] += dz;
+        numLastStepsAccepted += 1;
+      }
+    };
 
     do {
       iterations += 1;
       numLastStepsAccepted = 0;
 
-      // TODO: improve performance by doing more than one bead at a time
-      for (Eigen::Index i = (fixFirst ? 1 : 0);
-           i < (fixLast ? nBeads - 1 : nBeads);
-           ++i) {
-        double bondLen21 = i == 0 ? 0.
-                                  : (coordinates.segment(3 * i, 3) -
-                                     coordinates.segment(3 * (i - 1), 3))
-                                      .squaredNorm();
-        double bondLen22 = i == nBeads - 1
-                             ? 0.
-                             : (coordinates.segment(3 * i, 3) -
-                                coordinates.segment(3 * (i + 1), 3))
-                                 .squaredNorm();
-
-        Eigen::Vector3d displacement =
-          stepSize * Eigen::Vector3d(displacementSamplingDist(rng),
-                                     displacementSamplingDist(rng),
-                                     displacementSamplingDist(rng));
-
-        double newBondLen21 =
-          i == 0 ? 0.
-                 : (coordinates.segment(3 * i, 3) + displacement -
-                    coordinates.segment(3 * (i - 1), 3))
-                     .squaredNorm();
-        double newBondLen22 =
-          i == nBeads - 1 ? 0.
-                          : (coordinates.segment(3 * i, 3) + displacement -
-                             coordinates.segment(3 * (i + 1), 3))
-                              .squaredNorm();
-
-        const double deltaBondLen2 =
-          (newBondLen21 + newBondLen22) - (bondLen21 + bondLen22);
-
-        // Metropolis acceptance criterion:
-        // P_new / P_old = exp(normalisationFactorInExponential *
-        // deltaBondLen2). Since normalisationFactorInExponential < 0, if
-        // deltaBondLen2 <= 0 the energy decreases or stays equal (acceptance
-        // prob >= 1), so the move is accepted unconditionally without
-        // evaluating exp() or RNG.
-        if (deltaBondLen2 <= 0.0 ||
-            std::exp(normalisationFactorInExponential * deltaBondLen2) >
-              probabilitySamplingDist(rng)) {
-          coordinates.segment(3 * i, 3) += displacement;
-          numLastStepsAccepted += 1;
-        }
+      if (!fixFirst) {
+        const double dx = stepSize * displacementSamplingDist(rng);
+        const double dy = stepSize * displacementSamplingDist(rng);
+        const double dz = stepSize * displacementSamplingDist(rng);
+        const double ux = coords[0] - coords[3];
+        const double uy = coords[1] - coords[4];
+        const double uz = coords[2] - coords[5];
+        const double d2 = dx * dx + dy * dy + dz * dz;
+        const double deltaBondLen2 = 2.0 * (ux * dx + uy * dy + uz * dz) + d2;
+        tryAccept(coords, dx, dy, dz, deltaBondLen2);
       }
 
-      double acceptanceRatio = static_cast<double>(numLastStepsAccepted) /
-                               static_cast<double>(nBeadsToMove);
+      for (size_t i = 1; i + 1 < nBeads; ++i) {
+        double* const c = coords + 3 * i;
+        const double dx = stepSize * displacementSamplingDist(rng);
+        const double dy = stepSize * displacementSamplingDist(rng);
+        const double dz = stepSize * displacementSamplingDist(rng);
+        const double ux = 2.0 * c[0] - c[-3] - c[3];
+        const double uy = 2.0 * c[1] - c[-2] - c[4];
+        const double uz = 2.0 * c[2] - c[-1] - c[5];
+        const double d2 = dx * dx + dy * dy + dz * dz;
+        const double deltaBondLen2 = 2.0 * ((ux * dx + uy * dy + uz * dz) + d2);
+        tryAccept(c, dx, dy, dz, deltaBondLen2);
+      }
+
+      if (!fixLast) {
+        double* const c = coords + 3 * (nBeads - 1);
+        const double dx = stepSize * displacementSamplingDist(rng);
+        const double dy = stepSize * displacementSamplingDist(rng);
+        const double dz = stepSize * displacementSamplingDist(rng);
+        const double ux = c[0] - c[-3];
+        const double uy = c[1] - c[-2];
+        const double uz = c[2] - c[-1];
+        const double d2 = dx * dx + dy * dy + dz * dz;
+        const double deltaBondLen2 = 2.0 * (ux * dx + uy * dy + uz * dz) + d2;
+        tryAccept(c, dx, dy, dz, deltaBondLen2);
+      }
+
+      const double acceptanceRatio = static_cast<double>(numLastStepsAccepted) /
+                                     static_cast<double>(nBeadsToMove);
       // dynamic step to target acceptance of 50%
       stepSize *= (1. + (acceptanceRatio - 0.5) / 10.);
-    } while (iterations < nSteps && stepSize > 1e-5);
+    } while (static_cast<size_t>(iterations) < nSteps && stepSize > 1e-5);
 
 #ifndef NDEBUG
     // validate bond lengths

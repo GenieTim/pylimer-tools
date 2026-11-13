@@ -1542,11 +1542,11 @@ class MCUniverseGenerator:
                     :param strand_lengths: A list of integers representing the number of beads of each of the strands.
                     :param strand_atom_type: Type of atoms for the strands (default: 1).
         """
-    def config_nr_of_mc_steps(self, n_steps: typing.SupportsInt | typing.SupportsIndex = 2000) -> None:
+    def config_nr_of_mc_steps(self, n_steps: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         """
                Set the number of Monte-Carlo steps during bond length equilibration.
         
-               :param n_steps: Number of MC steps to perform (default: 2000)
+               :param n_steps: Number of MC steps to perform (default: 0)
         """
     def config_primary_loop_probability(self, probability: typing.SupportsFloat | typing.SupportsIndex = 1.0) -> None:
         """

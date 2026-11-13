@@ -16,7 +16,7 @@ To find the chains, there are two main approaches:
 - Removing the crosslinkers and analysing the remaining polymer strands using :func:`~pylimer_tools_cpp.Universe.get_molecules()`
 - Decomposing the network to chains, but keeping the crosslinkers in place, possibly being repeated in all the chains it is associated with. This decomposition can be done using the :func:`~pylimer_tools_cpp.Universe.get_chains_with_crosslinker()` method.
 
-pylimer-tools provides two more advanced methods for decomposing networks:
+pylimer-tools also provides a more advanced method for decomposing networks:
 - If you removed the junctions yourself, you can use :func:`~pylimer_tools_cpp.Universe.get_clusters()`
 
 If you want even more control, you could assemble your own decomposition algorithm using the :class:`~pylimer_tools_cpp.Universe` class and its methods, such as :func:`~pylimer_tools_cpp.Universe.get_atoms_connected_to()`.
