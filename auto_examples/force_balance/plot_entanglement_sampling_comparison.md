@@ -426,7 +426,7 @@ We evaluate how defective networks behave across crosslinker conversion $p \in [
 Multi-seed repetitions provide empirical variance and Student’s t 95%
 confidence intervals.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 411-831 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 411-833 -->
 ```Python
 def _count_active_entanglements(fb: pt.MEHPForceBalance2) -> int:
     """Count the number of active load-bearing entanglements in the network."""
@@ -502,6 +502,8 @@ def _simulate_conversion_sweep_single_repeat(
         gen.link_strands_to_conversion(p)
 
         # 1. Discrete Full Universe with INACTIVE_THEN_X2F simplification
+        # (this constructor filters entanglements by default, i.e. it is
+        # equivalent to the "Filtered" variants below)
         u = gen.get_universe()
         fb_disc = pt.MEHPForceBalance2(
             u,
@@ -846,7 +848,7 @@ def run_all_benchmarks(max_workers: Optional[int] = None) -> Dict[str, Any]:
     return combined
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 832-840 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 834-842 -->
 
 ## Loading Benchmark & Statistical Data
 
@@ -857,7 +859,7 @@ benchmark data is loaded from the committed cache.
 The dataset can be recomputed from scratch at any time by passing `--recompute`
 to this script or setting `PYLIMER_RECOMPUTE_CACHE=1`.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 840-906 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 842-908 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     cache_path = get_example_cache_path(
@@ -929,7 +931,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 Loading cached example data from entanglement_sampling_comparison_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 907-923 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 909-925 -->
 
 ## Comparison 1: Memory Footprint & Runtime Scaling
 
@@ -948,7 +950,7 @@ force-balance construction. Note that the discrete method must realize and neigh
 survive the bounding-box culling, so the on-demand method can
 legitimately be faster.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 923-1064 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 925-1066 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 
@@ -1091,7 +1093,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
         plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1065-1079 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1067-1081 -->
 
 ## Comparison 2: Conformational Statistics (Contour & Spatial Distributions)
 
@@ -1108,7 +1110,7 @@ Below, we compare:
    sampling cutoff $r_{\text{cut}}$, producing identical Euclidean
    distance distributions.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1079-1169 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1081-1171 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax_alpha, ax_dist) = plt.subplots(1, 2, figsize=(11, 4.5))
@@ -1200,12 +1202,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-```none
-/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/numpy/lib/_histograms_impl.py:897: RuntimeWarning: invalid value encountered in divide
-  return n / db / n.sum(), bin_edges
-```
-
-<!-- GENERATED FROM PYTHON SOURCE LINES 1170-1220 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1172-1222 -->
 
 ## Comparison 3: Crosslinker Conversion, Topological Filtering & Network Simplification
 
@@ -1257,7 +1254,7 @@ When comparing discrete and analytical sampling across conversions, two distinct
 When multi-seed ensembles are enabled, shaded confidence bands and error bars show the
 **95% Student’s t confidence interval** across independent realizations.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1220-1636 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1222-1638 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax_mod, ax_ent, ax_frac) = plt.subplots(1, 3, figsize=(15, 4.6))
@@ -1675,7 +1672,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1637-1729 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1639-1733 -->
 
 ## Method Comparison & Practical Guidance
 
@@ -1699,9 +1696,11 @@ The table below summarizes key trade-offs between discrete, on-demand, and analy
    2-functional nodes into straight strands, bringing discrete and analytical networks into close agreement.
 2. **Inherent Differences at Full Conversion and On-Demand Equivalence**:
    At $p = 1.00$, on-demand sampling achieves near-exact fidelity with discrete sampling
-   ($G_{\text{discrete}} \approx 316$ kPa vs. $G_{\text{on-demand}} \approx 318$ kPa,
-   matching within < 0.5%) because on-demand sampling reconstructs the exact discrete bead positions
+   ($G_{\text{discrete}} \approx 318$ kPa vs. $G_{\text{on-demand}} \approx 320$ kPa,
+   matching within ~1%) because on-demand sampling reconstructs the exact discrete bead positions
    using deterministic per-strand random seeds inside candidate bounding boxes.
+   Note that the discrete [`MEHPForceBalance2`](../../api/pylimer_tools_cpp.MEHPForceBalance2.md#pylimer_tools_cpp.MEHPForceBalance2) constructor filters
+   entanglements by default, so it is to be compared with the *Filtered* curves.
 
    In contrast, discrete/on-demand and analytical sampling exhibit a small, unavoidable ~3–5%
    difference in shear modulus ($G_{\text{analytical}} \approx 301$ kPa):
@@ -1734,7 +1733,7 @@ The table below summarizes key trade-offs between discrete, on-demand, and analy
      [`NONE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.md#pylimer_tools_cpp.EntanglementFilteringMode.NONE) (paired with simplification) or scale
      target $N_{\text{ent}}$ by $1 / w_{\text{active}}^2$.
 
-**Total running time of the script:** (0 minutes 1.813 seconds)
+**Total running time of the script:** (0 minutes 2.381 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 

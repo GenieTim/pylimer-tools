@@ -894,6 +894,8 @@ confidence intervals.</p>
 </span>        <span class="n">gen</span><span class="o">.</span><span class="n">link_strands_to_conversion</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w">
 </span><span class="w">
 </span>        <span class="c1"># 1. Discrete Full Universe with INACTIVE_THEN_X2F simplification</span><span class="w">
+</span>        <span class="c1"># (this constructor filters entanglements by default, i.e. it is</span><span class="w">
+</span>        <span class="c1"># equivalent to the &quot;Filtered&quot; variants below)</span><span class="w">
 </span>        <span class="n">u</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">get_universe</span><span class="p">(</span><span class="p">)</span><span class="w">
 </span>        <span class="n">fb_disc</span> <span class="o">=</span> <a class="sphx-glr-backref-module-pylimer_tools_cpp sphx-glr-backref-type-py-class reference internal" href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><span class="n">pt</span><span class="o">.</span><span class="n">MEHPForceBalance2</span></a><span class="p">(</span><span class="w">
 </span>            <span class="n">u</span><span class="p">,</span><span class="w">
@@ -1578,11 +1580,7 @@ distance distributions.</p></li>
 </span>    <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tight_layout.html#matplotlib.pyplot.tight_layout" title="matplotlib.pyplot.tight_layout"><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<img src="../../_images/sphx_glr_plot_entanglement_sampling_comparison_004.png" srcset="../../_images/sphx_glr_plot_entanglement_sampling_comparison_004.png" alt="Entanglement Position along Strands, Entanglement Pair Separation ($r \leq r_{\mathrm{cut}}$)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/numpy/lib/_histograms_impl.py:897: RuntimeWarning: invalid value encountered in divide
-  return n / db / n.sum(), bin_edges
-</pre></div>
-</div>
-</section>
+<img src="../../_images/sphx_glr_plot_entanglement_sampling_comparison_004.png" srcset="../../_images/sphx_glr_plot_entanglement_sampling_comparison_004.png" alt="Entanglement Position along Strands, Entanglement Pair Separation ($r \leq r_{\mathrm{cut}}$)" class = "sphx-glr-single-img"/></section>
 <section id="comparison-3-crosslinker-conversion-topological-filtering-network-simplification">
 <h2>Comparison 3: Crosslinker Conversion, Topological Filtering &amp; Network Simplification<a class="headerlink" href="#comparison-3-crosslinker-conversion-topological-filtering-network-simplification" title="Link to this heading">¶</a></h2>
 <p>In real polymer networks, crosslinking reactions do not reach 100% conversion (<span class="math notranslate nohighlight">\(p &lt; 1.0\)</span>).
@@ -2124,9 +2122,11 @@ artificially stiffening the network. Simplification prunes inactive zero-force l
 2-functional nodes into straight strands, bringing discrete and analytical networks into close agreement.</p></li>
 <li><p><strong>Inherent Differences at Full Conversion and On-Demand Equivalence</strong>:
 At <span class="math notranslate nohighlight">\(p = 1.00\)</span>, on-demand sampling achieves near-exact fidelity with discrete sampling
-(<span class="math notranslate nohighlight">\(G_{\text{discrete}} \approx 316\)</span> kPa vs. <span class="math notranslate nohighlight">\(G_{\text{on-demand}} \approx 318\)</span> kPa,
-matching within &lt; 0.5%) because on-demand sampling reconstructs the exact discrete bead positions
-using deterministic per-strand random seeds inside candidate bounding boxes.</p>
+(<span class="math notranslate nohighlight">\(G_{\text{discrete}} \approx 318\)</span> kPa vs. <span class="math notranslate nohighlight">\(G_{\text{on-demand}} \approx 320\)</span> kPa,
+matching within ~1%) because on-demand sampling reconstructs the exact discrete bead positions
+using deterministic per-strand random seeds inside candidate bounding boxes.
+Note that the discrete <a class="reference internal" href="../../api/pylimer_tools_cpp.MEHPForceBalance2.html#pylimer_tools_cpp.MEHPForceBalance2" title="pylimer_tools_cpp.MEHPForceBalance2"><code class="xref py py-class docutils literal notranslate"><span class="pre">MEHPForceBalance2</span></code></a> constructor filters
+entanglements by default, so it is to be compared with the <em>Filtered</em> curves.</p>
 <p>In contrast, discrete/on-demand and analytical sampling exhibit a small, unavoidable ~3–5%
 difference in shear modulus (<span class="math notranslate nohighlight">\(G_{\text{analytical}} \approx 301\)</span> kPa):</p>
 <ul class="simple">
@@ -2164,7 +2164,7 @@ target <span class="math notranslate nohighlight">\(N_{\text{ent}}\)</span> by <
 </ul>
 </li>
 </ol>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.813 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 2.381 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e982b60b86203b0d7ad5e3e99407fe20/plot_entanglement_sampling_comparison.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_entanglement_sampling_comparison.ipynb</span></code></a></p>

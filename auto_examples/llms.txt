@@ -241,7 +241,7 @@
 - [Trajectory Analysis](trajectory_analysis/index.html.md): pylimer-tools provides advanced tools for analyzing molecular dynamics trajectories, particularly fo...
 - [NOTE](trajectory_analysis/plot_trajectory_analysis.html.md): Go to the end
 - [Computation times](dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.279&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
-- [Computation times](force_balance/sg_execution_times.html.md): &#42;&#42;00:07.925&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](force_balance/sg_execution_times.html.md): &#42;&#42;00:08.493&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 - [Computation times](network_generator/sg_execution_times.html.md): &#42;&#42;01:00.121&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
 - [Computation times](normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:10.988&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
 - [Computation times](readers_writers/sg_execution_times.html.md): &#42;&#42;00:17.316&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:

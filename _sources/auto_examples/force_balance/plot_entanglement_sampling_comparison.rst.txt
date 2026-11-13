@@ -467,7 +467,7 @@ We evaluate how defective networks behave across crosslinker conversion :math:`p
 Multi-seed repetitions provide empirical variance and Student's t 95%
 confidence intervals.
 
-.. GENERATED FROM PYTHON SOURCE LINES 411-831
+.. GENERATED FROM PYTHON SOURCE LINES 411-833
 
 .. code-block:: Python
 
@@ -547,6 +547,8 @@ confidence intervals.
             gen.link_strands_to_conversion(p)
 
             # 1. Discrete Full Universe with INACTIVE_THEN_X2F simplification
+            # (this constructor filters entanglements by default, i.e. it is
+            # equivalent to the "Filtered" variants below)
             u = gen.get_universe()
             fb_disc = pt.MEHPForceBalance2(
                 u,
@@ -898,7 +900,7 @@ confidence intervals.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 832-840
+.. GENERATED FROM PYTHON SOURCE LINES 834-842
 
 Loading Benchmark & Statistical Data
 ------------------------------------
@@ -909,7 +911,7 @@ benchmark data is loaded from the committed cache.
 The dataset can be recomputed from scratch at any time by passing ``--recompute``
 to this script or setting ``PYLIMER_RECOMPUTE_CACHE=1``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 840-906
+.. GENERATED FROM PYTHON SOURCE LINES 842-908
 
 .. code-block:: Python
 
@@ -992,7 +994,7 @@ to this script or setting ``PYLIMER_RECOMPUTE_CACHE=1``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 907-923
+.. GENERATED FROM PYTHON SOURCE LINES 909-925
 
 Comparison 1: Memory Footprint & Runtime Scaling
 ------------------------------------------------
@@ -1011,7 +1013,7 @@ force-balance construction. Note that the discrete method must realize and neigh
 survive the bounding-box culling, so the on-demand method can
 legitimately be faster.
 
-.. GENERATED FROM PYTHON SOURCE LINES 923-1064
+.. GENERATED FROM PYTHON SOURCE LINES 925-1066
 
 .. code-block:: Python
 
@@ -1187,7 +1189,7 @@ legitimately be faster.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 1065-1079
+.. GENERATED FROM PYTHON SOURCE LINES 1067-1081
 
 Comparison 2: Conformational Statistics (Contour & Spatial Distributions)
 -------------------------------------------------------------------------
@@ -1204,7 +1206,7 @@ Below, we compare:
    sampling cutoff :math:`r_{\text{cut}}`, producing identical Euclidean
    distance distributions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 1079-1169
+.. GENERATED FROM PYTHON SOURCE LINES 1081-1171
 
 .. code-block:: Python
 
@@ -1307,17 +1309,10 @@ Below, we compare:
    :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    /opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/numpy/lib/_histograms_impl.py:897: RuntimeWarning: invalid value encountered in divide
-      return n / db / n.sum(), bin_edges
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 1170-1220
+.. GENERATED FROM PYTHON SOURCE LINES 1172-1222
 
 Comparison 3: Crosslinker Conversion, Topological Filtering & Network Simplification
 -------------------------------------------------------------------------------------
@@ -1370,7 +1365,7 @@ When comparing discrete and analytical sampling across conversions, two distinct
 When multi-seed ensembles are enabled, shaded confidence bands and error bars show the
 **95% Student's t confidence interval** across independent realizations.
 
-.. GENERATED FROM PYTHON SOURCE LINES 1220-1636
+.. GENERATED FROM PYTHON SOURCE LINES 1222-1638
 
 .. code-block:: Python
 
@@ -1802,7 +1797,7 @@ When multi-seed ensembles are enabled, shaded confidence bands and error bars sh
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 1637-1729
+.. GENERATED FROM PYTHON SOURCE LINES 1639-1733
 
 Method Comparison & Practical Guidance
 --------------------------------------
@@ -1858,9 +1853,11 @@ Physical Understanding & Limitations
 
 2. **Inherent Differences at Full Conversion and On-Demand Equivalence**:
    At :math:`p = 1.00`, on-demand sampling achieves near-exact fidelity with discrete sampling
-   (:math:`G_{\text{discrete}} \approx 316` kPa vs. :math:`G_{\text{on-demand}} \approx 318` kPa,
-   matching within < 0.5%) because on-demand sampling reconstructs the exact discrete bead positions
+   (:math:`G_{\text{discrete}} \approx 318` kPa vs. :math:`G_{\text{on-demand}} \approx 320` kPa,
+   matching within ~1%) because on-demand sampling reconstructs the exact discrete bead positions
    using deterministic per-strand random seeds inside candidate bounding boxes.
+   Note that the discrete :class:`~pylimer_tools_cpp.MEHPForceBalance2` constructor filters
+   entanglements by default, so it is to be compared with the *Filtered* curves.
 
    In contrast, discrete/on-demand and analytical sampling exhibit a small, unavoidable ~3–5%
    difference in shear modulus (:math:`G_{\text{analytical}} \approx 301` kPa):
@@ -1900,7 +1897,7 @@ Physical Understanding & Limitations
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.813 seconds)
+   **Total running time of the script:** (0 minutes 2.381 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_entanglement_sampling_comparison.py:
