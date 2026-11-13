@@ -20,19 +20,19 @@ jobs:
           - "3.10"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: "recursive"
           fetch-tags: true
           ref: ${{ github.ref }}
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           cache: "pip"
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v6
         with:
           path: |
             ~\AppData\Local\pip\Cache
@@ -48,10 +48,10 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v3
 
       - name: Install choco dependencies
-        uses: crazy-max/ghaction-chocolatey@v2
+        uses: crazy-max/ghaction-chocolatey@v4
         with:
           args: install -y winflexbison3 eigen
 
@@ -65,7 +65,7 @@ jobs:
           CMAKE_BUILD_TYPE: Release
 
       - name: Store the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-package-distributions-windows-${{ matrix.python-version }}
           path: dist
@@ -84,19 +84,19 @@ jobs:
           - 3.9
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: "recursive"
           fetch-tags: true
           ref: ${{ github.ref }}
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           cache: "pip"
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v6
         with:
           path: |
             ~/Library/Caches/pip
@@ -127,7 +127,7 @@ jobs:
           CMAKE_BUILD_TYPE: Release
 
       - name: Store the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-package-distributions-macos-${{ matrix.python-version }}
           path: dist
@@ -139,14 +139,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: "recursive"
           fetch-tags: true
           ref: ${{ github.ref }}
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           cache: "pip"
           python-version: "3.14"
@@ -158,7 +158,7 @@ jobs:
       - name: Install Dependencies
         run: pip install pybind11 scikit-build cmake ninja setuptools wheel build pyodide-build
 
-      - uses: emscripten-core/setup-emsdk@v15
+      - uses: emscripten-core/setup-emsdk@v16
         with:
           version: "5.0.3"
           actions-cache-folder: "emsdk-cache"
@@ -179,7 +179,7 @@ jobs:
           CMAKE_PREFIX_PATH: ${{ env.CMAKE_PREFIX_PATH }}
 
       - name: Store the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: wheels-wasm
           path: ./dist/*.whl
@@ -189,19 +189,19 @@ jobs:
     name: Build 📦 for ManyLinux
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: "recursive"
           fetch-tags: true
           ref: ${{ github.ref }}
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           cache: "pip"
           python-version: "3.12"
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cache/pip
@@ -234,7 +234,7 @@ jobs:
           CIBW_SKIP: "*musllinux*"
 
       - name: Store the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-package-distributions-linux
           path: dist
@@ -245,14 +245,14 @@ jobs:
     name: Build SRC Package for Any
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: "recursive"
           fetch-tags: true
           ref: ${{ github.ref }}
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           cache: "pip"
           python-version: "3.10"
@@ -270,7 +270,7 @@ jobs:
           CMAKE_BUILD_TYPE: Release
 
       - name: Store the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-package-distributions-sdist
           path: dist
@@ -294,33 +294,33 @@ jobs:
 
     steps:
       - name: Download Windows artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: python-package-distributions-windows-*
           path: dist/
           merge-multiple: true
 
       - name: Download macOS artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: python-package-distributions-macos-*
           path: dist/
           merge-multiple: true
 
       - name: Download Linux artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: python-package-distributions-linux
           path: dist/
 
       - name: Download WASM artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: wheels-wasm
           path: dist/
 
       - name: Download sdist artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: python-package-distributions-sdist
           path: dist/
@@ -350,33 +350,33 @@ jobs:
 
     steps:
       - name: Download Windows artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: python-package-distributions-windows-*
           path: dist/
           merge-multiple: true
 
       - name: Download macOS artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: python-package-distributions-macos-*
           path: dist/
           merge-multiple: true
 
       - name: Download Linux artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: python-package-distributions-linux
           path: dist/
 
       - name: Download WASM artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: wheels-wasm
           path: dist/
 
       - name: Download sdist artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: python-package-distributions-sdist
           path: dist/
@@ -404,7 +404,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: "recursive"
           fetch-tags: true
@@ -435,33 +435,33 @@ jobs:
           prerelease: false
 
       - name: Download Windows artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: python-package-distributions-windows-*
           path: dist/
           merge-multiple: true
 
       - name: Download macOS artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: python-package-distributions-macos-*
           path: dist/
           merge-multiple: true
 
       - name: Download Linux artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: python-package-distributions-linux
           path: dist/
 
       - name: Download WASM artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: wheels-wasm
           path: dist/
 
       - name: Download sdist artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: python-package-distributions-sdist
           path: dist/

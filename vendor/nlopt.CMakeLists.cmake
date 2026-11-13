@@ -33,7 +33,7 @@ if (NOT DEFINED nlopt_LOADED)
             ExternalProject_Add(
                     nloptLib
                     GIT_REPOSITORY https://github.com/stevengj/nlopt
-                    GIT_TAG 9e44e525370646def8152e73bb5c53a6531f6f7e # 2.10.1
+                    GIT_TAG 88c424d4f458412787df96fcc95218acbca224fd # 2.11.0
                     UPDATE_COMMAND ""
                     PREFIX ${nlopt_PREFIX_PATH}
                     INSTALL_DIR ${nlopt_PREFIX_PATH}/nloptLib-install

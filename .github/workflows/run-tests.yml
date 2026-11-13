@@ -25,12 +25,12 @@ jobs:
 
     name: Run Python + C++ Tests
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: "recursive"
 
       - name: Detect file changes
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
@@ -53,7 +53,7 @@ jobs:
 
       - name: Cache built C++ extension
         id: cpp-ext-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             src/*.so
@@ -68,7 +68,7 @@ jobs:
           restore-keys: |
             cpp-ext-${{ runner.os }}-py-3.13-
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
           cache: "pip"
@@ -97,7 +97,7 @@ jobs:
         run: genbadge coverage -i coverage.xml -o ".github/coverage.svg"
 
       - name: Upload test coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           fail_ci_if_error: false # optional (default = false)
