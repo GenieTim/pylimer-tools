@@ -484,6 +484,8 @@ def _simulate_conversion_sweep_single_repeat(
         gen.link_strands_to_conversion(p)
 
         # 1. Discrete Full Universe with INACTIVE_THEN_X2F simplification
+        # (this constructor filters entanglements by default, i.e. it is
+        # equivalent to the "Filtered" variants below)
         u = gen.get_universe()
         fb_disc = pt.MEHPForceBalance2(
             u,
@@ -1688,9 +1690,11 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 #
 # 2. **Inherent Differences at Full Conversion and On-Demand Equivalence**:
 #    At :math:`p = 1.00`, on-demand sampling achieves near-exact fidelity with discrete sampling
-#    (:math:`G_{\text{discrete}} \approx 316` kPa vs. :math:`G_{\text{on-demand}} \approx 318` kPa,
-#    matching within < 0.5%) because on-demand sampling reconstructs the exact discrete bead positions
+#    (:math:`G_{\text{discrete}} \approx 318` kPa vs. :math:`G_{\text{on-demand}} \approx 320` kPa,
+#    matching within ~1%) because on-demand sampling reconstructs the exact discrete bead positions
 #    using deterministic per-strand random seeds inside candidate bounding boxes.
+#    Note that the discrete :class:`~pylimer_tools_cpp.MEHPForceBalance2` constructor filters
+#    entanglements by default, so it is to be compared with the *Filtered* curves.
 #
 #    In contrast, discrete/on-demand and analytical sampling exhibit a small, unavoidable ~3–5%
 #    difference in shear modulus (:math:`G_{\text{analytical}} \approx 301` kPa):
