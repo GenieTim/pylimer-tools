@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:07.453** total execution time for 10 files **from auto_examples/force_balance**:
+**00:07.850** total execution time for 10 files **from auto_examples/force_balance**:
 
 .. container::
 
@@ -36,7 +36,7 @@ Computation times
      - 00:02.929
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_entanglement_sampling_comparison.py` (``plot_entanglement_sampling_comparison.py``)
-     - 00:01.341
+     - 00:01.738
      - 0.0
    * - :ref:`sphx_glr_auto_examples_force_balance_plot_sampling_cutoff_effect.py` (``plot_sampling_cutoff_effect.py``)
      - 00:00.642

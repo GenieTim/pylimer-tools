@@ -34,9 +34,10 @@ three complementary sampling methods:
    Samples each strand once upfront using deterministic seeds to compute its 3D bounding box (AABB),
    storing only 6 floats + seed per strand ($O(N_{\text{strands}})$ memory). During entanglement
    detection, periodic neighbor lists on bounding-box centroids cull non-overlapping strands with >99%
-   efficiency; candidate strands regenerate explicit beads on demand into a small LRU cache.
+   efficiency; candidate strands regenerate explicit beads on demand into a bead-budgeted LRU
+   cache (~6 MB) with spatially-grouped cell traversal so nearby strands stay hot in cache.
    This achieves physical bead-level fidelity identical to discrete sampling with a memory footprint
-   close to that of analytical sampling, and is typically also the fastest of the three for large systems.
+   close to that of analytical sampling, and scales linearly with system size.
 3. **Analytical Method** ([`sample_entanglements()`](../../api/pylimer_tools_cpp.MCUniverseGenerator.md#pylimer_tools_cpp.MCUniverseGenerator.sample_entanglements) with
    `method=EntanglementSamplingMethod.ANALYTICAL` or [`randomly_sample_entanglements_analytical()`](../../api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.md#pylimer_tools_cpp.randomly_sample_entanglements_analytical)):
    Bypasses bead coordinates entirely by evaluating pairwise conditional Gaussian Brownian-bridge
@@ -61,7 +62,7 @@ This example illustrates:
      (simultaneous frozen multi-chain bead realization with intra-chain correlations vs. independent pairwise conditional bridge sampling).
 5. **Practical Decision Guide**: When to choose which method, key trade-offs, and physical assumptions.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 56-85 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 57-86 -->
 
 ## Background: The Memory Wall in Entanglement Sampling
 
@@ -93,7 +94,7 @@ from their conditional Gaussian distributions. Furthermore, all three sampling m
 `EntanglementFilteringMode.PRUNE_UPFRONT`), discarding candidate links that involve
 dangling chains or soluble molecules.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 85-121 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 86-122 -->
 ```Python
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import json
@@ -130,37 +131,19 @@ from pylimer_tools.io.bead_spring_parameter_provider import (  # noqa: E402
 import pylimer_tools_cpp as pt  # noqa: E402
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 122-128 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 123-130 -->
 
 ## Benchmark 1: Scaling Benchmark (Peak Memory & Runtime)
 
 We measure peak resident memory (RSS) and execution time across network sizes
-ranging from 200 to 10,000 strands (up to 200,000+ beads).
-Subprocesses isolate memory measurements per condition to prevent
-accumulation.
+ranging from 200 to 15,000 strands (10,000 to 750,000+ beads) and across strand
+lengths at fixed total atom count. Subprocesses isolate memory measurements per
+condition to prevent accumulation, and each repeat uses an independent
+random seed.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 128-282 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 130-357 -->
 ```Python
-def run_scaling_benchmark(
-    sizes: Sequence[int] = (200, 500, 1000, 2000, 4000, 7000, 10000),
-    strand_len: int = 50,
-    seed: int = 42,
-    n_repeats: int = 5,
-) -> Dict[str, np.ndarray]:
-    """Measure peak memory and runtime (median of ``n_repeats``) for discrete, on-demand, and analytical methods across system sizes.
-
-    All methods use the same filtering mode and sampling target; the network definition
-    (identical for all) is excluded from the timings. Sampling and force balance
-    construction are timed separately.
-    """
-    print("Running Scaling Benchmark across system sizes...")
-    params = get_parameters_for_polymer(
-        "PDMS", parameter_type=ParameterType.GAUSSIAN)
-    bead_density = params.get_bead_density()
-    cutoff = params.get_sampling_cutoff()
-    ent_density = params.get_entanglement_density()
-
-    worker_code = """
+_SCALING_WORKER_CODE = """
 import sys, time, resource, json
 import pylimer_tools_cpp as pt
 
@@ -178,6 +161,7 @@ L = vol ** (1.0 / 3.0)
 n_ent = int(ent_density * vol)
 
 filt = pt.EntanglementFilteringMode.OMIT_INACTIVE
+samp_seed = f"seed_{seed}"
 
 # Phase 0: network definition (identical for all methods)
 t0 = time.perf_counter()
@@ -196,7 +180,7 @@ if mode == "discrete":
     u = gen.get_universe()
     t_universe = time.perf_counter()
     ents = pt.randomly_sample_entanglements(
-        u, n_ent, cutoff, 0.0, 0, 3.0, "seed", filtering_mode=filt
+        u, n_ent, cutoff, 0.0, 0, 3.0, samp_seed, filtering_mode=filt
     )
     n_sampled = len(ents.pairs_of_atoms)
     t_sample = time.perf_counter()
@@ -209,7 +193,7 @@ else:
         else pt.EntanglementSamplingMethod.ANALYTICAL
     )
     es = gen.sample_entanglements(
-        n_ent, cutoff, 0.0, 0, 3.0, "seed", filt, method=method
+        n_ent, cutoff, 0.0, 0, 3.0, samp_seed, filt, method=method
     )
     n_sampled = len(es.alpha_1)
     t_sample = time.perf_counter()
@@ -226,7 +210,8 @@ else:
 
 # "time" excludes the common network definition; it covers universe + sampling + FB build.
 print(json.dumps({
-    "mode": mode, "n_strands": n_strands, "n_atoms": n_atoms,
+    "mode": mode, "n_strands": n_strands, "strand_len": strand_len,
+    "n_atoms": n_atoms,
     "time": t1 - t_setup, "t_setup": t_setup - t0,
     "t_universe": t_universe - t_setup,
     "t_sample": t_sample - t_universe, "t_build": t1 - t_sample,
@@ -234,24 +219,47 @@ print(json.dumps({
 }))
 """
 
-    modes = ["analytical", "on_demand", "discrete"]
-    records: Dict[str, List[Dict[str, Any]]] = {m: [] for m in modes}
-    atoms: List[int] = []
 
-    for n in sizes:
+def _run_scaling_grid(
+    configs: Sequence[Tuple[int, int]],
+    seed: int = 42,
+    n_repeats: int = 5,
+    prefix: str = "scaling",
+) -> Dict[str, np.ndarray]:
+    """Run subprocess scaling benchmarks for a sequence of ``(n_strands, strand_len)`` pairs.
+
+    Each repeat uses a distinct random seed (``seed + 101 * r``) so that median and
+    interquartile-range (25th–75th percentile) statistics capture both timing jitter and
+    network realization variance.
+    """
+    params = get_parameters_for_polymer(
+        "PDMS", parameter_type=ParameterType.GAUSSIAN)
+    bead_density = params.get_bead_density()
+    cutoff = params.get_sampling_cutoff()
+    ent_density = params.get_entanglement_density()
+
+    modes = ["analytical", "on_demand", "discrete"]
+    records: Dict[str, List[Dict[str, float]]] = {m: [] for m in modes}
+    atoms: List[int] = []
+    strands_out: List[int] = []
+    strand_lens_out: List[int] = []
+
+    for n_strands, strand_len in configs:
         runs: Dict[str, List[Dict[str, Any]]] = {m: [] for m in modes}
         # Interleave modes across repeats so that transient machine load
-        # affects all methods alike; report the median.
-        for _ in range(n_repeats):
+        # affects all methods alike; vary seed per repeat to capture
+        # realization variance.
+        for r in range(n_repeats):
+            run_seed = seed + 101 * r
             for mode in modes:
                 cmd = [
                     sys.executable,
                     "-c",
-                    worker_code,
+                    _SCALING_WORKER_CODE,
                     mode,
-                    str(n),
+                    str(n_strands),
                     str(strand_len),
-                    str(seed),
+                    str(run_seed),
                     str(bead_density),
                     str(cutoff),
                     str(ent_density),
@@ -262,45 +270,113 @@ print(json.dumps({
                          if l.startswith("{")]
                 runs[mode].append(json.loads(lines[-1]))
         atoms.append(int(runs[modes[0]][0]["n_atoms"]))
+        strands_out.append(int(n_strands))
+        strand_lens_out.append(int(strand_len))
         for mode in modes:
-            med: Dict[str, Any] = {
+            med: Dict[str, float] = {
                 k: float(np.median([r[k] for r in runs[mode]]))
-                for k in ("time", "t_universe", "t_sample", "t_build", "rss_mb", "n_sampled")
+                for k in (
+                    "time",
+                    "t_universe",
+                    "t_sample",
+                    "t_build",
+                    "rss_mb",
+                    "n_sampled",
+                )
             }
+            for k in ("time", "rss_mb"):
+                vals = [r[k] for r in runs[mode]]
+                med[f"{k}_q25"] = float(np.percentile(vals, 25))
+                med[f"{k}_q75"] = float(np.percentile(vals, 75))
             records[mode].append(med)
             print(
-                f"{mode:10s} N_atoms={atoms[-1]:7d} | Time={med['time']:6.2f}s "
+                f"{mode:10s} N_s={n_strands:5d} N_b={strand_len:3d} "
+                f"N_atoms={atoms[-1]:7d} | Time={med['time']:6.2f}s "
+                f"[{med['time_q25']:.2f}, {med['time_q75']:.2f}] "
                 f"(univ={med['t_universe']:5.2f}s, "
-                f"sample={med['t_sample']:5.2f}s, build={med['t_build']:5.2f}s) | "
-                f"RSS={med['rss_mb']:6.1f} MB | n_sampled={med['n_sampled']:.0f}"
+                f"sample={
+                    med['t_sample']:5.2f}s, build={
+                    med['t_build']:5.2f}s) | "
+                f"RSS={
+                    med['rss_mb']:6.1f} MB | n_sampled={
+                    med['n_sampled']:.0f}"
             )
 
     def col(mode: str, key: str) -> np.ndarray:
         return np.array([r[key] for r in records[mode]])
 
-    out: Dict[str, np.ndarray] = {"scaling_atoms": np.array(atoms)}
-    for mode, tag in (
-        ("discrete", "discrete"),
-        ("on_demand", "on_demand"),
-        ("analytical", "analytical"),
-    ):
-        out[f"scaling_time_{tag}"] = col(mode, "time")
-        out[f"scaling_rss_{tag}"] = col(mode, "rss_mb")
-        out[f"scaling_time_universe_{tag}"] = col(mode, "t_universe")
-        out[f"scaling_time_sample_{tag}"] = col(mode, "t_sample")
-        out[f"scaling_time_build_{tag}"] = col(mode, "t_build")
-        out[f"scaling_n_sampled_{tag}"] = col(mode, "n_sampled")
+    out: Dict[str, np.ndarray] = {
+        f"{prefix}_atoms": np.array(atoms),
+        f"{prefix}_strands": np.array(strands_out),
+        f"{prefix}_strand_lens": np.array(strand_lens_out),
+        f"{prefix}_n_repeats": np.array(n_repeats),
+    }
+    for tag in ("discrete", "on_demand", "analytical"):
+        out[f"{prefix}_time_{tag}"] = col(tag, "time")
+        out[f"{prefix}_time_q25_{tag}"] = col(tag, "time_q25")
+        out[f"{prefix}_time_q75_{tag}"] = col(tag, "time_q75")
+        out[f"{prefix}_rss_{tag}"] = col(tag, "rss_mb")
+        out[f"{prefix}_rss_q25_{tag}"] = col(tag, "rss_mb_q25")
+        out[f"{prefix}_rss_q75_{tag}"] = col(tag, "rss_mb_q75")
+        out[f"{prefix}_time_universe_{tag}"] = col(tag, "t_universe")
+        out[f"{prefix}_time_sample_{tag}"] = col(tag, "t_sample")
+        out[f"{prefix}_time_build_{tag}"] = col(tag, "t_build")
+        out[f"{prefix}_n_sampled_{tag}"] = col(tag, "n_sampled")
     return out
+
+
+def run_scaling_benchmark(
+    sizes: Sequence[int] = (200, 500, 1000, 2000, 4000, 7000, 10000, 15000),
+    strand_len: int = 50,
+    seed: int = 42,
+    n_repeats: int = 5,
+) -> Dict[str, np.ndarray]:
+    """Measure peak memory and runtime (median & IQR of ``n_repeats`` seeds) across system sizes.
+
+    All methods use the same filtering mode and sampling target; the network definition
+    (identical for all) is excluded from the timings. Sampling and force balance
+    construction are timed separately.
+    """
+    print("Running Scaling Benchmark across system sizes...")
+    return _run_scaling_grid(
+        [(n, strand_len) for n in sizes],
+        seed=seed,
+        n_repeats=n_repeats,
+        prefix="scaling",
+    )
+
+
+def run_strand_length_benchmark(
+    strand_lens: Sequence[int] = (15, 25, 50, 100, 200, 500),
+    target_atoms: int = 250000,
+    seed: int = 42,
+    n_repeats: int = 5,
+) -> Dict[str, np.ndarray]:
+    """Measure peak memory and runtime across strand lengths at fixed total atom count.
+
+    Varying ``strand_len`` at fixed ``target_atoms`` separates :math:`O(N_{\\text{strands}})`
+    effects (on-demand LRU cache capacity and strand neighbor list) from
+    :math:`O(N_{\\text{atoms}})` effects (discrete ``Universe`` construction and RAM).
+    """
+    print(f"Running Strand-Length Benchmark at ~{target_atoms} atoms...")
+    configs = [(max(10, round(target_atoms / (sl + 0.5))), sl)
+               for sl in strand_lens]
+    return _run_scaling_grid(
+        configs,
+        seed=seed,
+        n_repeats=n_repeats,
+        prefix="strlen",
+    )
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 283-287 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 358-362 -->
 
 ## Benchmark 2: Conformational Statistics Comparison
 
 We sample entanglements and compare the distribution of continuous contour positions
 $\alpha$ and spatial Euclidean distances $r$ against explicit discrete bead sampling.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 287-406 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 362-481 -->
 ```Python
 def run_distribution_comparison(
     n_strands: int = 10000,
@@ -419,7 +495,7 @@ def run_distribution_comparison(
     }
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 407-412 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 482-487 -->
 
 ## Benchmark 3: Crosslinker Conversion Sweep & Multi-Seed Ensembles
 
@@ -427,7 +503,7 @@ We evaluate how defective networks behave across crosslinker conversion $p \in [
 Multi-seed repetitions provide empirical variance and Student’s t 95%
 confidence intervals.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 412-834 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 487-910 -->
 ```Python
 def _count_active_entanglements(fb: pt.MEHPForceBalance2) -> int:
     """Count the number of active load-bearing entanglements in the network."""
@@ -844,12 +920,13 @@ def run_all_benchmarks(max_workers: Optional[int] = None) -> Dict[str, Any]:
     """Execute all benchmark suites and compile into a single dataset dictionary."""
     combined: Dict[str, Any] = {}
     combined.update(run_scaling_benchmark())
+    combined.update(run_strand_length_benchmark())
     combined.update(run_distribution_comparison())
     combined.update(run_conversion_sweep(max_workers=max_workers))
     return combined
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 835-843 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 911-919 -->
 
 ## Loading Benchmark & Statistical Data
 
@@ -860,7 +937,7 @@ benchmark data is loaded from the committed cache.
 The dataset can be recomputed from scratch at any time by passing `--recompute`
 to this script or setting `PYLIMER_RECOMPUTE_CACHE=1`.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 843-910 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 919-1019 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     cache_path = get_example_cache_path(
@@ -869,19 +946,52 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     data = load_or_compute_cache(cache_path, run_all_benchmarks)
 
     scaling_atoms = data["scaling_atoms"]
+    scaling_strands = data.get("scaling_strands")
+    scaling_strand_lens = data.get("scaling_strand_lens")
+    scaling_n_repeats = int(data.get("scaling_n_repeats", 1))
     scaling_time_disc = data["scaling_time_discrete"]
     scaling_rss_disc = data["scaling_rss_discrete"]
     scaling_time_od = data.get("scaling_time_on_demand")
     scaling_rss_od = data.get("scaling_rss_on_demand")
     scaling_time_ana = data["scaling_time_analytical"]
     scaling_rss_ana = data["scaling_rss_analytical"]
-    # Optional per-phase timings (universe realization, sampling, force-balance construction)
+    scaling_time_iqr = {
+        m: (data.get(f"scaling_time_q25_{m}"),
+            data.get(f"scaling_time_q75_{m}"))
+        for m in ("discrete", "on_demand", "analytical")
+    }
+    scaling_rss_iqr = {
+        m: (data.get(f"scaling_rss_q25_{m}"), data.get(f"scaling_rss_q75_{m}"))
+        for m in ("discrete", "on_demand", "analytical")
+    }
+    # Optional per-phase timings (universe realization, sampling,
+    # force-balance construction)
     scaling_phase = {
         m: (
             data.get(f"scaling_time_sample_{m}"),
             data.get(f"scaling_time_build_{m}"),
             data.get(f"scaling_time_universe_{m}"),
         )
+        for m in ("discrete", "on_demand", "analytical")
+    }
+
+    # Optional strand-length scaling data at fixed total atom count
+    strlen_lens = data.get("strlen_strand_lens")
+    strlen_strands = data.get("strlen_strands")
+    strlen_atoms = data.get("strlen_atoms")
+    strlen_n_repeats = int(data.get("strlen_n_repeats", 1))
+    strlen_time = {
+        m: data.get(f"strlen_time_{m}") for m in ("discrete", "on_demand", "analytical")
+    }
+    strlen_time_iqr = {
+        m: (data.get(f"strlen_time_q25_{m}"), data.get(f"strlen_time_q75_{m}"))
+        for m in ("discrete", "on_demand", "analytical")
+    }
+    strlen_rss = {
+        m: data.get(f"strlen_rss_{m}") for m in ("discrete", "on_demand", "analytical")
+    }
+    strlen_rss_iqr = {
+        m: (data.get(f"strlen_rss_q25_{m}"), data.get(f"strlen_rss_q75_{m}"))
         for m in ("discrete", "on_demand", "analytical")
     }
 
@@ -933,7 +1043,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 Loading cached example data from entanglement_sampling_comparison_cache.npz...
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 911-939 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1020-1052 -->
 
 ## Comparison 1: Memory Footprint & Runtime Scaling
 
@@ -945,7 +1055,11 @@ memory footprint nearly flat and substantially reducing peak RAM on large networ
 For a fair runtime comparison, all methods sample the same number of entanglements with the
 same filtering mode (`OMIT_INACTIVE`), MC equilibration is disabled for all
 (`config_nr_of_mc_steps(0)`), the identical network-definition step is excluded from the
-timings, and every point is the median over several runs in fresh subprocesses.
+timings, and every point shows the median and interquartile range (25th–75th percentile)
+over independent random seeds in fresh subprocesses. Varying strand length at fixed
+$N_{\text{atoms}}$ (Figure 2b) separates $O(N_{\text{strands}})$ scaling
+(on-demand and analytical) from $O(N_{\text{atoms}})$ scaling (discrete `Universe`
+construction and memory).
 
 In Figure 3, runtime is split into three phases:
 
@@ -964,7 +1078,7 @@ In Figure 3, runtime is split into three phases:
    atomistic graph down to crosslinkers and strands, whereas `get_force_balance2(es, ...)`
    builds directly from [`CrosslinkerUniverse`](../../api/pylimer_tools_cpp.CrosslinkerUniverse.md#pylimer_tools_cpp.CrosslinkerUniverse).
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 939-1099 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1052-1317 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 
@@ -977,35 +1091,72 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 
     k_formatter = ticker.FuncFormatter(format_k)
 
+    def _plot_with_iqr(
+        ax,
+        x: np.ndarray,
+        y: np.ndarray,
+        iqr: Tuple[Optional[np.ndarray], Optional[np.ndarray]],
+        fmt: str,
+        color: str,
+        label: str,
+    ) -> None:
+        q25, q75 = iqr
+        if q25 is not None and q75 is not None:
+            yerr = np.vstack(
+                [np.maximum(0.0, y - q25), np.maximum(0.0, q75 - y)])
+            ax.errorbar(
+                x,
+                y,
+                yerr=yerr,
+                fmt=fmt,
+                color=color,
+                linewidth=2,
+                markersize=6,
+                capsize=3,
+                elinewidth=1.2,
+                label=label,
+            )
+            ax.fill_between(x, q25, q75, color=color, alpha=0.14)
+        else:
+            ax.plot(
+                x,
+                y,
+                fmt,
+                color=color,
+                linewidth=2,
+                markersize=6,
+                label=label,
+            )
+
     # Figure 1: Peak Memory
     fig, ax_mem = plt.subplots(figsize=(7, 4.5))
-    ax_mem.plot(
+    _plot_with_iqr(
+        ax_mem,
         scaling_atoms,
         scaling_rss_disc,
+        scaling_rss_iqr["discrete"],
         "o-",
-        color="#d95f02",
-        linewidth=2,
-        markersize=6,
-        label="Discrete (Full Universe)",
+        "#d95f02",
+        "Discrete (Full Universe)",
     )
     if scaling_rss_od is not None:
-        ax_mem.plot(
+        _plot_with_iqr(
+            ax_mem,
             scaling_atoms,
             scaling_rss_od,
+            scaling_rss_iqr["on_demand"],
             "^--",
-            color="#7570b3",
-            linewidth=2,
-            markersize=6,
-            label="On-Demand (Bounding Box)",
+            "#7570b3",
+            "On-Demand (Bounding Box)",
         )
-    ax_mem.plot(
+    _plot_with_iqr(
+        ax_mem,
         scaling_atoms,
         scaling_rss_ana,
+        scaling_rss_iqr["analytical"],
         "s-",
-        color="#1b9e77",
-        linewidth=2,
-        markersize=6,
-        label="Analytical (Universe-Free)",
+        "#1b9e77",
+        "Analytical (Universe-Free)",
     )
 
     max_atoms = scaling_atoms[-1]
@@ -1016,7 +1167,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_mem.annotate(
         f"{pct_savings:.0f}% Memory\nReduction",
         xy=(max_atoms, mem_ana_last),
-        xytext=(max_atoms * 0.60, 75),
+        xytext=(max_atoms * 0.55, 75),
         arrowprops=dict(arrowstyle="->", color="#1b9e77", lw=1.5),
         fontsize=10,
         fontweight="bold",
@@ -1029,7 +1180,9 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_mem.xaxis.set_major_formatter(k_formatter)
     ax_mem.set_xlabel(r"Total Atoms in Network ($N_{\mathrm{atoms}}$)")
     ax_mem.set_ylabel("Peak Resident Memory (RSS) [MB]")
-    ax_mem.set_title("Peak Memory Consumption")
+    ax_mem.set_title(
+        f"Peak Memory Consumption (median & IQR, N={scaling_n_repeats} seeds)"
+    )
     ax_mem.grid(True, which="both", linestyle="--", alpha=0.5)
     ax_mem.legend(frameon=True)
     plt.tight_layout()
@@ -1037,33 +1190,33 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 
     # Figure 2: Runtime
     fig, ax_time = plt.subplots(figsize=(7, 4.5))
-    ax_time.plot(
+    _plot_with_iqr(
+        ax_time,
         scaling_atoms,
         scaling_time_disc,
+        scaling_time_iqr["discrete"],
         "o-",
-        color="#d95f02",
-        linewidth=2,
-        markersize=6,
-        label="Discrete (Full Universe)",
+        "#d95f02",
+        "Discrete (Full Universe)",
     )
     if scaling_time_od is not None:
-        ax_time.plot(
+        _plot_with_iqr(
+            ax_time,
             scaling_atoms,
             scaling_time_od,
+            scaling_time_iqr["on_demand"],
             "^--",
-            color="#7570b3",
-            linewidth=2,
-            markersize=6,
-            label="On-Demand (Bounding Box)",
+            "#7570b3",
+            "On-Demand (Bounding Box)",
         )
-    ax_time.plot(
+    _plot_with_iqr(
+        ax_time,
         scaling_atoms,
         scaling_time_ana,
+        scaling_time_iqr["analytical"],
         "s-",
-        color="#1b9e77",
-        linewidth=2,
-        markersize=6,
-        label="Analytical (Universe-Free)",
+        "#1b9e77",
+        "Analytical (Universe-Free)",
     )
 
     ax_time.set_xscale("log")
@@ -1071,15 +1224,80 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     ax_time.xaxis.set_major_formatter(k_formatter)
     ax_time.set_xlabel(r"Total Atoms in Network ($N_{\mathrm{atoms}}$)")
     ax_time.set_ylabel("Sampling & Force-Balance Setup Time [s]")
-    ax_time.set_title("Sampling & Force-Balance Setup Time (median)")
+    ax_time.set_title(
+        f"Sampling & Force-Balance Setup Time (median & IQR, N={scaling_n_repeats} seeds)"
+    )
     ax_time.grid(True, which="both", linestyle="--", alpha=0.5)
     ax_time.legend(frameon=True)
 
     plt.tight_layout()
     plt.show()
 
+    # Figure 2b: Runtime & Memory vs. Strand Length at fixed total atom count
+    if (
+        strlen_lens is not None
+        and strlen_time["discrete"] is not None
+        and strlen_time["analytical"] is not None
+    ):
+        fig, (ax_sl_t, ax_sl_m) = plt.subplots(1, 2, figsize=(11.5, 4.5))
+        style_map = (
+            ("discrete", "o-", "#d95f02", "Discrete (Full Universe)"),
+            ("on_demand", "^--", "#7570b3", "On-Demand (Bounding Box)"),
+            ("analytical", "s-", "#1b9e77", "Analytical (Universe-Free)"),
+        )
+        for m, fmt, color, label in style_map:
+            if strlen_time[m] is not None:
+                _plot_with_iqr(
+                    ax_sl_t,
+                    strlen_lens,
+                    strlen_time[m],
+                    strlen_time_iqr[m],
+                    fmt,
+                    color,
+                    label,
+                )
+            if strlen_rss[m] is not None:
+                _plot_with_iqr(
+                    ax_sl_m,
+                    strlen_lens,
+                    strlen_rss[m],
+                    strlen_rss_iqr[m],
+                    fmt,
+                    color,
+                    label,
+                )
+
+        approx_atoms = (
+            int(np.median(strlen_atoms))
+            if strlen_atoms is not None and len(strlen_atoms) > 0
+            else 250000
+        )
+
+        for ax in (ax_sl_t, ax_sl_m):
+            ax.set_xscale("log")
+            ax.set_yscale("log")
+            ax.set_xlabel(r"Strand Length ($N_{\mathrm{beads}}$ per strand)")
+            ax.grid(True, which="both", linestyle="--", alpha=0.5)
+            ax.legend(frameon=True, fontsize=8.5)
+
+        ax_sl_t.set_ylabel("Sampling & Force-Balance Setup Time [s]")
+        ax_sl_t.set_title(
+            f"Runtime vs. Strand Length ($N_{{\\mathrm{{atoms}}}} \\approx {
+                approx_atoms // 1000
+            }\\mathrm{{k}}$)"
+        )
+        ax_sl_m.set_ylabel("Peak Resident Memory (RSS) [MB]")
+        ax_sl_m.set_title(
+            f"Peak Memory vs. Strand Length ($N_{{\\mathrm{{atoms}}}} \\approx {
+                approx_atoms // 1000
+            }\\mathrm{{k}}$)"
+        )
+        plt.tight_layout()
+        plt.show()
+
     # Figure 3: Phase breakdown at the largest system size
-    if all(v[0] is not None and v[1] is not None for v in scaling_phase.values()):
+    if all(v[0] is not None and v[1]
+           is not None for v in scaling_phase.values()):
         labels = {
             "discrete": "Discrete",
             "on_demand": "On-Demand",
@@ -1089,7 +1307,8 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
         names = list(labels)
         x_labels = [labels[m] for m in names]
         univ = [
-            float(scaling_phase[m][2][-1]) if scaling_phase[m][2] is not None else 0.0
+            float(scaling_phase[m][2][-1]
+                  ) if scaling_phase[m][2] is not None else 0.0
             for m in names
         ]
         samp = [float(scaling_phase[m][0][-1]) for m in names]
@@ -1126,7 +1345,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
         plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1100-1114 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1318-1332 -->
 
 ## Comparison 2: Conformational Statistics (Contour & Spatial Distributions)
 
@@ -1143,7 +1362,7 @@ Below, we compare:
    sampling cutoff $r_{\text{cut}}$, producing identical Euclidean
    distance distributions.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1114-1204 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1332-1422 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax_alpha, ax_dist) = plt.subplots(1, 2, figsize=(11, 4.5))
@@ -1235,12 +1454,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-```none
-/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/numpy/lib/_histograms_impl.py:897: RuntimeWarning: invalid value encountered in divide
-  return n / db / n.sum(), bin_edges
-```
-
-<!-- GENERATED FROM PYTHON SOURCE LINES 1205-1255 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1423-1473 -->
 
 ## Comparison 3: Crosslinker Conversion, Topological Filtering & Network Simplification
 
@@ -1292,7 +1506,7 @@ When comparing discrete and analytical sampling across conversions, two distinct
 When multi-seed ensembles are enabled, shaded confidence bands and error bars show the
 **95% Student’s t confidence interval** across independent realizations.
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1255-1671 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1473-1889 -->
 ```Python
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     fig, (ax_mod, ax_ent, ax_frac) = plt.subplots(1, 3, figsize=(15, 4.6))
@@ -1710,7 +1924,7 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 ```
 
-<!-- GENERATED FROM PYTHON SOURCE LINES 1672-1767 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 1890-1985 -->
 
 ## Method Comparison & Practical Guidance
 
@@ -1771,7 +1985,7 @@ The table below summarizes key trade-offs between discrete, on-demand, and analy
      [`NONE`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.md#pylimer_tools_cpp.EntanglementFilteringMode.NONE) (paired with simplification) or scale
      target $N_{\text{ent}}$ by $1 / w_{\text{active}}^2$.
 
-**Total running time of the script:** (0 minutes 1.341 seconds)
+**Total running time of the script:** (0 minutes 1.738 seconds)
 
 <a id="sphx-glr-download-auto-examples-force-balance-plot-entanglement-sampling-comparison-py"></a>
 

@@ -2,7 +2,7 @@
 
 # Computation times
 
-**07:23.953** total execution time for 39 files **from all galleries**:
+**07:24.349** total execution time for 39 files **from all galleries**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -26,7 +26,7 @@ $(document).ready( function () {
 | [Normal Mode Analysis (NMA)](auto_examples/normal_mode_analysis/plot_normal_mode_analysis.md#sphx-glr-auto-examples-normal-mode-analysis-plot-normal-mode-analysis-py) (`../examples/normal_mode_analysis/plot_normal_mode_analysis.py`)                   | 00:10.988 |          0 |
 | [DPD Simulations](auto_examples/dpd_simulations/plot_dpd_simulation.md#sphx-glr-auto-examples-dpd-simulations-plot-dpd-simulation-py) (`../examples/dpd_simulations/plot_dpd_simulation.py`)                                                    | 00:04.279 |          0 |
 | [MEHP Force Relaxation](auto_examples/force_balance/plot_force_relaxation.md#sphx-glr-auto-examples-force-balance-plot-force-relaxation-py) (`../examples/force_balance/plot_force_relaxation.py`)                                              | 00:02.929 |          0 |
-| [Entanglement Sampling Methods](auto_examples/force_balance/plot_entanglement_sampling_comparison.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`../examples/force_balance/plot_entanglement_sampling_comparison.py`)      | 00:01.341 |          0 |
+| [Entanglement Sampling Methods](auto_examples/force_balance/plot_entanglement_sampling_comparison.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`../examples/force_balance/plot_entanglement_sampling_comparison.py`)      | 00:01.738 |          0 |
 | [Sampling Cut-Off Effect](auto_examples/force_balance/plot_sampling_cutoff_effect.md#sphx-glr-auto-examples-force-balance-plot-sampling-cutoff-effect-py) (`../examples/force_balance/plot_sampling_cutoff_effect.py`)                                | 00:00.642 |          0 |
 | [Inactive Removal & Sampling](auto_examples/force_balance/plot_inactive_removal_and_sampling.md#sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py) (`../examples/force_balance/plot_inactive_removal_and_sampling.py`)              | 00:00.609 |          0 |
 | [Simple Crosslinked Network](auto_examples/network_generator/plot_simple_crosslinked_network.md#sphx-glr-auto-examples-network-generator-plot-simple-crosslinked-network-py) (`../examples/network_generator/plot_simple_crosslinked_network.py`)             | 00:00.438 |          0 |
