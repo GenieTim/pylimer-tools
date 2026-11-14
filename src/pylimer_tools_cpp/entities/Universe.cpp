@@ -792,7 +792,7 @@ Universe::countAtomsInSkinDistance(const std::vector<double>& distances,
   const Box currentBox = this->getBox();
   const Eigen::VectorXd coordinates =
     unwrapped ? this->getUnwrappedVertexCoordinates(currentBox)
-              : this->getAssumedVertexCoordinates(currentBox);
+              : this->getVertexCoordinates();
   const double maxCutoff = pylimer_tools::utils::last<double>(distances);
   const double listCutoff = std::max(maxCutoff, 1e-2);
   const EigenNeighbourList neighbourList(coordinates, currentBox, listCutoff);

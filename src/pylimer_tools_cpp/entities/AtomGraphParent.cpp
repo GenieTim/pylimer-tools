@@ -546,6 +546,72 @@ AtomGraphParent::getUnwrappedVertexCoordinates(
   return result;
 }
 
+Eigen::VectorXd
+AtomGraphParent::getVertexCoordinates(const igraph_vs_t selector) const
+{
+  igraph_vector_t xvalues;
+  igraph_vector_init(&xvalues, 0);
+  igraph_vector_t yvalues;
+  igraph_vector_init(&yvalues, 0);
+  igraph_vector_t zvalues;
+  igraph_vector_init(&zvalues, 0);
+
+  if (igraph_cattribute_VANV(&this->graph, "x", selector, &xvalues)) {
+    throw std::runtime_error("Failed to query property x of graph.");
+  }
+  if (igraph_cattribute_VANV(&this->graph, "y", selector, &yvalues)) {
+    throw std::runtime_error("Failed to query property y of graph.");
+  }
+  if (igraph_cattribute_VANV(&this->graph, "z", selector, &zvalues)) {
+    throw std::runtime_error("Failed to query property z of graph.");
+  }
+
+  const size_t size = static_cast<size_t>(igraph_vector_size(&xvalues));
+  Eigen::VectorXd results(size * 3);
+  for (size_t i = 0; i < size; ++i) {
+    const igraph_integer_t idx = static_cast<igraph_integer_t>(i);
+    results[static_cast<Eigen::Index>(3 * i)] =
+      igraph_vector_get(&xvalues, idx);
+    results[static_cast<Eigen::Index>(3 * i + 1)] =
+      igraph_vector_get(&yvalues, idx);
+    results[static_cast<Eigen::Index>(3 * i + 2)] =
+      igraph_vector_get(&zvalues, idx);
+  }
+
+  igraph_vector_destroy(&xvalues);
+  igraph_vector_destroy(&yvalues);
+  igraph_vector_destroy(&zvalues);
+
+  return results;
+}
+
+Eigen::VectorXd
+AtomGraphParent::getVertexCoordinates() const
+{
+  return this->getVertexCoordinates(igraph_vss_all());
+}
+
+Eigen::VectorXd
+AtomGraphParent::getVertexCoordinates(
+  const igraph_vector_int_t& vertices) const
+{
+  return this->getVertexCoordinates(igraph_vss_vector(&vertices));
+}
+
+Eigen::VectorXd
+AtomGraphParent::getVertexCoordinates(
+  const std::vector<igraph_integer_t>& vertices) const
+{
+  igraph_vector_int_t vertices_v;
+  igraph_vector_int_init(&vertices_v,
+                         static_cast<igraph_integer_t>(vertices.size()));
+  pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertices_v);
+  Eigen::VectorXd result = this->getVertexCoordinates(vertices_v);
+  igraph_vector_int_destroy(&vertices_v);
+  assert(static_cast<size_t>(result.size()) == vertices.size() * 3);
+  return result;
+}
+
 /**
  * @brief Get the Vertex And Edge Property Names
  *

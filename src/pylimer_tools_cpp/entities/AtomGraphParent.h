@@ -462,6 +462,23 @@ public:
     const pylimer_tools::entities::Box& box) const;
 
   /**
+   * @brief Get the raw stored vertex coordinates (x, y, z) without applying
+   * image flags (nx, ny, nz)
+   *
+   * @param selector
+   * @return Eigen::VectorXd
+   */
+  Eigen::VectorXd getVertexCoordinates(const igraph_vs_t selector) const;
+
+  Eigen::VectorXd getVertexCoordinates() const;
+
+  Eigen::VectorXd getVertexCoordinates(
+    const igraph_vector_int_t& vertices) const;
+
+  Eigen::VectorXd getVertexCoordinates(
+    const std::vector<igraph_integer_t>& vertices) const;
+
+  /**
    * @brief Get the Property (attribute) of one vertex
    *
    * @tparam OUT
@@ -581,7 +598,7 @@ public:
     assert(igraph_vector_int_size(&order) == this->getNrOfVertices());
     assert(igraph_vector_int_size(&parents) == this->getNrOfVertices());
 
-    Eigen::VectorXd coordinates = this->getUnwrappedVertexCoordinates(box);
+    Eigen::VectorXd coordinates = this->getVertexCoordinates();
 
     // use the parents and order to reconstruct the coordinates based on the
     // bonds
@@ -629,14 +646,7 @@ public:
       return results;
     }
 
-    igraph_vector_int_t vertex_ids;
-    igraph_vector_int_init(&vertex_ids, 0);
-    pylimer_tools::utils::StdVectorToIgraphVectorT(vertexIds, &vertex_ids);
-
-    Eigen::VectorXd coordinates =
-      this->getUnwrappedVertexCoordinates(vertex_ids, box);
-
-    igraph_vector_int_destroy(&vertex_ids);
+    Eigen::VectorXd coordinates = this->getVertexCoordinates(vertexIds);
 
     // take the distances
     Eigen::VectorXd distances = coordinates.segment(3, coordinates.size() - 3) -

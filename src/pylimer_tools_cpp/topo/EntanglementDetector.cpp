@@ -3,13 +3,13 @@
 #include "../entities/EigenNeighbourList.h"
 #include "../entities/Molecule.h"
 #include "../entities/Universe.h"
-#include "../utils/LazyDistanceMatrix.h"
 #include "../utils/RandomWalker.h"
 #include "../utils/StringUtils.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <iostream>
+#include <limits>
 #include <list>
 #include <numeric>
 #include <random>
@@ -62,6 +62,181 @@ namespace {
     return std::mt19937(seedSeq);
   }
 
+  struct StrandTopology
+  {
+    std::vector<int32_t> strandId;
+    std::vector<uint32_t> posInStrand;
+    std::vector<uint32_t> distToEnd;
+    std::vector<uint32_t> strandLength;
+    std::vector<uint8_t> strandIsRing;
+  };
+
+  /**
+   * @brief Label every degree-2 bead with its strand ID, position along the
+   * strand, and distance to the nearest non-degree-2 vertex in O(N_atoms).
+   */
+  StrandTopology buildStrandTopology(const igraph_t& graph,
+                                     const std::vector<int>& vertexDegrees)
+  {
+    const size_t nAtoms = vertexDegrees.size();
+    StrandTopology topo;
+    topo.strandId.assign(nAtoms, -1);
+    topo.posInStrand.assign(nAtoms, 0);
+    topo.distToEnd.assign(nAtoms, 0);
+
+    igraph_vector_int_t neighbors;
+    igraph_vector_int_init(&neighbors, 8);
+    igraph_vector_int_t deg2Neighbors;
+    igraph_vector_int_init(&deg2Neighbors, 2);
+
+    // 1. Walk linear strands starting from non-degree-2 vertices
+    for (size_t v = 0; v < nAtoms; ++v) {
+      if (vertexDegrees[v] == 2) {
+        continue;
+      }
+      REQUIRE_IGRAPH_SUCCESS(igraph_neighbors(&graph,
+                                              &neighbors,
+                                              static_cast<igraph_integer_t>(v),
+                                              IGRAPH_ALL,
+                                              IGRAPH_LOOPS_TWICE,
+                                              true));
+      const igraph_integer_t nDeg = igraph_vector_int_size(&neighbors);
+      for (igraph_integer_t k = 0; k < nDeg; ++k) {
+        const size_t startNb =
+          static_cast<size_t>(igraph_vector_int_get(&neighbors, k));
+        if (vertexDegrees[startNb] != 2 || topo.strandId[startNb] != -1) {
+          continue;
+        }
+        const int32_t sid = static_cast<int32_t>(topo.strandLength.size());
+        size_t prev = v;
+        size_t curr = startNb;
+        uint32_t pos = 0;
+        while (vertexDegrees[curr] == 2 && topo.strandId[curr] == -1) {
+          topo.strandId[curr] = sid;
+          topo.posInStrand[curr] = pos++;
+          REQUIRE_IGRAPH_SUCCESS(
+            igraph_neighbors(&graph,
+                             &deg2Neighbors,
+                             static_cast<igraph_integer_t>(curr),
+                             IGRAPH_ALL,
+                             IGRAPH_LOOPS_TWICE,
+                             true));
+          const size_t n0 =
+            static_cast<size_t>(igraph_vector_int_get(&deg2Neighbors, 0));
+          const size_t n1 =
+            static_cast<size_t>(igraph_vector_int_get(&deg2Neighbors, 1));
+          const size_t next = (n0 != prev) ? n0 : n1;
+          prev = curr;
+          curr = next;
+        }
+        topo.strandLength.push_back(pos);
+        topo.strandIsRing.push_back(0);
+      }
+    }
+
+    // 2. Walk isolated cyclic rings (components where all vertices have degree
+    // 2)
+    for (size_t v = 0; v < nAtoms; ++v) {
+      if (vertexDegrees[v] != 2 || topo.strandId[v] != -1) {
+        continue;
+      }
+      const int32_t sid = static_cast<int32_t>(topo.strandLength.size());
+      size_t prev = v;
+      size_t curr = v;
+      uint32_t pos = 0;
+      while (topo.strandId[curr] == -1) {
+        topo.strandId[curr] = sid;
+        topo.posInStrand[curr] = pos++;
+        REQUIRE_IGRAPH_SUCCESS(
+          igraph_neighbors(&graph,
+                           &deg2Neighbors,
+                           static_cast<igraph_integer_t>(curr),
+                           IGRAPH_ALL,
+                           IGRAPH_LOOPS_TWICE,
+                           true));
+        const size_t n0 =
+          static_cast<size_t>(igraph_vector_int_get(&deg2Neighbors, 0));
+        const size_t n1 =
+          static_cast<size_t>(igraph_vector_int_get(&deg2Neighbors, 1));
+        const size_t next =
+          (pos == 1) ? ((n0 != curr) ? n0 : n1) : ((n0 != prev) ? n0 : n1);
+        prev = curr;
+        curr = next;
+      }
+      topo.strandLength.push_back(pos);
+      topo.strandIsRing.push_back(1);
+    }
+
+    igraph_vector_int_destroy(&deg2Neighbors);
+    igraph_vector_int_destroy(&neighbors);
+
+    // 3. Populate distToEnd for every degree-2 vertex
+    constexpr uint32_t kRingDist = std::numeric_limits<uint32_t>::max() / 2;
+    for (size_t v = 0; v < nAtoms; ++v) {
+      const int32_t sid = topo.strandId[v];
+      if (sid < 0) {
+        continue;
+      }
+      if (topo.strandIsRing[static_cast<size_t>(sid)] != 0) {
+        topo.distToEnd[v] = kRingDist;
+      } else {
+        const uint32_t pos = topo.posInStrand[v];
+        const uint32_t len = topo.strandLength[static_cast<size_t>(sid)];
+        topo.distToEnd[v] = std::min(pos + 1, len - pos);
+      }
+    }
+
+    return topo;
+  }
+
+  /**
+   * @brief Stamp all vertices within <= maxDepth bonds of source using an
+   * epoch counter to avoid clearing bfsVisited between queries.
+   */
+  void runBoundedBfs(const igraph_t& graph,
+                     const size_t source,
+                     const size_t maxDepth,
+                     std::vector<uint32_t>& bfsVisited,
+                     uint32_t& bfsEpoch,
+                     std::vector<std::pair<size_t, size_t>>& bfsQueue,
+                     igraph_vector_int_t& neighbors)
+  {
+    ++bfsEpoch;
+    if (bfsEpoch == 0) {
+      std::fill(bfsVisited.begin(), bfsVisited.end(), 0);
+      bfsEpoch = 1;
+    }
+    bfsQueue.clear();
+    bfsVisited[source] = bfsEpoch;
+    bfsQueue.emplace_back(source, 0);
+
+    size_t head = 0;
+    while (head < bfsQueue.size()) {
+      const size_t curr = bfsQueue[head].first;
+      const size_t depth = bfsQueue[head].second;
+      ++head;
+      if (depth >= maxDepth) {
+        continue;
+      }
+      REQUIRE_IGRAPH_SUCCESS(
+        igraph_neighbors(&graph,
+                         &neighbors,
+                         static_cast<igraph_integer_t>(curr),
+                         IGRAPH_ALL,
+                         IGRAPH_LOOPS_TWICE,
+                         true));
+      const igraph_integer_t nDeg = igraph_vector_int_size(&neighbors);
+      for (igraph_integer_t k = 0; k < nDeg; ++k) {
+        const size_t nb =
+          static_cast<size_t>(igraph_vector_int_get(&neighbors, k));
+        if (bfsVisited[nb] != bfsEpoch) {
+          bfsVisited[nb] = bfsEpoch;
+          bfsQueue.emplace_back(nb, depth + 1);
+        }
+      }
+    }
+  }
+
 } // anonymous namespace
 
 AtomPairEntanglements
@@ -90,45 +265,55 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
     return AtomPairEntanglements(pairsOfAtoms, pairOfAtom);
   }
 
-  igraph_lazy_distance_matrix_state_t distance_matrix_computer;
-  igraph_t graph = universe.getCopyOfGraph();
-  igraph_lazy_distance_matrix_state_init(
-    &distance_matrix_computer,
-    &graph,
-    IGRAPH_ALL,
-    sameStrandCutoff > 0 ? static_cast<igraph_integer_t>(sameStrandCutoff) : 0);
-
   std::mt19937 rng = initializeRng(seed);
 
   const pylimer_tools::entities::Box box = universe.getBox();
-  const Eigen::VectorXd coordinates =
-    universe.getUnwrappedVertexCoordinates(box);
+  const Eigen::VectorXd coordinates = universe.getVertexCoordinates();
   const pylimer_tools::entities::EigenNeighbourList neighbourList(
     coordinates, box, upperCutoff);
-  std::vector<bool> vertexIsEligible(universe.getNrOfAtoms(), true);
+  std::vector<uint8_t> vertexIsEligible(universe.getNrOfAtoms(), 1);
   const std::vector<int> vertexTypes = universe.getPropertyValues<int>("type");
   const std::vector<int> vertexDegrees = universe.getVertexDegrees();
 
-  const std::vector<bool> activeAtoms =
-    (filteringMode != EntanglementFilteringMode::NONE)
-      ? universe.identifyActiveAtoms(crossLinkerType)
-      : std::vector<bool>();
+  const size_t cutoffCeil = sameStrandCutoff > 0.0
+                              ? static_cast<size_t>(std::ceil(sameStrandCutoff))
+                              : 0;
+  StrandTopology strandTopo;
+  std::vector<uint32_t> bfsVisited;
+  uint32_t bfsEpoch = 0;
+  std::vector<std::pair<size_t, size_t>> bfsQueue;
+  igraph_vector_int_t bfsNeighbors;
+  if (cutoffCeil > 0) {
+    strandTopo = buildStrandTopology(universe.getGraph(), vertexDegrees);
+    bfsVisited.assign(universe.getNrOfAtoms(), 0);
+    igraph_vector_int_init(&bfsNeighbors, 8);
+  }
+
+  std::vector<uint8_t> activeAtoms;
+  if (filteringMode != EntanglementFilteringMode::NONE) {
+    const std::vector<bool> activeAtomsBool =
+      universe.identifyActiveAtoms(crossLinkerType);
+    activeAtoms.resize(activeAtomsBool.size());
+    for (size_t i = 0; i < activeAtomsBool.size(); ++i) {
+      activeAtoms[i] = activeAtomsBool[i] ? 1 : 0;
+    }
+  }
 
   std::vector<long int> vertexIdsToSample;
   vertexIdsToSample.reserve(universe.getNrOfAtoms());
 
   for (size_t i = 0; i < universe.getNrOfAtoms(); ++i) {
     if (vertexDegrees[i] != 2) {
-      vertexIsEligible[i] = false;
+      vertexIsEligible[i] = 0;
     }
     if (ignoreCrosslinks && vertexTypes[i] == crossLinkerType) {
-      vertexIsEligible[i] = false;
+      vertexIsEligible[i] = 0;
     }
     if (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT &&
-        !activeAtoms.empty() && !activeAtoms[i]) {
-      vertexIsEligible[i] = false;
+        !activeAtoms.empty() && activeAtoms[i] == 0) {
+      vertexIsEligible[i] = 0;
     }
-    if (vertexIsEligible[i]) {
+    if (vertexIsEligible[i] != 0) {
       vertexIdsToSample.push_back(static_cast<long int>(i));
     }
   }
@@ -139,27 +324,34 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
 
   do {
     numLinksFoundInIteration = 0;
-    std::ranges::shuffle(vertexIdsToSample, rng);
-    for (const long int atomVertexIdx1 : vertexIdsToSample) {
+    for (size_t sampleIdx = 0; sampleIdx < vertexIdsToSample.size();
+         ++sampleIdx) {
+      const size_t randSampleIdx = std::uniform_int_distribution<size_t>(
+        sampleIdx, vertexIdsToSample.size() - 1)(rng);
+      std::swap(vertexIdsToSample[sampleIdx], vertexIdsToSample[randSampleIdx]);
+      const long int atomVertexIdx1 = vertexIdsToSample[sampleIdx];
       if (pairOfAtom[atomVertexIdx1] != -1) {
         continue;
       }
-      vertexIsEligible[atomVertexIdx1] = false;
+      vertexIsEligible[atomVertexIdx1] = 0;
 
       const size_t nNeighbours = neighbourList.getIndicesCloseToCoordinates(
         neighbourIndices,
         coordinates.segment<3>(3 * atomVertexIdx1),
         upperCutoff);
       long int atomVertexIdx2 = -1;
-
-      std::shuffle(
-        neighbourIndices.data(), neighbourIndices.data() + nNeighbours, rng);
+      bool hasBfsForSource = false;
 
       for (Eigen::Index idxInNeighbours = 0;
            idxInNeighbours < static_cast<Eigen::Index>(nNeighbours);
            ++idxInNeighbours) {
+        const Eigen::Index randNeighbourIdx =
+          std::uniform_int_distribution<Eigen::Index>(
+            idxInNeighbours, static_cast<Eigen::Index>(nNeighbours) - 1)(rng);
+        std::swap(neighbourIndices[idxInNeighbours],
+                  neighbourIndices[randNeighbourIdx]);
         const long int candidateVertex = neighbourIndices[idxInNeighbours];
-        if (!vertexIsEligible[candidateVertex] ||
+        if (vertexIsEligible[candidateVertex] == 0 ||
             pairOfAtom[candidateVertex] != -1) {
           continue;
         }
@@ -174,21 +366,59 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
           continue;
         }
 
-        igraph_integer_t pathLength =
-          sameStrandCutoff <= 0
-            ? LAZY_DISTANCE_INFINITY
-            : igraph_lazy_distance_matrix_path_length(&distance_matrix_computer,
-                                                      atomVertexIdx1,
-                                                      candidateVertex,
-                                                      false);
-        if (sameStrandCutoff <= 0 || pathLength >= sameStrandCutoff ||
-            pathLength == LAZY_DISTANCE_INFINITY) {
+        bool pathValid = true;
+        if (cutoffCeil > 0) {
+          const size_t u = static_cast<size_t>(atomVertexIdx1);
+          const size_t v = static_cast<size_t>(candidateVertex);
+          const int32_t sidU = strandTopo.strandId[u];
+          const int32_t sidV = strandTopo.strandId[v];
+          if (sidU == sidV && sidU >= 0) {
+            const uint32_t posU = strandTopo.posInStrand[u];
+            const uint32_t posV = strandTopo.posInStrand[v];
+            const uint32_t diff = (posU > posV) ? (posU - posV) : (posV - posU);
+            if (strandTopo.strandIsRing[static_cast<size_t>(sidU)] != 0) {
+              const uint32_t len =
+                strandTopo.strandLength[static_cast<size_t>(sidU)];
+              const uint32_t ringDist = std::min(diff, len - diff);
+              pathValid = (ringDist >= cutoffCeil);
+            } else if (diff < cutoffCeil) {
+              pathValid = false;
+            } else if (static_cast<uint64_t>(strandTopo.distToEnd[u]) +
+                         static_cast<uint64_t>(strandTopo.distToEnd[v]) <
+                       cutoffCeil) {
+              if (!hasBfsForSource) {
+                runBoundedBfs(universe.getGraph(),
+                              u,
+                              cutoffCeil - 1,
+                              bfsVisited,
+                              bfsEpoch,
+                              bfsQueue,
+                              bfsNeighbors);
+                hasBfsForSource = true;
+              }
+              pathValid = (bfsVisited[v] != bfsEpoch);
+            }
+          } else if (static_cast<uint64_t>(strandTopo.distToEnd[u]) +
+                       static_cast<uint64_t>(strandTopo.distToEnd[v]) <
+                     cutoffCeil) {
+            if (!hasBfsForSource) {
+              runBoundedBfs(universe.getGraph(),
+                            u,
+                            cutoffCeil - 1,
+                            bfsVisited,
+                            bfsEpoch,
+                            bfsQueue,
+                            bfsNeighbors);
+              hasBfsForSource = true;
+            }
+            pathValid = (bfsVisited[v] != bfsEpoch);
+          }
+        }
+        if (pathValid) {
           atomVertexIdx2 = candidateVertex;
           break;
         }
       }
-      igraph_lazy_distance_matrix_forget_source(&distance_matrix_computer,
-                                                atomVertexIdx1);
 
       if (atomVertexIdx2 < 0) {
         continue;
@@ -203,8 +433,8 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
         pairsOfAtoms.emplace_back(universe.getAtomIdByIdx(atomVertexIdx1),
                                   universe.getAtomIdByIdx(atomVertexIdx2));
       } else if (filteringMode == EntanglementFilteringMode::OMIT_INACTIVE) {
-        if (activeAtoms.empty() ||
-            (activeAtoms[atomVertexIdx1] && activeAtoms[atomVertexIdx2])) {
+        if (activeAtoms.empty() || (activeAtoms[atomVertexIdx1] != 0 &&
+                                    activeAtoms[atomVertexIdx2] != 0)) {
           pairOfAtom[atomVertexIdx2] =
             static_cast<long int>(pairsOfAtoms.size());
           pairOfAtom[atomVertexIdx1] =
@@ -222,7 +452,7 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
                                   universe.getAtomIdByIdx(atomVertexIdx2));
       }
 
-      vertexIsEligible[atomVertexIdx2] = false;
+      vertexIsEligible[atomVertexIdx2] = 0;
       numEntanglementsSampled += 1;
       numLinksFoundInIteration += 1;
 
@@ -253,8 +483,9 @@ randomlyFindEntanglements(const pylimer_tools::entities::Universe& universe,
     }
   }
 
-  igraph_lazy_distance_matrix_state_destroy(&distance_matrix_computer);
-  igraph_destroy(&graph);
+  if (cutoffCeil > 0) {
+    igraph_vector_int_destroy(&bfsNeighbors);
+  }
 
   AtomPairEntanglements result;
   result.pairsOfAtoms = pairsOfAtoms;

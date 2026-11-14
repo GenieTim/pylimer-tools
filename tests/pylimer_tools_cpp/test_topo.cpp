@@ -85,6 +85,71 @@ TEST_CASE("Entanglement Detector throws", "[analysis][EntanglementDetector]")
     box, crosslinkerUniverse, 5, 2.0, 0.0, 10));
 }
 
+TEST_CASE("Entanglement Detector enforces sameStrandCutoff on rings and "
+          "crosslinker-adjacent beads",
+          "[analysis][EntanglementDetector]")
+{
+  SECTION("Isolated cyclic ring of 6 beads")
+  {
+    pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+    std::vector<long int> ids = { 1, 2, 3, 4, 5, 6 };
+    std::vector<int> types(6, 1);
+    std::vector<double> coords(6, 1.0);
+    std::vector<int> zeros(6, 0);
+    universe.addAtoms(ids, types, coords, coords, coords, zeros, zeros, zeros);
+    universe.addBonds({ 1, 2, 3, 4, 5, 6 }, { 2, 3, 4, 5, 6, 1 });
+
+    // Max distance on a 6-ring is 3 bonds
+    pt::AtomPairEntanglements es3 = pt::randomlyFindEntanglements(
+      universe, 1, 5.0, 0.0, 1, 3.0, "ring_seed", 2, true, false);
+    REQUIRE(es3.pairsOfAtoms.size() == 1);
+    const size_t v1 = universe.getIdxByAtomId(es3.pairsOfAtoms[0].first);
+    const size_t v2 = universe.getIdxByAtomId(es3.pairsOfAtoms[0].second);
+    CHECK(universe.getPathLength(static_cast<long int>(v1),
+                                 static_cast<long int>(v2)) >= 3);
+
+    // No pair has distance >= 4 on a 6-ring
+    pt::AtomPairEntanglements es4 = pt::randomlyFindEntanglements(
+      universe, 1, 5.0, 0.0, 0, 4.0, "ring_seed", 2, true, false);
+    CHECK(es4.pairsOfAtoms.empty());
+  }
+
+  SECTION("Crosslinker-adjacent beads across a primary loop / junction")
+  {
+    // Atom 1 is a degree-4 crosslinker with two 2-bead primary loops:
+    // 1 - 2 - 3 - 1 and 1 - 4 - 5 - 1
+    // Every bead (2, 3, 4, 5) has distToEnd == 1, so distToEnd[u] +
+    // distToEnd[v] == 2 < 3, forcing the bounded BFS check for
+    // sameStrandCutoff=3.
+    pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+    std::vector<long int> ids = { 1, 2, 3, 4, 5 };
+    std::vector<int> types = { 2, 1, 1, 1, 1 };
+    std::vector<double> coords(5, 1.0);
+    std::vector<int> zeros(5, 0);
+    universe.addAtoms(ids, types, coords, coords, coords, zeros, zeros, zeros);
+    universe.addBonds({ 1, 2, 3, 1, 4, 5 }, { 2, 3, 1, 4, 5, 1 });
+
+    // All pairs among {2, 3, 4, 5} have path length <= 2 through atom 1
+    pt::AtomPairEntanglements es3 = pt::randomlyFindEntanglements(
+      universe, 1, 5.0, 0.0, 0, 3.0, "loop_seed", 2, true, false);
+    CHECK(es3.pairsOfAtoms.empty());
+
+    // With sameStrandCutoff = 2.0, pairs across different loops (e.g. 2 and 4)
+    // have path length 2 >= 2.0 and can pair, while same-loop pairs (2 and 3)
+    // have path length 1 < 2.0 and cannot.
+    pt::AtomPairEntanglements es2 = pt::randomlyFindEntanglements(
+      universe, 1, 5.0, 0.0, 1, 2.0, "loop_seed", 2, true, false);
+    REQUIRE(es2.pairsOfAtoms.size() == 1);
+    for (const std::pair<size_t, size_t>& pair : es2.pairsOfAtoms) {
+      const long int v1 =
+        static_cast<long int>(universe.getIdxByAtomId(pair.first));
+      const long int v2 =
+        static_cast<long int>(universe.getIdxByAtomId(pair.second));
+      CHECK(universe.getPathLength(v1, v2) >= 2);
+    }
+  }
+}
+
 TEST_CASE("Analytical Entanglement Detector samples valid entanglements on "
           "CrosslinkerUniverse",
           "[analysis][EntanglementDetector][analytical]")
