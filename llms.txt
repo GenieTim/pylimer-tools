@@ -319,11 +319,11 @@
 - [TRACK_BACKWARD](api/pylimer_tools_cpp.TRACK_BACKWARD.html.md): Track backward in the linking process
 - [TRACK_FORWARD](api/pylimer_tools_cpp.TRACK_FORWARD.html.md): Continue linking forward
 - [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.279&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
-- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;00:08.493&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;00:07.453&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 - [Computation times](auto_examples/network_generator/sg_execution_times.html.md): &#42;&#42;01:00.121&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
 - [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:10.988&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
 - [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:17.316&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
 - [Computation times](auto_examples/sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
 - [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.384&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
 - [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;05:43.410&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
-- [Computation times](sg_execution_times.html.md): &#42;&#42;07:24.992&#42;&#42; total execution time for 39 files &#42;&#42;from all galleries&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;07:23.953&#42;&#42; total execution time for 39 files &#42;&#42;from all galleries&#42;&#42;:

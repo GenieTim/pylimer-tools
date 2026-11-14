@@ -204,7 +204,7 @@
 - [NOTE](plot_sampling_cutoff_effect.html.md): Go to the end
 - [NOTE](plot_inactive_removal_and_sampling.html.md): Go to the end
 - [NOTE](plot_entanglement_sampling_comparison.html.md): Go to the end
-- [Computation times](sg_execution_times.html.md): &#42;&#42;00:08.493&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;00:07.453&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
 
 ## Optional
 

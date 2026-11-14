@@ -180,6 +180,7 @@ t_setup = time.perf_counter()
 # all with the same filtering (OMIT_INACTIVE) and target count.
 if mode == "discrete":
     u = gen.get_universe()
+    t_universe = time.perf_counter()
     ents = pt.randomly_sample_entanglements(
         u, n_ent, cutoff, 0.0, 0, 3.0, "seed", filtering_mode=filt
     )
@@ -187,6 +188,7 @@ if mode == "discrete":
     t_sample = time.perf_counter()
     fb = pt.MEHPForceBalance2(u, ents, 2, False, False)
 else:
+    t_universe = t_setup
     method = (
         pt.EntanglementSamplingMethod.ON_DEMAND
         if mode == "on_demand"
@@ -208,11 +210,12 @@ if sys.platform == "darwin":
 else:
     rss_mb = maxrss / 1024.0
 
-# "time" excludes the common network definition; it covers sampling + FB build.
+# "time" excludes the common network definition; it covers universe + sampling + FB build.
 print(json.dumps({
     "mode": mode, "n_strands": n_strands, "n_atoms": n_atoms,
     "time": t1 - t_setup, "t_setup": t_setup - t0,
-    "t_sample": t_sample - t_setup, "t_build": t1 - t_sample,
+    "t_universe": t_universe - t_setup,
+    "t_sample": t_sample - t_universe, "t_build": t1 - t_sample,
     "n_sampled": n_sampled, "rss_mb": rss_mb,
 }))
 """
@@ -248,17 +251,14 @@ print(json.dumps({
         for mode in modes:
             med: Dict[str, Any] = {
                 k: float(np.median([r[k] for r in runs[mode]]))
-                for k in ("time", "t_sample", "t_build", "rss_mb", "n_sampled")
+                for k in ("time", "t_universe", "t_sample", "t_build", "rss_mb", "n_sampled")
             }
             records[mode].append(med)
             print(
                 f"{mode:10s} N_atoms={atoms[-1]:7d} | Time={med['time']:6.2f}s "
-                f"(sample={
-                    med['t_sample']:5.2f}s, build={
-                    med['t_build']:5.2f}s) | "
-                f"RSS={
-                    med['rss_mb']:6.1f} MB | n_sampled={
-                    med['n_sampled']:.0f}"
+                f"(univ={med['t_universe']:5.2f}s, "
+                f"sample={med['t_sample']:5.2f}s, build={med['t_build']:5.2f}s) | "
+                f"RSS={med['rss_mb']:6.1f} MB | n_sampled={med['n_sampled']:.0f}"
             )
 
     def col(mode: str, key: str) -> np.ndarray:
@@ -272,6 +272,7 @@ print(json.dumps({
     ):
         out[f"scaling_time_{tag}"] = col(mode, "time")
         out[f"scaling_rss_{tag}"] = col(mode, "rss_mb")
+        out[f"scaling_time_universe_{tag}"] = col(mode, "t_universe")
         out[f"scaling_time_sample_{tag}"] = col(mode, "t_sample")
         out[f"scaling_time_build_{tag}"] = col(mode, "t_build")
         out[f"scaling_n_sampled_{tag}"] = col(mode, "n_sampled")
@@ -853,11 +854,12 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     scaling_rss_od = data.get("scaling_rss_on_demand")
     scaling_time_ana = data["scaling_time_analytical"]
     scaling_rss_ana = data["scaling_rss_analytical"]
-    # Optional per-phase timings (sampling vs. force-balance construction)
+    # Optional per-phase timings (universe realization, sampling, force-balance construction)
     scaling_phase = {
         m: (
             data.get(f"scaling_time_sample_{m}"),
             data.get(f"scaling_time_build_{m}"),
+            data.get(f"scaling_time_universe_{m}"),
         )
         for m in ("discrete", "on_demand", "analytical")
     }
@@ -917,11 +919,23 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 # same filtering mode (``OMIT_INACTIVE``), MC equilibration is disabled for all
 # (``config_nr_of_mc_steps(0)``), the identical network-definition step is excluded from the
 # timings, and every point is the median over several runs in fresh subprocesses.
-# Runtime is split into sampling (for the discrete method including bead realization) and
-# force-balance construction. Note that the discrete method must realize and neighbor-search
-# *all* beads, whereas the on-demand method only regenerates beads of candidate strands that
-# survive the bounding-box culling, so the on-demand method can
-# legitimately be faster.
+#
+# In Figure 3, runtime is split into three phases:
+#
+# 1. **Universe realization** (:meth:`~pylimer_tools_cpp.MCUniverseGenerator.get_universe`,
+#    discrete only): constructing the full :math:`N_{\text{atoms}}` atom tables, bond lists, and
+#    ``igraph`` molecular graph.
+# 2. **Entanglement sampling**: even excluding ``get_universe``, the discrete sampler must
+#    bin all :math:`N_{\text{atoms}}` beads into a spatial neighbor list, identify active atoms on
+#    the full atomistic graph, and label bead strand indices in an :math:`O(N_{\text{atoms}})`
+#    pass so ``same_strand_cutoff`` can be checked in :math:`O(1)` (falling back to a local BFS
+#    only near crosslinkers). By contrast, the on-demand sampler builds a spatial neighbor list
+#    over :math:`N_{\text{strands}}` bounding-box centroids (~50× fewer entries), culls
+#    non-overlapping strands with a cheap AABB check before regenerating coordinates into a
+#    small LRU cache, and enforces ``same_strand_cutoff`` via :math:`O(1)` bead-index arithmetic.
+# 3. **Force-balance construction**: ``MEHPForceBalance2(u, ...)`` simplifies the full
+#    atomistic graph down to crosslinkers and strands, whereas ``get_force_balance2(es, ...)``
+#    builds directly from :class:`~pylimer_tools_cpp.CrosslinkerUniverse`.
 
 if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 
@@ -1036,22 +1050,41 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
     plt.show()
 
     # Figure 3: Phase breakdown at the largest system size
-    if all(v[0] is not None for v in scaling_phase.values()):
+    if all(v[0] is not None and v[1] is not None for v in scaling_phase.values()):
         labels = {
-            "discrete": "Discrete\n(bead realization\n+ sampling)",
+            "discrete": "Discrete",
             "on_demand": "On-Demand",
             "analytical": "Analytical",
         }
         fig, ax_ph = plt.subplots(figsize=(7, 4.5))
         names = list(labels)
+        x_labels = [labels[m] for m in names]
+        univ = [
+            float(scaling_phase[m][2][-1]) if scaling_phase[m][2] is not None else 0.0
+            for m in names
+        ]
         samp = [float(scaling_phase[m][0][-1]) for m in names]
         build = [float(scaling_phase[m][1][-1]) for m in names]
-        ax_ph.bar([labels[m] for m in names], samp,
-                  color="#7570b3", label="Sampling")
+        samp_bottom = univ
+        build_bottom = [u + s for u, s in zip(univ, samp)]
+        if any(u > 0.0 for u in univ):
+            ax_ph.bar(
+                x_labels,
+                univ,
+                color="#d95f02",
+                label="Universe realization (get_universe)",
+            )
         ax_ph.bar(
-            [labels[m] for m in names],
+            x_labels,
+            samp,
+            bottom=samp_bottom,
+            color="#7570b3",
+            label="Sampling",
+        )
+        ax_ph.bar(
+            x_labels,
             build,
-            bottom=samp,
+            bottom=build_bottom,
             color="#e7298a",
             label="Force-balance construction",
         )
@@ -1653,8 +1686,9 @@ if __name__ == "__main__" or "sphinx_gallery" in sys.modules:
 #      - Low: :math:`O(N_{\text{strands}})` (stores only 6 floats + seed per strand).
 #      - Low: :math:`O(N_{\text{xlinks}} + N_{\text{strands}})`.
 #    * - **Execution Speed**
-#      - Moderate: requires placing every bead and building 3D neighbor cell lists; cost grows with
-#        :math:`N_{\text{atoms}}`.
+#      - Moderate: pays ``get_universe()`` realization, atom-level neighbor-list binning,
+#        :math:`O(N_{\text{atoms}})` strand labeling for ``same_strand_cutoff``, and atomistic graph
+#        simplification during force-balance setup (see the 3-phase breakdown figure).
 #      - Fastest for large systems: periodic bounding-box culling (>99% pairs culled), beads regenerated on demand.
 #      - Fast for small systems, but can become the slowest option for large systems, as each candidate
 #        pair requires evaluating conditional distributions. See the runtime plot above.

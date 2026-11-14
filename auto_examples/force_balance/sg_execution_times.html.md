@@ -2,7 +2,7 @@
 
 # Computation times
 
-**00:08.493** total execution time for 10 files **from auto_examples/force_balance**:
+**00:07.453** total execution time for 10 files **from auto_examples/force_balance**:
 
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -20,7 +20,7 @@ $(document).ready( function () {
 | Example                                                                                                                                                                                                 | Time      |   Mem (MB) |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|------------|
 | [MEHP Force Relaxation](plot_force_relaxation.html.md#sphx-glr-auto-examples-force-balance-plot-force-relaxation-py) (`plot_force_relaxation.py`)                                         | 00:02.929 |          0 |
-| [Entanglement Sampling Methods](plot_entanglement_sampling_comparison.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`plot_entanglement_sampling_comparison.py`) | 00:02.381 |          0 |
+| [Entanglement Sampling Methods](plot_entanglement_sampling_comparison.html.md#sphx-glr-auto-examples-force-balance-plot-entanglement-sampling-comparison-py) (`plot_entanglement_sampling_comparison.py`) | 00:01.341 |          0 |
 | [Sampling Cut-Off Effect](plot_sampling_cutoff_effect.html.md#sphx-glr-auto-examples-force-balance-plot-sampling-cutoff-effect-py) (`plot_sampling_cutoff_effect.py`)                           | 00:00.642 |          0 |
 | [Inactive Removal & Sampling](plot_inactive_removal_and_sampling.html.md#sphx-glr-auto-examples-force-balance-plot-inactive-removal-and-sampling-py) (`plot_inactive_removal_and_sampling.py`)         | 00:00.609 |          0 |
 | [Force Balance 2](plot_force_balance_2.html.md#sphx-glr-auto-examples-force-balance-plot-force-balance-2-py) (`plot_force_balance_2.py`)                                                 | 00:00.390 |          0 |
