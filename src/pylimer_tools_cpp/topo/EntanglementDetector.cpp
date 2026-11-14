@@ -711,17 +711,19 @@ namespace {
     }
   }
 
+  /**
+   * @brief Bead-budgeted LRU cache for regenerated strand coordinates.
+   */
   class StrandCache
   {
   public:
-    explicit StrandCache(size_t capacity = 4096)
-      : capacity_(std::max<size_t>(1, capacity))
+    explicit StrandCache(const size_t maxBeads = 250000)
+      : maxBeads_(std::max<size_t>(1, maxBeads))
     {
-      indexMap_.reserve(capacity_);
     }
 
     template<typename Generator>
-    const Eigen::VectorXd& get(size_t strandIdx, Generator&& gen)
+    const Eigen::VectorXd& get(const size_t strandIdx, Generator&& gen)
     {
       const auto it = indexMap_.find(strandIdx);
       if (it != indexMap_.end()) {
@@ -731,10 +733,13 @@ namespace {
         return entries_.front().coords;
       }
       Eigen::VectorXd coords = gen();
-      if (entries_.size() >= capacity_) {
+      const size_t nBeads = static_cast<size_t>(coords.size() / 3);
+      while (cachedBeads_ + nBeads > maxBeads_ && !entries_.empty()) {
+        cachedBeads_ -= static_cast<size_t>(entries_.back().coords.size() / 3);
         indexMap_.erase(entries_.back().strandIdx);
         entries_.pop_back();
       }
+      cachedBeads_ += nBeads;
       entries_.push_front(Entry{ strandIdx, std::move(coords) });
       indexMap_[strandIdx] = entries_.begin();
       return entries_.front().coords;
@@ -746,9 +751,117 @@ namespace {
       size_t strandIdx;
       Eigen::VectorXd coords;
     };
-    size_t capacity_;
+    size_t maxBeads_;
+    size_t cachedBeads_ = 0;
     std::list<Entry> entries_;
     std::unordered_map<size_t, std::list<Entry>::iterator> indexMap_;
+  };
+
+  /**
+   * @brief Periodic 3D spatial grid storing strand indices in all cells
+   *        overlapped by each strand's padded AABB.
+   *
+   * Eliminates global max-radius sensitivity and small-box 1x1x1 bucket
+   * collapse: a point query only inspects the single cell containing the point.
+   */
+  class StrandSpatialGrid
+  {
+  public:
+    StrandSpatialGrid(const pylimer_tools::entities::Box& box,
+                      const double targetCellSize,
+                      const size_t nStrands)
+      : boxLow_(box.getLowX(), box.getLowY(), box.getLowZ())
+      , boxL_(box.getL())
+    {
+      const double safeCellSize = std::max(1e-3, targetCellSize);
+      for (int d = 0; d < 3; ++d) {
+        nCells_[d] = std::max<size_t>(
+          1, static_cast<size_t>(std::floor(boxL_[d] / safeCellSize)));
+      }
+      const size_t totalCells = nCells_[0] * nCells_[1] * nCells_[2];
+      const size_t maxCells = std::max<size_t>(4096, 8 * nStrands);
+      if (totalCells > maxCells) {
+        const double scale = std::cbrt(static_cast<double>(totalCells) /
+                                       static_cast<double>(maxCells));
+        for (int d = 0; d < 3; ++d) {
+          nCells_[d] =
+            std::max<size_t>(1,
+                             static_cast<size_t>(std::floor(
+                               static_cast<double>(nCells_[d]) / scale)));
+        }
+      }
+      for (int d = 0; d < 3; ++d) {
+        cellWidth_[d] = boxL_[d] / static_cast<double>(nCells_[d]);
+      }
+      cells_.resize(nCells_[0] * nCells_[1] * nCells_[2]);
+    }
+
+    void insertAABB(const size_t strandIdx,
+                    const Eigen::Vector3d& center,
+                    const Eigen::Vector3d& halfExtents,
+                    const double pad)
+    {
+      const Eigen::Vector3d effHalf = halfExtents.array() + pad + 1e-6;
+      long int lo[3];
+      long int hi[3];
+      for (int d = 0; d < 3; ++d) {
+        const double minRel = center[d] - effHalf[d] - boxLow_[d];
+        const double maxRel = center[d] + effHalf[d] - boxLow_[d];
+        lo[d] = static_cast<long int>(std::floor(minRel / cellWidth_[d]));
+        hi[d] = static_cast<long int>(std::floor(maxRel / cellWidth_[d]));
+        if (static_cast<size_t>(hi[d] - lo[d] + 1) >= nCells_[d]) {
+          lo[d] = 0;
+          hi[d] = static_cast<long int>(nCells_[d]) - 1;
+        }
+      }
+      for (long int ix = lo[0]; ix <= hi[0]; ++ix) {
+        const size_t wx = wrapIndex(ix, nCells_[0]);
+        for (long int iy = lo[1]; iy <= hi[1]; ++iy) {
+          const size_t wy = wrapIndex(iy, nCells_[1]);
+          for (long int iz = lo[2]; iz <= hi[2]; ++iz) {
+            const size_t wz = wrapIndex(iz, nCells_[2]);
+            cells_[flatIndex(wx, wy, wz)].push_back(strandIdx);
+          }
+        }
+      }
+    }
+
+    size_t cellIndexForPoint(const Eigen::Vector3d& pt) const
+    {
+      size_t idx[3];
+      for (int d = 0; d < 3; ++d) {
+        const long int raw = static_cast<long int>(
+          std::floor((pt[d] - boxLow_[d]) / cellWidth_[d]));
+        idx[d] = wrapIndex(raw, nCells_[d]);
+      }
+      return flatIndex(idx[0], idx[1], idx[2]);
+    }
+
+    const std::vector<size_t>& queryPoint(const Eigen::Vector3d& pt) const
+    {
+      return cells_[cellIndexForPoint(pt)];
+    }
+
+    size_t numCells() const { return cells_.size(); }
+
+  private:
+    static size_t wrapIndex(const long int idx, const size_t n)
+    {
+      const long int m = static_cast<long int>(n);
+      const long int r = idx % m;
+      return static_cast<size_t>(r < 0 ? r + m : r);
+    }
+
+    size_t flatIndex(const size_t x, const size_t y, const size_t z) const
+    {
+      return (x * nCells_[1] + y) * nCells_[2] + z;
+    }
+
+    Eigen::Vector3d boxLow_;
+    Eigen::Vector3d boxL_;
+    size_t nCells_[3] = { 1, 1, 1 };
+    double cellWidth_[3] = { 1.0, 1.0, 1.0 };
+    std::vector<std::vector<size_t>> cells_;
   };
 
   struct PinnedPoint
@@ -1056,7 +1169,6 @@ randomlyFindEntanglementsAnalytical(
 
   std::vector<StrandModel> strands(nStrands);
   std::vector<size_t> strandInternalOffset(nStrands + 1, 0);
-  double maxStrandReach = 0.0;
 
   for (size_t s = 0; s < nStrands; ++s) {
     StrandModel& sm = strands[s];
@@ -1122,12 +1234,6 @@ randomlyFindEntanglementsAnalytical(
 
     strandInternalOffset[s + 1] =
       strandInternalOffset[s] + static_cast<size_t>(sm.nInternalBeads);
-    if (sm.nInternalBeads > 0) {
-      const double reach = sm.halfChordLen + 4.5 * sm.maxSigma;
-      if (reach > maxStrandReach) {
-        maxStrandReach = reach;
-      }
-    }
   }
 
   const size_t totalInternalBeads = strandInternalOffset[nStrands];
@@ -1135,14 +1241,39 @@ randomlyFindEntanglementsAnalytical(
     return result;
   }
 
-  // Build spatial grid over strand midpoints
-  Eigen::VectorXd strandMidpointCoords(3 * nStrands);
+  // Build spatial grid over strand bounding spheres using median reach for cell
+  // sizing
+  std::vector<double> activeReaches;
+  activeReaches.reserve(nStrands);
   for (size_t s = 0; s < nStrands; ++s) {
-    strandMidpointCoords.segment<3>(3 * s) = strands[s].midpoint;
+    const StrandModel& sm = strands[s];
+    if (sm.nInternalBeads <= 0 ||
+        (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT &&
+         sm.isIgnored)) {
+      continue;
+    }
+    activeReaches.push_back(sm.halfChordLen + 4.5 * sm.maxSigma);
   }
-  const double searchCutoff = maxStrandReach + upperCutoff;
-  const pylimer_tools::entities::EigenNeighbourList strandNeighbourList(
-    strandMidpointCoords, box, searchCutoff);
+  double medianReach = 0.0;
+  if (!activeReaches.empty()) {
+    const size_t midIdx = activeReaches.size() / 2;
+    std::nth_element(activeReaches.begin(),
+                     activeReaches.begin() + midIdx,
+                     activeReaches.end());
+    medianReach = activeReaches[midIdx];
+  }
+  StrandSpatialGrid strandGrid(box, 2.0 * medianReach + upperCutoff, nStrands);
+  for (size_t s = 0; s < nStrands; ++s) {
+    const StrandModel& sm = strands[s];
+    if (sm.nInternalBeads <= 0 ||
+        (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT &&
+         sm.isIgnored)) {
+      continue;
+    }
+    const double reach = sm.halfChordLen + 4.5 * sm.maxSigma;
+    strandGrid.insertAABB(
+      s, sm.midpoint, Eigen::Vector3d::Constant(reach), upperCutoff);
+  }
 
   struct BeadRef
   {
@@ -1202,7 +1333,6 @@ randomlyFindEntanglementsAnalytical(
   };
   std::vector<CandidatePartner> partners;
   partners.reserve(64);
-  Eigen::ArrayXi nearbyStrands = Eigen::ArrayXi::Zero(32);
 
   std::normal_distribution<double> stdNormal(0.0, 1.0);
   std::uniform_real_distribution<double> uniform01(0.0, 1.0);
@@ -1254,15 +1384,13 @@ randomlyFindEntanglementsAnalytical(
       // 2. Query nearby strands around r1
       Eigen::Vector3d r1Wrapped = r1;
       box.handlePBC(r1Wrapped);
-      const size_t nNearbyStrands =
-        strandNeighbourList.getIndicesCloseToCoordinates(
-          nearbyStrands, r1Wrapped, searchCutoff, true);
+      const std::vector<size_t>& nearbyStrands =
+        strandGrid.queryPoint(r1Wrapped);
 
       partners.clear();
       double survivalProb = 1.0;
 
-      for (size_t nsIdx = 0; nsIdx < nNearbyStrands; ++nsIdx) {
-        const size_t s2 = static_cast<size_t>(nearbyStrands[nsIdx]);
+      for (const size_t s2 : nearbyStrands) {
         const StrandModel& sm2 = strands[s2];
         if (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT &&
             sm2.isIgnored) {
@@ -1521,7 +1649,6 @@ randomlyFindEntanglementsOnDemand(
   }
 
   std::vector<StrandBoundingBox> bboxes(nStrands);
-  double maxRadius = 0.0;
   std::vector<size_t> strandInternalOffset(nStrands + 1, 0);
 
   for (size_t s = 0; s < nStrands; ++s) {
@@ -1563,9 +1690,6 @@ randomlyFindEntanglementsOnDemand(
     bboxes[s].center = unwrappedCenter;
     box.handlePBC(bboxes[s].center);
     bboxes[s].radius = bboxes[s].halfExtents.norm();
-    if (bboxes[s].radius > maxRadius) {
-      maxRadius = bboxes[s].radius;
-    }
   }
 
   const size_t totalInternalBeads = strandInternalOffset[nStrands];
@@ -1573,19 +1697,49 @@ randomlyFindEntanglementsOnDemand(
     return result;
   }
 
-  Eigen::VectorXd strandCenters(3 * nStrands);
+  // Build spatial grid over strand AABBs using median radius for cell sizing
+  std::vector<double> activeRadii;
+  activeRadii.reserve(nStrands);
   for (size_t s = 0; s < nStrands; ++s) {
-    strandCenters.segment<3>(3 * s) = bboxes[s].center;
+    if (bboxes[s].nBeads <= 0 ||
+        (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT &&
+         bboxes[s].isIgnored)) {
+      continue;
+    }
+    activeRadii.push_back(bboxes[s].radius);
   }
-  const double searchCutoff = maxRadius + upperCutoff;
-  const pylimer_tools::entities::EigenNeighbourList strandNeighbourList(
-    strandCenters, box, searchCutoff);
+  double medianRadius = 0.0;
+  if (!activeRadii.empty()) {
+    const size_t midIdx = activeRadii.size() / 2;
+    std::nth_element(
+      activeRadii.begin(), activeRadii.begin() + midIdx, activeRadii.end());
+    medianRadius = activeRadii[midIdx];
+  }
+  StrandSpatialGrid strandGrid(box, 2.0 * medianRadius + upperCutoff, nStrands);
+  std::vector<std::vector<size_t>> strandsInCell(strandGrid.numCells());
+  for (size_t s = 0; s < nStrands; ++s) {
+    if (bboxes[s].nBeads <= 0 ||
+        (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT &&
+         bboxes[s].isIgnored)) {
+      continue;
+    }
+    strandGrid.insertAABB(
+      s, bboxes[s].center, bboxes[s].halfExtents, upperCutoff);
+    strandsInCell[strandGrid.cellIndexForPoint(bboxes[s].center)].push_back(s);
+  }
+  std::vector<size_t> nonEmptyCells;
+  nonEmptyCells.reserve(strandsInCell.size());
+  for (size_t c = 0; c < strandsInCell.size(); ++c) {
+    if (!strandsInCell[c].empty()) {
+      nonEmptyCells.push_back(c);
+    }
+  }
 
   std::vector<uint8_t> beadIsPaired(totalInternalBeads, 0);
-  std::vector<size_t> candidateOrder(totalInternalBeads);
-  std::iota(candidateOrder.begin(), candidateOrder.end(), 0);
+  std::vector<size_t> candidateOrder;
+  candidateOrder.reserve(totalInternalBeads);
 
-  StrandCache cache(4096);
+  StrandCache cache(250000);
 
   std::vector<Eigen::Vector3d> sampledPos1;
   std::vector<Eigen::Vector3d> sampledPos2;
@@ -1599,8 +1753,6 @@ randomlyFindEntanglementsOnDemand(
   sampledPos1.reserve(nrOfEntanglementsToSample);
   sampledPos2.reserve(nrOfEntanglementsToSample);
   sampledMidpoints.reserve(nrOfEntanglementsToSample);
-
-  Eigen::ArrayXi nearbyStrands = Eigen::ArrayXi::Zero(32);
 
   struct PartnerCandidate
   {
@@ -1617,7 +1769,26 @@ randomlyFindEntanglementsOnDemand(
 
   do {
     numLinksFoundInIteration = 0;
-    std::ranges::shuffle(candidateOrder, masterRng);
+    // Shuffle cell visit order, then shuffle beads within each cell so that
+    // nearby strands remain hot in the bead-budgeted LRU cache.
+    std::ranges::shuffle(nonEmptyCells, masterRng);
+    candidateOrder.clear();
+    for (const size_t c : nonEmptyCells) {
+      const size_t cellStart = candidateOrder.size();
+      for (const size_t s : strandsInCell[c]) {
+        const size_t startG = strandInternalOffset[s];
+        const size_t endG = strandInternalOffset[s + 1];
+        for (size_t g = startG; g < endG; ++g) {
+          if (!beadIsPaired[g]) {
+            candidateOrder.push_back(g);
+          }
+        }
+      }
+      std::shuffle(candidateOrder.begin() +
+                     static_cast<std::ptrdiff_t>(cellStart),
+                   candidateOrder.end(),
+                   masterRng);
+    }
 
     for (const size_t g1 : candidateOrder) {
       if (beadIsPaired[g1]) {
@@ -1671,11 +1842,10 @@ randomlyFindEntanglementsOnDemand(
       }
 
       // 2. Different-strand candidate beads
-      const size_t nNearby = strandNeighbourList.getIndicesCloseToCoordinates(
-        nearbyStrands, r1Wrapped, searchCutoff, true);
+      const std::vector<size_t>& nearbyStrands =
+        strandGrid.queryPoint(r1Wrapped);
 
-      for (size_t nsIdx = 0; nsIdx < nNearby; ++nsIdx) {
-        const size_t s2 = static_cast<size_t>(nearbyStrands[nsIdx]);
+      for (const size_t s2 : nearbyStrands) {
         if (s2 == s1 ||
             (filteringMode == EntanglementFilteringMode::PRUNE_UPFRONT &&
              bboxes[s2].isIgnored) ||

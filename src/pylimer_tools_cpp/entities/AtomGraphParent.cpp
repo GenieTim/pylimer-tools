@@ -592,8 +592,7 @@ AtomGraphParent::getVertexCoordinates() const
 }
 
 Eigen::VectorXd
-AtomGraphParent::getVertexCoordinates(
-  const igraph_vector_int_t& vertices) const
+AtomGraphParent::getVertexCoordinates(const igraph_vector_int_t& vertices) const
 {
   return this->getVertexCoordinates(igraph_vss_vector(&vertices));
 }
