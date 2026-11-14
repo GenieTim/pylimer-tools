@@ -1,6 +1,6 @@
 # Changelog
 
-## main
+## v0.5.0
 
 ### OpenMP Parallelization, Thread-Safety & Build Optimizations
 - **OpenMP Configuration & macOS `libomp` Discovery (`vendor/openmp.CMakeLists.cmake`, `setup.py`)**:
