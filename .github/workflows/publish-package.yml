@@ -45,7 +45,7 @@ jobs:
             ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
       - name: Install Dependencies
-        run: pip install -r requirements.txt
+        run: pip install pybind11 scikit-build cmake setuptools wheel build
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v3
@@ -112,7 +112,7 @@ jobs:
             ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
       - name: Install Dependencies
-        run: pip install -r requirements.txt
+        run: pip install pybind11 scikit-build cmake ninja setuptools wheel build
 
       - name: Install additional dependencies
         run: brew install bison flex libomp
@@ -216,9 +216,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-3.12-
 
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
-
       - name: Install cibuildwheel
         run: pip install cibuildwheel
 
@@ -258,7 +255,7 @@ jobs:
           python-version: "3.10"
 
       - name: Install Dependencies
-        run: pip install -r requirements.txt
+        run: pip install pybind11 scikit-build cmake ninja setuptools wheel build
 
       - name: Ensure version file exists
         run: python bin/get_version.py --ensure-file
