@@ -4,7 +4,7 @@
 
 Bases: `pybind11_object`
 
-A struct to store analytically sampled entanglements on strands (without requiring an explicit Universe of all beads).
+A struct to store sampled entanglements on strands (without requiring an explicit Universe of all beads).
 
 Get an instance of this struct
 

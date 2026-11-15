@@ -7,8 +7,8 @@ Overloaded function.
 1. randomly_sample_entanglements_on_demand(box: pylimer_tools_cpp.Box, crosslinker_universe: pylimer_tools_cpp.CrosslinkerUniverse, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = ‘’, filtering_mode: pylimer_tools_cpp.EntanglementFilteringMode = EntanglementFilteringMode.OMIT_INACTIVE, n_mc_steps: typing.SupportsInt | typing.SupportsIndex = 0) -> pylimer_tools_cpp.StrandPairEntanglements
    > Sample pairs of strand beads that could form entanglements on demand from a CrosslinkerUniverse
    > using per-strand bounding boxes and on-demand Brownian bridge bead resampling.
-   > Only strand seeds and bounding boxes are stored, achieving the O(N_strands) memory scaling
-   > of the analytical method while sampling from the exact discrete multi-bead chain conformations.
+   > Only strand seeds and bounding boxes are stored, achieving O(N_strands) memory scaling
+   > while sampling from the exact discrete multi-bead chain conformations.
    > * **param box:**
    >   The simulation box for periodic boundary conditions.
    > * **param crosslinker_universe:**

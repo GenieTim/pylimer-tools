@@ -203,16 +203,16 @@
 - [Dissipative Particle Dynamics (DPD) Simulations](auto_examples/dpd_simulations/index.html.md): pylimer-tools provides a powerful framework for simulating coarse-grained polymer systems using Diss...
 - [NOTE](auto_examples/dpd_simulations/plot_dpd_simulation.html.md): Go to the end
 - [Force Balance, Maximum Entropy Homogenization Procedures](auto_examples/force_balance/index.html.md): pylimer-tools provides three implementations of the Force Balance &#91;BG25&#93;, Maximum Entropy Homogeniza...
-- [NOTE](auto_examples/force_balance/plot_fb_deformation_exp.html.md): Go to the end
-- [NOTE](auto_examples/force_balance/plot_force_balance.html.md): Go to the end
-- [NOTE](auto_examples/force_balance/plot_force_balance_2.html.md): Go to the end
-- [NOTE](auto_examples/force_balance/plot_force_relaxation.html.md): Go to the end
-- [NOTE](auto_examples/force_balance/plot_entanglement_link_vs_spring.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_slipping_vs_fixed_links.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_entanglement_link_vs_spring.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_polydispersity_study.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_sampling_cutoff_effect.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_inactive_removal_and_sampling.html.md): Go to the end
 - [NOTE](auto_examples/force_balance/plot_entanglement_sampling_comparison.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_fb_deformation_exp.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_force_balance.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_force_balance_2.html.md): Go to the end
+- [NOTE](auto_examples/force_balance/plot_force_relaxation.html.md): Go to the end
 - [Network Generation](auto_examples/network_generator/index.html.md): pylimer-tools includes a powerful Monte Carlo-based network generator for creating realistic polymer...
 - [NOTE](auto_examples/network_generator/plot_save_network.html.md): Go to the end
 - [NOTE](auto_examples/network_generator/plot_polydisperse_system.html.md): Go to the end
@@ -259,8 +259,7 @@
 - [do_random_walk_chain_from_to_mc](api/pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html.md): Do a random walk from one point to another.
 - [inverse_langevin](api/pylimer_tools_cpp.inverse_langevin.html.md): A somewhat accurate (for $x &#92;in (-1, 1)$) implementation of the inverse Langevin function.
 - [peel_topological_leaves](api/pylimer_tools_cpp.peel_topological_leaves.html.md): Peel 1-core dangling trees and subgraphs iteratively from the CrosslinkerUniverse topology.
-- [randomly_sample_entanglements](api/pylimer_tools_cpp.randomly_sample_entanglements.html.md): Randomly find pairs of atoms that are close together and could be entanglements.
-- [randomly_sample_entanglements_analytical](api/pylimer_tools_cpp.randomly_sample_entanglements_analytical.html.md): Overloaded function.
+- [randomly_sample_entanglements](api/pylimer_tools_cpp.randomly_sample_entanglements.html.md): Overloaded function.
 - [randomly_sample_entanglements_on_demand](api/pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html.md): Overloaded function.
 - [randomly_sample_entanglements_v2](api/pylimer_tools_cpp.randomly_sample_entanglements_v2.html.md): Alias for randomly_sample_entanglements (v2 has been unified into standard method).
 - [sample_strand_beads_on_demand](api/pylimer_tools_cpp.sample_strand_beads_on_demand.html.md): Deterministically realize the internal bead coordinates of a single strand
@@ -282,7 +281,6 @@
 - [DumpFileReader](api/pylimer_tools_cpp.DumpFileReader.html.md): Bases: &#96;pybind11_object&#96;
 - [EndToEndStats](api/pylimer_tools_cpp.EndToEndStats.html.md): Bases: &#96;pybind11_object&#96;
 - [EntanglementFilteringMode](api/pylimer_tools_cpp.EntanglementFilteringMode.html.md): Bases: &#96;IntEnum&#96;
-- [EntanglementSamplingMethod](api/pylimer_tools_cpp.EntanglementSamplingMethod.html.md): Bases: &#96;Enum&#96;
 - [ExitReason](api/pylimer_tools_cpp.ExitReason.html.md): Bases: &#96;IntEnum&#96;
 - [LazyUniverseSequenceIterator](api/pylimer_tools_cpp.LazyUniverseSequenceIterator.html.md): Bases: &#96;pybind11_object&#96;
 - [LinearMaxDistanceProvider](api/pylimer_tools_cpp.LinearMaxDistanceProvider.html.md): Bases: &#96;MaxDistanceProvider&#96;
@@ -322,12 +320,12 @@
 - [STOP](api/pylimer_tools_cpp.STOP.html.md): Stop the linking process
 - [TRACK_BACKWARD](api/pylimer_tools_cpp.TRACK_BACKWARD.html.md): Track backward in the linking process
 - [TRACK_FORWARD](api/pylimer_tools_cpp.TRACK_FORWARD.html.md): Continue linking forward
-- [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.279&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
-- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;00:09.069&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
-- [Computation times](auto_examples/network_generator/sg_execution_times.html.md): &#42;&#42;01:00.121&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
-- [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:10.988&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
-- [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:17.316&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
+- [Computation times](auto_examples/dpd_simulations/sg_execution_times.html.md): &#42;&#42;00:04.265&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/dpd_simulations&#42;&#42;:
+- [Computation times](auto_examples/force_balance/sg_execution_times.html.md): &#42;&#42;00:07.830&#42;&#42; total execution time for 10 files &#42;&#42;from auto_examples/force_balance&#42;&#42;:
+- [Computation times](auto_examples/network_generator/sg_execution_times.html.md): &#42;&#42;00:56.005&#42;&#42; total execution time for 9 files &#42;&#42;from auto_examples/network_generator&#42;&#42;:
+- [Computation times](auto_examples/normal_mode_analysis/sg_execution_times.html.md): &#42;&#42;00:16.016&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/normal_mode_analysis&#42;&#42;:
+- [Computation times](auto_examples/readers_writers/sg_execution_times.html.md): &#42;&#42;00:04.133&#42;&#42; total execution time for 13 files &#42;&#42;from auto_examples/readers_writers&#42;&#42;:
 - [Computation times](auto_examples/sg_execution_times.html.md): &#42;&#42;00:00.000&#42;&#42; total execution time for 0 files &#42;&#42;from auto_examples&#42;&#42;:
-- [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.384&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
-- [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;05:43.410&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
-- [Computation times](sg_execution_times.html.md): &#42;&#42;07:25.568&#42;&#42; total execution time for 39 files &#42;&#42;from all galleries&#42;&#42;:
+- [Computation times](auto_examples/structure_analysis/sg_execution_times.html.md): &#42;&#42;00:00.275&#42;&#42; total execution time for 4 files &#42;&#42;from auto_examples/structure_analysis&#42;&#42;:
+- [Computation times](auto_examples/trajectory_analysis/sg_execution_times.html.md): &#42;&#42;03:27.861&#42;&#42; total execution time for 1 file &#42;&#42;from auto_examples/trajectory_analysis&#42;&#42;:
+- [Computation times](sg_execution_times.html.md): &#42;&#42;04:56.385&#42;&#42; total execution time for 39 files &#42;&#42;from all galleries&#42;&#42;:

@@ -183,7 +183,7 @@ We configure two simulations:
 
  .. code-block:: none
 
-    Entangled final residual norm: 1.110e-08 (iterations: 198)
+    Entangled final residual norm: 1.840e-08 (iterations: 214)
 
 
 
@@ -243,9 +243,9 @@ The macroscopic shear modulus :math:`G` is computed by summing the strand-level
 
  .. code-block:: none
 
-    Shear Modulus (Entangled): 0.0632 MPa
+    Shear Modulus (Entangled): 0.0528 MPa
     Shear Modulus (Phantom)  : 0.0061 MPa
-    Directional Moduli       : Gx=0.0229, Gy=0.0128, Gz=0.0276 MPa (sum=0.0632)
+    Directional Moduli       : Gx=0.0245, Gy=0.0066, Gz=0.0217 MPa (sum=0.0528)
     Active weight fraction   : 0.539
 
 
@@ -364,7 +364,7 @@ We visualize:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.390 seconds)
+   **Total running time of the script:** (0 minutes 0.342 seconds)
 
 
 .. _sphx_glr_download_auto_examples_force_balance_plot_force_balance_2.py:

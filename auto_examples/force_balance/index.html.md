@@ -13,25 +13,54 @@ Here, we distinguish the following three different implementations:
 
 ## Sampling Entanglements
 
-Entanglements can be sampled in three ways:
+Entanglements can be sampled in two ways:
 
-1. **Discrete full-universe sampling**: Directly on explicit bead coordinates in a [`Universe`](../../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe).
-2. **On-demand bounding-box sampling**: Computes per-strand bounding boxes and regenerates candidate strand beads on demand, matching discrete bead-level fidelity with ~80–95% lower peak memory.
-3. **Analytical Brownian-bridge sampling**: Directly on the crosslinkers and strand connectivity of a [`CrosslinkerUniverse`](../../api/pylimer_tools_cpp.CrosslinkerUniverse.html.md#pylimer_tools_cpp.CrosslinkerUniverse) without instantiating intermediate strand beads, reducing peak memory by ~80–95%.
+1. **On-demand bounding-box sampling** (default): Computes per-strand bounding boxes and regenerates candidate strand beads on demand, matching discrete bead-level fidelity with ~80–95% lower peak memory.
+2. **Discrete full-universe sampling**: Directly on explicit bead coordinates in a [`Universe`](../../api/pylimer_tools_cpp.Universe.html.md#pylimer_tools_cpp.Universe).
 
-All three methods support [`EntanglementFilteringMode`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode) for topological leaf peeling of dangling and soluble fractions.
+Both methods support [`EntanglementFilteringMode`](../../api/pylimer_tools_cpp.EntanglementFilteringMode.html.md#pylimer_tools_cpp.EntanglementFilteringMode) for topological leaf peeling of dangling and soluble fractions.
 
 See:
 
-- [Entanglement Sampling Methods](plot_entanglement_sampling_comparison.html.md) for a detailed benchmark and comparison of discrete vs. analytical sampling methods,
+- [Entanglement Sampling Methods](plot_entanglement_sampling_comparison.html.md) for a detailed benchmark and comparison of discrete vs. on-demand sampling methods,
 - [Entanglement Links vs. Springs](plot_entanglement_link_vs_spring.html.md) for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,
-- [Slipping vs. Fixed Links](plot_slipping_vs_fixed_links.html.md) for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
+- [Slipping vs. Fixed Entanglement Links](plot_slipping_vs_fixed_links.html.md) for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
 - [Inactive Removal & Sampling](plot_inactive_removal_and_sampling.html.md) for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling,
 - [Polydispersity Study](plot_polydispersity_study.html.md) for the effect of precursor strand length polydispersity on equilibrium shear modulus and defect fractions, and
 - [Sampling Cut-Off Effect](plot_sampling_cutoff_effect.html.md) for the effect of the slip-link sampling cut-off distance on the equilibrium shear modulus in Force Balance 2, investigating pre-strain distortions, link vs. spring representations, and interactions with strand length $N$, conversion $p$, and stoichiometric imbalance $r$.
 
 <div id='sg-tag-list' class='sphx-glr-tag-list'></div><div class="sphx-glr-thumbnails">
-<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPForceBalance2 class in a deformation experiment.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_fb_deformation_exp_thumb.png)
+<!-- thumbnail-parent-div-open --><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance (gusev_numerical_2019, bernhard_phantom_2025), entanglement links can either remain frozen at their initial contour positions (\`\`disable_slipping=True\`\`) or slide dynamically along the polymer strands to balance contour tension (\`\`disable_slipping=False\`\`).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png)
+
+[Slipping vs. Fixed Entanglement Links](plot_slipping_vs_fixed_links.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Slipping vs. Fixed Entanglement Links</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In MEHPForceBalance2 (gusev_numerical_2019, bernhard_phantom_2025), users can choose between two representations for sampled entanglements via entanglements_as_springs:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_link_vs_spring_thumb.png)
+
+[Entanglement Links vs. Springs](plot_entanglement_link_vs_spring.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Entanglement Links vs. Springs</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of precursor strand length polydispersity on the equilibrium shear modulus and topological network structure of end-linked polymer networks (tsimouri_monte_2021, bernhard_phantom_2025).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png)
+
+[Polydispersity Study](plot_polydispersity_study.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Polydispersity Study</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In MEHP Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are sampled between bead pairs within a spatial cut-off \\|\\mathbf{r}_i - \\mathbf{r}_j\\| \\le r_{\\text{cut}}.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_sampling_cutoff_effect_thumb.png)
+
+[Sampling Cut-Off Effect](plot_sampling_cutoff_effect.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Sampling Cut-Off Effect</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Networks below full conversion contain dangling chains, sol fractions, and loops. In MEHPForceBalance2, entanglements do not slip off chain ends, so two complementary controls prevent dangling arms from artificially stiffening the network:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_inactive_removal_and_sampling_thumb.png)
+
+[Inactive Removal & Sampling](plot_inactive_removal_and_sampling.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Inactive Removal & Sampling</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as localized topological constraints (entanglement links or springs).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_sampling_comparison_thumb.png)
+
+[Entanglement Sampling Methods](plot_entanglement_sampling_comparison.html.md)
+
+  <div class="sphx-glr-thumbnail-title">Entanglement Sampling Methods</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to use the MEHPForceBalance2 class in a deformation experiment.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_fb_deformation_exp_thumb.png)
 
 [Deformation Experiment](plot_fb_deformation_exp.html.md)
 
@@ -51,35 +80,5 @@ See:
 [MEHP Force Relaxation](plot_force_relaxation.html.md)
 
   <div class="sphx-glr-thumbnail-title">MEHP Force Relaxation</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements impose constraints on polymer chain fluctuations.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_link_vs_spring_thumb.png)
-
-[Entanglement Links vs. Springs](plot_entanglement_link_vs_spring.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Entanglement Links vs. Springs</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In the first-generation Maximum Entropy Homogenization Procedure (MEHP) Force Balance (~pylimer_tools_cpp.MEHPForceBalance, bernhard_phantom_2025), topological entanglements can be modeled with dynamic mobility along the polymer chain contour.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_slipping_vs_fixed_links_thumb.png)
-
-[Slipping vs. Fixed Links](plot_slipping_vs_fixed_links.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Slipping vs. Fixed Links</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we study the effect of polymer strand length polydispersity on the equilibrium shear modulus and topological network structure of end-linked polymer networks.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_polydispersity_study_thumb.png)
-
-[Polydispersity Study](plot_polydispersity_study.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Polydispersity Study</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), topological entanglements are introduced by sampling candidate pairs of chain beads that lie within a spatial proximity cut-off:">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_sampling_cutoff_effect_thumb.png)
-
-[Sampling Cut-Off Effect](plot_sampling_cutoff_effect.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Sampling Cut-Off Effect</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network modeling via the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), networks generated below or near full conversion contain significant fractions of dangling chains, sol fractions, and topological loops.">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_inactive_removal_and_sampling_thumb.png)
-
-[Inactive Removal & Sampling](plot_inactive_removal_and_sampling.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Inactive Removal & Sampling</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In polymer network elasticity simulations using the Maximum Entropy Homogenization Procedure (MEHP) and Force Balance (gusev_numerical_2019, bernhard_phantom_2025), entanglements are represented as localized topological constraints (entanglement links or springs).">![](auto_examples/force_balance/images/thumb/sphx_glr_plot_entanglement_sampling_comparison_thumb.png)
-
-[Entanglement Sampling Methods](plot_entanglement_sampling_comparison.html.md)
-
-  <div class="sphx-glr-thumbnail-title">Entanglement Sampling Methods</div>
 </div>
 <!-- thumbnail-parent-div-close --></div>

@@ -199,8 +199,7 @@
 - [do_random_walk_chain_from_to_mc](pylimer_tools_cpp.do_random_walk_chain_from_to_mc.html.md): Do a random walk from one point to another.
 - [inverse_langevin](pylimer_tools_cpp.inverse_langevin.html.md): A somewhat accurate (for $x &#92;in (-1, 1)$) implementation of the inverse Langevin function.
 - [peel_topological_leaves](pylimer_tools_cpp.peel_topological_leaves.html.md): Peel 1-core dangling trees and subgraphs iteratively from the CrosslinkerUniverse topology.
-- [randomly_sample_entanglements](pylimer_tools_cpp.randomly_sample_entanglements.html.md): Randomly find pairs of atoms that are close together and could be entanglements.
-- [randomly_sample_entanglements_analytical](pylimer_tools_cpp.randomly_sample_entanglements_analytical.html.md): Overloaded function.
+- [randomly_sample_entanglements](pylimer_tools_cpp.randomly_sample_entanglements.html.md): Overloaded function.
 - [randomly_sample_entanglements_on_demand](pylimer_tools_cpp.randomly_sample_entanglements_on_demand.html.md): Overloaded function.
 - [randomly_sample_entanglements_v2](pylimer_tools_cpp.randomly_sample_entanglements_v2.html.md): Alias for randomly_sample_entanglements (v2 has been unified into standard method).
 - [sample_strand_beads_on_demand](pylimer_tools_cpp.sample_strand_beads_on_demand.html.md): Deterministically realize the internal bead coordinates of a single strand
@@ -222,7 +221,6 @@
 - [DumpFileReader](pylimer_tools_cpp.DumpFileReader.html.md): Bases: &#96;pybind11_object&#96;
 - [EndToEndStats](pylimer_tools_cpp.EndToEndStats.html.md): Bases: &#96;pybind11_object&#96;
 - [EntanglementFilteringMode](pylimer_tools_cpp.EntanglementFilteringMode.html.md): Bases: &#96;IntEnum&#96;
-- [EntanglementSamplingMethod](pylimer_tools_cpp.EntanglementSamplingMethod.html.md): Bases: &#96;Enum&#96;
 - [ExitReason](pylimer_tools_cpp.ExitReason.html.md): Bases: &#96;IntEnum&#96;
 - [LazyUniverseSequenceIterator](pylimer_tools_cpp.LazyUniverseSequenceIterator.html.md): Bases: &#96;pybind11_object&#96;
 - [LinearMaxDistanceProvider](pylimer_tools_cpp.LinearMaxDistanceProvider.html.md): Bases: &#96;MaxDistanceProvider&#96;
