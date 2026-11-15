@@ -1,4 +1,7 @@
 #include "../../src/pylimer_tools_cpp/calc/NormalModeAnalyzer.h"
+#ifdef USE_METAL
+#include "../../src/pylimer_tools_cpp/calc/MetalNormalModeSolver.h"
+#endif
 
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
@@ -393,6 +396,11 @@ TEST_CASE("NormalModeAnalyzer Metal GPU solver computes accurate eigenvalues "
           "and eigenvectors",
           "[analysis][NormalModeAnalyzer][Metal]")
 {
+#ifdef USE_METAL
+  if (!pc::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
+#endif
   // Test 1: Simple 3-bead ring
   {
     pc::NormalModeAnalyzer nmaCPU({ 0, 1, 2 }, { 1, 2, 0 });
@@ -449,6 +457,11 @@ TEST_CASE("NormalModeAnalyzer Metal GPU solver computes accurate eigenvalues "
 TEST_CASE("NormalModeAnalyzer Metal KPM computes accurate Chebyshev moments",
           "[analysis][NormalModeAnalyzer][Metal][KPM]")
 {
+#ifdef USE_METAL
+  if (!pc::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
+#endif
   std::vector<size_t> springFrom;
   std::vector<size_t> springTo;
   size_t n = 100;
@@ -502,6 +515,11 @@ TEST_CASE("NormalModeAnalyzer Metal KPM computes accurate Chebyshev moments",
 TEST_CASE("NormalModeAnalyzer Metal vs CPU KPM benchmark",
           "[!benchmark][NormalModeAnalyzer][Metal]")
 {
+#ifdef USE_METAL
+  if (!pc::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
+#endif
   std::vector<size_t> springFrom;
   std::vector<size_t> springTo;
   size_t n = 2000;

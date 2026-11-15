@@ -2738,6 +2738,13 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple melt systems",
          pcm::SLESolver::METAL_CG,
 #endif
        }) {
+#ifdef USE_METAL
+    if ((solver == pcm::SLESolver::METAL_BARZILAI_BORWEIN ||
+         solver == pcm::SLESolver::METAL_CG) &&
+        !pcm::isMetalAvailable()) {
+      continue;
+    }
+#endif
     INFO("Testing solver: " << solver << " ("
                             << pcm::SLESolverNames[static_cast<int>(solver)]
                             << ")");
@@ -2819,6 +2826,13 @@ TEST_CASE("All MEHPForceBalance2 solvers solve simple network systems",
          pcm::SLESolver::METAL_CG,
 #endif
        }) {
+#ifdef USE_METAL
+    if ((solver == pcm::SLESolver::METAL_BARZILAI_BORWEIN ||
+         solver == pcm::SLESolver::METAL_CG) &&
+        !pcm::isMetalAvailable()) {
+      continue;
+    }
+#endif
     INFO("Testing solver: " << solver);
     pcm::MEHPForceBalance2 forceBalancer =
       pcm::MEHPForceBalance2(universe, 2, false);
@@ -3021,6 +3035,9 @@ TEST_CASE("All MEHP compute correct dangling and soluble fractions",
 TEST_CASE("MEHPForceBalance2 Metal SLE Solvers Accuracy and Benchmark",
           "[MEHPForceBalance2][Metal]")
 {
+  if (!pcm::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
   std::cout << "Running test \"MEHPForceBalance2 Metal SLE Solvers Accuracy "
                "and Benchmark\""
             << std::endl;
@@ -3141,6 +3158,9 @@ TEST_CASE("MEHPForceBalance2 Metal SLE Solvers Accuracy and Benchmark",
 TEST_CASE("MEHPForceBalance2 Metal vs CPU Network Relaxation Benchmark",
           "[!benchmark][MEHPForceBalance2][Metal]")
 {
+  if (!pcm::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
   size_t nrOfBeads = 80;
   size_t nrOfChains = 25;
   pe::Universe universe = pe::Universe(20.0, 20.0, 20.0);
@@ -3215,6 +3235,9 @@ TEST_CASE("MEHPForceBalance2 Metal vs CPU Network Relaxation Benchmark",
 TEST_CASE("MEHPForceBalance2 Metal Buffer Pooling and Reallocation",
           "[MEHPForceBalance2][Metal]")
 {
+  if (!pcm::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
   std::cout << "Running test \"MEHPForceBalance2 Metal Buffer Pooling and "
                "Reallocation\""
             << std::endl;
@@ -3286,6 +3309,9 @@ TEST_CASE("MEHPForceBalance2 Metal Buffer Pooling and Reallocation",
 TEST_CASE("MEHPForceBalance2 Metal Center-of-Mass Zero-Mode Projection",
           "[MEHPForceBalance2][Metal]")
 {
+  if (!pcm::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
   std::cout << "Running test \"MEHPForceBalance2 Metal Center-of-Mass "
                "Zero-Mode Projection\""
             << std::endl;
@@ -3420,6 +3446,9 @@ TEST_CASE("MEHPForceBalance2 Metal Center-of-Mass Zero-Mode Projection",
 TEST_CASE("MEHPForceBalance2 Metal SIMDgroup-Cooperative SpMV Degree Variation",
           "[MEHPForceBalance2][Metal]")
 {
+  if (!pcm::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
   std::cout << "Running test \"MEHPForceBalance2 Metal SIMDgroup-Cooperative "
                "SpMV Degree Variation\""
             << std::endl;
@@ -3475,6 +3504,9 @@ TEST_CASE(
   "MEHPForceBalance2 Metal Multi-RHS 3D Block-SpMV Accuracy and Benchmark",
   "[MEHPForceBalance2][Metal]")
 {
+  if (!pcm::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
   std::cout << "Running test \"MEHPForceBalance2 Metal Multi-RHS 3D Block-SpMV "
                "Accuracy and Benchmark\""
             << std::endl;
@@ -3662,6 +3694,9 @@ TEST_CASE(
   "MEHPForceBalance2 Metal GPU-Resident Jacobi Preconditioner Convergence",
   "[MEHPForceBalance2][Metal]")
 {
+  if (!pcm::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
   std::cout << "Running test \"MEHPForceBalance2 Metal GPU-Resident Jacobi "
                "Preconditioner Convergence\""
             << std::endl;
@@ -3786,6 +3821,9 @@ TEST_CASE(
 TEST_CASE("MEHPForceBalance2 Metal End-to-End GPU Relaxation",
           "[MEHPForceBalance2][Metal]")
 {
+  if (!pcm::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
   std::cout << "Running test \"MEHPForceBalance2 Metal End-to-End GPU "
                "Relaxation\""
             << std::endl;
@@ -4066,6 +4104,9 @@ TEST_CASE("MEHPForceBalance2 Metal Single-Precision Solvers & Robust CPU "
           "Fallback on Ill-Conditioned Networks",
           "[MEHPForceBalance2][Metal][IllConditioned][Fallback]")
 {
+  if (!pcm::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
   std::cout << "\n=== Testing Single-Precision GPU Solvers & CPU Fallback on "
                "Ill-Conditioned Networks ==="
             << std::endl;
@@ -4155,6 +4196,9 @@ TEST_CASE(
   "MEHPForceBalance2 Metal Pinned Reference Node vs Center-of-Mass Projection",
   "[MEHPForceBalance2][Metal][PinnedNode][EliminationTree]")
 {
+  if (!pcm::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
   std::cout << "\n=== Testing Elimination Tree / Pinned Reference Node vs "
                "Center-of-Mass Projection ==="
             << std::endl;
@@ -4275,6 +4319,9 @@ TEST_CASE(
   "MEHPForceBalance2 Metal Hybrid SIMDgroup SpMM Degree-Aware Work-Queue",
   "[MEHPForceBalance2][Metal][Hybrid][SpMM]")
 {
+  if (!pcm::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
   std::cout
     << "\n=== Testing Hybrid SIMDgroup SpMM: Degree-Aware Work-Queue ==="
     << std::endl;
@@ -4339,6 +4386,9 @@ TEST_CASE(
 TEST_CASE("MEHPForceBalance2 Metal Zero-Copy End-to-End Simulation Pipeline",
           "[MEHPForceBalance2][Metal][ZeroCopy]")
 {
+  if (!pcm::isMetalAvailable()) {
+    SKIP("Metal GPU backend is not available on this device.");
+  }
   std::cout << "\n=== Testing Zero-Copy End-to-End Simulation Pipeline ==="
             << std::endl;
   // Construct small test network for runGpuRelaxationStep

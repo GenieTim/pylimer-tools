@@ -1,6 +1,8 @@
 import datetime
 import os
 import pathlib as pl
+import tempfile
+import time
 import unittest
 
 import numpy as np
@@ -70,32 +72,45 @@ class TestUtilFunctions(PandasComparingTestCase):
             [{"a": 1, "b": 0}, {"a": 2, "b": 0}, {
                 "a": 2.5, "b": 0}, {"a": 3, "b": 0}]
         )
-        # make suffix unique so subsequent test runs are consistent
-        suffix = "test.out" + datetime.datetime.now().strftime("%d%m%Y%H%M%S%f")
-        file = os.path.dirname(__file__) + "/../fixtures/any_file.txt"
-        # now, test cache capabilities
-        do_cache(test_dataframe, file, suffix)
-        path = pl.Path(get_cache_file_name(file, suffix))
-        self.assertTrue(path.is_file())
-        cached_df = load_cache(file, suffix)
-        self.assertEqual(test_dataframe, cached_df)
+        suffix = "test.out"
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            file = os.path.join(tmp_dir, "any_file.txt")
+            with open(file, "w") as test_file:
+                test_file.write("TEST\n")
 
-        # and the receival of a warning for non-files
-        do_cache(test_dataframe, "non-ex-file", suffix)
-        path = pl.Path(get_cache_file_name("non-ex-file", suffix))
-        self.assertTrue(path.is_file())
-        with self.assertWarns(Warning):
-            loaded_data = load_cache("non-ex-file", suffix)
-            self.assertEqual(test_dataframe, loaded_data)
+            past_time = time.time() - 10.0
+            os.utime(file, (past_time, past_time))
 
-        # test that the cache returns empty if not written yet...
-        self.assertIsNone(load_cache(file, "non-ex-suffix"))
-        # ...or if the file has been modified
-        test_file = open(file, "w")
-        test_file.write("TEST\n")
-        test_file.write(datetime.datetime.now().strftime("%c"))
-        test_file.close()
-        self.assertIsNone(load_cache(file, suffix))
+            # now, test cache capabilities
+            do_cache(test_dataframe, file, suffix, tmp_dir=tmp_dir)
+            path = pl.Path(get_cache_file_name(file, suffix, tmp_dir=tmp_dir))
+            self.assertTrue(path.is_file())
+            cached_df = load_cache(file, suffix, tmp_dir=tmp_dir)
+            self.assertEqual(test_dataframe, cached_df)
+
+            # and the receival of a warning for non-files
+            do_cache(test_dataframe, "non-ex-file", suffix, tmp_dir=tmp_dir)
+            path = pl.Path(
+                get_cache_file_name(
+                    "non-ex-file",
+                    suffix,
+                    tmp_dir=tmp_dir))
+            self.assertTrue(path.is_file())
+            with self.assertWarns(Warning):
+                loaded_data = load_cache(
+                    "non-ex-file", suffix, tmp_dir=tmp_dir)
+                self.assertEqual(test_dataframe, loaded_data)
+
+            # test that the cache returns empty if not written yet...
+            self.assertIsNone(
+                load_cache(
+                    file,
+                    "non-ex-suffix",
+                    tmp_dir=tmp_dir))
+            # ...or if the file has been modified
+            future_time = time.time() + 10.0
+            os.utime(file, (future_time, future_time))
+            self.assertIsNone(load_cache(file, suffix, tmp_dir=tmp_dir))
 
     def test_mc_universe_generator_streaming_stats(self):
         from pylimer_tools_cpp import (

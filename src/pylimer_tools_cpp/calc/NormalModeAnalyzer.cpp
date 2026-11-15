@@ -429,7 +429,12 @@ NormalModeAnalyzer::solveMatrix(const Eigen::SparseMatrix<double>& mat,
   }
   if (solver == NormalModeSolver::METAL) {
 #ifdef USE_METAL
-    computeAllEigenvaluesMetal(mat, includeEigenvectors, outEvals, outEvecs);
+    if (isMetalAvailable()) {
+      computeAllEigenvaluesMetal(mat, includeEigenvectors, outEvals, outEvecs);
+    } else {
+      computeAllEigenvaluesDense(
+        mat, includeEigenvectors, false, outEvals, outEvecs);
+    }
 #else
     computeAllEigenvaluesDense(
       mat, includeEigenvectors, false, outEvals, outEvecs);
@@ -785,13 +790,19 @@ NormalModeAnalyzer::computeAllEigenvaluesGPU(const bool includeEigenvectors)
     this->setEigenvectors(eigenvectorsMemory);
   }
 #elif defined(USE_METAL)
-  Eigen::VectorXd outEvals;
-  Eigen::MatrixXd outEvecs;
-  computeAllEigenvaluesMetal(
-    this->assembledConnectivityMatrix, includeEigenvectors, outEvals, outEvecs);
-  this->setEigenvalues(outEvals);
-  if (includeEigenvectors) {
-    this->setEigenvectors(outEvecs);
+  if (isMetalAvailable()) {
+    Eigen::VectorXd outEvals;
+    Eigen::MatrixXd outEvecs;
+    computeAllEigenvaluesMetal(this->assembledConnectivityMatrix,
+                               includeEigenvectors,
+                               outEvals,
+                               outEvecs);
+    this->setEigenvalues(outEvals);
+    if (includeEigenvectors) {
+      this->setEigenvectors(outEvecs);
+    }
+  } else {
+    this->computeAllEigenvalues(includeEigenvectors);
   }
 #else
   std::cerr << "GPU computation requested but neither USE_CUDA nor USE_METAL "
