@@ -3,6 +3,7 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
+#include "../sim/MEHPNetworkBuilders.h"
 #include "../sim/MEHPUtilityStructures.h"
 #include "../sim/OutputSupportingSimulation.h"
 #include "../topo/EntanglementDetector.h"
@@ -92,6 +93,23 @@ public:
     this->currentSpringPartitionsVec = springPartitions;
     this->currentDisplacements = Eigen::VectorXd::Zero(net.coordinates.size());
     this->box = pylimer_tools::entities::Box(net.L[0], net.L[1], net.L[2]);
+    this->completeInitialization();
+  }
+
+  MEHPForceBalance(const pylimer_tools::entities::Box& box,
+                   const CrosslinkerUniverse& cu,
+                   const bool is2D = false,
+                   const bool removeDanglingChains = false,
+                   const bool includeFreeChains = true)
+  {
+    this->is2D = is2D;
+    this->box = box;
+    this->initialConfig = buildForceBalanceNetwork(
+      box, cu, !removeDanglingChains, includeFreeChains);
+    this->currentSpringPartitionsVec =
+      Eigen::VectorXd::Ones(this->initialConfig.nrOfSprings);
+    this->currentDisplacements =
+      Eigen::VectorXd::Zero(this->initialConfig.coordinates.size());
     this->completeInitialization();
   }
 

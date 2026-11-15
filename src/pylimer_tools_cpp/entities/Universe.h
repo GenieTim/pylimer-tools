@@ -6,6 +6,7 @@ extern "C"
 #include <igraph/igraph.h>
 }
 #include "../utils/CerealUtils.h"
+#include "../utils/CrosslinkerUniverseStats.h"
 #include "Atom.h"
 #include "AtomGraphParent.h"
 #include "Molecule.h"
@@ -249,7 +250,7 @@ public:
   };
   [[nodiscard]] double computeMeanSquaredBondLength() const
   {
-    return AtomGraphParent::computeMeanSquaredBondLength(this->box);
+    return this->computeBondLengthStats().meanSquaredBondLength;
   };
   [[nodiscard]] double computeTemperature(int dimensions = 3,
                                           double kb = 1.) const;
@@ -270,6 +271,13 @@ public:
     bool onlyThoseWithTwoCrosslinkers = false,
     bool implyImageFlags = false) const;
   [[nodiscard]] double computeMeanBondLength() const;
+  [[nodiscard]] pylimer_tools::utils::BondLengthStats computeBondLengthStats()
+    const;
+  [[nodiscard]] pylimer_tools::utils::EndToEndStats computeEndToEndStats(
+    int crossLinkerType = 2,
+    pylimer_tools::utils::StrandCategory category =
+      pylimer_tools::utils::StrandCategory::NETWORK_STRAND,
+    bool implyImageFlags = true) const;
   [[nodiscard]] double computeTotalMass() const;
   [[nodiscard]] double computeTotalMassWithMasses(
     std::map<int, double> massPerTypeToUse) const;

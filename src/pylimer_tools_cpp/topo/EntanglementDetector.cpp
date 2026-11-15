@@ -646,71 +646,6 @@ namespace {
     return distSq <= cutoff * cutoff;
   }
 
-  Eigen::VectorXd sampleStrandBeadsOnDemand(
-    const pylimer_tools::entities::Box& box,
-    const pylimer_tools::sim::mehp::CrosslinkerUniverse& cu,
-    const size_t strandIdx,
-    const uint64_t strandSeed,
-    const int nMcSteps)
-  {
-    const int nBeads = cu.beadsInStrand[strandIdx];
-    if (nBeads <= 0) {
-      return Eigen::VectorXd(0);
-    }
-    const double beadDist = cu.beadDistanceInStrand.size() > strandIdx
-                              ? cu.beadDistanceInStrand[strandIdx]
-                              : 1.0;
-    const double meanSqDist =
-      cu.meanSquaredBeadDistanceInStrand.size() > strandIdx
-        ? cu.meanSquaredBeadDistanceInStrand[strandIdx]
-        : 1.0;
-
-    std::mt19937 strandRng(static_cast<std::mt19937::result_type>(strandSeed));
-    const long int from = cu.strandFrom[strandIdx];
-    const long int to = cu.strandTo[strandIdx];
-
-    if (from >= 0 && to >= 0) {
-      Eigen::Vector3d rFrom(cu.xlinkX[from], cu.xlinkY[from], cu.xlinkZ[from]);
-      Eigen::Vector3d rTo(cu.xlinkX[to], cu.xlinkY[to], cu.xlinkZ[to]);
-      Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChainFromTo(
-        box, rFrom, rTo, nBeads, beadDist, meanSqDist, strandRng, true);
-      if (nMcSteps > 0) {
-        pylimer_tools::sim::equilibrateChainWithMC(
-          positions, meanSqDist, strandRng, true, true, nMcSteps);
-      }
-      return positions.segment(3, 3 * nBeads);
-    } else if (from >= 0 || to >= 0) {
-      const size_t anchor = static_cast<size_t>(from >= 0 ? from : to);
-      Eigen::Vector3d rAnchor(
-        cu.xlinkX[anchor], cu.xlinkY[anchor], cu.xlinkZ[anchor]);
-      Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
-        nBeads, beadDist, meanSqDist, strandRng);
-      if (nMcSteps > 0) {
-        pylimer_tools::sim::equilibrateChainWithMC(
-          positions, meanSqDist, strandRng, true, false, nMcSteps);
-      }
-      positions += rAnchor.replicate(nBeads, 1);
-      return positions;
-    } else {
-      std::uniform_real_distribution<double> distX(box.getLowX(),
-                                                   box.getHighX());
-      std::uniform_real_distribution<double> distY(box.getLowY(),
-                                                   box.getHighY());
-      std::uniform_real_distribution<double> distZ(box.getLowZ(),
-                                                   box.getHighZ());
-      Eigen::Vector3d rFrom(
-        distX(strandRng), distY(strandRng), distZ(strandRng));
-      Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
-        nBeads, beadDist, meanSqDist, strandRng);
-      if (nMcSteps > 0) {
-        pylimer_tools::sim::equilibrateChainWithMC(
-          positions, meanSqDist, strandRng, true, false, nMcSteps);
-      }
-      positions += rFrom.replicate(nBeads, 1);
-      return positions;
-    }
-  }
-
   /**
    * @brief Bead-budgeted LRU cache for regenerated strand coordinates.
    */
@@ -1588,6 +1523,70 @@ randomlyFindEntanglementsAnalytical(
   return result;
 }
 
+Eigen::VectorXd
+sampleStrandBeadsOnDemand(
+  const pylimer_tools::entities::Box& box,
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse& cu,
+  const size_t strandIdx,
+  const uint64_t strandSeed,
+  const int nMcSteps)
+{
+  const int nBeads = cu.beadsInStrand[strandIdx];
+  if (nBeads <= 0) {
+    return Eigen::VectorXd(0);
+  }
+  const double beadDist = cu.beadDistanceInStrand.size() > strandIdx
+                            ? cu.beadDistanceInStrand[strandIdx]
+                            : 1.0;
+  const double meanSqDist =
+    cu.meanSquaredBeadDistanceInStrand.size() > strandIdx
+      ? cu.meanSquaredBeadDistanceInStrand[strandIdx]
+      : 1.0;
+
+  std::mt19937 strandRng(static_cast<std::mt19937::result_type>(strandSeed));
+  const long int from = cu.strandFrom[strandIdx];
+  const long int to = cu.strandTo[strandIdx];
+
+  if (from >= 0 && to >= 0) {
+    const Eigen::Vector3d rFrom(
+      cu.xlinkX[from], cu.xlinkY[from], cu.xlinkZ[from]);
+    const Eigen::Vector3d rTo(cu.xlinkX[to], cu.xlinkY[to], cu.xlinkZ[to]);
+    Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChainFromTo(
+      box, rFrom, rTo, nBeads, beadDist, meanSqDist, strandRng, true);
+    if (nMcSteps > 0) {
+      pylimer_tools::sim::equilibrateChainWithMC(
+        positions, meanSqDist, strandRng, true, true, nMcSteps);
+    }
+    return positions.segment(3, 3 * nBeads);
+  } else if (from >= 0 || to >= 0) {
+    const size_t anchor = static_cast<size_t>(from >= 0 ? from : to);
+    const Eigen::Vector3d rAnchor(
+      cu.xlinkX[anchor], cu.xlinkY[anchor], cu.xlinkZ[anchor]);
+    Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
+      nBeads, beadDist, meanSqDist, strandRng);
+    if (nMcSteps > 0) {
+      pylimer_tools::sim::equilibrateChainWithMC(
+        positions, meanSqDist, strandRng, true, false, nMcSteps);
+    }
+    positions += rAnchor.replicate(nBeads, 1);
+    return positions;
+  } else {
+    std::uniform_real_distribution<double> distX(box.getLowX(), box.getHighX());
+    std::uniform_real_distribution<double> distY(box.getLowY(), box.getHighY());
+    std::uniform_real_distribution<double> distZ(box.getLowZ(), box.getHighZ());
+    const Eigen::Vector3d rFrom(
+      distX(strandRng), distY(strandRng), distZ(strandRng));
+    Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
+      nBeads, beadDist, meanSqDist, strandRng);
+    if (nMcSteps > 0) {
+      pylimer_tools::sim::equilibrateChainWithMC(
+        positions, meanSqDist, strandRng, true, false, nMcSteps);
+    }
+    positions += rFrom.replicate(nBeads, 1);
+    return positions;
+  }
+}
+
 StrandPairEntanglements
 randomlyFindEntanglementsOnDemand(
   const pylimer_tools::entities::Box& box,
@@ -1642,10 +1641,14 @@ randomlyFindEntanglementsOnDemand(
   std::mt19937 masterRng = initializeRng(seed);
 
   std::vector<uint64_t> strandSeeds(nStrands);
-  std::uniform_int_distribution<uint64_t> seedDist(
-    0, std::numeric_limits<uint64_t>::max());
-  for (size_t s = 0; s < nStrands; ++s) {
-    strandSeeds[s] = seedDist(masterRng);
+  if (seed.empty() && crosslinkerUniverse.strandSeeds.size() == nStrands) {
+    strandSeeds = crosslinkerUniverse.strandSeeds;
+  } else {
+    std::uniform_int_distribution<uint64_t> seedDist(
+      0, std::numeric_limits<uint64_t>::max());
+    for (size_t s = 0; s < nStrands; ++s) {
+      strandSeeds[s] = seedDist(masterRng);
+    }
   }
 
   std::vector<StrandBoundingBox> bboxes(nStrands);

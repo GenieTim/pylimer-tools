@@ -559,15 +559,13 @@ init_pylimer_bound_entities(py::module_& m)
        An (ideally) connected series of atoms/beads.
   )pbdoc",
                                          py::module_local())
-    .def(py::init<Box&, igraph_t*, MoleculeType, std::map<int, double>>(),
+    .def(py::init<const Molecule&>(),
          R"pbdoc(
-         Construct a molecule from a graph structure.
-         
-         :param box: The simulation box containing this molecule
-         :param graph: Pointer to the igraph structure representing connectivity
-         :param type: The type of molecule (see MoleculeType enum)
-         :param mass_map: Map of atom types to their masses
-         )pbdoc")
+         Construct a copy of a molecule.
+
+         :param other: The molecule to copy
+         )pbdoc",
+         py::arg("other"))
     // getters
     .def("get_nr_of_bonds",
          &Molecule::getNrOfBonds,
@@ -799,6 +797,7 @@ init_pylimer_bound_entities(py::module_& m)
             )pbdoc")
     .def("compute_end_to_end_vector_with_derived_image_flags",
          &Molecule::computeEndToEndVectorWithDerivedImageFlags,
+         py::arg("crosslinker_type") = 2,
          R"pbdoc(
             Compute the end-to-end vector (:math:`\overrightarrow{R}_{ee}`) of this molecule,
             but ignoring the image flags attached to the atoms. 
@@ -814,6 +813,7 @@ init_pylimer_bound_entities(py::module_& m)
             )pbdoc")
     .def("compute_end_to_end_distance_with_derived_image_flags",
          &Molecule::computeEndToEndDistanceWithDerivedImageFlags,
+         py::arg("crosslinker_type") = 2,
          R"pbdoc(
             Compute the end-to-end distance (:math:`R_{ee}`) of this molecule,
             but ignoring the image flags attached to the atoms. 
@@ -936,6 +936,176 @@ init_pylimer_bound_entities(py::module_& m)
          
          :return: A new Molecule instance that is a copy of this one
          )pbdoc");
+
+  using pylimer_tools::utils::BondLengthStats;
+  using pylimer_tools::utils::EndToEndStats;
+  using pylimer_tools::utils::StrandCategory;
+
+  py::native_enum<StrandCategory>(
+    m,
+    "StrandCategory",
+    "enum.IntEnum",
+    "Topological category of a strand in a CrosslinkerUniverse.")
+    .value("ALL", StrandCategory::ALL, "All strands")
+    .value("NETWORK_STRAND",
+           StrandCategory::NETWORK_STRAND,
+           "Strands connected to two distinct crosslinkers")
+    .value("TWO_CROSSLINKERS_INCLUDING_LOOPS",
+           StrandCategory::TWO_CROSSLINKERS_INCLUDING_LOOPS,
+           "Strands connected to two crosslinkers (including primary loops)")
+    .value("DANGLING_CHAIN",
+           StrandCategory::DANGLING_CHAIN,
+           "Strands connected to exactly one crosslinker")
+    .value("FREE_CHAIN",
+           StrandCategory::FREE_CHAIN,
+           "Unconnected solvent/free chains")
+    .value("PRIMARY_LOOP",
+           StrandCategory::PRIMARY_LOOP,
+           "Strands with both ends connected to the same crosslinker")
+    .finalize();
+
+  py::class_<BondLengthStats>(m, "BondLengthStats", R"pbdoc(
+    Summary statistics for realized bond lengths.
+  )pbdoc")
+    .def(py::init<>())
+    .def_readonly("nr_of_bonds", &BondLengthStats::nrOfBonds)
+    .def_readonly("mean_bond_length", &BondLengthStats::meanBondLength)
+    .def_readonly("mean_squared_bond_length",
+                  &BondLengthStats::meanSquaredBondLength)
+    .def_readonly("min_bond_length", &BondLengthStats::minBondLength)
+    .def_readonly("max_bond_length", &BondLengthStats::maxBondLength);
+
+  py::class_<EndToEndStats>(m, "EndToEndStats", R"pbdoc(
+    Summary statistics for realized end-to-end distances.
+  )pbdoc")
+    .def(py::init<>())
+    .def_readonly("nr_of_strands", &EndToEndStats::nrOfStrands)
+    .def_readonly("nr_of_excluded_zero_length",
+                  &EndToEndStats::nrOfExcludedZeroLength)
+    .def_readonly("mean_end_to_end_distance",
+                  &EndToEndStats::meanEndToEndDistance)
+    .def_readonly("mean_squared_end_to_end_distance",
+                  &EndToEndStats::meanSquaredEndToEndDistance);
+
+  py::class_<pylimer_tools::sim::mehp::CrosslinkerUniverse, py::smart_holder>(
+    m, "CrosslinkerUniverse", py::module_local(), R"pbdoc(
+      A struct representing the topological and spatial state of crosslinkers and strands
+      without explicitly instantiating all individual strand beads.
+    )pbdoc")
+    .def(py::init<>(), "Get an instance of this struct")
+    .def_readwrite("xlink_types",
+                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::xlinkTypes)
+    .def_readwrite("xlink_x",
+                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::xlinkX)
+    .def_readwrite("xlink_y",
+                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::xlinkY)
+    .def_readwrite("xlink_z",
+                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::xlinkZ)
+    .def_readwrite(
+      "strands_of_xlink",
+      &pylimer_tools::sim::mehp::CrosslinkerUniverse::strandsOfXlink)
+    .def_readwrite("xlink_chain_id",
+                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::xlinkChainId)
+    .def_readwrite("strand_from",
+                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::strandFrom)
+    .def_readwrite("strand_to",
+                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::strandTo)
+    .def_readwrite(
+      "beads_in_strand",
+      &pylimer_tools::sim::mehp::CrosslinkerUniverse::beadsInStrand)
+    .def_readwrite(
+      "strand_bead_type",
+      &pylimer_tools::sim::mehp::CrosslinkerUniverse::strandBeadType)
+    .def_readwrite(
+      "bead_distance_in_strand",
+      &pylimer_tools::sim::mehp::CrosslinkerUniverse::beadDistanceInStrand)
+    .def_readwrite("mean_squared_bead_distance_in_strand",
+                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::
+                     meanSquaredBeadDistanceInStrand)
+    .def_readwrite("strand_seeds",
+                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::strandSeeds)
+    .def(
+      "classify_strand",
+      [](const pylimer_tools::sim::mehp::CrosslinkerUniverse& self,
+         const size_t strandIdx) {
+        return pylimer_tools::utils::classifyStrand(self, strandIdx);
+      },
+      py::arg("strand_idx"),
+      R"pbdoc(
+      Classify a strand into its topological StrandCategory.
+
+      :param strand_idx: Index of the strand.
+      :return: StrandCategory of the strand.
+    )pbdoc")
+    .def(
+      "compute_bond_length_stats",
+      [](const pylimer_tools::sim::mehp::CrosslinkerUniverse& self,
+         const Box& box,
+         const int nMcSteps) {
+        return pylimer_tools::utils::computeBondLengthStats(
+          box, self, nMcSteps);
+      },
+      py::arg("box"),
+      py::arg("n_mc_steps") = 0,
+      R"pbdoc(
+      Stream over all strands in O(1) strand memory to compute realized bond length statistics.
+
+      :param box: Simulation box.
+      :param n_mc_steps: Number of MC equilibration steps per strand (default: 0).
+      :return: BondLengthStats object.
+    )pbdoc")
+    .def(
+      "compute_end_to_end_stats",
+      [](const pylimer_tools::sim::mehp::CrosslinkerUniverse& self,
+         const Box& box,
+         const StrandCategory category,
+         const int nMcSteps) {
+        return pylimer_tools::utils::computeEndToEndStats(
+          box, self, category, nMcSteps);
+      },
+      py::arg("box"),
+      py::arg_v("category",
+                StrandCategory::NETWORK_STRAND,
+                "StrandCategory.NETWORK_STRAND"),
+      py::arg("n_mc_steps") = 0,
+      R"pbdoc(
+      Stream over strands matching `category` to compute realized end-to-end distance statistics.
+
+      :param box: Simulation box.
+      :param category: StrandCategory filter (default: NETWORK_STRAND).
+      :param n_mc_steps: Number of MC equilibration steps per strand (default: 0).
+      :return: EndToEndStats object.
+    )pbdoc")
+    .def("count_atom_types",
+         &pylimer_tools::utils::countAtomTypes,
+         R"pbdoc(
+      Count atoms per atom type in O(N_xlinks + N_strands).
+
+      :return: Dict mapping atom type to count.
+    )pbdoc")
+    .def("count_atoms_by_degree",
+         &pylimer_tools::utils::countAtomsByDegree,
+         R"pbdoc(
+      Count atoms per bond degree in O(N_xlinks + N_strands).
+
+      :return: Dict mapping degree to atom count.
+    )pbdoc")
+    .def("determine_effective_functionality_per_type",
+         &pylimer_tools::utils::determineEffectiveFunctionalityPerType,
+         R"pbdoc(
+      Compute effective functionality (mean degree) per atom type in O(N_xlinks + N_strands).
+
+      :return: Dict mapping atom type to mean degree.
+    )pbdoc")
+    .def("compute_strand_bond_counts",
+         &pylimer_tools::utils::computeStrandBondCounts,
+         py::arg_v("category", StrandCategory::ALL, "StrandCategory.ALL"),
+         R"pbdoc(
+      Return the number of bonds for each strand matching `category`.
+
+      :param category: StrandCategory filter (default: ALL).
+      :return: List of bond counts per matching strand.
+    )pbdoc");
 
   py::class_<Universe, py::smart_holder>(m,
                                          "Universe",
@@ -1779,6 +1949,30 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("crosslinker_type"),
          py::arg("only_those_with_two_crosslinkers") = false,
          py::arg("derive_image_flags") = false)
+    .def("compute_bond_length_stats",
+         &Universe::computeBondLengthStats,
+         R"pbdoc(
+          Compute summary bond length statistics (count, mean, mean squared, min, max)
+          from the Universe's actual bond coordinates.
+
+          :return: BondLengthStats object.
+     )pbdoc")
+    .def("compute_end_to_end_stats",
+         &Universe::computeEndToEndStats,
+         R"pbdoc(
+          Compute summary end-to-end distance statistics (count, excluded zero-length count,
+          mean, mean squared) for strands matching ``category`` from the Universe's actual coordinates.
+
+          :param crosslinker_type: The type of crosslinker atoms (default: 2)
+          :param category: StrandCategory filter (default: NETWORK_STRAND)
+          :param derive_image_flags: Whether to derive image flags from connectivity (default: True)
+          :return: EndToEndStats object.
+     )pbdoc",
+         py::arg("crosslinker_type") = 2,
+         py::arg_v("category",
+                   pylimer_tools::utils::StrandCategory::NETWORK_STRAND,
+                   "StrandCategory.NETWORK_STRAND"),
+         py::arg("derive_image_flags") = true)
     .def("compute_dxs",
          &Universe::computeDxs,
          R"pbdoc(

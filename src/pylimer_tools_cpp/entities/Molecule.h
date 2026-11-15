@@ -75,9 +75,10 @@ public:
   // computations
   [[nodiscard]] Eigen::Vector3d computeEndToEndVector() const;
   [[nodiscard]] double computeEndToEndDistance() const;
-  [[nodiscard]] Eigen::Vector3d computeEndToEndVectorWithDerivedImageFlags()
-    const;
-  [[nodiscard]] double computeEndToEndDistanceWithDerivedImageFlags() const;
+  [[nodiscard]] Eigen::Vector3d computeEndToEndVectorWithDerivedImageFlags(
+    int crossLinkerType = 2) const;
+  [[nodiscard]] double computeEndToEndDistanceWithDerivedImageFlags(
+    int crossLinkerType = 2) const;
   [[nodiscard]] double computeRadiusOfGyration();
   [[nodiscard]] double computeRadiusOfGyrationWithDerivedImageFlags() const;
   [[nodiscard]] double computeTotalMass();

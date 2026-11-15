@@ -1440,9 +1440,6 @@ Universe::toCrosslinkerUniverse(const int crossLinkerType) const
     this->getChainsWithCrosslinker(crossLinkerType);
   for (size_t c = 0; c < chains.size(); ++c) {
     const Molecule& chain = chains[c];
-    if (chain.getNrOfBonds() == 0 && chain.getLength() <= 1) {
-      continue;
-    }
 
     std::vector<Atom> chainEnds = chain.getChainEnds(crossLinkerType, true);
     long int fromXlink = -1;
@@ -1460,6 +1457,9 @@ Universe::toCrosslinkerUniverse(const int crossLinkerType) const
     } else if (chainEnds.size() == 1) {
       const size_t v0 = this->getIdxByAtomId(chainEnds[0].getId());
       fromXlink = vertexToXlinkIdx[v0];
+      if (chain.getType() == MoleculeType::PRIMARY_LOOP) {
+        toXlink = fromXlink;
+      }
     }
 
     const int nCrosslinksInChain =
@@ -1549,9 +1549,6 @@ Universe::identifyActiveAtoms(const int crossLinkerType) const
   size_t strandIdx = 0;
   for (size_t c = 0; c < chains.size(); ++c) {
     const Molecule& chain = chains[c];
-    if (chain.getNrOfBonds() == 0 && chain.getLength() <= 1) {
-      continue;
-    }
     if (strandIdx < peelResult.strandIsIgnored.size()) {
       const bool strandActive = !peelResult.strandIsIgnored[strandIdx];
       const std::vector<long int> atomIds =
@@ -3263,8 +3260,13 @@ std::vector<double>
 Universe::computeEndToEndDistances(const int crossLinkerType,
                                    bool implyImageFlags) const
 {
-  std::vector<Molecule> molecules =
-    this->getChainsWithCrosslinker(crossLinkerType);
+  if (this->cachedChainsWithCrosslinker_.find(crossLinkerType) ==
+      this->cachedChainsWithCrosslinker_.end()) {
+    this->cachedChainsWithCrosslinker_[crossLinkerType] =
+      this->getChainsWithCrosslinker(crossLinkerType);
+  }
+  const std::vector<Molecule>& molecules =
+    this->cachedChainsWithCrosslinker_[crossLinkerType];
 
   std::vector<double> distances;
   distances.reserve(molecules.size());
@@ -3272,9 +3274,10 @@ Universe::computeEndToEndDistances(const int crossLinkerType,
     molecules.begin(),
     molecules.end(),
     std::back_inserter(distances),
-    [implyImageFlags](Molecule molecule) {
+    [crossLinkerType, implyImageFlags](const Molecule& molecule) {
       return implyImageFlags
-               ? molecule.computeEndToEndDistanceWithDerivedImageFlags()
+               ? molecule.computeEndToEndDistanceWithDerivedImageFlags(
+                   crossLinkerType)
                : molecule.computeEndToEndDistance();
     });
 
@@ -3294,31 +3297,15 @@ double
 Universe::computeMeanEndToEndDistance(const int crossLinkerType,
                                       const bool implyImageFlags) const
 {
-  std::vector<Molecule> molecules =
-    this->getChainsWithCrosslinker(crossLinkerType);
-
-  double meanEndToEndDistance = 0.0;
-  int validMolecules = 0;
-
-  for (Molecule molecule : molecules) {
-    double dist = implyImageFlags
-                    ? molecule.computeEndToEndDistanceWithDerivedImageFlags()
-                    : molecule.computeEndToEndDistance();
-    if (dist > 0.0) {
-      meanEndToEndDistance += dist;
-      validMolecules += 1;
-    }
-  }
-
-  if (validMolecules == 0) {
-    return 0.0;
-  }
-
-  return meanEndToEndDistance / static_cast<double>(validMolecules);
+  const pylimer_tools::utils::EndToEndStats stats =
+    this->computeEndToEndStats(crossLinkerType,
+                               pylimer_tools::utils::StrandCategory::ALL,
+                               implyImageFlags);
+  return stats.meanEndToEndDistance;
 }
 
 /**
- * @brief Get the mean end to end distance
+ * @brief Get the mean square end to end distance
  *
  * Does not take loops into account as a contributor to the mean.
  * Returns 0 for systems without any qualifying strands.
@@ -3332,35 +3319,13 @@ Universe::computeMeanSquareEndToEndDistance(
   const bool onlyThoseWithTwoCrosslinkers,
   const bool implyImageFlags) const
 {
-  if (this->cachedChainsWithCrosslinker_.find(crossLinkerType) ==
-      this->cachedChainsWithCrosslinker_.end()) {
-    this->cachedChainsWithCrosslinker_[crossLinkerType] =
-      this->getChainsWithCrosslinker(crossLinkerType);
-  }
-  const std::vector<Molecule>& molecules =
-    this->cachedChainsWithCrosslinker_[crossLinkerType];
-
-  double meanEndToEndDistance = 0.0;
-  int validMolecules = 0;
-
-  for (const Molecule& molecule : molecules) {
-    if (!onlyThoseWithTwoCrosslinkers ||
-        molecule.getAtomsOfType(crossLinkerType).size() == 2) {
-      double dist = implyImageFlags
-                      ? molecule.computeEndToEndDistanceWithDerivedImageFlags()
-                      : molecule.computeEndToEndDistance();
-      if (dist > 0.0) {
-        meanEndToEndDistance += dist * dist;
-        validMolecules += 1;
-      }
-    }
-  }
-
-  if (validMolecules == 0) {
-    return 0.0;
-  }
-
-  return meanEndToEndDistance / static_cast<double>(validMolecules);
+  const pylimer_tools::utils::StrandCategory category =
+    onlyThoseWithTwoCrosslinkers
+      ? pylimer_tools::utils::StrandCategory::NETWORK_STRAND
+      : pylimer_tools::utils::StrandCategory::ALL;
+  const pylimer_tools::utils::EndToEndStats stats =
+    this->computeEndToEndStats(crossLinkerType, category, implyImageFlags);
+  return stats.meanSquaredEndToEndDistance;
 }
 
 /**
@@ -3394,31 +3359,121 @@ Universe::computeTotalMassWithMasses(
 double
 Universe::computeMeanBondLength() const
 {
-  double length = 0.0;
-  if (this->getNrOfBonds() == 0) {
-    return length;
+  return this->computeBondLengthStats().meanBondLength;
+}
+
+pylimer_tools::utils::BondLengthStats
+Universe::computeBondLengthStats() const
+{
+  pylimer_tools::utils::BondLengthStats stats;
+  const size_t nBonds = static_cast<size_t>(this->getNrOfBonds());
+  if (nBonds == 0) {
+    return stats;
   }
-  // construct iterator
+
   igraph_eit_t bondIterator;
   REQUIRE_IGRAPH_SUCCESS(igraph_eit_create(
     &this->getGraph(), igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator));
 
+  double sumB = 0.0;
+  double sumB2 = 0.0;
   while (!IGRAPH_EIT_END(bondIterator)) {
-    long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
-    igraph_integer_t bondFrom;
-    igraph_integer_t bondTo;
-    REQUIRE_IGRAPH_SUCCESS(
-      igraph_edge(&this->getGraph(), edgeId, &bondFrom, &bondTo));
-    // TODO: this is more intensive than needed
-    // check whether the compiler optimizes this or not
-    Atom atom1 = this->getAtomByVertexIdx(bondFrom);
-    Atom atom2 = this->getAtomByVertexIdx(bondTo);
-    length += atom1.distanceTo(atom2, this->box);
+    const long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
+    Eigen::Vector3d distance =
+      this->getPositionVectorForVertex(IGRAPH_TO(&this->getGraph(), edgeId)) -
+      this->getPositionVectorForVertex(IGRAPH_FROM(&this->getGraph(), edgeId));
+    this->box.handlePBC(distance);
+    const double len = distance.norm();
+    if (stats.nrOfBonds == 0) {
+      stats.minBondLength = len;
+      stats.maxBondLength = len;
+    } else {
+      stats.minBondLength = std::min(stats.minBondLength, len);
+      stats.maxBondLength = std::max(stats.maxBondLength, len);
+    }
+    stats.nrOfBonds += 1;
+    sumB += len;
+    sumB2 += len * len;
     IGRAPH_EIT_NEXT(bondIterator);
   }
 
   igraph_eit_destroy(&bondIterator);
-  return length / static_cast<double>(this->getNrOfBonds());
+  if (stats.nrOfBonds > 0) {
+    const double invN = 1.0 / static_cast<double>(stats.nrOfBonds);
+    stats.meanBondLength = sumB * invN;
+    stats.meanSquaredBondLength = sumB2 * invN;
+  }
+  return stats;
+}
+
+namespace {
+
+  bool moleculeMatchesCategory(
+    const MoleculeType molType,
+    const pylimer_tools::utils::StrandCategory category)
+  {
+    using pylimer_tools::utils::StrandCategory;
+    switch (category) {
+      case StrandCategory::ALL:
+        return true;
+      case StrandCategory::NETWORK_STRAND:
+        return molType == MoleculeType::NETWORK_STRAND;
+      case StrandCategory::TWO_CROSSLINKERS_INCLUDING_LOOPS:
+        return molType == MoleculeType::NETWORK_STRAND ||
+               molType == MoleculeType::PRIMARY_LOOP;
+      case StrandCategory::DANGLING_CHAIN:
+        return molType == MoleculeType::DANGLING_CHAIN;
+      case StrandCategory::FREE_CHAIN:
+        return molType == MoleculeType::FREE_CHAIN;
+      case StrandCategory::PRIMARY_LOOP:
+        return molType == MoleculeType::PRIMARY_LOOP;
+    }
+    return false;
+  }
+
+} // namespace
+
+pylimer_tools::utils::EndToEndStats
+Universe::computeEndToEndStats(
+  const int crossLinkerType,
+  const pylimer_tools::utils::StrandCategory category,
+  const bool implyImageFlags) const
+{
+  if (this->cachedChainsWithCrosslinker_.find(crossLinkerType) ==
+      this->cachedChainsWithCrosslinker_.end()) {
+    this->cachedChainsWithCrosslinker_[crossLinkerType] =
+      this->getChainsWithCrosslinker(crossLinkerType);
+  }
+  const std::vector<Molecule>& molecules =
+    this->cachedChainsWithCrosslinker_[crossLinkerType];
+
+  pylimer_tools::utils::EndToEndStats stats;
+  double sumR = 0.0;
+  double sumR2 = 0.0;
+
+  for (const Molecule& molecule : molecules) {
+    if (!moleculeMatchesCategory(molecule.getType(), category)) {
+      continue;
+    }
+    const double dist =
+      implyImageFlags
+        ? molecule.computeEndToEndDistanceWithDerivedImageFlags(crossLinkerType)
+        : molecule.computeEndToEndDistance();
+    if (dist > 0.0) {
+      stats.nrOfStrands += 1;
+      sumR += dist;
+      sumR2 += dist * dist;
+    } else {
+      stats.nrOfExcludedZeroLength += 1;
+    }
+  }
+
+  if (stats.nrOfStrands > 0) {
+    const double invN = 1.0 / static_cast<double>(stats.nrOfStrands);
+    stats.meanEndToEndDistance = sumR * invN;
+    stats.meanSquaredEndToEndDistance = sumR2 * invN;
+  }
+  return stats;
 }
 /**
  * @brief Compute the weight average molecular weight

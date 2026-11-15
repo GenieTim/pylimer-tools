@@ -1,5 +1,19 @@
 # Changelog
 
+## main
+
+### Deterministic Per-Strand Seeds, Streaming Statistics & Unified Network Builders
+- **Deterministic Per-Strand Bead Realization (`CrosslinkerUniverse`, `EntanglementDetector`, `MCUniverseGenerator`)**:
+  - Add per-strand deterministic PRNG seeds (`CrosslinkerUniverse::strandSeeds`, populated via `MCUniverseGenerator::strandSeedRng`) and public `sampleStrandBeadsOnDemand` (`sample_strand_beads_on_demand`), ensuring that `MCUniverseGenerator::getUniverse() const`, `randomlyFindEntanglementsOnDemand`, and streaming statistics realize identical bead coordinates without mutating generator state.
+  - Preserve 1-bead free chains and record `toXlink = fromXlink` on `PRIMARY_LOOP` chains in `Universe::toCrosslinkerUniverse` and `Universe::identifyActiveAtoms`.
+  - Fix primary-loop closure handling (`closeLoop = true` and clamping floating-point residuals on non-winding closed loops) in `Molecule::computeEndToEndVectorWithDerivedImageFlags` and `Molecule::computeEndToEndDistanceWithDerivedImageFlags`.
+- **Streaming Statistics & Topological Queries (`CrosslinkerUniverseStats`, `MCUniverseGenerator`, `Universe`)**:
+  - Add `CrosslinkerUniverseStats` (`StrandCategory`, `BondLengthStats`, `EndToEndStats`, `classifyStrand`, `computeBondLengthStats`, `computeEndToEndStats`, `countAtomTypes`, `countAtomsByDegree`, `determineEffectiveFunctionalityPerType`, `computeStrandBondCounts`), enabling streaming $O(1)$-strand-memory bond-length and end-to-end vector/distance statistics and $O(N_{\text{xlinks}} + N_{\text{strands}})$ topological degree/functionality queries on `MCUniverseGenerator`, `CrosslinkerUniverse`, and `Universe` without materializing a `Universe` or decomposing molecules.
+  - Unify `Universe::computeMeanEndToEndDistance`, `Universe::computeMeanSquareEndToEndDistance`, `Universe::computeMeanBondLength`, and `Universe::computeMeanSquaredBondLength` to delegate to `computeEndToEndStats` and `computeBondLengthStats`, and reuse `cachedChainsWithCrosslinker_` in `Universe::computeEndToEndDistances`.
+- **Unified MEHP Network Builders (`MEHPNetworkBuilders`)**:
+  - Extract shared `buildForceRelaxationNetwork`, `buildForceBalanceNetwork`, and `buildForceBalance2Network` builders (`MEHPNetworkBuilders.h` / `MEHPNetworkBuilders.cpp`), eliminating duplicated network construction logic in `MCUniverseGenerator`.
+  - Add direct `(const Box&, const CrosslinkerUniverse&, ...)` constructors to `MEHPForceRelaxation`, `MEHPForceBalance`, and `MEHPForceBalance2` (and expose them in Python bindings).
+
 ## v0.5.0
 
 ### OpenMP Parallelization, Thread-Safety & Build Optimizations

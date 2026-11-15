@@ -28,11 +28,13 @@ add_library(pylimer_tools
     topo/ResistanceDistanceAnalysis.cpp
     sim/OutputSupportingSimulation.cpp
     sim/MEHPForceEvaluator.cpp
+    sim/MEHPNetworkBuilders.cpp
     sim/MEHPForceRelaxation.cpp
     sim/MEHPForceBalance.cpp
     sim/MEHPForceBalance2.cpp
     sim/DPDSimulator.cpp
     sim/RouseBrownianSimulator.cpp
+    utils/CrosslinkerUniverseStats.cpp
     utils/MCUniverseGenerator.cpp
 )
 

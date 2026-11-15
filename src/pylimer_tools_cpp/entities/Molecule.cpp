@@ -183,15 +183,19 @@ Molecule::computeEndToEndVector() const
 }
 
 double
-Molecule::computeEndToEndDistanceWithDerivedImageFlags() const
+Molecule::computeEndToEndDistanceWithDerivedImageFlags(
+  const int crossLinkerType) const
 {
-  return this->computeEndToEndVectorWithDerivedImageFlags().norm();
+  return this->computeEndToEndVectorWithDerivedImageFlags(crossLinkerType)
+    .norm();
 }
 
 Eigen::Vector3d
-Molecule::computeEndToEndVectorWithDerivedImageFlags() const
+Molecule::computeEndToEndVectorWithDerivedImageFlags(
+  const int crossLinkerType) const
 {
-  const std::vector<igraph_integer_t> vertices = this->getVerticesLinedUp();
+  const std::vector<igraph_integer_t> vertices =
+    this->getVerticesLinedUp(crossLinkerType, /*closeLoop=*/true);
   if (vertices.empty() || vertices.size() == 1) {
     return Eigen::Vector3d::Zero();
   }
@@ -201,6 +205,12 @@ Molecule::computeEndToEndVectorWithDerivedImageFlags() const
 
   Eigen::Vector3d distance = coordinates.segment(3 * (vertices.size() - 1), 3) -
                              coordinates.segment(0, 3);
+  // For closed loops within the same periodic box, floating-point accumulation
+  // along the loop can leave ~1e-15 residual; clamp to exact zero so
+  // non-winding primary loops are excluded consistently.
+  if (vertices.front() == vertices.back() && distance.norm() < 1e-10) {
+    return Eigen::Vector3d::Zero();
+  }
 
   return distance;
 }

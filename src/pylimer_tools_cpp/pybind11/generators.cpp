@@ -2,6 +2,7 @@
 #define PYBIND_GENERATORS_H
 
 #include "../entities/Box.h"
+#include "../utils/CrosslinkerUniverseStats.h"
 #include "../utils/MCUniverseGenerator.h"
 #include "../utils/RandomWalker.h"
 
@@ -39,6 +40,7 @@ init_pylimer_bound_generators(py::module_& m)
            EntanglementSamplingMethod::BOUNDING_BOX,
            "Alias for ON_DEMAND")
     .finalize();
+
   py::class_<MaxDistanceProvider, std::shared_ptr<MaxDistanceProvider>>(
     m, "MaxDistanceProvider", R"pbdoc(
      A generic implementation of a class, that shall provide a maximum distance for the MC sampling.
@@ -711,6 +713,56 @@ init_pylimer_bound_generators(py::module_& m)
 
             :return: The Box object.
             )pbdoc")
+    .def("compute_bond_length_stats",
+         &MCUniverseGenerator::computeBondLengthStats,
+         R"pbdoc(
+            Stream over strands in O(1) strand memory to compute realized bond length statistics
+            without constructing a Universe.
+
+            :return: BondLengthStats object.
+            )pbdoc")
+    .def("compute_end_to_end_stats",
+         &MCUniverseGenerator::computeEndToEndStats,
+         R"pbdoc(
+            Stream over strands matching `category` to compute end-to-end distance statistics
+            without constructing a Universe.
+
+            :param category: StrandCategory filter (default: NETWORK_STRAND).
+            :return: EndToEndStats object.
+            )pbdoc",
+         py::arg_v("category",
+                   StrandCategory::NETWORK_STRAND,
+                   "StrandCategory.NETWORK_STRAND"))
+    .def("count_atom_types",
+         &MCUniverseGenerator::countAtomTypes,
+         R"pbdoc(
+            Count atoms per atom type without constructing a Universe.
+
+            :return: Dict mapping atom type to count.
+            )pbdoc")
+    .def("count_atoms_by_degree",
+         &MCUniverseGenerator::countAtomsByDegree,
+         R"pbdoc(
+            Count atoms per bond degree without constructing a Universe.
+
+            :return: Dict mapping degree to atom count.
+            )pbdoc")
+    .def("determine_effective_functionality_per_type",
+         &MCUniverseGenerator::determineEffectiveFunctionalityPerType,
+         R"pbdoc(
+            Compute effective functionality (mean degree) per atom type without constructing a Universe.
+
+            :return: Dict mapping atom type to mean degree.
+            )pbdoc")
+    .def("compute_strand_bond_counts",
+         &MCUniverseGenerator::computeStrandBondCounts,
+         R"pbdoc(
+            Return the number of bonds for each strand matching `category`.
+
+            :param category: StrandCategory filter (default: ALL).
+            :return: List of bond counts per matching strand.
+            )pbdoc",
+         py::arg_v("category", StrandCategory::ALL, "StrandCategory.ALL"))
     .def(
       "sample_entanglements",
       py::overload_cast<

@@ -17,7 +17,7 @@ import numpy
 import numpy.typing
 import scipy.sparse
 import typing
-__all__: list[str] = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'BackTrackStatus', 'Box', 'CONJUGATE_GRADIENT', 'ComputedDoubleValues', 'ComputedIntValues', 'CrosslinkerUniverse', 'DIRECT_LDLT', 'DIRECT_LLT', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'EntanglementFilteringMode', 'EntanglementSamplingMethod', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'NormalModeSolver', 'OutputConfiguration', 'ResistanceDistanceAnalysis', 'RouseBrownianSimulator', 'RouseSimulationResult', 'RouseSolverType', 'SLESolver', 'STOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StrandPairEntanglements', 'StructureSimplificationMode', 'TRACK_BACKWARD', 'TRACK_FORWARD', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'peel_topological_leaves', 'randomly_sample_entanglements', 'randomly_sample_entanglements_analytical', 'randomly_sample_entanglements_on_demand', 'randomly_sample_entanglements_v2', 'split_csv', 'version_information']
+__all__: list[str] = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'BackTrackStatus', 'BondLengthStats', 'Box', 'CONJUGATE_GRADIENT', 'ComputedDoubleValues', 'ComputedIntValues', 'CrosslinkerUniverse', 'DIRECT_LDLT', 'DIRECT_LLT', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'EndToEndStats', 'EntanglementFilteringMode', 'EntanglementSamplingMethod', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'NormalModeSolver', 'OutputConfiguration', 'ResistanceDistanceAnalysis', 'RouseBrownianSimulator', 'RouseSimulationResult', 'RouseSolverType', 'SLESolver', 'STOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StrandCategory', 'StrandPairEntanglements', 'StructureSimplificationMode', 'TRACK_BACKWARD', 'TRACK_FORWARD', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'peel_topological_leaves', 'randomly_sample_entanglements', 'randomly_sample_entanglements_analytical', 'randomly_sample_entanglements_on_demand', 'randomly_sample_entanglements_v2', 'sample_strand_beads_on_demand', 'split_csv', 'version_information']
 class Atom:
     """
     
@@ -346,6 +346,29 @@ class BackTrackStatus(enum.Enum):
     STOP: typing.ClassVar[BackTrackStatus]  # value = <BackTrackStatus.STOP: 0>
     TRACK_BACKWARD: typing.ClassVar[BackTrackStatus]  # value = <BackTrackStatus.TRACK_BACKWARD: 2>
     TRACK_FORWARD: typing.ClassVar[BackTrackStatus]  # value = <BackTrackStatus.TRACK_FORWARD: 1>
+class BondLengthStats:
+    """
+    
+        Summary statistics for realized bond lengths.
+      
+    """
+    def __init__(self) -> None:
+        ...
+    @property
+    def max_bond_length(self) -> float:
+        ...
+    @property
+    def mean_bond_length(self) -> float:
+        ...
+    @property
+    def mean_squared_bond_length(self) -> float:
+        ...
+    @property
+    def min_bond_length(self) -> float:
+        ...
+    @property
+    def nr_of_bonds(self) -> int:
+        ...
 class Box:
     """
     
@@ -548,6 +571,55 @@ class CrosslinkerUniverse:
         """
         Get an instance of this struct
         """
+    def classify_strand(self, strand_idx: typing.SupportsInt | typing.SupportsIndex) -> StrandCategory:
+        """
+              Classify a strand into its topological StrandCategory.
+        
+              :param strand_idx: Index of the strand.
+              :return: StrandCategory of the strand.
+        """
+    def compute_bond_length_stats(self, box: Box, n_mc_steps: typing.SupportsInt | typing.SupportsIndex = 0) -> BondLengthStats:
+        """
+              Stream over all strands in O(1) strand memory to compute realized bond length statistics.
+        
+              :param box: Simulation box.
+              :param n_mc_steps: Number of MC equilibration steps per strand (default: 0).
+              :return: BondLengthStats object.
+        """
+    def compute_end_to_end_stats(self, box: Box, category: StrandCategory = ..., n_mc_steps: typing.SupportsInt | typing.SupportsIndex = 0) -> EndToEndStats:
+        """
+              Stream over strands matching `category` to compute realized end-to-end distance statistics.
+        
+              :param box: Simulation box.
+              :param category: StrandCategory filter (default: NETWORK_STRAND).
+              :param n_mc_steps: Number of MC equilibration steps per strand (default: 0).
+              :return: EndToEndStats object.
+        """
+    def compute_strand_bond_counts(self, category: StrandCategory = ...) -> list[int]:
+        """
+              Return the number of bonds for each strand matching `category`.
+        
+              :param category: StrandCategory filter (default: ALL).
+              :return: List of bond counts per matching strand.
+        """
+    def count_atom_types(self) -> dict[int, int]:
+        """
+              Count atoms per atom type in O(N_xlinks + N_strands).
+        
+              :return: Dict mapping atom type to count.
+        """
+    def count_atoms_by_degree(self) -> dict[int, int]:
+        """
+              Count atoms per bond degree in O(N_xlinks + N_strands).
+        
+              :return: Dict mapping degree to atom count.
+        """
+    def determine_effective_functionality_per_type(self) -> dict[int, float]:
+        """
+              Compute effective functionality (mean degree) per atom type in O(N_xlinks + N_strands).
+        
+              :return: Dict mapping atom type to mean degree.
+        """
     @property
     def bead_distance_in_strand(self) -> list[float]:
         ...
@@ -577,6 +649,12 @@ class CrosslinkerUniverse:
         ...
     @strand_from.setter
     def strand_from(self, arg0: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
+        ...
+    @property
+    def strand_seeds(self) -> list[int]:
+        ...
+    @strand_seeds.setter
+    def strand_seeds(self, arg0: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> None:
         ...
     @property
     def strand_to(self) -> list[int]:
@@ -1281,6 +1359,26 @@ class DumpFileReader:
         """
                  Read the whole file.
         """
+class EndToEndStats:
+    """
+    
+        Summary statistics for realized end-to-end distances.
+      
+    """
+    def __init__(self) -> None:
+        ...
+    @property
+    def mean_end_to_end_distance(self) -> float:
+        ...
+    @property
+    def mean_squared_end_to_end_distance(self) -> float:
+        ...
+    @property
+    def nr_of_excluded_zero_length(self) -> int:
+        ...
+    @property
+    def nr_of_strands(self) -> int:
+        ...
 class EntanglementFilteringMode(enum.IntEnum):
     """
     Enum representing the filtering mode for entanglement sampling.
@@ -1542,6 +1640,28 @@ class MCUniverseGenerator:
                     :param strand_lengths: A list of integers representing the number of beads of each of the strands.
                     :param strand_atom_type: Type of atoms for the strands (default: 1).
         """
+    def compute_bond_length_stats(self) -> BondLengthStats:
+        """
+                    Stream over strands in O(1) strand memory to compute realized bond length statistics
+                    without constructing a Universe.
+        
+                    :return: BondLengthStats object.
+        """
+    def compute_end_to_end_stats(self, category: StrandCategory = ...) -> EndToEndStats:
+        """
+                    Stream over strands matching `category` to compute end-to-end distance statistics
+                    without constructing a Universe.
+        
+                    :param category: StrandCategory filter (default: NETWORK_STRAND).
+                    :return: EndToEndStats object.
+        """
+    def compute_strand_bond_counts(self, category: StrandCategory = ...) -> list[int]:
+        """
+                    Return the number of bonds for each strand matching `category`.
+        
+                    :param category: StrandCategory filter (default: ALL).
+                    :return: List of bond counts per matching strand.
+        """
     def config_nr_of_mc_steps(self, n_steps: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         """
                Set the number of Monte-Carlo steps during bond length equilibration.
@@ -1565,6 +1685,24 @@ class MCUniverseGenerator:
                  This results in more secondary loops for shorter chains than for longer ones.
         
                  Set to 0. to disable the formation of secondary loops.
+        """
+    def count_atom_types(self) -> dict[int, int]:
+        """
+                    Count atoms per atom type without constructing a Universe.
+        
+                    :return: Dict mapping atom type to count.
+        """
+    def count_atoms_by_degree(self) -> dict[int, int]:
+        """
+                    Count atoms per bond degree without constructing a Universe.
+        
+                    :return: Dict mapping degree to atom count.
+        """
+    def determine_effective_functionality_per_type(self) -> dict[int, float]:
+        """
+                    Compute effective functionality (mean degree) per atom type without constructing a Universe.
+        
+                    :return: Dict mapping atom type to mean degree.
         """
     def disable_max_distance(self) -> None:
         """
@@ -1940,6 +2078,7 @@ class MEHPForceBalance:
         ...
     def __getstate__(self) -> tuple[str]:
         ...
+    @typing.overload
     def __init__(self, universe: Universe, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -> None:
         """
                   Instantiate the simulator for a certain universe.
@@ -1950,6 +2089,17 @@ class MEHPForceBalance:
                   :param kappa: The spring constant
                   :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
                   :param remove_dangling_chains: whether to keep or remove obviously dangling chains when setting up the network
+        """
+    @typing.overload
+    def __init__(self, box: Box, crosslinker_universe: CrosslinkerUniverse, is_2d: bool = False, remove_dangling_chains: bool = False, include_free_chains: bool = True) -> None:
+        """
+                  Instantiate the simulator from a Box and a CrosslinkerUniverse.
+        
+                  :param box: Simulation box
+                  :param crosslinker_universe: Canonical CrosslinkerUniverse representation
+                  :param is_2d: Whether to ignore the z direction
+                  :param remove_dangling_chains: Whether to exclude dangling chains
+                  :param include_free_chains: Whether to include free/soluble chains
         """
     def __setstate__(self, arg0: tuple) -> None:
         ...
@@ -2371,6 +2521,20 @@ class MEHPForceBalance2:
                    :param crosslinker_type: The atom type of the crosslinkers. Needed to reduce the network.
                    :param is_2d: Whether to ignore the z direction.
                    :param entanglements_as_springs: whether to use the entanglements as springs instead of links
+        """
+    @typing.overload
+    def __init__(self, box: Box, crosslinker_universe: CrosslinkerUniverse, entanglements: StrandPairEntanglements = ..., crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, entanglements_as_springs: bool = False, remove_dangling_chains: bool = False, include_free_chains: bool = True) -> None:
+        """
+                   Instantiate the simulator from a Box, a CrosslinkerUniverse, and StrandPairEntanglements.
+        
+                   :param box: Simulation box
+                   :param crosslinker_universe: Canonical CrosslinkerUniverse representation
+                   :param entanglements: StrandPairEntanglements along strands
+                   :param crosslinker_type: The atom type of crosslinkers
+                   :param is_2d: Whether to ignore the z direction
+                   :param entanglements_as_springs: Whether to model entanglements as springs instead of merged links
+                   :param remove_dangling_chains: Whether to exclude dangling chains
+                   :param include_free_chains: Whether to include free/soluble chains
         """
     @typing.overload
     def __init__(self, universe: Universe, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_sampling_cutoff: typing.SupportsFloat | typing.SupportsIndex = 1.2, lower_sampling_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_sliplinks: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3, seed: str = '', crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, skip_dangling_soluble_entanglements: bool = True, entanglements_as_springs: bool = True) -> None:
@@ -2807,6 +2971,7 @@ class MEHPForceRelaxation:
     """
     def __getstate__(self) -> tuple[str]:
         ...
+    @typing.overload
     def __init__(self, universe: Universe, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, is_2d: bool = False, force_evaluator: MEHPForceEvaluator = None, kappa: typing.SupportsFloat | typing.SupportsIndex = 1.0, remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -> None:
         """
                   Instantiate the simulator for a certain universe.
@@ -2821,6 +2986,19 @@ class MEHPForceRelaxation:
                        **Caution**: Removing the dangling chains will result in incorrect results fo the computation of
                        :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_soluble_weight_fraction` and
                        :meth:`~pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction`
+        """
+    @typing.overload
+    def __init__(self, box: Box, crosslinker_universe: CrosslinkerUniverse, is_2d: bool = False, force_evaluator: MEHPForceEvaluator = None, kappa: typing.SupportsFloat | typing.SupportsIndex = 1.0, remove_dangling_chains: bool = False, include_free_chains: bool = True) -> None:
+        """
+                  Instantiate the simulator from a Box and a CrosslinkerUniverse.
+        
+                  :param box: Simulation box
+                  :param crosslinker_universe: Canonical CrosslinkerUniverse representation
+                  :param is_2d: Whether to ignore the z direction
+                  :param force_evaluator: The force evaluator to use
+                  :param kappa: The spring constant
+                  :param remove_dangling_chains: Whether to exclude dangling chains
+                  :param include_free_chains: Whether to include free/soluble chains
         """
     def __setstate__(self, arg0: tuple) -> None:
         ...
@@ -3143,14 +3321,11 @@ class Molecule:
         """
                Access an atom by its vertex index.
         """
-    def __init__(self, arg0: Box, arg1: igraph_t, arg2: MoleculeType, arg3: collections.abc.Mapping[typing.SupportsInt | typing.SupportsIndex, typing.SupportsFloat | typing.SupportsIndex]) -> None:
+    def __init__(self, other: Molecule) -> None:
         """
-                 Construct a molecule from a graph structure.
-                 
-                 :param box: The simulation box containing this molecule
-                 :param graph: Pointer to the igraph structure representing connectivity
-                 :param type: The type of molecule (see MoleculeType enum)
-                 :param mass_map: Map of atom types to their masses
+                 Construct a copy of a molecule.
+        
+                 :param other: The molecule to copy
         """
     def __iter__(self) -> MoleculeIterator:
         """
@@ -3176,7 +3351,7 @@ class Molecule:
                        
                     :return: The end-to-end distance
         """
-    def compute_end_to_end_distance_with_derived_image_flags(self) -> float:
+    def compute_end_to_end_distance_with_derived_image_flags(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2) -> float:
         """
                     Compute the end-to-end distance (:math:`R_{ee}`) of this molecule,
                     but ignoring the image flags attached to the atoms. 
@@ -3199,7 +3374,7 @@ class Molecule:
                        
                     :return: The end-to-end vector
         """
-    def compute_end_to_end_vector_with_derived_image_flags(self) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
+    def compute_end_to_end_vector_with_derived_image_flags(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[3, 1]"]:
         """
                     Compute the end-to-end vector (:math:`\\overrightarrow{R}_{ee}`) of this molecule,
                     but ignoring the image flags attached to the atoms. 
@@ -4166,6 +4341,23 @@ class SimplifiedNetwork:
     @property
     def volume(self) -> float:
         ...
+class StrandCategory(enum.IntEnum):
+    """
+    Topological category of a strand in a CrosslinkerUniverse.
+    """
+    ALL: typing.ClassVar[StrandCategory]  # value = <StrandCategory.ALL: 0>
+    DANGLING_CHAIN: typing.ClassVar[StrandCategory]  # value = <StrandCategory.DANGLING_CHAIN: 3>
+    FREE_CHAIN: typing.ClassVar[StrandCategory]  # value = <StrandCategory.FREE_CHAIN: 4>
+    NETWORK_STRAND: typing.ClassVar[StrandCategory]  # value = <StrandCategory.NETWORK_STRAND: 1>
+    PRIMARY_LOOP: typing.ClassVar[StrandCategory]  # value = <StrandCategory.PRIMARY_LOOP: 5>
+    TWO_CROSSLINKERS_INCLUDING_LOOPS: typing.ClassVar[StrandCategory]  # value = <StrandCategory.TWO_CROSSLINKERS_INCLUDING_LOOPS: 2>
+    @classmethod
+    def __new__(cls, value):
+        ...
+    def __format__(self, format_spec):
+        """
+        Convert to a string according to format_spec.
+        """
 class StrandPairEntanglements:
     """
     
@@ -4394,6 +4586,13 @@ class Universe:
                  
                  :return: A list of angle values in radians
         """
+    def compute_bond_length_stats(self) -> BondLengthStats:
+        """
+                  Compute summary bond length statistics (count, mean, mean squared, min, max)
+                  from the Universe's actual bond coordinates.
+        
+                  :return: BondLengthStats object.
+        """
     def compute_bond_lengths(self) -> list[float]:
         """
                  Compute the length of each bond in the molecule, respecting periodic boundaries.
@@ -4443,6 +4642,16 @@ class Universe:
                   :param crosslinker_type: The type of crosslinker atoms
                   :param derive_image_flags: Whether to derive image flags from connectivity
                   :return: List of end-to-end distances
+        """
+    def compute_end_to_end_stats(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, category: StrandCategory = ..., derive_image_flags: bool = True) -> EndToEndStats:
+        """
+                  Compute summary end-to-end distance statistics (count, excluded zero-length count,
+                  mean, mean squared) for strands matching ``category`` from the Universe's actual coordinates.
+        
+                  :param crosslinker_type: The type of crosslinker atoms (default: 2)
+                  :param category: StrandCategory filter (default: NETWORK_STRAND)
+                  :param derive_image_flags: Whether to derive image flags from connectivity (default: True)
+                  :return: EndToEndStats object.
         """
     def compute_mean_end_to_end_distance(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex, derive_image_flags: bool = False) -> float:
         """
@@ -5014,7 +5223,7 @@ class Universe:
                  This operation cleans up the graph structure by removing
                  redundant connections.
         """
-    def to_crosslinker_universe(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2) -> ...:
+    def to_crosslinker_universe(self, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2) -> CrosslinkerUniverse:
         """
                     Convert this Universe into a CrosslinkerUniverse representation.
         
@@ -5327,6 +5536,18 @@ def randomly_sample_entanglements_on_demand(crosslinker_universe: CrosslinkerUni
 def randomly_sample_entanglements_v2(universe: Universe, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, ignore_crosslinks: bool = True, filtering_mode: EntanglementFilteringMode = ...) -> AtomPairEntanglements:
     """
     Alias for randomly_sample_entanglements (v2 has been unified into standard method).
+    """
+def sample_strand_beads_on_demand(box: Box, crosslinker_universe: CrosslinkerUniverse, strand_idx: typing.SupportsInt | typing.SupportsIndex, strand_seed: typing.SupportsInt | typing.SupportsIndex, n_mc_steps: typing.SupportsInt | typing.SupportsIndex = 0) -> typing.Annotated[numpy.typing.NDArray[numpy.float64], "[m, 1]"]:
+    """
+        Deterministically realize the internal bead coordinates of a single strand
+        in a CrosslinkerUniverse using a per-strand PRNG seed.
+    
+        :param box: The simulation box.
+        :param crosslinker_universe: The CrosslinkerUniverse of crosslinkers and strands.
+        :param strand_idx: Index of the strand in `crosslinker_universe`.
+        :param strand_seed: Deterministic per-strand PRNG seed.
+        :param n_mc_steps: Number of Monte Carlo equilibration steps (default: 0).
+        :return: Vector of length `3 * beads_in_strand[strand_idx]` with bead coordinates.
     """
 def split_csv(file_path: str, delimiter: str = ',') -> list[str]:
     """

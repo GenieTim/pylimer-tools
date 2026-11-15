@@ -155,6 +155,7 @@ struct CrosslinkerUniverse
   std::vector<int> strandBeadType;
   std::vector<double> beadDistanceInStrand;
   std::vector<double> meanSquaredBeadDistanceInStrand;
+  std::vector<uint64_t> strandSeeds;
 
 #ifdef CEREALIZABLE
   template<class Archive>
@@ -171,7 +172,8 @@ struct CrosslinkerUniverse
        beadsInStrand,
        strandBeadType,
        beadDistanceInStrand,
-       meanSquaredBeadDistanceInStrand);
+       meanSquaredBeadDistanceInStrand,
+       strandSeeds);
   }
 #endif
 };

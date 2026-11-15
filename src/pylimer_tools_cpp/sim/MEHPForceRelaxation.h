@@ -5,6 +5,7 @@
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
 #include "MEHPForceEvaluator.h"
+#include "MEHPNetworkBuilders.h"
 #include "MEHPUtilityStructures.h"
 #include "OutputSupportingSimulation.h"
 #include <Eigen/Dense>
@@ -167,6 +168,23 @@ public:
 
     this->initializeDefaults();
     this->setForceEvaluator(newForceEvaluator);
+  }
+
+  MEHPForceRelaxation(const pylimer_tools::entities::Box& box,
+                      const CrosslinkerUniverse& cu,
+                      const bool is2D = false,
+                      MEHPForceEvaluator* newForceEvaluator = nullptr,
+                      const double kappa = 1.0,
+                      const bool removeDanglingChains = false,
+                      const bool includeFreeChains = true)
+    : MEHPForceRelaxation(buildForceRelaxationNetwork(box,
+                                                      cu,
+                                                      !removeDanglingChains,
+                                                      includeFreeChains),
+                          is2D,
+                          newForceEvaluator,
+                          kappa)
+  {
   }
 
 #ifdef CEREALIZABLE

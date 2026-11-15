@@ -3,6 +3,7 @@
 
 #include "../topo/EntanglementDetector.h"
 #include "../topo/ResistanceDistanceAnalysis.h"
+#include "../utils/CrosslinkerUniverseStats.h"
 
 #include <pybind11/eigen.h>
 #include <pybind11/native_enum.h>
@@ -35,42 +36,6 @@ init_pylimer_bound_topo(py::module_& m)
            "Active-only mode: topologically peel leaves upfront, sample "
            "strictly between active strands")
     .finalize();
-
-  py::class_<pylimer_tools::sim::mehp::CrosslinkerUniverse, py::smart_holder>(
-    m, "CrosslinkerUniverse", py::module_local(), R"pbdoc(
-      A struct representing the topological and spatial state of crosslinkers and strands
-      without explicitly instantiating all individual strand beads.
-    )pbdoc")
-    .def(py::init<>(), "Get an instance of this struct")
-    .def_readwrite("xlink_types",
-                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::xlinkTypes)
-    .def_readwrite("xlink_x",
-                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::xlinkX)
-    .def_readwrite("xlink_y",
-                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::xlinkY)
-    .def_readwrite("xlink_z",
-                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::xlinkZ)
-    .def_readwrite(
-      "strands_of_xlink",
-      &pylimer_tools::sim::mehp::CrosslinkerUniverse::strandsOfXlink)
-    .def_readwrite("xlink_chain_id",
-                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::xlinkChainId)
-    .def_readwrite("strand_from",
-                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::strandFrom)
-    .def_readwrite("strand_to",
-                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::strandTo)
-    .def_readwrite(
-      "beads_in_strand",
-      &pylimer_tools::sim::mehp::CrosslinkerUniverse::beadsInStrand)
-    .def_readwrite(
-      "strand_bead_type",
-      &pylimer_tools::sim::mehp::CrosslinkerUniverse::strandBeadType)
-    .def_readwrite(
-      "bead_distance_in_strand",
-      &pylimer_tools::sim::mehp::CrosslinkerUniverse::beadDistanceInStrand)
-    .def_readwrite("mean_squared_bead_distance_in_strand",
-                   &pylimer_tools::sim::mehp::CrosslinkerUniverse::
-                     meanSquaredBeadDistanceInStrand);
 
   m.def("peel_topological_leaves",
         &peelTopologicalLeaves,
@@ -217,6 +182,25 @@ init_pylimer_bound_topo(py::module_& m)
     py::arg_v("filtering_mode",
               EntanglementFilteringMode::OMIT_INACTIVE,
               "EntanglementFilteringMode.OMIT_INACTIVE"));
+
+  m.def("sample_strand_beads_on_demand",
+        &sampleStrandBeadsOnDemand,
+        R"pbdoc(
+    Deterministically realize the internal bead coordinates of a single strand
+    in a CrosslinkerUniverse using a per-strand PRNG seed.
+
+    :param box: The simulation box.
+    :param crosslinker_universe: The CrosslinkerUniverse of crosslinkers and strands.
+    :param strand_idx: Index of the strand in `crosslinker_universe`.
+    :param strand_seed: Deterministic per-strand PRNG seed.
+    :param n_mc_steps: Number of Monte Carlo equilibration steps (default: 0).
+    :return: Vector of length `3 * beads_in_strand[strand_idx]` with bead coordinates.
+  )pbdoc",
+        py::arg("box"),
+        py::arg("crosslinker_universe"),
+        py::arg("strand_idx"),
+        py::arg("strand_seed"),
+        py::arg("n_mc_steps") = 0);
 
   m.def("randomly_sample_entanglements_on_demand",
         py::overload_cast<const pe::Box&,

@@ -1539,3 +1539,107 @@ TEST_CASE("Universe can contract vertices", "[Universe][entity]")
   //   CHECK(strandId == strandAffiliationInfo.strandIdOfVertex[0]);
   // }
 }
+
+TEST_CASE("Universe BondLengthStats, EndToEndStats, and PRIMARY_LOOP handling",
+          "[entity][Universe][CrosslinkerUniverseStats]")
+{
+  pe::Universe universe(10.0, 10.0, 10.0);
+
+  SECTION("Empty universe returns zeroed stats")
+  {
+    const pylimer_tools::utils::BondLengthStats bStats =
+      universe.computeBondLengthStats();
+    CHECK(bStats.nrOfBonds == 0);
+    CHECK(bStats.meanBondLength == 0.0);
+    CHECK(bStats.meanSquaredBondLength == 0.0);
+    CHECK(bStats.minBondLength == 0.0);
+    CHECK(bStats.maxBondLength == 0.0);
+
+    const pylimer_tools::utils::EndToEndStats eStats =
+      universe.computeEndToEndStats(2,
+                                    pylimer_tools::utils::StrandCategory::ALL);
+    CHECK(eStats.nrOfStrands == 0);
+    CHECK(eStats.nrOfExcludedZeroLength == 0);
+    CHECK(eStats.meanEndToEndDistance == 0.0);
+    CHECK(eStats.meanSquaredEndToEndDistance == 0.0);
+  }
+
+  SECTION("Non-winding and box-winding primary loops")
+  {
+    // Crosslinkers 1 (at 1,1,1) and 2 (at 4,1,1): network strand 1-3-2
+    // Non-winding primary loop on 1: 1-4-5-1
+    // Box-winding primary loop on 2: 2-6-7-2 wrapping across x = 10
+    // Dangling chain on 1: 1-8
+    // 1-bead free chain: 9
+    universe.addAtoms({ 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+                      { 2, 2, 1, 1, 1, 1, 1, 1, 1 },
+                      { 1.0, 4.0, 2.5, 1.5, 0.5, 7.5, 0.5, 1.0, 8.0 },
+                      { 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 2.0, 8.0 },
+                      { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 8.0 },
+                      { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                      { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                      { 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+    universe.addBonds({ 1, 3, 1, 4, 5, 2, 6, 7, 1 },
+                      { 3, 2, 4, 5, 1, 6, 7, 2, 8 });
+
+    // Check BondLengthStats matches computeBondLengths()
+    const pylimer_tools::utils::BondLengthStats bStats =
+      universe.computeBondLengthStats();
+    const std::vector<double> bondLens = universe.computeBondLengths();
+    REQUIRE(bStats.nrOfBonds == bondLens.size());
+    CHECK(bStats.minBondLength ==
+          Catch::Approx(*std::min_element(bondLens.begin(), bondLens.end())));
+    CHECK(bStats.maxBondLength ==
+          Catch::Approx(*std::max_element(bondLens.begin(), bondLens.end())));
+
+    // Check Molecule::computeEndToEndDistanceWithDerivedImageFlags on primary
+    // loops
+    const std::vector<pe::Molecule> chains =
+      universe.getChainsWithCrosslinker(2);
+    size_t nNonWindingLoop = 0;
+    size_t nWindingLoop = 0;
+    for (const pe::Molecule& mol : chains) {
+      if (mol.getType() == pe::MoleculeType::PRIMARY_LOOP) {
+        const double d = mol.computeEndToEndDistanceWithDerivedImageFlags(2);
+        if (d == 0.0) {
+          nNonWindingLoop += 1;
+        } else {
+          CHECK(d == Catch::Approx(10.0).margin(1e-12));
+          nWindingLoop += 1;
+        }
+      }
+    }
+    CHECK(nNonWindingLoop == 1);
+    CHECK(nWindingLoop == 1);
+
+    // NETWORK_STRAND: only 1-3-2 (distance 3.0)
+    const pylimer_tools::utils::EndToEndStats netStats =
+      universe.computeEndToEndStats(
+        2, pylimer_tools::utils::StrandCategory::NETWORK_STRAND);
+    CHECK(netStats.nrOfStrands == 1);
+    CHECK(netStats.nrOfExcludedZeroLength == 0);
+    CHECK(netStats.meanEndToEndDistance == Catch::Approx(3.0));
+    CHECK(netStats.meanSquaredEndToEndDistance == Catch::Approx(9.0));
+
+    // PRIMARY_LOOP: 1 non-winding (excluded), 1 box-winding (distance 10.0)
+    const pylimer_tools::utils::EndToEndStats loopStats =
+      universe.computeEndToEndStats(
+        2, pylimer_tools::utils::StrandCategory::PRIMARY_LOOP);
+    CHECK(loopStats.nrOfStrands == 1);
+    CHECK(loopStats.nrOfExcludedZeroLength == 1);
+    CHECK(loopStats.meanEndToEndDistance == Catch::Approx(10.0));
+    CHECK(loopStats.meanSquaredEndToEndDistance == Catch::Approx(100.0));
+
+    // ALL: network (3.0), winding loop (10.0), dangling (1.0);
+    // excluded: non-winding loop (0.0) and 1-bead free chain (0.0)
+    const pylimer_tools::utils::EndToEndStats allStats =
+      universe.computeEndToEndStats(2,
+                                    pylimer_tools::utils::StrandCategory::ALL);
+    CHECK(allStats.nrOfStrands == 3);
+    CHECK(allStats.nrOfExcludedZeroLength == 2);
+    CHECK(allStats.meanSquaredEndToEndDistance ==
+          Catch::Approx((9.0 + 100.0 + 1.0) / 3.0));
+    CHECK(universe.computeMeanSquareEndToEndDistance(2, false, true) ==
+          Catch::Approx(allStats.meanSquaredEndToEndDistance));
+  }
+}

@@ -2154,3 +2154,192 @@ TEST_CASE(
   // }
 }
 #endif
+
+TEST_CASE("MCUniverseGenerator streaming stats match Universe and "
+          "sampleEntanglementsOnDemand",
+          "[generator][MCUniverseGenerator][CrosslinkerUniverseStats]")
+{
+  pu::MCUniverseGenerator gen(20.0, 20.0, 20.0);
+  gen.setSeed(12345);
+  gen.configNrOfMCSteps(5);
+  gen.configPrimaryLoopProbability(0.0);
+  gen.configSecondaryLoopProbability(1.0);
+
+  gen.addCrosslinkers(25, 4, 2);
+  gen.addStrands(50, std::vector<int>(50, 8), 1);
+  gen.linkStrandsToConversion(0.9);
+  gen.addSolventChains(5, 6, 1);
+  gen.addSolventChains(2, 1, 1);
+
+  const pe::Universe u = gen.getUniverse();
+  // Calling getUniverse() a second time should produce the exact same atoms
+  const pe::Universe u2 = gen.getUniverse();
+  REQUIRE(u.getNrOfAtoms() == u2.getNrOfAtoms());
+
+  // 1. Bond length stats
+  const pu::BondLengthStats bondStats = gen.computeBondLengthStats();
+  const pu::BondLengthStats uBondStats = u.computeBondLengthStats();
+  CHECK(bondStats.nrOfBonds == uBondStats.nrOfBonds);
+  CHECK_THAT(bondStats.meanBondLength,
+             Catch::Matchers::WithinRel(uBondStats.meanBondLength, 1e-12));
+  CHECK_THAT(
+    bondStats.meanSquaredBondLength,
+    Catch::Matchers::WithinRel(uBondStats.meanSquaredBondLength, 1e-12));
+  CHECK_THAT(bondStats.minBondLength,
+             Catch::Matchers::WithinRel(uBondStats.minBondLength, 1e-12));
+  CHECK_THAT(bondStats.maxBondLength,
+             Catch::Matchers::WithinRel(uBondStats.maxBondLength, 1e-12));
+  const std::vector<double> uBondLens = u.computeBondLengths();
+  REQUIRE(bondStats.nrOfBonds == uBondLens.size());
+  double uSumB = 0.0;
+  double uSumB2 = 0.0;
+  for (const double b : uBondLens) {
+    uSumB += b;
+    uSumB2 += b * b;
+  }
+  CHECK_THAT(bondStats.meanBondLength,
+             Catch::Matchers::WithinRel(
+               uSumB / static_cast<double>(uBondLens.size()), 1e-12));
+  CHECK_THAT(bondStats.meanSquaredBondLength,
+             Catch::Matchers::WithinRel(
+               uSumB2 / static_cast<double>(uBondLens.size()), 1e-12));
+
+  // 2. Atom type counts, degree counts, effective functionality
+  CHECK(gen.countAtomTypes() == u.countAtomTypes());
+
+  const std::map<int, size_t> degCounts = gen.countAtomsByDegree();
+  for (const auto& [deg, count] : degCounts) {
+    CHECK(u.getAtomsOfDegree(deg).size() == count);
+  }
+
+  const std::map<int, double> effFunc =
+    gen.determineEffectiveFunctionalityPerType();
+  const std::map<int, double> uEffFunc =
+    u.determineEffectiveFunctionalityPerType();
+  REQUIRE(effFunc.size() == uEffFunc.size());
+  for (const auto& [type, val] : uEffFunc) {
+    CHECK_THAT(effFunc.at(type), Catch::Matchers::WithinRel(val, 1e-12));
+  }
+
+  // 3. End-to-end stats across all strand categories match Universe
+  for (const pu::StrandCategory cat :
+       { pu::StrandCategory::ALL,
+         pu::StrandCategory::NETWORK_STRAND,
+         pu::StrandCategory::TWO_CROSSLINKERS_INCLUDING_LOOPS,
+         pu::StrandCategory::DANGLING_CHAIN,
+         pu::StrandCategory::FREE_CHAIN,
+         pu::StrandCategory::PRIMARY_LOOP }) {
+    const pu::EndToEndStats genCatStats = gen.computeEndToEndStats(cat);
+    const pu::EndToEndStats uCatStats = u.computeEndToEndStats(2, cat);
+    CHECK(genCatStats.nrOfStrands == uCatStats.nrOfStrands);
+    CHECK(genCatStats.nrOfExcludedZeroLength ==
+          uCatStats.nrOfExcludedZeroLength);
+    if (genCatStats.nrOfStrands > 0) {
+      CHECK_THAT(
+        genCatStats.meanEndToEndDistance,
+        Catch::Matchers::WithinRel(uCatStats.meanEndToEndDistance, 1e-12));
+      CHECK_THAT(genCatStats.meanSquaredEndToEndDistance,
+                 Catch::Matchers::WithinRel(
+                   uCatStats.meanSquaredEndToEndDistance, 1e-12));
+    } else {
+      CHECK(uCatStats.meanEndToEndDistance == 0.0);
+      CHECK(uCatStats.meanSquaredEndToEndDistance == 0.0);
+    }
+  }
+
+  const pu::EndToEndStats netStats =
+    gen.computeEndToEndStats(pu::StrandCategory::NETWORK_STRAND);
+  const double uR2TwoXlinks =
+    u.computeMeanSquareEndToEndDistance(2, true, true);
+  CHECK_THAT(netStats.meanSquaredEndToEndDistance,
+             Catch::Matchers::WithinRel(uR2TwoXlinks, 1e-12));
+
+  const pu::EndToEndStats twoXlinkStats = gen.computeEndToEndStats(
+    pu::StrandCategory::TWO_CROSSLINKERS_INCLUDING_LOOPS);
+  CHECK_THAT(twoXlinkStats.meanSquaredEndToEndDistance,
+             Catch::Matchers::WithinRel(uR2TwoXlinks, 1e-12));
+
+  const pu::EndToEndStats allStats =
+    gen.computeEndToEndStats(pu::StrandCategory::ALL);
+  const double uR2All = u.computeMeanSquareEndToEndDistance(2, false, true);
+  CHECK_THAT(allStats.meanSquaredEndToEndDistance,
+             Catch::Matchers::WithinRel(uR2All, 1e-12));
+
+  // 4. Strand bond counts match Molecule::getNrOfBonds()
+  const std::vector<int> allBondCounts =
+    gen.computeStrandBondCounts(pu::StrandCategory::ALL);
+  const std::vector<pe::Molecule> uChains = u.getChainsWithCrosslinker(2);
+  CHECK(allBondCounts.size() == uChains.size());
+  long long sumGenBonds = 0;
+  for (const int c : allBondCounts) {
+    sumGenBonds += c;
+  }
+  long long sumUBonds = 0;
+  for (const pe::Molecule& mol : uChains) {
+    sumUBonds += mol.getNrOfBonds();
+  }
+  CHECK(sumGenBonds == sumUBonds);
+  CHECK(sumGenBonds == static_cast<long long>(uBondLens.size()));
+
+  // 5. sampleEntanglementsOnDemand sees the exact same bead coordinates as
+  // getUniverse()
+  const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+    ents = gen.sampleEntanglementsOnDemand(10, 3.0, 0.0, 0, 3.0, "", false);
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse cu =
+    gen.getCrosslinkerUniverse();
+  const size_t nXlinks = cu.xlinkTypes.size();
+  std::vector<size_t> strandStartAtomIdx(cu.strandFrom.size(), 0);
+  size_t runningAtomIdx = nXlinks;
+  for (size_t s = 0; s < cu.strandFrom.size(); ++s) {
+    strandStartAtomIdx[s] = runningAtomIdx;
+    runningAtomIdx += static_cast<size_t>(std::max(0, cu.beadsInStrand[s]));
+  }
+  for (size_t e = 0; e < ents.strandIdx1.size(); ++e) {
+    const long int atomId1 = static_cast<long int>(
+      strandStartAtomIdx[ents.strandIdx1[e]] + ents.beadIdx1[e] + 1);
+    const pe::Atom a1 = u.getAtom(atomId1);
+    Eigen::Vector3d diff1 =
+      Eigen::Vector3d(a1.getX(), a1.getY(), a1.getZ()) -
+      ents.position1.segment<3>(static_cast<Eigen::Index>(3 * e));
+    u.getBox().handlePBC(diff1);
+    CHECK(diff1.norm() < 1e-12);
+  }
+
+  // 6. After removeSolubleFraction(), streaming stats still match Universe
+  gen.removeSolubleFraction(true);
+  const pe::Universe uActive = gen.getUniverse();
+  const pu::BondLengthStats activeBondStats = gen.computeBondLengthStats();
+  const std::vector<double> uActiveBonds = uActive.computeBondLengths();
+  CHECK(activeBondStats.nrOfBonds == uActiveBonds.size());
+  CHECK_THAT(
+    gen.computeEndToEndStats(pu::StrandCategory::NETWORK_STRAND)
+      .meanSquaredEndToEndDistance,
+    Catch::Matchers::WithinRel(
+      uActive.computeMeanSquareEndToEndDistance(2, true, true), 1e-12));
+
+  // 7. CrosslinkerUniverse-based MEHP constructors match generator builders
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse uCu =
+    u.toCrosslinkerUniverse(2);
+  CHECK(uCu.strandFrom.size() == cu.strandFrom.size());
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse cuActive =
+    gen.getCrosslinkerUniverse();
+  pylimer_tools::sim::mehp::MEHPForceBalance fbFromCu(uActive.getBox(),
+                                                      cuActive);
+  pylimer_tools::sim::mehp::MEHPForceBalance fbFromGen = gen.getForceBalance();
+  CHECK(fbFromCu.getNrOfSprings() == fbFromGen.getNrOfSprings());
+  CHECK(fbFromCu.getNrOfLinks() == fbFromGen.getNrOfLinks());
+
+  pylimer_tools::sim::mehp::MEHPForceBalance2 fb2FromCu(uActive.getBox(),
+                                                        cuActive);
+  pylimer_tools::sim::mehp::MEHPForceBalance2 fb2FromGen =
+    gen.getForceBalance2();
+  CHECK(fb2FromCu.getNrOfSprings() == fb2FromGen.getNrOfSprings());
+  CHECK(fb2FromCu.getNrOfLinks() == fb2FromGen.getNrOfLinks());
+
+  pylimer_tools::sim::mehp::MEHPForceRelaxation frFromCu(uActive.getBox(),
+                                                         cuActive);
+  pylimer_tools::sim::mehp::MEHPForceRelaxation frFromGen =
+    gen.getForceRelaxation();
+  CHECK(frFromCu.getNrOfSprings() == frFromGen.getNrOfSprings());
+  CHECK(frFromCu.getNrOfNodes() == frFromGen.getNrOfNodes());
+}

@@ -549,6 +549,32 @@ A strand is a chain of connected links between two crosslinks.
          py::arg("remove_dangling_chains") = false,
          py::keep_alive<1, 5>()) // Keep force_evaluator alive with the
                                  // MEHPForceRelaxation object
+    .def(py::init<const pe::Box&,
+                  const mehp::CrosslinkerUniverse&,
+                  bool,
+                  mehp::MEHPForceEvaluator*,
+                  double,
+                  bool,
+                  bool>(),
+         R"pbdoc(
+          Instantiate the simulator from a Box and a CrosslinkerUniverse.
+
+          :param box: Simulation box
+          :param crosslinker_universe: Canonical CrosslinkerUniverse representation
+          :param is_2d: Whether to ignore the z direction
+          :param force_evaluator: The force evaluator to use
+          :param kappa: The spring constant
+          :param remove_dangling_chains: Whether to exclude dangling chains
+          :param include_free_chains: Whether to include free/soluble chains
+          )pbdoc",
+         py::arg("box"),
+         py::arg("crosslinker_universe"),
+         py::arg("is_2d") = false,
+         py::arg("force_evaluator") = nullptr,
+         py::arg("kappa") = 1.0,
+         py::arg("remove_dangling_chains") = false,
+         py::arg("include_free_chains") = true,
+         py::keep_alive<1, 5>())
     .def(
       "run_force_relaxation",
       [](mehp::MEHPForceRelaxation& self,
@@ -978,6 +1004,25 @@ A strand is a chain of connected links between two crosslinks.
          py::arg("is_2d") = false,
          py::arg("remove_2functional_crosslinkers") = false,
          py::arg("remove_dangling_chains") = false)
+    .def(py::init<const pe::Box&,
+                  const mehp::CrosslinkerUniverse&,
+                  bool,
+                  bool,
+                  bool>(),
+         R"pbdoc(
+          Instantiate the simulator from a Box and a CrosslinkerUniverse.
+
+          :param box: Simulation box
+          :param crosslinker_universe: Canonical CrosslinkerUniverse representation
+          :param is_2d: Whether to ignore the z direction
+          :param remove_dangling_chains: Whether to exclude dangling chains
+          :param include_free_chains: Whether to include free/soluble chains
+          )pbdoc",
+         py::arg("box"),
+         py::arg("crosslinker_universe"),
+         py::arg("is_2d") = false,
+         py::arg("remove_dangling_chains") = false,
+         py::arg("include_free_chains") = true)
     .def("__copy__",
          [](const mehp::MEHPForceBalance& self) {
            return mehp::MEHPForceBalance(self);
@@ -1663,6 +1708,39 @@ A strand is a chain of connected links between two crosslinks.
          py::arg("crosslinker_type") = 2,
          py::arg("is_2d") = false,
          py::arg("entanglements_as_springs") = false)
+    .def(
+      py::init<const pe::Box&,
+               const mehp::CrosslinkerUniverse&,
+               const pylimer_tools::topo::entanglement_detection::
+                 StrandPairEntanglements&,
+               int,
+               bool,
+               bool,
+               bool,
+               bool>(),
+      R"pbdoc(
+           Instantiate the simulator from a Box, a CrosslinkerUniverse, and StrandPairEntanglements.
+
+           :param box: Simulation box
+           :param crosslinker_universe: Canonical CrosslinkerUniverse representation
+           :param entanglements: StrandPairEntanglements along strands
+           :param crosslinker_type: The atom type of crosslinkers
+           :param is_2d: Whether to ignore the z direction
+           :param entanglements_as_springs: Whether to model entanglements as springs instead of merged links
+           :param remove_dangling_chains: Whether to exclude dangling chains
+           :param include_free_chains: Whether to include free/soluble chains
+           )pbdoc",
+      py::arg("box"),
+      py::arg("crosslinker_universe"),
+      py::arg_v(
+        "entanglements",
+        pylimer_tools::topo::entanglement_detection::StrandPairEntanglements(),
+        "StrandPairEntanglements()"),
+      py::arg("crosslinker_type") = 2,
+      py::arg("is_2d") = false,
+      py::arg("entanglements_as_springs") = false,
+      py::arg("remove_dangling_chains") = false,
+      py::arg("include_free_chains") = true)
 
     .def(py::init<const pe::Universe&,
                   size_t,

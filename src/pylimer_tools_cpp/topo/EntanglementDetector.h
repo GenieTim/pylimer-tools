@@ -241,6 +241,25 @@ randomlyFindEntanglementsAnalytical(
 }
 
 /**
+ * @brief Deterministically realize the internal bead coordinates of a single
+ * strand in a CrosslinkerUniverse using a per-strand PRNG seed.
+ *
+ * @param box the simulation box
+ * @param cu the crosslinker & strand representation
+ * @param strandIdx index of the strand in cu
+ * @param strandSeed deterministic per-strand PRNG seed
+ * @param nMcSteps number of Monte Carlo equilibration steps (default: 0)
+ * @return Eigen::VectorXd 3 * cu.beadsInStrand[strandIdx] coordinates
+ */
+Eigen::VectorXd
+sampleStrandBeadsOnDemand(
+  const pylimer_tools::entities::Box& box,
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse& cu,
+  size_t strandIdx,
+  uint64_t strandSeed,
+  int nMcSteps = 0);
+
+/**
  * @brief Sample spatial entanglements on a CrosslinkerUniverse using
  * per-strand bounding boxes and on-demand Brownian bridge bead resampling.
  * Only strand seeds and bounding boxes are stored, achieving the O(N_strands)

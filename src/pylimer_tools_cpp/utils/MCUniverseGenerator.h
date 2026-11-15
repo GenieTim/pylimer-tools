@@ -10,6 +10,7 @@
 #include "../sim/MEHPUtilityStructures.h"
 #include "../topo/EntanglementDetector.h"
 #include "../utils/BoolUtils.h"
+#include "CrosslinkerUniverseStats.h"
 #include "RandomWalker.h"
 #include "StringUtils.h"
 #include "VectorUtils.h"
@@ -218,6 +219,7 @@ public:
     std::random_device rd{};
     this->maxDistanceProvider.reset(new NoMaxDistanceProvider());
     this->rng = std::mt19937(rd());
+    this->strandSeedRng = std::mt19937(rd());
     this->distX = std::uniform_real_distribution<double>(0.0, Lx);
     this->distY = std::uniform_real_distribution<double>(0.0, Ly);
     this->distZ = std::uniform_real_distribution<double>(0.0, Lz);
@@ -239,6 +241,7 @@ public:
     , secondaryLoopProbability(other.secondaryLoopProbability)
     , nMcSteps(other.nMcSteps)
     , rng(other.rng)
+    , strandSeedRng(other.strandSeedRng)
     , distX(other.distX)
     , distY(other.distY)
     , distZ(other.distZ)
@@ -258,7 +261,11 @@ public:
     }
   }
 
-  void setSeed(const unsigned int seed) { this->rng.seed(seed); }
+  void setSeed(const unsigned int seed)
+  {
+    this->rng.seed(seed);
+    this->strandSeedRng.seed(seed ^ 0x9e3779b9U);
+  }
 
   void setBeadDistance(double newBeadDistance, bool updateMeanSquared = true);
 
@@ -297,7 +304,67 @@ public:
    *
    * @return pylimer_tools::entities::Universe
    */
-  pylimer_tools::entities::Universe getUniverse();
+  pylimer_tools::entities::Universe getUniverse() const;
+
+  /**
+   * @brief Stream over strands in O(1) strand memory to compute realized bond
+   * length statistics without constructing a Universe.
+   */
+  BondLengthStats computeBondLengthStats() const
+  {
+    return pylimer_tools::utils::computeBondLengthStats(
+      this->box, this->simplifiedUniverse, static_cast<int>(this->nMcSteps));
+  }
+
+  /**
+   * @brief Stream over strands matching @p category to compute end-to-end
+   * distance statistics without constructing a Universe.
+   */
+  EndToEndStats computeEndToEndStats(
+    const StrandCategory category = StrandCategory::NETWORK_STRAND) const
+  {
+    return pylimer_tools::utils::computeEndToEndStats(
+      this->box,
+      this->simplifiedUniverse,
+      category,
+      static_cast<int>(this->nMcSteps));
+  }
+
+  /**
+   * @brief Count atoms per atom type without constructing a Universe.
+   */
+  std::map<int, int> countAtomTypes() const
+  {
+    return pylimer_tools::utils::countAtomTypes(this->simplifiedUniverse);
+  }
+
+  /**
+   * @brief Count atoms per bond degree without constructing a Universe.
+   */
+  std::map<int, size_t> countAtomsByDegree() const
+  {
+    return pylimer_tools::utils::countAtomsByDegree(this->simplifiedUniverse);
+  }
+
+  /**
+   * @brief Compute effective functionality (mean degree) per atom type without
+   * constructing a Universe.
+   */
+  std::map<int, double> determineEffectiveFunctionalityPerType() const
+  {
+    return pylimer_tools::utils::determineEffectiveFunctionalityPerType(
+      this->simplifiedUniverse);
+  }
+
+  /**
+   * @brief Return the number of bonds for each strand matching @p category.
+   */
+  std::vector<int> computeStrandBondCounts(
+    const StrandCategory category = StrandCategory::ALL) const
+  {
+    return pylimer_tools::utils::computeStrandBondCounts(
+      this->simplifiedUniverse, category);
+  }
 
   /**
    * @brief Add free atoms with a specified type and functionality for
@@ -933,6 +1000,7 @@ public:
             maxDistanceProvider,
             nMcSteps,
             rng,
+            strandSeedRng,
             distX,
             distY,
             distZ,
@@ -955,6 +1023,7 @@ private:
   size_t nMcSteps = 0;
   /// random distributions
   std::mt19937 rng;
+  std::mt19937 strandSeedRng;
   std::uniform_real_distribution<double> distX;
   std::uniform_real_distribution<double> distY;
   std::uniform_real_distribution<double> distZ;
@@ -978,32 +1047,6 @@ private:
     oss << this->rng;
     return oss.str();
   }
-
-  /**
-   * @brief Do a random walk of certain length to add a chain
-   *
-   * @param chainLen the number of additional atoms to add to the chain
-   */
-  Eigen::VectorXd sampleFreeChainCoordinates(int chainLen);
-
-  /**
-   * @brief Do a random walk of certain length starting somewhere to add a
-   * chain
-   *
-   * @param idxFrom the starting crosslink of the dangling chain
-   * @param chainLen the number of additional atoms to add to the chain
-   */
-  Eigen::VectorXd sampleDanglingChainCoordinates(size_t idxFrom, int chainLen);
-
-  /**
-   * @brief Do a random walk of certain length to add a chain from one to
-   * another atom
-   *
-   * @param from the atom to start the random walk from
-   * @param to the atom to end the random walk at
-   * @param chainLen the number of atoms to add in between from and to
-   */
-  Eigen::VectorXd sampleStrandCoordinates(size_t from, size_t to, int chainLen);
 
   /**
    * @brief Tell a strand how it is connected to a crosslink.

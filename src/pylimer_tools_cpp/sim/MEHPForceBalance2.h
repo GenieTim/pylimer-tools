@@ -3,6 +3,7 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
+#include "../sim/MEHPNetworkBuilders.h"
 #include "../sim/MEHPUtilityStructures.h"
 #include "../sim/OutputSupportingSimulation.h"
 #include "../topo/EntanglementDetector.h"
@@ -106,6 +107,28 @@ public:
     this->initialConfig = net;
     this->box = pylimer_tools::entities::Box(net.L[0], net.L[1], net.L[2]);
     this->completeInitialization();
+  }
+
+  MEHPForceBalance2(
+    const pylimer_tools::entities::Box& box,
+    const CrosslinkerUniverse& cu,
+    const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements&
+      entanglements = {},
+    const int crossLinkerType = 2,
+    const bool is2D = false,
+    const bool entanglementsAsSprings = false,
+    const bool removeDanglingChains = false,
+    const bool includeFreeChains = true)
+    : MEHPForceBalance2(buildForceBalance2Network(box,
+                                                  cu,
+                                                  entanglements,
+                                                  crossLinkerType,
+                                                  entanglementsAsSprings,
+                                                  !removeDanglingChains,
+                                                  includeFreeChains),
+                        is2D)
+  {
+    this->crossLinkerType = crossLinkerType;
   }
 
   /**
