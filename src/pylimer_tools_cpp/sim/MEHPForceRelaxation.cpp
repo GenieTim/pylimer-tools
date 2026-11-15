@@ -761,28 +761,16 @@ MEHPForceRelaxation::getNrOfActiveSpringsConnected(const double tolerance) const
 Eigen::VectorXd
 MEHPForceRelaxation::getResiduals() const
 {
-  double* r = new double[3 * this->forceRelaxationNetwork.nrOfNodes];
-  for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfNodes * 3; ++i) {
-    r[i] = 0.0;
-  }
-  try {
-    this->forceEvaluator->evaluateForceSetGradient(
-      3 * this->forceRelaxationNetwork.nrOfNodes,
-      this->currentSpringDistances,
-      r);
-  } catch (const std::exception& e) {
-    delete[] (r);
-    throw e;
-  }
+  const size_t nDofs = 3 * this->forceRelaxationNetwork.nrOfNodes;
+  std::vector<double> r(nDofs, 0.0);
+  this->forceEvaluator->evaluateForceSetGradient(
+    nDofs, this->currentSpringDistances, r.data());
 
   Eigen::VectorXd results =
-    Eigen::VectorXd::Zero(this->forceRelaxationNetwork.nrOfNodes * 3);
-  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(
-                                 this->forceRelaxationNetwork.nrOfNodes * 3);
-       ++i) {
-    results[i] = r[i];
+    Eigen::VectorXd::Zero(static_cast<Eigen::Index>(nDofs));
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(nDofs); ++i) {
+    results[i] = r[static_cast<size_t>(i)];
   }
-  delete[] (r);
   return results;
 }
 

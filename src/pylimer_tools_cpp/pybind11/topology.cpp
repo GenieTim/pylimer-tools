@@ -65,7 +65,7 @@ init_pylimer_bound_topo(py::module_& m)
 
   py::class_<StrandPairEntanglements, py::smart_holder>(
     m, "StrandPairEntanglements", py::module_local(), R"pbdoc(
-      A struct to store analytically sampled entanglements on strands (without requiring an explicit Universe of all beads).
+      A struct to store sampled entanglements on strands (without requiring an explicit Universe of all beads).
     )pbdoc")
     .def(py::init<>(), "Get an instance of this struct")
     .def_readwrite(
@@ -112,77 +112,6 @@ init_pylimer_bound_topo(py::module_& m)
       Convert the strand pair entanglements to AtomPairEntanglements using the deterministic atom indexing of CrosslinkerUniverse.
     )pbdoc");
 
-  m.def("randomly_sample_entanglements_analytical",
-        py::overload_cast<const pe::Box&,
-                          const pylimer_tools::sim::mehp::CrosslinkerUniverse&,
-                          const size_t,
-                          const double,
-                          const double,
-                          const size_t,
-                          const double,
-                          const std::string&,
-                          EntanglementFilteringMode>(
-          &randomlyFindEntanglementsAnalytical),
-        R"pbdoc(
-    Analytically and probabilistically sample pairs of strand beads that could form entanglements
-    using exact 3D Brownian bridge / random walk statistics and topological strand filtering,
-    without requiring all strand beads or a Universe to be instantiated.
-
-    :param box: The simulation box for periodic boundary conditions.
-    :param crosslinker_universe: The CrosslinkerUniverse of crosslinkers and strands.
-    :param nr_of_samples: The number of entanglement pairs to randomly sample.
-    :param upper_cutoff: The maximum distance between two beads to be considered an entanglement.
-    :param lower_cutoff: The minimum distance between two beads to be considered an entanglement.
-    :param minimum_nr_of_samples: The minimum number of entanglements to be found.
-    :param same_strand_cutoff: The minimum contour separation (in beads) between two beads on the same strand.
-    :param seed: A seed for the random number generator.
-    :param filtering_mode: Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
-  )pbdoc",
-        py::arg("box"),
-        py::arg("crosslinker_universe"),
-        py::arg("nr_of_samples"),
-        py::arg("upper_cutoff"),
-        py::arg("lower_cutoff") = 0.,
-        py::arg("minimum_nr_of_samples") = 0,
-        py::arg("same_strand_cutoff") = 3.,
-        py::arg("seed") = "",
-        py::arg_v("filtering_mode",
-                  EntanglementFilteringMode::OMIT_INACTIVE,
-                  "EntanglementFilteringMode.OMIT_INACTIVE"));
-
-  m.def(
-    "randomly_sample_entanglements_analytical",
-    [](const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse,
-       const pe::Box& box,
-       const size_t nrOfSamples,
-       const double upperCutoff,
-       const double lowerCutoff,
-       const size_t minimumNrOfSamples,
-       const double same_strand_cutoff,
-       const std::string& seed,
-       const EntanglementFilteringMode filteringMode) {
-      return randomlyFindEntanglementsAnalytical(box,
-                                                 crosslinkerUniverse,
-                                                 nrOfSamples,
-                                                 upperCutoff,
-                                                 lowerCutoff,
-                                                 minimumNrOfSamples,
-                                                 same_strand_cutoff,
-                                                 seed,
-                                                 filteringMode);
-    },
-    py::arg("crosslinker_universe"),
-    py::arg("box"),
-    py::arg("nr_of_samples"),
-    py::arg("upper_cutoff"),
-    py::arg("lower_cutoff") = 0.,
-    py::arg("minimum_nr_of_samples") = 0,
-    py::arg("same_strand_cutoff") = 3.,
-    py::arg("seed") = "",
-    py::arg_v("filtering_mode",
-              EntanglementFilteringMode::OMIT_INACTIVE,
-              "EntanglementFilteringMode.OMIT_INACTIVE"));
-
   m.def("sample_strand_beads_on_demand",
         &sampleStrandBeadsOnDemand,
         R"pbdoc(
@@ -216,8 +145,8 @@ init_pylimer_bound_topo(py::module_& m)
         R"pbdoc(
     Sample pairs of strand beads that could form entanglements on demand from a CrosslinkerUniverse
     using per-strand bounding boxes and on-demand Brownian bridge bead resampling.
-    Only strand seeds and bounding boxes are stored, achieving the O(N_strands) memory scaling
-    of the analytical method while sampling from the exact discrete multi-bead chain conformations.
+    Only strand seeds and bounding boxes are stored, achieving O(N_strands) memory scaling
+    while sampling from the exact discrete multi-bead chain conformations.
 
     :param box: The simulation box for periodic boundary conditions.
     :param crosslinker_universe: The CrosslinkerUniverse of crosslinkers and strands.
@@ -317,6 +246,66 @@ init_pylimer_bound_topo(py::module_& m)
     py::arg_v("filtering_mode",
               EntanglementFilteringMode::NONE,
               "EntanglementFilteringMode.NONE"));
+
+  m.def("randomly_sample_entanglements",
+        py::overload_cast<const pe::Box&,
+                          const pylimer_tools::sim::mehp::CrosslinkerUniverse&,
+                          const size_t,
+                          const double,
+                          const double,
+                          const size_t,
+                          const double,
+                          const std::string&,
+                          EntanglementFilteringMode,
+                          int>(&randomlyFindEntanglementsOnDemand),
+        py::arg("box"),
+        py::arg("crosslinker_universe"),
+        py::arg("nr_of_samples"),
+        py::arg("upper_cutoff"),
+        py::arg("lower_cutoff") = 0.,
+        py::arg("minimum_nr_of_samples") = 0,
+        py::arg("same_strand_cutoff") = 3.,
+        py::arg("seed") = "",
+        py::arg_v("filtering_mode",
+                  EntanglementFilteringMode::OMIT_INACTIVE,
+                  "EntanglementFilteringMode.OMIT_INACTIVE"),
+        py::arg("n_mc_steps") = 0);
+
+  m.def(
+    "randomly_sample_entanglements",
+    [](const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse,
+       const pe::Box& box,
+       const size_t nrOfSamples,
+       const double upperCutoff,
+       const double lowerCutoff,
+       const size_t minimumNrOfSamples,
+       const double sameStrandCutoff,
+       const std::string& seed,
+       const EntanglementFilteringMode filteringMode,
+       const int nMcSteps) {
+      return randomlyFindEntanglementsOnDemand(box,
+                                               crosslinkerUniverse,
+                                               nrOfSamples,
+                                               upperCutoff,
+                                               lowerCutoff,
+                                               minimumNrOfSamples,
+                                               sameStrandCutoff,
+                                               seed,
+                                               filteringMode,
+                                               nMcSteps);
+    },
+    py::arg("crosslinker_universe"),
+    py::arg("box"),
+    py::arg("nr_of_samples"),
+    py::arg("upper_cutoff"),
+    py::arg("lower_cutoff") = 0.,
+    py::arg("minimum_nr_of_samples") = 0,
+    py::arg("same_strand_cutoff") = 3.,
+    py::arg("seed") = "",
+    py::arg_v("filtering_mode",
+              EntanglementFilteringMode::OMIT_INACTIVE,
+              "EntanglementFilteringMode.OMIT_INACTIVE"),
+    py::arg("n_mc_steps") = 0);
 
   m.def(
     "randomly_sample_entanglements_v2",

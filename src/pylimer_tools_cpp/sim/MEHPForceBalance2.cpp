@@ -770,12 +770,11 @@ MEHPForceBalance2::extractUniverseMetadata(
     for (int linkIdx = 0; linkIdx < this->initialConfig.nrOfLinks; ++linkIdx) {
       long int atomId = this->initialConfig.oldAtomIds[linkIdx];
       if (atomId >= 0) {
-        try {
-          size_t v = static_cast<size_t>(u.getIdxByAtomId(atomId));
-          this->atomIdToClusterIdx[atomId] = static_cast<size_t>(
-            VECTOR(membership)[static_cast<igraph_integer_t>(v)]);
-        } catch (const std::exception&) {
-          // atom id not in universe
+        if (const std::optional<igraph_integer_t> v =
+              u.tryGetIdxByAtomId(atomId);
+            v.has_value()) {
+          this->atomIdToClusterIdx[atomId] =
+            static_cast<size_t>(VECTOR(membership)[v.value()]);
         }
       }
     }

@@ -20,6 +20,7 @@ extern "C"
 #endif
 
 #include <map>
+#include <optional>
 #include <unordered_map>
 #include <vector>
 
@@ -147,7 +148,7 @@ public:
 
   // getters
   [[nodiscard]] bool containsAtom(const Atom& atom) const;
-  [[nodiscard]] bool containsAtomWithId(int atomId) const;
+  [[nodiscard]] bool containsAtomWithId(long int atomId) const;
   [[nodiscard]] Atom getAtom(int atomId) const;
   [[nodiscard]] std::vector<Atom> getAtoms() const;
   // std::map<std::st¨ring, std::vector<long int>> getBonds() const;
@@ -213,6 +214,8 @@ public:
   [[nodiscard]] long int getAtomIdByIdx(
     igraph_integer_t vertexId) const override;
   [[nodiscard]] igraph_integer_t getIdxByAtomId(long int atomId) const override;
+  [[nodiscard]] std::optional<igraph_integer_t> tryGetIdxByAtomId(
+    long int atomId) const;
 
   // operators
   Atom operator[](const size_t index) const { return this->getAtom(index); }

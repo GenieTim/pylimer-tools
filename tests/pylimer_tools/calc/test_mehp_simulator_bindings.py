@@ -9,7 +9,6 @@ from pylimer_tools_cpp import (
     Box,
     CrosslinkerUniverse,
     EntanglementFilteringMode,
-    EntanglementSamplingMethod,
     MCUniverseGenerator,
     MEHPForceRelaxation,
     MEHPForceBalance2,
@@ -21,7 +20,6 @@ from pylimer_tools_cpp import (
     inverse_langevin,
     peel_topological_leaves,
     randomly_sample_entanglements,
-    randomly_sample_entanglements_analytical,
     randomly_sample_entanglements_on_demand,
 )
 
@@ -153,9 +151,8 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         fb.config_cg_fallback_max_iterations(0)
         self.assertEqual(fb.get_cg_fallback_max_iterations(), 0)
 
-    def test_analytical_entanglement_sampling_and_universe_free_force_balance(
-            self):
-        """Test Universe-free analytical entanglement sampling and MEHPForceBalance / MEHPForceBalance2."""
+    def test_universe_free_force_balance(self):
+        """Test Universe-free on-demand entanglement sampling and MEHPForceBalance / MEHPForceBalance2."""
         gen = MCUniverseGenerator(22.0, 22.0, 22.0)
         gen.set_seed(123456)
         gen.set_mean_squared_bead_distance(1.0)
@@ -174,7 +171,7 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         box = gen.get_box()
         self.assertAlmostEqual(box.get_lx(), 22.0)
 
-        es_direct = randomly_sample_entanglements_analytical(
+        es_direct = randomly_sample_entanglements_on_demand(
             cu,
             box,
             nr_of_samples=40,
@@ -318,7 +315,8 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         cu = gen.get_crosslinker_universe()
         box = gen.get_box()
 
-        # Direct topology function
+        # Direct topology function (both randomly_sample_entanglements_on_demand
+        # and the unified randomly_sample_entanglements overload)
         es_direct = randomly_sample_entanglements_on_demand(
             cu,
             box,
@@ -334,22 +332,22 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         self.assertGreaterEqual(len(es_direct), 10)
         self.assertLessEqual(len(es_direct), 40)
 
-        # Via MCUniverseGenerator.sample_entanglements_on_demand
-        es_gen_direct = gen.sample_entanglements_on_demand(
-            nr_of_entanglements_to_sample=40,
+        es_unified = randomly_sample_entanglements(
+            cu,
+            box,
+            nr_of_samples=40,
             upper_cutoff=2.5,
             lower_cutoff=0.2,
-            minimum_nr_of_entanglements=10,
+            minimum_nr_of_samples=10,
             same_strand_cutoff=3.0,
             seed="od_seed_42",
             filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
         )
-        self.assertEqual(len(es_gen_direct), len(es_direct))
-        self.assertEqual(es_gen_direct.strand_idx_1, es_direct.strand_idx_1)
-        self.assertEqual(es_gen_direct.strand_idx_2, es_direct.strand_idx_2)
+        self.assertEqual(len(es_unified), len(es_direct))
+        self.assertEqual(es_unified.strand_idx_1, es_direct.strand_idx_1)
+        self.assertEqual(es_unified.strand_idx_2, es_direct.strand_idx_2)
 
-        # Via MCUniverseGenerator.sample_entanglements(...,
-        # method=EntanglementSamplingMethod.ON_DEMAND)
+        # Via MCUniverseGenerator.sample_entanglements
         es_gen_method = gen.sample_entanglements(
             nr_of_entanglements_to_sample=40,
             upper_cutoff=2.5,
@@ -358,24 +356,10 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             same_strand_cutoff=3.0,
             seed="od_seed_42",
             filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
-            method=EntanglementSamplingMethod.ON_DEMAND,
         )
         self.assertEqual(len(es_gen_method), len(es_direct))
         self.assertEqual(es_gen_method.strand_idx_1, es_direct.strand_idx_1)
         self.assertEqual(es_gen_method.strand_idx_2, es_direct.strand_idx_2)
-
-        # Verify passing string method raises TypeError
-        with self.assertRaises(TypeError):
-            gen.sample_entanglements(
-                nr_of_entanglements_to_sample=40,
-                upper_cutoff=2.5,
-                lower_cutoff=0.2,
-                minimum_nr_of_entanglements=10,
-                same_strand_cutoff=3.0,
-                seed="od_seed_42",
-                filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
-                method="on_demand",
-            )
 
         # MEHPForceBalance (v1) with pre-sampled entanglements
         fb1 = gen.get_force_balance(es_gen_method)
@@ -392,8 +376,7 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         self.assertGreater(fb2.get_active_weight_fraction(), 0.0)
         self.assertGreater(fb2.get_gamma_factor(1.0), 0.0)
 
-        # Sampling and building directly via get_force_balance2(...,
-        # method=EntanglementSamplingMethod.ON_DEMAND)
+        # Sampling and building directly via get_force_balance2
         fb2_direct = gen.get_force_balance2(
             nr_of_entanglements_to_sample=40,
             upper_cutoff=2.5,
@@ -404,7 +387,6 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
             filtering_mode=EntanglementFilteringMode.OMIT_INACTIVE,
             crosslinker_type=2,
             entanglements_as_springs=False,
-            method=EntanglementSamplingMethod.ON_DEMAND,
         )
         fb2_direct.validate_network()
         self.assertGreater(fb2_direct.get_nr_of_extra_atoms(), 0)

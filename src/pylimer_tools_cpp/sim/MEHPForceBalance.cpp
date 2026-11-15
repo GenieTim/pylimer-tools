@@ -946,9 +946,10 @@ MEHPForceBalance::randomlyAddSliplinks(const size_t nrOfSliplinksToSample,
     crosslinkerUniverse.strandFrom.resize(nSprings);
     crosslinkerUniverse.strandTo.resize(nSprings);
     crosslinkerUniverse.beadsInStrand.resize(nSprings);
-    const double b2 = (this->defaultBondLength > 0.0)
-                        ? (this->defaultBondLength * this->defaultBondLength)
-                        : 1.0;
+    const double b =
+      (this->defaultBondLength > 0.0) ? this->defaultBondLength : 1.0;
+    const double b2 = b * b;
+    crosslinkerUniverse.beadDistanceInStrand.assign(nSprings, b);
     crosslinkerUniverse.meanSquaredBeadDistanceInStrand.assign(nSprings, b2);
     // springs whose anchored end is B, such that the contour fraction
     // sampled from the anchor has to be mirrored w.r.t. the spring direction
@@ -979,8 +980,9 @@ MEHPForceBalance::randomlyAddSliplinks(const size_t nrOfSliplinksToSample,
       }
     }
 
-    auto entanglements = pylimer_tools::topo::entanglement_detection::
-      randomlyFindEntanglementsAnalytical(this->box,
+    pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+      entanglements = pylimer_tools::topo::entanglement_detection::
+        randomlyFindEntanglementsOnDemand(this->box,
                                           crosslinkerUniverse,
                                           nrOfSliplinksToSample,
                                           cutoff,

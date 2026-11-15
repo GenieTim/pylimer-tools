@@ -13,17 +13,16 @@ Here, we distinguish the following three different implementations:
 Sampling Entanglements
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Entanglements can be sampled in three ways:
+Entanglements can be sampled in two ways:
 
-1. **Discrete full-universe sampling**: Directly on explicit bead coordinates in a :class:`~pylimer_tools_cpp.Universe`.
-2. **On-demand bounding-box sampling**: Computes per-strand bounding boxes and regenerates candidate strand beads on demand, matching discrete bead-level fidelity with ~80–95% lower peak memory.
-3. **Analytical Brownian-bridge sampling**: Directly on the crosslinkers and strand connectivity of a :class:`~pylimer_tools_cpp.CrosslinkerUniverse` without instantiating intermediate strand beads, reducing peak memory by ~80–95%.
+1. **On-demand bounding-box sampling** (default): Computes per-strand bounding boxes and regenerates candidate strand beads on demand, matching discrete bead-level fidelity with ~80–95% lower peak memory.
+2. **Discrete full-universe sampling**: Directly on explicit bead coordinates in a :class:`~pylimer_tools_cpp.Universe`.
 
-All three methods support :class:`~pylimer_tools_cpp.EntanglementFilteringMode` for topological leaf peeling of dangling and soluble fractions.
+Both methods support :class:`~pylimer_tools_cpp.EntanglementFilteringMode` for topological leaf peeling of dangling and soluble fractions.
 
 See:
 
-- :doc:`plot_entanglement_sampling_comparison` for a detailed benchmark and comparison of discrete vs. analytical sampling methods,
+- :doc:`plot_entanglement_sampling_comparison` for a detailed benchmark and comparison of discrete vs. on-demand sampling methods,
 - :doc:`plot_entanglement_link_vs_spring` for the difference between modeling entanglements as rigid merged links versus compliant Hookean springs in Force Balance 2,
 - :doc:`plot_slipping_vs_fixed_links` for a comparison of dynamic contour slipping versus fixed entanglement links in Force Balance 1, and
 - :doc:`plot_inactive_removal_and_sampling` for the removal of inactive strands/entanglements in Force Balance 2 and the impact of pre-filtering dangling chains during entanglement sampling,

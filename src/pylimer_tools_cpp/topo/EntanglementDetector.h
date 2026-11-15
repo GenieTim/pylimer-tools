@@ -183,64 +183,6 @@ struct StrandPairEntanglements
 };
 
 /**
- * @brief Analytically and probabilistically sample spatial entanglements
- * directly on a CrosslinkerUniverse using Brownian bridge / random walk
- * conditional Gaussian distributions and topological filtering, bypassing
- * explicit 3D bead coordinates and Universe / igraph_t construction.
- *
- * @param box the simulation box
- * @param crosslinkerUniverse the crosslinker & strand representation
- * @param nrOfEntanglementsToSample the maximum number of entanglements to
- * sample
- * @param upperCutoff the upper distance cutoff within which two beads can
- * entangle
- * @param lowerCutoff the lower distance cutoff
- * @param minimumNrOfEntanglements the minimum number of entanglements to sample
- * @param sameStrandCutoff the minimum number of bonds between two entangled
- * beads on the same strand
- * @param seed the random seed
- * @param filteringMode filtering mode (NONE, OMIT_INACTIVE, or PRUNE_UPFRONT)
- * @return StrandPairEntanglements
- */
-StrandPairEntanglements
-randomlyFindEntanglementsAnalytical(
-  const pylimer_tools::entities::Box& box,
-  const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse,
-  const size_t nrOfEntanglementsToSample,
-  const double upperCutoff,
-  const double lowerCutoff = 0.,
-  const size_t minimumNrOfEntanglements = 0,
-  const double sameStrandCutoff = 3,
-  const std::string& seed = "",
-  EntanglementFilteringMode filteringMode =
-    EntanglementFilteringMode::OMIT_INACTIVE);
-
-inline StrandPairEntanglements
-randomlyFindEntanglementsAnalytical(
-  const pylimer_tools::entities::Box& box,
-  const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse,
-  const size_t nrOfEntanglementsToSample,
-  const double upperCutoff,
-  const double lowerCutoff,
-  const size_t minimumNrOfEntanglements,
-  const double sameStrandCutoff,
-  const std::string& seed,
-  const bool filterDanglingAndSoluble)
-{
-  return randomlyFindEntanglementsAnalytical(
-    box,
-    crosslinkerUniverse,
-    nrOfEntanglementsToSample,
-    upperCutoff,
-    lowerCutoff,
-    minimumNrOfEntanglements,
-    sameStrandCutoff,
-    seed,
-    filterDanglingAndSoluble ? EntanglementFilteringMode::OMIT_INACTIVE
-                             : EntanglementFilteringMode::NONE);
-}
-
-/**
  * @brief Deterministically realize the internal bead coordinates of a single
  * strand in a CrosslinkerUniverse using a per-strand PRNG seed.
  *
@@ -262,8 +204,8 @@ sampleStrandBeadsOnDemand(
 /**
  * @brief Sample spatial entanglements on a CrosslinkerUniverse using
  * per-strand bounding boxes and on-demand Brownian bridge bead resampling.
- * Only strand seeds and bounding boxes are stored, achieving the O(N_strands)
- * memory scaling of the analytical method while sampling from the exact
+ * Only strand seeds and bounding boxes are stored, achieving O(N_strands)
+ * memory scaling while sampling from the exact
  * discrete multi-bead chain conformations.
  *
  * @param box the simulation box
@@ -321,6 +263,57 @@ randomlyFindEntanglementsOnDemand(
     filterDanglingAndSoluble ? EntanglementFilteringMode::OMIT_INACTIVE
                              : EntanglementFilteringMode::NONE,
     nMcSteps);
+}
+
+inline StrandPairEntanglements
+randomlyFindEntanglements(
+  const pylimer_tools::entities::Box& box,
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse,
+  const size_t nrOfEntanglementsToSample,
+  const double upperCutoff,
+  const double lowerCutoff = 0.,
+  const size_t minimumNrOfEntanglements = 0,
+  const double sameStrandCutoff = 3,
+  const std::string& seed = "",
+  const EntanglementFilteringMode filteringMode =
+    EntanglementFilteringMode::OMIT_INACTIVE,
+  const int nMcSteps = 0)
+{
+  return randomlyFindEntanglementsOnDemand(box,
+                                           crosslinkerUniverse,
+                                           nrOfEntanglementsToSample,
+                                           upperCutoff,
+                                           lowerCutoff,
+                                           minimumNrOfEntanglements,
+                                           sameStrandCutoff,
+                                           seed,
+                                           filteringMode,
+                                           nMcSteps);
+}
+
+inline StrandPairEntanglements
+randomlyFindEntanglements(
+  const pylimer_tools::entities::Box& box,
+  const pylimer_tools::sim::mehp::CrosslinkerUniverse& crosslinkerUniverse,
+  const size_t nrOfEntanglementsToSample,
+  const double upperCutoff,
+  const double lowerCutoff,
+  const size_t minimumNrOfEntanglements,
+  const double sameStrandCutoff,
+  const std::string& seed,
+  const bool filterDanglingAndSoluble,
+  const int nMcSteps = 0)
+{
+  return randomlyFindEntanglementsOnDemand(box,
+                                           crosslinkerUniverse,
+                                           nrOfEntanglementsToSample,
+                                           upperCutoff,
+                                           lowerCutoff,
+                                           minimumNrOfEntanglements,
+                                           sameStrandCutoff,
+                                           seed,
+                                           filterDanglingAndSoluble,
+                                           nMcSteps);
 }
 
 /**

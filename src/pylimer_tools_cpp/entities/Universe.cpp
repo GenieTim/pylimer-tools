@@ -538,10 +538,7 @@ Universe::addBonds(const size_t NNewBonds,
                        std::to_string(bondTypes.size()) + " types, alleged " +
                        std::to_string(NNewBonds) + ".");
 
-  std::vector<long int> newEdgesVector =
-    pylimer_tools::utils::interleave(from, to);
-  size_t edgesSize = newEdgesVector.size();
-  assert(edgesSize == NNewBonds * 2);
+  const size_t edgesSize = NNewBonds * 2;
   // translate from atomId to VertexIdx
   igraph_vector_int_t newEdges;
   size_t actualNrOfBondsAdded = 0;
@@ -551,28 +548,28 @@ Universe::addBonds(const size_t NNewBonds,
     addedBondTypes.reserve(NNewBonds);
   }
   igraph_vector_int_init(&newEdges, edgesSize);
-  int innerIndex = 0;
-  for (size_t i = 1; i < edgesSize; i += 2) {
-    try {
-      // two at once to throw in case one end cannot be resolved
-      size_t vertexFrom = this->atomIdToVertexIdx.at(newEdgesVector[i - 1]);
-      size_t vertexTo = this->atomIdToVertexIdx.at(newEdgesVector[i]);
-      igraph_vector_int_set(&newEdges, innerIndex, vertexFrom);
-      innerIndex += 1;
-      igraph_vector_int_set(&newEdges, innerIndex, vertexTo);
-      innerIndex += 1;
-      actualNrOfBondsAdded += 1;
-      if (hasExplicitBondTypes) {
-        addedBondTypes.push_back(bondTypes[i / 2]);
-      }
-    } catch ([[maybe_unused]] std::out_of_range& ex) {
+  igraph_integer_t innerIndex = 0;
+  for (size_t i = 0; i < NNewBonds; ++i) {
+    const std::optional<igraph_integer_t> idxFrom =
+      this->tryGetIdxByAtomId(from[i]);
+    const std::optional<igraph_integer_t> idxTo =
+      idxFrom.has_value() ? this->tryGetIdxByAtomId(to[i]) : std::nullopt;
+    if (!idxFrom.has_value() || !idxTo.has_value()) {
       if (!ignoreNonExistentAtoms) {
         igraph_vector_int_destroy(&newEdges);
         throw std::invalid_argument(
-          "Bond with atom with id " + std::to_string(newEdgesVector[i]) +
-          " and " + std::to_string(newEdgesVector[i - 1]) +
-          " impossible as atom is not added yet.");
+          "Bond with atom with id " + std::to_string(to[i]) + " and " +
+          std::to_string(from[i]) + " impossible as atom is not added yet.");
       }
+      continue;
+    }
+    igraph_vector_int_set(&newEdges, innerIndex, *idxFrom);
+    innerIndex += 1;
+    igraph_vector_int_set(&newEdges, innerIndex, *idxTo);
+    innerIndex += 1;
+    actualNrOfBondsAdded += 1;
+    if (hasExplicitBondTypes) {
+      addedBondTypes.push_back(bondTypes[i]);
     }
   }
   assert(innerIndex == 2 * actualNrOfBondsAdded);
@@ -2314,6 +2311,22 @@ Universe::getIdxByAtomId(const long int atomId) const
 }
 
 /**
+ * @brief Try to get the vertex index for a given atom id without throwing
+ *
+ * @param atomId
+ * @return std::optional<igraph_integer_t>
+ */
+std::optional<igraph_integer_t>
+Universe::tryGetIdxByAtomId(const long int atomId) const
+{
+  const auto it = this->atomIdToVertexIdx.find(atomId);
+  if (it == this->atomIdToVertexIdx.end()) {
+    return std::nullopt;
+  }
+  return it->second;
+}
+
+/**
  * @brief Check whether the given atom id is present in this universe
  *
  * @param atomId
@@ -2321,7 +2334,7 @@ Universe::getIdxByAtomId(const long int atomId) const
  * @return false
  */
 bool
-Universe::containsAtomWithId(const int atomId) const
+Universe::containsAtomWithId(const long int atomId) const
 {
   return pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx, atomId);
 }

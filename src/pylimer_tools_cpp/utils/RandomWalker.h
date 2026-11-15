@@ -29,10 +29,11 @@ namespace utils {
   {
     std::uniform_real_distribution<double> angleDistribution =
       std::uniform_real_distribution<double>(0, 2 * M_PI);
+    const double variance = meanSquaredBeadDistance - SQUARE(beadDistance);
+    const bool hasStepSizeVariance = variance > 1e-15;
     std::normal_distribution<double> stepSizeDistribution =
       std::normal_distribution<double>(
-        beadDistance,
-        std::sqrt(meanSquaredBeadDistance - SQUARE(beadDistance)));
+        beadDistance, hasStepSizeVariance ? std::sqrt(variance) : 1.0);
 
     Eigen::VectorXd coordinates = Eigen::VectorXd(3 * chainLen);
 
@@ -45,7 +46,9 @@ namespace utils {
       const double beta = angleDistribution(rng);
 
       // TODO: adjust step size according to mean squared bead distance
-      stepSize = stepSizeDistribution(rng);
+      if (hasStepSizeVariance) {
+        stepSize = stepSizeDistribution(rng);
+      }
 
       // coordinate system conversion: confirmation e.g. in
       // https://math.stackexchange.com/a/1385150/738831 or

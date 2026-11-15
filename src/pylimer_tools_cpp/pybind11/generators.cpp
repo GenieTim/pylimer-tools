@@ -21,26 +21,6 @@ using namespace pylimer_tools::utils;
 void
 init_pylimer_bound_generators(py::module_& m)
 {
-  py::native_enum<EntanglementSamplingMethod>(
-    m,
-    "EntanglementSamplingMethod",
-    "enum.Enum",
-    "Enum representing the method for sampling entanglements in polymer "
-    "networks.")
-    .value("DISCRETE",
-           EntanglementSamplingMethod::DISCRETE,
-           "Full bead-spring Universe discrete sampling")
-    .value("ANALYTICAL",
-           EntanglementSamplingMethod::ANALYTICAL,
-           "Universe-free analytical Gaussian Brownian-bridge sampling")
-    .value("ON_DEMAND",
-           EntanglementSamplingMethod::ON_DEMAND,
-           "On-demand Brownian-bridge sampling with bounding-box culling")
-    .value("BOUNDING_BOX",
-           EntanglementSamplingMethod::BOUNDING_BOX,
-           "Alias for ON_DEMAND")
-    .finalize();
-
   py::class_<MaxDistanceProvider, std::shared_ptr<MaxDistanceProvider>>(
     m, "MaxDistanceProvider", R"pbdoc(
      A generic implementation of a class, that shall provide a maximum distance for the MC sampling.
@@ -772,12 +752,12 @@ init_pylimer_bound_generators(py::module_& m)
         size_t,
         double,
         const std::string&,
-        pylimer_tools::topo::entanglement_detection::EntanglementFilteringMode,
-        EntanglementSamplingMethod>(&MCUniverseGenerator::sampleEntanglements,
-                                    py::const_),
+        pylimer_tools::topo::entanglement_detection::EntanglementFilteringMode>(
+        &MCUniverseGenerator::sampleEntanglements, py::const_),
       R"pbdoc(
          Sample entanglements directly from the generator's CrosslinkerUniverse
-         without generating all strand beads or constructing a Universe.
+         using per-strand bounding boxes and on-demand Brownian bridge bead
+         resampling without constructing a full Universe.
 
          :param nr_of_entanglements_to_sample: Target number of entanglements to sample.
          :param upper_cutoff: Upper cutoff distance between entangled beads.
@@ -786,81 +766,8 @@ init_pylimer_bound_generators(py::module_& m)
          :param same_strand_cutoff: Minimum contour separation on the same strand (default: 3.0).
          :param seed: Optional random seed (uses generator RNG if empty).
          :param filtering_mode: Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
-         :param method: Sampling method (default: EntanglementSamplingMethod.ANALYTICAL).
          :return: Sampled StrandPairEntanglements.
          )pbdoc",
-      py::arg("nr_of_entanglements_to_sample"),
-      py::arg("upper_cutoff"),
-      py::arg("lower_cutoff") = 0.,
-      py::arg("minimum_nr_of_entanglements") = 0,
-      py::arg("same_strand_cutoff") = 3.,
-      py::arg("seed") = "",
-      py::arg_v("filtering_mode",
-                pylimer_tools::topo::entanglement_detection::
-                  EntanglementFilteringMode::OMIT_INACTIVE,
-                "EntanglementFilteringMode.OMIT_INACTIVE"),
-      py::arg_v("method",
-                EntanglementSamplingMethod::ANALYTICAL,
-                "EntanglementSamplingMethod.ANALYTICAL"))
-    .def(
-      "sample_entanglements_analytical",
-      py::overload_cast<
-        size_t,
-        double,
-        double,
-        size_t,
-        double,
-        const std::string&,
-        pylimer_tools::topo::entanglement_detection::EntanglementFilteringMode>(
-        &MCUniverseGenerator::sampleEntanglementsAnalytical, py::const_),
-      R"pbdoc(
-            Sample entanglements analytically and probabilistically from the generator's CrosslinkerUniverse
-            using Brownian bridge conditional Gaussian distributions.
-
-            :param nr_of_entanglements_to_sample: Target number of entanglements to sample.
-            :param upper_cutoff: Upper cutoff distance between entangled beads.
-            :param lower_cutoff: Lower cutoff distance between entangled beads (default: 0.0).
-            :param minimum_nr_of_entanglements: Minimum number of entanglements required (default: 0).
-            :param same_strand_cutoff: Minimum contour separation on the same strand (default: 3.0).
-            :param seed: Optional random seed (uses generator RNG if empty).
-            :param filtering_mode: Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
-            :return: Sampled StrandPairEntanglements.
-            )pbdoc",
-      py::arg("nr_of_entanglements_to_sample"),
-      py::arg("upper_cutoff"),
-      py::arg("lower_cutoff") = 0.,
-      py::arg("minimum_nr_of_entanglements") = 0,
-      py::arg("same_strand_cutoff") = 3.,
-      py::arg("seed") = "",
-      py::arg_v("filtering_mode",
-                pylimer_tools::topo::entanglement_detection::
-                  EntanglementFilteringMode::OMIT_INACTIVE,
-                "EntanglementFilteringMode.OMIT_INACTIVE"))
-    .def(
-      "sample_entanglements_on_demand",
-      py::overload_cast<
-        size_t,
-        double,
-        double,
-        size_t,
-        double,
-        const std::string&,
-        pylimer_tools::topo::entanglement_detection::EntanglementFilteringMode>(
-        &MCUniverseGenerator::sampleEntanglementsOnDemand, py::const_),
-      R"pbdoc(
-            Sample entanglements from the generator's CrosslinkerUniverse using per-strand bounding
-            boxes and on-demand Brownian bridge bead resampling. Memory is O(N_strands) like analytical
-            sampling, while results physically match discrete multi-bead chain conformations.
-
-            :param nr_of_entanglements_to_sample: Target number of entanglements to sample.
-            :param upper_cutoff: Upper cutoff distance between entangled beads.
-            :param lower_cutoff: Lower cutoff distance between entangled beads (default: 0.0).
-            :param minimum_nr_of_entanglements: Minimum number of entanglements required (default: 0).
-            :param same_strand_cutoff: Minimum contour separation on the same strand (default: 3.0).
-            :param seed: Optional random seed (uses generator RNG if empty).
-            :param filtering_mode: Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
-            :return: Sampled StrandPairEntanglements.
-            )pbdoc",
       py::arg("nr_of_entanglements_to_sample"),
       py::arg("upper_cutoff"),
       py::arg("lower_cutoff") = 0.,
@@ -909,8 +816,7 @@ init_pylimer_bound_generators(py::module_& m)
          const double sameStrandCutoff,
          const std::string& seed,
          const pylimer_tools::topo::entanglement_detection::
-           EntanglementFilteringMode filteringMode,
-         const EntanglementSamplingMethod method) {
+           EntanglementFilteringMode filteringMode) {
         return self.getForceBalance(
           self.sampleEntanglements(nrOfEntanglementsToSample,
                                    upperCutoff,
@@ -918,8 +824,7 @@ init_pylimer_bound_generators(py::module_& m)
                                    minimumNrOfEntanglements,
                                    sameStrandCutoff,
                                    seed,
-                                   filteringMode,
-                                   method));
+                                   filteringMode));
       },
       R"pbdoc(
       Sample entanglements and return a configured MEHPForceBalance instance,
@@ -932,7 +837,6 @@ init_pylimer_bound_generators(py::module_& m)
       :param same_strand_cutoff: Minimum contour separation on the same strand (default: 3.0).
       :param seed: Optional random seed (uses generator RNG if empty).
       :param filtering_mode: Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
-      :param method: Entanglement sampling method (default: EntanglementSamplingMethod.ANALYTICAL).
       :return: Configured MEHPForceBalance instance.
       )pbdoc",
       py::arg("nr_of_entanglements_to_sample"),
@@ -944,10 +848,7 @@ init_pylimer_bound_generators(py::module_& m)
       py::arg_v("filtering_mode",
                 pylimer_tools::topo::entanglement_detection::
                   EntanglementFilteringMode::OMIT_INACTIVE,
-                "EntanglementFilteringMode.OMIT_INACTIVE"),
-      py::arg_v("method",
-                EntanglementSamplingMethod::ANALYTICAL,
-                "EntanglementSamplingMethod.ANALYTICAL"))
+                "EntanglementFilteringMode.OMIT_INACTIVE"))
     .def(
       "get_force_balance2",
       py::overload_cast<>(&MCUniverseGenerator::getForceBalance2, py::const_),
@@ -978,17 +879,16 @@ init_pylimer_bound_generators(py::module_& m)
     .def(
       "get_force_balance2",
       [](const MCUniverseGenerator& self,
-         size_t nrOfEntanglementsToSample,
-         double upperCutoff,
-         double lowerCutoff,
-         size_t minimumNrOfEntanglements,
-         double sameStrandCutoff,
+         const size_t nrOfEntanglementsToSample,
+         const double upperCutoff,
+         const double lowerCutoff,
+         const size_t minimumNrOfEntanglements,
+         const double sameStrandCutoff,
          const std::string& seed,
          const pylimer_tools::topo::entanglement_detection::
            EntanglementFilteringMode filteringMode,
-         bool entanglementsAsSprings,
-         int crosslinkerType,
-         const EntanglementSamplingMethod method) {
+         const bool entanglementsAsSprings,
+         const int crosslinkerType) {
         return self.getForceBalance2(
           self.sampleEntanglements(nrOfEntanglementsToSample,
                                    upperCutoff,
@@ -996,8 +896,7 @@ init_pylimer_bound_generators(py::module_& m)
                                    minimumNrOfEntanglements,
                                    sameStrandCutoff,
                                    seed,
-                                   filteringMode,
-                                   method),
+                                   filteringMode),
           crosslinkerType,
           entanglementsAsSprings);
       },
@@ -1014,7 +913,6 @@ init_pylimer_bound_generators(py::module_& m)
            :param filtering_mode: Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
            :param entanglements_as_springs: Whether to represent entanglements as springs between two split nodes (default: False).
            :param crosslinker_type: Crosslinker atom type (default: 2).
-           :param method: Entanglement sampling method (default: EntanglementSamplingMethod.ANALYTICAL).
            :return: Configured MEHPForceBalance2 instance.
            )pbdoc",
       py::arg("nr_of_entanglements_to_sample"),
@@ -1028,10 +926,7 @@ init_pylimer_bound_generators(py::module_& m)
                   EntanglementFilteringMode::OMIT_INACTIVE,
                 "EntanglementFilteringMode.OMIT_INACTIVE"),
       py::arg("entanglements_as_springs") = false,
-      py::arg("crosslinker_type") = 2,
-      py::arg_v("method",
-                EntanglementSamplingMethod::ANALYTICAL,
-                "EntanglementSamplingMethod.ANALYTICAL"))
+      py::arg("crosslinker_type") = 2)
 #ifdef CEREALIZABLE
     .def(py::pickle(
       [](const MCUniverseGenerator& gen) {

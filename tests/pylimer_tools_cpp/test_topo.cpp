@@ -79,9 +79,9 @@ TEST_CASE("Entanglement Detector throws", "[analysis][EntanglementDetector]")
 
   pylimer_tools::sim::mehp::CrosslinkerUniverse crosslinkerUniverse;
   pe::Box box(15.0, 15.0, 15.0);
-  CHECK_THROWS(pt::randomlyFindEntanglementsAnalytical(
+  CHECK_THROWS(pt::randomlyFindEntanglementsOnDemand(
     box, crosslinkerUniverse, 10, 1.0, 2.0));
-  CHECK_THROWS(pt::randomlyFindEntanglementsAnalytical(
+  CHECK_THROWS(pt::randomlyFindEntanglementsOnDemand(
     box, crosslinkerUniverse, 5, 2.0, 0.0, 10));
 }
 
@@ -150,9 +150,9 @@ TEST_CASE("Entanglement Detector enforces sameStrandCutoff on rings and "
   }
 }
 
-TEST_CASE("Analytical Entanglement Detector samples valid entanglements on "
+TEST_CASE("On-Demand Entanglement Detector samples valid entanglements on "
           "CrosslinkerUniverse",
-          "[analysis][EntanglementDetector][analytical]")
+          "[analysis][EntanglementDetector][on_demand]")
 {
   pe::Box box(20.0, 20.0, 20.0);
   pylimer_tools::sim::mehp::CrosslinkerUniverse cu;
@@ -213,25 +213,25 @@ TEST_CASE("Analytical Entanglement Detector samples valid entanglements on "
     const double sameStrandCutoff = 4.0;
 
     pt::StrandPairEntanglements es1 =
-      pt::randomlyFindEntanglementsAnalytical(box,
-                                              cu,
-                                              40,
-                                              upperCutoff,
-                                              lowerCutoff,
-                                              10,
-                                              sameStrandCutoff,
-                                              "analytical_seed_42",
-                                              true);
+      pt::randomlyFindEntanglementsOnDemand(box,
+                                            cu,
+                                            40,
+                                            upperCutoff,
+                                            lowerCutoff,
+                                            10,
+                                            sameStrandCutoff,
+                                            "on_demand_seed_42",
+                                            true);
     pt::StrandPairEntanglements es2 =
-      pt::randomlyFindEntanglementsAnalytical(box,
-                                              cu,
-                                              40,
-                                              upperCutoff,
-                                              lowerCutoff,
-                                              10,
-                                              sameStrandCutoff,
-                                              "analytical_seed_42",
-                                              true);
+      pt::randomlyFindEntanglementsOnDemand(box,
+                                            cu,
+                                            40,
+                                            upperCutoff,
+                                            lowerCutoff,
+                                            10,
+                                            sameStrandCutoff,
+                                            "on_demand_seed_42",
+                                            true);
 
     REQUIRE(es1.size() >= 10);
     CHECK(es1.size() <= 40);
@@ -298,14 +298,48 @@ TEST_CASE("Analytical Entanglement Detector samples valid entanglements on "
     solubleCu.meanSquaredBeadDistanceInStrand = { 1., 1., 1. };
 
     pt::StrandPairEntanglements filtered =
-      pt::randomlyFindEntanglementsAnalytical(
+      pt::randomlyFindEntanglementsOnDemand(
         box, solubleCu, 15, 4.0, 0.0, 0, 2.0, "seed_sol", true);
     CHECK(filtered.size() == 0);
 
     pt::StrandPairEntanglements unfiltered =
-      pt::randomlyFindEntanglementsAnalytical(
+      pt::randomlyFindEntanglementsOnDemand(
         box, solubleCu, 15, 4.0, 0.0, 5, 2.0, "seed_sol", false);
     CHECK(unfiltered.size() >= 5);
+    for (size_t e = 0; e < unfiltered.size(); ++e) {
+      for (const int side : { 0, 1 }) {
+        const size_t s =
+          (side == 0) ? unfiltered.strandIdx1[e] : unfiltered.strandIdx2[e];
+        const size_t k =
+          (side == 0) ? unfiltered.beadIdx1[e] : unfiltered.beadIdx2[e];
+        const double alpha =
+          (side == 0) ? unfiltered.alpha1[e] : unfiltered.alpha2[e];
+        const int nBeads = solubleCu.beadsInStrand[s];
+        if (s == 0) {
+          // Crosslinked strand: all nBeads beads are internal, nBonds = nBeads
+          // + 1
+          CHECK(k < static_cast<size_t>(nBeads));
+          CHECK(alpha == Catch::Approx(static_cast<double>(k + 1) /
+                                       static_cast<double>(nBeads + 1))
+                           .margin(1e-12));
+        } else if (s == 1) {
+          // Dangling strand: last bead (nBeads - 1) is degree-1 end, nBonds =
+          // nBeads
+          CHECK(k + 1 < static_cast<size_t>(nBeads));
+          CHECK(alpha == Catch::Approx(static_cast<double>(k + 1) /
+                                       static_cast<double>(nBeads))
+                           .margin(1e-12));
+        } else {
+          // Free strand: beads 0 and nBeads - 1 are degree-1 ends, nBonds =
+          // nBeads - 1
+          CHECK(k >= 1);
+          CHECK(k + 1 < static_cast<size_t>(nBeads));
+          CHECK(alpha == Catch::Approx(static_cast<double>(k) /
+                                       static_cast<double>(nBeads - 1))
+                           .margin(1e-12));
+        }
+      }
+    }
   }
 }
 

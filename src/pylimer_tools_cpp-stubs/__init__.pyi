@@ -17,7 +17,7 @@ import numpy
 import numpy.typing
 import scipy.sparse
 import typing
-__all__: list[str] = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'BackTrackStatus', 'BondLengthStats', 'Box', 'CONJUGATE_GRADIENT', 'ComputedDoubleValues', 'ComputedIntValues', 'CrosslinkerUniverse', 'DIRECT_LDLT', 'DIRECT_LLT', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'EndToEndStats', 'EntanglementFilteringMode', 'EntanglementSamplingMethod', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'NormalModeSolver', 'OutputConfiguration', 'ResistanceDistanceAnalysis', 'RouseBrownianSimulator', 'RouseSimulationResult', 'RouseSolverType', 'SLESolver', 'STOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StrandCategory', 'StrandPairEntanglements', 'StructureSimplificationMode', 'TRACK_BACKWARD', 'TRACK_FORWARD', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'peel_topological_leaves', 'randomly_sample_entanglements', 'randomly_sample_entanglements_analytical', 'randomly_sample_entanglements_on_demand', 'randomly_sample_entanglements_v2', 'sample_strand_beads_on_demand', 'split_csv', 'version_information']
+__all__: list[str] = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'BackTrackStatus', 'BondLengthStats', 'Box', 'CONJUGATE_GRADIENT', 'ComputedDoubleValues', 'ComputedIntValues', 'CrosslinkerUniverse', 'DIRECT_LDLT', 'DIRECT_LLT', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'EndToEndStats', 'EntanglementFilteringMode', 'ExitReason', 'LazyUniverseSequenceIterator', 'LinearMaxDistanceProvider', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'MaxDistanceProvider', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NoMaxDistanceProvider', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'NormalModeSolver', 'OutputConfiguration', 'ResistanceDistanceAnalysis', 'RouseBrownianSimulator', 'RouseSimulationResult', 'RouseSolverType', 'SLESolver', 'STOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalance2Network', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StrandCategory', 'StrandPairEntanglements', 'StructureSimplificationMode', 'TRACK_BACKWARD', 'TRACK_FORWARD', 'Universe', 'UniverseSequence', 'ZScoreMaxDistanceProvider', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'peel_topological_leaves', 'randomly_sample_entanglements', 'randomly_sample_entanglements_on_demand', 'randomly_sample_entanglements_v2', 'sample_strand_beads_on_demand', 'split_csv', 'version_information']
 class Atom:
     """
     
@@ -1393,13 +1393,6 @@ class EntanglementFilteringMode(enum.IntEnum):
         """
         Convert to a string according to format_spec.
         """
-class EntanglementSamplingMethod(enum.Enum):
-    """
-    Enum representing the method for sampling entanglements in polymer networks.
-    """
-    ANALYTICAL: typing.ClassVar[EntanglementSamplingMethod]  # value = <EntanglementSamplingMethod.ANALYTICAL: 1>
-    DISCRETE: typing.ClassVar[EntanglementSamplingMethod]  # value = <EntanglementSamplingMethod.DISCRETE: 0>
-    ON_DEMAND: typing.ClassVar[EntanglementSamplingMethod]  # value = <EntanglementSamplingMethod.ON_DEMAND: 2>
 class ExitReason(enum.IntEnum):
     """
     
@@ -1765,7 +1758,7 @@ class MCUniverseGenerator:
                  :return: Configured MEHPForceBalance instance.
         """
     @typing.overload
-    def get_force_balance(self, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filtering_mode: EntanglementFilteringMode = ..., method: EntanglementSamplingMethod = ...) -> MEHPForceBalance:
+    def get_force_balance(self, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filtering_mode: EntanglementFilteringMode = ...) -> MEHPForceBalance:
         """
               Sample entanglements and return a configured MEHPForceBalance instance,
               bypassing the creation of a Universe.
@@ -1777,7 +1770,6 @@ class MCUniverseGenerator:
               :param same_strand_cutoff: Minimum contour separation on the same strand (default: 3.0).
               :param seed: Optional random seed (uses generator RNG if empty).
               :param filtering_mode: Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
-              :param method: Entanglement sampling method (default: EntanglementSamplingMethod.ANALYTICAL).
               :return: Configured MEHPForceBalance instance.
         """
     @typing.overload
@@ -1800,7 +1792,7 @@ class MCUniverseGenerator:
                       :return: Configured MEHPForceBalance2 instance.
         """
     @typing.overload
-    def get_force_balance2(self, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filtering_mode: EntanglementFilteringMode = ..., entanglements_as_springs: bool = False, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, method: EntanglementSamplingMethod = ...) -> MEHPForceBalance2:
+    def get_force_balance2(self, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filtering_mode: EntanglementFilteringMode = ..., entanglements_as_springs: bool = False, crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2) -> MEHPForceBalance2:
         """
                    Sample entanglements and return a configured MEHPForceBalance2 instance,
                    bypassing the creation of a Universe.
@@ -1814,7 +1806,6 @@ class MCUniverseGenerator:
                    :param filtering_mode: Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
                    :param entanglements_as_springs: Whether to represent entanglements as springs between two split nodes (default: False).
                    :param crosslinker_type: Crosslinker atom type (default: 2).
-                   :param method: Entanglement sampling method (default: EntanglementSamplingMethod.ANALYTICAL).
                    :return: Configured MEHPForceBalance2 instance.
         """
     def get_force_relaxation(self) -> MEHPForceRelaxation:
@@ -1954,10 +1945,11 @@ class MCUniverseGenerator:
         
                     :param rescale_box: Whether to rescale the box dimensions to maintain constant density (default: true).
         """
-    def sample_entanglements(self, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filtering_mode: EntanglementFilteringMode = ..., method: EntanglementSamplingMethod = ...) -> StrandPairEntanglements:
+    def sample_entanglements(self, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filtering_mode: EntanglementFilteringMode = ...) -> StrandPairEntanglements:
         """
                  Sample entanglements directly from the generator's CrosslinkerUniverse
-                 without generating all strand beads or constructing a Universe.
+                 using per-strand bounding boxes and on-demand Brownian bridge bead
+                 resampling without constructing a full Universe.
         
                  :param nr_of_entanglements_to_sample: Target number of entanglements to sample.
                  :param upper_cutoff: Upper cutoff distance between entangled beads.
@@ -1966,37 +1958,7 @@ class MCUniverseGenerator:
                  :param same_strand_cutoff: Minimum contour separation on the same strand (default: 3.0).
                  :param seed: Optional random seed (uses generator RNG if empty).
                  :param filtering_mode: Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
-                 :param method: Sampling method (default: EntanglementSamplingMethod.ANALYTICAL).
                  :return: Sampled StrandPairEntanglements.
-        """
-    def sample_entanglements_analytical(self, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filtering_mode: EntanglementFilteringMode = ...) -> StrandPairEntanglements:
-        """
-                    Sample entanglements analytically and probabilistically from the generator's CrosslinkerUniverse
-                    using Brownian bridge conditional Gaussian distributions.
-        
-                    :param nr_of_entanglements_to_sample: Target number of entanglements to sample.
-                    :param upper_cutoff: Upper cutoff distance between entangled beads.
-                    :param lower_cutoff: Lower cutoff distance between entangled beads (default: 0.0).
-                    :param minimum_nr_of_entanglements: Minimum number of entanglements required (default: 0).
-                    :param same_strand_cutoff: Minimum contour separation on the same strand (default: 3.0).
-                    :param seed: Optional random seed (uses generator RNG if empty).
-                    :param filtering_mode: Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
-                    :return: Sampled StrandPairEntanglements.
-        """
-    def sample_entanglements_on_demand(self, nr_of_entanglements_to_sample: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_entanglements: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filtering_mode: EntanglementFilteringMode = ...) -> StrandPairEntanglements:
-        """
-                    Sample entanglements from the generator's CrosslinkerUniverse using per-strand bounding
-                    boxes and on-demand Brownian bridge bead resampling. Memory is O(N_strands) like analytical
-                    sampling, while results physically match discrete multi-bead chain conformations.
-        
-                    :param nr_of_entanglements_to_sample: Target number of entanglements to sample.
-                    :param upper_cutoff: Upper cutoff distance between entangled beads.
-                    :param lower_cutoff: Lower cutoff distance between entangled beads (default: 0.0).
-                    :param minimum_nr_of_entanglements: Minimum number of entanglements required (default: 0).
-                    :param same_strand_cutoff: Minimum contour separation on the same strand (default: 3.0).
-                    :param seed: Optional random seed (uses generator RNG if empty).
-                    :param filtering_mode: Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
-                    :return: Sampled StrandPairEntanglements.
         """
     def set_bead_distance(self, distance: typing.SupportsFloat | typing.SupportsIndex, update_mean_squared: bool = True) -> None:
         """
@@ -4361,7 +4323,7 @@ class StrandCategory(enum.IntEnum):
 class StrandPairEntanglements:
     """
     
-          A struct to store analytically sampled entanglements on strands (without requiring an explicit Universe of all beads).
+          A struct to store sampled entanglements on strands (without requiring an explicit Universe of all beads).
         
     """
     def __init__(self) -> None:
@@ -5476,6 +5438,7 @@ def peel_topological_leaves(crosslinker_universe: CrosslinkerUniverse) -> list[b
         :param crosslinker_universe: The CrosslinkerUniverse representation.
         :return: Boolean vector of ignored/pruned strands.
     """
+@typing.overload
 def randomly_sample_entanglements(universe: Universe, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', crosslinker_type: typing.SupportsInt | typing.SupportsIndex = 2, ignore_crosslinks: bool = True, filtering_mode: EntanglementFilteringMode = ...) -> AtomPairEntanglements:
     """
         Randomly find pairs of atoms that are close together and could be entanglements.
@@ -5492,32 +5455,18 @@ def randomly_sample_entanglements(universe: Universe, nr_of_samples: typing.Supp
         :param filtering_mode: Filtering mode for entanglements (default: EntanglementFilteringMode.NONE).
     """
 @typing.overload
-def randomly_sample_entanglements_analytical(box: Box, crosslinker_universe: CrosslinkerUniverse, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filtering_mode: EntanglementFilteringMode = ...) -> StrandPairEntanglements:
-    """
-        Analytically and probabilistically sample pairs of strand beads that could form entanglements
-        using exact 3D Brownian bridge / random walk statistics and topological strand filtering,
-        without requiring all strand beads or a Universe to be instantiated.
-    
-        :param box: The simulation box for periodic boundary conditions.
-        :param crosslinker_universe: The CrosslinkerUniverse of crosslinkers and strands.
-        :param nr_of_samples: The number of entanglement pairs to randomly sample.
-        :param upper_cutoff: The maximum distance between two beads to be considered an entanglement.
-        :param lower_cutoff: The minimum distance between two beads to be considered an entanglement.
-        :param minimum_nr_of_samples: The minimum number of entanglements to be found.
-        :param same_strand_cutoff: The minimum contour separation (in beads) between two beads on the same strand.
-        :param seed: A seed for the random number generator.
-        :param filtering_mode: Filtering mode for entanglements (default: EntanglementFilteringMode.OMIT_INACTIVE).
-    """
+def randomly_sample_entanglements(box: Box, crosslinker_universe: CrosslinkerUniverse, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filtering_mode: EntanglementFilteringMode = ..., n_mc_steps: typing.SupportsInt | typing.SupportsIndex = 0) -> StrandPairEntanglements:
+    ...
 @typing.overload
-def randomly_sample_entanglements_analytical(crosslinker_universe: CrosslinkerUniverse, box: Box, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filtering_mode: EntanglementFilteringMode = ...) -> StrandPairEntanglements:
+def randomly_sample_entanglements(crosslinker_universe: CrosslinkerUniverse, box: Box, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filtering_mode: EntanglementFilteringMode = ..., n_mc_steps: typing.SupportsInt | typing.SupportsIndex = 0) -> StrandPairEntanglements:
     ...
 @typing.overload
 def randomly_sample_entanglements_on_demand(box: Box, crosslinker_universe: CrosslinkerUniverse, nr_of_samples: typing.SupportsInt | typing.SupportsIndex, upper_cutoff: typing.SupportsFloat | typing.SupportsIndex, lower_cutoff: typing.SupportsFloat | typing.SupportsIndex = 0.0, minimum_nr_of_samples: typing.SupportsInt | typing.SupportsIndex = 0, same_strand_cutoff: typing.SupportsFloat | typing.SupportsIndex = 3.0, seed: str = '', filtering_mode: EntanglementFilteringMode = ..., n_mc_steps: typing.SupportsInt | typing.SupportsIndex = 0) -> StrandPairEntanglements:
     """
         Sample pairs of strand beads that could form entanglements on demand from a CrosslinkerUniverse
         using per-strand bounding boxes and on-demand Brownian bridge bead resampling.
-        Only strand seeds and bounding boxes are stored, achieving the O(N_strands) memory scaling
-        of the analytical method while sampling from the exact discrete multi-bead chain conformations.
+        Only strand seeds and bounding boxes are stored, achieving O(N_strands) memory scaling
+        while sampling from the exact discrete multi-bead chain conformations.
     
         :param box: The simulation box for periodic boundary conditions.
         :param crosslinker_universe: The CrosslinkerUniverse of crosslinkers and strands.

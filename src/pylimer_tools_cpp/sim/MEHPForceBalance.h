@@ -1485,8 +1485,7 @@ public:
   ExitReason getExitReason() const { return this->exitReason; }
 
   /**
-   * @brief Add slip-links from (e.g., analytically) sampled strand pair
-   * entanglements
+   * @brief Add slip-links from sampled strand pair entanglements
    *
    * @param entanglements the strand pairs, contour fractions and positions
    */

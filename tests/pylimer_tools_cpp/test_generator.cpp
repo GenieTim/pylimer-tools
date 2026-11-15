@@ -1847,7 +1847,7 @@ TEST_CASE("linkStrandsToStrandsToConversion also works with free strands",
 }
 
 TEST_CASE(
-  "MCUniverseGenerator analytical entanglements bypass Universe to "
+  "MCUniverseGenerator on-demand entanglements bypass Universe to "
   "MEHPForceBalance and MEHPForceBalance2",
   "[generator][MCUniverseGenerator][EntanglementDetector][MEHPForceBalance2]")
 {
@@ -1865,14 +1865,16 @@ TEST_CASE(
 
   const size_t expectedAtoms = generator.getCurrentNrOfAtoms();
 
-  auto entanglements =
-    generator.sampleEntanglements(60, 2.5, 0.2, 20, 3.0, "ent_seed_123", true);
+  const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+    entanglements = generator.sampleEntanglements(
+      60, 2.5, 0.2, 20, 3.0, "ent_seed_123", true);
   REQUIRE(entanglements.size() >= 20);
   CHECK(entanglements.size() <= 60);
 
   SECTION("MEHPForceBalance (v1) direct from generator with entanglements")
   {
-    auto fb = generator.getForceBalance(entanglements);
+    pylimer_tools::sim::mehp::MEHPForceBalance fb =
+      generator.getForceBalance(entanglements);
     CHECK(fb.validateNetwork());
     CHECK(fb.getNrOfSprings() == 150 + 15 + 10);
     CHECK(fb.getNrOfPartialSprings() ==
@@ -1887,7 +1889,7 @@ TEST_CASE(
 
   SECTION("MEHPForceBalance::randomlyAddSliplinks without Universe")
   {
-    auto fb = generator.getForceBalance();
+    pylimer_tools::sim::mehp::MEHPForceBalance fb = generator.getForceBalance();
     const size_t added = fb.randomlyAddSliplinks(30, 2.5, 0.0, 10, 42);
     CHECK(added >= 10);
     CHECK(fb.validateNetwork());
@@ -1895,7 +1897,8 @@ TEST_CASE(
 
   SECTION("MEHPForceBalance2 with entanglements as merged links (no Universe)")
   {
-    auto fb2 = generator.getForceBalance2(entanglements, 2, false);
+    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
+      generator.getForceBalance2(entanglements, 2, false);
     CHECK_NOTHROW(fb2.validateNetwork());
     CHECK(fb2.inferNrOfAtomsFromNetwork() == expectedAtoms);
     CHECK(fb2.getNumExtraAtoms() == entanglements.size());
@@ -1903,8 +1906,9 @@ TEST_CASE(
 
     // Compare weight fractions and gamma with Universe-constructed
     // MEHPForceBalance2
-    auto atomPairs =
-      entanglements.toAtomPairEntanglements(generator.getCrosslinkerUniverse());
+    const pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
+      atomPairs = entanglements.toAtomPairEntanglements(
+        generator.getCrosslinkerUniverse());
     pe::Universe universe = generator.getUniverse();
     CHECK(universe.getNrOfAtoms() == expectedAtoms);
 
@@ -1930,20 +1934,23 @@ TEST_CASE(
     CHECK_THAT(
       fb2.getDanglingWeightFraction(),
       Catch::Matchers::WithinAbs(fb2Univ.getDanglingWeightFraction(), 1e-6));
-    CHECK_THAT(fb2.getGammaFactor(1.0),
-               Catch::Matchers::WithinRel(fb2Univ.getGammaFactor(1.0), 0.1));
+    CHECK_THAT(
+      fb2.getGammaFactors(1.0).sum(),
+      Catch::Matchers::WithinRel(fb2Univ.getGammaFactors(1.0).sum(), 1e-4));
   }
 
   SECTION("MEHPForceBalance2 with entanglements as springs (no Universe)")
   {
-    auto fb2Springs = generator.getForceBalance2(entanglements, 2, true);
+    pylimer_tools::sim::mehp::MEHPForceBalance2 fb2Springs =
+      generator.getForceBalance2(entanglements, 2, true);
     CHECK_NOTHROW(fb2Springs.validateNetwork());
     CHECK(fb2Springs.inferNrOfAtomsFromNetwork() == expectedAtoms);
     CHECK(fb2Springs.getNumExtraAtoms() == 2 * entanglements.size());
     CHECK(fb2Springs.getNumExtraBonds() == entanglements.size());
 
-    auto atomPairs =
-      entanglements.toAtomPairEntanglements(generator.getCrosslinkerUniverse());
+    const pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
+      atomPairs = entanglements.toAtomPairEntanglements(
+        generator.getCrosslinkerUniverse());
     pe::Universe universe = generator.getUniverse();
     pylimer_tools::sim::mehp::MEHPForceBalance2 fb2UnivSprings(
       universe, atomPairs, 2, false, true);
@@ -1988,8 +1995,8 @@ TEST_CASE(
 
   // Test on-demand sampling directly
   const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
-    entanglements = generator.sampleEntanglementsOnDemand(
-      60, 2.5, 0.2, 20, 3.0, "od_seed_123", true);
+    entanglements =
+      generator.sampleEntanglements(60, 2.5, 0.2, 20, 3.0, "od_seed_123", true);
   REQUIRE(entanglements.size() >= 20);
   CHECK(entanglements.size() <= 60);
 
@@ -2010,55 +2017,31 @@ TEST_CASE(
     CHECK(entanglements.alpha2[i] < 1.0);
   }
 
-  SECTION("sampleEntanglements dispatching by method parameter")
+  SECTION("sampleEntanglements with EntanglementFilteringMode")
   {
     const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
-      entEnum = generator.sampleEntanglements(
+      entMode = generator.sampleEntanglements(
         40,
         2.5,
         0.0,
         10,
         3.0,
         "test_seed",
-        true,
-        pu::EntanglementSamplingMethod::ON_DEMAND);
-    CHECK(entEnum.size() >= 10);
+        pylimer_tools::topo::entanglement_detection::EntanglementFilteringMode::
+          OMIT_INACTIVE);
+    CHECK(entMode.size() >= 10);
 
     const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
-      entOnDemand = generator.sampleEntanglements(
-        40, 2.5, 0.0, 10, 3.0, "test_seed", true, "on_demand");
-    CHECK(entOnDemand.size() == entEnum.size());
-
-    const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
-      entBBox = generator.sampleEntanglements(
-        40,
-        2.5,
-        0.0,
-        10,
-        3.0,
-        "test_seed",
-        true,
-        pu::EntanglementSamplingMethod::BOUNDING_BOX);
-    CHECK(entBBox.size() == entOnDemand.size());
-
-    CHECK_THROWS_AS(generator.sampleEntanglements(
-                      10, 2.0, 0.0, 0, 3.0, "", true, "nonexistent_method"),
-                    std::invalid_argument);
+      entBool =
+        generator.sampleEntanglements(40, 2.5, 0.0, 10, 3.0, "test_seed", true);
+    CHECK(entBool.size() == entMode.size());
   }
 
   SECTION("MEHPForceBalance2 with on-demand entanglements")
   {
     pylimer_tools::sim::mehp::MEHPForceBalance2 fb2 =
-      generator.getForceBalance2(60,
-                                 2.5,
-                                 0.2,
-                                 20,
-                                 3.0,
-                                 "od_seed_123",
-                                 true,
-                                 false,
-                                 2,
-                                 pu::EntanglementSamplingMethod::ON_DEMAND);
+      generator.getForceBalance2(
+        60, 2.5, 0.2, 20, 3.0, "od_seed_123", true, false, 2);
     CHECK_NOTHROW(fb2.validateNetwork());
     CHECK(fb2.inferNrOfAtomsFromNetwork() == expectedAtoms);
     CHECK(fb2.getNumExtraAtoms() >= 20);
@@ -2281,10 +2264,10 @@ TEST_CASE("MCUniverseGenerator streaming stats match Universe and "
   CHECK(sumGenBonds == sumUBonds);
   CHECK(sumGenBonds == static_cast<long long>(uBondLens.size()));
 
-  // 5. sampleEntanglementsOnDemand sees the exact same bead coordinates as
+  // 5. sampleEntanglements sees the exact same bead coordinates as
   // getUniverse()
   const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
-    ents = gen.sampleEntanglementsOnDemand(10, 3.0, 0.0, 0, 3.0, "", false);
+    ents = gen.sampleEntanglements(10, 3.0, 0.0, 0, 3.0, "", false);
   const pylimer_tools::sim::mehp::CrosslinkerUniverse cu =
     gen.getCrosslinkerUniverse();
   const size_t nXlinks = cu.xlinkTypes.size();
@@ -2342,4 +2325,69 @@ TEST_CASE("MCUniverseGenerator streaming stats match Universe and "
     gen.getForceRelaxation();
   CHECK(frFromCu.getNrOfSprings() == frFromGen.getNrOfSprings());
   CHECK(frFromCu.getNrOfNodes() == frFromGen.getNrOfNodes());
+}
+
+TEST_CASE("On-demand entanglement sampling is spatially uniform across cells",
+          "[generator][MCUniverseGenerator][EntanglementDetector][on_demand]")
+{
+  const double L = 28.31;
+  const size_t nStrands = 1000;
+  const int strandLen = 50;
+  const size_t nEnt = 1379;
+  const double cutoff = 2.59;
+  const double b = 0.969;
+
+  pu::MCUniverseGenerator gen(L, L, L);
+  gen.configNrOfMCSteps(0);
+  gen.setSeed(777);
+  gen.setBeadDistance(b);
+  gen.setMeanSquaredBeadDistance(b * b);
+  gen.addStrands(nStrands, pu::initializeWithValue(nStrands, strandLen));
+  gen.addCrosslinkers(nStrands / 2, 4);
+  gen.linkStrandsToConversion(1.0);
+
+  const pylimer_tools::topo::entanglement_detection::StrandPairEntanglements
+    ents = gen.sampleEntanglements(nEnt,
+                                   cutoff,
+                                   0.0,
+                                   0,
+                                   3.0,
+                                   "uniform_test_seed",
+                                   pylimer_tools::topo::entanglement_detection::
+                                     EntanglementFilteringMode::OMIT_INACTIVE);
+  REQUIRE(ents.size() == nEnt);
+
+  // Verify strands are sampled across the network rather than clustered in
+  // 1-2 spatial cells (Poisson expectation ~ 1 - exp(-2*1379/1000) ~ 93.7%).
+  std::vector<bool> strandInvolved(nStrands, false);
+  std::array<size_t, 8> octantCounts = {};
+  for (size_t e = 0; e < ents.size(); ++e) {
+    strandInvolved[ents.strandIdx1[e]] = true;
+    strandInvolved[ents.strandIdx2[e]] = true;
+    const size_t oct = (ents.x[e] >= 0.0 ? 1 : 0) | (ents.y[e] >= 0.0 ? 2 : 0) |
+                       (ents.z[e] >= 0.0 ? 4 : 0);
+    octantCounts[oct] += 1;
+  }
+  const size_t numUniqueStrands = static_cast<size_t>(
+    std::count(strandInvolved.begin(), strandInvolved.end(), true));
+  CHECK(numUniqueStrands > 800);
+  for (const size_t c : octantCounts) {
+    CHECK(c > 100);
+  }
+
+  // Verify modulus matches discrete Universe-based MEHPForceBalance2
+  pylimer_tools::sim::mehp::MEHPForceBalance2 fbOd =
+    gen.getForceBalance2(ents, 2, false);
+  fbOd.runForceRelaxation(
+    pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F);
+
+  const pe::Universe u = gen.getUniverse();
+  pylimer_tools::sim::mehp::MEHPForceBalance2 fbDisc(
+    u, nEnt, cutoff, 0.0, 0, 3.0, "disc_test_seed", 2, false, true, false);
+  fbDisc.runForceRelaxation(
+    pylimer_tools::sim::mehp::StructureSimplificationMode::INACTIVE_THEN_X2F);
+
+  const double sumGammaOd = fbOd.getGammaFactors(b * b).sum();
+  const double sumGammaDisc = fbDisc.getGammaFactors(b * b).sum();
+  CHECK_THAT(sumGammaOd, Catch::Matchers::WithinRel(sumGammaDisc, 0.1));
 }

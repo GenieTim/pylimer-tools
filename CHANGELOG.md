@@ -2,6 +2,21 @@
 
 ## main
 
+### Unified Entanglement Sampling, Performance & Robustness Improvements
+- **Unified On-Demand Entanglement Sampling (`EntanglementDetector`, `MCUniverseGenerator`)**:
+  - Remove the analytical entanglement sampling approximation (`randomlyFindEntanglementsAnalytical` / `randomly_sample_entanglements_analytical`, `MCUniverseGenerator::sampleEntanglementsAnalytical` / `sample_entanglements_analytical`) and the `EntanglementSamplingMethod` enum (`parseEntanglementSamplingMethod`).
+  - Unify `MCUniverseGenerator::sampleEntanglements` (`sample_entanglements`) with on-demand Brownian-bridge bounding-box sampling (`sampleEntanglementsOnDemand`), removing the redundant `method` parameter from `MCUniverseGenerator::sampleEntanglements`, `getForceBalance`, and `getForceBalance2`.
+  - Add `(const Box&, const CrosslinkerUniverse&, ...)` and `(const CrosslinkerUniverse&, const Box&, ...)` overloads to `randomlyFindEntanglements` (`randomly_sample_entanglements`) that delegate directly to `randomlyFindEntanglementsOnDemand`.
+  - Enforce spatial uniformity in `randomlyFindEntanglementsOnDemand` via micro-batched candidate search (`BATCH_SIZE = 256`) and exact degree-2 internal bead and bond counting across crosslinked, dangling, free, and primary-loop strands (including shortest-path loop distance cutoffs and immediate marking of isolated candidate-free beads).
+  - Fix bifunctional crosslink entanglement-sandwich detection in `MEHPForceBalance2::findActiveStrands` when entanglements are modeled as split springs (`entanglementsAsSprings = true`).
+- **Non-Throwing Atom Lookups & Allocation-Free Metadata Extraction (`Universe`, `MEHPForceBalance2`, `MEHPForceRelaxation`, `RandomWalk`)**:
+  - Add `Universe::tryGetIdxByAtomId` (`std::optional<size_t>`) and adopt it in `Universe::addBonds` and `MEHPForceBalance2::extractUniverseMetadata` to avoid throwing and catching `std::invalid_argument` on missing atom IDs during bond validation and cluster metadata extraction.
+  - Eliminate transient `Eigen::VectorXd` heap allocations in `Universe::computeDanglingAtoms`.
+  - Replace raw `new[]` / `delete[]` buffer management with RAII `std::vector<double>` in `MEHPForceRelaxation::getResiduals`.
+  - Guard against zero variance (`std <= 0`) in `doRandomWalkChain` to avoid constructing invalid `std::normal_distribution<double>(0.0, 0.0)`.
+- **Force Balance Examples Modularization (`examples/force_balance/`)**:
+  - Extract reusable study runners (`examples/force_balance/_study_runners.py`) and plotting utilities (`examples/force_balance/_plotting.py`) shared across `plot_entanglement_sampling_comparison.py`, `plot_polydispersity_study.py`, and `plot_sampling_cutoff_effect.py`.
+
 ### Deterministic Per-Strand Seeds, Streaming Statistics & Unified Network Builders
 - **Deterministic Per-Strand Bead Realization (`CrosslinkerUniverse`, `EntanglementDetector`, `MCUniverseGenerator`)**:
   - Add per-strand deterministic PRNG seeds (`CrosslinkerUniverse::strandSeeds`, populated via `MCUniverseGenerator::strandSeedRng`) and public `sampleStrandBeadsOnDemand` (`sample_strand_beads_on_demand`), ensuring that `MCUniverseGenerator::getUniverse() const`, `randomlyFindEntanglementsOnDemand`, and streaming statistics realize identical bead coordinates without mutating generator state.

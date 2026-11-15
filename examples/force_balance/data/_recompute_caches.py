@@ -41,7 +41,7 @@ from _example_cache import (  # noqa: E402
 def recompute_entanglement_link_vs_spring(
         max_workers: Optional[int] = None) -> None:
     """Recompute the multi-seed ensemble dataset for plot_entanglement_link_vs_spring."""
-    from plot_entanglement_link_vs_spring import (
+    from _study_runners import (
         run_entanglement_link_vs_spring_simulation,
     )
 
@@ -63,7 +63,7 @@ def recompute_entanglement_link_vs_spring(
 def recompute_slipping_vs_fixed_links(
         max_workers: Optional[int] = None) -> None:
     """Recompute the multi-seed ensemble dataset for plot_slipping_vs_fixed_links."""
-    from plot_slipping_vs_fixed_links import run_slipping_vs_fixed_simulation
+    from _study_runners import run_slipping_vs_fixed_simulation
 
     cache_path = get_example_cache_path(
         "slipping_vs_fixed_cache.npz", "force_balance")
@@ -81,7 +81,7 @@ def recompute_entanglement_sampling_comparison(
     max_workers: Optional[int] = None,
 ) -> None:
     """Recompute the multi-seed benchmark dataset for plot_entanglement_sampling_comparison."""
-    from plot_entanglement_sampling_comparison import run_all_benchmarks
+    from _study_runners import run_all_benchmarks
 
     cache_path = get_example_cache_path(
         "entanglement_sampling_comparison_cache.npz", "force_balance"
@@ -103,7 +103,7 @@ def recompute_inactive_removal_and_sampling(
     max_workers: Optional[int] = None,
 ) -> None:
     """Recompute the multi-seed ensemble dataset for plot_inactive_removal_and_sampling."""
-    from plot_inactive_removal_and_sampling import (
+    from _study_runners import (
         run_inactive_removal_and_sampling_simulation,
     )
 
@@ -126,7 +126,7 @@ def recompute_sampling_cutoff_effect(
     max_workers: Optional[int] = None,
 ) -> None:
     """Recompute the multi-seed ensemble dataset for plot_sampling_cutoff_effect."""
-    from plot_sampling_cutoff_effect import run_sampling_cutoff_simulation
+    from _study_runners import run_sampling_cutoff_simulation
 
     cache_path = get_example_cache_path(
         "sampling_cutoff_effect_cache.npz", "force_balance"
@@ -145,7 +145,7 @@ def recompute_polydispersity_study(
     max_workers: Optional[int] = None,
 ) -> None:
     """Recompute the multi-seed ensemble dataset for plot_polydispersity_study."""
-    from plot_polydispersity_study import run_polydispersity_simulation
+    from _study_runners import run_polydispersity_simulation
 
     cache_path = get_example_cache_path(
         "polydispersity_study_cache.npz", "force_balance"

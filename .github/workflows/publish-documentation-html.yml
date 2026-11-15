@@ -2,6 +2,11 @@ name: Publish HTML Documentation
 
 on:
   workflow_dispatch:
+    inputs:
+      force_gallery_rebuild:
+        description: "Force re-execution of all Sphinx-Gallery examples"
+        type: boolean
+        default: false
   push:
     branches:
       - master
@@ -31,12 +36,29 @@ jobs:
         with:
           submodules: "recursive"
 
+      - name: Detect file changes
+        uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          list-files: json
+          filters: |
+            full_gallery:
+              - "src/**"
+              - "examples/_*.py"
+              - "docs/conf.py"
+              - "bin/make-docs.sh"
+              - ".github/workflows/publish-documentation-html.yml"
+            example_data_or_helpers:
+              - "examples/**/data/**"
+              - "examples/**/_*.py"
+
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: "pip"
 
-      - uses: actions/cache@v6
+      - name: Cache build dependencies
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cache/pip
@@ -47,12 +69,53 @@ jobs:
             ./vendor/nlopt-skbuild
             ./vendor/cereal
             ./vendor/cereal-skbuild
+          key: ${{ runner.os }}-docs-build-3.12-${{ hashFiles('**/requirements.txt', 'CMakeLists.txt', 'setup.py', 'vendor/**', 'src/**') }}
+          restore-keys: |
+            ${{ runner.os }}-docs-build-3.12-
+
+      - name: Cache Sphinx-Gallery outputs
+        uses: actions/cache@v6
+        with:
+          path: |
             ./docs/auto_examples
             ./docs/gen_modules
             ./docs-html
-          key: ${{ runner.os }}-docs-3.12-${{ hashFiles('**/requirements.txt', 'docs/**') }}
+          key: ${{ runner.os }}-docs-gallery-3.12-${{ hashFiles('docs/**', 'examples/**', 'src/**') }}
           restore-keys: |
-            ${{ runner.os }}-docs-3.12-
+            ${{ runner.os }}-docs-gallery-3.12-
+
+      - name: Invalidate stale Sphinx-Gallery caches
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.force_gallery_rebuild) || steps.filter.outputs.full_gallery == 'true' || steps.filter.outputs.example_data_or_helpers == 'true' }}
+        env:
+          FORCE_ALL: ${{ (github.event_name == 'workflow_dispatch' && inputs.force_gallery_rebuild) || steps.filter.outputs.full_gallery == 'true' }}
+          CHANGED_FILES: ${{ steps.filter.outputs.example_data_or_helpers_files }}
+        run: |
+          if [ ! -d docs/auto_examples ]; then
+            exit 0
+          fi
+          if [ "$FORCE_ALL" = "true" ]; then
+            echo "Invalidating all Sphinx-Gallery .py.md5 caches..."
+            find docs/auto_examples -name '*.py.md5' -delete
+          else
+            python3 - <<'EOF'
+          import json
+          import os
+          from pathlib import Path
+
+          changed = json.loads(os.environ.get("CHANGED_FILES") or "[]")
+          subdirs = {
+              Path(p).parts[1]
+              for p in changed
+              if len(Path(p).parts) >= 3 and Path(p).parts[0] == "examples"
+          }
+          for subdir in sorted(subdirs):
+              target = Path("docs/auto_examples") / subdir
+              if target.is_dir():
+                  for md5_file in target.rglob("*.py.md5"):
+                      print(f"Removing stale cache marker: {md5_file}")
+                      md5_file.unlink()
+          EOF
+          fi
 
       - name: Install Dependencies
         run: pip install -r requirements.txt

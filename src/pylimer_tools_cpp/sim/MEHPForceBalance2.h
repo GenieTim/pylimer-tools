@@ -1690,7 +1690,24 @@ protected:
       // strand would not yet be marked as active, even though it is:
       // when one end is inactive,
       // because it is bifunctional and in a sandwich with the same entanglement
-      // link
+      // link (or entanglement spring pair)
+      const auto areSameEntanglement = [&net](const size_t linkA,
+                                              const size_t linkB) -> bool {
+        if (linkA == linkB) {
+          return true;
+        }
+        for (const size_t sIdx : net.strandIndicesOfLink[linkA]) {
+          if (net.springIndicesOfStrand[sIdx].size() == 1 &&
+              net.springIsEntanglement[net.springIndicesOfStrand[sIdx][0]]) {
+            const std::vector<size_t>& links = net.linkIndicesOfStrand[sIdx];
+            if (links.size() == 2 && (links[0] == linkB || links[1] == linkB)) {
+              return true;
+            }
+          }
+        }
+        return false;
+      };
+
       if (!isActive0) {
         const size_t crossLinkIdx0 = net.linkIndicesOfStrand[strandIdx][0];
         const size_t entanglementLinkIdx0 =
@@ -1699,20 +1716,22 @@ protected:
         assert(net.linkIsEntanglement[entanglementLinkIdx0]);
         for (const size_t strandOfXlink :
              net.strandIndicesOfLink[crossLinkIdx0]) {
-          if (strandOfXlink == strandIdx) {
+          if (strandOfXlink == strandIdx ||
+              net.linkIndicesOfStrand[strandOfXlink].size() < 2) {
             continue;
           }
           if (net.linkIndicesOfStrand[strandOfXlink][0] == crossLinkIdx0 &&
-              net.linkIndicesOfStrand[strandOfXlink][1] ==
-                entanglementLinkIdx0) {
+              areSameEntanglement(net.linkIndicesOfStrand[strandOfXlink][1],
+                                  entanglementLinkIdx0)) {
             isActive0 = true;
             // break;
           }
           if (net.linkIndicesOfStrand[strandOfXlink].back() == crossLinkIdx0 &&
-              net.linkIndicesOfStrand
+              areSameEntanglement(
+                net.linkIndicesOfStrand
                   [strandOfXlink]
-                  [net.linkIndicesOfStrand[strandOfXlink].size() - 2] ==
-                entanglementLinkIdx0) {
+                  [net.linkIndicesOfStrand[strandOfXlink].size() - 2],
+                entanglementLinkIdx0)) {
             isActive0 = true;
             // break;
           }
@@ -1729,20 +1748,22 @@ protected:
         assert(net.linkIsEntanglement[entanglementLinkIdxN]);
         for (const size_t strandOfXlink :
              net.strandIndicesOfLink[crossLinkIdxN]) {
-          if (strandOfXlink == strandIdx) {
+          if (strandOfXlink == strandIdx ||
+              net.linkIndicesOfStrand[strandOfXlink].size() < 2) {
             continue;
           }
           if (net.linkIndicesOfStrand[strandOfXlink][0] == crossLinkIdxN &&
-              net.linkIndicesOfStrand[strandOfXlink][1] ==
-                entanglementLinkIdxN) {
+              areSameEntanglement(net.linkIndicesOfStrand[strandOfXlink][1],
+                                  entanglementLinkIdxN)) {
             isActiveN = true;
             // break;
           }
           if (net.linkIndicesOfStrand[strandOfXlink].back() == crossLinkIdxN &&
-              net.linkIndicesOfStrand
+              areSameEntanglement(
+                net.linkIndicesOfStrand
                   [strandOfXlink]
-                  [net.linkIndicesOfStrand[strandOfXlink].size() - 2] ==
-                entanglementLinkIdxN) {
+                  [net.linkIndicesOfStrand[strandOfXlink].size() - 2],
+                entanglementLinkIdxN)) {
             isActiveN = true;
             // break;
           }
